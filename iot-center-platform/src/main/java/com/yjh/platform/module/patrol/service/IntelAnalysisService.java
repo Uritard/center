@@ -189,12 +189,111 @@ public class IntelAnalysisService {
                 AnalyseObject analyseObject = new AnalyseObject();
                 analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
-            }else {
+            } else if (Objects.equals("14", analysis.getAnalyseType())) {
+                // AnalyseType 14表示相机预置位偏移识别
+                list.add(pkPicAnalyseReqForPreset(analysis));
+            } else {
                 AnalyseObject analyseObject = setAnalyseObject(analysis);
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
             }
         }
         return list;
+    }
+
+    /**
+     * 将图片地址转成Analysis格式，并复用现有框架代码进行算法接口的调用
+     *
+     * @param picModelPath picModelPath
+     * @param picTargetPath picTargetPath
+     * @param idStr idStr
+     * @return result
+     */
+    public List<Analysis> getAnalysisList(String picModelPath, String picTargetPath, String idStr) {
+        Analysis analysis = new Analysis();
+        analysis.setAnalyseType("14");
+        analysis.setTaskId(idStr + "_presetCheck");
+        analysis.setInstanceId(-1L);
+        analysis.setPicPath(picTargetPath);
+        analysis.setPicModelPath(picModelPath);
+        analysis.setIsAi(1);
+
+        return Arrays.asList(analysis);
+    }
+
+    /**
+     * 组装PicAnalyseRequest参数，用于请求算法接口
+     *
+     * @param analysis analysis
+     * @return result
+     */
+    private PicAnalyseRequest pkPicAnalyseReqForPreset(Analysis analysis) {
+        PicAnalyseRequest picAnalyseRequest = new PicAnalyseRequest();
+        picAnalyseRequest.setRequestHostIp(algorithmConfig.getResultIp());
+        picAnalyseRequest.setRequestHostPort(algorithmConfig.getResultPort());
+        picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + analysis.getTaskId());
+        AnalyseObject analyseObject = pkAnalyseObjectForPreset(analysis);
+        picAnalyseRequest.setObjectList(Arrays.asList(analyseObject));
+        return picAnalyseRequest;
+    }
+
+    /**
+     * analysis生成AnalyseObject参数
+     *
+     * @param analysis analysis
+     * @return result
+     */
+    private AnalyseObject pkAnalyseObjectForPreset(Analysis analysis) {
+        AnalyseObject analyseObject = new AnalyseObject();
+
+        String instanceId = String.valueOf(analysis.getInstanceId());
+        analyseObject.setObjectId(instanceId);
+        String targetNamePath = upLoadFileByHttpPath(analysis.getPicPath());
+        String modelNamePath = upLoadFileByHttpPath(analysis.getPicModelPath());
+        List<String> imageUrlList = new ArrayList<>();
+        imageUrlList.add(targetNamePath);
+        analyseObject.setImageUrlList(imageUrlList);
+        analyseObject.setImageNormalUrlPath(modelNamePath);
+        analyseObject.setTypeList(Arrays.asList("tx_yzwpy"));
+        return analyseObject;
+    }
+
+    /**
+     * 将http地址所在的图片文件上传ftps，并返回ftps路径
+     *
+     * @param httpPath httpPath
+     * @return result
+     */
+    private String upLoadFileByHttpPath(String httpPath) {
+        try {
+            String[] split = httpPath.split("/");
+            String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
+            uploadFileToFtps(httpPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+            return targetNamePath;
+        } catch (Exception e) {
+            log.error("upLoadFileByHttpPath err, httpPath: {}, msg: {}", httpPath, e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 算法识别后的预置位结果解析，只有当返回结果确定偏移时，对redis中缓存状态数据进行更新
+     *
+     * @param response response
+     * @param flagId flagId
+     */
+    private void presetCheckHandle(PicAnalyseResponse response, String flagId) {
+        try {
+            // 只有识别结果明确为偏移时才去修改redis
+            if ("1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
+                String[] arr = flagId.split("_");
+                Long cameraId = Long.parseLong(arr[0]);
+                Long presetId = Long.parseLong(arr[1]);
+                String key = String.format("CAMERA_PRESET_CHECK_RESULT_%d", cameraId);
+                redisTemplate.opsForHash().put(key, presetId, -1);
+            }
+        } catch (Exception e) {
+            log.error("presetCheckHandle fail, flagId: {}, err: {}", flagId, e.getMessage());
+        }
     }
 
     /**
@@ -379,6 +478,11 @@ public class IntelAnalysisService {
         // 算法接口测试
         if (Objects.equals("666666", flagId)){
             algorithmTestHandle(response);
+            return;
+        }
+        // 预置位偏移识别，flagId包含cameraId和presetId
+        if (flagId.endsWith("presetCheck")) {
+            presetCheckHandle(response, flagId);
             return;
         }
         // 普通图像分析

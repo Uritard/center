@@ -9,7 +9,9 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
@@ -481,21 +483,20 @@ public class TCameraPresetService {
         return resultMap;
     }
 
+    /**
+     * 异步线程进行相机预置位偏移校验，将校验结果实时写入redis
+     *
+     * @param cameraId cameraId
+     */
     private void cameraPresetCheck(Long cameraId) {
-        // 获取该相机所有预置位（含库中PTZ值）
-        // 批量查询相机各个预置位对应的PTZ值
-        // 比对库中PTZ与相机当前获取到的PTZ，结果不同标记-1，相同标记1
-        // 根据抓图比对配置项开关，确定是否抓图，如果抓图，
-        // 将标记1的预置位传给相机进行批量抓图；
-        // 获取库中所有预置位对应图片，一起发送到算法测进行二次比对；
-        // 比对通过标记1，否则标记-1；
-        // 将比对结果写入redis中
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    checkCameraPreset(cameraId);
+                    // 先获取锁，再进行处理
+                    if (getLock(cameraId)) {
+                        checkCameraPreset(cameraId);
+                    }
                 } catch (Exception e) {
                     log.error("预置位校验失败，错误: {}" + e.getMessage());
                 }
@@ -512,12 +513,6 @@ public class TCameraPresetService {
      */
     private void checkCameraPreset(Long cameraId) {
         try {
-            // 获取锁
-            if (!getLock(cameraId)) {
-                // 已有任务正在处理，不再重复校验
-                return;
-            }
-
             List<TCameraPreset> presetList = getAllCameraPreset(cameraId);
             if (CollectionUtils.isEmpty(presetList)) {
                 return;
@@ -543,11 +538,16 @@ public class TCameraPresetService {
     }
 
     /**
-     *  加锁
+     *  加锁，因为setIfAbsent操作无法设置超时时间，只能采用普通设值的方式
      **/
     public Boolean getLock(Long cameraId){
-        String locoKey = getPresetRedisLockByCameraId(cameraId);
-        return this.redisTemplate.opsForValue().setIfAbsent(locoKey, locoKey);
+        String lockKey = getPresetRedisLockByCameraId(cameraId);
+        if (redisTemplate.opsForValue().get(lockKey) == null) {
+            redisTemplate.opsForValue().set(lockKey, lockKey, 30, TimeUnit.MINUTES);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -611,28 +611,15 @@ public class TCameraPresetService {
             }
 
             // 判断是都需要调用算法接口进行图片比对
-            if (!cameraPresetSecondCheck) {
-                return 1;
+            if (cameraPresetSecondCheck) {
+                String idStr = String.format("%d_%d", tCameraPreset.getCameraId(), tCameraPreset.getPresetId());
+                sendPicToAnalyse(picOnline, tCameraPreset.getPresetImg(), idStr);
             }
 
-            return checkPresetByPic(tCameraPreset, picOnline);
+            return 1;
         } catch (Exception e) {
             log.error("checkOnePreset err: {}", e.getMessage());
-            return -1;
-        }
-    }
-
-    /**
-     * 对预置位进行图片校验
-     *
-     * @param tCameraPreset tCameraPreset
-     * @return result
-     */
-    private Integer checkPresetByPic(TCameraPreset tCameraPreset, String picOnline) {
-        if (sendPic(picOnline, tCameraPreset.getPresetImg())) {
             return 1;
-        } else {
-            return -1;
         }
     }
 
@@ -673,8 +660,16 @@ public class TCameraPresetService {
      * @param pic2 pic2
      * @return result
      */
-    private boolean sendPic(String pic1, String pic2) {
+    private boolean sendPicToAnalyse(String pic1, String pic2, String idStr) {
         // 发送预置位图片和实时抓取图片到算法，进行对比
+        // 调用智能分析主机接口进行分析
+        try {
+            List<Analysis> analysisList = intelAnalysisService.getAnalysisList(pic1, pic2, idStr);
+            intelAnalysisService.picAnalyseNoDetection(analysisList);
+        }catch (Exception e){
+            log.error("调用智能分析主机进行缺陷分析异常：", e);
+        }
+
         return true;
     }
 
