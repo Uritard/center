@@ -555,11 +555,13 @@ public class SendToUpSystemServices {
 
     public String createHostModel(String path, String stationCode) throws Exception {
         //巡视主机模型
+
+        String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+
         List<Map<String, Object>> finalList = new ArrayList<>();
         Map<String, Object> host = new HashMap<>();
         host.put("station_name", getStationName());
         host.put("station_code", stationCode);
-        host.put("patroldevice_name", "巡视主机");
         host.put("patroldevice_code", "YJH-001");
         host.put("device_model", "YJH");
         host.put("manufacturer", "亿嘉和");
@@ -571,7 +573,13 @@ public class SendToUpSystemServices {
         host.put("use_mode", "");
         host.put("video_mode", "");
         host.put("place", "");
-        host.put("type", "20");
+        if ("1".equals(edgeLevel)){
+            host.put("type", "21");
+            host.put("patroldevice_name", "边缘节点");
+        } else {
+            host.put("type", "20");
+            host.put("patroldevice_name", "巡视主机");
+        }
         host.put("patroldevice_info", "");
         host.put("robots_code", "");
         finalList.add(host);
