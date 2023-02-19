@@ -196,12 +196,10 @@ public class TStdDeviceModelService {
      */
     private void dealCameraPresetImage(TCameraPreset tCameraPreset, String ftpsPath,
                                        String presetPath, String presetRealPath) {
-        log.info("处理预置位图片");
         //当节点为巡视主机接入边缘节点时再触发
         if (StringUtils.isNotEmpty(tCameraPreset.getPresetImg())) {
             String imgPath = tCameraPreset.getPresetImg().replace(presetRealPath, "")
                     .replace(String.valueOf(tCameraPreset.getPresetId()), tCameraPreset.getOriginId());
-            log.info("预置位路径{}", imgPath);
             String presetFtpsImg = ftpsPath + imgPath;
             String newPresetImagePath = imgPath.replace(tCameraPreset.getOriginId(), tCameraPreset.getPresetId().toString());
             String presetImg = presetPath + newPresetImagePath;
