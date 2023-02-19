@@ -1340,3 +1340,8 @@ INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `c
 INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (3, '秒级静默任务','', -1);
 INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600);
 INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120);
+
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('901', '1', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('902', '2', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('903', '3', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('904', '4', NULL);

@@ -951,8 +951,8 @@
     <select id="selectTaskPriorityConfigList" resultType="java.util.Map">
         SELECT
         a.prioritized_task_type AS type,
-        a.execute_level AS LEVEL,
-        b.dict_note AS NAME
+        a.execute_level AS level,
+        b.dict_note AS name
         FROM
         t_task_priority_config a
         LEFT JOIN t_dict_business b ON a.prioritized_task_type = b.dict_code
