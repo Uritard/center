@@ -22,12 +22,18 @@ public class ProcessManager {
     private RedisTemplate redisTemplate;
 
     private final ConcurrentHashMap<Long, AutoRecoveredProcessRunner> runnerMap = new ConcurrentHashMap<Long, AutoRecoveredProcessRunner>();
+    private final ConcurrentHashMap<Long, AutoRecoveredProcessRunner> runnerBackMap = new ConcurrentHashMap<Long, AutoRecoveredProcessRunner>();
 
     public void run(VideoInfo videoInfo) throws RuntimeException, Exception {
         if (Optional.ofNullable(runnerMap.get(videoInfo.getId())).isPresent()) {
-            AutoRecoveredProcessRunner runner = runnerMap.get(videoInfo.getId());
-            runner.setStartTime(System.currentTimeMillis());
-            return;
+            if (videoInfo.getBack()) {
+                this.terminate(videoInfo.getId());
+            }
+            else {
+                AutoRecoveredProcessRunner runner = runnerMap.get(videoInfo.getId());
+                runner.setStartTime(System.currentTimeMillis());
+                return;
+            }
         }
 
         List<String> cmd = new ArrayList<>();

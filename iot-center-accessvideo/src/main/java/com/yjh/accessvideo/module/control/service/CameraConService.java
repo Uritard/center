@@ -388,7 +388,6 @@ public class CameraConService {
         return returnLightMap;
     }
 
-    //@Logs(title = "视频回放", code = "cameraPlayBack")
     @Transactional(rollbackFor = Exception.class)
     @SuppressWarnings("unchecked")
     public Map<String, Object> startPlayBack(Long cameraId, String startTime, String stopTime) {
@@ -440,6 +439,47 @@ public class CameraConService {
                             "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id);
+            manager.run(videoInfo);
+
+            String[] rtmpUrls = transUrl.split("rtmp");
+            String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
+
+            returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
+            returnMap.put("rtmpUrl", rtmpUrl);
+            String webRtc = "webrtc://" + hostIp + "/history/" + id;
+            returnMap.put("webRtcUrl", webRtc);
+            isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return returnMap;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> startVideoBack(String token,
+        Long cameraId, String startTime, String stopTime) {
+        Map<String, Object> returnMap = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
+            String password = cameraConInfo.getIdentityCode();    //nvr 密码
+            String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
+            int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
+            int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
+
+            String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
+            String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
+            String starttime = startTimeTem.replace(" ", "Z");
+            String endtime = stopTimeTem.replace(" ", "Z");
+
+            Long id = Long.parseLong(token);
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1,
+                    starttime, endtime, id);
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
+                            "historyPath:{}, historyTransUrl: {}"
+                    , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
+            VideoInfo videoInfo = new VideoInfo().setBack(true).setCommand(transUrl).setId(id);
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");

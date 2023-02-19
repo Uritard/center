@@ -236,6 +236,28 @@ public class CameraConController {
         }
         return result;
     }
+
+    @ApiOperation(value = "视频回放")
+    @RequestMapping(value = "/startVideoBack", method = RequestMethod.GET)
+//    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
+    public Result startVideoBack(HttpServletRequest request,
+        @RequestParam(value = "cameraId") Long cameraId,
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "stopTime") String stopTime) {
+        Result result = new Result();
+        try {
+            String token = request.getHeader("token");
+            log.info("token:{}",token);
+            result.setData(cameraConService.startVideoBack(token, cameraId, startTime, stopTime));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("视频回放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "机器人视频回放")
     @RequestMapping(value = "/startRobotPlayBack",method = RequestMethod.GET)
     public Result startRobotPlayBack(@RequestParam(value = "robotId")Long robotId,
