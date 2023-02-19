@@ -93,14 +93,15 @@ public class NonhomologousWarnThread implements Runnable{
                     log.info("robotInsResult === {}, videoInsResult === {}, 阈值 === {}, cruiseStatus === {}， 非同源告警另一个任务未完成", robotInsResult, videoInsResult, warnThreshold, cruiseStatus);
                     continue;
                 }
-
+                log.info("非同源告警---,redisInfoMap==={}", redisInfoMap);
                 // 1-红外 2-位置 3-表计数显 4-表计指针 5-相别 6-区间 7-五次不变
                 switch (warnType){
                     case "1":
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotBlank(redisInfoMap.get("resultNum"))
+                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             videoInsResult = StringUtils.substringBefore(videoInsResult, ",");
@@ -113,14 +114,15 @@ public class NonhomologousWarnThread implements Runnable{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},红外非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
                             }
                         }else{
-                            log.info("非同源告警---结果为空或告警已存在,redismap==={}", redisInfoMap);
+                            log.info("非同源告警---结果为空或告警已存在!");
                         }
                         break;
                     case "2":
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
+                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
@@ -130,14 +132,15 @@ public class NonhomologousWarnThread implements Runnable{
                                 log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果", robotInsResult, videoInsResult);
                             }
                         }else{
-                            log.info("非同源告警---结果为空或告警已存在,redismap==={}", redisInfoMap);
+                            log.info("非同源告警---结果为空或告警已存在!");
                         }
                         break;
                     case "3":
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
+                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
@@ -147,14 +150,15 @@ public class NonhomologousWarnThread implements Runnable{
                                 log.info("robotInsResult为==={},videoInsResult为==={},表计-数显非同源告警--结果不一致", robotInsResult, videoInsResult);
                             }
                         }else{
-                            log.info("非同源告警---结果为空或告警已存在,redismap==={}", redisInfoMap);
+                            log.info("非同源告警---结果为空或告警已存在!");
                         }
                         break;
                     case "4":
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
+                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
@@ -166,7 +170,7 @@ public class NonhomologousWarnThread implements Runnable{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},表计-指针非同源告警--数据非数字", robotInsResult, videoInsResult,warnThreshold);
                             }
                         }else{
-                            log.info("非同源告警---结果为空或告警已存在,redismap==={}", redisInfoMap);
+                            log.info("非同源告警---结果为空或告警已存在!");
                         }
                         break;
                     case "6":

@@ -31,6 +31,35 @@ public class FileUtil {
         }
     }
     /**
+     * 删除文件
+     * @param path
+     */
+    public static void deleteFile(String path){
+        File file = new File(path);
+
+        if(file.delete()){
+            log.info("Delete the file + {} success", file.getName());
+        }else {
+            log.warn("Delete the file + {} failed", file.getName());
+        }
+    }
+
+    public static void deleteDirectory(String path) {
+        File dir = new File(path);
+
+        if(!dir.isDirectory()) {
+            System.out.println("Not a directory. Do nothing");
+            return;
+        }
+        File[] listFiles = dir.listFiles();
+        for(File file : listFiles){
+            System.out.println("Deleting "+file.getName());
+            file.delete();
+        }
+        System.out.println("Deleting Directory. Success = "+dir.delete());
+    }
+
+    /**
      * 获取文件的绝对保存路径
      *
      * @return
