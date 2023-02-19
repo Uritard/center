@@ -36,5 +36,11 @@ public class TaskSimpleInfo implements Serializable {
     @ApiModelProperty(value = "机器人点位")
     private Long robotPointsCount;
 
+    @ApiModelProperty(value = "无人机点位")
+    private Long dronePointsCount;
+
+    @ApiModelProperty(value = "声纹设备点位")
+    private Long voicePointsCount;
+
 
 }
