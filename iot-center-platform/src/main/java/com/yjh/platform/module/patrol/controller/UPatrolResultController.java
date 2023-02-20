@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.UPatrolResultService;
@@ -74,14 +75,19 @@ public class UPatrolResultController {
             }
             List<Long> deviceIdList = new ArrayList<>();
             if (regionId == null){
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
-                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                deviceIdList =  null;
             }else {
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
-                if (regionIdList != null && !regionIdList.isEmpty()){
-                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                //判断是否是根节点
+                TStdRegion rootRegion = tStdRegionService.selectByPrimaryId(regionId);
+                if (rootRegion.getUpRegionId() == -1){
+                    deviceIdList = null;
                 }else {
-                    deviceIdList.add(regionId);
+                    List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                    if (regionIdList != null && !regionIdList.isEmpty()) {
+                        deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                    } else {
+                        deviceIdList.add(regionId);
+                    }
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
@@ -155,14 +161,19 @@ public class UPatrolResultController {
             }
             List<Long> deviceIdList = new ArrayList<>();
             if (regionId == null){
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
-                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                deviceIdList =  null;
             }else {
-                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
-                if (regionIdList != null && !regionIdList.isEmpty()){
-                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                //判断是否是根节点
+                TStdRegion rootRegion = tStdRegionService.selectByPrimaryId(regionId);
+                if (rootRegion.getUpRegionId() == -1){
+                    deviceIdList = null;
                 }else {
-                    deviceIdList.add(regionId);
+                    List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                    if (regionIdList != null && !regionIdList.isEmpty()) {
+                        deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                    } else {
+                        deviceIdList.add(regionId);
+                    }
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
