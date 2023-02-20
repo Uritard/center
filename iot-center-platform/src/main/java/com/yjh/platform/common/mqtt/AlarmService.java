@@ -54,7 +54,7 @@ public class AlarmService {
     }
 
     private String encode(String str){
-        return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        return str;
     }
     /**
      * 转发给platform的mqtt/postMqttMsg接口。后续需要各模块统一一下，是否都走platform
