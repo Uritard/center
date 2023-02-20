@@ -83,6 +83,10 @@ public class TaskJob extends QuartzJobBean {
             log.error(e.getMessage(), e);
         }
 
+        if (task == null || ancestralTask == null){
+            log.error("{} 任务初始化记录不存在，任务已经过期或删除", taskId);
+        }
+
         List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, date, null);
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             if (tCruiseTaskDelList != null && tCruiseTaskDelList.size() > 0) {

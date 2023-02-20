@@ -1199,14 +1199,8 @@ public class UPatrolTaskService {
                 }
                 //删除整个周期任务
                 log.info("del taskId..." + taskId + ", startTime; " + startTime);
-                log.info("taskMap..." + Constant.taskMap);
-                for (ConcurrentHashMap<String, Object> mapItem : Constant.taskMap) {
-                    //找到任务Id
-                    if (mapItem.get("taskId").equals(taskId)) {
-                        JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
-//                        Constant.taskMap.remove(mapItem);
-                    }
-                }
+                JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName);
+
                 log.info("taskMap del..." + Constant.taskMap);
                 log.info("del task totally...");
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
@@ -1215,15 +1209,7 @@ public class UPatrolTaskService {
                 return uPatrolTaskDao.deleteByPrimaryId(taskId);
             }
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
-            //删除定时任务
-            for (ConcurrentHashMap<String, Object> mapItem : Constant.taskMap) {
-                //找到任务Id
-                if (mapItem.get("taskId").equals(taskId)) {
-                    //删除定时任务
-                    JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
-//                    Constant.taskMap.remove(mapItem);
-                }
-            }
+            JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName);
         }
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条

@@ -305,13 +305,8 @@ public class JobManager {
         }
         JobDetail jobDetail = JobBuilder.newJob(TaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", task.getTaskId()).build();
-        taskMap.put("taskId",task.getTaskId());
-        taskMap.put("jobName",quartzTask.getJobName()+System.currentTimeMillis());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
+
+        String str = quartzTask.getJobName() + "_trg";
         Trigger trigger = null;
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             trigger = TriggerBuilder.newTrigger()
