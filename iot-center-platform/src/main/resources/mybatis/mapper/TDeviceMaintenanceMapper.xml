@@ -370,7 +370,7 @@
         </if>
     </select>
     <select id="selectOnlineRobot" resultType="java.lang.String">
-        SELECT
+        SELECT DISTINCT
         a.robot_code
         FROM
         t_robot_info a
