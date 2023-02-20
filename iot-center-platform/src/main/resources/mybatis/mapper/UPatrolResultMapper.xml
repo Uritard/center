@@ -666,9 +666,10 @@
                 FROM
                     t_cruise_point_instance a
                         LEFT JOIN u_patrol_task_attr c ON a.instance_id = c.instance_id
+                        LEFT JOIN u_patrol_task d ON c.task_id = d.task_code
                 WHERE
                     a.cruise_type=dict_code
-                  AND c.task_id=#{taskId,jdbcType=VARCHAR}
+                  AND d.task_id=#{taskId,jdbcType=VARCHAR}
             ) AS "Count"
         FROM
             t_dict_business
