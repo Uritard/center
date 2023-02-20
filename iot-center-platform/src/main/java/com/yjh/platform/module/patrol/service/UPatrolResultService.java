@@ -55,19 +55,13 @@ public class UPatrolResultService {
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
-        List<TCruiseResultExpand> list = new ArrayList<>();
-        if (deviceIdList != null && !deviceIdList.isEmpty()) {
-            list =
-                uPatrolResultDao.selectTaskByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
-                    isCheck);
-        }
-        return list;
+        return uPatrolResultDao.selectTaskByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
+                isCheck);
     }
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
         String startTime, String endTime, List<Long> deviceIdList, String customId) {
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
-        if (deviceIdList != null && !deviceIdList.isEmpty()) {
             cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
                     customId);
@@ -77,7 +71,6 @@ public class UPatrolResultService {
                     c.setEdgeName(currentEdge);
                 }
             });
-        }
         return cruiseResultDetailList;
     }
 
