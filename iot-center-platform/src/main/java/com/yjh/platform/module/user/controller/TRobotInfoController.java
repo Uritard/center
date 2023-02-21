@@ -50,15 +50,15 @@ public class TRobotInfoController {
     }
 
     /**
-     * 新增机器人履历信息
+     * 新增机器人或无人机履历信息
      *
      * @param request request
      * @param tRobotInfo tRobotInfo
      * @return result
      */
-    @ApiOperation(value = "插入机器人履历信息")
+    @ApiOperation(value = "插入履历信息")
     @PostMapping(value = "/addResumeInfo")
-    @Logs(title = "新增机器人履历信息",content = "根据用户传递的参数新增机器人履历信息",logType = 2,authority = "1234", codeName="droneType")
+    @Logs(title = "新增履历信息",content = "根据用户传递的参数新增机器人或无人机履历信息",logType = 2,authority = "1234", codeName="droneType")
     public Result insertRobotResumeInfo(HttpServletRequest request, @Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
