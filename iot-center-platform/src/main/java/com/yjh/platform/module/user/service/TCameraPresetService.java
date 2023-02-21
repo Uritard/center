@@ -606,7 +606,7 @@ public class TCameraPresetService {
             String picOnline = "";
             if (resultMap != null && resultMap.size() > 0) {
                 onLinePTZStr = resultMap.get("cameraPtz").toString();
-                picOnline = resultMap.get("urlPath").toString();
+                picOnline = resultMap.get("absPath").toString();
             }
 
             if (!cmpPTZ(onLinePTZStr, tCameraPreset.getPresetPtz())) {

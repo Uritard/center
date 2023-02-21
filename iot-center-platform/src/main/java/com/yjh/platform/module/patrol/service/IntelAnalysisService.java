@@ -248,7 +248,9 @@ public class IntelAnalysisService {
 
         String instanceId = String.valueOf(analysis.getInstanceId());
         analyseObject.setObjectId(instanceId);
-        String targetNamePath = upLoadFileByHttpPath(analysis.getPicPath());
+
+        String picPath = analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString());
+        String targetNamePath = upLoadFileByHttpPath(picPath);
         String modelNamePath = upLoadFileByHttpPath(analysis.getPicModelPath());
         List<String> imageUrlList = new ArrayList<>();
         imageUrlList.add(targetNamePath);
@@ -285,7 +287,8 @@ public class IntelAnalysisService {
     private void presetCheckHandle(PicAnalyseResponse response, String flagId) {
         try {
             // 只有识别结果明确为偏移时才去修改redis
-            if ("1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
+            if ("2000".equals(response.getResultsList().get(0).getResults().get(0).getCode())
+                && "1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
                 String[] arr = flagId.split("_");
                 Long cameraId = Long.parseLong(arr[0]);
                 Long presetId = Long.parseLong(arr[1]);
