@@ -451,7 +451,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "导出模型文件")
     @RequestMapping(value = "/downloadModel",method = RequestMethod.GET)
-    @Logs(title = "导出模型文件",content = "导出模型文件",logType = 4)
+    @Logs(title = "导出模型文件",content = "导出模型文件",logType = 9)
     public Result downloadModel(@RequestParam(value="type")String type){
         Result result=new Result();
         try{

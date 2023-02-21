@@ -493,7 +493,7 @@
     </select>
     <select id="selectForTaskInstanceId" resultType="java.lang.String">
         SELECT
-            a.origin_id
+            a.instance_id
         FROM
             t_cruise_point_instance a
                 LEFT JOIN t_std_devicemete b on b.device_mete_id = a.device_mete_id

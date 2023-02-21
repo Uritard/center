@@ -291,25 +291,26 @@ public class UPatrolTaskService {
     }
 
     private void setLevel(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
-        Object level1 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "901", "level");
-        Object level3 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "903", "level");
-        Object level4 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
+        String level1 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "901", "level");
+        String level2 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "902", "level");
+        String level3 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "903", "level");
+        String level4 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
         Integer ifRun = uPatrolTask.getExecuteType();
         if (tCruiseTaskAdd.getTaskLevel() == null) {
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
             if("3".equals(sysLevel)) {
                 // 上级系统
-                uPatrolTask.setTaskLevel(2);
+                uPatrolTask.setTaskLevel(NumberUtils.toInt(level2, 2));
                 return;
             }
             if (Objects.equals("0", tCruiseTaskAdd.getUnionTaskStatus()) || tCruiseTaskAdd.getUnionTaskStatus() == null) {
                 if (Objects.equals(TaskTypeEnum.NOW.getType(), ifRun)) {
-                    uPatrolTask.setTaskLevel(Objects.isNull(level3) ? 3 : Integer.parseInt(String.valueOf(level3)));
+                    uPatrolTask.setTaskLevel(NumberUtils.toInt(level3, 3));
                 } else {
-                    uPatrolTask.setTaskLevel(Objects.isNull(level1) ? 1 : Integer.parseInt(String.valueOf(level1)));
+                    uPatrolTask.setTaskLevel(NumberUtils.toInt(level1, 1));
                 }
             } else {
-                uPatrolTask.setTaskLevel(Objects.isNull(level4) ? 4 : Integer.parseInt(String.valueOf(level4)));
+                uPatrolTask.setTaskLevel(NumberUtils.toInt(level4, 4));
             }
         }
     }
