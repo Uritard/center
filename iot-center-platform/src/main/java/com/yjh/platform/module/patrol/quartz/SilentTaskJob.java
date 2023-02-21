@@ -179,8 +179,8 @@ public class SilentTaskJob implements Runnable {
 
             //上传图片
             String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            String ftpsTarPath = edgeCode+"/jm/"+stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+            String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
             FtpsUtil.putFile(absPath, ftpsTarPath, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
             xmlItem.put("file_path", ftpsTarPath);
