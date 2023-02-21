@@ -594,12 +594,15 @@ public class TRobotInfoService{
      */
     private String getMergeInfo(String insertInfoStr, String oriInfoStr) {
         if (!StringUtils.isEmpty(insertInfoStr)) {
-        return new StringBuilder()
-            .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
-            .append(" ")
-            .append(insertInfoStr)
-            .append("\r\n")
-            .append(oriInfoStr).toString().trim();
+            StringBuilder sb = new StringBuilder()
+                .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
+                .append(" ")
+                .append(insertInfoStr);
+            if (!StringUtils.isEmpty(oriInfoStr)) {
+                sb.append(oriInfoStr);
+            }
+
+            return sb.toString().trim();
         } else {
             return oriInfoStr;
         }
