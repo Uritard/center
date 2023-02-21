@@ -128,6 +128,29 @@ public class RobotService {
         return tRobotInfoDao.updateAllRobotStatus("离线");
     }
 
+    private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
+    static {
+        NEED_CONFIRM_SET.add("1_1"); // 机器人远方复位
+        NEED_CONFIRM_SET.add("1_3"); // 机器人一键返航
+        NEED_CONFIRM_SET.add("1_5"); // 机器人控制模式切换
+        NEED_CONFIRM_SET.add("1_6"); // 机器人控制权获得
+        NEED_CONFIRM_SET.add("3_9"); // 机器人云台复位
+        NEED_CONFIRM_SET.add("22_8"); // 机器人红外热像仪重启
+        NEED_CONFIRM_SET.add("21_8"); // 机器人可见光摄像机重启
+        NEED_CONFIRM_SET.add("20001_2"); //无人机系统自检
+        NEED_CONFIRM_SET.add("20001_3"); //无人机一键返航
+        NEED_CONFIRM_SET.add("20001_4"); //无人机自动降落
+        NEED_CONFIRM_SET.add("20001_5"); //无人机控制模式
+        NEED_CONFIRM_SET.add("20001_6"); //无人机控制权获得
+        NEED_CONFIRM_SET.add("20001_7"); //无人机控制权释放
+        NEED_CONFIRM_SET.add("20001_8"); //无人机电源管理
+        NEED_CONFIRM_SET.add("20002_7"); //无人机急停
+        NEED_CONFIRM_SET.add("20003_5"); //无人机云台重置
+        NEED_CONFIRM_SET.add("20005_1"); //机巢
+        NEED_CONFIRM_SET.add("20005_2"); //机巢急停
+        NEED_CONFIRM_SET.add("20005_3"); //机巢舱门
+    }
+
     /**
      * 巡视主机下发控制指令到机器人
      *
@@ -148,98 +171,15 @@ public class RobotService {
         String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
         Map scmap = new HashMap();
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
-        if (command.equals("1") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if (command.equals("3") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if (command.equals("5") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if (command.equals("6") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if (command.equals("9") && type.equals("3")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if (command.equals("8") && type.equals("22")) {
+
+        String typeCommand = type + "_" + command;
+        if (NEED_CONFIRM_SET.contains(typeCommand)) {
             Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         }
-        if ("2".equals(command) && "20001".equals(type)) { //无人机系统自检
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("3".equals(command) && "20001".equals(type)) { //无人机一键返航
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("4".equals(command) && "20001".equals(type)) { //无人机自动降落
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("5".equals(command) && "20001".equals(type)) { //无人机控制模式
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("6".equals(command) && "20001".equals(type)) { //无人机控制权获得
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("7".equals(command) && "20001".equals(type)) { //无人机控制权释放
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("8".equals(command) && "20001".equals(type)) { //无人机电源管理
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        }else if ("7".equals(command) && "20002".equals(type)) { //无人机急停
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("5".equals(command) && "20003".equals(type)) { //无人机云台重置
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("1".equals(command) && "20005".equals(type)) { //机巢
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("2".equals(command) && "20005".equals(type)) { //机巢急停
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        } else if ("3".equals(command) && "20005".equals(type)) { //机巢舱门
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
-            if (zcz.get("code") != null) {
-                return zcz;
-            }
-        }
+
         List<Map<String, Object>> item = new LinkedList<>();
         Map<String, Object> map = new HashMap<>(3);
         if (StringUtils.isNotEmpty(value)) {

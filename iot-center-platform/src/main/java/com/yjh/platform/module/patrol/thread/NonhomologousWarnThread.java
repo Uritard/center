@@ -78,6 +78,7 @@ public class NonhomologousWarnThread implements Runnable{
         Map<String, String> cruiseResultMap = new HashMap<>(4);
         cruiseResultMap.put("deviceId", robotPatrolTaskAlarm.getDeviceId());
         List<Map<String, Object>> list = nonhomologousWarnDao.getNonhomologousInspections(cruiseResultMap);
+        log.info("非同源告警配置 === {}", JSON.toJSONString(list));
         for(Map<String, Object> map : list){
             if (!Objects.isNull(map.get("oneCruiseName")) && !Objects.isNull(map.get("warnType"))){
                 String warnType = String.valueOf(map.get("warnType"));
@@ -89,20 +90,16 @@ public class NonhomologousWarnThread implements Runnable{
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskCode + ":" +  map.get("oldId"));
                 String videoInsResult = redisInfoMap.get("resultNum");
                 int cruiseStatus = MapUtils.getIntValue(redisInfoMap,"cruiseStatus", CruiseConstant.CRUISE_STATE_UN);
-                if (CruiseConstant.CRUISE_STATE_UN == cruiseStatus || CommonUtils.isEmptyOrNullstr(videoInsResult)) {
-                    log.info("robotInsResult === {}, videoInsResult === {}, 阈值 === {}, cruiseStatus === {}， 非同源告警另一个任务未完成", robotInsResult, videoInsResult, warnThreshold, cruiseStatus);
+                boolean isRunning = !MapUtils.isEmpty(redisInfoMap) && (CruiseConstant.CRUISE_STATE_UN == cruiseStatus || CommonUtils.isEmptyOrNullstr(videoInsResult));
+                if (isRunning) {
+                    log.info("robotInsResult === {}, videoInsResult === {}, 阈值 === {}, cruiseStatus === {}，redisInfoMap === {}, 非同源告警另一个任务未完成", robotInsResult, videoInsResult, warnThreshold, cruiseStatus, JSON.toJSONString(redisInfoMap));
                     continue;
                 }
                 log.info("非同源告警---,redisInfoMap==={}", redisInfoMap);
                 // 1-红外 2-位置 3-表计数显 4-表计指针 5-相别 6-区间 7-五次不变
                 switch (warnType){
                     case "1":
-                        if (Objects.isNull(map.get("oneCruiseName"))){
-                            break;
-                        }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotBlank(redisInfoMap.get("resultNum"))
-                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
-                                && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
+                        if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             videoInsResult = StringUtils.substringBefore(videoInsResult, ",");
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
@@ -118,12 +115,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "2":
-                        if (Objects.isNull(map.get("oneCruiseName"))){
-                            break;
-                        }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
-                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
-                                && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
+                        if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
                                 String warnContent = "位置状态非同源结果不一致";
@@ -136,12 +128,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "3":
-                        if (Objects.isNull(map.get("oneCruiseName"))){
-                            break;
-                        }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
-                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
-                                && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
+                        if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
                                 String warnContent = "数显类表计识别非同源结果不一致";
@@ -154,12 +141,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "4":
-                        if (Objects.isNull(map.get("oneCruiseName"))){
-                            break;
-                        }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("resultNum"))
-                                && !StringUtils.equals("null", redisInfoMap.get("resultNum"))
-                                && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
+                        if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
                                 if(Math.abs(Double.parseDouble(robotInsResult) - Double.parseDouble(videoInsResult)) > Double.parseDouble(warnThreshold)){
