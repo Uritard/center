@@ -641,11 +641,11 @@ public class UPatrolTaskService {
             map.put("taskSource", "1");
             map.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
         }
-        if (!"1".equals(map.get("taskSource"))) {
+        /*if (!"1".equals(map.get("taskSource"))) {
             log.info("Task create by self, don`t continue, taskId: {}", taskId);
             redisTemplate.opsForHash().put(key, "taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             return;
-        }
+        }*/
 
         try {
             if (TASK_STATE_NOT_START == MapUtils.getIntValue(map, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
@@ -655,14 +655,22 @@ public class UPatrolTaskService {
                 log.info("TaskResult start, taskId: {}", taskId);
                 uPatrolResultDao.update(result);
             }
-
+            //任务暂停继续处理
+            if (TASK_STATE_PAUSE == taskState) {
+                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_PAUSE);
+                uPatrolResultDao.update(result);
+            } else if (TASK_STATE_EXECUTING == taskState) {
+                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_EXECUTING);
+                uPatrolResultDao.update(result);
+            }
+            map.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             map.put("taskState", String.valueOf(taskState));
             String progress = robotPatrolTaskStatus.getTaskProgress();
             if (StringUtils.contains(progress, "%")) {
                 float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
                 progress = CommonUtils.percentFormat(pf, "#.####");
             }
-            if (NumberUtils.isCreatable(progress)) {
+            if ("1".equals(map.get("taskSource")) && NumberUtils.isCreatable(progress)) {
                 map.put("taskProgress", progress);
             }
             map.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
@@ -1675,7 +1683,25 @@ public class UPatrolTaskService {
             // 巡视结果上报上一级系统
             processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
             //任务状态上报站端
-            sendTaskStateToUp(taskId, 2);
+            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+            Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            int taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
+            int state = 2;
+            switch (taskStatus) {
+                case TASK_STATE_PAUSE:
+                    state = 3;
+                    break;
+                case TASK_STATE_INTERRUPT:
+                case TASK_STATE_ABNORMAL:
+                    state = 4;
+                    break;
+                case TASK_STATE_TIMEOUT:
+                    state = 6;
+                    break;
+                default:
+                    break;
+            }
+            sendTaskStateToUp(taskId, state);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
