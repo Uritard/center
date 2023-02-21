@@ -23,18 +23,19 @@
             <el-button type="primary" @click="severSend">服务端发送消息</el-button>
             <el-button type="primary" @click="resetData">重置发送报文</el-button>
             <el-button type="primary" @click="resetTextReception">重置接收报文</el-button>
+            <el-button type="primary" @click="gotoBatchTask">并发测试</el-button>
           </el-form-item>
         </el-form>
       </div>
       <el-input
           type="textarea"
-          :rows="14"
+          :rows="20"
           placeholder="请输入报文"
           v-model="textarea">
       </el-input>
     </div>
     <div class="reception">
-      <el-scrollbar style="width: 100%;">
+      <el-scrollbar style="width: 1920px;height: 500px;">
       <div v-for="item in textReceptionList" class="text-reception" v-text="item.name"></div>
       </el-scrollbar>
     </div>
@@ -48,7 +49,7 @@ export default {
   name: "test",
   data() {
     return {
-      wsIp:'ws://127.0.0.1:18088/demo/message',
+      wsIp:'ws://192.168.20.11:18088/demo/message',
       ws_platform: null,
       textarea:'<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
@@ -76,6 +77,9 @@ export default {
         let oo = JSON.parse(msgData);
         this.textReceptionList.push({name:oo.data.xml});
       })
+    },
+    gotoBatchTask() {
+      this.$router.push('/batchTask');
     },
     onSend() {
     },
@@ -147,7 +151,7 @@ export default {
 }
 .send {
   width: 100%;
-  height: 318px;
+  height: 50%;
   border: 1px solid #0AAFB7;
   .connect {
     width: 100%;
@@ -156,7 +160,7 @@ export default {
 }
 .reception {
   width: 100%;
-  height: calc(100vh - 324px);
+  height: 50%;
   .text-reception {
     width: 100%;
     height: 50px;
