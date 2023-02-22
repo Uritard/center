@@ -77,7 +77,7 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
         }
 
         // 国网要求
-        robotService.upToCruise(xmlBaseModel);
+//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

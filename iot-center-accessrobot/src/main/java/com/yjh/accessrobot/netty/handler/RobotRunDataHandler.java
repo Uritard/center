@@ -81,7 +81,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
         }
 
         // 国网要求
-        robotService.upToCruise(xmlBaseModel);
+//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override
