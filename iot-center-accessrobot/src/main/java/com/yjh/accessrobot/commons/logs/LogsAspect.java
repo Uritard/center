@@ -78,6 +78,10 @@ public class LogsAspect {
         Object result = null;
         if (annotation != null) {
             content.append(annotation.content());
+            params.set("logType", annotation.logType());
+            params.set("state", 1);
+            params.set("ip", ip);
+            params.set("title", annotation.title());
             params.set("userId", userId);
             params.set("userName", userName);
             params.set("requestOrigin", request.getRequestURL());
