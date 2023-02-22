@@ -15,6 +15,7 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -465,6 +466,46 @@ public class TStdDeviceController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("导出模型文件:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "上报模型文件")
+    @RequestMapping(value = "/uploadModel", method = RequestMethod.GET)
+    @Logs(title = "上报模型文件", content = "上报模型文件", logType = 5)
+    public Result uploadModel(@RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+            String code;
+            switch (type) {
+                case "1":
+                    code = "2";
+                    break;
+                case "2":
+                    code = "3";
+                    break;
+                case "3":
+                    code = "4";
+                    break;
+                case "4":
+                    code = "1";
+                    break;
+                default:
+                    code = type;
+                    break;
+            }
+            if (StringUtils.isNotEmpty(code)) {
+                Constant.modelUpload(code);
+                result.setData("type:" + type + "upload success");
+            } else {
+                result.setData("type is not empty !");
+            }
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("上报模型文件:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("上报模型文件:", e);
         }
         return result;
     }
