@@ -67,9 +67,6 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             nestStatusMap.put("valueUnit", res.get("value_unit").toString());
             nestStatusMap.put("unit", res.get("unit").toString());
             nestStatusList.add(nestStatusMap);
-
-            // 国网要求
-            robotService.upToCruise(xmlBaseModel);
         });
         log.info("无人机机巢状态数据是：" + nestStatusList);
 
@@ -82,6 +79,8 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
 //        if (nestStatusList.size() > 0) {
 //            robotService.updateNestInfo(robotCode, String.valueOf(nestStatusList.get(0).get("nestCode")), String.valueOf(nestStatusList.get(0).get("nestName")));
 //        }
+        // 国网要求
+        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

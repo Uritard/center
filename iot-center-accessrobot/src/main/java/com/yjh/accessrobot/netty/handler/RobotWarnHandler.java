@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -30,6 +31,8 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
 
     @Autowired
     private RobotService robotService;
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Value("${other.webSocketUrl}")
     private String syncWebsocketUrl;
 
@@ -67,6 +70,9 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
         // 国网要求
+        //上报 Code 为 变电站编码
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+        xmlBaseModel.setCode(stationCode);
         robotService.upToCruise(xmlBaseModel);
     }
 
