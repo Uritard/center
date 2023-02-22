@@ -164,7 +164,7 @@ public class MessageThread {
         }
         //控制消息
         if ("1".equals(xmlBaseModel.getType()) || "2".equals(xmlBaseModel.getType()) || "3".equals(xmlBaseModel.getType()) || "4".equals(
-            xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())) {
+            xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType()) || "23".equals(xmlBaseModel.getType())) {
             log.info("--响应控制 控制下发--");
             Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
             List<XMLBaseModel> list = new ArrayList<>();
@@ -239,7 +239,7 @@ public class MessageThread {
                     //如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     if ("2".equals(edgeLevel)){
-                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_id").toString());
+                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
                         tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
@@ -279,7 +279,7 @@ public class MessageThread {
                     //如果从上级系统下发  点位为机器人的id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     if ("2".equals(edgeLevel)){
-                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_id").toString());
+                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
                         tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());

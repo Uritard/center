@@ -83,6 +83,9 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
         }
 
         // 国网要求
+        //上报 Code 为 变电站编码
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+        xmlBaseModel.setCode(stationCode);
         robotService.upToCruise(xmlBaseModel);
     }
 
