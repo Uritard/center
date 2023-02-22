@@ -198,8 +198,6 @@ public class TCameraPresetService {
         }
         tree.add(camera);
 
-        //--起线程执行相机预置位校验功能
-        cameraPresetCheck(cameraId);
         return tree;
     }
     public boolean judgePresentNum(Long cameraId,Integer presentNum) {
@@ -491,7 +489,7 @@ public class TCameraPresetService {
      *
      * @param cameraId cameraId
      */
-    private void cameraPresetCheck(Long cameraId) {
+    public void cameraPresetCheck(Long cameraId) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -526,14 +524,28 @@ public class TCameraPresetService {
             setPresetCheckResultToRedis(checkResults);
 
             // 循环遍历所有预置位，进行PTZ比对和图片对比，每处理完一个预置位，立即同步结果到redis
-            checkResults.forEach(item -> {
+            boolean cameraIsUnused = true; // 相机是否空闲
+            for (CameraPresetCheckResult item : checkResults) {
                 try {
-                    item.setPresetCheckResult(checkOnePreset(item.getPreset()));
+                    if (!cameraIsUnused) {
+                        // 相机不可控，检测结果置为终止态
+                        item.setPresetCheckResult(-2);
+                    } else {
+                        // 否则继续尝试采集图片和ptz信息，并进行检测
+                        Integer result = checkOnePreset(item.getPreset());
+                        if (result == -2) {
+                            cameraIsUnused = false;
+                        }
+
+                        item.setPresetCheckResult(result);
+                    }
+
+                    // 检测结果及时同步到redis
                     setPresetCheckResultToRedis(checkResults);
                 } catch (Exception e) {
                     log.error("checkCameraPreset err: {}", e.getMessage());
                 }
-            });
+            }
         } finally {
             // 释放锁
             releaseLock(cameraId);
@@ -607,6 +619,9 @@ public class TCameraPresetService {
             if (resultMap != null && resultMap.size() > 0) {
                 onLinePTZStr = resultMap.get("cameraPtz").toString();
                 picOnline = resultMap.get("absPath").toString();
+            } else {
+                // 图片采集失败，终止校验
+                return -2;
             }
 
             if (!cmpPTZ(onLinePTZStr, tCameraPreset.getPresetPtz())) {
@@ -634,7 +649,12 @@ public class TCameraPresetService {
      * @return result
      */
     private boolean cmpPTZ(String onLinePTZStr, String dbPTZStr) {
-        return StringUtils.isNotEmpty(onLinePTZStr) && StringUtils.isNotEmpty(dbPTZStr) && onLinePTZStr.equals(dbPTZStr);
+        // 当两个ptz都不为空且不相等时，返回false，否则返回true
+        if (StringUtils.isNotEmpty(onLinePTZStr) && StringUtils.isNotEmpty(dbPTZStr) && !onLinePTZStr.equals(dbPTZStr)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
