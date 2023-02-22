@@ -121,7 +121,7 @@ public class MessageThread {
                     list.add(xmlBaseModel);
                     robotMap.put("list", list);
                     //国网要求
-                    Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);
+//                    Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);
                 } else {
                     log.info("---注册响应--400拒绝注册----");
                     //注册拒绝 继续注册

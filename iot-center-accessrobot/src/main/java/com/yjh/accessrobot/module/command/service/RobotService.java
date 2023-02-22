@@ -208,11 +208,11 @@ public class RobotService {
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
             int robotType = 159;
-            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
+//            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
             // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
+//            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
             robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
-            if (isEdge){
+            if (tRobotInfo.getOriginId() != null){
                 robotCode = tRobotInfo.getEdgeCode();
             }
 
