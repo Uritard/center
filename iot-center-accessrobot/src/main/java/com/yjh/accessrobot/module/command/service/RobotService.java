@@ -960,12 +960,15 @@ public class RobotService {
     public String deviceMaintenanceIssued(Map<String, Object> resMap) {
         List<Map<String, Object>> itemList = new ArrayList<>();
         String onlineCode = String.valueOf(resMap.get("online_code"));
+        List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(onlineCode, 1);
+        String stationId = CollectionUtils.isNotEmpty(tStdRegionList) ? tStdRegionList.get(0).getStationId() : Constant.stationCode;
         resMap.remove("online_code");
         itemList.add(resMap);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+        XMLBaseModel xmlBaseModel =
+            new XMLBaseModel()
                 .setSendCode(Constant.sendCode)
                 .setReceiveCode(onlineCode)
-                .setCode(Constant.stationCode)
+                .setCode(stationId)
                 .setType("81")
                 .setCommand("4")
                 .setItems(itemList);
