@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.user.entity.TSysParam;
+import com.yjh.platform.module.video.FileUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -597,10 +598,12 @@ public class TSequentialConfService{
             }
             String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
             String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-            String devicePath = ftpsFilePath + "/" + stationId + "/linkage/" + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
+            String path = ftpsFilePath + "/" + stationId + "/linkage/";
+            FileUtil.createDirectory(path);
+            String devicePath = path + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
 
             File txt=new File(devicePath);
-            if(txt.exists()){
+            if(txt.delete()){
                 txt.delete();
             }
             if (!txt.exists()) {
@@ -651,7 +654,9 @@ public class TSequentialConfService{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
             String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
-            String devicePath = ftpsFilePath + "/" + stationId + "/linkage/" + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String path = ftpsFilePath + "/" + stationId + "/linkage/";
+            FileUtil.createDirectory(path);
+            String devicePath = path + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
             log.info("unionTask devicePath {}", devicePath);
             File txt=new File(devicePath);
 

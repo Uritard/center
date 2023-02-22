@@ -272,7 +272,7 @@ public class TCruiseTaskResultService {
         if (Objects.nonNull(resultMap.get("picpath"))) {
             inspectResult.setImagePath(resultMap.get("picpath"));
         } else {
-            inspectResult.setImagePath("null");
+            inspectResult.setImagePath("");
         }
         Map<String, String> videoInfo = new HashMap<>();
         if ("230".equals(resultMap.containsKey("cruiseType") ?
