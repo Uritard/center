@@ -465,10 +465,16 @@ public class CameraConController {
         Result result = new Result();
         try {
             Map<String, Object> resultMap = new HashMap<>();
+            // 确认相机可控
             cameraConService.isCameraControlled(cameraId);
+            //相机移动到预置位，并更新相机的操作时间
             cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET);
+            // 更新相机操作时间
+            cameraConService.pushCtrlTime(cameraId);
             Thread.sleep(10000); // 等10秒钟，确保相机镜头调整到位
 
+            // 再次确认相机可控
+            cameraConService.isCameraControlled(cameraId);
             // 获取预置位的PTZ数据
             String ptzStr = cameraConService.getCameraPTZ(presetId, cameraId);
             resultMap.put("cameraPtz", ptzStr);

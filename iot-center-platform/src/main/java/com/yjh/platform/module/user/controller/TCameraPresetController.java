@@ -363,6 +363,20 @@ public class TCameraPresetController {
         return result;
     }
 
+    @ApiOperation(value = "启动执行相机预置位校验")
+    @GetMapping(value = "/startPresetCheck")
+    @Logs(title = "启动执行相机预置位校验",content = "根据用户传递的相机ID，启动执行相机预置位校验",logType = 1)
+    public Result startPresetCheck(@RequestParam(value = "cameraId", required = false) Long cameraId) {
+        Result result = new Result();
+        try {
+            tCameraPresetService.cameraPresetCheck(cameraId);
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("启动执行相机预置位校验：" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询预置偏移校验结果")
     @GetMapping(value = "/queryPresetCheckResult")
     @Logs(title = "查询预置偏移校验结果",content = "根据用户传递的参数查询预置偏移校验结果",logType = 1)
