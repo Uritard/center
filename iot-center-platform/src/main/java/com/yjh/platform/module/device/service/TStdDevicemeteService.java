@@ -99,21 +99,21 @@ public class TStdDevicemeteService{
 
         this.tStdDevicemeteDao.deleteByPrimaryId(deviceMeteId);//删除当前标准测点
 
-        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
-//
-            if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
-//                List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
-                tStdDeviceDao.deleteByUnionKeys(deviceId);
-//                if(tStdDevices.size()==1){
-//                tStdDevices.get(0).setCustomId("700");
-//                tStdDevices.get(0).setCustomName("本体");
-//                tStdDeviceDao.add(tStdDevices.get(0));
-//                }
-            }else {                                               //若存在则删除与当前测点关联的设备信息
-                tStdDeviceDao.deleteByUnionKeys(deviceId);
-            }
-//
-        }
+//        if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
+////
+//            if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
+////                List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
+//                tStdDeviceDao.deleteByUnionKeys(deviceId);
+////                if(tStdDevices.size()==1){
+////                tStdDevices.get(0).setCustomId("700");
+////                tStdDevices.get(0).setCustomName("本体");
+////                tStdDeviceDao.add(tStdDevices.get(0));
+////                }
+//            }else {                                               //若存在则删除与当前测点关联的设备信息
+//                tStdDeviceDao.deleteByUnionKeys(deviceId);
+//            }
+////
+//        }
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         //tCruisePointInstance.setDeviceMeteId(deviceMeteId);
         List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
