@@ -139,8 +139,8 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectDictNote(dictCode, colName);
     }
 
-    public String selectAlarmLevel(String colName, String dictNote){
-        return analyseDataOperateDao.selectAlarmLevel(colName, dictNote);
+    public String selectAlarmLevel(String aliasName){
+        return analyseDataOperateDao.selectAlarmLevel(aliasName);
     }
 
     @Transactional(rollbackFor = Exception.class)

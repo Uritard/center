@@ -993,9 +993,9 @@ public class IntelAnalysisService {
         List<TWarnInfo> list = new ArrayList<>();
         try {
             for (int i = 0; i < resultArr.length; i++) {
-                String alarmLevel = analyseDataOperateService.selectAlarmLevel("defect_model", resultArr[i]);
+                String alarmLevel = analyseDataOperateService.selectAlarmLevel(resultArr[i]);
                 TWarnInfo tWarnInfo = new TWarnInfo()
-                        .setWarnLevel(Integer.valueOf(alarmLevel))
+                        .setWarnLevel(ValueUtil.toInteger(alarmLevel,131))
                         .setWarnTime(new Date())
                         .setWarnName("静默监视告警数据")
                         .setWarnContent(resultArr[i])
