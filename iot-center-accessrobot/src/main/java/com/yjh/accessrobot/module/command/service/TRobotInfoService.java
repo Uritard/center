@@ -111,7 +111,7 @@ public class TRobotInfoService {
             tRobotInfo.setInferadUsername(robotModel.getInferadUsername());
             tRobotInfo.setInferadPassword(robotModel.getInferadPassword());
             tRobotInfo.setPhotePath(StringUtils.isBlank(robotModel.getPhotePath()) ? robotModel.getPhotePath() :
-                robotModel.getPhotePath().replace(relativeImgMap.get("content"), absoluteImgMap.get("content")));
+                robotModel.getPhotePath().replace(absoluteImgMap.get("content"), relativeImgMap.get("content")));
             tRobotInfo.setCreateBy(robotModel.getCreateBy());
             tRobotInfo.setCreateDate(robotModel.getCreateDate());
             tRobotInfo.setUpdateBy(robotModel.getUpdateBy());

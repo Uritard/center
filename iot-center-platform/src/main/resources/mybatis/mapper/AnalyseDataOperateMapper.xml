@@ -1040,14 +1040,20 @@
     </select>
 
     <select id="selectPatrolDevice" resultType="java.util.HashMap">
-        SELECT DISTINCT
-        tsd.device_id as deviceId,
-        tsd.device_code as deviceCode,
-        tsd.device_name as deviceName
-        FROM
-        t_std_device tsd
-        LEFT JOIN t_cruise_point_instance tcpi ON tcpi.device_id = tsd.device_id
-        WHERE tcpi.instance_id = #{instanceId}
+        SELECT
+            tsd.device_id as deviceId,
+            tsd.device_code as deviceCode,
+            tsd.device_name as deviceName,
+            if(b.preset_id is null,if(c.inspection_id is null,d.voice_code,e.robot_num),b.camera_id) as patroldevice_code ,
+            if(b.preset_id is null,if(c.inspection_id is null,d.voice_device_name,e.robot_name),f.camera_name) as patroldevice_name
+        from t_cruise_point_instance a
+        left join t_camera_preset b on a.cruise_id = b.preset_id
+        left join t_camera_info f on b.camera_id = b.camera_id
+        left join t_robot_inspection c on a.cruise_id = c.inspection_id
+        left join t_robot_info e on c.robot_id = e.robot_id
+        left join t_voice_device d on a.cruise_id = d.voice_device_id
+        left join t_std_device tsd on a.device_id = tsd.device_id
+        where a.instance_id =  #{instanceId}
     </select>
 
     <select id="selectPMSByCameraId" resultType="java.lang.String">

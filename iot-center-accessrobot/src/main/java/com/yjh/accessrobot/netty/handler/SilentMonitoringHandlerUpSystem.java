@@ -75,7 +75,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setDeviceId(tStdDevice.getDeviceId())
                 .setConfMode(276)
                 .setDefectModel(450)
-                .setAlarmSource(800)
+                .setAlarmSource(689)
                 .setImagePath(defectResultRealImg);
         tWarnInfoMapper.insert(tWarnInfo);
     }
