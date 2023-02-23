@@ -14,6 +14,7 @@ import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TSysParam;
+import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,6 +53,8 @@ public class TSysParamController {
     @Autowired
     @Qualifier("normalVideoCruiseExecute")
     private AbstractVideoCruise abstractVideoCruise;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
 
 
     private Logger log = LoggerFactory.getLogger(TSysParamController.class);
@@ -104,6 +107,7 @@ public class TSysParamController {
             boolean verify = tSysParamService.secureVerify(tSysParam, userId, result);
             if (verify){
                 result.setData(tSysParamService.update(tSysParam));
+                dealSetIsSilentTask(tSysParam);
             }
             // 更新声纹日志开关
             Constant.refreshPacketLog();
@@ -117,6 +121,16 @@ public class TSysParamController {
             log.error("更新系统参数错误:", e);
         }
         return result;
+    }
+
+    private void dealSetIsSilentTask(TSysParam tSysParam){
+        if ("isSilentTask".equals(tSysParam.getParamCode())){
+            if ("true".equals(tSysParam.getContent())){
+                tCameraPresetService.startSilentTask();
+            }else if ("false".equals(tSysParam.getContent())){
+                tCameraPresetService.stopSilentTask();
+            }
+        }
     }
 
     @ApiOperation(value = "主键查询")

@@ -445,6 +445,13 @@ public class TCameraPresetService {
         silentConfs.forEach(this::creatSilentTask);
     }
 
+    public void stopSilentTask(){
+        silentConfMap.forEach((integer, scheduledFuture) -> {
+            scheduledFuture.cancel(true);
+            executor.setRemoveOnCancelPolicy(true);
+        });
+    }
+
     public void creatSilentTask(SilentConf silentConf){
         // 静默任务开关
         String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));

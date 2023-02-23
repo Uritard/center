@@ -36,6 +36,8 @@ public class TSysParamService{
     private RedisTemplate redisTemplate;
     @Autowired
     private SysParamConfig sysParamConfig;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -54,7 +56,19 @@ public class TSysParamService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TSysParam tSysParam) {
         this.tSysParamDao.update(tSysParam);
-        return this.insertIntoRedis();
+        insertIntoRedis();
+        dealSetIsSilentTask(tSysParam);
+        return 1;
+    }
+
+    private void dealSetIsSilentTask(TSysParam tSysParam){
+        if ("isSilentTask".equals(tSysParam.getParamCode())){
+            if ("true".equals(tSysParam.getContent())){
+                tCameraPresetService.startSilentTask();
+            }else if ("false".equals(tSysParam.getContent())){
+                tCameraPresetService.stopSilentTask();
+            }
+        }
     }
 
     /**
