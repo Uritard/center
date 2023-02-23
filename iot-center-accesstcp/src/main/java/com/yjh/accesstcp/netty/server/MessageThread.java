@@ -211,12 +211,12 @@ public class MessageThread {
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-//            if (StringUtils.equals("1", xmlBaseModel.getCommand())){
+            if (StringUtils.equals("1", xmlBaseModel.getCommand())){
                 String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                 item.put("task_patrolled_id", stationCode + "_" +xmlBaseModel.getCode() + "_" + time);
-//            }else{
-//                item.put("task_patrolled_id", xmlBaseModel.getCode());
-//            }
+            }else{
+                item.put("task_patrolled_id", xmlBaseModel.getCode());
+            }
             items.add(item);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
