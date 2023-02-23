@@ -903,7 +903,7 @@
     </select>
     <select id="selectRobotIsRunning" resultType="java.lang.String">
         SELECT DISTINCT
-        e.robot_code
+        IF(e.origin_id IS NOT NULL,e.edge_code,e.robot_code) AS robot_code
         FROM
         u_patrol_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e
         where 1=1
@@ -911,17 +911,6 @@
         and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
         <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
-
-    <select id="selectEdgeIsRunning" resultType="java.lang.String">
-        SELECT DISTINCT
-        c.edge_code
-        FROM
-        u_patrol_task_attr b, t_cruise_point_instance c
-        where b.instance_id = c.instance_id
-        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        and c.edge_code !='' and c.origin_id !=''
-    </select>
-
 
     <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
         SELECT

@@ -119,7 +119,7 @@ public class UPatrolTaskController {
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
             if (i == 1) {
-                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd));
+                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
             } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
@@ -304,7 +304,7 @@ public class UPatrolTaskController {
             log.info("--站端任务下发--"+tCruiseTaskAdd);
             tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
             tCruiseTaskAdd.setTaskId(null);
-            result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd));
+            result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
         } catch (BusinessException e) {
             result.setMessage(e.getCode(), e.getMessage());
             log.error("站端任务下发异常: {}", e.getMessage());

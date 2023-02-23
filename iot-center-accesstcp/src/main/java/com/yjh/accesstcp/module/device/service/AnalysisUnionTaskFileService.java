@@ -48,10 +48,11 @@ public class AnalysisUnionTaskFileService {
             FileUtil.createDirectory(localFilePath);
             ftpsUtil.downloadFile(localFilePath + fileName, filePath);
             List<Map<String, Object>> itemList = readUnionTaskXml(localFilePath + fileName);
-            deleteData(itemList);
             if (CollectionUtils.isNotEmpty(itemList)){
+                deleteData(itemList);
                 saveData(itemList);
             }else {
+
                 log.info("handleUnionTaskFile is empty !!!");
             }
             log.info("handleUnionTaskFile success,filePath:{}", filePath);
