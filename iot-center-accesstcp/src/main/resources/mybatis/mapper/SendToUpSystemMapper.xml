@@ -335,7 +335,7 @@
 
     <select id="countResultCheck" resultType="java.util.LinkedHashMap">
         SELECT count(1)                      AS totalNum,
-               count(result.identify_result) AS validNum
+               count(detail.identify_result) AS validNum
         FROM u_patrol_result result
                  LEFT JOIN u_patrol_data_result detail ON result.task_id = detail.task_id
         WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
