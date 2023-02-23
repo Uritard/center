@@ -58,7 +58,9 @@ public enum HandlerEnum {
     // 巡视报告数据
     ROBOT_CRUISE_REPORT("63", "robotCruiseReport"),
     // 任务审核结果
-    REVIEW_RESULT("611","reviewResult");
+    REVIEW_RESULT("611","reviewResult"),
+    // 相机预置位更新 巡视系统——>边缘节点
+    CAMERA_PRESET_UPDATE("2023","cameraPresetUpdate");
 
     /**
      * 状态值

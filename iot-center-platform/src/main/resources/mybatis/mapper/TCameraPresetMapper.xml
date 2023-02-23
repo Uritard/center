@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraPreset">
         <id column="preset_id" jdbcType="BIGINT" property="presetId" />
         <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="origin_id" jdbcType="VARCHAR" property="originId" />
         <result column="preset_num" jdbcType="INTEGER" property="presetNum" />
         <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
         <result column="creator_user" jdbcType="VARCHAR" property="creatorUser" />
@@ -103,6 +104,7 @@
         select
         a.preset_id,
         a.camera_id,
+        a.origin_id,
         a.preset_num,
         a.preset_name,
         a.preset_type,
@@ -112,6 +114,7 @@
         a.preset_img,
         a.inspection_postion,
         a.collect_status,
+        a.preset_ptz,
         a.calibration_status
         from t_camera_preset a
         where 1 = 1

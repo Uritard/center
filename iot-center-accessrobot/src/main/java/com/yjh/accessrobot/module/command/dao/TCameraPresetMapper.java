@@ -33,6 +33,7 @@ public interface TCameraPresetMapper {
 
     int updateByPrimaryKey(TCameraPreset record);
 
+    int updatePtzByPrimaryKey(TCameraPreset record);
 
     List<TCameraPreset> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 

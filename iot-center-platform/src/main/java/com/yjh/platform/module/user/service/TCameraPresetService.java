@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -7,6 +8,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -788,6 +790,57 @@ public class TCameraPresetService {
             log.error(e.getMessage(), e);
         }
         return response;
+    }
+
+    /**
+     * 将相机采集到的图片覆盖到原预置位图片
+     *
+     * @param urlPath urlPath
+     * @param presetImg presetImg
+     * @return result
+     */
+    public String saveImgToFtpsToCoverOriImg(String urlPath, String presetImg) {
+        return intelAnalysisService.upLoadFileToCoverHttpPath(urlPath, presetImg);
+    }
+
+    /**
+     * 相机预置位图片和ptz信息从巡视系统同步到边缘节点
+     *
+     * @param presetPtz presetPtz
+     * @param tCameraPreset tCameraPreset
+     */
+    public void SycPresetToEdge(String presetPtz, TCameraPreset tCameraPreset) {
+        String originIdStr = tCameraPreset.getOriginId();
+        if (StringUtils.isEmpty(originIdStr)) {
+            // 不是下级节点同步的预置位，不用处理
+            return;
+        }
+
+        TCameraPreset edgePreset = new TCameraPreset();
+        edgePreset.setPresetId(Long.parseLong(originIdStr));
+        edgePreset.setPresetPtz(presetPtz);
+        edgePreset.setPresetImg(tCameraPreset.getPresetImg());
+
+        sendMsg(tCameraPreset);
+    }
+
+    /**
+     * 发送同步预置位消息
+     *
+     * @param tCameraPreset tCameraPreset
+     */
+    private void sendMsg(TCameraPreset tCameraPreset) {
+        try {
+            Map<String, String> jasonMap = new HashMap<>();
+            jasonMap.put("presetId", tCameraPreset.getPresetId().toString());
+            jasonMap.put("presetPtz", tCameraPreset.getPresetPtz());
+            jasonMap.put("presetImg", tCameraPreset.getPresetImg());
+            String jsonMessage = JSONUtil.toJSONString(tCameraPreset);
+            log.info("需要同步的相机预置位消息：" + jsonMessage);
+            Constant.websocketSendMsg(Constant.CAMERA_PRESET_UPDATE_URL, jasonMap);
+        } catch (Exception e) {
+            log.error("SycPresetToEdge err", e);
+        }
     }
 }
 

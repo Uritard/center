@@ -10,8 +10,10 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
+import com.yjh.accessrobot.module.command.entity.TCameraPreset;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
+import com.yjh.accessrobot.module.command.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -40,6 +42,8 @@ public class RobotController {
 
     @Autowired
     private final RobotService robotService;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -410,6 +414,23 @@ public class RobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("测试失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "发送同步相机预置位信息指令接口")
+    @PostMapping(value = "/sycPresetInfo")
+    @Logs(title = "同步相机预置位信息",content = "根据用户传递的参数给边缘节点同步相机预置位信息",logType = 10)
+    public Result sycPresetInfo(@RequestBody TCameraPreset tCameraPreset) {
+        Result result = new Result();
+        try {
+            log.info("platform传来的tCameraPreset是=={}", tCameraPreset);
+            tCameraPresetService.sycPresetInfoToEdge(tCameraPreset);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发送任务接口调用错误:", e);
         }
         return result;
     }
