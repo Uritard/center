@@ -739,6 +739,7 @@ public class TStdDeviceModelService {
                     updateIdSet.contains(t.getOriginId())).forEach(t -> {
                 TStdDevice old = oldMap.get(t.getOriginId());
                 t.setDeviceId(old.getDeviceId());
+                t.setRealCode(old.getRealCode());
                 tStdDeviceMapper.updateByPrimaryKey(t);
             });
         }
