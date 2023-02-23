@@ -94,7 +94,8 @@ public class UPatrolTaskService {
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
     public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
     public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
-    public static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+    public static final String TASK_PRIORITY_REDIS_KEY = "task_priority_config:";
+    public static final String TASK_LOWER_REDIS_KEY = "lowPatrolTask:";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
 
     @Autowired
@@ -310,6 +311,7 @@ public class UPatrolTaskService {
                     uPatrolTask.setTaskLevel(NumberUtils.toInt(level1, 1));
                 }
             } else {
+                // 联动任务
                 uPatrolTask.setTaskLevel(NumberUtils.toInt(level4, 4));
             }
         }
@@ -1230,6 +1232,21 @@ public class UPatrolTaskService {
         //任务暂停 不用给机器人发
         UPatrolResult taskResult = uPatrolResultDao.selectByPrimaryId(taskId);
         taskResult.setTaskState(TASK_STATE_PAUSE);
+
+        // 更新Redis任务状态
+        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
+        // 更新数据库任务状态
+        int ret = uPatrolResultDao.update(taskResult);
+
+        // 任务状态向下级和上级同步
+        taskPauseStateAnsy(taskId);
+
+        return ret;
+    }
+
+    public void taskPauseStateAnsy(String taskId) {
+        // 消息不发给前端，newTask 会刷新消息界面
+/*
         try {
             //Thread.sleep(10000);
             //机器人任务暂停
@@ -1240,15 +1257,24 @@ public class UPatrolTaskService {
             log.info("发送给前端的消息：" + jsonMessage);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
         } catch (Exception e) {
-            log.error("任务暂停异常: " + e);
-            e.printStackTrace();
+            log.error("任务暂停异常: ", e);
+        }
+*/
+
+        Map<String, Object> robotTaskStatesMap = new HashMap<>(8);
+        robotTaskStatesMap.put("taskId", taskId);
+        robotTaskStatesMap.put("commandValue", 2);
+        // 给下级系统任务暂停
+        List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
+        log.info("===Edge task pause,edgeCodeList:{}", edgeCodeList);
+        if (CollectionUtils.isNotEmpty(edgeCodeList)) {
+            robotTaskStatesMap.put("robotCodeList", edgeCodeList);
+            robotTaskStates(robotTaskStatesMap);
         }
 
         //任务状态上报站端
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
         sendTaskStateToUp(task, 3);
-
-        return uPatrolResultDao.update(taskResult);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1349,6 +1375,19 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
+
+        List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, uPatrolResult.getTaskLevel());
+        if (CollectionUtils.isNotEmpty(highTaskList)) {
+            log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
+            for (String htId : highTaskList) {
+                String highKey = TASK_LOWER_REDIS_KEY + htId;
+                redisTemplate.opsForSet().add(highKey, taskId);
+                redisTemplate.expire(highKey, 3, TimeUnit.DAYS);
+            }
+            taskPauseStateAnsy(taskId);
+
+            return -1;
+        }
 
         try {
             //机器人任务继续
@@ -1565,9 +1604,6 @@ public class UPatrolTaskService {
             }
 
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-
-
-
             switch (cruiseTypeEnum) {
                 case VIDEO: // 视频
                 case INFRARED: // 红外
@@ -2479,8 +2515,8 @@ public class UPatrolTaskService {
     }
 
     private void lowTaskGoOn(String taskId){
-        String lowTaskKey = "lowTask:" + taskId;
-        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+        String lowTaskKey = TASK_LOWER_REDIS_KEY + taskId;
+        Set<String> lowTaskList = redisTemplate.opsForSet().members(lowTaskKey);
         if (lowTaskList != null && lowTaskList.size() > 0) {
             lowTaskList.forEach(lowTask -> {
                 try {

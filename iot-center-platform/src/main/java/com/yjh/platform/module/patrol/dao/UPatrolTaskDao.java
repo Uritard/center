@@ -55,7 +55,7 @@ public interface UPatrolTaskDao {
 
     int batchAdd(List<UPatrolTask> list);
     int batchDelete(List<String> list);
-    List<String> selectPlanRunningTask(@Param(value = "taskLevel")Integer taskLevel);
+    List<String> selectPlanRunningTask(@Param(value = "lowerLevel")Integer lowerLevel, @Param(value = "highLevel")Integer highLevel);
     List<Long> selectInsByTask(@Param(value = "taskId")String taskId);
 
     int countInstance(@Param(value = "taskId") String taskId);

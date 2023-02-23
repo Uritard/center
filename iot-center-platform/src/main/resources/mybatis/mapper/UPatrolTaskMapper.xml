@@ -251,8 +251,10 @@
             distinct
             result.task_id
         from u_patrol_result result
-                 left join u_patrol_task task on task.task_id = result.task_id
-        where result.task_state = 239  and task.task_level &lt; #{taskLevel}
+        where result.task_state = 239
+        <if test="lowerLevel != null and lowerLevel != ''"> and result.task_level &lt; #{lowerLevel}</if>
+        <if test="highLevel != null and highLevel != ''"> and result.task_level > #{highLevel}</if>
+
     </select>
 
     <select id="selectInsByTask" resultType="java.lang.Long">
@@ -914,10 +916,9 @@
         SELECT DISTINCT
         c.edge_code
         FROM
-        u_patrol_task a , u_patrol_task_attr b , t_cruise_point_instance c
-        where 1=1
-        and a.task_id = b.task_id and b.instance_id = c.instance_id
-        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        u_patrol_task_attr b, t_cruise_point_instance c
+        where b.instance_id = c.instance_id
+        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
         and c.edge_code !='' and c.origin_id !=''
     </select>
 
