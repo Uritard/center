@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -62,9 +63,6 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("本级系统给下级{}响应了", robotCode);
 
-        // 任务状态数据上报上一级系统
-        // robotService.upToCruise(xmlBaseModel);
-
         // 处理数据
         List<RobotPatrolTaskStatus> statusList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()) {
@@ -95,6 +93,37 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
                 // TaskExecutePool.getInstance().execute(standTaskDealThread);
             }
         }
+
+        Long robotId = robotService.selectRobotIdByCode(xmlBaseModel.getSendCode());
+        if (robotId != null) {
+            // 上一级系统无法获取机器人任务进度，需将任务状态数据上报上一级系统
+            String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+            List<Map<String,Object>> upItems = new ArrayList<>(xmlBaseModel.getItems().size());
+            Map<String,Object> downItem = xmlBaseModel.getItems().get(0);
+            Map<String,Object> upItem = Maps.newHashMap();
+            upItem.put("taskPatrolledId", downItem.get("task_patrolled_id") == null ? null:downItem.get("task_patrolled_id").toString());
+            upItem.put("taskName", downItem.get("task_name") == null ? null:downItem.get("task_name").toString());
+            upItem.put("taskCode", downItem.get("task_code") == null ? null:downItem.get("task_code").toString());
+            upItem.put("taskState", downItem.get("task_state") == null ? null:downItem.get("task_state").toString());
+            upItem.put("planStartTime", downItem.get("plan_start_time") == null ? null:downItem.get("plan_start_time").toString());
+            upItem.put("robotCode", xmlBaseModel.getSendCode());
+            upItem.put("startTime", downItem.get("start_time") == null ? null:downItem.get("start_time").toString());
+            upItem.put("taskProgress", downItem.get("task_progress") == null ? null:downItem.get("task_progress").toString());
+            upItem.put("taskEstimatedTime", downItem.get("task_estimated_time") == null ? null:downItem.get("task_estimated_time").toString());
+            upItem.put("description", downItem.get("description") == null ? null:downItem.get("description").toString());
+
+            XMLBaseModel upXmlBaseModel = new XMLBaseModel()
+                .setSendCode(Constant.sendCode)
+                .setReceiveCode(recvCode)
+                .setType("411")
+                .setItems(Collections.singletonList(upItem));
+
+            Map<String ,List<XMLBaseModel>> map = Maps.newHashMap();
+            map.put("list",Collections.singletonList(upXmlBaseModel));
+            Constant.mapToOtherServer(map, Constant.TCP_URL);
+        }
+
+
         log.info("The statusList to platform is=={}", statusList);
 
         try {
