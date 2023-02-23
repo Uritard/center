@@ -79,9 +79,6 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             redisTemplate.opsForHash().putAll(robotOperation, robotOperationList.get(i));
             redisTemplate.expire(robotOperation, 7, TimeUnit.DAYS);
         }
-
-        // 国网要求
-//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

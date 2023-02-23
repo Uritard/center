@@ -44,7 +44,7 @@ public class NestRunThread implements Runnable{
                 List<Map<String, Object>> onlinePatrolDevice = sendToUpSystemServices.selectOnlinePatrolDevice();
                 for (Map<String, Object> device : onlinePatrolDevice) {
                     List<Map<String, Object>> list = new ArrayList<>();
-                    if (!Objects.equals("drone", device.get("robot_code"))){
+                    if (!Objects.equals("drone", device.get("type"))){
                         continue;
                     }
                     //电池电量
