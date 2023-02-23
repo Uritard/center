@@ -358,6 +358,18 @@ public class UPatrolResultService {
             }
 
             reviewList.add(cruiseManualReview);
+
+            // insert QrDecode as device's real code. by tt.
+            TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
+            if (Objects.nonNull(tCruisePointInstance)) {
+                String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
+                if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                    TStdDevice tStdDevice = new TStdDevice();
+                    tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
+                    tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
+                    tStdDeviceDao.update(tStdDevice);
+                }
+            }
         }
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(reviewList, true);
