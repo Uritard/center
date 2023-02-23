@@ -332,9 +332,7 @@ public class MessageThread {
                 //7-任务文件  任务模型 A.2.5
                 //8-检修区域配置文件 检修区域模型 A.2.6
                 //9-地图文件
-                Map<String, Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
-                List<Map<String, Object>> list = new ArrayList<>();
-                list.add(map);
+                List<Map<String, Object>> list = sendToUpSystemServices.creatModelList(xmlBaseModel.getCommand());
                 String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                 String command = "4";
                 if ("1".equals(edgeLevel)){

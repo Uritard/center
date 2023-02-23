@@ -376,15 +376,15 @@
         select
             phote_path
         from t_robot_info
-        where phote_path is not null
+        where phote_path is not null and phote_path != ''
         limit 1
     </select>
 
-    <select id="selectMapPathALl" resultType="java.lang.String">
+    <select id="selectMapPathAll" resultType="java.lang.String">
         select
             phote_path
         from t_robot_info
-        where phote_path is not null
+        where phote_path is not null and phote_path != ''
     </select>
 
     <select id="selectOnlinePatrolDevice" resultType="java.util.Map">

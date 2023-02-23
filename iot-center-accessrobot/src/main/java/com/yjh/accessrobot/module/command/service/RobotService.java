@@ -879,47 +879,48 @@ public class RobotService {
             if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()) {
 //                RobotServerHandler.getRobotResultMap().put("Item", null);
             } else {
-                Map<String, Object> map = xmlBaseModel.getItems().get(0);
-                RobotServerHandler.getRobotResultMap().put("Item", map);
+                for (Map<String,Object> map : xmlBaseModel.getItems()) {
+                    RobotServerHandler.getRobotResultMap().put("Item", map);
 
-                Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-                Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-                Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+                    Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+                    Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+                    Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
-                // 文件在ftp服务器上的绝对路径
-                String temporaryPath = filePathMap.get("content");
+                    // 文件在ftp服务器上的绝对路径
+                    String temporaryPath = filePathMap.get("content");
 
-                if (map.containsKey("file_path")) {
-                    String ftpFilePath = String.valueOf(map.get("file_path"));
-                    String[] sArray = ftpFilePath.split("/");
-                    // 抓图结果文件名称
-                    String ftpFileName = sArray[sArray.length - 1];
-                    temporaryPath = temporaryPath + "/" + ftpFilePath;
-                    String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/CameraLib/";
-                    String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+                    if (map.containsKey("file_path")) {
+                        String ftpFilePath = String.valueOf(map.get("file_path"));
+                        String[] sArray = ftpFilePath.split("/");
+                        // 抓图结果文件名称
+                        String ftpFileName = sArray[sArray.length - 1];
+                        temporaryPath = temporaryPath + "/" + ftpFilePath;
+                        String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+                        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
 
-                    if (ftpFileName.endsWith(".jpg")) {
-                        developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
-                        developRelativeUrl = developRelativeUrl + "BigImg/";
-                    } else if (ftpFileName.endsWith(".bmp")) {
-                        developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
-                        developRelativeUrl = developRelativeUrl + "Infrared/";
-                    } else if (ftpFileName.endsWith(".mp4")) {
-                        developAbsoluteUrl = developAbsoluteUrl + "Video/";
-                        developRelativeUrl = developRelativeUrl + "Video/";
+                        if (ftpFileName.endsWith(".jpg")) {
+                            developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
+                            developRelativeUrl = developRelativeUrl + "BigImg/";
+                        } else if (ftpFileName.endsWith(".bmp")) {
+                            developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
+                            developRelativeUrl = developRelativeUrl + "Infrared/";
+                        } else if (ftpFileName.endsWith(".mp4")) {
+                            developAbsoluteUrl = developAbsoluteUrl + "Video/";
+                            developRelativeUrl = developRelativeUrl + "Video/";
+                        }
+
+                        log.info("developAbsoluteUrl是: {} ------developRelativeUrl是: {}", developAbsoluteUrl, developRelativeUrl);
+
+                        // 将机器人摄像机抓图结果从ftp服务器上的复制到开发环境
+                        copyFileToDevelop(temporaryPath, developAbsoluteUrl);
+                        RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
+                        RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
                     }
-
-                    log.info("developAbsoluteUrl是: {} ------developRelativeUrl是: {}", developAbsoluteUrl, developRelativeUrl);
-
-                    // 将机器人摄像机抓图结果从ftp服务器上的复制到开发环境
-                    copyFileToDevelop(temporaryPath, developAbsoluteUrl);
-                    RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
-                    RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
-                }
-                if (ModelFileEnum.getMapByNameSet(map.keySet()) != null) {
-                    String code = ModelFileEnum.getMapByNameSet(map.keySet()).get("code");
-                    String name = ModelFileEnum.getMapByNameSet(map.keySet()).get("name");
-                    syncModelUpdate(code,map.get(name).toString(),xmlBaseModel.getSendCode());
+                    if (ModelFileEnum.getMapByNameSet(map.keySet()) != null) {
+                        String code = ModelFileEnum.getMapByNameSet(map.keySet()).get("code");
+                        String name = ModelFileEnum.getMapByNameSet(map.keySet()).get("name");
+                        syncModelUpdate(code,map.get(name).toString(),xmlBaseModel.getSendCode());
+                    }
                 }
             }
         } else {

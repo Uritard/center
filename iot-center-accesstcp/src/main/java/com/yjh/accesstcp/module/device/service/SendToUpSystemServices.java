@@ -223,6 +223,120 @@ public class SendToUpSystemServices {
         }
         return null;
     }
+    public List<Map<String, Object>> creatModelList(String type) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        try {
+            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model"+"/"+stationCode+"/Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            log.info("模型文件路径："+path);
+
+            switch (type) {
+                case "1":
+                    //巡视主机模型
+                    String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
+                    ftpsUtil.putFile(createHostModel(path, stationCode), hostModelTargetPath);
+                    map.put("host_file_path", hostModelTargetPath);
+                    list.add(map);
+                    break;
+                case "2":
+                    //机器人模型
+                    String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
+                    ftpsUtil.putFile(createRobotModel(path), robotModelTargetPath);
+                    map.put("robot_file_path", robotModelTargetPath);
+                    list.add(map);
+                    break;
+                case "3":
+                    //摄像机模型
+                    String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
+                    ftpsUtil.putFile(createCameraModel(path), videoModelTargetPath);
+                    map.put("video_file_path", videoModelTargetPath);
+                    list.add(map);
+                    break;
+                case "4":
+                    //点位模型
+                    String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
+                    ftpsUtil.putFile(createDeviceModel(path, stationCode), deviceModelTargetPath);
+                    map.put("device_file_path", deviceModelTargetPath);
+                    list.add(map);
+                    break;
+                case "5":
+                    //无人机
+                    String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
+                    ftpsUtil.putFile(createDroneModel(path), droneModelTargetPath);
+                    map.put("drone_file_path", droneModelTargetPath);
+                    list.add(map);
+                    break;
+                case "6":
+                    //声纹模型
+                    String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
+                    ftpsUtil.putFile(createVoiceModel(path), voiceModelTargetPath);
+                    map.put("voice_file_path", voiceModelTargetPath);
+                    list.add(map);
+                    break;
+                case "7":
+                    //任务模型
+                    String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
+                    ftpsUtil.putFile(createTaskModel(path,stationCode), taskModelTargetPath);
+                    map.put("task_file_path", taskModelTargetPath);
+                    list.add(map);
+                    break;
+                case "8":            //检修区域模型
+                    String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
+                    ftpsUtil.putFile(createMaintenanceModel(path, stationCode), overhaulareaModelTargetPath);
+                    map.put("overhaularea_file_path", overhaulareaModelTargetPath);
+                    list.add(map);
+                    break;
+                case "9":
+                    List<String> mapRealPathList = sendToUpSystemDao.selectMapPathAll();
+                    if (CollectionUtils.isNotEmpty(mapRealPathList)) {
+                        for (String mapRealPath : mapRealPathList) {
+                            Map<String,Object> mapInfo = new HashMap<>();
+                            String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
+                            String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                            String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
+                            String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
+                            ftpsUtil.putFile(mapAbsPath, mapModelTargetPath);
+                            mapInfo.put("map_file_path", mapModelTargetPath);
+                            list.add(mapInfo);
+                        }
+                    }
+                    break;
+                case "10":
+                    //设备资源信息配置文件
+                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
+                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                    ftpsUtil.putFile(sourceModelPath, sourceFilePath);
+                    map.put("source_file_path",sourceFilePath);
+                    list.add(map);
+                    break;
+                case "1001":
+                    // 区域模型
+                    String regionModelTargetPath = String.format(stationCode + "/Model/region_model.xml");
+                    ftpsUtil.putFile(createRegionModel(path), regionModelTargetPath);
+                    map.put("region_path", regionModelTargetPath);
+                    list.add(map);
+                    break;
+                case "1002":
+                    // 录像机模型
+                    String recordModelTargetPath = String.format(stationCode + "/Model/record_model.xml");
+                    ftpsUtil.putFile(createRecordFile(path), recordModelTargetPath);
+                    map.put("record_file_path", recordModelTargetPath);
+                    list.add(map);
+                    break;
+                default:
+                    break;
+            }
+
+
+            return list;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
 
     @Async
     public void creatFile(String type) {
@@ -998,7 +1112,7 @@ public class SendToUpSystemServices {
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
                     return createMaintenanceModel(path, stationCode);
                 case "9":
-                    List<String> mapFileList = sendToUpSystemDao.selectMapPathALl();
+                    List<String> mapFileList = sendToUpSystemDao.selectMapPathAll();
                     if (mapFileList.isEmpty()){
                         throw new BusinessException("不存在地图文件");
                     }
