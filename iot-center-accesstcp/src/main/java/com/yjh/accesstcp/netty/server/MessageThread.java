@@ -17,6 +17,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +40,8 @@ public class MessageThread {
     private static final ExecutorService executorService =
         new ThreadPoolExecutor(10, 30, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(128), new MyThreadFactory(true),
             new ThreadPoolExecutor.CallerRunsPolicy());
+
+    public static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
 
     public static void doProcessMessage(XMLBaseModel xmlBaseModel, long sendSessionId, TCPClientHandler clientHandler,
         SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate, RegisterManager registerManager) {
@@ -235,9 +238,9 @@ public class MessageThread {
                 log.info("--响应任务 任务下发--");
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
-                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, false);
                     //如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, false, edgeLevel);
                     if ("2".equals(edgeLevel)){
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
@@ -275,9 +278,9 @@ public class MessageThread {
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
                     String taskId = item.get("task_code").toString();
-                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, true);
                     //如果从上级系统下发  点位为机器人的id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, true, edgeLevel);
                     if ("2".equals(edgeLevel)){
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
@@ -420,7 +423,7 @@ public class MessageThread {
      * @param linkage 是否为联动任务
      * @return
      */
-    public static TCruiseTaskAdd covertBean(Map<String, Object> item, Boolean linkage){
+    public static TCruiseTaskAdd covertBean(Map<String, Object> item, RedisTemplate redisTemplate, Boolean linkage, String edgeLevel){
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
         tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
         tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
@@ -437,6 +440,7 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
 
+        String priority = item.getOrDefault("priority", "").toString();
 
         // 周期任务需要处理
         String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
@@ -454,12 +458,14 @@ public class MessageThread {
             }
             tCruiseTaskAdd.setCycleWeek(str.toString());
         }
-
+        String level;
         //联动任务立即执行
         if (linkage) {
+            level = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
         } else {
+            level = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "902", "level");
             if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())) {
                 long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
                 log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
@@ -477,6 +483,10 @@ public class MessageThread {
                 tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(startTime));
             }
         }
+
+        priority = StringUtils.isEmpty(priority) || "2".equals(edgeLevel) ? level : priority;
+        tCruiseTaskAdd.setTaskLevel(NumberUtils.toInt(priority));
+
         return tCruiseTaskAdd;
     }
 
