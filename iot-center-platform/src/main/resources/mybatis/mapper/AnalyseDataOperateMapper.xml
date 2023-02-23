@@ -1048,7 +1048,7 @@
             if(b.preset_id is null,if(c.inspection_id is null,d.voice_device_name,e.robot_name),f.camera_name) as patroldevice_name
         from t_cruise_point_instance a
         left join t_camera_preset b on a.cruise_id = b.preset_id
-        left join t_camera_info f on b.camera_id = b.camera_id
+        left join t_camera_info f on b.camera_id = f.camera_id
         left join t_robot_inspection c on a.cruise_id = c.inspection_id
         left join t_robot_info e on c.robot_id = e.robot_id
         left join t_voice_device d on a.cruise_id = d.voice_device_id
