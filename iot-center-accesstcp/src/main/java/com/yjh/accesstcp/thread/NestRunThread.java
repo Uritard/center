@@ -82,9 +82,9 @@ public class NestRunThread implements Runnable{
 
     public static Map<String, Object> createMap(Integer type, Map<String, Object> mapForRedis){
         Map<String, Object> map = new HashMap<>(7);
-        map.put("nest_name", Optional.ofNullable(mapForRedis.get("nest_name")).orElse(""));
-        map.put("nest_code", Optional.ofNullable(mapForRedis.get("nest_code")).orElse(""));
-        map.put("module_no", Optional.ofNullable(mapForRedis.get("module_no")).orElse(""));
+        map.put("nest_name", Optional.ofNullable(mapForRedis.get("nestName")).orElse(""));
+        map.put("nest_code", Optional.ofNullable(mapForRedis.get("nestCode")).orElse(""));
+        map.put("module_no", Optional.ofNullable(mapForRedis.get("moduleNo")).orElse(""));
         map.put("type", type);
         map.put("value", Optional.ofNullable(mapForRedis.get("value")).orElse("0"));
         map.put("unit", Optional.ofNullable(mapForRedis.get("unit")).orElse(""));
