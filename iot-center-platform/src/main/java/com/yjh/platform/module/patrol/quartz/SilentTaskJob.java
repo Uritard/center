@@ -75,6 +75,13 @@ public class SilentTaskJob implements Runnable {
 
     @Override
     public void run() {
+        // 静默任务开关
+        String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+        if (StringUtils.equals("false", silentFlag)) {
+            log.info("静默任务开关：isSilentTask 没开");
+            return;
+        }
+
         log.info("静默任务定时任务==静默监视类型：{}", presetType);
         // 分析主机开关
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis", "content"));
