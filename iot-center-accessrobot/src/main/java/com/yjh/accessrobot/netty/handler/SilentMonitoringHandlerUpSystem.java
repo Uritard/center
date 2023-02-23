@@ -3,6 +3,8 @@ package com.yjh.accessrobot.netty.handler;
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
@@ -13,6 +15,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,10 +45,21 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("上级系统接收到静默告警数据 xmlBaseModel:{}", JSON.toJSONString(xmlBaseModel));
         String sendCode = xmlBaseModel.getSendCode();
-        if (!Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
-            log.error("robotRegisterFlag not exist,sendCode:{} ",sendCode);
-            return;
+        if (StringUtils.isEmpty(sendCode)) {
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
+        }
+
+        // 给下级响应
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send(operationProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
+
         String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
         String deviceId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
         String content= String.valueOf(xmlBaseModel.getItems().get(0).get("content"));

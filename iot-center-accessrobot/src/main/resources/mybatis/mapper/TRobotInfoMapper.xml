@@ -1248,9 +1248,9 @@
         up_dict = #{upDict, jdbcType = VARCHAR}
     </select>
 
-    <select id="selectRobotCodeByRobotNum" resultType="java.lang.String">
+    <select id="selectRobotInfoByRobotNum" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         SELECT
-        a.robot_code
+        <include refid="Base_Column_List" />
         FROM
         `t_robot_info` a
         WHERE

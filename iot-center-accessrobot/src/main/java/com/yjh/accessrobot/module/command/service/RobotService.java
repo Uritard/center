@@ -1616,19 +1616,13 @@ public class RobotService {
      */
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
-        //上级下发的 code 是robotNum
-        String receiveCode = xmlBaseModel.getReceiveCode();
         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        //上级下发的 code 是robotNum
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByRobotNum(xmlBaseModel.getCode(), "");
+        String receiveCode = tRobotInfo.getEdgeCode();
         //到边缘节点 receiveCode 为巡视设备的唯一标识
         if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
-            receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
-        } else {
-            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(receiveCode, 1);
-            // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
-            if (isEdge) {
-                receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), receiveCode);
-            }
+            receiveCode = tRobotInfo.getRobotCode();
         }
 
         xmlBaseModel.setSendCode(Constant.sendCode);
@@ -2892,7 +2886,7 @@ public class RobotService {
                 sendCode = tRobotInfoDao.selectRobotCodeByNestNum(nestNum);
             }else {
                 String robotNum = xmlBaseModel.getItems().get(0).get("patroldevice_code").toString();
-                String sendCodeItem = tRobotInfoDao.selectRobotCodeByRobotNum(robotNum, sendCode);
+                String sendCodeItem = tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, sendCode).getRobotCode();
                 sendCode = StringUtils.isNotEmpty(sendCodeItem) ? sendCodeItem : sendCode;
             }
         }

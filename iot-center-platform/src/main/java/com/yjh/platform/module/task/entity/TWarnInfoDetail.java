@@ -131,4 +131,7 @@ public class TWarnInfoDetail implements Serializable {
 
     @ApiModelProperty(value = "告警下限4")
     private Float lowLimit4;
+
+    @ApiModelProperty(value = "变电站名称")
+    private String stationName;
 }

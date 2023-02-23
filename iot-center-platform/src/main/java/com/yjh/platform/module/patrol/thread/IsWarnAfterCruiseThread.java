@@ -204,6 +204,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", isTemDif ? initInfo.get("valueTemp") : "");
 
 
+            // newAlarm
             StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 
             // 将告警信息放入redis

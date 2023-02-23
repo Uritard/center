@@ -31,6 +31,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
@@ -442,6 +443,24 @@ public class UPatrolTaskService {
             }else {
                 map.put("cameraId","");
                 map.put("robotId", String.valueOf(item.getRobotId()));
+            }
+
+            // 初始化识别类型和采集文件类型
+            map.put("recognition_type", RecognitionTypeEnum.getProRecognize(item.getMeteType()).getSysRecognize());
+            map.put("file_type", "5");
+            switch (item.getMeteType()){
+                case "222":
+                    map.put("file_type", "1");
+                    break;
+                case "223":
+                    map.put("file_type", "3");
+                    break;
+                case "220":
+                case "433":
+                    map.put("file_type", "2");
+                    break;
+                default:
+                    break;
             }
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             log.info("str {}", str);

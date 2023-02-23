@@ -23,8 +23,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
@@ -46,6 +48,8 @@ public class InspectionResultThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final AnalyseDataOperateDao analyseDataOperateDao;
     private final PatrolResultHandler resultHandler;
+
+    private static ReentrantLock lock = new ReentrantLock();
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
@@ -113,15 +117,21 @@ public class InspectionResultThread implements Runnable{
         String taskId = infoMap.get("taskId");
 
         boolean isnormal = true;
-        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
-            tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-            log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
-        } else {
-            // value无值且resultNum为--，若结果非音频文件，则为异常情况
-            tCruiseTaskResultMap.put("resultNum", "--");
-            if (!"3".equals(robotPatrolTaskResult.getFileType())) {
-                isnormal = false;
-                log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
+
+        Integer type = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getSendCode());
+        boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
+        // 非模拟工具上来的结果
+        if (Boolean.FALSE.equals(isSimulationTool)) {
+            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
+                tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
+                log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
+            } else {
+                // value无值且resultNum为--，若结果非音频文件，则为异常情况
+                tCruiseTaskResultMap.put("resultNum", "--");
+                if (!"3".equals(robotPatrolTaskResult.getFileType())) {
+                    isnormal = false;
+                    log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
+                }
             }
         }
         String cruiseResult;
@@ -300,8 +310,6 @@ public class InspectionResultThread implements Runnable{
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
         log.info("====This is the result of no algorithm===");
-        String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
-
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             switch (value){
@@ -326,36 +334,9 @@ public class InspectionResultThread implements Runnable{
             }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("resultDesc", "--");
-            TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(tCruiseTaskResultMap.get("instanceId")));
-
-            String resultNum = tCruiseTaskResultMap.get("resultNum");
-            if (StringUtils.equals("693", stdDeviceMete.getMeteType())){
-                // 模拟工具局放类型的点位处理
-                String resultNumItem = "";
-                switch (tCruiseTaskResultMap.get("valueType")){
-                    case "11":
-                        resultNumItem = "局放频次:" + value;
-                        break;
-                    case "12":
-                        resultNumItem =  "放电峰值:" + value;
-                        break;
-                    case "13":
-                        resultNumItem =  "信号均值:" + value;
-                        break;
-                    default:
-                        break;
-                }
-                if (StringUtils.isNotEmpty(resultNum)){
-                    resultNum = resultNum + "," + resultNumItem;
-                    tCruiseTaskResultMap.put("resultNum", resultNum);
-                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
-                    return;
-                }
-                tCruiseTaskResultMap.put("resultNum", resultNumItem);
-            }else {
-                tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
-                        value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
-            }
+            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
+                    value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
+            String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");
