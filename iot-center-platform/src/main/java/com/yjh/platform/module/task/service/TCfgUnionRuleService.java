@@ -55,7 +55,12 @@ public class TCfgUnionRuleService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long ruleId) {
-        return this.tCfgUnionRuleDao.deleteByPrimaryId(ruleId);
+        TCfgUnionRule tCfgUnionRule = this.selectByPrimaryId(ruleId);
+        int num = tCfgUnionRuleDao.deleteByPrimaryId(ruleId);
+        if (num > 0) {
+            this.transferToEdge(tCfgUnionRule.getInputParam());
+        }
+        return num;
     }
 
     @Transactional(rollbackFor = Exception.class)

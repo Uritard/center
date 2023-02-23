@@ -148,7 +148,7 @@
         <if test="robotNum != null "> a.robot_num = #{robotNum},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="nestCode != null ">a.nest_code = #{nestCode},</if>
-        <if test="nestName != null ">a.nest_code = #{nestName},</if>
+        <if test="nestName != null ">a.nest_name = #{nestName},</if>
         <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
         <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
         <if test="droneType != null ">a.drone_type = #{droneType, jdbcType=INTEGER},</if>

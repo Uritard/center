@@ -330,7 +330,7 @@ public class TCfgDataCurrentService {
             // 联动任务优先级
             tCruiseTaskAdd.setTaskLevel(4);
 //            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
-            String taskId= StringUtils.substringBetween(uPatrolTaskService.addTask(tCruiseTaskAdd),"_");//联动任务ID
+            String taskId= StringUtils.substringBetween(uPatrolTaskService.addTask(tCruiseTaskAdd, true),"_");//联动任务ID
             cLogger.info("联动开始执行");
             //联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));

@@ -153,12 +153,15 @@ public class UPatrolTaskService {
 
     /**
      * 任务下发，在外层处理设置定时器逻辑，不走事物，否则会导致定时器延时
+     * @param tCruiseTaskAdd 任务组装参数
+     * @param issueFlag 是否往下级节点发送
+     * @return 任务执行ID
      */
-    public String addTask(TCruiseTaskAdd tCruiseTaskAdd){
+    public String addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
         // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
         UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
         assert proxy != null;
-        UPatrolTask uPatrolTask = proxy.insert(tCruiseTaskAdd);
+        UPatrolTask uPatrolTask = proxy.insert(tCruiseTaskAdd, issueFlag);
 
         // 设置定时器，不走事物逻辑，否则会延时
         setQuartzTask(uPatrolTask);
@@ -168,7 +171,7 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public UPatrolTask insert(TCruiseTaskAdd tCruiseTaskAdd) {
+    public UPatrolTask insert(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag) {
         UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
 
         // 设置任务优先级
@@ -207,10 +210,13 @@ public class UPatrolTaskService {
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
         List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
-        // 找出下级设备或下级节点的点让其做任务
-        String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
-        if (StringUtils.isNotEmpty(res)) {
-            throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
+        //任务启动只创建任务不往下发
+        if (issueFlag) {
+            // 找出下级设备或下级节点的点让其做任务
+            String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
+            if (StringUtils.isNotEmpty(res)) {
+                throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
+            }
         }
 
         return uPatrolTask;
@@ -943,25 +949,6 @@ public class UPatrolTaskService {
                 log.info("===============The task was successfully sent to the robot===============");
             }
         }
-
-        // 暂时只给机器人和无人机发送了任务启动的命令 下级节点未考虑
-        try {
-            String startCommand = (String)redisTemplate.opsForHash().get("t_sys_param:robotStartCommand", "content");
-
-            if (Boolean.parseBoolean(startCommand)) {
-                List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
-                log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
-                if (robotCodeList != null && robotCodeList.size() > 0) {
-                    Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                    robotTaskStatesMap.put("taskId", task.getTaskId());
-                    robotTaskStatesMap.put("commandValue", 1);
-                    robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                    robotTaskStates(robotTaskStatesMap);
-                }
-            }
-        } catch (Exception e) {
-            log.error("发送机器人/无人机启动错误：", e);
-        }
     }
 
     /**
@@ -1283,7 +1270,19 @@ public class UPatrolTaskService {
         try {
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
-            if (robotCodeList != null && robotCodeList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(robotCodeList)) {
+                //创建立即任务
+                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+                UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+                tCruiseTaskAdd.setTaskCode(uPatrolTask.getTaskCode());
+                tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
+                tCruiseTaskAdd.setIfRun(173);
+                tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动");
+                tCruiseTaskAdd.setType(uPatrolTask.getTaskType());
+                tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
+                tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
+                tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
+                this.addTask(tCruiseTaskAdd, false);
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
                 robotTaskStatesMap.put("commandValue", 1);
@@ -1324,24 +1323,14 @@ public class UPatrolTaskService {
             //Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
-            Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
-            robotTaskStatesMap.put("taskId", taskId);
-            robotTaskStatesMap.put("commandValue", 2);
-
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
+                log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
+                Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
+                robotTaskStatesMap.put("taskId", taskId);
+                robotTaskStatesMap.put("commandValue", 2);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-
-            // 给下级系统任务暂停
-            List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
-            log.info("===Edge task pause,edgeCodeList:{}", edgeCodeList);
-            if (CollectionUtils.isNotEmpty(edgeCodeList)) {
-                robotTaskStatesMap.put("robotCodeList", edgeCodeList);
-                robotTaskStates(robotTaskStatesMap);
-            }
-
             updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
             Map<String, String> jasonMapOnFinished = new HashMap<>();
             jasonMapOnFinished.put("type", "taskChange");
@@ -1392,21 +1381,12 @@ public class UPatrolTaskService {
         try {
             //机器人任务继续
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
-            Map<String, Object> robotTaskStatesMap = new HashMap<>();
-            robotTaskStatesMap.put("taskId", taskId);
-            robotTaskStatesMap.put("commandValue", 3);
-
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
+                log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", taskId);
+                robotTaskStatesMap.put("commandValue", 3);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                robotTaskStates(robotTaskStatesMap);
-            }
-
-            // 给下级系统任务暂停
-            List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
-            log.info("下级系统任务继续,edgeCodeList:{}", edgeCodeList);
-            if (CollectionUtils.isNotEmpty(edgeCodeList)) {
-                robotTaskStatesMap.put("robotCodeList", edgeCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
             if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED || uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
@@ -1450,21 +1430,12 @@ public class UPatrolTaskService {
 
         // 机器人任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
-        Map<String, Object> robotTaskStatesMap = new HashMap<>();
-        robotTaskStatesMap.put("taskId", taskId);
-        robotTaskStatesMap.put("commandValue", 4);
-
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
+            log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
+            Map<String, Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId", taskId);
+            robotTaskStatesMap.put("commandValue", 4);
             robotTaskStatesMap.put("robotCodeList", robotCodeList);
-            robotTaskStates(robotTaskStatesMap);
-        }
-
-        // 给下级系统任务终止
-        List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
-        log.info("边缘节点任务终止,edgeCodeList:{}",edgeCodeList);
-        if (CollectionUtils.isNotEmpty(edgeCodeList)) {
-            robotTaskStatesMap.put("robotCodeList", edgeCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
 
