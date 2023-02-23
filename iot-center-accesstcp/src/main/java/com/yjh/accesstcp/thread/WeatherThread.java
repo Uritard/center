@@ -71,14 +71,16 @@ public class WeatherThread implements Runnable{
                         Map<String, Object> mapForAirPressure = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":6");
                         Map<String, Object> map6 = createMap(now, 6, mapForAirPressure, device);
                         list.add(map6);
-                        //氧气含量
-                        Map<String, Object> mapForOxygen = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":7");
-                        Map<String, Object> map7 = createMap(now, 7, mapForOxygen, device);
-                        list.add(map7);
-                        //SF6含量
-                        Map<String, Object> mapForSf6 = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":8");
-                        Map<String, Object> map8 = createMap(now, 8, mapForSf6, device);
-                        list.add(map8);
+                        if ("robot".equals(device.get("type"))) {
+                            //氧气含量
+                            Map<String, Object> mapForOxygen = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":7");
+                            Map<String, Object> map7 = createMap(now, 7, mapForOxygen, device);
+                            list.add(map7);
+                            //SF6含量
+                            Map<String, Object> mapForSf6 = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":8");
+                            Map<String, Object> map8 = createMap(now, 8, mapForSf6, device);
+                            list.add(map8);
+                        }
                         sendToUpSystemServices.sendResponse(0L, "21","",Constant.stationCode,list, true);
                     }
                     log.info("--天气信息已发送--");

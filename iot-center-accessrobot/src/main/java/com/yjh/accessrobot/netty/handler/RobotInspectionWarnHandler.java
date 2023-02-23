@@ -82,9 +82,6 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         }catch (Exception e){
             log.error("调用platform出错：{}", e.getMessage());
         }
-
-        // 国网要求
-//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

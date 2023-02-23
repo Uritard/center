@@ -191,9 +191,6 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         System.out.println("微气象数据测试一波++++++++" + info);
         Constant.mapToOtherServer(info, Constant.WEATHER_URL);
 
-        // 国网要求
-//         robotService.upToCruise(xmlBaseModel);
-
     }
 
     @Override

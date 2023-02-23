@@ -62,7 +62,6 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
             nestOperationMap.put("nestName", res.get("nest_name").toString());
             nestOperationMap.put("nestCode", res.get("nest_code").toString());
             nestOperationMap.put("moduleNo", res.get("module_no").toString());
-//                nestOperationMap.put("time", res.get("time").toString());
             nestOperationMap.put("type", res.get("type").toString());
             nestOperationMap.put("value", res.get("value").toString());
             nestOperationMap.put("valueUnit", res.get("value_unit").toString());
@@ -75,9 +74,6 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
             redisTemplate.opsForHash().putAll(nestOperation, nestOperationList.get(i));
             redisTemplate.expire(nestOperation, 7, TimeUnit.DAYS);
         }
-
-        // 国网要求
-//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override
