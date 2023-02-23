@@ -910,6 +910,7 @@
         and b.instance_id = c.instance_id
         and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
         <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        and (c.edge_code is null or c.origin_id is null)
     </select>
 
     <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
