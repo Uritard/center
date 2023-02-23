@@ -29,6 +29,8 @@ public enum HandlerEnum {
     MICRO_WEATHER_DATA("21","microWeatherData"),
     // 任务状态数据
     ROBOT_TASK_STATUS("41","robotTaskStatus"),
+    // 机器人任务状态数据递层同步
+    ROBOT_TASK_STATUS_TO_CRUISE("411","robotTaskStatusToCruise"),
     // 巡视结果
     INSPECTION_RESULT("61","inspectionResult"),
     // 机器人站端任务
