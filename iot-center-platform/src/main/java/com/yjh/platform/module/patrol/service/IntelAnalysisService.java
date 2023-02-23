@@ -950,7 +950,7 @@ public class IntelAnalysisService {
                     log.info("巡视点为{}的图像无问题", map.get("instance_id"));
                     continue;
                 }
-                content.add(desc);
+                content.add(type);
 
                 // 因为算法端乱改乱改 所以就在这里截取了 不想改动后面的逻辑(拼接路径)
                 String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
