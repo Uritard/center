@@ -1010,7 +1010,7 @@ public class RobotService {
             }
             if (StringUtils.isNotEmpty(item.getEdgeCode())){
                 // 边缘节点-任务下发
-                boolean edgeStatus = checkEdgeStatus(item);
+                boolean edgeStatus = checkEdgeStatus(item.getEdgeCode());
                 if (edgeStatus) {
                     Runnable runnable = new Runnable() {
                         @Override
@@ -1126,14 +1126,14 @@ public class RobotService {
     /**
      * 判断边缘节点是否在线是否正在运作
      *
-     * @param  item
+     * @param  edgeCode
      * @return boolean
      */
-    private boolean checkEdgeStatus(RobotTaskInstanceInfo item){
-        String edgeOnlineStatus = tRobotInfoDao.selectStatusByEdgeCode(item.getEdgeCode());
+    public boolean checkEdgeStatus(String edgeCode){
+        String edgeOnlineStatus = tRobotInfoDao.selectStatusByEdgeCode(edgeCode);
 
         if (StringUtils.equals(OFF_LINE, edgeOnlineStatus)){
-            log.info("=========="+ item.getEdgeCode() +"该边缘节点处于离线状态,没有成功将任务下发到边缘节点,巡视结果数据默认==========");
+            log.info("=========="+ edgeCode +"该边缘节点处于离线状态,没有成功将任务下发到边缘节点,巡视结果数据默认==========");
             return false;
         }
         return true;

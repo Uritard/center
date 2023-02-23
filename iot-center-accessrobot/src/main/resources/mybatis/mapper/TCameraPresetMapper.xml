@@ -19,6 +19,7 @@
             <result property="calibrationStatus" column="calibration_status" jdbcType="INTEGER"/>
             <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="presetPtz" column="preset_ptz" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -27,7 +28,7 @@
         preset_name,preset_type,
         creator_user,creator_time,is_use,
         preset_img,inspection_postion,collect_status,
-        calibration_status,remark,origin_id,
+        calibration_status,remark,preset_ptz,origin_id,
         edge_code
     </sql>
 
@@ -152,7 +153,14 @@
             calibration_status =  #{calibrationStatus,jdbcType=INTEGER},
             remark =  #{remark,jdbcType=VARCHAR},
             origin_id =  #{originId,jdbcType=VARCHAR},
+            preset_ptz =  #{presetPtz,jdbcType=VARCHAR},
             edge_code =  #{edgeCode,jdbcType=VARCHAR}
+        where   preset_id = #{presetId,jdbcType=BIGINT}
+    </update>
+    <update id="updatePtzByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
+        update t_camera_preset
+        set
+        preset_ptz =  #{presetPtz,jdbcType=VARCHAR}
         where   preset_id = #{presetId,jdbcType=BIGINT}
     </update>
     <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap">

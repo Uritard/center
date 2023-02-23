@@ -470,11 +470,14 @@ public class TCameraPresetController {
             params.put("meteName", cameraPreset.getPresetName());
 
             Result response1 = sendPostRequest(Constant.SET_PRESET_URL, params);//设置预置点
-            if (response1.getData().equals(true)) {
+            if (!StringUtils.isEmpty(response1.getData().toString())) {
                 Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                 JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
-                cameraPreset.setPresetImg((String)json.get("urlPath"));
-                tCameraPresetService.update(cameraPreset);//存图
+                tCameraPresetService.saveImgToFtpsToCoverOriImg((String)json.get("urlPath"), cameraPreset.getPresetImg());
+                String presetPtz = response1.getData().toString();
+                tCameraPreset.setPresetPtz(presetPtz);
+                tCameraPresetService.update(cameraPreset); // 更新PTZ信息
+                tCameraPresetService.SycPresetToEdge(presetPtz, tCameraPreset); // 向边缘节点同步预置位图片和ptz信息
                 result.setData(1);
             } else {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

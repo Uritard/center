@@ -84,6 +84,9 @@ public class TCameraPreset implements Serializable {
     @ApiModelProperty(value = "相机预置位PTZ值")
     private String presetPtz ;
 
+    @ApiModelProperty(value = "边缘节点预置位Id")
+    private String originId ;
+
     @Max(value=999999999)
     @ApiModelProperty(value = "守望位类型")
     // 默认普通预置位

@@ -101,6 +101,11 @@ public class TCameraPreset implements Serializable {
      */
     private Integer isSecondKeepWatchTask;
 
+    /**
+     * 相机预置位PTZ信息
+     */
+    private String presetPtz;
+
     private static final long serialVersionUID = 1L;
 
 }

@@ -279,6 +279,24 @@ public class IntelAnalysisService {
     }
 
     /**
+     * 将图片覆盖到http地址所在的图片ftps路径中，并返回ftps路径
+     *
+     * @param urlPath urlPath
+     * @param httpPath httpPath
+     * @return result
+     */
+    public String upLoadFileToCoverHttpPath(String urlPath, String httpPath) {
+        try {
+            String targetNamePath = httpPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), "");
+            uploadFileToFtps(urlPath, targetNamePath, intelAnalysisFtpsConfig);
+            return targetNamePath;
+        } catch (Exception e) {
+            log.error("upLoadFileToHttpPath err, httpPath: {}, msg: {}", urlPath, e.getMessage());
+            return "";
+        }
+    }
+
+    /**
      * 算法识别后的预置位结果解析，只有当返回结果确定偏移时，对redis中缓存状态数据进行更新
      *
      * @param response response

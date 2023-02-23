@@ -60,6 +60,8 @@ public class Constant {
 
     public static final String STATISTIC = "http://iot-center-accessrobot/robot/v1/cruiseStatistic";
 
+    public static final String CAMERA_PRESET_UPDATE_URL = "http://iot-center-accessrobot/robot/v1/sycPresetInfo";
+
     public static final String ALGORITHM_URL ="http://iot-center-accessvideo/analysis/v1/algorithm";
 
     public static final String NVR_URL = "http://iot-center-accessvideo/camera/v2/getNVRStoreInfo?recordId={recordId}";
