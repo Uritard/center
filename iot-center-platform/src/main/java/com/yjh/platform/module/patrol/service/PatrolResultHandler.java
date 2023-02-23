@@ -13,6 +13,8 @@ import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -26,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -99,6 +102,42 @@ public class PatrolResultHandler {
         }
     }
 
+    public static void main(String[] args) {
+        RobotPatrolTaskResult result = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("qqq");
+        RobotPatrolTaskResult result2 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("www");
+        RobotPatrolTaskResult result3 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("eee");
+        RobotPatrolTaskResult result1 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("yyy");
+        RobotPatrolTaskResult result4 = new RobotPatrolTaskResult().setDeviceId("456").setDeviceName("rrr");
+        RobotPatrolTaskResult result6 = new RobotPatrolTaskResult().setDeviceId("456").setDeviceName("uuu");
+        RobotPatrolTaskResult result5 = new RobotPatrolTaskResult().setDeviceId("789").setDeviceName("ttt");
+        List<RobotPatrolTaskResult> resultList = new ArrayList<>();
+        resultList.add(result);
+        resultList.add(result1);
+        resultList.add(result2);
+        resultList.add(result3);
+        resultList.add(result4);
+        resultList.add(result5);
+        resultList.add(result6);
+        System.out.println(resultList);
+        System.out.println("============resultList===============");
+        Map<String, Long> collect = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()));
+        System.out.println(collect);
+        System.out.println("=============collect==============");
+        int size = collect.size();
+        System.out.println(size);
+        System.out.println("=============size==============");
+        List<String> repeat = collect.entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toList());
+        System.out.println(repeat);
+        System.out.println("============repeat===============");
+        List<Map.Entry<String, Long>> entryList = collect.entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
+        System.out.println(entryList);
+        System.out.println("============entryList===============");
+        entryList.forEach(map -> {
+                    System.out.println(map.getKey());
+                    System.out.println(map.getValue());
+        });
+
+    }
     /**
      * 处理下级系统的巡视结果
      *
@@ -112,6 +151,15 @@ public class PatrolResultHandler {
         String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         log.info("robotPatrolTaskResult resultList=={}", resultList);
 
+        // 将重复的deviceId挑出来
+        List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
+                .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(entryList)) {
+            entryList.forEach(map -> {
+                redisTemplate.opsForHash().put("repeatDeviceId:" + map.getKey(), "value", String.valueOf(map.getValue()));
+            });
+        }
+        HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
                 Map<String, String> infoMap = new HashMap<>(8);
@@ -172,7 +220,23 @@ public class PatrolResultHandler {
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
+
+                boolean isJFRepeat = false;
+                for (Map.Entry<String, Long> entry : entryList) {
+                    if (StringUtils.equals(entry.getKey(), robotPatrolTaskResult.getDeviceId())){
+                        isJFRepeat = true;
+                        break;
+                    }
+                }
+
                 // 巡视结果处理
+                TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
+                if (StringUtils.equals("693", stdDeviceMete.getMeteType()) && isJFRepeat) {
+                    List<RobotPatrolTaskResult> list = multipleValuesResultMap.getOrDefault(robotPatrolTaskResult.getDeviceId(), new ArrayList<>());
+                    list.add(robotPatrolTaskResult);
+                    multipleValuesResultMap.put(robotPatrolTaskResult.getDeviceId(), list);
+                    continue;
+                }
                 InspectionResultThread cruiseResultDealThread =
                     new InspectionResultThread(robotPatrolTaskResult, infoMap, insInfo, redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
@@ -181,6 +245,36 @@ public class PatrolResultHandler {
                 log.error("处理下级系统的巡视结果异常:", e);
             }
         }
+
+        if (MapUtils.isEmpty(multipleValuesResultMap)){
+            return;
+        }
+
+        multipleValuesResultMap.keySet().forEach(
+                key ->{
+                    List<RobotPatrolTaskResult> robotPatrolTaskResults = multipleValuesResultMap.get(key);
+                    StringJoiner resultNum = new StringJoiner(",");
+                    for (RobotPatrolTaskResult robotPatrolTaskResult : robotPatrolTaskResults){
+                        String valueUnit = robotPatrolTaskResult.getValueUnit();
+                        switch (robotPatrolTaskResult.getValueType()) {
+                            case "11":
+                                valueUnit = "局放频次:" + valueUnit;
+                                break;
+                            case "12":
+                                valueUnit = "放电峰值:" + valueUnit;
+                                break;
+                            case "13":
+                                valueUnit = "信号均值:" + valueUnit;
+                                break;
+                            default:
+                                break;
+                        }
+                        resultNum.add(valueUnit);
+                    }
+                    robotPatrolTaskResults.get(0).setValue(resultNum.toString());
+                    robotPatrolTaskResult(Collections.singletonList(robotPatrolTaskResults.get(0)));
+                }
+        );
     }
 
     /**
@@ -587,6 +681,7 @@ public class PatrolResultHandler {
                         infoMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
                         alarmPopUp(tStdDevicemete, infoMap);
 
+                        // newAlarm
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
 
                         // 将产生的告警上送至上一级系统
@@ -666,7 +761,7 @@ public class PatrolResultHandler {
             infoMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
             alarmPopUp(tStdDevicemete, infoMap);
 
-            // 告警推送前端页面
+            // newAlarm
             pushAlarmInfo(warnMap.get("warnName"), warnMap.get("warnContent"));
 
             // 告警上报上一级系统
@@ -800,6 +895,7 @@ public class PatrolResultHandler {
                     infoMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
                     alarmPopUp(tStdDevicemete, infoMap);
 
+                    // newAlarm
                     pushAlarmInfo(resultValue, tStdDevicemete.getMeteName() + "--" + resultValue);
 
                 } else if (resultArr.length > 1) {
@@ -829,6 +925,7 @@ public class PatrolResultHandler {
                         defectNames = defectNames + res + " ";
                     }
 
+                    // newAlarm
                     pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + defectNames);
                 }
             }else {

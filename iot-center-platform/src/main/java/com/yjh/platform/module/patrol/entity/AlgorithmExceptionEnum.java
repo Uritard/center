@@ -17,7 +17,9 @@ public enum AlgorithmExceptionEnum {
     /**
      * 2001
      */
-    FAIL_DOWNLOAD_PICTURE("Faild to download image", "算法下载图片失败");
+    FAIL_DOWNLOAD_PICTURE("Faild to download image", "算法下载图片失败"),
+
+    FAIL_DOWNLOAD_PB_PICTURE("Faild to download PB images ", "算法下载判别基准图失败");
 
 
 

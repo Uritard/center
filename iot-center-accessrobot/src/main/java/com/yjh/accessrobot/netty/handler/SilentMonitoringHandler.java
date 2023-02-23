@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -68,10 +70,21 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到静默监视的数据了+++++++++++++++++ xmlBaseModel:{}", JSON.toJSONString(xmlBaseModel));
         String sendCode = xmlBaseModel.getSendCode();
-        if (!Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
-            log.info("未注册");
-            return;
+        if (StringUtils.isEmpty(sendCode)) {
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
+        }
+
+        // 给下级响应
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send(operationProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
+
         List<SilentInfo> silentInfos = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             SilentInfo silentInfo = new SilentInfo();

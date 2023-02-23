@@ -11,6 +11,8 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.stream.Collectors;
 
 
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
@@ -47,6 +49,8 @@ public class TStdDeviceService{
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -540,6 +544,9 @@ public class TStdDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectDevTaskTree(String taskId) {
 
+        UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
+        // 周期间隔任务的taskId和taskCode不一致
+        taskId = StringUtils.equals(uPatrolTask.getTaskCode(), taskId) ? taskId : uPatrolTask.getTaskCode();
         List<AreaInfo> listTree = this.tStdDeviceDao.selectDevTaskTree(taskId);
 
         List<AreaInfo> areaInfoCountryList = new ArrayList<>();

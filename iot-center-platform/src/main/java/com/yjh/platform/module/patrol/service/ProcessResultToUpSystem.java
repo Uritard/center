@@ -19,10 +19,8 @@ import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.net.ftp.FTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -88,7 +86,6 @@ public class ProcessResultToUpSystem {
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
-
         try {
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
@@ -98,8 +95,8 @@ public class ProcessResultToUpSystem {
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
-                String analyseType = getAlgorithmTypeMap(instanceId);
-                HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
+
+                HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
 
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
                 String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
@@ -138,6 +135,10 @@ public class ProcessResultToUpSystem {
                 xmlItems.add(xmlItem);
             }
             xmlBaseModel.setItems(xmlItems);
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            if (StringUtils.equals("1", sysLevel)) {
+                xmlBaseModel.setCommand("1");
+            }
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
@@ -182,68 +183,22 @@ public class ProcessResultToUpSystem {
     }
 
     /**
-     * 根据算法分析类型获取信息
+     * 组装识别类型和文件类型
      *
-     * @param analyseType 算法分析类型
+     * @param cruiseResultMap redis的数据
      * @return Map<String, String>
      */
-    private HashMap<String, String> getTypeAndPathName(String analyseType){
+    private HashMap<String, String> getTypeAndPathName(Map<String, String> cruiseResultMap){
         HashMap<String, String> map = new HashMap<>(4);
         // 识别类型、文件类型、文件名命名
-        String recognitionType = "";
-        String fileNamePath = "";
-        String fileType = "";
-        switch (analyseType){
-            case "1":
-            case "2":
-            case "3":
-                recognitionType = "1";
-                fileNamePath = CCD_PATH;
-                fileType = "2";
-                break;
-            case "4":
-            case "6":
-            case "11":
-                recognitionType = "2";
-                fileNamePath = CCD_PATH;
-                fileType = "2";
-                break;
-            case "5":
-                recognitionType = "6";
-                fileNamePath = CCD_PATH;
-                fileType = "5";
-                break;
-            case "7":
-                recognitionType = "3";
-                fileNamePath = CCD_PATH;
-                fileType = "2";
-                break;
-            case "398":
-            case "8":
-                recognitionType = "3";
-                fileNamePath = CCD_PATH;
-                fileType = "5";
-                break;
-            case "9":
-                recognitionType = "4";
-                fileNamePath = FIR_PATH;
-                fileType = "1";
-                break;
-            case "10":
-                recognitionType = "2";
-                fileNamePath = CCD_PATH;
-                fileType = "5";
-                break;
-            case "13":
-                recognitionType = "5";
-                fileNamePath = AUDIO_PATH;
-                fileType = "3";
-                break;
-            default:
-                recognitionType = "3";
-                fileNamePath = CCD_PATH;
-                fileType = "2";
-                break;
+        String recognitionType = cruiseResultMap.getOrDefault("recognitionType", "3");
+        String fileType = cruiseResultMap.getOrDefault("fileType", "2");
+
+        String fileNamePath = CCD_PATH;
+        if (StringUtils.equals("4", recognitionType)){
+            fileNamePath = FIR_PATH;
+        }else if (StringUtils.equals("5", recognitionType)){
+            fileNamePath = AUDIO_PATH;
         }
         map.put("recognitionType", recognitionType);
         map.put("fileNamePath", fileNamePath);
@@ -426,7 +381,7 @@ public class ProcessResultToUpSystem {
                     tWarnInfo.setWarnContent(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
 
                     tWarnInfo.setWarnSubtype(Integer.valueOf(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450")));
-                    String defectLevel = redisInfoMap.get("defectContent");
+                    String defectLevel = redisInfoMap.get("defectLevel");
                     switch (defectLevel){
                         case "130":
                             alarmLevel = "1";

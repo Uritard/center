@@ -59,7 +59,7 @@ public class WarnSubController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/isPop", method = RequestMethod.GET)
-    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 4,authority = "1235")
+//    @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 4,authority = "1235")
     public Result isPop(@RequestParam(value = "userId", required = true) Long userId,
                          @RequestParam(value = "type", required = true) String type,
                          @RequestParam(value = "warnId", required = true) Long warnId,

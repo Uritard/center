@@ -528,6 +528,7 @@
         )
         END
         ) AS instanceName,
+        b.mete_type,
         b.analyse_type,
         b.is_ai,
         b.is_judge,
