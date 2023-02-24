@@ -3,6 +3,7 @@ package com.yjh.accesstcp.module.device.service;
 import com.yjh.accesstcp.module.device.dao.TCameraPresetMapper;
 import com.yjh.accesstcp.module.device.entity.TCameraPreset;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 /**
@@ -29,6 +30,9 @@ public class TCameraPresetService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private FtpsUtil ftpsUtil;
 
     /**
      * 处理相机预置位同步消息
@@ -65,7 +69,7 @@ public class TCameraPresetService {
      */
     private void updatePresetPtz(Map<String, Object> presetInfoMap) {
         TCameraPreset tCameraPreset = new TCameraPreset();
-        tCameraPreset.setPresetId((Long)presetInfoMap.get("presetId"));
+        tCameraPreset.setPresetId(Long.parseLong(presetInfoMap.get("presetId").toString()));
         tCameraPreset.setPresetPtz(presetInfoMap.get("presetPtz").toString());
         tCameraPresetMapper.updatePtzByPrimaryKey(tCameraPreset);
     }
@@ -75,12 +79,12 @@ public class TCameraPresetService {
      *
      * @param presetInfoMap presetInfoMap
      */
-    private void updatePresetImg(Map<String, Object> presetInfoMap) {
-        TCameraPreset tCameraPreset = tCameraPresetMapper.selectByPrimaryKey((Long)presetInfoMap.get("presetId"));
+    private void updatePresetImg(Map<String, Object> presetInfoMap) throws NoSuchAlgorithmException {
+        TCameraPreset tCameraPreset = tCameraPresetMapper.selectByPrimaryKey(Long.parseLong(presetInfoMap.get("presetId").toString()));
         String devPath = getImageLocalPath(tCameraPreset.getPresetImg());
         String oriFtpsPath = presetInfoMap.get("presetImg").toString();
 
-        copyFileToDevelop(oriFtpsPath, devPath);
+        ftpsUtil.downloadFile(devPath, oriFtpsPath);
     }
 
     /**
@@ -96,26 +100,5 @@ public class TCameraPresetService {
         String presetImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
 
         return presetImg.replaceAll(presetImgPath, presetRealImgPath);
-    }
-
-    /**
-     * 将ftp服务器上的文件复制到开发环境
-     *
-     * @param source 源文件
-     * @param aim    目标文件
-     * @return void
-     */
-    public static void copyFileToDevelop(String source, String aim) {
-        File ff = new File(aim);
-        if (!ff.exists()) {
-            ff.setWritable(true, false);
-            ff.mkdirs();
-        }
-        try {
-            String url = "cp " + source + " " + aim;
-            Runtime.getRuntime().exec(url);
-        } catch (Exception e) {
-            e.getMessage();
-        }
     }
 }

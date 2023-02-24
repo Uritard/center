@@ -815,11 +815,6 @@ public class TCameraPresetService {
             return;
         }
 
-        TCameraPreset edgePreset = new TCameraPreset();
-        edgePreset.setPresetId(Long.parseLong(originIdStr));
-        edgePreset.setPresetPtz(tCameraPreset.getPresetPtz());
-        edgePreset.setPresetImg(tCameraPreset.getPresetImg());
-
         sendMsg(tCameraPreset);
     }
 
