@@ -77,7 +77,7 @@ public interface TCPClientHandler {
             .setCommand("1");
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
         byte[] send = PlatformPacketUtil.createPacket(Constant.sendSessionId.incrementAndGet(),0L,true,xml);
-        send(send);
+        send(send, xmlBaseModel.getReceiveCode());
         //sendString(ctx,PlatformXMLUtil.generateXml(xmlBaseModel));
     }
 
@@ -89,26 +89,21 @@ public interface TCPClientHandler {
             String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
             long sendSessionId = Constant.sendSessionId.incrementAndGet();//刷新sendSessionId
             byte[] send = PlatformPacketUtil.createPacket(sendSessionId, 0L, true, xml);
-            send(send);
+            send(send, xmlBaseModel.getReceiveCode());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
     }
 
-    default void send( byte[] bytes) {
-        ChannelHandlerContext ctx = getChannel();
-        ByteBuf byteBuf = ctx.alloc().buffer();
+    default void send( byte[] bytes , String code) {
+        ChannelHandlerContext context = getChannel();
+        ByteBuf byteBuf = context.alloc().buffer();
         byteBuf.writeBytes(bytes);
-        StringBuilder Str = new StringBuilder();
-        for (byte byteitem : bytes) {
-            Str.append(String.format("%02x ", byteitem));
-        }
-        log.info("commandSendToRobot:" + Str + " : " );
-        ctx.pipeline().writeAndFlush(byteBuf);
-        log.info("发送成功");
+        context.pipeline().writeAndFlush(byteBuf);
+        log.info("command Send To system {} Success", code);
         if (byteBuf.refCnt() >= 1) {
-            ReferenceCountUtil.release(ctx);
+            ReferenceCountUtil.release(context);
         }
     }
 

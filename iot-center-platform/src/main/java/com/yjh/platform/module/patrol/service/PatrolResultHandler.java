@@ -878,6 +878,7 @@ public class PatrolResultHandler {
                     // 缺陷信息存redis
                     String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
                     Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
+                    cruiseResultMap.put("isWarn", "1");
                     log.info("defectMap=={}", JSON.toJSONString(defectMap));
                     redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                     // 为上报到算法管理平台暂存数据
@@ -905,6 +906,7 @@ public class PatrolResultHandler {
                         // 缺陷信息存redis
                         String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
                         Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, res);
+                        cruiseResultMap.put("isWarn", "1");
                         log.info("defectMap=={}", JSON.toJSONString(defectMap));
                         redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                         // 为上报到算法管理平台暂存数据

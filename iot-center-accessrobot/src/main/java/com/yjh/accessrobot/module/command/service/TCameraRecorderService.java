@@ -34,7 +34,7 @@ public class TCameraRecorderService {
     @Resource
     private ServiceRestTemplate serviceRestTemplate;
 
-    @Transactional
+//    @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<TCameraRecorder> tCameraRecorderList, String edgeNode) {
         if (CollectionUtils.isEmpty(tCameraRecorderList)) {
             log.info("tCameraRecorderList is null");
@@ -50,7 +50,7 @@ public class TCameraRecorderService {
         List<TCameraRecorder> oldTCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         // 无历史数据则全部新增
         if (CollectionUtils.isEmpty(oldTCameraRecorderList)) {
-            tCameraRecorderDao.batchInsert(tCameraRecorderList);
+            batchInsertRecorder(tCameraRecorderList);
             tCameraRecorderList.forEach(tCameraRecorder -> registerNVR(tCameraRecorder.getRecordId()));
             // 否则对比数据
         } else {
@@ -75,10 +75,15 @@ public class TCameraRecorderService {
             SetUtils.SetView<String> insertIdCollection = SetUtils.difference(newTCameraRecorderMap.keySet(), oldTCameraRecorderMap.keySet());
             if (CollectionUtils.isNotEmpty(insertIdCollection)) {
                 List<TCameraRecorder> insertTCameraRecorderList = tCameraRecorderList.stream().filter(tCameraRecorder -> insertIdCollection.contains(tCameraRecorder.getOriginId())).collect(Collectors.toList());
-                tCameraRecorderDao.batchInsert(insertTCameraRecorderList);
+                batchInsertRecorder(insertTCameraRecorderList);
                 insertTCameraRecorderList.forEach(tCameraRecorder -> registerNVR(tCameraRecorder.getRecordId()));
             }
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void batchInsertRecorder(List<TCameraRecorder> tCameraRecorderList) {
+        tCameraRecorderDao.batchInsert(tCameraRecorderList);
     }
 
     private void registerNVR(Long recordId) {

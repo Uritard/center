@@ -2038,7 +2038,7 @@ public class UPatrolTaskService {
                     dayAfterTime = tCruiseTaskCount.getEndTime();
                 }
 
-                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
+//                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
