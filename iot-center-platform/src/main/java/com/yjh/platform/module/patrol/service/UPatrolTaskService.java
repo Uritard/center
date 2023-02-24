@@ -273,10 +273,9 @@ public class UPatrolTaskService {
             if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
                 uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
             } else {
-
                 uPatrolTask.setStartTime(new Date());
-                uPatrolTask.setEndTime(new Date());
             }
+            uPatrolTask.setEndTime(new Date());
         }
         if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
             uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskCode());
