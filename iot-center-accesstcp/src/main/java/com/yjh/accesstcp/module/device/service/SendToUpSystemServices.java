@@ -123,7 +123,7 @@ public class SendToUpSystemServices {
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("发送给上级系统的消息：{}\nsendSessionId:{}, receiveSessionId:{}", xml, sendSessionId, receiveSessionId);
         bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, isSend, xml);
-        tcpClientHandler.send(bytes);
+        tcpClientHandler.send(bytes, xmlBaseModel.getReceiveCode());
         return 1;
     }
 
