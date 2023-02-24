@@ -1027,11 +1027,13 @@ public class IntelAnalysisService {
                 jasonMaps.put("type", "alarmPopUp");
                 jasonMaps.put("warnId", warnId);
                 jasonMaps.put("defectModel", 450);
+                jasonMaps.put("warnLevel", tWarnInfo.getWarnLevel());
+                jasonMaps.put("warnType", "1");
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
                 String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
                 if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
-                    postUrl(syncWebsocketUrl, json);
+                    postUrl(Constant.WEBSOCKET_URL, json);
                 }
             }
             return list;
@@ -1200,8 +1202,10 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
                 String targetNamePath = imgPath.replace(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
+
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
-                uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
+                String edgeId = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+                uploadFileToUpFtps(imgPath, edgeId + "/jm/" + targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
                 xmlItem.put("time", warnTime);
