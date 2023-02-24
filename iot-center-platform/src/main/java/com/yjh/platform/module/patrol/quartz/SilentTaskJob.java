@@ -225,7 +225,7 @@ public class SilentTaskJob implements Runnable {
                 // 暂定静默监视识别类型为12,没有实际意义
                 .setAnalyseType("12")
                 .setInstanceId(presetId)
-                .setTaskId("jm#this")
+                .setTaskId("jm")
                 .setPicPath(absPath);
         analysisList.add(analysis);
         List<Response> responseList= intelAnalysisService.picAnalyseNoDetection(analysisList);
