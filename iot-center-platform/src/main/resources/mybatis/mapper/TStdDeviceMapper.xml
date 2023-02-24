@@ -128,8 +128,8 @@
         <if test="upRegionName != null ">a.up_region_name = #{upRegionName},</if>
         <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
-        <if test="presetId != null and '' != presetId">a.preset_id = #{presetId},</if>
-        <if test="cameraId != null and '' != cameraId">a.camera_id = #{cameraId},</if>
+        a.preset_id = #{presetId},
+        a.camera_id = #{cameraId},
         a.update_time = CURRENT_TIMESTAMP(),
         a.real_code = #{realCode},
     </set>
