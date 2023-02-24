@@ -109,7 +109,7 @@ public class LogsAspect {
             params.set("requestMethod", request.getMethod());
             if(Constant.apiPermissions){
                 try {
-                    if (!"".equals(annotation.authority())) {
+                    if (StringUtils.isNotEmpty(annotation.authority())) {
                         String ans = annotation.authority();
                         assert userRole != null;
                         if (!ans.contains(userRole)) {
