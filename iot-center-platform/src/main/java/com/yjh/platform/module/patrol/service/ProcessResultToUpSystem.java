@@ -102,9 +102,9 @@ public class ProcessResultToUpSystem {
                 String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
                 UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskByTaskCode(taskCode);
                 String taskPatrolledIdTemp = taskId;
-                if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
+                /*if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                     taskPatrolledIdTemp = taskCode;
-                }
+                }*/
 
                 xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "deviceCode"));
                 xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "deviceName"));
@@ -114,7 +114,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
-                xmlItem.put("task_code", taskPatrolledIdTemp);
+                xmlItem.put("task_code", taskCode);
                 xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
 
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg

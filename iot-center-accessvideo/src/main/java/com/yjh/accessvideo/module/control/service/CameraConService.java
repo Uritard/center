@@ -1897,6 +1897,7 @@ public class CameraConService {
             String path = videoPath + fileName;
             fileName = fileName.replace(videoPath, "");
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
+            hCNetSDK.NET_DVR_StopSaveRealData(lRealPlayHandle);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String url = "chmod 777 " + path;
             Runtime.getRuntime().exec(url);
