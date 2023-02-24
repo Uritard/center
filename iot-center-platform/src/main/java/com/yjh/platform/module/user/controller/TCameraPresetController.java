@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,8 @@ public class TCameraPresetController {
     private final TCameraPresetService tCameraPresetService;
     @Autowired
     private  TCameraPresetDao tCameraPresetDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetController.class);
 
@@ -473,11 +476,15 @@ public class TCameraPresetController {
             if (!StringUtils.isEmpty(response1.getData().toString())) {
                 Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                 JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
-                tCameraPresetService.saveImgToFtpsToCoverOriImg((String)json.get("urlPath"), cameraPreset.getPresetImg());
+
+                String realLocalPath = (String)json.get("urlPath");
+                realLocalPath = realLocalPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString());
+
+                tCameraPresetService.saveImgToFtpsToCoverOriImg(realLocalPath, cameraPreset.getPresetImg());
                 String presetPtz = response1.getData().toString();
-                tCameraPreset.setPresetPtz(presetPtz);
+                cameraPreset.setPresetPtz(presetPtz);
                 tCameraPresetService.update(cameraPreset); // 更新PTZ信息
-                tCameraPresetService.SycPresetToEdge(presetPtz, tCameraPreset); // 向边缘节点同步预置位图片和ptz信息
+                tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
                 result.setData(1);
             } else {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
