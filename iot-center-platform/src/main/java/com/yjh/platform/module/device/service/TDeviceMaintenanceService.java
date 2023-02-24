@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -339,64 +340,162 @@ public class TDeviceMaintenanceService{
         return this.tDeviceMaintenanceDao.selectInstance(deviceId);
     }
 
-
+    /**
+     * 边缘节点处理巡视系统同步过来的检修区域信息
+     *
+     * @param xmlBaseModel xmlBaseModel
+     * @return result
+     * @throws Exception Exception
+     */
     @Transactional(rollbackFor = Exception.class)
     public int systemSend(XMLBaseModel xmlBaseModel) throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<Map<String, Object>> list = xmlBaseModel.getItems();
-        for (Map<String, Object> item : list) {
-            String enable = item.get("enable").toString();
-            String startTime = item.get("start_time").toString();
-            String endTime = item.get("end_time").toString();
-            String deviceLevel = item.get("device_level").toString();
-            String deviceList = item.get("device_list").toString();
-            String coordinatePixel = item.get("coordinate_pixel").toString();
-            List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-            if (!"".equals(deviceLevel)) {
-                List<Long> deviceIdLst = new ArrayList<>();
-                switch (deviceLevel) {
-                    case "1":
-                        //区域
-                        deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
-                        break;
-                    case "2":
-                        deviceIdLst = idList;
-                        break;
-                    case "3":
-                        deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
-                        break;
-                    default:
-                        break;
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.forEach(item -> {
+                try {
+                    processOneDeviceItem(item);
+                } catch (Exception e) {
+                    log.error("systemSend err", e);
                 }
-                if ("1".equals(enable)) {
-                    List<DeviceAndInstance> lists = new ArrayList<>();
-                    if (!deviceIdLst.isEmpty()) {
-                        List<Long> ins = tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
-                        ins.forEach(insItem -> {
-                            DeviceAndInstance deviceAndInstance = new DeviceAndInstance();
-                            deviceAndInstance.setInstanceId(insItem);
-                            lists.add(deviceAndInstance);
-                        });
-                    }
-                    //设置检修区域
-                    TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
-                    tDeviceMaintenance.setMaintenanceName("检修区域" + startTime);
-                    tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(startTime));
-                    tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(endTime));
-                    tDeviceMaintenance.setDeviceIdList(deviceIdLst);
-                    tDeviceMaintenance.setDeviceLevel(deviceLevel);
-                    tDeviceMaintenance.setDeviceAndInstanceList(lists);
-                    tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
-                    this.add(tDeviceMaintenance);
-                }
-                if ("0".equals(enable)) {
-                    //删除检修区域
-                    tDeviceMaintenanceDao.deleteByDeviceIdList(StringUtils.join(deviceIdLst.toArray(), ","), "检修区域" + startTime);
-                }
-            }
+            });
         }
+
         return 1;
     }
 
+    /**
+     * 处理单个同步过来的检修区域信息
+     *
+     * @param item item
+     * @throws Exception Exception
+     */
+    private void processOneDeviceItem(Map<String, Object> item) throws Exception {
+        String enable = item.get("enable").toString();
+        if ("1".equals(enable)) {
+            processAdd(item);
+        } else if ("0".equals(enable)) {
+            processDelete(item);
+        }
+    }
+
+    /**
+     * 处理新增检修区域
+     *
+     * @param item item
+     * @throws Exception Exception
+     */
+    private void processAdd(Map<String, Object> item) throws Exception {
+        String deviceLevel = item.get("device_level").toString();
+        String deviceList = item.get("device_list").toString();
+
+        if (StringUtils.isNotEmpty(deviceLevel)) {
+            List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
+            List<Long> cruisePoints = getCruisePoints(deviceList, deviceLevel);
+            addDeviceMaintenance(item, deviceIdLst, cruisePoints);
+        }
+    }
+
+    /**
+     * 处理删除检修区域
+     *
+     * @param item item
+     */
+    private void processDelete(Map<String, Object> item) {
+        String startTime = item.get("start_time").toString();
+        String deviceLevel = item.get("device_level").toString();
+        String deviceList = item.get("device_list").toString();
+        List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
+
+        //删除检修区域
+        tDeviceMaintenanceDao.deleteByDeviceIdList(StringUtils.join(deviceIdLst.toArray(), ","), "检修区域" + startTime);
+    }
+
+    /**
+     * 处理新增检修区域
+     *
+     * @param item item
+     * @param deviceIdLst deviceIdLst
+     * @param cruisePoints cruisePoints
+     * @throws Exception Exception
+     */
+    private void addDeviceMaintenance(Map<String, Object> item, List<Long> deviceIdLst, List<Long> cruisePoints) throws Exception {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String startTime = item.get("start_time").toString();
+        String endTime = item.get("end_time").toString();
+        String deviceLevel = item.get("device_level").toString();
+        String coordinatePixel = item.get("coordinate_pixel").toString();
+
+        List<DeviceAndInstance> lists = new ArrayList<>();
+        cruisePoints.forEach(insItem -> {
+            DeviceAndInstance deviceAndInstance = new DeviceAndInstance();
+            deviceAndInstance.setInstanceId(insItem);
+            lists.add(deviceAndInstance);
+        });
+
+        //设置检修区域
+        TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
+        tDeviceMaintenance.setMaintenanceName("检修区域" + startTime);
+        tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(startTime));
+        tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(endTime));
+        tDeviceMaintenance.setDeviceIdList(deviceIdLst);
+        tDeviceMaintenance.setDeviceLevel(deviceLevel);
+        tDeviceMaintenance.setDeviceAndInstanceList(lists);
+        tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
+        this.add(tDeviceMaintenance);
+    }
+
+    /**
+     * 获取同步过来的巡视点列表
+     *
+     * @param deviceList deviceList
+     * @param deviceLevel deviceLevel
+     * @return result
+     */
+    private List<Long> getCruisePoints(String deviceList, String deviceLevel) {
+        List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        List<Long> deviceIdLst = new ArrayList<>();
+        switch (deviceLevel) {
+            case "1":
+                //区域
+                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+                return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
+            case "2":
+                // 间隔
+                deviceIdLst = idList;
+                return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
+            case "3":
+                // 监测点
+                return idList;
+            default:
+                return deviceIdLst;
+        }
+    }
+
+    /**
+     * 获取同步过来的设备列表
+     *
+     * @param deviceList deviceList
+     * @param deviceLevel deviceLevel
+     * @return result
+     */
+    private List<Long> getDeviceIdLst(String deviceList, String deviceLevel) {
+        List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        List<Long> deviceIdLst = new ArrayList<>();
+        switch (deviceLevel) {
+            case "1":
+                //区域
+                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+            case "2":
+                // 间隔
+                deviceIdLst = idList;
+            case "3":
+                // 监测点
+                deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
+            default:
+                break;
+        }
+
+        return deviceIdLst;
+    }
 }
 
