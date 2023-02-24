@@ -480,10 +480,12 @@ public class TCameraPresetController {
                 String realLocalPath = (String)json.get("urlPath");
                 realLocalPath = realLocalPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString());
 
-                tCameraPresetService.saveImgToFtpsToCoverOriImg(realLocalPath, cameraPreset.getPresetImg());
+                String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(realLocalPath, cameraPreset.getPresetImg());
                 String presetPtz = response1.getData().toString();
                 cameraPreset.setPresetPtz(presetPtz);
                 tCameraPresetService.update(cameraPreset); // 更新PTZ信息
+
+                cameraPreset.setPresetImg(remotePath);
                 tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
                 result.setData(1);
             } else {

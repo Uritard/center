@@ -158,6 +158,7 @@ public class UPatrolPlanAttrService {
         Map<String, Object> map = new HashMap<>();
         map.put("planId", planId);
         map.put("planName", String.valueOf(planDetailMap.get("planName")));
+        map.put("type", planDetailMap.get("type"));
         this.tCruisePlanDao.updateByMap(map);
         if (uPatrolPlanAttrList.size() > 0) {
             return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
