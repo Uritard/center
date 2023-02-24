@@ -151,8 +151,10 @@ public class HttpClientUtils {
     public String getUrl(String url, String json) throws IOException {
         // CloseableHttpClient client = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(300000).setConnectionRequestTimeout(100000).setSocketTimeout(300000).build();
         httpGet.addHeader("Content-type", "application/json;charset=utf-8");
         httpGet.setHeader("Accept", "application/json");
+        httpGet.setConfig(requestConfig);
         CloseableHttpResponse response = client.execute(httpGet);
         HttpEntity entity = response.getEntity();
         String result = EntityUtils.toString(entity, "UTF-8");

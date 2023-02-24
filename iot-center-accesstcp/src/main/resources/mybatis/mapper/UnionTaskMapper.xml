@@ -159,4 +159,14 @@
         </foreach>
         )
     </delete>
+    <delete id="deleteAll">
+        DELETE t_cruise_plan,u_patrol_plan_attr,t_cfg_union_rule
+        FROM
+	    t_cruise_plan,
+	    u_patrol_plan_attr,
+	    t_cfg_union_rule
+        WHERE
+	    t_cruise_plan.plan_id = u_patrol_plan_attr.plan_id
+        AND t_cruise_plan.plan_id = t_cfg_union_rule.plan_id
+    </delete>
 </mapper>

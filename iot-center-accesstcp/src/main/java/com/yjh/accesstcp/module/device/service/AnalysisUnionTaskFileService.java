@@ -52,7 +52,7 @@ public class AnalysisUnionTaskFileService {
                 deleteData(itemList);
                 saveData(itemList);
             }else {
-
+                deleteAll();
                 log.info("handleUnionTaskFile is empty !!!");
             }
             log.info("handleUnionTaskFile success,filePath:{}", filePath);
@@ -127,5 +127,7 @@ public class AnalysisUnionTaskFileService {
         unionTaskDao.deletePlanAttr(planIdList);
         unionTaskDao.deleteUnionRule(planIdList);
     }
-
+    private void deleteAll() {
+        unionTaskDao.deleteAll();
+    }
 }

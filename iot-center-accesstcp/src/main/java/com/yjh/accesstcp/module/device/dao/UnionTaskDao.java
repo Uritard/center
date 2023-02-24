@@ -28,4 +28,7 @@ public interface UnionTaskDao {
     void batchInsertRule(@Param("tCfgUnionRuleList") List<TCfgUnionRule> tCfgUnionRuleList);
 
     List<UPatrolPlanAttr> selectPatrolPlan(@Param("planId") Long planId,  @Param("instanceIdList") Set<Long> instanceIdList);
+
+    void deleteAll();
+
 }
