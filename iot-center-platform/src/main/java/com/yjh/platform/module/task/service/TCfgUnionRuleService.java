@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TCfgMeteDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgMete;
@@ -82,17 +83,20 @@ public class TCfgUnionRuleService{
 
     private void transferToEdge(String inputParam) {
         if (StringUtils.isNotEmpty(inputParam)) {
-            List<String> edgeCodeList = tCfgMeteDao.selectAllEdgeCode(inputParam.replace(" ", ""));
-            edgeCodeList.forEach(edgeCode -> {
-                Map<String, Object> map = new HashMap<>(2);
-                map.put("edgeCode", edgeCode);
-                map.put("command", "1");
-                try {
-                    Constant.mapToOtherServer(map, Constant.LINKAGE_FILE_TRANSFER);
-                } catch (Exception e) {
-                    log.error("联动配置信息转发失败！", e);
-                }
-            });
+            Runnable runnable = () -> {
+                List<String> edgeCodeList = tCfgMeteDao.selectAllEdgeCode(inputParam.replace(" ", ""));
+                edgeCodeList.forEach(edgeCode -> {
+                    Map<String, Object> map = new HashMap<>(2);
+                    map.put("edgeCode", edgeCode);
+                    map.put("command", "1");
+                    try {
+                        Constant.mapToOtherServer(map, Constant.LINKAGE_FILE_TRANSFER);
+                    } catch (Exception e) {
+                        log.error("联动配置信息转发失败！", e);
+                    }
+                });
+            };
+            ThreadPoolUtil.COMMON_POOL.addThread(runnable);
         } else {
             log.info("联动配置未添加触发点");
         }
