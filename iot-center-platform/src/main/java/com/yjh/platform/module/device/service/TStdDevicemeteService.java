@@ -66,6 +66,11 @@ public class TStdDevicemeteService{
 //                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),"101");  //删除之前本体部位的设备
 //            }
 //        }
+        if(StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelString())) {
+            String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
+            tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
+        }
+
         this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
@@ -129,6 +134,11 @@ public class TStdDevicemeteService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+
+        if(StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelString())) {
+            String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
+            tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
+        }
         //修改测点配置的算法
         if ((Objects.nonNull(tStdDeviceMeteDetail.getAnalyseType())
                 || Objects.equals("on",tStdDeviceMeteDetail.getIsAi())) && Objects.equals("on", tStdDeviceMeteDetail.getIsJudge())) {

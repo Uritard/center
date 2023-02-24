@@ -93,7 +93,8 @@
             state_one,
             alarm_state,
             is_temdif,
-            redundant_type
+            redundant_type,
+                                     alarm_level_string
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
@@ -136,7 +137,8 @@
                 #{stateOne, jdbcType=VARCHAR},
                 #{alarmState, jdbcType=INTEGER},
                 #{isTemdif, jdbcType=INTEGER},
-                #{redundantType, jdbcType=VARCHAR}
+                #{redundantType, jdbcType=VARCHAR},
+                #{alarmLevelString,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -283,6 +285,7 @@
         a.state_one = #{stateOne},
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
         a.redundant_type = #{redundantType},
+        a.alarm_level_string = #{alarmLevelString,jdbcType=VARCHAR},
         <if test="isTemdif != null ">a.is_temdif = #{isTemdif},</if>
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
@@ -448,6 +451,7 @@
         a.device_id,
         a.device_point_id,
         a.custom_id as customType,
+               a.alarm_level_string,
         a.mete_id,
         a.mete_kind,
         a.meter_type,

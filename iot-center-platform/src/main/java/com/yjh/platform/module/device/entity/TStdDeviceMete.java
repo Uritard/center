@@ -120,6 +120,9 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "告警级别")
     private Integer alarmLevel;
 
+    @ApiModelProperty(value = "告警级别List")
+    private String alarmLevelString;
+
     @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;
