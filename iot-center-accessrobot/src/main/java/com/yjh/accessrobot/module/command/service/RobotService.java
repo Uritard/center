@@ -341,7 +341,6 @@ public class RobotService {
      * <3>: =反向联动信息转发文件
      * @return boolean
      */
-    @Transactional(rollbackFor = Exception.class)
     public boolean linkageFileTransfer(String edgeCode, String command, String filePath) {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, 1);
         if (CollectionUtils.isNotEmpty(stdRegionList)) {

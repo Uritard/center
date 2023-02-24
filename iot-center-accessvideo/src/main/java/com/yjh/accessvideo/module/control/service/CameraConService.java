@@ -1898,8 +1898,7 @@ public class CameraConService {
             fileName = fileName.replace(videoPath, "");
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
-            VideoUtil.h264ToMp4(path);
-            String url = "chmod 777 " + videoPath + fileName;
+            String url = "chmod 777 " + path;
             Runtime.getRuntime().exec(url);
         } catch (Exception ignored) {
             log.info("录制失败");
