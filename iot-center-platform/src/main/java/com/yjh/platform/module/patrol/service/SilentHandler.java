@@ -3,6 +3,8 @@ package com.yjh.platform.module.patrol.service;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class SilentHandler {
     private RedisTemplate redisTemplate;
     @Autowired
     private IntelAnalysisService intelAnalysisService;
+    @Autowired
+    private TCameraPresetDao tCameraPresetDao;
 
     /**
      * 静默结果处理
@@ -44,10 +48,12 @@ public class SilentHandler {
         FileUtil.copyFileUsingStream(temporaryFilePath,tarPath);
         // 调用算法接口分析结果
         List<Analysis> analysisList = new ArrayList<>();
+        TCameraPreset tCameraPreset = tCameraPresetDao.selectIsDownSystemPreset(Long.valueOf(presetId));
+
         Analysis analysis = new Analysis()
                 // 暂定静默监视识别类型为12,没有实际意义
                 .setAnalyseType("12")
-                .setInstanceId(Long.valueOf(presetId))
+                .setInstanceId(tCameraPreset.getPresetId())
                 .setTaskId("jm")
                 .setPicPath(tarPath);
         analysisList.add(analysis);
