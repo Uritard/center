@@ -627,18 +627,13 @@ public class UPatrolTaskService {
                     .setExecuteTime(startTime);
 
             UPatrolTask taskExist = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode());
-            if (StringUtils.isEmpty(taskExist.getDateType())){
-                if (taskExist == null || Optional.ofNullable(taskExist.getTaskSource()).orElse(0) == 1) {
-                    uPatrolTaskDao.add(uPatrolTask);
-                } else {
-                    log.warn("Task already exist, not insert, task: {}", JSON.toJSONString(taskExist));
-                    return null;
-                }
-            }else {
-                // 如果是周期任务, 上一级系统初始化过了
+            if (taskExist == null || Optional.ofNullable(taskExist.getTaskSource()).orElse(0) == 1) {
+                uPatrolTaskDao.add(uPatrolTask);
+            } else {
                 log.warn("Task already exist, not insert, task: {}", JSON.toJSONString(taskExist));
                 return null;
             }
+
             UPatrolResult resultExsis = uPatrolResultDao.selectByPrimaryId(taskId);
             if (resultExsis == null) {
                 uPatrolResultDao.add(uPatrolResult);
@@ -1097,11 +1092,11 @@ public class UPatrolTaskService {
         try {
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
             String taskPatrolledIdTemp = task.getTaskId();
-
+/*
             UPatrolTask uPatrolTask = selectTaskByTaskCode(task.getTaskCode());
             if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                 taskPatrolledIdTemp = task.getTaskCode();
-            }
+            }*/
 
             item.put("task_patrolled_id", stationCode + "_" +taskPatrolledIdTemp + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
