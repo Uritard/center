@@ -1500,10 +1500,11 @@ public class UPatrolTaskService {
             log.info("任务终止失败", e);
         }
 
-        lowTaskGoOn(taskId);
         //任务状态上报站端
         // sendTaskStateToUp(task, 4);
         uPatrolResultDao.update(uPatrolResult);
+
+        lowTaskGoOn(taskId);
     }
 
     /**
