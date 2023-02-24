@@ -36,9 +36,9 @@ public class UdpMessageTest {
     public static Map<Integer, List<String>> dataMap = new HashMap<>();
 
     public static void main(String[] args) {
-        String str = udpParse(1001, 1, "变位", "控合");
+        String str = udpParse(1001, 1, "变位", "分");
         udpVerify(str);
-
+/*
         String path = "D:\\webapp\\temp\\udpParseFile.cime";
         List<String> filePackage = udpParseFile(path);
         System.out.println("==================== 报文验证 ====================");
@@ -46,7 +46,7 @@ public class UdpMessageTest {
             udpVerify(pac);
         }
         System.out.println("==================== 报文文本 ====================");
-        System.out.println(String.join("\n\n", filePackage));
+        System.out.println(String.join("\n\n", filePackage));*/
     }
 
     public static List<String> udpParseFile(String filepath) {
