@@ -14,14 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <功能描述>
@@ -42,78 +40,6 @@ public class TCameraPresetService {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
-    /**
-     * 处理相机预置位同步消息
-     *
-     * @param xmlBaseModel xmlBaseModel
-     * @param receiveSessionId receiveSessionId
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCameraPresetInfo(XMLBaseModel xmlBaseModel, long receiveSessionId) {
-        if (Constant.sendSessionId == receiveSessionId) {
-            log.info("-------------这是刚发命令的响应{}-------------", receiveSessionId);
-            if (!CollectionUtils.isEmpty(xmlBaseModel.getItems())) {
-                xmlBaseModel.getItems().forEach(map -> {
-                    processOnePreset(map);
-                });
-            }
-        }
-    }
-
-    /**
-     * 处理单个与之位
-     *
-     * @param presetInfoMap presetInfoMap
-     */
-    private void processOnePreset(Map<String, Object> presetInfoMap) {
-        try {
-            updatePresetPtz(presetInfoMap);
-            updatePresetImg(presetInfoMap);
-        } catch (Exception e) {
-            log.error("processOnePreset err", e);
-        }
-    }
-
-    /**
-     * 更新PresetPtz字段
-     *
-     * @param presetInfoMap presetInfoMap
-     */
-    private void updatePresetPtz(Map<String, Object> presetInfoMap) {
-        TCameraPreset tCameraPreset = new TCameraPreset();
-        tCameraPreset.setPresetId((Long)presetInfoMap.get("presetId"));
-        tCameraPreset.setPresetPtz(presetInfoMap.get("presetPtz").toString());
-        tCameraPresetMapper.updatePtzByPrimaryKey(tCameraPreset);
-    }
-
-    /**
-     * 更新预置位图片（从巡视主机拷贝覆盖到本地）
-     *
-     * @param presetInfoMap presetInfoMap
-     */
-    private void updatePresetImg(Map<String, Object> presetInfoMap) {
-        TCameraPreset tCameraPreset = tCameraPresetMapper.selectByPrimaryKey((Long)presetInfoMap.get("presetId"));
-        String devPath = getImageLocalPath(tCameraPreset.getPresetImg());
-        String oriFtpsPath = presetInfoMap.get("presetImg").toString();
-
-        robotService.copyFileToDevelop(oriFtpsPath, devPath);
-    }
-
-    /**
-     * 将presetImg路劲从ftps路径变成绝对路径
-     *
-     * @param presetImg presetImg
-     * @return result
-     */
-    private String getImageLocalPath(String presetImg) {
-        // /home/yjh_iot_center/iot-picture/specimens
-        String presetRealImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
-        // https://172.24.39.9/imgs/specimens
-        String presetImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
-
-        return presetImg.replaceAll(presetImgPath, presetRealImgPath);
-    }
 
     public void sycPresetInfoToEdge(TCameraPreset tCameraPreset) {
         if (StringUtils.isNotEmpty(tCameraPreset.getEdgeCode())){
@@ -149,7 +75,7 @@ public class TCameraPresetService {
             .setReceiveCode(tCameraPreset.getEdgeCode())
             .setCode("1111")
             .setTime(DateTimeUtil.format(new Date()))
-            .setType("1")
+            .setType("2023")
             .setCommand("5")
             .setItems(item);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);

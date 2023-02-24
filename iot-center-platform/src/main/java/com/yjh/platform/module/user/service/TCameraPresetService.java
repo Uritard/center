@@ -806,10 +806,9 @@ public class TCameraPresetService {
     /**
      * 相机预置位图片和ptz信息从巡视系统同步到边缘节点
      *
-     * @param presetPtz presetPtz
      * @param tCameraPreset tCameraPreset
      */
-    public void SycPresetToEdge(String presetPtz, TCameraPreset tCameraPreset) {
+    public void SycPresetToEdge(TCameraPreset tCameraPreset) {
         String originIdStr = tCameraPreset.getOriginId();
         if (StringUtils.isEmpty(originIdStr)) {
             // 不是下级节点同步的预置位，不用处理
@@ -818,7 +817,7 @@ public class TCameraPresetService {
 
         TCameraPreset edgePreset = new TCameraPreset();
         edgePreset.setPresetId(Long.parseLong(originIdStr));
-        edgePreset.setPresetPtz(presetPtz);
+        edgePreset.setPresetPtz(tCameraPreset.getPresetPtz());
         edgePreset.setPresetImg(tCameraPreset.getPresetImg());
 
         sendMsg(tCameraPreset);

@@ -6,6 +6,7 @@ package com.yjh.accesstcp.netty.server;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.StaticContextAccessor;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.entity.RobotTaskInstanceInfo;
@@ -14,6 +15,7 @@ import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.module.device.service.TCameraPresetService;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -415,6 +417,10 @@ public class MessageThread {
             }
         }
 
+        // 相机预置位图片和ptz信息同步
+        if ("2023".equals(xmlBaseModel.getType())) {
+            StaticContextAccessor.getBean(TCameraPresetService.class).updateCameraPresetInfo(xmlBaseModel);
+        }
     }
 
     /**
