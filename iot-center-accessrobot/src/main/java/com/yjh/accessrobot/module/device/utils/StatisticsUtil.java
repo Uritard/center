@@ -1,16 +1,22 @@
 package com.yjh.accessrobot.module.device.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
+import com.yjh.accessrobot.module.command.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +36,11 @@ public class StatisticsUtil {
   private static final Map<Long, Long> LAST_ONLINE_TIME_MAP = new ConcurrentHashMap<>();
 
   @Autowired private TRobotInfoDao tRobotInfoDao;
+
+  @Resource
+  private ServiceRestTemplate serviceRestTemplate;
+  @Value("${other.webSocketUrl}")
+  private String syncWebsocketUrl;
   /**
    * 刷新机器人/无人机状态的同时，刷新缓存，统计在线时长及离线次数 <br>
    * isOnline - 是否在线 <br>
@@ -135,10 +146,28 @@ public class StatisticsUtil {
           log.info("tRobotAlarm的内容==={}", tRobotAlarm);
           int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
           log.info("插告警表的结果=" + res);
+
+          sendWebsocket(tRobotAlarm);
         }
       }
     } catch (Exception e) {
       log.error("定时查询在线状态定时任务发生异常", e);
+    }
+  }
+
+  private void sendWebsocket(TRobotAlarm tRobotAlarm) {
+    Map<String, Object> jasonMaps = new HashMap<>(16);
+    jasonMaps.put("type", "alarmPopUp");
+    jasonMaps.put("warnType", "2");
+    jasonMaps.put("warnLevel", tRobotAlarm.getAlarmLevel());
+    jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
+    String json = JSON.toJSONString(jasonMaps);
+    log.info("发送给前端的消息：{}", json);
+    try {
+      String result = serviceRestTemplate.postForObject(syncWebsocketUrl, json, String.class);
+      log.info("param:{} result:{}", json, result);
+    } catch (Exception e) {
+      log.error("发送前端失败", e);
     }
   }
 

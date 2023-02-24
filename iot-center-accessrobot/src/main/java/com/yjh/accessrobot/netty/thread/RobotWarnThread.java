@@ -58,6 +58,7 @@ public class RobotWarnThread implements Runnable{
                 jasonMaps.put("type", "alarmPopUp");
                 jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
                 jasonMaps.put("warnType", "2");
+                jasonMaps.put("warnLevel", tRobotAlarm.getAlarmLevel());
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
                 Constant.postUrl(syncWebsocketUrl, json);
