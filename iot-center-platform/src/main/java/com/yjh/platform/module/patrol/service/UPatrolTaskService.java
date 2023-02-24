@@ -446,18 +446,18 @@ public class UPatrolTaskService {
             }
 
             // 初始化识别类型和采集文件类型
-            map.put("recognition_type", RecognitionTypeEnum.getProRecognize(item.getMeteType()).getSysRecognize());
-            map.put("file_type", "5");
+            map.put("recognitionType", RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize());
+            map.put("fileType", "5");
             switch (item.getMeteType()){
                 case "222":
-                    map.put("file_type", "1");
+                    map.put("fileType", "1");
                     break;
                 case "223":
-                    map.put("file_type", "3");
+                    map.put("fileType", "3");
                     break;
                 case "220":
                 case "433":
-                    map.put("file_type", "2");
+                    map.put("fileType", "2");
                     break;
                 default:
                     break;

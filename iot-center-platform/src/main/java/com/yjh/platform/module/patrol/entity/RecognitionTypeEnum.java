@@ -65,6 +65,11 @@ public enum RecognitionTypeEnum {
     public String getSysRecognize() {
         return sysRecognize;
     }
+
+    public String getProtocolRecognize() {
+        return protocolRecognize;
+    }
+
     String protocolRecognize;
 
     RecognitionTypeEnum(String sysRecognize, String protocolRecognize){
