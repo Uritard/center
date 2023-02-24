@@ -904,13 +904,15 @@
 
     <select id="selectRobotIsRunning" resultType="java.lang.String">
         SELECT DISTINCT
-        IF(e.origin_id IS NOT NULL,e.edge_code,e.robot_code) AS robot_code
+        IF(c.origin_id IS NOT NULL, c.edge_code, e.robot_code) AS robot_code
         FROM
-        u_patrol_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e
-        where 1=1
-        and b.instance_id = c.instance_id
-        and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
-        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        u_patrol_task a
+        RIGHT JOIN u_patrol_task_attr b ON a.task_code = b.task_id
+        LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+        LEFT JOIN t_robot_inspection d ON c.cruise_id = d.inspection_id
+        LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
 
@@ -918,10 +920,12 @@
         SELECT DISTINCT
         c.edge_code
         FROM
-        u_patrol_task_attr b, t_cruise_point_instance c
-        where b.instance_id = c.instance_id
-        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        and c.edge_code !='' and c.origin_id !=''
+        u_patrol_task a
+        RIGHT JOIN u_patrol_task_attr b ON a.task_code = b.task_id
+        LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        AND c.edge_code != '' AND c.origin_id != ''
     </select>
 
     <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
