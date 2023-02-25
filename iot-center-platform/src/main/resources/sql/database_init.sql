@@ -1799,6 +1799,8 @@ CREATE TABLE `t_std_devicemete` (
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
   `redundant_type` varchar(50) NOT NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
+  `is_temdif` int(5) DEFAULT '0' COMMENT '是否温差任务（0-否；1-是）',
+  `alarm_level_string` varchar(64) NULL  DEFAULT '' COMMENT '告警级别list',
   PRIMARY KEY (`device_mete_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='标准设备测点表';
 

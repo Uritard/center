@@ -714,7 +714,10 @@ INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('812', 'device_type', '变电站环境', '32', '设备类型', '1');
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('813', 'recorder_type', '海康超脑', '0', 'NVR类型', '1' );
-
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('814', 'mete_type', '环境温度检测', '1', '巡视内容', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('815', 'mete_type', '环境湿度检测', '1', '巡视内容', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('816', 'mete_type', '氧气浓度检测', '1', '巡视内容', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('817', 'mete_type', 'SF6浓度检测', '1', '巡视内容', '1');
 
 -- ----------------------------
 -- Records of t_period_model
