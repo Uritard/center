@@ -42,6 +42,7 @@ public class TCameraPresetService {
     private RedisTemplate redisTemplate;
 
     public void sycPresetInfoToEdge(TCameraPreset tCameraPreset) {
+        log.info("处理sycPresetInfoToEdge数据");
         if (StringUtils.isNotEmpty(tCameraPreset.getEdgeCode())){
             // 边缘节点-任务下发
             boolean edgeStatus = robotService.checkEdgeStatus(tCameraPreset.getEdgeCode());

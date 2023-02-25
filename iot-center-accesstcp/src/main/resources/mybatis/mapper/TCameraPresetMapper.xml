@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.accessrobot.module.command.dao.TCameraPresetMapper">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.TCameraPresetMapper">
 
     <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TCameraPreset">
             <id property="presetId" column="preset_id" jdbcType="BIGINT"/>
@@ -38,136 +38,11 @@
         from t_camera_preset
         where  preset_id = #{presetId,jdbcType=BIGINT} 
     </select>
-    <select id="selectByEdgeCode" resultType="com.yjh.accesstcp.module.device.entity.TCameraPreset">
-        select
-        <include refid="Base_Column_List" />
-        from t_camera_preset
-        where  edge_code = #{edgeCode}
-    </select>
 
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from t_camera_preset
-        where  preset_id = #{presetId,jdbcType=BIGINT} 
-    </delete>
-    <delete id="deleteByEdgeCodeAndOriginId">
-        delete from t_camera_preset  where edge_code=#{edgeCode}
-        and origin_id in
-        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
-    </delete>
-    <delete id="deleteByEdgeCode">
-        delete from t_camera_preset  where edge_code=#{edgeCode}
-    </delete>
-    <insert id="insert" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraPreset" useGeneratedKeys="true">
-        insert into t_camera_preset
-        ( preset_id,camera_id,preset_num
-        ,preset_name,preset_type
-        ,creator_user,creator_time,is_use
-        ,preset_img,inspection_postion,collect_status
-        ,calibration_status,remark,origin_id
-        ,edge_code)
-        values (#{presetId,jdbcType=BIGINT},#{cameraId,jdbcType=BIGINT},#{presetNum,jdbcType=INTEGER}
-        ,#{presetName,jdbcType=VARCHAR},#{presetType,jdbcType=INTEGER}
-        ,#{creatorUser,jdbcType=VARCHAR},#{creatorTime,jdbcType=TIMESTAMP},#{isUse,jdbcType=INTEGER}
-        ,#{presetImg,jdbcType=VARCHAR},#{inspectionPostion,jdbcType=INTEGER},#{collectStatus,jdbcType=INTEGER}
-        ,#{calibrationStatus,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
-        ,#{edgeCode,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraPreset" useGeneratedKeys="true">
-        insert into t_camera_preset
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="presetId != null">preset_id,</if>
-                <if test="cameraId != null">camera_id,</if>
-                <if test="presetNum != null">preset_num,</if>
-                <if test="presetName != null">preset_name,</if>
-                <if test="presetType != null">preset_type,</if>
-                <if test="creatorUser != null">creator_user,</if>
-                <if test="creatorTime != null">creator_time,</if>
-                <if test="isUse != null">is_use,</if>
-                <if test="presetImg != null">preset_img,</if>
-                <if test="inspectionPostion != null">inspection_postion,</if>
-                <if test="collectStatus != null">collect_status,</if>
-                <if test="calibrationStatus != null">calibration_status,</if>
-                <if test="remark != null">remark,</if>
-                <if test="originId != null">origin_id,</if>
-                <if test="edgeCode != null">edge_code,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="presetId != null">#{presetId,jdbcType=BIGINT},</if>
-                <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
-                <if test="presetNum != null">#{presetNum,jdbcType=INTEGER},</if>
-                <if test="presetName != null">#{presetName,jdbcType=VARCHAR},</if>
-                <if test="presetType != null">#{presetType,jdbcType=INTEGER},</if>
-                <if test="creatorUser != null">#{creatorUser,jdbcType=VARCHAR},</if>
-                <if test="creatorTime != null">#{creatorTime,jdbcType=TIMESTAMP},</if>
-                <if test="isUse != null">#{isUse,jdbcType=INTEGER},</if>
-                <if test="presetImg != null">#{presetImg,jdbcType=VARCHAR},</if>
-                <if test="inspectionPostion != null">#{inspectionPostion,jdbcType=INTEGER},</if>
-                <if test="collectStatus != null">#{collectStatus,jdbcType=INTEGER},</if>
-                <if test="calibrationStatus != null">#{calibrationStatus,jdbcType=INTEGER},</if>
-                <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
-                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
-                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
-        </trim>
-    </insert>
-    <insert id="batchInsert" keyColumn="preset_id" keyProperty="presetId" parameterType="java.util.List" useGeneratedKeys="true">
-        insert into t_camera_preset
-        (camera_id,preset_num
-        ,preset_name,preset_type
-        ,creator_user,creator_time,is_use
-        ,preset_img,inspection_postion,collect_status
-        ,calibration_status,remark,origin_id
-        ,edge_code)
-        values
-        <foreach collection="list"  item="tCameraPreset" separator=",">
-            (#{tCameraPreset.cameraId,jdbcType=BIGINT},#{tCameraPreset.presetNum,jdbcType=INTEGER}
-            ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.presetType,jdbcType=INTEGER}
-            ,#{tCameraPreset.creatorUser,jdbcType=VARCHAR},#{tCameraPreset.creatorTime,jdbcType=TIMESTAMP},#{tCameraPreset.isUse,jdbcType=INTEGER}
-            ,#{tCameraPreset.presetImg,jdbcType=VARCHAR},#{tCameraPreset.inspectionPostion,jdbcType=INTEGER},#{tCameraPreset.collectStatus,jdbcType=INTEGER}
-            ,#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
-            ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR})
-        </foreach>
-    </insert>
-
-    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TCameraPreset">
-        update t_camera_preset
-        <set>
-                <if test="presetImg != null">
-                    preset_img = #{presetImg,jdbcType=VARCHAR},
-                </if>
-        </set>
-        where   preset_id = #{presetId,jdbcType=BIGINT} 
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraPreset">
-        update t_camera_preset
-        set 
-            camera_id =  #{cameraId,jdbcType=BIGINT},
-            preset_num =  #{presetNum,jdbcType=INTEGER},
-            preset_name =  #{presetName,jdbcType=VARCHAR},
-            preset_type =  #{presetType,jdbcType=INTEGER},
-            creator_user =  #{creatorUser,jdbcType=VARCHAR},
-            creator_time =  #{creatorTime,jdbcType=TIMESTAMP},
-            is_use =  #{isUse,jdbcType=INTEGER},
-            preset_img =  #{presetImg,jdbcType=VARCHAR},
-            inspection_postion =  #{inspectionPostion,jdbcType=INTEGER},
-            collect_status =  #{collectStatus,jdbcType=INTEGER},
-            calibration_status =  #{calibrationStatus,jdbcType=INTEGER},
-            remark =  #{remark,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=VARCHAR},
-            preset_ptz =  #{presetPtz,jdbcType=VARCHAR},
-            edge_code =  #{edgeCode,jdbcType=VARCHAR}
-        where   preset_id = #{presetId,jdbcType=BIGINT}
-    </update>
     <update id="updatePtzByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraPreset">
         update t_camera_preset
         set
         preset_ptz =  #{presetPtz,jdbcType=VARCHAR}
         where   preset_id = #{presetId,jdbcType=BIGINT}
     </update>
-    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from t_camera_preset
-        where edge_code = #{edgeCode} and origin_id=#{originId}
-    </select>
-
 </mapper>

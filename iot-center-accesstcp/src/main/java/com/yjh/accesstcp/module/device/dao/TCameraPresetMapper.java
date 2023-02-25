@@ -17,27 +17,7 @@ import java.util.List;
 @Repository
 public interface TCameraPresetMapper {
 
-    int deleteByPrimaryKey(Long id);
-
-    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
-
-    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
-
-    int insert(TCameraPreset record);
-
-    int insertSelective(TCameraPreset record);
-
     TCameraPreset selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(TCameraPreset record);
-
-    int updateByPrimaryKey(TCameraPreset record);
-
     int updatePtzByPrimaryKey(TCameraPreset record);
-
-    List<TCameraPreset> selectByEdgeCode(@Param("edgeCode") String edgeCode);
-
-    int batchInsert(List<TCameraPreset> list);
-
-    TCameraPreset selectByEdgeCodeAndOriginId (@Param("edgeCode") String edgeCode ,@Param("originId") String originId );
 }

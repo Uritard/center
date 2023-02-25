@@ -36,6 +36,10 @@ public class TCameraPreset implements Serializable {
     @TableField(value = "camera_id",updateStrategy = FieldStrategy.IGNORED)
     private Long cameraId ;
 
+    @ApiModelProperty(value = "边缘节点ID")
+    @TableField(value = "edge_code",updateStrategy = FieldStrategy.IGNORED)
+    private String edgeCode;
+
     @Max(value=999999999)
     @ApiModelProperty(value = "预置位号")
     private Integer presetNum ;

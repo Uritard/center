@@ -99,6 +99,6 @@ public class TCameraPresetService {
         // https://172.24.39.9/imgs/specimens
         String presetImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
 
-        return presetImg.replaceAll(presetImgPath, presetRealImgPath);
+        return presetImg.replaceAll(presetRealImgPath, presetImgPath);
     }
 }
