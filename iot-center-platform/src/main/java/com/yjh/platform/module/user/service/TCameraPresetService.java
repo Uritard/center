@@ -489,7 +489,7 @@ public class TCameraPresetService {
      */
     public Map<Long, Integer> queryPresetCheckResult(Long cameraId) {
         String redisKey = getPresetRedisKeyByCameraId(cameraId);
-        Map<Long, Integer> resultMap = (Map<Long, Integer>) redisTemplate.opsForValue().get(redisKey);
+        Map<Long, Integer> resultMap = redisTemplate.opsForHash().entries(redisKey);
         return resultMap;
     }
 
@@ -713,7 +713,7 @@ public class TCameraPresetService {
     private void setPresetCheckResultToRedis(List<CameraPresetCheckResult> checkResults) {
         String presetRedisKey = getPresetRedisKey(checkResults);
         Map<Long, Integer> presetMap = getPresetCheckResultMap(checkResults);
-        redisTemplate.opsForValue().set(presetRedisKey,presetMap,1, TimeUnit.DAYS);
+        redisTemplate.opsForHash().putAll(presetRedisKey,presetMap);
     }
 
     /**
@@ -734,7 +734,7 @@ public class TCameraPresetService {
      * @return result
      */
     private String getPresetRedisKeyByCameraId(Long cameraId) {
-        return String.format("CAMERA_PRESET_CHECK_RESULT_%d", cameraId);
+        return String.format("CAMERA_PRESET_CHECK_RESULT:%d", cameraId);
     }
 
     /**
