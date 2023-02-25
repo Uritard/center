@@ -826,12 +826,13 @@ public class TCameraPresetService {
     private void sendMsg(TCameraPreset tCameraPreset) {
         try {
             Map<String, String> jasonMap = new HashMap<>();
-            jasonMap.put("presetId", tCameraPreset.getPresetId().toString());
+            jasonMap.put("presetId", tCameraPreset.getOriginId());
             jasonMap.put("presetPtz", tCameraPreset.getPresetPtz());
             jasonMap.put("presetImg", tCameraPreset.getPresetImg());
-            String jsonMessage = JSONUtil.toJSONString(tCameraPreset);
+            jasonMap.put("edgeCode", tCameraPreset.getEdgeCode());
+            String jsonMessage = JSONUtil.toJSONString(jasonMap);
             log.info("需要同步的相机预置位消息：" + jsonMessage);
-            Constant.websocketSendMsg(Constant.CAMERA_PRESET_UPDATE_URL, jasonMap);
+            SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).postForObject(Constant.CAMERA_PRESET_UPDATE_URL, jasonMap, Result.class);
         } catch (Exception e) {
             log.error("SycPresetToEdge err", e);
         }

@@ -7,6 +7,7 @@
         <id column="preset_id" jdbcType="BIGINT" property="presetId" />
         <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
         <result column="origin_id" jdbcType="VARCHAR" property="originId" />
+        <result column="edge_code" jdbcType="VARCHAR" property="edgeCode" />
         <result column="preset_num" jdbcType="INTEGER" property="presetNum" />
         <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
         <result column="creator_user" jdbcType="VARCHAR" property="creatorUser" />
@@ -104,6 +105,7 @@
         select
         a.preset_id,
         a.camera_id,
+        a.edge_code,
         a.origin_id,
         a.preset_num,
         a.preset_name,
