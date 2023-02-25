@@ -299,10 +299,11 @@ public class IntelAnalysisService {
             // 只有识别结果明确为偏移时才去修改redis
             if ("2000".equals(response.getResultsList().get(0).getResults().get(0).getCode())
                 && "1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
+                log.info("算法识别预置位偏移, flagId: {}", flagId);
                 String[] arr = flagId.split("_");
                 Long cameraId = Long.parseLong(arr[0]);
                 Long presetId = Long.parseLong(arr[1]);
-                String key = String.format("CAMERA_PRESET_CHECK_RESULT_%d", cameraId);
+                String key = String.format("CAMERA_PRESET_CHECK_RESULT:%d", cameraId);
                 redisTemplate.opsForHash().put(key, presetId, -1);
             }
         } catch (Exception e) {
