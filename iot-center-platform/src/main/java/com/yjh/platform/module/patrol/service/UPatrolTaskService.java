@@ -1283,8 +1283,8 @@ public class UPatrolTaskService {
     }
 
 //    @Transactional(rollbackFor = Exception.class)
-    public int taskStart(String taskId) {
-
+    public String taskStart(String taskId) {
+        String taskPatrolledId = "";
         try {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
@@ -1304,8 +1304,7 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
             tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
             tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
-
-            this.addTask(tCruiseTaskAdd, false);
+            taskPatrolledId = this.addTask(tCruiseTaskAdd, false);
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
@@ -1315,17 +1314,11 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-
         } catch (Exception e) {
             log.error("任务启动异常: " + e);
             e.printStackTrace();
         }
-//
-//        //任务状态上报站端
-//        UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(newTaskId);
-//        sendTaskStateToUp(uPatrolTask, 2);
-
-        return 1;
+        return taskPatrolledId;
     }
 
     public void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
@@ -2684,7 +2677,7 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception {
+    public String upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception {
         String com = xmlBaseModel.getCommand();
         String code = xmlBaseModel.getCode();
         String taskId = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
@@ -2693,14 +2686,14 @@ public class UPatrolTaskService {
             case "1":
                 return this.taskStart(taskId);
             case "2":
-                return this.taskPause(taskId);
+                return String.valueOf(this.taskPause(taskId));
             case "3":
-                return this.taskGoOn(taskId);
+                return String.valueOf(this.taskGoOn(taskId));
             case "4":
                 this.taskShutDown(taskId);
-                return 1;
+                return "1";
             default:
-                return -1;
+                return "-1";
         }
     }
 }
