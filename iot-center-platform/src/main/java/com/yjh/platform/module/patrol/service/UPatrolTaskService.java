@@ -278,8 +278,12 @@ public class UPatrolTaskService {
             uPatrolTask.setEndTime(new Date());
         }
         if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
-            uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskCode());
             uPatrolTask.setTaskCode(tCruiseTaskAdd.getTaskCode());
+            if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) {
+                uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());
+            }else {
+                uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskCode());
+            }
         }
         if (tCruiseTaskAdd.getAreaId() == null){
             String areaId =  redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content").toString();
@@ -1278,25 +1282,27 @@ public class UPatrolTaskService {
         sendTaskStateToUp(task, 3);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public int taskStart(String taskId) {
 
         try {
+            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+            UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+            TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+            //创建立即任务
+            tCruiseTaskAdd.setTaskId(newTaskId);
+            tCruiseTaskAdd.setTaskCode(uPatrolTask.getTaskCode());
+            tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
+            tCruiseTaskAdd.setIfRun(173);
+            tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动");
+            tCruiseTaskAdd.setType(uPatrolTask.getTaskType());
+            tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
+            tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
+            tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
+            this.addTask(tCruiseTaskAdd, false);
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
-                //创建立即任务
-                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
-                UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
-                tCruiseTaskAdd.setTaskCode(uPatrolTask.getTaskCode());
-                tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
-                tCruiseTaskAdd.setIfRun(173);
-                tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动");
-                tCruiseTaskAdd.setType(uPatrolTask.getTaskType());
-                tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
-                tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
-                tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
-                this.addTask(tCruiseTaskAdd, false);
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
                 robotTaskStatesMap.put("commandValue", 1);
@@ -1308,10 +1314,10 @@ public class UPatrolTaskService {
             log.error("任务启动异常: " + e);
             e.printStackTrace();
         }
-
-        //任务状态上报站端
-        UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
-        sendTaskStateToUp(uPatrolTask, 2);
+//
+//        //任务状态上报站端
+//        UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(newTaskId);
+//        sendTaskStateToUp(uPatrolTask, 2);
 
         return 1;
     }
