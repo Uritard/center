@@ -231,7 +231,7 @@ public class PatrolResultHandler {
 
                 // 巡视结果处理
                 TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
-                if (StringUtils.equals("693", stdDeviceMete.getMeteType()) && isJFRepeat) {
+                if (ArrayUtils.contains(new String[]{"690", "691", "692"}, stdDeviceMete.getMeteType()) && isJFRepeat) {
                     List<RobotPatrolTaskResult> list = multipleValuesResultMap.getOrDefault(robotPatrolTaskResult.getDeviceId(), new ArrayList<>());
                     list.add(robotPatrolTaskResult);
                     multipleValuesResultMap.put(robotPatrolTaskResult.getDeviceId(), list);

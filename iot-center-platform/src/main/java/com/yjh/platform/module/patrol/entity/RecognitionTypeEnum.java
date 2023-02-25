@@ -34,15 +34,15 @@ public enum RecognitionTypeEnum {
     /**
      * 局放超声波检测
      */
-    EMISSION_ULTRASOUND("6931", "11"),
+    EMISSION_ULTRASOUND("691", "11"),
     /**
      * 局放地电压检测
      */
-    DISCHARGE_VOLTAGE("6932", "12"),
+    DISCHARGE_VOLTAGE("690", "12"),
     /**
      * 局放特高频检测
      */
-    AMPLIFIER_HIGH("6933", "13"),
+    AMPLIFIER_HIGH("692", "13"),
     /**
      * 环境温度检测
      */
