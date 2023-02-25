@@ -35,4 +35,5 @@ public interface UPatrolTaskAttrDao {
 
     List<TCruisePointInstance> batchSelect(@Param("instanceList") List<Long> instanceList);
 
+    List<String> selectDeviceList(@Param(value = "taskId") String taskId);
 }

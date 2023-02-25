@@ -1289,16 +1289,22 @@ public class UPatrolTaskService {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
             TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+            if (Objects.nonNull(uPatrolTask.getPlanId())){
+                tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
+            }else {
+                List<String> deviceList = uPatrolTaskAttrDao.selectDeviceList(taskId);
+                tCruiseTaskAdd.setDeviceList(StringUtils.join(deviceList, ","));
+            }
             //创建立即任务
             tCruiseTaskAdd.setTaskId(newTaskId);
             tCruiseTaskAdd.setTaskCode(uPatrolTask.getTaskCode());
-            tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
             tCruiseTaskAdd.setIfRun(173);
-            tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动");
+            tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动" + DateTimeUtil.format3(new Date()));
             tCruiseTaskAdd.setType(uPatrolTask.getTaskType());
             tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
             tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
             tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
+
             this.addTask(tCruiseTaskAdd, false);
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
