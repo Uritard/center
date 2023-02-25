@@ -69,7 +69,7 @@ public class TaskJob extends QuartzJobBean {
 
         String taskId = context.getMergedJobDataMap().getString("taskId");
         UPatrolTask ancestralTask = uPatrolTaskDao.selectByPrimaryId(taskId);
-        UPatrolTask task = uPatrolTaskDao.selectThisTaskByTaskCode(taskId);
+        UPatrolTask task = uPatrolTaskDao.selectThisTaskByTaskCode(ancestralTask.getTaskCode());
         //任务的计划执行时间
         Date date = context.getScheduledFireTime();
         String taskDate = DateTimeUtil.format(date);

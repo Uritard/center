@@ -170,6 +170,15 @@
             </foreach>
         </if>
     </select>
+    <select id="selectDeviceList" resultType="java.lang.String">
+        SELECT
+            a.instance_id
+        FROM
+            u_patrol_task_attr a
+        WHERE
+            1 = 1
+          AND a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
 
     <insert id="batchAdd">
         insert into u_patrol_task_attr(
