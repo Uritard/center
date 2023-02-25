@@ -215,10 +215,8 @@ public class MessageThread {
             re = Constant.otherServer(map,Constant.TASK_STATE_URL);
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
-            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
             if (StringUtils.equals("1", xmlBaseModel.getCommand())){
-                String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                item.put("task_patrolled_id", stationCode + "_" +xmlBaseModel.getCode() + "_" + time);
+                item.put("task_patrolled_id", re.getData());
             }else{
                 item.put("task_patrolled_id", xmlBaseModel.getCode());
             }
