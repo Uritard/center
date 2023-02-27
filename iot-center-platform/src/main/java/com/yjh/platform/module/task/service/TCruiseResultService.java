@@ -23,6 +23,7 @@ import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,7 +414,7 @@ public class TCruiseResultService{
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 Map<String, String> body = redisTemplate.opsForHash().entries(key);
-                switch (body.get("cruiseType")) {
+                switch (MapUtils.getString(body, "cruiseType", "228")) {
                     case "229":
                     case "230":
                         cameraCount++;

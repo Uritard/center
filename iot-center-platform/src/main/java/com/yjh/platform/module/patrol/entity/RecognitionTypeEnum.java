@@ -83,7 +83,7 @@ public enum RecognitionTypeEnum {
                 return result;
             }
         }
-        return null;
+        return APPEARANCE_VIEW;
     }
 
 
