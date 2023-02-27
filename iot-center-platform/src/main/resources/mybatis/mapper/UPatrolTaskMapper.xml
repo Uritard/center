@@ -909,10 +909,9 @@
         u_patrol_task a
         RIGHT JOIN u_patrol_task_attr b ON a.task_code = b.task_id
         LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
-        LEFT JOIN t_robot_inspection d ON c.cruise_id = d.inspection_id
-        LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
+        JOIN t_robot_inspection d ON c.cruise_id = d.inspection_id
+        JOIN t_robot_info e ON d.robot_id = e.robot_id
         WHERE 1 = 1
-        AND d.robot_id IS NOT NULL
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
