@@ -1,19 +1,16 @@
 package com.yjh.platform.module.user.service;
 
-import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
@@ -33,7 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -489,8 +485,13 @@ public class TCameraPresetService {
      */
     public Map<Long, Integer> queryPresetCheckResult(Long cameraId) {
         String redisKey = getPresetRedisKeyByCameraId(cameraId);
-        Map<Long, Integer> resultMap = redisTemplate.opsForHash().entries(redisKey);
-        return resultMap;
+        Map<String, String> map = redisTemplate.opsForHash().entries(redisKey);
+        Map<Long, Integer> result = new HashMap<>();
+        map.forEach((k,v) -> {
+            result.put(Long.parseLong(k), Integer.parseInt(v));
+        });
+
+        return result;
     }
 
     /**
@@ -712,7 +713,7 @@ public class TCameraPresetService {
      */
     private void setPresetCheckResultToRedis(List<CameraPresetCheckResult> checkResults) {
         String presetRedisKey = getPresetRedisKey(checkResults);
-        Map<Long, Integer> presetMap = getPresetCheckResultMap(checkResults);
+        Map<String, String> presetMap = getPresetCheckResultMap(checkResults);
         redisTemplate.opsForHash().putAll(presetRedisKey,presetMap);
     }
 
@@ -764,10 +765,10 @@ public class TCameraPresetService {
      * @param checkResults checkResults
      * @return result
      */
-    private Map<Long, Integer> getPresetCheckResultMap(List<CameraPresetCheckResult> checkResults) {
+    private Map<String, String> getPresetCheckResultMap(List<CameraPresetCheckResult> checkResults) {
         return checkResults.stream().collect(Collectors.toMap(
-            item ->item.getPreset().getPresetId(),
-            obj -> obj.getPresetCheckResult(),
+            item ->item.getPreset().getPresetId().toString(),
+            obj -> obj.getPresetCheckResult().toString(),
             (key1 , key2) -> key1
         ));
     }
