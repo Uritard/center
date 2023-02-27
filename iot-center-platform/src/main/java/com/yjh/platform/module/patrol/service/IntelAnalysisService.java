@@ -1007,7 +1007,7 @@ public class IntelAnalysisService {
                         .setWarnLevel(ValueUtil.toInteger(alarmLevel,131))
                         .setWarnTime(new Date())
                         .setWarnName("静默监视告警数据")
-                        .setWarnContent(resultArr[i])
+                        .setWarnContent(analyseDataOperateService.resolveDefectResult(resultArr[i]))
                         .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
                         .setCunstomId(String.valueOf(map.get("custom_id")))
                         .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
