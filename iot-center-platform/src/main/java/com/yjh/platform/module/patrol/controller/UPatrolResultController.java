@@ -171,6 +171,10 @@ public class UPatrolResultController {
                     List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
                     if (regionIdList != null && !regionIdList.isEmpty()) {
                         deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                        if (deviceIdList.isEmpty()){
+                            //此区域下没有设备
+                            deviceIdList.add(-1L);
+                        }
                     } else {
                         deviceIdList.add(regionId);
                     }
