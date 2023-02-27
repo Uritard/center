@@ -116,10 +116,11 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
                 xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
-
+                // 文件后缀
+                String fileExt = StringUtils.substringAfterLast(cruiseResultMap.getOrDefault("picPath", "1.jpg"), ".");
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + ".jpg";
+                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + "." + fileExt;
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {

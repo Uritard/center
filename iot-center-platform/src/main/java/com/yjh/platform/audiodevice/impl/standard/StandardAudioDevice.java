@@ -7,6 +7,7 @@ import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
 import com.yjh.platform.audiodevice.impl.standard.tcp.Packet;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -130,6 +131,8 @@ public class StandardAudioDevice implements AudioDevice {
 
         if (audioPackets != null) {
             genAudioFile(audioFilepath, audioPackets);
+        } else {
+            throw new BusinessException("录音失败，没有接收到录音数据！");
         }
     }
 

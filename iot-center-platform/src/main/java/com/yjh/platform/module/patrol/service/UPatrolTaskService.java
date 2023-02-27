@@ -424,6 +424,7 @@ public class UPatrolTaskService {
 
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
         log.info("instancesList==={}", detailList);
+        Set<String> nodeSet = new HashSet<>(8);
         for (TCruisePointInstanceNameDetail item : detailList) {
             UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
             uPatrolDataResult.setTaskId(task.getTaskId())
@@ -435,17 +436,25 @@ public class UPatrolTaskService {
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
-            Map map = Object2Map.objectToMap(uPatrolDataResult, true);
-            map.put("edgeCode", Optional.ofNullable(item.getEdgeCode()).orElse(""));
+            Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
+            String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
+            map.put("edgeCode", edgeCode);
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
-            if(item.getCruiseType() != 228){
-                map.put("cameraId", String.valueOf(item.getCameraId()));
-                map.put("robotId","");
-            }else {
+            if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 map.put("robotId", String.valueOf(item.getRobotId()));
+            }else {
+                map.put("cameraId", String.valueOf(item.getCameraId()));
+                map.put("robotId","");
+            }
+
+            if (StringUtils.isEmpty(edgeCode)) {
+                String robotId = map.get("robotId");
+                nodeSet.add(StringUtils.isEmpty(robotId) ? "camera" : robotId);
+            } else {
+                nodeSet.add(edgeCode);
             }
 
             // 初始化识别类型和采集文件类型,默认值为位置状态识别和识别图片
@@ -472,7 +481,7 @@ public class UPatrolTaskService {
             log.info("task {}", task);
             redisTemplate.opsForHash().putAll(str, map);
         }
-        initializeThisTaskInfo(task,instanceList);
+        initializeThisTaskInfo(task, instanceList, nodeSet);
         sendTaskStateToUp(task, 5);
         return detailList;
     }
@@ -511,7 +520,7 @@ public class UPatrolTaskService {
         return initializeTaskInfo(instanceList, ctask);
     }
 
-    public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
+    public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList, Set<String> nodeSet) {
 
         Map<String, String> mapForAbnormal = new HashMap<>();
         mapForAbnormal.put("all", String.valueOf(instanceList.size()));
@@ -519,6 +528,7 @@ public class UPatrolTaskService {
         mapForAbnormal.put("normal", "0");
         mapForAbnormal.put("taskStart", DateTimeUtil.format(task.getStartTime()));
         mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
+        mapForAbnormal.put("nodes", JSON.toJSONString(nodeSet));
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
@@ -573,25 +583,28 @@ public class UPatrolTaskService {
                 default:
                     break;
             }
+            String robotCode = robotPatrolTaskStatus.getRobotCode();
             if (StringUtils.isEmpty(taskId)) {
                 taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             }
             if (StringUtils.isEmpty(taskId)) {
                 taskId = patrolledId;
             }
-            updateTaskProgress(robotPatrolTaskStatus, taskId, taskState);
+            //判断是不是机器人或者无人机
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+
+            updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
+
             if (robotEnd) {
                 String taskIdFinal = taskId;
                 // 机器人/下级系统任务终止
-                ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal));
+                ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId));
             }
 
-            //判断是不是机器人或者无人机
-            Long robotId = tRobotInfoDao.selectRobotIdByCode(robotPatrolTaskStatus.getRobotCode());
             if (robotId != null){
                 //放入redis
                 redisTemplate.opsForHash().putAll(ROBOT_OR_DRONE_TASK+robotPatrolTaskStatus.getTaskCode()+":"+robotId,Object2Map.objectToMap(robotPatrolTaskStatus));
-                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + robotPatrolTaskStatus.getRobotCode() + ":" + taskCode, Object2Map.objectToMap(robotPatrolTaskStatus));
+                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + robotCode + ":" + taskCode, Object2Map.objectToMap(robotPatrolTaskStatus));
             }
         });
     }
@@ -654,18 +667,19 @@ public class UPatrolTaskService {
     /**
      * 更新任务进度，下级系统主动上报任务，非本级创建任务
      */
-    private void updateTaskProgress(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId, int taskState){
+    private void updateTaskProgress(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId, int taskState, Long robotId){
         String key = PATROL_SUMMARY_PREFIX + taskId;
-        Map<String, String> map = redisTemplate.opsForHash().entries(key);
-        if (MapUtils.isEmpty(map)) {
-            map = new HashMap<>(16);
-            map.put("taskStart", robotPatrolTaskStatus.getStartTime());
-            map.put("abnormal", "0");
-            map.put("normal", "0");
-            map.put("all", "0");
+        Map<String, String> countMap = redisTemplate.opsForHash().entries(key);
+        Map<String, String> countChangeMap = new HashMap<>(16);
+        if (MapUtils.isEmpty(countMap)) {
+            countChangeMap.put("taskStart", robotPatrolTaskStatus.getStartTime());
+            countChangeMap.put("abnormal", "0");
+            countChangeMap.put("normal", "0");
+            countChangeMap.put("all", "0");
             // taskSource==1 下级创建任务主动上报
-            map.put("taskSource", "1");
-            map.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
+            countChangeMap.put("taskSource", "1");
+            countChangeMap.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
+            countMap.putAll(countChangeMap);
         }
         /*if (!"1".equals(map.get("taskSource"))) {
             log.info("Task create by self, don`t continue, taskId: {}", taskId);
@@ -673,36 +687,70 @@ public class UPatrolTaskService {
             return;
         }*/
 
+        // 是否下级主动创建任务
+        boolean subCreateTask = "1".equals(countMap.get("taskSource"));
         try {
-            if (TASK_STATE_NOT_START == MapUtils.getIntValue(map, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
-                UPatrolResult result =
-                        new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
-                                .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
-                log.info("TaskResult start, taskId: {}", taskId);
-                uPatrolResultDao.update(result);
-            }
-            //任务暂停继续处理
-            if (TASK_STATE_PAUSE == taskState) {
-                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_PAUSE);
-                uPatrolResultDao.update(result);
-            } else if (TASK_STATE_EXECUTING == taskState) {
-                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_EXECUTING);
-                uPatrolResultDao.update(result);
-            }
-            map.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
-            map.put("taskState", String.valueOf(taskState));
-            String progress = robotPatrolTaskStatus.getTaskProgress();
-            if (StringUtils.contains(progress, "%")) {
-                float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
-                progress = CommonUtils.percentFormat(pf, "#.####");
-            }
-            if ("1".equals(map.get("taskSource")) && NumberUtils.isCreatable(progress)) {
-                map.put("taskProgress", progress);
-            }
-            map.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
-            log.info("update down task status: {}", JSON.toJSONString(map));
+            countChangeMap.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
+            countChangeMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
+            if (subCreateTask) {
+                // 下级主动创建任务第一次启动更新任务状态，更新任务进度
+                if (TASK_STATE_NOT_START == MapUtils.getIntValue(countMap, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                        .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
+                    log.info("TaskResult start, taskId: {}", taskId);
+                    uPatrolResultDao.update(result);
+                }
 
-            redisTemplate.opsForHash().putAll(key, map);
+                String progress = robotPatrolTaskStatus.getTaskProgress();
+                if (StringUtils.contains(progress, "%")) {
+                    float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
+                    progress = CommonUtils.percentFormat(pf, "#.####");
+                }
+                if (NumberUtils.isCreatable(progress)) {
+                    countChangeMap.put("taskProgress", progress);
+                }
+            }
+
+            String nodesStr = countChangeMap.get("nodes");
+            List<String> nodes = Collections.emptyList();
+            if (StringUtils.isNotEmpty(nodesStr)) {
+                nodes = JSON.parseArray(nodesStr, String.class);
+            }
+
+            // 判断子节点状态，若所有子节点状态相同，则更新节点状态
+            boolean stateNodeAll = true;
+            String realCode = robotId == null ? robotPatrolTaskStatus.getRobotCode() : robotId.toString();
+            for (String node : nodes) {
+                if (!StringUtils.equals(node, realCode)) {
+                    String tmpKey = PATROL_SUMMARY_PREFIX + "sub_state:" + taskId + ":" + node;
+                    int nodeState = NumberUtils.toInt((String)redisTemplate.opsForValue().get(tmpKey));
+                    if (nodeState != taskState) {
+                        stateNodeAll = false;
+                        break;
+                    }
+                }
+            }
+
+            boolean stateChange = nodes.size() <= 1;
+            // 若节点是子节点创建，或仅包含一个节点，或所有节点状态相等，则更新当前节点状态
+            if (subCreateTask || stateChange || stateNodeAll) {
+                //任务暂停继续处理
+                if (TASK_STATE_PAUSE == taskState) {
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_PAUSE);
+                    uPatrolResultDao.update(result);
+                } else if (TASK_STATE_EXECUTING == taskState) {
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_EXECUTING);
+                    uPatrolResultDao.update(result);
+                }
+                countChangeMap.put("taskState", String.valueOf(taskState));
+            }
+            String subKey = PATROL_SUMMARY_PREFIX + "sub_state:" + taskId + ":" + realCode;
+            redisTemplate.opsForValue().set(subKey, taskState);
+            redisTemplate.expire(subKey, 3, TimeUnit.DAYS);
+
+            log.info("update down task status: {}，taskState: {}, subCreateTask: {}, nodes: {}", JSON.toJSONString(countChangeMap), taskState, subCreateTask, JSON.toJSONString(nodes));
+
+            redisTemplate.opsForHash().putAll(key, countChangeMap);
             redisTemplate.expire(key, 3, TimeUnit.DAYS);
 
             Map<String, String> jasonMap = new HashMap<>();
@@ -715,7 +763,7 @@ public class UPatrolTaskService {
         }
     }
 
-    private void dealRobotTaskShutDown(String taskId) {
+    private void dealRobotTaskShutDown(String taskId, String robotCode, Long robotId) {
         try {
             //等待30秒
             Thread.sleep(15 * 1000);
@@ -745,10 +793,19 @@ public class UPatrolTaskService {
             int cruiseType = MapUtils.getIntValue(result, "cruiseType");
             int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
             String instanceId = result.get("instanceId");
-            if (TypeEnum.ROBOT.getCode() == cruiseType && CRUISE_STATE_UN == cruiseState) {
+            boolean inNode; // 判断当前节点是否在任务结束节点范围内，包括机器人/无人机/下级节点
+            if (robotId == null) {
+                // 是下级节点
+                inNode = StringUtils.equals(robotCode, result.get("edgeCode"));
+            } else {
+                // 无人机或机器人节点
+                inNode = robotId == MapUtils.getLongValue(result, "robotId");
+            }
+            if (inNode && CRUISE_STATE_UN == cruiseState) {
                 //这个点 没有做
+                String rname = TypeEnum.ROBOT.getCode() == cruiseType ? "机器人" : "无人机";
                 result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
-                result.put("resultNum", "机器人任务异常");
+                result.put("resultNum", rname + "任务异常");
                 result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
                 result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
                 result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常

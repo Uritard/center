@@ -85,6 +85,10 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
+            if ("3".equals(robotPatrolTaskResult.getFileType())) {
+                // 声音文件处理
+                tCruiseTaskResultMap.put("voicePath", infoMap.getOrDefault("relativePath", ""));
+            }
             tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             tCruiseTaskResultMap.putIfAbsent("isWarn", "0");
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());

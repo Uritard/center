@@ -9,6 +9,7 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.thread.*;
@@ -144,11 +145,12 @@ public class PatrolResultHandler {
                 infoMap.put("taskId", taskId);
                 infoMap.put("taskCode", taskCode);
 
-                // 文件处理
-                Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
-                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
                 TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
-                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{228,524}, instance.getCruiseType())){
+                // 文件处理
+                Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
+
+                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
+                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
                     log.info("No alarms need to be handled...");
                 }else {
                     // 告警处理
@@ -269,7 +271,7 @@ public class PatrolResultHandler {
      * @param infoMap               任务结果其他信息
      * @return Map<String, String>
      */
-    private Map<String, String> resultFileHandler(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap) {
+    private Map<String, String> resultFileHandler(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap, TCruisePointInstance instance) {
         Map<String, String> isAlarmMap = new HashMap<>(16);
         String taskId = infoMap.get("taskId");
 
@@ -306,8 +308,18 @@ public class PatrolResultHandler {
                     isAlarm = true;
                     break;
                 case "3":
-                    descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/Audio/" + fileName;
+                    if (instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
+                        String voicePath = (String)redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
+                        String voiceUrl = (String)redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content");
+                        String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                        String voiceAbsPath = "/" + instance.getCruiseId() + "/1/" + timeAfterTem + "/" + fileName;
+                        descFilePath = voicePath + voiceAbsPath;
+                        // descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                        descRelativeUrl = voiceUrl + voiceAbsPath;
+                    } else {
+                        descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                        descRelativeUrl = developRelativeUrl + "/Audio/" + fileName;
+                    }
                     break;
                 case "4":
                     descFilePath = developAbsoluteUrl + "/Video/" + fileName;
