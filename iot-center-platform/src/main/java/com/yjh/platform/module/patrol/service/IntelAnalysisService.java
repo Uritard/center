@@ -676,15 +676,12 @@ public class IntelAnalysisService {
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
 
             if (list.isEmpty()){
-                if (StringUtils.isEmpty(type)){
+                if (StringUtils.isEmpty(type) || StringUtils.equals("0", value)){
                     // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
                     map.put("resultDesc", "");
                     map.put("resultValue", "");
                     map.put("resultImg", originPicPath);
                     return map;
-                }
-                if (StringUtils.equals("0", value)){
-                    resultDesc.add(type);
                 }
                 if (StringUtils.equals("1", value)){
                     resultValue.add(type);

@@ -102,42 +102,6 @@ public class PatrolResultHandler {
         }
     }
 
-    public static void main(String[] args) {
-        RobotPatrolTaskResult result = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("qqq");
-        RobotPatrolTaskResult result2 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("www");
-        RobotPatrolTaskResult result3 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("eee");
-        RobotPatrolTaskResult result1 = new RobotPatrolTaskResult().setDeviceId("123").setDeviceName("yyy");
-        RobotPatrolTaskResult result4 = new RobotPatrolTaskResult().setDeviceId("456").setDeviceName("rrr");
-        RobotPatrolTaskResult result6 = new RobotPatrolTaskResult().setDeviceId("456").setDeviceName("uuu");
-        RobotPatrolTaskResult result5 = new RobotPatrolTaskResult().setDeviceId("789").setDeviceName("ttt");
-        List<RobotPatrolTaskResult> resultList = new ArrayList<>();
-        resultList.add(result);
-        resultList.add(result1);
-        resultList.add(result2);
-        resultList.add(result3);
-        resultList.add(result4);
-        resultList.add(result5);
-        resultList.add(result6);
-        System.out.println(resultList);
-        System.out.println("============resultList===============");
-        Map<String, Long> collect = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()));
-        System.out.println(collect);
-        System.out.println("=============collect==============");
-        int size = collect.size();
-        System.out.println(size);
-        System.out.println("=============size==============");
-        List<String> repeat = collect.entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toList());
-        System.out.println(repeat);
-        System.out.println("============repeat===============");
-        List<Map.Entry<String, Long>> entryList = collect.entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
-        System.out.println(entryList);
-        System.out.println("============entryList===============");
-        entryList.forEach(map -> {
-                    System.out.println(map.getKey());
-                    System.out.println(map.getValue());
-        });
-
-    }
     /**
      * 处理下级系统的巡视结果
      *
@@ -154,11 +118,7 @@ public class PatrolResultHandler {
         // 将重复的deviceId挑出来
         List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
                 .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(entryList)) {
-            entryList.forEach(map -> {
-                redisTemplate.opsForHash().put("repeatDeviceId:" + map.getKey(), "value", String.valueOf(map.getValue()));
-            });
-        }
+
         HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
