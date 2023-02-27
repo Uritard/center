@@ -443,7 +443,7 @@
         limit 1
     </select>
     <!--机器人本体告警入库-->
-    <insert id="insertRobotAlarm"  parameterType="com.yjh.accessrobot.module.command.entity.TRobotAlarm">
+    <insert id="insertRobotAlarm"  useGeneratedKeys="true" keyProperty="robotAlarmId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotAlarm">
         insert into t_robot_alarm(
             robot_alarm_id,
             alarm_name,
