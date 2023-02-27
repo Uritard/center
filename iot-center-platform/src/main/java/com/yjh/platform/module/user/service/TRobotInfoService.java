@@ -599,6 +599,7 @@ public class TRobotInfoService{
                 .append(" ")
                 .append(insertInfoStr);
             if (!StringUtils.isEmpty(oriInfoStr)) {
+                sb.append("\r\n");
                 sb.append(oriInfoStr);
             }
 
