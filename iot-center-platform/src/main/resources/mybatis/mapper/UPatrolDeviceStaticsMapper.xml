@@ -86,7 +86,7 @@
                  SELECT COUNT(
                                 DISTINCT TO_DAYS(updr.cruise_time))  AS cruise_day,
                         TO_DAYS(
-                                NOW()) - TO_DAYS(tr.commission_date) AS commission_days
+                                NOW()) - TO_DAYS(tr.commission_date) + 1 AS commission_days
                  FROM t_robot_info tr
                           LEFT JOIN t_robot_inspection tri ON tr.robot_id = tri.robot_id
                           LEFT JOIN t_cruise_point_instance tcpi ON tri.inspection_id = tcpi.cruise_id
@@ -105,7 +105,7 @@
                  SELECT COUNT(
                                 DISTINCT TO_DAYS(updr.cruise_time))  AS cruise_day,
                         TO_DAYS(
-                                NOW()) - TO_DAYS(tc.commission_date) AS commission_days
+                                NOW()) - TO_DAYS(tc.commission_date) + 1 AS commission_days
                  FROM t_camera_info tc
                           LEFT JOIN t_camera_preset tcp ON tc.camera_id = tcp.camera_id
                           LEFT JOIN t_cruise_point_instance tcpi ON tcp.preset_id = tcpi.cruise_id
