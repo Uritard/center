@@ -119,9 +119,11 @@
         select
             *
         from u_patrol_task a
+        LEFT JOIN u_patrol_result b ON a.task_id = b.task_id
         where 1 = 1
         and a.task_code = #{taskCode}
-        order by create_time desc
+        and b.task_state = 238
+        order by a.create_time desc
             limit 1
     </select>
 
