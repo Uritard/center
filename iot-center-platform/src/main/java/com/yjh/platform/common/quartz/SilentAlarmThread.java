@@ -211,7 +211,7 @@ public class SilentAlarmThread implements Runnable {
                 copyFile(filePathTem, filePath);
 
                 log.info("filePathTem:{}", filePathTem);
-                silentHandler(filePathTem, presetId, eventType);
+                silentHandler(filePath, presetId, eventType);
             }
         } catch (Exception e) {
             log.error("图片处理失败: ", e);
@@ -421,12 +421,12 @@ public class SilentAlarmThread implements Runnable {
     private TWarnInfo silentMonitorHandle(String imageUrl, String desc, Map<String, Object> map) {
         try {
             // 图片在ftps上的全路径
-            String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content")  + imageUrl;
-            String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") + imageUrl;
-            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
-
-            String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
+//            String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content")  + imageUrl;
+//            String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") + imageUrl;
+//            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
+//
+            String defectResultRealImg = imageUrl.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")));
             String alarmLevel = tCameraPresetService.selectAlarmLevel("defect_model", desc);
             if (alarmLevel == null) {
                 alarmLevel = "132";
@@ -503,10 +503,10 @@ public class SilentAlarmThread implements Runnable {
                 // 目前都是识别图片 所以是5
                 xmlItem.put("file_type", "5");
                 String imgPath = tWarnInfo.getImagePath().replaceAll(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")));
                 String targetNamePath = imgPath.replace(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")), "").substring(1);
                 log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
                 uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
 
