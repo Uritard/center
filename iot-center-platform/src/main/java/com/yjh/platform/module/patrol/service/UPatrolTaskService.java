@@ -324,6 +324,8 @@ public class UPatrolTaskService {
                 // 联动任务
                 uPatrolTask.setTaskLevel(NumberUtils.toInt(level4, 4));
             }
+        } else {
+            uPatrolTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
         }
     }
 
@@ -1439,11 +1441,11 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskGoOn(String taskId) {
+    public int taskGoOn(String taskId, boolean force) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
 
         List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, uPatrolResult.getTaskLevel());
-        if (CollectionUtils.isNotEmpty(highTaskList)) {
+        if (!force && CollectionUtils.isNotEmpty(highTaskList)) {
             log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
             for (String htId : highTaskList) {
                 String highKey = TASK_LOWER_REDIS_KEY + htId;
@@ -2576,7 +2578,7 @@ public class UPatrolTaskService {
         if (lowTaskList != null && lowTaskList.size() > 0) {
             lowTaskList.forEach(lowTask -> {
                 try {
-                    taskGoOn(lowTask);
+                    taskGoOn(lowTask, false);
                 }catch (Exception e){
                     log.info("低优先级任务继续出错：",e);
                 }
@@ -2753,7 +2755,7 @@ public class UPatrolTaskService {
             case "2":
                 return String.valueOf(this.taskPause(taskId));
             case "3":
-                return String.valueOf(this.taskGoOn(taskId));
+                return String.valueOf(this.taskGoOn(taskId, true));
             case "4":
                 this.taskShutDown(taskId);
                 return "1";
