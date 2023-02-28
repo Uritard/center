@@ -491,11 +491,8 @@ public class TDeviceMaintenanceService{
         List<Long> deviceIdLst = new ArrayList<>();
         switch (deviceLevel) {
             case "1":
-                //区域
-                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
-                break;
             case "2":
-                // 间隔
+                //区域 间隔
                 deviceIdLst = idList;
                 break;
             case "3":
