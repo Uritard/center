@@ -48,6 +48,8 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
     private final HashOperations<String, String, String> hashOperations;
 
+    private boolean isEdge = false;
+
     public VoiceCruiseExecuteImpl(RedisTemplate<String, ?> redisTemplate, AudioDeviceManager audioDeviceManager,
         TVoiceDeviceService tVoiceDeviceService, PatrolResultHandler patrolResultHandler) {
         this.redisTemplate = redisTemplate;
@@ -77,6 +79,9 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
     }
 
     private void voiceRecord(Map<String, String> inspectionMap) {
+        String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+        isEdge = "1".equals(sysLevel);
+
         String dateT = DateTimeUtil.getDateTimeString();
         inspectionMap.put("cruiseTime", dateT);
 
@@ -179,10 +184,10 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
         }
         int warnVal = NumberUtils.toInt(warnDb);
         int maxVal = dbList.stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0);
-        if (maxVal > warnVal) {
+        if (!isEdge && maxVal > warnVal) {
             patrolResultHandler.voiceResultHandler(String.valueOf(maxVal), cruiseResultMap, maxVal - warnVal, alarmPrefix);
         }
-        return maxVal > warnVal ? maxVal : 0;
+        return maxVal;
     }
 
     @Override

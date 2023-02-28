@@ -18,6 +18,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -228,7 +229,7 @@ public class InspectionResultThread implements Runnable{
             // 机器人类型为模拟机器人/模拟无人机 为模拟工具
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
-            boolean needAnalysis = type == null && !"3".equals(sysLevel) && (cruiseTypeEnum == TypeEnum.INFRARED || cruiseTypeEnum == TypeEnum.VIDEO);
+            boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
            isSimulationTool = isSimulationTool || needAnalysis;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
@@ -292,7 +293,7 @@ public class InspectionResultThread implements Runnable{
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
-            if (algorithm != null) {
+            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
                 Long preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
@@ -349,8 +350,15 @@ public class InspectionResultThread implements Runnable{
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");
-            Map<String, String> cruiseResultMap = resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
-            redisTemplate.opsForHash().putAll(str, cruiseResultMap);
+
+            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
+            if (TypeEnum.VOICE.getCode() != cruiseType) {
+                Map<String, String> cruiseResultMap = resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
+            } else {
+                // 声纹告警处理
+                resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
+            }
+            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
