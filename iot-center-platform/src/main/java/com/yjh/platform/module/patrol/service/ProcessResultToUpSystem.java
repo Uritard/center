@@ -302,7 +302,7 @@ public class ProcessResultToUpSystem {
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")));
         }
         try {
-            String materialId = analyseDataOperateService.selectMaterialId(Long.valueOf(cruiseResultMap.get("deviceId")));
+            String materialId = analyseDataOperateService.selectMaterialId(NumberUtils.toLong(cruiseResultMap.get("deviceId")));
             String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
 
             String cruiseType = Optional.ofNullable(cruiseResultMap.get("cruiseType")).orElse("");

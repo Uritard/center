@@ -31,13 +31,11 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.service.RunAtNowTask;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -76,7 +74,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -120,8 +117,6 @@ public class UPatrolTaskService {
     @Autowired
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
     @Autowired
-    private AnalyseDataOperateService analyseDataOperateService;
-    @Autowired
     private TCruisePlanDao tCruisePlanDao;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
@@ -142,15 +137,12 @@ public class UPatrolTaskService {
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
-    //算法接口
-    private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
-    private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
     private static final byte[] LOCK_FLAG = new byte[0];
 
     private final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private final SimpleDateFormat daySdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * 任务下发，在外层处理设置定时器逻辑，不走事物，否则会导致定时器延时
@@ -1962,7 +1954,8 @@ public class UPatrolTaskService {
                 uPatrolResult.setTaskCount(allCounts);
             }
             // 获取当前站内的环境数据并添加
-            getStationWeather(uPatrolResult);
+            String stationWeather = getStationWeather();
+            uPatrolResult.setWeather(stationWeather);
 
             uPatrolResultDao.update(uPatrolResult);
             log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
@@ -2001,7 +1994,7 @@ public class UPatrolTaskService {
         }
     }
 
-    private void getStationWeather(UPatrolResult uPatrolResult){
+    public String getStationWeather(){
         String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "1").getOrDefault("valueUnit", ""));
         String humidity = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "2").getOrDefault("valueUnit", ""));
         String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "3").getOrDefault("valueUnit", ""));
@@ -2016,7 +2009,7 @@ public class UPatrolTaskService {
         airPressure = StringUtils.isEmpty(airPressure) ? "暂无" : airPressure;
         String weather = "气温:" + temperature + ",湿度:" + humidity + ",风速:" + windSpeed + ",雨量:" + precipitation + ",风向:" + windDirection + ",气压:" + airPressure;
         log.info("====Now the environmental data is {}", weather);
-        uPatrolResult.setWeather(weather);
+       return weather;
     }
 
     @Transactional(rollbackFor = Exception.class)

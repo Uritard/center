@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * 巡视报告模板--北京检测要求
+ * 巡视报告模板--检测要求
  *
  * @author YC
  * @date 2020/10/29 - 15:18
