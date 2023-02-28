@@ -323,6 +323,7 @@ public class TCruisePlanController {
             planDetailMap.put("planName", tCruisePlanCount.getPlanName());
             planDetailMap.put("typeName", tCruisePlanCount.getPlanTypeName());
             planDetailMap.put("type", tCruisePlanCount.getType());
+            planDetailMap.put("subType", tCruisePlanCount.getSubType());
             List<TCruisePlanAttrDetail> tCruisePlanAttrDetailList = tCruisePlanAttrService.selectByPrimaryId(planId);
             List<Long> deviceIds = new ArrayList<>();
             for (TCruisePlanAttrDetail tCruisePlanAttrDetail:tCruisePlanAttrDetailList) {

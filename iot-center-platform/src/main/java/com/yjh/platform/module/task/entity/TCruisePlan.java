@@ -62,10 +62,13 @@ public class TCruisePlan implements Serializable {
     @TableField(value = "plan_name", updateStrategy = FieldStrategy.IGNORED)
     private String planName;
 
-    @Max(value = 99999999999l)
+    @Max(value = 99999999999L)
     @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
-
     private Integer type;
+
+    @Max(value = 99999999999L)
+    @ApiModelProperty(value = "任务子类型")
+    private Integer subType;
 
     @Length(max = 32, message = "planPointTypes长度必须小于等于32")
     @ApiModelProperty(value = "表计读数，位置状态识别，外观缺陷识别，红外测温，声音检测")
