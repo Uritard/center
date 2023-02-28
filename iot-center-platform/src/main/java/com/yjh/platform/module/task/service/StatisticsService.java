@@ -776,7 +776,7 @@ public class StatisticsService {
 
     private void formatDuration(Statistics statistics) {
         Integer originDuration = statistics.getValidNum();
-        if (originDuration != null) {
+        if (originDuration != null && originDuration > 0) {
             Integer hourData = originDuration / 60;
             Integer minData = originDuration % 60;
             statistics.setDuration(hourData + "小时" + minData + "分钟");
