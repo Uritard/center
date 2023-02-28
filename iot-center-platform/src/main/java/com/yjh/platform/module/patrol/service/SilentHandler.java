@@ -43,7 +43,7 @@ public class SilentHandler {
         // 文件路径
         String temporaryFilePath = ftpsFilePath + "/" + imgPath;
         log.info("temporaryFilePath==={}", temporaryFilePath);
-        String tarPath = resultImg+"jm/"+presetId+".jpg";
+        String tarPath = resultImg+"jm/"+presetId+"_"+System.currentTimeMillis()+".jpg";
 
         FileUtil.copyFileUsingStream(temporaryFilePath,tarPath);
         // 调用算法接口分析结果
