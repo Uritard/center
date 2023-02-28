@@ -16,6 +16,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
@@ -325,6 +326,12 @@ public class UPatrolResultService {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
+        UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        if (StringUtils.isNotEmpty(uPatrolResult.getCheckUser()) && !uPatrolResult.getCheckUser().contains(userName)){
+            userName = uPatrolResult.getCheckUser() + ", "+userName;
+        } else {
+            userName = uPatrolResult.getCheckUser();
+        }
         int result = uPatrolResultDao.updateCheck(taskId, userName, date, "1");
         //审核未被审核的巡视点
         List<UPatrolDataResult> list = uPatrolResultDao.selectCruiseDataResult(taskId);
