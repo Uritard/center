@@ -1364,6 +1364,7 @@ public class UPatrolTaskService {
             taskPatrolledId = this.addTask(tCruiseTaskAdd, false);
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
+            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
@@ -1399,8 +1400,9 @@ public class UPatrolTaskService {
             //Thread.sleep(10000);
             // 机器人任务暂停，包括机器人和下级系统
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
-                log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
                 Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
                 robotTaskStatesMap.put("taskId", taskId);
                 robotTaskStatesMap.put("commandValue", 2);
@@ -1457,8 +1459,9 @@ public class UPatrolTaskService {
         try {
             //机器人任务继续
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+            log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
             if (CollectionUtils.isNotEmpty(robotCodeList)) {
-                log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
                 robotTaskStatesMap.put("commandValue", 3);
@@ -1506,8 +1509,9 @@ public class UPatrolTaskService {
 
         // 机器人任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+        robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
-            log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
             robotTaskStatesMap.put("commandValue", 4);
