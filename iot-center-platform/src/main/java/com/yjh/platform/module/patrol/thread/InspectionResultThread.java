@@ -103,6 +103,11 @@ public class InspectionResultThread implements Runnable{
                 }
                 MAP_LOCK.remove(taskId + instanceId);
             }
+            //巡视主机任务终止的结果消息不处理 以免调用算法
+            String taskShutDown = "任务终止";
+            if (taskShutDown.equals(robotPatrolTaskResult.getValue())){
+                return;
+            }
             // 是否为本级系统下发给下级系统的任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"));
             if (Boolean.FALSE.equals(flag)) {
