@@ -192,7 +192,7 @@ public class UPatrolTaskController {
     public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskGoOn(taskId));
+            result.setData(uPatrolTaskService.taskGoOn(taskId, true));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务继续异常:", e);
@@ -336,7 +336,7 @@ public class UPatrolTaskController {
         try {
             lowTaskIdList.forEach(taskId->{
                 try {
-                    uPatrolTaskService.taskGoOn(taskId);
+                    uPatrolTaskService.taskGoOn(taskId, false);
                 }catch (Exception e){
                     log.info("其他服务调低优先级任务继续出错:{}",e);
                 }
