@@ -415,11 +415,10 @@ public class UPatrolTaskService {
                 .setExecuteType(task.getExecuteType())
                 .setTaskLevel(task.getTaskLevel())
                 .setTaskState(238)
-                .setCreateTime(new Date())
+                .setCreateTime(task.getCreateTime())
                 .setTaskCount(instanceList.size())
                 .setTaskWait(instanceList.size())
-                .setRemark("0")
-                .setCreateTime(now);
+                .setRemark("0");
         uPatrolResultDao.add(uPatrolResult);
 
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
