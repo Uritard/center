@@ -38,7 +38,7 @@ public class RunningThread implements Runnable{
                     log.info("Thread stop success!");
                 }
 
-                String s = Constant.paramMap.get("env_interval");
+                String s = Constant.paramMap.get("patroldevice_run_interval");
                 if(s == null){
                     s= "30";
                 }
