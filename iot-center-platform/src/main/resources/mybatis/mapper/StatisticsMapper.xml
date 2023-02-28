@@ -414,29 +414,26 @@
     </select>
 
     <select id="countTaskExecutedDurationByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(tct.start_time, '%Y-%m-%d') DAY,
-               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
-        FROM
-            u_patrol_task tct
-        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        SELECT DATE_FORMAT(tct.execute_time, '%Y-%m-%d') DAY,
+               SUM(timestampdiff(MINUTE, tct.execute_time, tct.end_time )) AS validNum
+        FROM u_patrol_result tct
+        WHERE tct.execute_time BETWEEN #{startTime} and #{endTime}
         GROUP BY DAY
     </select>
 
     <select id="countTaskExecutedDurationByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(tct.start_time, '%u') + 1 week,
-               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
-        FROM
-            u_patrol_task tct
-        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        SELECT DATE_FORMAT(tct.execute_time, '%u') + 1 week,
+               SUM(timestampdiff(MINUTE, tct.execute_time, tct.end_time )) AS validNum
+        FROM u_patrol_result tct
+        WHERE tct.execute_time BETWEEN #{startTime} and #{endTime}
         GROUP BY week
     </select>
 
     <select id="countTaskExecutedDurationByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(tct.start_time, '%Y-%m') month,
-               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
-        FROM
-            u_patrol_task tct
-        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        SELECT DATE_FORMAT(tct.execute_time, '%Y-%m') month,
+               SUM(timestampdiff(MINUTE, tct.execute_time, tct.end_time )) AS validNum
+        FROM u_patrol_result tct
+        WHERE tct.execute_time BETWEEN #{startTime} and #{endTime}
         GROUP BY month
     </select>
 
