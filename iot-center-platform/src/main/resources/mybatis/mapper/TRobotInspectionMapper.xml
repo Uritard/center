@@ -414,10 +414,10 @@
         SELECT
             a.task_id
         FROM
-            u_patrol_result a
+        u_patrol_result a left join u_patrol_task b on a.task_id = b.task_id
         WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.task_state in (238,239,241)
             <if test="executeTime != null">
-                and a.create_time <![CDATA[<]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
+                and b.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
             </if>
         ORDER BY a.create_time desc
             LIMIT 1

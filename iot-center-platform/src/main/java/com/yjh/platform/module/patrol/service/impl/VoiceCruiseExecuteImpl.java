@@ -99,6 +99,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
         AudioDevice audioDevice = audioDeviceManager.getAudioDevice(voiceCode);
         log.info("录音设备，taskId: {}，voiceCode: {}", taskId, voiceDevice.getVoiceCode());
         boolean isok = false;
+        String voiceFileUrl = "";
         if (StringUtils.isNotEmpty(voiceCode)) {
             try {
                 audioDevice.startRecording();
@@ -111,7 +112,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
                 String absVoicePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content"));
                 String relativeVoicePath =
                     String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:relativeVoicePath").get("content"));
-                voiceFilePath = voiceFilePath.replace(absVoicePath, relativeVoicePath);
+                voiceFileUrl = voiceFilePath.replace(absVoicePath, relativeVoicePath);
             } catch (Exception e) {
                 log.warn("声纹设备录音出错", e);
             }
@@ -126,12 +127,12 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             inspectionMap.put("resultNum", "录音成功");
             // 巡视结果，正常
             inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-            inspectionMap.put("picpath", voiceFilePath);
-            inspectionMap.put("voicePath", voiceFilePath);
+            inspectionMap.put("picpath", voiceFileUrl);
+            inspectionMap.put("voicePath", voiceFileUrl);
             // 巡检数据状态，已经执行
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
-            voiceAnalyse(inspectionMap, voicePath, voiceDevice);
+            voiceAnalyse(inspectionMap, voiceFilePath, voiceDevice);
         } else {
             // 录音结果处理
             inspectionMap.put("resultNum", "录音失败");
@@ -144,7 +145,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
         }
     }
 
-    private String voiceAnalyse(Map<String, String> cruiseResultMap, String voicePath, VoiceDeviceAllInfoDetail voiceDevice){
+    public String voiceAnalyse(Map<String, String> cruiseResultMap, String voicePath, VoiceDeviceAllInfoDetail voiceDevice){
 
         // 频率数组
         List<Integer> fList = null;
