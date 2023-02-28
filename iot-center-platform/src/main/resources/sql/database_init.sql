@@ -940,7 +940,7 @@ CREATE TABLE `t_cfg_telesignal` (
 DROP TABLE IF EXISTS `t_cfg_union_rule`;
 CREATE TABLE `t_cfg_union_rule` (
   `rule_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '规则编号',
-  `plan_id` bigint(32) NOT NULL COMMENT '预案id',
+  `plan_id` bigint(32) DEFAULT NULL COMMENT '预案id',
   `rule_name` varchar(50) NOT NULL COMMENT '规则名称',
   `rule_type` varchar(20) DEFAULT '' COMMENT '是否生成联动监控弹窗0.不生成1.生成',
   `rule_content` varchar(500) DEFAULT '' COMMENT '具体治理规则',

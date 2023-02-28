@@ -68,7 +68,7 @@ public class AnalysisUnionTaskFileService {
      * @throws DocumentException DocumentException
      */
     @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> readUnionTaskXml(String filePath) throws DocumentException {
+    public List<Map<String, Object>> readUnionTaskXml(String filePath) throws DocumentException {
         SAXReader reader = new SAXReader();
         Document document = reader.read(new File(filePath));
         Element rootElement = document.getRootElement();
@@ -99,20 +99,25 @@ public class AnalysisUnionTaskFileService {
         Set<Long> instanceIdList = Sets.newHashSet();
         List<TCfgUnionRule> tCfgUnionRuleList = Lists.newArrayList();
         itemList.forEach(item -> {
-            String instanceIds = String.valueOf(item.get("device_id"));
-            instanceIdList.addAll(ValueUtil.stringToList(instanceIds, ",", Long::parseLong));
-            TCfgUnionRule tCfgUnionRule = new TCfgUnionRule();
-            tCfgUnionRule.setRuleName(String.valueOf(item.get("source_name")));
-            String inputParam = String.valueOf(item.get("source_code"));
-            tCfgUnionRule.setInputParam(inputParam);
-            tCfgUnionRuleList.add(tCfgUnionRule);
+            if (item.get("device_id") != null) {
+                String instanceIds = String.valueOf(item.get("device_id"));
+                instanceIdList.addAll(ValueUtil.stringToList(instanceIds, ",", Long::parseLong));
+                TCfgUnionRule tCfgUnionRule = new TCfgUnionRule();
+                tCfgUnionRule.setRuleName(String.valueOf(item.get("source_name")));
+                String inputParam = String.valueOf(item.get("source_code"));
+                tCfgUnionRule.setInputParam(inputParam);
+                tCfgUnionRuleList.add(tCfgUnionRule);
+            }
         });
-        unionTaskDao.insertPlan(tCruisePlan);
-        Long planId = tCruisePlan.getPlanId();
-        tCfgUnionRuleList.forEach(tCfgUnionRule -> tCfgUnionRule.setPlanId(planId));
-        List<UPatrolPlanAttr> uPatrolPlanAttrList = unionTaskDao.selectPatrolPlan(planId, instanceIdList);
-        unionTaskDao.batchInsertPlanAttr(uPatrolPlanAttrList);
-        unionTaskDao.batchInsertRule(tCfgUnionRuleList);
+        if (tCfgUnionRuleList.size() > 0){
+            unionTaskDao.insertPlan(tCruisePlan);
+            Long planId = tCruisePlan.getPlanId();
+            tCfgUnionRuleList.forEach(tCfgUnionRule -> tCfgUnionRule.setPlanId(planId));
+            List<UPatrolPlanAttr> uPatrolPlanAttrList = unionTaskDao.selectPatrolPlan(planId, instanceIdList);
+            unionTaskDao.batchInsertPlanAttr(uPatrolPlanAttrList);
+            unionTaskDao.batchInsertRule(tCfgUnionRuleList);
+        }
+
     }
 
     /**

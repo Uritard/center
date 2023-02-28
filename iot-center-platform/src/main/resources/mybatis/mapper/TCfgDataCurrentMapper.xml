@@ -149,6 +149,13 @@
         </select>
 
         <select id="selectCurrentDataByMeteId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
-            select * from t_cfg_data_current where mete_id=#{meteId,jdbcType=BIGINT}
+            select
+                   a.*,
+                   b.dict_note as meteKindName,
+                   c.device_name as deviceName
+            from t_cfg_data_current a
+            left join t_dict_business b on a.mete_kind = b.dict_code and b.col_name = 'mete_kind'
+            left join t_cfg_device c on a.mete_id = c.device_id
+            where mete_id=#{meteId,jdbcType=BIGINT}
         </select>
 </mapper>
