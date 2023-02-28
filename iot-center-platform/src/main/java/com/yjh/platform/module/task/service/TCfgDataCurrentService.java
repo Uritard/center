@@ -4,7 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.patrol.controller.UPatrolTaskController;
@@ -16,6 +20,7 @@ import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,6 +78,8 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TCfgDeviceService tCfgDeviceService;
+
+    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
 
     public static String meteValues(String commintValue){
         if("返回".equals(commintValue)){
@@ -279,6 +286,38 @@ public class TCfgDataCurrentService {
                     ScriptEngine engine = sm.getEngineByName("js");
                     String sum = engine.eval(content).toString();
                     if (sum == "true") {
+
+                        //预案为空
+                        if (rule.getPlanId() == null && rule.getPresetId() != null){
+                            //配了联动预置位
+                            Map<String,String> map = new HashMap<>();
+                            map.put("type","linkagePresetPopUp");
+                            map.put("cameraId", String.valueOf(rule.getCameraId()));
+                            map.put("presetId",String.valueOf(rule.getPresetId()));
+                            map.put("meteName",current.getDeviceName());
+                            map.put("meteKindName",current.getMeteKindName());
+                            map.put("meteValue",current.getMeteValue());
+                            map.put("time", DateTimeUtil.format(current.getRecordTime()));
+                            String json = JSON.toJSONString(map);
+                            log.info("发送给前端的联动预置位消息：" + json);
+                            //将摄像机转到预置位
+                            ThreadPoolUtil.COMMON_POOL.addThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String str = "camera_info:" + rule.getCameraId();
+                                    Map<String, String> map = redisTemplate.opsForHash().entries(str);
+                                    if ("0".equals(map.get("state"))) {
+                                        HashMap<String, Object> moveMap = new HashMap<>();
+                                        moveMap.put("presetId", rule.getPresetId());
+                                        moveMap.put("cameraId", rule.getCameraId());
+                                        move(moveMap);
+                                        map.put("lastTime",simpleDateFormat.format(new Date()));
+                                        redisTemplate.opsForHash().putAll(str,map);
+                                    }
+                                }
+                            });
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
+                        }
                         unionRule.add(rule);
                         contents.add(content);
                         try {
@@ -316,6 +355,9 @@ public class TCfgDataCurrentService {
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
         for(Long plan:plans){
             log.info("planId----"+plan);
+            if (plan == null){
+                continue;
+            }
 //            TCruiseTask tCruiseTask=new TCruiseTask();
             TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
 //            tCruiseTasks.add(tCruiseTask);
@@ -374,7 +416,17 @@ public class TCfgDataCurrentService {
     }
 
 
-
+    //相机转到预置位
+    private void move(HashMap<String, Object> map) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.getForObject(MOVE_URL, String.class, map);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
