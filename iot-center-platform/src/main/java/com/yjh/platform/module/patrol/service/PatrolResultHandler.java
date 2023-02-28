@@ -9,13 +9,13 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
+import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -46,6 +46,7 @@ public class PatrolResultHandler {
     private final AnalyseDataOperateService analyseDataOperateService;
     private final ProcessResultToUpSystem processResultToUpSystem;
     private final UPatrolTaskService uPatrolTaskService;
+    private final TVoiceDeviceService tVoiceDeviceService;
 
     private static final String JUDGE = "panbie";
     private static final String DEFECT = "defect";
@@ -53,12 +54,14 @@ public class PatrolResultHandler {
 
     Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
-    public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem, UPatrolTaskService uPatrolTaskService) {
+    public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
+        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
         this.processResultToUpSystem = processResultToUpSystem;
         this.uPatrolTaskService = uPatrolTaskService;
+        this.tVoiceDeviceService = tVoiceDeviceService;
     }
 
     /**
@@ -680,6 +683,37 @@ public class PatrolResultHandler {
         }
         log.info("cruiseResultMap=={}", cruiseResultMap);
         //非同源处理
+        return cruiseResultMap;
+    }
+
+    public Map<String, String> voiceAlarmHandler(String resultValue, Map<String, String> cruiseResultMap) {
+        if (!StringUtils.containsAny(resultValue, "DB:", "F:")) {
+            log.warn("voice is not analyse, resultValue: {}, cruiseResultMap: {}", resultValue, JSON.toJSONString(cruiseResultMap));
+        }
+        Long cruiseId = org.apache.commons.collections4.MapUtils.getLongValue(cruiseResultMap, "cruiseId");
+        VoiceDeviceAllInfoDetail voiceDevice = tVoiceDeviceService.selectByPrimaryId(cruiseId);
+
+        String[] restVals = resultValue.split(" ");
+        Map<String, Integer> voiceMap = new HashMap<>(8);
+        for (String ret : restVals) {
+            String[] rets = StringUtils.split(ret,":");
+            if (rets.length >= 2) {
+                voiceMap.put(rets[0], NumberUtils.toInt(rets[1]));
+            }
+        }
+
+        int warnDbVal = NumberUtils.toInt(voiceDevice.getDbValue());
+        int maxDbVal = voiceMap.getOrDefault("DB", 0);
+        if (maxDbVal > warnDbVal) {
+            voiceResultHandler(String.valueOf(maxDbVal), cruiseResultMap, maxDbVal - warnDbVal, "分贝");
+        }
+
+        int warnfVal = NumberUtils.toInt(voiceDevice.getfValue());
+        int maxfVal = voiceMap.getOrDefault("DB", 0);
+        if (warnfVal > maxfVal) {
+            voiceResultHandler(String.valueOf(warnfVal), cruiseResultMap, warnfVal - maxfVal, "频率");
+        }
+
         return cruiseResultMap;
     }
 
