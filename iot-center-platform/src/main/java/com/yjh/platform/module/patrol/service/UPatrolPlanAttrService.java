@@ -8,10 +8,10 @@ import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -40,6 +40,10 @@ public class UPatrolPlanAttrService {
         TCruisePlan tCruisePlan = new TCruisePlan();
         tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
         Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
+        if (map.containsKey("subType") && StringUtils.isNotEmpty(map.get("subType").toString())) {
+            Integer planSubType = Integer.parseInt(String.valueOf(map.get("subType")));
+            tCruisePlan.setSubType(planSubType);
+        }
         tCruisePlan.setType(planType);
         tCruisePlan.setUpRegionId(map.get("upRegionId") == null ? null : Long.parseLong(map.get("upRegionId").toString()));
         tCruisePlan.setPlanCode(map.get("planCode") == null ? "" : map.get("planCode").toString());
@@ -159,6 +163,7 @@ public class UPatrolPlanAttrService {
         map.put("planId", planId);
         map.put("planName", String.valueOf(planDetailMap.get("planName")));
         map.put("type", planDetailMap.get("type"));
+        map.put("subType", planDetailMap.get("subType"));
         this.tCruisePlanDao.updateByMap(map);
         if (uPatrolPlanAttrList.size() > 0) {
             return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
