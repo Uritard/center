@@ -338,7 +338,7 @@ public class TSequentialConfService{
                         String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
                         String services = HttpClientUtils.getInstance().getUrl(endRecordVideo + "?fileName=" + fileName, null);
                         log.info("视频结果: {}", services);
-                        filePath = filePath.replace(".h264", ".mp4");
+//                        filePath = filePath.replace(".h264", ".mp4");
                         if (StringUtils.isNotEmpty(filePath)) {
                             param.put("picPath", filePath);
                             param.put("fileName", fileName);

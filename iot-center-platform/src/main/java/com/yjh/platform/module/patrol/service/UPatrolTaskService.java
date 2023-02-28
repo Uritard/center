@@ -1594,7 +1594,12 @@ public class UPatrolTaskService {
         log.info("taskInfoList size: {}", taskInfoList.size());
 
         // 查询检修区域
-        List<Long> overhaul = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        String overhaulString = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        List<String> overhaul = new ArrayList<>();
+        if (StringUtils.isNotEmpty(overhaulString)){
+            overhaul = Arrays.asList(overhaulString.split(","));
+        }
+        List<String> finalOverhaul = overhaul;
         // 不需要执行的点
         List<Map<String, String>> skipPointList = new ArrayList<>();
         Map<String, List<Map<String, String>>> cruiseGroupMap = new HashMap<>(32);
@@ -1618,7 +1623,7 @@ public class UPatrolTaskService {
 
             boolean skipFlag = false;
             // 设备检修判断
-            if (CollectionUtils.isNotEmpty(overhaul) && Collections.binarySearch(overhaul, MapUtils.getLong(m, "deviceId")) >= 0) {
+            if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "deviceId")) >= 0) {
                 m.put("resultNum", "设备检修中");
                 // 异常原因，设备检修
                 m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
