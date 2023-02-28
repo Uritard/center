@@ -634,9 +634,25 @@
         </foreach>
     </select>
 
-    <select id="selectTimeIsIn" resultType="java.lang.Long">
+    <select id="selectTimeIsIn" resultType="java.lang.String">
         SELECT DISTINCT
-        a.device_ids
+            CASE
+                WHEN a.device_level = 1 THEN
+                    (
+                        SELECT
+                            GROUP_CONCAT(b.instance_id)
+                        FROM
+                            t_cruise_point_instance b
+                                LEFT JOIN t_std_device c ON b.device_id = c.device_id
+                        WHERE
+                            FIND_IN_SET(c.up_region_id, a.device_ids)
+                    )
+                WHEN a.device_level = 2
+                    OR a.device_level = 4 THEN
+                    a.device_ids
+                ELSE
+                    a.instance_ids
+                END AS device_ids
         FROM
         t_device_maintenance a
         WHERE

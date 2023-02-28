@@ -1864,7 +1864,7 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
             //生成文件名
             Date date = new Date();
-            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".h264";
+            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".mp4";
             log.info("生成文件名" + fileName);
             //保存文件地址
             createDirectory(videoPath);

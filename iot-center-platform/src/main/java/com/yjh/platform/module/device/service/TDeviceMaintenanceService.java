@@ -57,8 +57,16 @@ public class TDeviceMaintenanceService{
         for(DeviceAndInstance item:deviceAndInstanceList){
             instanceList.add(item.getInstanceId());
         }
-        tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
-                .toString().replace("[","").replace("]","").replace(" ", ""));
+        if ("1".equals(tDeviceMaintenance.getDeviceLevel())){
+            List<String> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList);
+            if (CollectionUtils.isNotEmpty(regionList)) {
+                String deviceListString = StringUtils.join(regionList.toArray(), ",");
+                tDeviceMaintenance.setDeviceIds(deviceListString);
+            }
+        }else {
+            tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
+                    .toString().replace("[","").replace("]","").replace(" ", ""));
+        }
         tDeviceMaintenance.setInstanceIds(instanceList
                 .toString().replace("[","").replace("]","").replace(" ", ""));
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
@@ -485,12 +493,15 @@ public class TDeviceMaintenanceService{
             case "1":
                 //区域
                 deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+                break;
             case "2":
                 // 间隔
                 deviceIdLst = idList;
+                break;
             case "3":
                 // 监测点
                 deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
+                break;
             default:
                 break;
         }
