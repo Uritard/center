@@ -1072,7 +1072,44 @@
     </sql>
 
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
-        <include refid="TongYong"></include>
+        select
+        f.task_id,
+        f.cruise_data_id,
+        f.device_id,
+        f.device_name,
+        b.device_mete_id,
+        f.instance_id,
+        f.instance_name,
+        b.mete_type,
+        w.dict_note as mete_type_name,
+        f.evaluation_state,
+        x.dict_note as evaluation_state_name,
+        f.result_num,
+        f.picpath as picPath,
+        F.cruise_result,
+        g.dict_note as cruise_result_name,
+        f.cruise_time,
+        a.real_code,
+        f.person_check,
+        f.identify_result,
+        z.dict_note as identify_result_name,
+        f.cruise_type,
+        n.dict_note as dataType,
+        b.custom_id,
+        b.custom_name as componentName,
+        a.up_region_name as intervalName,
+        m.region_name as regionName
+        from u_patrol_data_result f
+        LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
+        LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
+        LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result and g.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business w on w.dict_code = b.mete_type and w.col_name = 'mete_type'
+        LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state and x.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
+        LEFT JOIN t_std_device a on a.device_id = f.device_id
+        LEFT JOIN t_std_region d on d.region_id = a.up_region_id
+        LEFT JOIN t_std_region m on m.region_id = d.up_region_id
+        LEFT JOIN t_dict_business n on n.dict_code = f.cruise_type and n.col_name = 'cruise_type'
         where 1 = 1
         and f.device_id in
         <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
