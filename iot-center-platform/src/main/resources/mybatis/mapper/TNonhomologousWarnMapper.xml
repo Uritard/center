@@ -62,7 +62,7 @@
         a.cruise_id as inspectionId,
         a.result_num as resultValue
         from u_patrol_data_result a
-        where a.cruise_id = #{inspectionId}
+        where a.instance_id = #{inspectionId}
         and a.createtime is not null and (select (a.result_num REGEXP '[^0-9.]'))=0
         <if test="type == 6" >
             and a.createtime between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
