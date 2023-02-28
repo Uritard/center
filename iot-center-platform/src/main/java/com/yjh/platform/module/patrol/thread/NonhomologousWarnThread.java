@@ -87,10 +87,11 @@ public class NonhomologousWarnThread implements Runnable{
                 String videoInstanceId = String.valueOf(map.get("instanceIdTwo"));
                 String instanceId = String.valueOf(map.get("instanceId"));
 
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskCode + ":" +  map.get("oldId"));
+                String oldId = MapUtils.getString(map, "oldId");
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskCode + ":" + oldId);
                 String videoInsResult = redisInfoMap.get("resultNum");
                 int cruiseStatus = MapUtils.getIntValue(redisInfoMap,"cruiseStatus", CruiseConstant.CRUISE_STATE_UN);
-                boolean isRunning = !MapUtils.isEmpty(redisInfoMap) && (CruiseConstant.CRUISE_STATE_UN == cruiseStatus || CommonUtils.isEmptyOrNullstr(videoInsResult));
+                boolean isRunning = StringUtils.isNotEmpty(oldId) && (MapUtils.isEmpty(redisInfoMap) || CruiseConstant.CRUISE_STATE_UN == cruiseStatus || CommonUtils.isEmptyOrNullstr(videoInsResult));
                 if (isRunning) {
                     log.info("robotInsResult === {}, videoInsResult === {}, 阈值 === {}, cruiseStatus === {}，redisInfoMap === {}, 非同源告警另一个任务未完成", robotInsResult, videoInsResult, warnThreshold, cruiseStatus, JSON.toJSONString(redisInfoMap));
                     continue;
