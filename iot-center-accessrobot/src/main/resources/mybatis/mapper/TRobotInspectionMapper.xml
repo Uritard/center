@@ -404,4 +404,20 @@
     <delete id="deleteByEdgeCode">
         delete from t_robot_inspection  where edge_code=#{edgeCode}
     </delete>
+
+    <select id="selectInstanceIdByDeviceId" resultType="java.lang.Long">
+        SELECT
+
+        a.instance_id as instance_id
+        FROM
+            `t_cruise_point_instance` a
+                LEFT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+                LEFT JOIN u_patrol_task_attr c on a.instance_id = c.instance_id
+        WHERE
+                b.inspection_code IN
+                <foreach collection="deviceIds" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+          and c.task_id = #{taskCode}
+    </select>
 </mapper>

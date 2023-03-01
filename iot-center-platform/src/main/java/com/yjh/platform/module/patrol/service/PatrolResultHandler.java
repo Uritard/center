@@ -89,17 +89,18 @@ public class PatrolResultHandler {
             log.info("taskCode==={},taskId===={}", taskCode, taskId);
             taskAlarm.setTaskCode(taskId);
 
-            RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate,
-                    analyseDataOperateService, taskCode);
-            ThreadPoolUtil.PATROL_POOL.addThread(robotWarnThread);
-
             boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
             if (flag) {
                 //非同源告警处理
                 NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm,
-                        redisTemplate, 0);
+                    redisTemplate, 0);
                 ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                return;
             }
+            RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate,
+                    analyseDataOperateService, taskCode);
+            ThreadPoolUtil.PATROL_POOL.addThread(robotWarnThread);
+
         }
         }catch (Exception e){
             log.error("处理下级系统的测点告警异常:", e);

@@ -59,4 +59,6 @@ public interface TRobotInspectionDao {
     int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
 
     List<String> selectInspectionCodeList(@Param("deviceIdList")  String deviceIdList);
+
+    List<Long> selectInstanceIdByDeviceId(@Param("deviceIds")List<String> deviceIds,@Param("taskCode")String taskCode);
 }
