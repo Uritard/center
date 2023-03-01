@@ -476,6 +476,7 @@ public class TCameraPresetController {
             if (!StringUtils.isEmpty(response1.getData().toString())) {
                 Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                 JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
+                log.info("重置预置位相机抓图结果：{}", response2.getData());
 
                 String realLocalPath = (String)json.get("urlPath");
                 realLocalPath = realLocalPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString());
