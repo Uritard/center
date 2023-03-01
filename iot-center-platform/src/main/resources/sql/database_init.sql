@@ -1054,6 +1054,7 @@ CREATE TABLE `t_cruise_plan` (
   `robot_id` bigint(11) DEFAULT NULL COMMENT '机器人id',
   `plan_name` varchar(32) DEFAULT '' COMMENT '预案名称',
   `type` int(11) DEFAULT '1' COMMENT '任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义',
+  `sub_type` int(11) DEFAULT '1' COMMENT '任务子类型',
   `plan_point_types` varchar(32) DEFAULT '' COMMENT '表计读数，位置状态识别，外观缺陷识别，红外测温，声音检测',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
