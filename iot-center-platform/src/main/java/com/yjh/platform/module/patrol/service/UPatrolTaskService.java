@@ -1628,7 +1628,7 @@ public class UPatrolTaskService {
 
             boolean skipFlag = false;
             // 设备检修判断
-            if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "deviceId")) >= 0) {
+            if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "instanceId")) >= 0) {
                 m.put("resultNum", "设备检修中");
                 // 异常原因，设备检修
                 m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
