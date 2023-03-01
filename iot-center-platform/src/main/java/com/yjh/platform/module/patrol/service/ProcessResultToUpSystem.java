@@ -56,10 +56,6 @@ public class ProcessResultToUpSystem {
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
-    private static final String JUDGE = "panbie";
-    private static final String DEFECT = "defect";
-    private static final String METER = "meter";
-    private static final String FTPIMG = "ftpImg";
 
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
@@ -220,15 +216,8 @@ public class ProcessResultToUpSystem {
     private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
-        if (StringUtils.contains(imagePath, METER)){
-            imagePath = imagePath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-        }else if (StringUtils.contains(imagePath, FTPIMG)){
-            imagePath = imagePath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
-        }
+        log.info("imagePath=={}", imagePath);
+        imagePath = replaceResultImgPath(imagePath, false);
 
         try {
             String recognitionType = String.valueOf(xmlItem.get("recognition_type"));
@@ -277,31 +266,10 @@ public class ProcessResultToUpSystem {
      */
     private Map<String, String> packageCruiseResultInfo(String taskId, String instanceId, Map<String, String> cruiseResultMap, Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(5);
-        String imgPath = "";
         String picPath = String.valueOf(redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "picpath"));
-        log.info("picPath====={}", picPath);
-        // meter-表计 defect-缺陷 panbie-判别
-        if (StringUtils.contains(picPath, METER)){
-            imgPath = picPath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-        }else if (StringUtils.contains(picPath, DEFECT)){
-            imgPath = picPath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")));
-        }else if (StringUtils.contains(picPath, JUDGE)){
-            imgPath = picPath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")));
-        }else if (StringUtils.contains(picPath, FTPIMG)){
-            imgPath = picPath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
-        }else{
-            imgPath = picPath.replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")));
-        }
+        log.info("picPath=={}", picPath);
+        picPath = replaceResultImgPath(picPath, false);
+
         try {
             String materialId = analyseDataOperateService.selectMaterialId(NumberUtils.toLong(cruiseResultMap.get("deviceId")));
             String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
@@ -350,7 +318,7 @@ public class ProcessResultToUpSystem {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-        resultPathMap.put("imgPath", imgPath);
+        resultPathMap.put("imgPath", picPath);
         resultPathMap.put("tagPath", tagPath);
         return resultPathMap;
     }
@@ -666,5 +634,27 @@ public class ProcessResultToUpSystem {
 
             return keys;
         });
+    }
+
+    /**
+     * 图片路径的绝对地址与相对地址的转换
+     *
+     * @param analyseResultImg 图片路径
+     * @param flag true-绝对转相对 false-相对转绝对
+     * @return java.lang.String
+     */
+    public String replaceResultImgPath(String analyseResultImg, boolean flag) {
+        String resultImage = analyseResultImg;
+        try {
+            Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
+            String absPath = map.get("content");
+            Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
+            String relPath = entries.get("content");
+            resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
+            log.info("The image path after replacement is=={}", resultImage);
+        }catch (Exception e){
+            log.error("图片路径转换异常", e);
+        }
+        return resultImage;
     }
 }

@@ -43,6 +43,7 @@ public class TableCellElement {
         this(rowStart, rowEnd, columnStart, columnEnd, value, type, DEFAULT_FONT_HEIGHT_IN_POINT, -1, -1, ALIGN_DEFAULT, tableIndex);
     }
 
+    // 图像
     public TableCellElement(int rowStart, int rowEnd, int columnStart, int columnEnd, String[] value, int type) {
         this(rowStart, rowEnd, columnStart, columnEnd, value, type, DEFAULT_FONT_HEIGHT_IN_POINT, -1, -1, ALIGN_DEFAULT, -1);
     }

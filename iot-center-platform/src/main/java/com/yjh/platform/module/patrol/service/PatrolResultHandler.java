@@ -48,8 +48,6 @@ public class PatrolResultHandler {
     private final UPatrolTaskService uPatrolTaskService;
     private final TVoiceDeviceService tVoiceDeviceService;
 
-    private static final String JUDGE = "panbie";
-    private static final String DEFECT = "defect";
     private static final String METER = "meter";
 
     Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
@@ -395,7 +393,7 @@ public class PatrolResultHandler {
             }
 
             cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            cruiseResultMap.put("isWarn", StringUtils.isNotEmpty(cruiseResultMap.get("isWarn")) ? "0" : "1");
+            cruiseResultMap.put("isWarn", Optional.ofNullable(cruiseResultMap.get("isWarn")).orElse("0"));
             cruiseResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             log.info("cruiseResultMap==={}", cruiseResultMap);
             redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
@@ -425,11 +423,7 @@ public class PatrolResultHandler {
         String resultImage;
         try {
             if(StringUtils.contains(analyseResultImg, METER)){
-                resultImage = analyseResultImg.replaceAll(
-                        (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"),
-                        (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
-                log.info("recognition image=={}", resultImage);
-
+                resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
                 cruiseResultMap.put("picpath", resultImage);
             }
 
@@ -858,17 +852,7 @@ public class PatrolResultHandler {
     private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
         String resultImage;
         try {
-            if (StringUtils.contains(analyseResultImg, DEFECT)){
-                resultImage = analyseResultImg.replaceAll(
-                        (String)redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content"),
-                        (String)redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content"));
-            }else {
-                resultImage = analyseResultImg.replaceAll(
-                        (String)redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"),
-                        (String)redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
-            }
-            log.info("defect image=={}", resultImage);
-
+            resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
             log.info("Defect data is ==={}", resultValueItem);
             String resultValue = analyseDataOperateService.resolveDefectResult(resultValueItem);
             log.info("Parse defect data is ==={}", resultValue);
@@ -1090,17 +1074,7 @@ public class PatrolResultHandler {
     private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap) {
         String resultImage;
         try {
-            if (StringUtils.contains(analyseResultImg, JUDGE)){
-                resultImage = analyseResultImg.replaceAll(
-                        (String)redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content"),
-                        (String)redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content"));
-            }else {
-                resultImage = analyseResultImg.replaceAll(
-                        (String)redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"),
-                        (String)redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
-            }
-            log.info("distinguish image=={}", resultImage);
-
+            resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
             resultValue = analyseDataOperateService.resolveDefectResult(resultValue);
             log.info("Parse distinguish data is==={}", resultValue);
 
@@ -1119,5 +1093,4 @@ public class PatrolResultHandler {
             log.error("判别结果处理异常：", e);
         }
     }
-
 }
