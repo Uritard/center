@@ -28,5 +28,7 @@ public class TCruiseTypeDetail extends TCruiseType{
     private Integer cruiseType;
 
     private String cruiseTypeName;
+
+    private String cruiseDeviceName;
 }
 
