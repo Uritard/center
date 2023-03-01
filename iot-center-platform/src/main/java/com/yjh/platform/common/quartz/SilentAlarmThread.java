@@ -446,17 +446,18 @@ public class SilentAlarmThread implements Runnable {
                     .setImagePath(defectResultRealImg);
             tWarnInfoDao.insert(tWarnInfo);
             //webSocket通知前端调用查询告警弹框的接口
-            Map<String, Object> jasonMaps = new HashMap<>(16);
+            Map<String, String> jasonMaps = new HashMap<>(16);
             jasonMaps.put("type", "alarmPopUp");
             jasonMaps.put("warnType", "1");
             jasonMaps.put("warnLevel", alarmLevel);
-            jasonMaps.put("warnId", tWarnInfo.getWarnId());
-            jasonMaps.put("defectModel", 450);
+            jasonMaps.put("warnId", ValueUtil.toString(tWarnInfo.getWarnId(),"1"));
+            jasonMaps.put("defectModel", "450");
             String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
             log.info("发送给前端的消息: {}", json);
             String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
             if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
-                restTemplatePost(syncWebsocketUrl, json);
+//                restTemplatePost(syncWebsocketUrl, json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
             }
             return tWarnInfo;
         } catch (Exception e) {
@@ -508,9 +509,13 @@ public class SilentAlarmThread implements Runnable {
                 String targetNamePath = imgPath.replace(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")), "").substring(1);
                 log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
-                uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
+                String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+                String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
 
-                xmlItem.put("file_path", targetNamePath);
+                uploadFileToUpFtps(imgPath, ftpsTarPath, upFtpsConfig);
+
+                xmlItem.put("file_path", ftpsTarPath);
                 xmlItem.put("time", warnTime);
                 xmlItem.put("content", tWarnInfo.getWarnContent());
                 xmlItems.add(xmlItem);

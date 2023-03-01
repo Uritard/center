@@ -71,8 +71,8 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
             return;
         }
         // 图片在ftps上的全路径
-        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + filePath;
-        String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + filePath;
+        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/"+filePath;
+        String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + "/"+filePath;
         try {
             FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
         } catch (IOException e) {
