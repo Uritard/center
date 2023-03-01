@@ -2945,5 +2945,9 @@ public class RobotService {
 
 
     }
+
+    public List<Long> selectInstanceIdByDeviceId(List<String> deviceIds,String taskCode) {
+        return tRobotInspectionDao.selectInstanceIdByDeviceId(deviceIds,taskCode);
+    }
 }
 
