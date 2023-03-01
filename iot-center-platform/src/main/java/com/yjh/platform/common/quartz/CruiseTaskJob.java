@@ -347,7 +347,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         overhaul = Arrays.asList(overhaulString.split(","));
                     }
                     if(overhaul != null && overhaul.size()>0){//判断是否检修
-                        if(overhaul.contains(item.getDeviceId())){
+                        if(overhaul.contains(item.getInstanceId())){
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
                                 tCruiseResult.setCState(240);
