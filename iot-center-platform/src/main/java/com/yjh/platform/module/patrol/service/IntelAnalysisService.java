@@ -1186,7 +1186,7 @@ public class IntelAnalysisService {
                 xmlItem.put("monitor_type", "100");
                 String[] alarmType = algorithmConfig.getSilentMonitorNameAndType().split(",");
                 for (String str : alarmType) {
-                    String[] split = new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8).split(":");
+                    String[] split =/* new String(*/str/*.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8)*/.split(":");
                     if (tWarnInfo.getWarnContent().contains(split[0])) {
                         xmlItem.put("monitor_type", split[1]);
                         break;
