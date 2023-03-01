@@ -203,7 +203,7 @@
         n.one_cruise_device_name,
         n.two_cruise_device_name
         from t_cruise_nonhomologous_warn a
-        inner join t_cruise_nonhomologous_point_instance n on n.instance_id =a.instance_id
+        left join t_cruise_nonhomologous_point_instance n on n.instance_id =a.instance_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
         left join t_std_device e on e.device_id = d.device_id
         left join t_dict_business k on k.dict_code = e.device_type
