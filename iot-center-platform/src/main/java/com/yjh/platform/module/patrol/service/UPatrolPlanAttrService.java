@@ -43,6 +43,8 @@ public class UPatrolPlanAttrService {
         if (map.containsKey("subType") && StringUtils.isNotEmpty(map.get("subType").toString())) {
             Integer planSubType = Integer.parseInt(String.valueOf(map.get("subType")));
             tCruisePlan.setSubType(planSubType);
+        }else {
+            tCruisePlan.setSubType(1);
         }
         tCruisePlan.setType(planType);
         tCruisePlan.setUpRegionId(map.get("upRegionId") == null ? null : Long.parseLong(map.get("upRegionId").toString()));
@@ -163,7 +165,7 @@ public class UPatrolPlanAttrService {
         map.put("planId", planId);
         map.put("planName", String.valueOf(planDetailMap.get("planName")));
         map.put("type", planDetailMap.get("type"));
-        map.put("subType", planDetailMap.get("subType"));
+        map.put("subType", planDetailMap.getOrDefault("subType", 1));
         this.tCruisePlanDao.updateByMap(map);
         if (uPatrolPlanAttrList.size() > 0) {
             return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
