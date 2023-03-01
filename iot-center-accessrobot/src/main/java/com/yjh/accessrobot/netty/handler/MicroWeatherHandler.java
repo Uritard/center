@@ -12,16 +12,14 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -72,9 +70,10 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             weatherMap.put("robotCode", robotCode);
             weatherMap.put("time", res.get("time").toString());
             weatherMap.put("type", res.get("type").toString());
-            weatherMap.put("value", res.get("value").toString());
-            weatherMap.put("valueUnit", res.get("value_unit").toString());
             weatherMap.put("unit", res.get("unit").toString());
+            String valueTemp = new DecimalFormat("#0.00").format(NumberUtils.toDouble(res.get("value").toString()));
+            weatherMap.put("value", valueTemp);
+            weatherMap.put("valueUnit", valueTemp + weatherMap.get("unit"));
 
             weatherList.add(weatherMap);
             // 2022过检 环境类型修改
