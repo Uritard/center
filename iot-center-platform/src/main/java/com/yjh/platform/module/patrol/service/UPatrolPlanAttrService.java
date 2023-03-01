@@ -165,7 +165,11 @@ public class UPatrolPlanAttrService {
         map.put("planId", planId);
         map.put("planName", String.valueOf(planDetailMap.get("planName")));
         map.put("type", planDetailMap.get("type"));
-        map.put("subType", planDetailMap.getOrDefault("subType", 1));
+        if (planDetailMap.containsKey("subType") && StringUtils.isNotEmpty(planDetailMap.get("subType").toString())) {
+            map.put("subType", planDetailMap.get("subType"));
+        }else {
+            map.put("subType", 1);
+        }
         this.tCruisePlanDao.updateByMap(map);
         if (uPatrolPlanAttrList.size() > 0) {
             return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
