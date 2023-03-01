@@ -27,13 +27,13 @@ public class MQTTConfig {
     private String appName;
     @Value("${server.port}")
     private String appPort;
-    @Value("${mqtt.user}")
+    @Value("${mqtt.user:}")
     private String user;
-    @Value("${mqtt.pwd}")
+    @Value("${mqtt.pwd:}")
     private String pwd;
-    @Value("${audio.mqtt.user}")
+    @Value("${audio.mqtt.user:}")
     private String voiceUser;
-    @Value("${audio.mqtt.pwd}")
+    @Value("${audio.mqtt.pwd:}")
     private String voicePwd;
 
 
