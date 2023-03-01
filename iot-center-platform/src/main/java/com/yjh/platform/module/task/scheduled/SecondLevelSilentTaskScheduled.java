@@ -71,7 +71,7 @@ public class SecondLevelSilentTaskScheduled {
             String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
             if (redisTemplate.hasKey(key)) {
                 log.info("已经发送过了");
-//                return ;
+                return ;
             } else {
                 HashMap<String, Object> redisMap = new HashMap<>(3);
                 redisMap.put("cameraId", cameraId);
