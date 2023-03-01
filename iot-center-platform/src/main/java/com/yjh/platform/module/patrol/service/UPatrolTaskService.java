@@ -1443,7 +1443,10 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId, boolean force) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
-
+        if (ArrayUtils.contains(new int[] {TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, uPatrolResult.getTaskState())) {
+            log.info("当前任务已经结束:{}, state: {}", taskId, uPatrolResult.getTaskState());
+            return 1;
+        }
         List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, uPatrolResult.getTaskLevel());
         if (!force && CollectionUtils.isNotEmpty(highTaskList)) {
             log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
@@ -1469,7 +1472,7 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-            if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED || uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
+            if (uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
                 return 1;
             }
 
