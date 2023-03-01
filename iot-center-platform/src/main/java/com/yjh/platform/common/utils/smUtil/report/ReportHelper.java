@@ -134,7 +134,7 @@ public class ReportHelper {
         return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars)) * 256;
     }
     public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest) {
-        final SXSSFWorkbook wb = new SXSSFWorkbook();
+        final SXSSFWorkbook wb = new SXSSFWorkbook(rowNum);
         final Sheet sheet = wb.createSheet("巡检报告");
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         Row row;
@@ -169,11 +169,10 @@ public class ReportHelper {
             boolean crossColumn = colStart != element.getColumnEnd();
             boolean crossRow = rowIndex != element.getRowEnd();
             row = sheet.getRow(rowIndex);
-            if (isEmptyRow(row)){
-                continue;
-            }
+//            if (isEmptyRow(row)){
+//                continue;
+//            }
             cell = row.getCell(colStart);
-
             if (cellType == TableCellElement.TYPE_TEXT_STRING ||
                     cellType == TableCellElement.TYPE_NUMBER_STRING) {
                 String[] textValues = element.getValue();
