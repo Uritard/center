@@ -327,10 +327,12 @@ public class UPatrolResultService {
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (StringUtils.isNotEmpty(uPatrolResult.getCheckUser()) && !uPatrolResult.getCheckUser().contains(userName)){
-            userName = uPatrolResult.getCheckUser() + ", "+userName;
-        } else {
-            userName = uPatrolResult.getCheckUser();
+        if (StringUtils.isNotEmpty(uPatrolResult.getCheckUser()) ){
+            if (uPatrolResult.getCheckUser().contains(userName)){
+                userName = uPatrolResult.getCheckUser();
+            } else {
+                userName = uPatrolResult.getCheckUser() + ", "+userName;
+            }
         }
         int result = uPatrolResultDao.updateCheck(taskId, userName, date, "1");
         //审核未被审核的巡视点
