@@ -46,14 +46,16 @@ public class FileUtil {
      * @param descPath 文件目的路径
      * @return
      */
-    public static void copyFileUsingStream(String sourcePath, String descPath) {
+    public static boolean copyFileUsingStream(String sourcePath, String descPath) {
         File source = new File(sourcePath);
         File dest = new File(descPath);
 
         try {
             FileUtils.copyFile(source, dest);
+            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
+        return false;
     }
 }
