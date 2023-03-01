@@ -40,7 +40,7 @@ public class DeviceStatistics {
 
 //    private static String VOICE_URL = "http://iot-center-platform/statistics/v1/voice?voice={voice}";
 
-    @Scheduled(cron = "${spring.device.time}")
+//    @Scheduled(cron = "${spring.device.time}")
     public void deviceStatisticsUpload() {
         log.info("设备统计信息上传: "+new Date());
         String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");

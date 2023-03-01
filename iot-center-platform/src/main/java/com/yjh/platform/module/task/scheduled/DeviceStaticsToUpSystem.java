@@ -1,12 +1,14 @@
 package com.yjh.platform.module.task.scheduled;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.service.StatisticsService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +57,9 @@ public class DeviceStaticsToUpSystem {
      **/
 
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "${spring.device.time}")
     public void resultToUpSystem() {
-        String reportDate = simpleDateFormat.format(new Date());
+        String reportDate = DateUtils.dateToString(new Date());
         List<Map<String, Object>> infoMaps = new ArrayList<>();
         // 获取摄像机，机器人，无人机的信息
         List<Map<String, Object>> robotList = statisticsDao.selectRobot();
@@ -208,12 +210,6 @@ public class DeviceStaticsToUpSystem {
         }
         for (int type = 1; type < 7; type++) {
             Map<String, Object> infoMap = new HashMap<>(16);
-            infoMap.put("patroldevice_code", device.get("patrolDeviceCode"));
-            infoMap.put("patroldevice_name", device.get("patrolDeviceName"));
-            infoMap.put("commission_time", Optional.ofNullable(device.get("commissionTime")).orElse(""));
-            infoMap.put("report_time", reportDate);
-            infoMap.put("type", type);
-            infoMap.put("device_type",device.get("device_type"));
             switch (type) {
                 case 1:
                     // 累积在线时长总和
@@ -224,6 +220,7 @@ public class DeviceStaticsToUpSystem {
                     infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : parseDate(deviceStaticsInfo.get("duration").toString(), MINUTE));
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "分");
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 case 2:
                     // 累积离线次数总和
@@ -234,6 +231,7 @@ public class DeviceStaticsToUpSystem {
                     infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("off_line_count")) ? 0 : Integer.parseInt(deviceStaticsInfo.get("off_line_count").toString()));
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "次");
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 case 3:
                     // 累计连续正常运行天数
@@ -248,6 +246,7 @@ public class DeviceStaticsToUpSystem {
                     infoMap.put("value", NormalDays == null ? 0 : NormalDays);
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "天");
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 case 4:
                     // 正常巡检天数
@@ -263,6 +262,7 @@ public class DeviceStaticsToUpSystem {
                         infoMap.put("value_unit", "1");
                         infoMap.put("unit", "天");
                     }
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 case 5:
                     // 巡检出勤率
@@ -278,6 +278,7 @@ public class DeviceStaticsToUpSystem {
                         infoMap.put("value_unit", "1");
                         infoMap.put("unit", "%");
                     }
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 case 6:
                     // 录像完整率
@@ -291,12 +292,24 @@ public class DeviceStaticsToUpSystem {
                     }
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "%");
+                    dealFuncInfo(device, reportDate, type, infoMap);
                     break;
                 default:
                     break;
             }
-            infoMaps.add(infoMap);
+            if (MapUtils.isNotEmpty(infoMap)){
+                infoMaps.add(infoMap);
+            }
         }
+    }
+
+    private void dealFuncInfo(Map<String, Object> device, String reportDate, int type, Map<String, Object> infoMap) {
+        infoMap.put("patroldevice_code", device.get("patrolDeviceCode"));
+        infoMap.put("patroldevice_name", device.get("patrolDeviceName"));
+        infoMap.put("commission_time", Optional.ofNullable(device.get("commissionTime")).orElse(""));
+        infoMap.put("report_time", reportDate);
+        infoMap.put("type", type);
+        infoMap.put("device_type", device.get("device_type"));
     }
 
     private Long parseDate(String dateString, String target) {

@@ -469,15 +469,15 @@
 
     <select id="selectRobot" resultType="java.util.Map">
         SELECT
-               0 as device_type,
-        robot_id as robotId,
-        robot_num as patrolDeviceCode,
-        robot_name as patrolDeviceName,
-        commission_date as commissionTime
+            0 as device_type,
+            robot_id as robotId,
+            robot_num as patrolDeviceCode,
+            robot_name as patrolDeviceName,
+            DATE_FORMAT(commission_date, '%Y-%m-%d %H:%i:%s' ) as commissionTime
         FROM
-        t_robot_info
+            t_robot_info
         WHERE
-        robot_type IS NOT NULL
+            robot_type IS NOT NULL
     </select>
     <select id="selectCamera" resultType="java.util.Map">
         SELECT
@@ -485,7 +485,7 @@
         camera_id as cameraId,
         camera_id as patrolDeviceCode,
         camera_name as patrolDeviceName,
-        create_time as commissionTime
+            DATE_FORMAT(commission_date, '%Y-%m-%d %H:%i:%s' ) as commissionTime
         FROM
         t_camera_info
     </select>
@@ -495,7 +495,7 @@
         robot_id as robotId,
         robot_num as patrolDeviceCode,
         robot_name as patrolDeviceName,
-        commission_date as commissionTime
+            DATE_FORMAT(commission_date, '%Y-%m-%d %H:%i:%s' ) as commissionTime
         FROM
         t_robot_info
         WHERE
