@@ -66,6 +66,7 @@ public class HeartBeatJob {
     }
 
     private String encode(String str){
-        return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        // return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+        return str;
     }
 }

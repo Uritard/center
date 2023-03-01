@@ -1,6 +1,7 @@
 package com.yjh.platform.common.mqtt;
 
 import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -27,10 +28,10 @@ public class MqttUtilsServer {
         this.serverClientId = serverClientId;
         this.user = user;
         this.pwd = pwd;
-        initClient(host, serverClientId, user, pwd);
+        initClient(host, serverClientId, user, pwd, false);
     }
 
-    private void initClient(String host, String serverClientId, String user, String pwd) {
+    private void initClient(String host, String serverClientId, String user, String pwd, boolean sync) {
         try {
             this.mqttClient = new MqttClient(host, serverClientId, new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
@@ -43,18 +44,20 @@ public class MqttUtilsServer {
             options.setKeepAliveInterval(60);
             options.setAutomaticReconnect(true);
             this.mqttClient.setCallback(new PushCallback());
-            new Runnable() {
-                @Override
-                public void run() {
+            if (sync) {
+                mqttClient.connect(options);
+            } else {
+                ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                     try {
                         mqttClient.connect(options);
                     } catch (Exception e) {
-                        log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
+                        log.error("connetct mqttserver-异常\nclientId:{}\n", serverClientId, e);
                     }
-                }
-            };
+                });
+            }
+
         } catch (Exception e) {
-            log.error("init mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
+            log.error("init mqttserver-异常\nclientId:{}\n", serverClientId, e);
         }
     }
 
@@ -123,7 +126,7 @@ public class MqttUtilsServer {
 
     public void reconnection() {
         log.info("reconnection mqtt");
-        initClient(host, serverClientId, user, pwd);
+        initClient(host, serverClientId, user, pwd, true);
     }
 
 }
