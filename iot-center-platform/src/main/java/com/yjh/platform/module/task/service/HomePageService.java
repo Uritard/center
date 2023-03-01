@@ -108,7 +108,7 @@ public class HomePageService {
     public List<TaskOnExecuteInfo> taskOnExecute() throws ParseException {
         //查出正在执行的任务
         List<TaskOnExecuteInfo> listTask = tCruiseTaskDao.selectTaskOnExecute();
-        log.info("任务list: " + listTask);
+//        log.info("任务list: " + listTask);
         for (TaskOnExecuteInfo item : listTask) {
             try {
 //                CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(item.getTaskId());

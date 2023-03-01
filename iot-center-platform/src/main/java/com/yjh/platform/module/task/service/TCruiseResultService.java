@@ -400,7 +400,7 @@ public class TCruiseResultService{
 
     private void getTaskCountByCache(TaskSimpleInfo temTask) {
         //取出taskId对应下的所有instanceId
-        log.info("任务数据==={}", temTask);
+        log.info("doing taskId is==={}", temTask.getTaskId());
         Set<String> instanceKey = redisTemplate.keys("patrol_task_result:"+ temTask.getTaskId() +":*");
 //        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {

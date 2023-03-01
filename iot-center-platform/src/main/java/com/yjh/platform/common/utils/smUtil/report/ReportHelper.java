@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -168,7 +169,11 @@ public class ReportHelper {
             boolean crossColumn = colStart != element.getColumnEnd();
             boolean crossRow = rowIndex != element.getRowEnd();
             row = sheet.getRow(rowIndex);
+            if (isEmptyRow(row)){
+                continue;
+            }
             cell = row.getCell(colStart);
+
             if (cellType == TableCellElement.TYPE_TEXT_STRING ||
                     cellType == TableCellElement.TYPE_NUMBER_STRING) {
                 String[] textValues = element.getValue();
@@ -308,5 +313,23 @@ public class ReportHelper {
 
         styleCache.clear();
         return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static boolean isEmptyRow(Row row) {
+        if (row == null || row.toString().isEmpty()) {
+            return true;
+        } else {
+            Iterator<Cell> it = row.iterator();
+            boolean isEmpty = true;
+            while (it.hasNext()) {
+                Cell cell = it.next();
+                if (cell != null || cell.getCellType() != Cell.CELL_TYPE_BLANK) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            return isEmpty;
+        }
     }
 }
