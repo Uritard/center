@@ -600,6 +600,7 @@
             d.dict_note AS dealTypeName,
             alarm.deal_time,
             '本体' AS customName,
+            '0' AS deviceType,
             c.robot_num AS deviceCode
         FROM
             t_robot_alarm alarm
