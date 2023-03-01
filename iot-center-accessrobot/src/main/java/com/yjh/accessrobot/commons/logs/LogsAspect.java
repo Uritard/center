@@ -72,7 +72,22 @@ public class LogsAspect {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
                 userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            } else { userName = "admin"; }
+            } else {
+                try {
+                    return joinPoint.proceed();
+                } catch (Throwable e) {
+                    serviceId = logsConfig.getName();
+                    params.set("logType", annotation.logType());
+                    params.set("ip", ip);
+                    params.set("title", "内部接口错误");
+                    params.set("state", 3);
+                    params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
+                    params.set("userId", userId);
+                    params.set("userName", userName);
+                    post(params);
+                    throw e;
+                }
+            }
         }
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         Object result = null;
