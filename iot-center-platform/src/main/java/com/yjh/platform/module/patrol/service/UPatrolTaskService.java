@@ -1095,11 +1095,8 @@ public class UPatrolTaskService {
     public Result robotTask(Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            HttpHeaders headers = SessionUtils.packageHeader();
-
-            HttpEntity<Map<String, List<RobotTaskInstanceInfo>>> httpEntity = new HttpEntity<>(robotTaskInfoMap,headers);
             if (null != serviceRestTemplate) {
-                return serviceRestTemplate.postForObject(ROBOT_TASK_URL, httpEntity, Result.class);
+                return serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, Result.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1380,11 +1377,9 @@ public class UPatrolTaskService {
 
     public void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
         try {
-            HttpHeaders headers = SessionUtils.packageHeader();
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(robotTaskStatesMap,headers);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, httpEntity, String.class);
+                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, robotTaskStatesMap, String.class);
             }
         } catch (Exception e) {
             log.error("机器人任务控制出错：", e);
