@@ -6,8 +6,10 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -64,6 +66,10 @@ public class TCameraPresetService {
     private IntelAnalysisService intelAnalysisService;
     @Autowired
     private UpFtpsConfig upFtpsConfig;
+
+    @Autowired
+    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+
     /**
      * 变电站编码
      */
@@ -796,12 +802,29 @@ public class TCameraPresetService {
     /**
      * 将相机采集到的图片覆盖到原预置位图片
      *
-     * @param urlPath urlPath
-     * @param presetImg presetImg
+     * @param urlPath urlPath https类型，需要转成romotePath
+     * @param presetImgHttpUrl presetImgHttpUrl https类型，需要转成本地localPath
      * @return result
      */
-    public String saveImgToFtpsToCoverOriImg(String urlPath, String presetImg) {
-        return intelAnalysisService.upLoadFileToCoverHttpPath(urlPath, presetImg);
+    public String saveImgToFtpsToCoverOriImg(String urlPath, String presetImgHttpUrl) {
+        log.info("将相机采集到的图片覆盖到原预置位图片, urlPath: {}, presetImg: {}", urlPath, presetImgHttpUrl);
+        try {
+            String localPath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
+            String ftpsLocalPath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
+            String romotePath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), "");
+
+            FtpsUtil.putFile(ftpsLocalPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
+                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+
+            log.info("ftpsUtil.downloadFile(, localPath: {}, romotePath: {}", localPath, romotePath);
+            // localPath: 本地需要覆盖到的地址， romotePath:ftps间接地址
+            FtpsUtil.downloadFile(localPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
+                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            return romotePath;
+        } catch (Exception e) {
+            log.info("将相机采集到的图片覆盖到原预置位图片失败, ", e);
+            return "";
+        }
     }
 
     /**
