@@ -709,7 +709,7 @@ public class UPatrolTaskService {
                 }
             }
 
-            String nodesStr = countChangeMap.get("nodes");
+            String nodesStr = countMap.get("nodes");
             List<String> nodes = Collections.emptyList();
             if (StringUtils.isNotEmpty(nodesStr)) {
                 nodes = JSON.parseArray(nodesStr, String.class);

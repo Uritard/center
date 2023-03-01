@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +105,7 @@ public class InspectionResultThread implements Runnable{
                 }
                 MAP_LOCK.remove(taskId + instanceId);
             }
-            //巡视主机任务终止的结果消息不处理 以免调用算法
-            String taskShutDown = "任务终止";
-            if (taskShutDown.equals(robotPatrolTaskResult.getValue())){
-                return;
-            }
+
             // 是否为本级系统下发给下级系统的任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"));
             if (Boolean.FALSE.equals(flag)) {
@@ -223,6 +220,8 @@ public class InspectionResultThread implements Runnable{
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType) {
         try {
             String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+            // 巡视主机任务终止的结果消息不调用算法
+            boolean isInterrupt = StringUtils.containsAny(robotPatrolTaskResult.getValue(), "任务终止", "超时");
 
             CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
             Integer type = uPatrolTaskService.selectRobotType(sendCode);
@@ -230,8 +229,8 @@ public class InspectionResultThread implements Runnable{
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
             boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
-           isSimulationTool = isSimulationTool || needAnalysis;
-            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
+            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt;
+            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}, isInterrupt: {}", isSimulationTool, taskId, type, sysLevel, cruiseType, isInterrupt);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
@@ -290,10 +289,11 @@ public class InspectionResultThread implements Runnable{
             // 巡检点类型
             int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
+            boolean fileFound = new File(resultImagePath).exists();
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
-            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType) {
+            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
                 Long preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);

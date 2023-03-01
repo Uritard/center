@@ -57,7 +57,7 @@ public class MqttUtilsServer {
             }
 
         } catch (Exception e) {
-            log.error("init mqttserver-异常\nclientId:{}\n", serverClientId, e);
+            log.error("init mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
         }
     }
 
