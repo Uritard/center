@@ -124,8 +124,8 @@ public class TaskJob extends QuartzJobBean {
             int taskState = canRunning ? CruiseConstant.TASK_STATE_EXECUTING : CruiseConstant.TASK_STATE_PAUSE;
             setTaskResult(task, fireTime, taskState);
             if (canRunning) {
-                //给下级设备或节点发任务启动
-                // uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
+                //给下级设备或节点发任务
+                 uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
                 //调用摄像机任务
                 uPatrolTaskService.localTaskStart(task.getTaskId());
             }
