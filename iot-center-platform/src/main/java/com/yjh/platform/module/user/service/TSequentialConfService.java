@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.NumberUtils;
 
 import javax.management.ObjectName;
 
@@ -178,6 +179,21 @@ public class TSequentialConfService{
         list.add(areaInfoItem4);
 
         return list;
+    }
+
+    /**
+     * 替换redis中的一键顺控结果sequentialResult
+     *
+     * @param resultNum resultNum
+     * @return result
+     */
+    public String setSequentialResult(Integer resultNum) {
+        if (resultNum == null || resultNum < 1 || resultNum > 4) {
+            return "resultNum must 1-4";
+        }
+
+        redisTemplate.opsForHash().put("t_sys_param:sequentialResult", "content", resultNum.toString());
+        return "ok";
     }
 
     @Transactional(rollbackFor = Exception.class)
