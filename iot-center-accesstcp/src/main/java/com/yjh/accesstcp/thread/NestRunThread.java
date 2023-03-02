@@ -68,7 +68,7 @@ public class NestRunThread implements Runnable{
                     Map<String, Object> map9 = createMap(5, mapForHeadRollAngle);
                     list.add(map9);
                     //舱内湿度
-                    Map<String, Object> mapForHeadYawAngle = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":10");
+                    Map<String, Object> mapForHeadYawAngle = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":6");
                     Map<String, Object> map10 = createMap(6, mapForHeadYawAngle);
                     list.add(map10);
 
