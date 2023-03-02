@@ -480,7 +480,7 @@ public class SilentAlarmThread implements Runnable {
             Map<String, Object> xmlItem = new HashMap<>(16);
 
             xmlBaseModel.setType("63");
-            xmlItem.put("patroldevice_code", map.get("device_id"));
+            xmlItem.put("patroldevice_code", map.get("preset_id"));
             xmlItem.put("patroldevice_name", map.get("device_name"));
             switch (tWarnInfo.getWarnLevel()) {
                 case 130:
