@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -646,11 +647,20 @@ public class ProcessResultToUpSystem {
     public String replaceResultImgPath(String analyseResultImg, boolean flag) {
         String resultImage = analyseResultImg;
         try {
-            Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
+            HashOperations<String, String, String> operations = redisTemplate.opsForHash();
+            Map<String,String> map = operations.entries("t_sys_param:prefixAbsolutePath");
             String absPath = map.get("content");
-            Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
+            Map<String,String> entries = operations.entries("t_sys_param:prefixRelativePath");
             String relPath = entries.get("content");
-            resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
+            if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
+                resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
+            } else {
+                String filePath = operations.get("t_sys_param:fileAbsPath", "content");
+                String fileUrl = operations.get("t_sys_param:fileRealPath", "content");
+                assert fileUrl != null; assert filePath != null;
+                resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
+            }
+
             log.info("The image path after replacement is=={}", resultImage);
         }catch (Exception e){
             log.error("图片路径转换异常", e);

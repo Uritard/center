@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.info.MultimediaInfo;
 
 import java.io.File;
 import java.net.InetAddress;
