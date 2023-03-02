@@ -704,11 +704,11 @@ public class PatrolResultHandler {
         }
 
         int warnfVal = NumberUtils.toInt(voiceDevice.getfValue());
-        int maxfVal = voiceMap.getOrDefault("DB", 0);
-        if (warnfVal > maxfVal) {
-            voiceResultHandler(String.valueOf(warnfVal), cruiseResultMap, warnfVal - maxfVal, "频率");
+        int maxfVal = voiceMap.getOrDefault("F", 0);
+        if (maxfVal > warnfVal) {
+            voiceResultHandler(String.valueOf(warnfVal), cruiseResultMap, maxfVal - warnfVal, "频率");
         }
-
+        log.info("voice point info, maxDbVal: {}, warnDbVal: {}, maxfVal: {}, warnfVal: {}, restVals: {}", maxDbVal, warnDbVal, maxfVal, warnfVal, JSON.toJSONString(voiceMap));
         return cruiseResultMap;
     }
 
