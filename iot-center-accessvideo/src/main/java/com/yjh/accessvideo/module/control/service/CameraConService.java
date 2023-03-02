@@ -1864,7 +1864,7 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
             //生成文件名
             Date date = new Date();
-            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".mp4";
+            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".h264";
             log.info("生成文件名" + fileName);
             //保存文件地址
             createDirectory(videoPath);
@@ -1899,7 +1899,10 @@ public class CameraConService {
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopSaveRealData(lRealPlayHandle);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
-            String url = "chmod 777 " + path;
+            String ffmUrl = "/usr/local/bin/ffmpeg -i " + path + " -c copy -an -r 25 " + path.replace(".h264", ".mp4");
+            Runtime.getRuntime().exec(ffmUrl);
+            Thread.sleep(1000);
+            String url = "chmod 777 " + path.replace(".h264", ".mp4");
             Runtime.getRuntime().exec(url);
         } catch (Exception ignored) {
             log.info("录制失败");
