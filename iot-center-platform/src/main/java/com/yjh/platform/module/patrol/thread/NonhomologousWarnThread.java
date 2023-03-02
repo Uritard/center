@@ -215,9 +215,8 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("warnType", 6);
                             warn.put("instanceId", Long.parseLong(instanceId));
                             warn.put("warnContent", "时间范围内表计识别结果差值超过阈值：" + warnThreshold);
-                            List<Map<String,Object>> insResults = new ArrayList<>();
-                            intervalResults.stream().forEach(i -> i.put("warnId", warn.get("warnId")));
-                            insResults.addAll(numResults);
+                            intervalResults.forEach(i -> i.put("warnId", warn.get("warnId")));
+                            List<Map<String, Object>> insResults = new ArrayList<>(numResults);
                             warn.put("resultsInfo", insResults);
                             insertNonhomologousWarnInfo(warn);
                         }

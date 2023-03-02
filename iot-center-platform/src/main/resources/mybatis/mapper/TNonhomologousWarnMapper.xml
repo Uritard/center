@@ -59,7 +59,7 @@
     <select id="selectWarnResults" parameterType="java.util.Map" resultType="java.util.Map">
         select
         a.task_id as taskId,
-        a.cruise_id as inspectionId,
+        a.instance_id as inspectionId,
         a.result_num as resultValue
         from u_patrol_data_result a
         where a.instance_id = #{inspectionId}
