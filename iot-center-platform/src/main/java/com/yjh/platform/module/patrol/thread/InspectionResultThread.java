@@ -303,7 +303,7 @@ public class InspectionResultThread implements Runnable{
                 log.info("presetId====== {}",preset);
                 abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
             } else {
-                updatePointStatusNum(taskId, tCruiseTaskResultMap, details, value);
+                updatePointStatusNum(taskId, tCruiseTaskResultMap, details, value, fileFound);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -317,8 +317,10 @@ public class InspectionResultThread implements Runnable{
      * @param tCruiseTaskResultMap 巡视结果map
      * @param details              测点信息
      * @param value                值
+     * @param fileFound            文件是否能找到
      */
-    private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
+    private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details,
+                                      String value, boolean fileFound) {
         log.info("====This is the result of no algorithm===");
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -352,11 +354,13 @@ public class InspectionResultThread implements Runnable{
             String resultValue = tCruiseTaskResultMap.get("resultNum");
 
             int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
-            if (TypeEnum.VOICE.getCode() != cruiseType) {
-                Map<String, String> cruiseResultMap = resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
-            } else {
-                // 声纹告警处理
-                resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
+            if (fileFound){
+                if (TypeEnum.VOICE.getCode() != cruiseType) {
+                    resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
+                } else {
+                    // 声纹告警处理
+                    resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
+                }
             }
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
