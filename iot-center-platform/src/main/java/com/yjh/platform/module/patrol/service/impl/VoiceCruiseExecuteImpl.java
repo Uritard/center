@@ -183,7 +183,13 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             return 0;
         }
         int warnVal = NumberUtils.toInt(warnDb);
-        int maxVal = dbList.stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0);
+
+        int maxVal;
+        if ("频率".equals(alarmPrefix)) {
+            maxVal = tVoiceDeviceService.findBigPeakClipp(dbList, 0, dbList.size(), 5);
+        } else {
+            maxVal = dbList.stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0);
+        }
         if (!isEdge && maxVal > warnVal) {
             patrolResultHandler.voiceResultHandler(String.valueOf(maxVal), cruiseResultMap, maxVal - warnVal, alarmPrefix);
         }

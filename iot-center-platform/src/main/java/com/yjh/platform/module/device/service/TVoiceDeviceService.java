@@ -603,17 +603,19 @@ public class TVoiceDeviceService{
                 Map<String,String> map = new HashMap<>();
                 map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
                 map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
-                if(timeList.get(j+1) == (DBList.size()-1)){
+                if (timeList.get(j + 1) == (DBList.size() - 1)) {
                     //整个文件满足
-                    map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
-                    map.put("time",String.valueOf(second/1000F));
+                    map.put("endTime", simpleDateFormat.format(second - TimeZone.getDefault().getRawOffset()));
+                    map.put("time", String.valueOf(second / 1000F));
                 } else {
-                    map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
-                    map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
+                    map.put("endTime", simpleDateFormat.format(timeList.get(j + 1) * hm - TimeZone.getDefault().getRawOffset()));
+                    map.put("time", df1.format(((timeList.get(j + 1) - timeList.get(j)) * hm) / 1000F));
                 }
-
-                map.put("result", findBigPeakClipp(DBList, timeList.get(j), timeList.get(j+1), 3).toString());
-                reList.add(map);
+                Integer max = findBigPeakClipp(DBList, timeList.get(j), timeList.get(j + 1), 3);
+                if (max >= warnDb) {
+                    map.put("result", String.valueOf(max));
+                    reList.add(map);
+                }
             }
         }catch (Exception e){
             log.info("时间转化错误：", e);
