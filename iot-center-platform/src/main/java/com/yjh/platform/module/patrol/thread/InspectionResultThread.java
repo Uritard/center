@@ -276,18 +276,19 @@ public class InspectionResultThread implements Runnable{
             TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
 
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            // 巡检点类型
+            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
+
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
             tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             tCruiseTaskResultMap.put("isWarn", "0");
-            tCruiseTaskResultMap.put("origpic", resultImagePath);
-            String picPath = resultImagePath.replace(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
-            tCruiseTaskResultMap.put("picpath", picPath);
-
-            // 巡检点类型
-            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
+            if (TypeEnum.VOICE.getCode() != cruiseType) {
+                tCruiseTaskResultMap.put("origpic", resultImagePath);
+                String picPath =
+                    resultImagePath.replace(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                tCruiseTaskResultMap.put("picpath", picPath);
+            }
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
             boolean fileFound = new File(resultImagePath).exists();
 

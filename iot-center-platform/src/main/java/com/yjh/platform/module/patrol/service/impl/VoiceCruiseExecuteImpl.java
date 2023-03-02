@@ -172,7 +172,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
         int dbWarn = warning(dbList, voiceDevice.getDbValue(), cruiseResultMap, "分贝");
 
-        String retVal = "DB:" + dbWarn + "  F:" + fWarn;
+        String retVal = "DB:" + dbWarn + " F:" + fWarn;
         cruiseResultMap.put("resultNum", retVal);
 
         return retVal;
@@ -186,7 +186,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
         int maxVal;
         if ("频率".equals(alarmPrefix)) {
-            maxVal = tVoiceDeviceService.findBigPeakClipp(dbList, 0, dbList.size(), 5);
+            maxVal = tVoiceDeviceService.findBigPeakClipp(dbList, 0, dbList.size() - 1, 5);
         } else {
             maxVal = dbList.stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0);
         }

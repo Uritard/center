@@ -523,7 +523,7 @@ public class TVoiceDeviceService{
      */
     public Integer findBigPeakClipp(List<Integer> list, int start, int end, int size){
         LittlePriorityQueue<Integer> queue = new LittlePriorityQueue<>(size, size, 0);
-        for(int i = start;i<= end;i++){
+        for (int i = start; i <= end; i++) {
             queue.insert(list.get(i));
         }
         return queue.pop();
