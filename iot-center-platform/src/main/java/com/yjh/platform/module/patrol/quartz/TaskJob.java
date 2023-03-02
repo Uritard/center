@@ -106,6 +106,11 @@ public class TaskJob extends QuartzJobBean {
             }
         }
 
+
+        List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
+        // 如果是一天多个时间点 调度走本级 给下级设备或节点发立即任务
+        uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
+
         boolean canRunning = true;
         try {
             log.info("当前任务优先级：{}", task.getTaskLevel());
@@ -117,15 +122,11 @@ public class TaskJob extends QuartzJobBean {
         log.info("任务Id {} ", task.getTaskId());
         log.info("任务执行时间 {}, fireTime: {} ", DateTimeUtil.format(new Date()), taskDate);
         log.info("task.getStartTime {} ", task.getStartTime());
-        List<Long> allInstanceList = null;
         try {
-            allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
             //更改任务状态
             int taskState = canRunning ? CruiseConstant.TASK_STATE_EXECUTING : CruiseConstant.TASK_STATE_PAUSE;
             setTaskResult(task, fireTime, taskState);
             if (canRunning) {
-                //给下级设备或节点发任务
-                 uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
                 //调用摄像机任务
                 uPatrolTaskService.localTaskStart(task.getTaskId());
             }
