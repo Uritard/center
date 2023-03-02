@@ -731,7 +731,7 @@ public class UPatrolTaskService {
 
             boolean stateChange = nodes.size() <= 1;
             // 若节点是子节点创建，或仅包含一个节点，或所有节点状态相等，则更新当前节点状态
-            if (subCreateTask || stateChange || stateNodeAll) {
+            if (robotId == null && (subCreateTask || stateChange || stateNodeAll)) {
                 //任务暂停继续处理
                 if (TASK_STATE_PAUSE == taskState) {
                     UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_PAUSE);
@@ -1900,7 +1900,7 @@ public class UPatrolTaskService {
                 ended = Boolean.parseBoolean(resultCountsMap.get("ended"));
 
                 taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
-                taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
+                taskStatus = canFinish(taskStatus) ? TASK_STATE_FINISHED : taskStatus;
 
                 all = MapUtils.getIntValue(resultCountsMap, "all", 0);
 
@@ -2001,6 +2001,10 @@ public class UPatrolTaskService {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+    }
+
+    private boolean canFinish(Integer taskState) {
+        return ArrayUtils.contains(new int[]{TASK_STATE_EXECUTING,TASK_STATE_PAUSE,TASK_STATE_NOT_START},taskState);
     }
 
     public String getStationWeather(){
