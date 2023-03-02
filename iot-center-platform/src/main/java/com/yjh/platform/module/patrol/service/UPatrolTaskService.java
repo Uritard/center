@@ -2008,12 +2008,17 @@ public class UPatrolTaskService {
     }
 
     public String getStationWeather(){
-        String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("valueUnit", ""));
-        String humidity = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:2").getOrDefault("valueUnit", ""));
-        String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:3").getOrDefault("valueUnit", ""));
-        String precipitation = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:4").getOrDefault("valueUnit", ""));
-        String windDirection = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:5").getOrDefault("valueUnit", ""));
-        String airPressure = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:6").getOrDefault("valueUnit", ""));
+        String temperature = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("temperature", ""))
+                 + redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("temperatureUnit", "");
+        String humidity = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("humidity", ""))
+                + redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("humidityUnit", "");
+        String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("windSpeed", ""))
+                + redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("windSpeedUnit", "");
+        String precipitation = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("precipitation", ""))
+                + redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("precipitationUnit", "");
+        String windDirection = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("windDirection", ""));
+        String airPressure = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("airPressure", ""))
+                + redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("airPressureUnit", "");
         temperature = StringUtils.isEmpty(temperature) ? "暂无" : temperature;
         humidity = StringUtils.isEmpty(humidity) ? "暂无" : humidity;
         windSpeed = StringUtils.isEmpty(windSpeed) ? "暂无" : windSpeed;

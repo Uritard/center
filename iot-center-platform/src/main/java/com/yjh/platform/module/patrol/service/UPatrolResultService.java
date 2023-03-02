@@ -225,7 +225,7 @@ public class UPatrolResultService {
                 && Objects.equals("222", tStdDevicemete.getMeteType());
         if (isTemDif){
             // 配置了红外温差任务用差值去判断告警
-            String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
+            String temperature = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("temperature", ""));
             if (!CommonUtils.isEmptyOrNullstr(temperature)){
                 double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(personCheck));
                 initInfo.put("valueTemp", String.valueOf(abs));

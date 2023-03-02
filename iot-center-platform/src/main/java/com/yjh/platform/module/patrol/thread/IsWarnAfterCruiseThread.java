@@ -119,7 +119,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             initInfo.put("isTemDif", String.valueOf(isTemDif));
             if (isTemDif) {
                 // 配置了红外温差任务用差值去判断告警
-                String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
+                String temperature = String.valueOf(redisTemplate.opsForHash().entries("weatherInfoForLastValue").getOrDefault("temperature", ""));
                 if (!CommonUtils.isEmptyOrNullstr(temperature)) {
                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
                     String valueTemp = new DecimalFormat("#0.00").format(Double.valueOf(abs));

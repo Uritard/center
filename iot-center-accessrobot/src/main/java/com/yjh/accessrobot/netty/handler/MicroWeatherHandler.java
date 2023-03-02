@@ -71,9 +71,9 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             weatherMap.put("time", res.get("time").toString());
             weatherMap.put("type", res.get("type").toString());
             weatherMap.put("unit", res.get("unit").toString());
-            String valueTemp = new DecimalFormat("#0.00").format(NumberUtils.toDouble(res.get("value").toString()));
-            weatherMap.put("value", valueTemp);
-            weatherMap.put("valueUnit", valueTemp + weatherMap.get("unit"));
+            weatherMap.put("value", res.get("value").toString());
+            weatherMap.put("valueUnit", res.get("value_unit").toString());
+            weatherMap.put("unit", res.get("unit").toString());
 
             weatherList.add(weatherMap);
             // 2022过检 环境类型修改
@@ -181,11 +181,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
 
         for (int i = 0; i < weatherList.size(); i++) {
             String robotWeather = "RobotWeather:" + robotCode + ":" + weatherList.get(i).get("type");
-            String stationWeather = "stationWeather:" + weatherList.get(i).get("type");
             redisTemplate.opsForHash().putAll(robotWeather, weatherList.get(i));
             redisTemplate.expire(robotWeather, 7, TimeUnit.DAYS);
-            redisTemplate.opsForHash().putAll(stationWeather, weatherList.get(i));
-            redisTemplate.expire(stationWeather, 7, TimeUnit.DAYS);
         }
         System.out.println("微气象数据测试一波++++++++" + info);
         Constant.mapToOtherServer(info, Constant.WEATHER_URL);
