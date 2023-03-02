@@ -310,7 +310,7 @@ public class PatrolResultHandler {
                     isAlarm = true;
                     break;
                 case "3":
-                    if (instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
+                    if (instance != null && instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
                         String voicePath = (String)redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
                         String voiceUrl = (String)redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content");
                         String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
