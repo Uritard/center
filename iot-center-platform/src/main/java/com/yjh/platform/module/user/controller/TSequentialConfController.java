@@ -237,6 +237,19 @@ public class TSequentialConfController {
         return result;
     }
 
+    @ApiOperation(value = "手动干预一键顺控结果")
+    @RequestMapping(value = "/sequentialResult",method = RequestMethod.GET)
+    public Result sequentialResult(@RequestParam(value = "resultNum", required = false) Integer resultNum){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.setSequentialResult(resultNum));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "触发顺控抓图识别")
     @RequestMapping(value = "/sequentialRec",method = RequestMethod.GET)
     public Result sequentialRec(@RequestParam Map<String,String> meteId){
