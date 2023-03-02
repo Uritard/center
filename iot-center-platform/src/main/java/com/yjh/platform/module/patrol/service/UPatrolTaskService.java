@@ -1000,7 +1000,6 @@ public class UPatrolTaskService {
             RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
             robotTaskInfo.setCruiseType(task.getTaskType());
             robotTaskInfo.setTaskId(task.getTaskId());
-//                robotTaskInfo.setPlanCode(task.getPlanCode());
             robotTaskInfo.setPriority(task.getTaskLevel());
             robotTaskInfo.setTaskName(task.getTaskName());
             List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
