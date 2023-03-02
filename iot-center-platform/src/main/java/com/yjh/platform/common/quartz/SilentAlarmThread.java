@@ -206,9 +206,9 @@ public class SilentAlarmThread implements Runnable {
                 File file = new File(filePath);
                 FileUtils.writeByteArrayToFile(file, image);
 
-                String url = "chmod 777 " + filePath;
-                Runtime.getRuntime().exec(url);
-                copyFile(filePathTem, filePath);
+//                String url = "chmod 777 " + filePath;
+//                Runtime.getRuntime().exec(url);
+//                copyFile(filePathTem, filePath);
 
                 log.info("filePathTem:{}", filePathTem);
                 silentHandler(filePath, presetId, eventType);
@@ -511,7 +511,7 @@ public class SilentAlarmThread implements Runnable {
                 log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
                 String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
                 String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
+                String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+"_"+System.currentTimeMillis()+".jpg";
 
                 uploadFileToUpFtps(imgPath, ftpsTarPath, upFtpsConfig);
 
