@@ -649,7 +649,15 @@
                     )
                 WHEN a.device_level = 2
                     OR a.device_level = 4 THEN
-                    a.device_ids
+                    (
+                        SELECT
+                            GROUP_CONCAT(b.instance_id)
+                        FROM
+                            t_cruise_point_instance b
+                                LEFT JOIN t_std_device c ON b.device_id = c.device_id
+                        WHERE
+                            FIND_IN_SET(c.device_id, a.device_ids)
+                    )
                 ELSE
                     a.instance_ids
                 END AS device_ids
