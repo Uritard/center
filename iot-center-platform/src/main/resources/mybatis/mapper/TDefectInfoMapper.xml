@@ -593,6 +593,8 @@
             '279' AS alarmSource,
             '机器人' AS alarmSourceName,
             alarm.robot_id AS deviceId,
+            alarm.robot_id AS cameraId,
+            "1" AS videoCameraType,
             c.robot_name AS deviceName,
             alarm.alarm_name AS warnContent,
             alarm.deal_info,
