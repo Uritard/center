@@ -557,7 +557,7 @@ public class TCameraPresetService {
                     }
 
                     // 检测结果及时同步到redis
-                    setPresetCheckResultToRedis(checkResults);
+                    setPresetCheckResultToRedis(item);
                 } catch (Exception e) {
                     log.error("checkCameraPreset err: {}", e.getMessage());
                 }
@@ -721,6 +721,16 @@ public class TCameraPresetService {
         String presetRedisKey = getPresetRedisKey(checkResults);
         Map<String, String> presetMap = getPresetCheckResultMap(checkResults);
         redisTemplate.opsForHash().putAll(presetRedisKey,presetMap);
+    }
+
+    /**
+     * 将当前相机预置位检测结果写入redis
+     * @param checkResult checkResult
+     */
+    private void setPresetCheckResultToRedis(CameraPresetCheckResult checkResult) {
+        String presetRedisKey = getPresetRedisKeyByCameraId(checkResult.getPreset().getCameraId());
+        String redisValue = checkResult.getPresetCheckResult().toString();
+        redisTemplate.opsForHash().put(presetRedisKey, checkResult.getPreset().getPresetId().toString(), redisValue);
     }
 
     /**
