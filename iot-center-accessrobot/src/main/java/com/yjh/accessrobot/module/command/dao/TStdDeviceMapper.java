@@ -41,4 +41,6 @@ public interface TStdDeviceMapper {
 
     TStdDevice selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
 
+    Map<String,String> selectInstanceInfo(@Param(value = "originId") Long originId);
+
 }

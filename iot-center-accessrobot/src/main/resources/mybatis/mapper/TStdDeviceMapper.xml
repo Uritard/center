@@ -245,4 +245,23 @@
         where  edge_code = #{edgeCode} and origin_id=#{originId}
     </select>
 
+    <select id="selectInstanceInfo" resultType="java.util.Map">
+    SELECT
+    a.preset_id,
+    a.camera_id,
+    b.cruise_id,
+    b.instance_id,
+    b.custom_id,
+    b.device_id,
+    d.device_name,
+    b.device_mete_id,
+    e.mete_name
+    FROM
+    t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
+    where a.preset_id = b.cruise_id
+    and d.device_id = b.device_id and e.custom_id = b.custom_id
+    AND b.device_mete_id = e.device_mete_id
+    and a.origin_id = #{originId}
+    </select>
+
 </mapper>

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * <功能描述> 上级系统接收巡视主机消息
@@ -61,13 +62,13 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         log.info("本级系统给下级{}响应了", sendCode);
 
         String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-        String deviceId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
+        String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
         String content= String.valueOf(xmlBaseModel.getItems().get(0).get("content"));
         String alaramLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
 
-        TStdDevice tStdDevice=tStdDeviceMapper.selectByEdgeCodeAndOriginId(sendCode,deviceId);
-        if(tStdDevice==null){
-            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,deviceId);
+        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(originId));
+        if(map==null){
+            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,originId);
             return;
         }
         // 图片在ftps上的全路径
@@ -86,7 +87,10 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setWarnTime(new Date())
                 .setWarnName("静默监视告警数据")
                 .setWarnContent(content)
-                .setDeviceId(tStdDevice.getDeviceId())
+                .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
+                .setCunstomId(String.valueOf(map.get("custom_id")))
+                .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
+                .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
                 .setConfMode(276)
                 .setDefectModel(450)
                 .setAlarmSource(689)
