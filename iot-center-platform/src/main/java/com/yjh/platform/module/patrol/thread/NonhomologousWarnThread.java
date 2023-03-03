@@ -48,22 +48,26 @@ public class NonhomologousWarnThread implements Runnable{
             String warnId = String.valueOf(UUID.randomUUID()).replace("-", "");
             if (0 == isResult){
                 // 三相告警
-                Map<String,Object> warnInfo = new HashMap<>(6);
-                warnInfo.put("warnId", warnId);
-                warnInfo.put("warnType", 5);
-                warnInfo.put("instanceId", null);
-                warnInfo.put("warnContent", "机器人相别告警：" + robotPatrolTaskAlarm.getContent());
-                List<Map<String, Object>> insResults = new ArrayList<>();
-                String[] deviceIdArray = robotPatrolTaskAlarm.getDeviceId().split(",");
-                for(String deviceId : deviceIdArray){
-                    Map<String, Object> robotWarn = new HashMap<>(4);
-                    robotWarn.put("taskId", taskCode);
-                    robotWarn.put("inspectionId", nonhomologousWarnDao.getInstanceIdByDeviceId(deviceId, taskCode));
-                    robotWarn.put("warnId", warnId);
-                    insResults.add(robotWarn);
+                //只处理系统下发任务产生的三相告警
+                if (StringUtils.isNotBlank(robotPatrolTaskAlarm.getTaskCode())) {
+                    Map<String,Object> warnInfo = new HashMap<>(6);
+                    warnInfo.put("warnId", warnId);
+                    warnInfo.put("warnType", 5);
+                    warnInfo.put("instanceId", null);
+                    warnInfo.put("warnContent", "机器人相别告警：" + robotPatrolTaskAlarm.getContent());
+                    List<Map<String, Object>> insResults = new ArrayList<>();
+                    String[] deviceIdArray = robotPatrolTaskAlarm.getDeviceId().split(",");
+                    for(String deviceId : deviceIdArray){
+                        Map<String, Object> robotWarn = new HashMap<>(4);
+                        robotWarn.put("taskId", taskCode);
+                        robotWarn.put("inspectionId", nonhomologousWarnDao.getInstanceIdByDeviceId(deviceId, taskCode));
+                        robotWarn.put("warnId", warnId);
+                        insResults.add(robotWarn);
+                    }
+                    warnInfo.put("resultsInfo", insResults);
+                    insertNonhomologousWarnInfo(warnInfo);
                 }
-                warnInfo.put("resultsInfo", insResults);
-                insertNonhomologousWarnInfo(warnInfo);
+
             }else {
                 // 需要判断的非同源告警
                 judgeNonhomologousWarn(taskCode, robotInsResult, warnId);
