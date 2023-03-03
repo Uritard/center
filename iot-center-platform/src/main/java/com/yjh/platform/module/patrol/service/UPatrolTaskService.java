@@ -1652,7 +1652,7 @@ public class UPatrolTaskService {
                 m.put("isWarn", "0");
                 m.put("picpath", "--");
                 // 巡检数据状态，未执行
-                m.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+                m.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
                 String dateTime = DateTimeUtil.getDateTimeString();
                 // m.put("createtime", dateTime);
                 m.put("endTime", dateTime);

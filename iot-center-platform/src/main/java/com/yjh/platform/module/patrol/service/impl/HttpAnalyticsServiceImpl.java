@@ -201,7 +201,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         }
 
         List<String> typeList = analyseTypeMap.getOrDefault(analyseType, new ArrayList<>());
-        processDefectAnalyseType(analyseType, typeList);
+        typeList = processDefectAnalyseType(analyseType, typeList);
         analyseObject.setTypeList(typeList);
 
         return analyseObject;
@@ -213,20 +213,16 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * @param analyseType analyseType
      * @param typeList typeList
      */
-    private void processDefectAnalyseType(String analyseType, List<String> typeList) {
+    private List<String> processDefectAnalyseType(String analyseType, List<String> typeList) {
         if (StringUtils.isNotEmpty(analyseType) && "11".equals(analyseType)) {
             String defectAnalyseType = (String)redisTemplate.opsForHash().get("t_sys_param:defectAnalyseType", "content");
             if (StringUtils.isNotEmpty(defectAnalyseType)) {
                 log.info("特殊处理AI判别，优先获取redis上的值: {}", defectAnalyseType);
-                if (!CollectionUtils.isEmpty(typeList)) {
-                    typeList.clear();
-                } else {
-                    typeList = new ArrayList<>();
-                }
-
-                typeList.add("defectAnalyseType");
+                return Arrays.asList(defectAnalyseType);
             }
         }
+
+        return typeList;
     }
 
     /**
