@@ -157,6 +157,10 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "6":
+                        if(!isNumeric(robotInsResult)){
+                            log.info("区间非同源告警--数据非数字");
+                            break;
+                        }
                         // 1-天 2-周 3-月
                         String timeType = String.valueOf(map.get("intervalType"));
                         Date endTime= new Date();
@@ -222,6 +226,10 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "7":
+                        if(!isNumeric(robotInsResult)){
+                            log.info("最近五次非同源告警--数据非数字");
+                            break;
+                        }
                         Map<String,Object> fiveResultsParam = new HashMap<>(4);
                         fiveResultsParam.put("type", 7);
                         fiveResultsParam.put("inspectionId", robotInstanceId);
@@ -247,9 +255,8 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("warnType", 7);
                             warn.put("instanceId", Long.parseLong(instanceId));
                             warn.put("warnContent", "累计五次表计结果一致");
-                            List<Map<String,Object>> insResults = new ArrayList<>();
-                            fiveResults.stream().forEach(i -> i.put("warnId", warn.get("warnId")));
-                            insResults.addAll(fiveResults);
+                            fiveResults.forEach(i -> i.put("warnId", warn.get("warnId")));
+                            List<Map<String, Object>> insResults = new ArrayList<>(fiveResults);
                             warn.put("resultsInfo", insResults);
                             insertNonhomologousWarnInfo(warn);
                         }
