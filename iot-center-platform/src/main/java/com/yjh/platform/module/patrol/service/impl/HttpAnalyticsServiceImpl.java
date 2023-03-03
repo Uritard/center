@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.*;
@@ -200,9 +201,32 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         }
 
         List<String> typeList = analyseTypeMap.getOrDefault(analyseType, new ArrayList<>());
+        processDefectAnalyseType(analyseType, typeList);
         analyseObject.setTypeList(typeList);
 
         return analyseObject;
+    }
+
+    /**
+     * 特殊处理AI判别，优先获取redis上的值
+     *
+     * @param analyseType analyseType
+     * @param typeList typeList
+     */
+    private void processDefectAnalyseType(String analyseType, List<String> typeList) {
+        if (StringUtils.isNotEmpty(analyseType) && "11".equals(analyseType)) {
+            String defectAnalyseType = (String)redisTemplate.opsForHash().get("t_sys_param:defectAnalyseType", "content");
+            if (StringUtils.isNotEmpty(defectAnalyseType)) {
+                log.info("特殊处理AI判别，优先获取redis上的值: {}", defectAnalyseType);
+                if (!CollectionUtils.isEmpty(typeList)) {
+                    typeList.clear();
+                } else {
+                    typeList = new ArrayList<>();
+                }
+
+                typeList.add("defectAnalyseType");
+            }
+        }
     }
 
     /**
