@@ -1328,6 +1328,8 @@ INSERT INTO `t_sys_param` VALUES ('100124', '404', 'ftpsTurbo', 'ftps 服务加�
 INSERT INTO `t_sys_param` VALUES ('100125', '404', 'analysisTurbo', '分析主机分析服务加速', 'false', '开启使用新逻辑减少IO，提升分析速度', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'fileAbsPath', '文件映射相对路径', '/home/yjh_iot_center/iot-files/', '文件映射相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
 INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'fileRealPath', '文件映射绝对路径', 'https://172.24.39.9/files/', '文件映射相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'deviceMaintenance', '检修区域检测', 'false', '检修区域检测项', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

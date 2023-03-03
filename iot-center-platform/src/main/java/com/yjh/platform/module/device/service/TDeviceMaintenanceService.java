@@ -6,15 +6,13 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
-import com.yjh.platform.module.device.entity.IdAndNameDetail;
-import com.yjh.platform.module.device.entity.TDeviceMaintenance;
-import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import com.yjh.platform.module.device.entity.DeviceAndInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +40,7 @@ public class TDeviceMaintenanceService{
 
     @Autowired
     private RedisTemplate redisTemplate;
+
     private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4});){0,3}([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
@@ -129,7 +128,7 @@ public class TDeviceMaintenanceService{
                     break;
             }
             if (StringUtils.isNotEmpty(deviceListString)) {
-                sendPostRequest(enable, deviceListString, robot, tDeviceMaintenance);
+                createMap(enable, deviceListString, robot, tDeviceMaintenance);
             }
         });
         //下级节点(所选设备点所对应的下级节点)
@@ -160,12 +159,12 @@ public class TDeviceMaintenanceService{
                     break;
             }
             if (StringUtils.isNotEmpty(deviceListString)) {
-                sendPostRequest(enable, deviceListString, edge, tDeviceMaintenance);
+                createMap(enable, deviceListString, edge, tDeviceMaintenance);
             }
         });
     }
 
-    public Result sendPostRequest(int enable, String deviceListString, String onlineCode, TDeviceMaintenance tDeviceMaintenance) {
+    public void createMap(int enable, String deviceListString, String onlineCode, TDeviceMaintenance tDeviceMaintenance){
         HashMap<String,Object> params = new HashMap<>(8);
         params.put("enable", enable);
         params.put("device_list", deviceListString);
@@ -175,12 +174,16 @@ public class TDeviceMaintenanceService{
         params.put("config_code", tDeviceMaintenance.getMaintenanceId());
         params.put("coordinate_pixel", tDeviceMaintenance.getCoordinatePixel());
         params.put("online_code", onlineCode);
+        Result result = sendPostRequest(params);
+        log.info(result.getData().toString());
+    }
 
+    public Result sendPostRequest(Map<String,Object> item) {
         Result response = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                response = serviceRestTemplate.postForObject(Constant.Maintenance_Issued, params,Result.class);
+                response = serviceRestTemplate.postForObject(Constant.Maintenance_Issued, item, Result.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -359,10 +362,15 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public int systemSend(XMLBaseModel xmlBaseModel) throws Exception {
         List<Map<String, Object>> list = xmlBaseModel.getItems();
+        String deviceMaintenance = (String) redisTemplate.opsForHash().get("t_sys_param:deviceMaintenance", "content");
         if (CollectionUtils.isNotEmpty(list)) {
             list.forEach(item -> {
                 try {
-                    processOneDeviceItem(item);
+                    if ("true".equals(deviceMaintenance)) {
+                        processOneDeviceItemCheck(item);
+                    } else {
+                        processOneDeviceItem(item);
+                    }
                 } catch (Exception e) {
                     log.error("systemSend err", e);
                 }
@@ -370,6 +378,23 @@ public class TDeviceMaintenanceService{
         }
 
         return 1;
+    }
+
+    /**
+     * 报文检测直接给在线设备下发
+     * @param item xml
+     */
+    private void processOneDeviceItemCheck(Map<String, Object> item) {
+        List<String> edgeList = tDeviceMaintenanceDao.selectOnlineEdge(null);
+        edgeList.forEach(edge -> {
+            item.put("online_code", edge);
+            sendPostRequest(item);
+        });
+        List<String> robotList = tDeviceMaintenanceDao.selectOnlineRobot(null);
+        robotList.forEach(robot -> {
+            item.put("online_code", robot);
+            sendPostRequest(item);
+        });
     }
 
     /**
@@ -411,10 +436,20 @@ public class TDeviceMaintenanceService{
      */
     private void processDelete(Map<String, Object> item) {
         String startTime = item.get("start_time").toString();
+        String stopTime = item.get("end_time").toString();
         String deviceLevel = item.get("device_level").toString();
         String deviceList = item.get("device_list").toString();
+        String coordinatePixel = item.get("coordinate_pixel").toString();
+        String configCode = item.get("config_code").toString();
         List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
-
+        List<Long> cruisePoints = getCruisePoints(deviceList, deviceLevel);
+        TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
+        tDeviceMaintenance.setMaintenanceId(Long.valueOf(configCode));
+        tDeviceMaintenance.setMaintenanceStart(DateTimeUtil.getDate(startTime));
+        tDeviceMaintenance.setMaintenanceStop(DateTimeUtil.getDate(stopTime));
+        tDeviceMaintenance.setDeviceLevel(deviceLevel);
+        tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
+        createMaintenance(tDeviceMaintenance, cruisePoints, deviceIdLst , 0);
         //删除检修区域
         tDeviceMaintenanceDao.deleteByDeviceIdList(StringUtils.join(deviceIdLst.toArray(), ","), "检修区域" + startTime);
     }
@@ -469,7 +504,7 @@ public class TDeviceMaintenanceService{
                 deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
                 return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
             case "2":
-                // 间隔
+                //设备
                 deviceIdLst = idList;
                 return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
             case "3":
