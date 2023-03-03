@@ -79,12 +79,17 @@ public class UPatrolResultController {
             }else {
                 //判断是否是根节点
                 TStdRegion rootRegion = tStdRegionService.selectByPrimaryId(regionId);
-                if (rootRegion.getUpRegionId() == -1){
+                if (rootRegion != null && rootRegion.getUpRegionId() == -1){
                     deviceIdList = null;
                 }else {
                     List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
                     if (regionIdList != null && !regionIdList.isEmpty()) {
                         deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                        if (deviceIdList.isEmpty()){
+                            //此区域下没有设备
+                            deviceIdList.add(-1L);
+                        }
+
                     } else {
                         deviceIdList.add(regionId);
                     }
