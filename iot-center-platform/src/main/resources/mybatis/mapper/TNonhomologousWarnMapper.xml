@@ -22,7 +22,7 @@
         insert into t_cruise_nonhomologous_warn_inspection(
         warn_id,
         task_id,
-        inspection_id
+        inspection_id,
         )values
         <foreach collection="list" item="inspections" separator=",">
             (

@@ -1,11 +1,16 @@
 package com.yjh.platform.module.device.service;
 
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
+import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.entity.NonhomologousWarnEnum;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * @author sunjinyan
@@ -84,12 +91,50 @@ public class TCruiseNonhomologousPointInstanceService {
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseNonhomologousWarnInfo> selectWarnByPage(TCruiseNonhomologousWarnInfo tCruiseNonhomologousWarnInfo) {
         List<TCruiseNonhomologousWarnInfo> list = tCruiseNonhomologousPointInstanceDao.selectWarnByPage(tCruiseNonhomologousWarnInfo);
+
+        for (TCruiseNonhomologousWarnInfo info: list) {
+            if(NonhomologousWarnEnum.SANXIANG.getCode().equals(info.getWarnType())) {
+                List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(info.getWarnId());
+                if (CollectionUtils.isNotEmpty(listMaps)) {
+                    String taskCode = listMaps.get(0).get("task_id").toString();
+                    Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
+                    String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
+                    StringJoiner meteNames = new StringJoiner("/");
+                    listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
+                    info.setDeviceName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_name").toString());
+                    info.setOneCruiseDeviceName(robotName);
+                    info.setDeviceTypeName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_type_name").toString());
+                    info.setDeviceMeteName(meteNames.toString());
+                }
+            }
+        }
         return list;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectWarnByPrimaryId(String warnId) {
-        Map<String,Object> tCruiseNonhomologousWarnInfo = tCruiseNonhomologousPointInstanceDao.selectWarnByPrimaryId(warnId);
+        TCruiseNonhomologousWarnDO tCruiseNonhomologousWarnDO = tCruiseNonhomologousPointInstanceDao.getTCruiseNonhomologousWarnByPrimaryId(warnId);
+        Map<String,Object> tCruiseNonhomologousWarnInfo = Maps.newHashMap();
+        if (NonhomologousWarnEnum.SANXIANG.getCode().equals(tCruiseNonhomologousWarnDO.getWarnType())) {
+            List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(warnId);
+            if (CollectionUtils.isNotEmpty(listMaps)) {
+                String taskCode = listMaps.get(0).get("task_id").toString();
+                Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
+                String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
+                StringJoiner meteNames = new StringJoiner("/");
+                listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
+                tCruiseNonhomologousWarnInfo.put("deviceName",listMaps.get(0) == null ? null : listMaps.get(0).get("device_name"));
+                tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",robotName);
+                tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
+                tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
+                tCruiseNonhomologousWarnInfo.put("delayName", listMaps.get(0) == null ? null : listMaps.get(0).get("region_name"));
+                tCruiseNonhomologousWarnInfo.put("customName", listMaps.get(0) == null ? null : listMaps.get(0).get("custom_name"));
+                tCruiseNonhomologousWarnInfo.put("warnContent", tCruiseNonhomologousWarnDO.getWarnContent());
+            }
+        }
+        else {
+            tCruiseNonhomologousWarnInfo = tCruiseNonhomologousPointInstanceDao.selectWarnByPrimaryId(warnId);
+        }
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
         for(Map<String,Object> m : warnDetailInfo){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());

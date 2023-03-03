@@ -56,4 +56,8 @@ public interface TCruiseNonhomologousPointInstanceDao {
     int checkNonhomologousPointInstanceExist(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance);
 
     String selectCruiseDeviceByInstanceId(@Param(value = "instanceId") Long instanceId);
+    List<Map<String,Object>> getSanxiangInfo(@Param(value = "warnId") String warnId);
+    String getCruiseDeviceInfo(@Param(value = "taskId") String taskId,@Param("inspectionId")Long inspectionId);
+
+    TCruiseNonhomologousWarnDO getTCruiseNonhomologousWarnByPrimaryId(@Param(value = "warnId")String warnId);
 }
