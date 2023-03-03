@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -21,6 +22,7 @@ import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -160,6 +162,9 @@ public class UPatrolResultService {
         if (Objects.nonNull(tCruisePointInstance)) {
             String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
             if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                if (!NumberUtils.isNumber(cruiseManualReview.getPersonCheck())){
+                    throw new BusinessException("实物编码应为纯数字！");
+                }
                 TStdDevice tStdDevice = new TStdDevice();
                 tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
                 tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
@@ -373,6 +378,9 @@ public class UPatrolResultService {
             if (Objects.nonNull(tCruisePointInstance)) {
                 String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
                 if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                    if (!NumberUtils.isNumber(cruiseManualReview.getPersonCheck())){
+                        throw new BusinessException("实物编码应为纯数字！");
+                    }
                     TStdDevice tStdDevice = new TStdDevice();
                     tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
                     tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
