@@ -312,7 +312,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 拍照和声音点位结果redis更新
+     * 未配置算法点位结果处理
      *
      * @param taskId               任务id
      * @param tCruiseTaskResultMap 巡视结果map

@@ -1635,11 +1635,12 @@ public class UPatrolTaskService {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "机器人离线,未执行");
-                    if (robotOfflineMap.get(robotId) == 4) {
-                        m.put("resultNum", "机器人处于检修状态,未执行");
-                    }
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
+                    if (robotOfflineMap.get(robotId) == 4) {
+                        m.put("resultNum", "机器人处于检修状态,未执行");
+                        m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                    }
                     skipFlag = true;
                 }
             }
