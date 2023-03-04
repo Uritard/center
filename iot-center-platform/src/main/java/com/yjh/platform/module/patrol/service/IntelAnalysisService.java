@@ -21,6 +21,7 @@ import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.service.TSequentialConfService;
@@ -45,7 +46,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -53,6 +59,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -125,6 +132,9 @@ public class IntelAnalysisService {
             map.put("typeList", analyseObject.getTypeList());
             map.put("imageUrlList", analyseObject.getImageUrlList());
             objectList.add(map);
+
+            // 暂存到redis
+            saveSilentMonitorImageUrlToRedis(map);
         });
         param.put("objectList", objectList);
 
@@ -145,6 +155,43 @@ public class IntelAnalysisService {
             log.error(e.getMessage(), e);
             return Response.serverError();
         }
+    }
+
+    /**
+     * 将静默监视图片缓存到redis
+     *
+     * @param map map
+     */
+    private void saveSilentMonitorImageUrlToRedis(Map<String, Object> map) {
+        String imageUrl = ((List<String>)map.get("imageUrlList")).get(0);
+        List<String> typeList = (List<String>)map.get("typeList");
+        String objectId = (String)map.get("objectId");
+
+        if (checkIsSilentMonitor(typeList)) {
+            redisTemplate.opsForHash().put("silentMonitorImageUrl", objectId, imageUrl);
+        }
+    }
+
+    /**
+     * 检测是否为静默监视
+     *
+     * @param typeList typeList
+     * @return result
+     */
+    private boolean checkIsSilentMonitor(List<String> typeList) {
+        try {
+            String[] arr = algorithmConfig.getSilentMonitorType().split(",");
+            Map<String, String> map = Arrays.asList(arr).stream().collect(Collectors.toMap(item -> item, item -> item));
+            for (String type : typeList) {
+                if (map.containsKey(type)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            log.error("检测是否为静默监视异常！", e);
+        }
+
+        return false;
     }
 
     /**
@@ -942,6 +989,10 @@ public class IntelAnalysisService {
             }
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
             Boolean isHave = false;
+
+            // 人工干预静默监视识别结果
+            processSilentMonitorResult(analyseResult);
+
             for (AnalyseResultItem result : results) {
                 String code = Optional.ofNullable(result.getCode()).orElse("");
                 String value = Optional.ofNullable(result.getValue()).orElse("");
@@ -985,6 +1036,190 @@ public class IntelAnalysisService {
 
 //            alarmToSFZJ(isHave,String.valueOf(map.get("custom_id")),results);
         }
+    }
+
+    /**
+     * 人工干预静默算法识别结果
+     *
+     * @param analyseResult analyseResult
+     */
+    private void processSilentMonitorResult(AnalyseResult  analyseResult) {
+        try {
+            List<AnalyseResultItem> analyseResults = analyseResult.getResults();
+            String objectId = analyseResult.getObjectId();
+
+            if (CollectionUtils.isEmpty(analyseResults)) {
+                return;
+            }
+
+            Object needManMadeObj = redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade");
+            boolean silentMonitorNeedManMade = false;
+            if (needManMadeObj != null) {
+                silentMonitorNeedManMade = (Boolean) needManMadeObj;
+            }
+
+            if (!silentMonitorNeedManMade) {
+                return;
+            }
+
+            String type = (String) redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.type");
+            String imageUrl = (String) redisTemplate.opsForHash().get("silentMonitorImageUrl", objectId);
+            String analyseImageUrl = createAnalyseImage(imageUrl, objectId, type);
+            for (AnalyseResultItem result : analyseResults) {
+                result.setCode("2000");
+                result.setValue("1");
+                result.setType(type);
+                result.setResImageUrl(analyseImageUrl);
+                setAnalyseArea(result.getPos().get(0));
+            }
+
+            redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.needManMade", false);
+        } catch (Exception e) {
+            log.error("人工干预静默算法识别结果失败：", e);
+        }
+    }
+
+    /**
+     * 设置Area
+     *
+     * @param area area
+     */
+    private void setAnalyseArea(Area area) {
+        if (CollectionUtils.isEmpty(area.getAreas()) || area.getAreas().get(0).getX() <= 0) {
+            List<Point> points = new ArrayList<>();
+            points.add(new Point(100, 100));
+            points.add(new Point(1820, 980));
+            area.setAreas(points);
+        }
+    }
+
+    /**
+     * 将图片复制到本地进行绘制告警框，再从本地上传到ftps
+     *
+     * @param imageUrl imageUrl
+     * @param objectId objectId
+     * @param type type
+     * @return result
+     */
+    private String createAnalyseImage(String imageUrl, String objectId, String type) {
+        int max=9999,min=1;
+        int ran = (int) (Math.random()*(max-min)+min);
+        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
+        String filePathTem = formatter.format(new Date())+ ran;
+
+        String analyseImageUrl = String.format("/data/sb_output/%s_%s.jpg", objectId, filePathTem);
+        String localPath = String.format("/home/yjh_iot_center/iot-picture/resultImg/%s_%s.jpg", objectId, filePathTem);
+        downloadFile(imageUrl, localPath);
+
+        // 绘制告警图像
+        pictureWaterMark(localPath, type);
+
+        uploadFile(analyseImageUrl, localPath);
+        return analyseImageUrl;
+    }
+
+    /**
+     * 将图片从ftps下载到本地
+     *
+     * @param ftpsPath ftpsPath
+     * @param localPath localPath
+     */
+    private void downloadFile(String ftpsPath, String localPath){
+        try {
+            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
+                return;
+            }
+
+            FtpsUtil.downloadFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
+                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件从 platform ftp 服务器下载到本地错误:", e);
+        }
+    }
+
+    /**
+     * 将本地文件上传到ftps
+     *
+     * @param ftpsPath ftpsPath
+     * @param localPath localPath
+     */
+    private void uploadFile(String ftpsPath, String localPath){
+        try {
+            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
+                return;
+            }
+
+            FtpsUtil.putFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
+                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至 platform ftp 服务器错误:", e);
+        }
+    }
+
+    /**
+     * 给图片设置水印和告警框
+     *
+     * @param filePath         图片地址
+     * @param waterMarkContent 水印内容
+     */
+    private void pictureWaterMark(String filePath, String waterMarkContent) {
+        try {
+            File file = new File(filePath);
+            BufferedImage image = ImageIO.read(file);
+            //获取图片的宽
+            waterMarkWrite(image, waterMarkContent, file);
+        } catch (Exception e) {
+            log.error("图片设置水印错误: ", e);
+        }
+    }
+
+    /**
+     * 给图片设置水印和告警框
+     *
+     * @param image image
+     * @param waterMarkContent waterMarkContent
+     * @param file file
+     * @throws IOException IOException
+     */
+    private void waterMarkWrite(BufferedImage image, String waterMarkContent, File file) throws IOException {
+        String suffix = StringUtils.substringAfterLast(file.getName(), ".");
+        //获取图片的宽
+        int srcImgWidth = image.getWidth();
+        //获取图片的高
+        int srcImgHeight = image.getHeight();
+
+        // 创建画笔
+        Graphics2D pen = image.createGraphics();
+        // 设置画笔颜色
+        pen.setColor(Color.blue);
+        // 设置画笔字体样式
+        pen.setFont(new Font("微软雅黑", Font.BOLD, 30));
+
+        //设置水印的坐标(为原图片右下角)
+        int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) - 110;
+        int y = 90;
+
+        // 写上水印文字和坐标
+        pen.drawString(waterMarkContent, x, y);
+
+        pen.setColor(Color.red);
+        pen.drawRect(100, 100, srcImgWidth - 200, srcImgHeight - 200);
+        try (FileImageOutputStream fos = new FileImageOutputStream(file)){
+            ImageIO.write(image, suffix, fos);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 获取水印文字的长度
+     *
+     * @param waterMarkContent
+     * @param g
+     * @return
+     */
+    private static int getWatermarkLength(String waterMarkContent, Graphics2D g) {
+        return g.getFontMetrics(g.getFont()).charsWidth(waterMarkContent.toCharArray(), 0, waterMarkContent.length());
     }
 
     /**

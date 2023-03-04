@@ -193,6 +193,41 @@ public class TSequentialConfService{
         }
 
         redisTemplate.opsForHash().put("t_sys_param:sequentialResult", "content", resultNum.toString());
+
+        // 将人工干预的开关打开
+        redisTemplate.opsForHash().put("t_sys_param:sequentialFlag", "content", "true");
+        return "ok";
+    }
+
+    /**
+     * 手动干预静默监视识别结果
+     *
+     * @param type type
+     * @return result
+     */
+    public String setSilentMonitorResult(Integer type) {
+        String typeStr = "sly_bjbmyw";
+        switch (type) {
+            case 1:
+                typeStr = "sly_bjbmyw";
+                break;
+            case 2:
+                typeStr = "sly_dmyw";
+                break;
+            case 3:
+                typeStr = "pzqcd";
+                break;
+            case 4:
+                typeStr = "drqgd";
+                break;
+            default:
+                break;
+        }
+
+        redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.type", typeStr);
+
+        // 将人工干预的开关打开
+        redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.needManMade", true);
         return "ok";
     }
 
@@ -546,6 +581,9 @@ public class TSequentialConfService{
                     if (StringUtils.equals("true", sequentialFlag)){
                         String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
                         recBack.put("value", sequentialResult);
+
+                        // 关闭人工干预开关，下次继续走算法分析
+                        redisTemplate.opsForHash().put("t_sys_param:sequentialFlag", "content", "false");
                     }
 
                     if(!Objects.isNull(recBack.get("code")) && "2000".equals(recBack.get("code"))){
