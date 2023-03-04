@@ -1336,4 +1336,19 @@
         </if>
     </select>
 
+    <select id="selectMeteInfoByInstanceId" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT
+            is_ai as ai,is_judge as judge,device_mete_id as deviceMeteId
+        FROM
+            t_std_devicemete
+        WHERE
+                device_mete_id IN (
+                SELECT
+                    device_mete_id
+                FROM
+                    t_cruise_point_instance
+                WHERE
+                    instance_id = #{instanceId})
+    </select>
+
 </mapper>

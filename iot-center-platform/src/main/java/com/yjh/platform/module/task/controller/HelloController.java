@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
@@ -13,6 +14,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -40,6 +42,7 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -71,6 +74,9 @@ public class HelloController {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    @Qualifier( "redisTemplateForThree" )
+    private RedisTemplate redisTemplateForThree;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
@@ -619,4 +625,16 @@ public class HelloController {
     public void resultToUpSystem() {
         deviceStaticsToUpSystem.resultToUpSystem();
     }
+
+
+    @GetMapping(value = "/testRedis")
+    @ApiOperation(value = "testRedis")
+    @Logs(title = "testRedis",content = "testRedis",logType = 2)
+    public void testRedis() {
+        Map<String,String> map = Maps.newHashMap();
+        map.put("content","bababab");
+        redisTemplateForThree.opsForHash().putAll("judge:"+"instance_id:",map);
+        Map mmm = redisTemplateForThree.opsForHash().entries("judge:"+"123123:");
+    }
+
 }

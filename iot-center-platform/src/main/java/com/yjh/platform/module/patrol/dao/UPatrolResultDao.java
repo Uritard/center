@@ -198,5 +198,7 @@ public interface UPatrolResultDao {
 
     TaskInfoBean queryTaskInfo();
 
+    Map<String,Object> selectMeteInfoByInstanceId(@Param("instanceId")Long instanceId);
+
 
 }
