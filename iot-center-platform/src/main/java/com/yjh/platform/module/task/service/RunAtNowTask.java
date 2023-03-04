@@ -340,7 +340,7 @@ public class RunAtNowTask implements Runnable{
                 }
             }
             log.info("robotCruiseList   :" +robotCruiseList);
-            List<Long> robotTaskInstanceList = new ArrayList<>();
+            List<String> robotTaskInstanceList = new ArrayList<>();
             if(robotCruiseList.size() > 0  && !isGoOn){
                 List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
@@ -370,7 +370,7 @@ public class RunAtNowTask implements Runnable{
                     List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
                     for (String item : robotCode) {
                         robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList, item);
-                        for (Long itemLong : robotTaskInstanceList) {
+                        for (String itemLong : robotTaskInstanceList) {
                             instancesList.remove(itemLong);
                         }
                     }

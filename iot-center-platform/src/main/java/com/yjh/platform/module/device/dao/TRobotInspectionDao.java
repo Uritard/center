@@ -36,7 +36,7 @@ public interface TRobotInspectionDao {
 
     int batchInsert(List<TRobotInspection> list);
     List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
-    List<Long> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
+    List<String> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
                                          @Param(value = "robotCode") String robotCode);
     List<TCruisePointAttr> selectRobotTaskMessage(@Param(value = "list") String[] list);
 

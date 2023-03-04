@@ -833,13 +833,13 @@ public class UPatrolTaskService {
                     .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
                     .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(edgeDetailList)) {
-                Map<String, List<Long>> listMap = Maps.newHashMap();
+                Map<String, List<String>> listMap = Maps.newHashMap();
                 edgeDetailList.forEach(t -> {
-                    List<Long> list = new ArrayList<>();
+                    List<String> list = new ArrayList<>();
                     if (listMap.containsKey(t.getEdgeCode())) {
                         list = listMap.get(t.getEdgeCode());
                     }
-                    list.add(Long.valueOf(t.getOriginId()));
+                    list.add(t.getOriginId());
                     listMap.put(t.getEdgeCode(), list);
                 });
 
@@ -911,7 +911,7 @@ public class UPatrolTaskService {
                     // 从巡视主机下发至机器人的任务等级都暂定3级
                     robotTaskInfo.setPriority(3);
                     robotTaskInfo.setTaskName(task.getTaskName());
-                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                    List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
                     robotTaskInfo.setIfRun(ifFun);
@@ -946,13 +946,13 @@ public class UPatrolTaskService {
                 .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(edgeDetailList)) {
-            Map<String, List<Long>> listMap = Maps.newHashMap();
+            Map<String, List<String>> listMap = Maps.newHashMap();
             edgeDetailList.forEach(t -> {
-                List<Long> list = new ArrayList<>();
+                List<String> list = new ArrayList<>();
                 if (listMap.containsKey(t.getEdgeCode())) {
                     list = listMap.get(t.getEdgeCode());
                 }
-                list.add(Long.valueOf(t.getOriginId()));
+                list.add(t.getOriginId());
                 listMap.put(t.getEdgeCode(), list);
             });
 
@@ -1002,7 +1002,7 @@ public class UPatrolTaskService {
             robotTaskInfo.setTaskId(task.getTaskId());
             robotTaskInfo.setPriority(task.getTaskLevel());
             robotTaskInfo.setTaskName(task.getTaskName());
-            List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+            List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
             robotTaskInfo.setInstanceList(robotTaskInstanceList);
             robotTaskInfo.setIfRun("173");
             robotTaskInfo.setRobotCode(item);

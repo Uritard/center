@@ -515,7 +515,7 @@ public class TCruiseTaskService {
                     // 从巡视主机下发至机器人的任务等级都暂定3级
                     robotTaskInfo.setPriority(3);
                     robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                    List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
                     String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
                     robotTaskInfo.setIfRun(ifFun);

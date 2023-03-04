@@ -1091,7 +1091,7 @@ public class RobotService {
         packageXMLBaseModel(item, robotCode, taskId, str);
     }
 
-    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<Long> instanceIdList) {
+    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
         try {
             // 将instanceIdLkist放缓存，以备后续使用
@@ -1101,7 +1101,7 @@ public class RobotService {
             redisTemplate.opsForHash().putAll("RobotTaskStatus:" + robotCode + ":" + taskId, instanceListMap);
 
             // 根据instanceIdList查询inspectionCodeList
-            for (Long instanceId : instanceIdList) {
+            for (String instanceId : instanceIdList) {
                 String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
                 str.add(inspectionCode);
 
@@ -1150,8 +1150,8 @@ public class RobotService {
         String edgeCode = item.getEdgeCode();
         String taskId = item.getTaskId();
         StringJoiner str = new StringJoiner(",");
-        for (Long instanceId : item.getInstanceList()) {
-            str.add(String.valueOf(instanceId));
+        for (String instanceId : item.getInstanceList()) {
+            str.add(instanceId);
         }
         // 边缘节点任务临时信息存放至redis
         Map<String, Object> instanceListMap = new HashMap<>(5);

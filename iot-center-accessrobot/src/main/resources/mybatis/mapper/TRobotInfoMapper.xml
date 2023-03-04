@@ -355,13 +355,13 @@
                 limit 1
     </delete>
     <!--根据instanceId查询inspectionCode-->
-    <select id="selectInspectionCode" parameterType="java.lang.Long" resultType="java.lang.String">
+    <select id="selectInspectionCode" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT
             b.inspection_code
         FROM t_cruise_point_instance a,t_robot_inspection b
         where  1 = 1
         and a.cruise_id = b.inspection_id
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=VARCHAR}</if>
     </select>
     <!--查询机器人相关信息-->
     <select id="selectTaskResultId" resultType="com.yjh.accessrobot.module.command.entity.TCruiseResult">

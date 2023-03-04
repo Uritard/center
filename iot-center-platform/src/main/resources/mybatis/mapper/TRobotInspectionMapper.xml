@@ -184,7 +184,7 @@
         </foreach>
     </select>
 
-    <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT
             a.instance_id
         FROM
