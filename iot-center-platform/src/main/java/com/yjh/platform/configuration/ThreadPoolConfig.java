@@ -40,15 +40,15 @@ public class ThreadPoolConfig {
     /**
      * 核心线程数
      */
-    private static int patrolCorePoolSize = 100;
+    private static int patrolCorePoolSize = 80;
     /**
      * 最大线程数
      */
-    private static int patrolMaxPoolSize = 800;
+    private static int patrolMaxPoolSize = 400;
     /**
      * 线程队列大小
      */
-    private static int patrolQueueSize = 64;
+    private static int patrolQueueSize = 16;
 
     public static int getCorePoolSizeDefault() {
         return corePoolSizeDefault;
