@@ -2,8 +2,10 @@ package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -18,13 +20,16 @@ import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +46,9 @@ import java.util.*;
 public class UPatrolResultService {
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    @Qualifier( "redisTemplateForThree" )
+    private RedisTemplate redisTemplateForThree;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
@@ -137,6 +145,25 @@ public class UPatrolResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
+
+        if (IdentifyStateEnum.FAULT.getCode().equals(cruiseManualReview.getIdentifyState())) {
+            Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
+            String ai = String.valueOf(result.get("ai"));
+            String judge = String.valueOf(result.get("judge"));
+            String KEY_PREFIX = "";
+            if ("on".equals(ai)) {
+                //缺陷
+                KEY_PREFIX ="DEFECT:" + cruiseManualReview.getInstanceId();
+                //将redisData存入redis
+            } else if ("on".equals(judge)){
+                KEY_PREFIX ="JUDGE:" + cruiseManualReview.getInstanceId();
+            }
+            //塞
+            if (!KEY_PREFIX.equals("")) {
+                redisTemplateForThree.opsForValue().set(KEY_PREFIX,cruiseManualReview.getPersonCheck());
+            }
+        }
+
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         Date date = new Date();
         cruiseManualReview.setCheckUser(userName);

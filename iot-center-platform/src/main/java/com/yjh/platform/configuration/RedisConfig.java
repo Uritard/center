@@ -85,4 +85,30 @@ public class RedisConfig extends CachingConfigurerSupport {
         return template;
 
     }
+    /**
+     * redisTemplate配置
+     *
+     * @param
+     * @return
+     */
+    @Bean("redisTemplateForThree")
+    public RedisTemplate<String, Object> redisTemplateForThree() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        JedisConnectionFactory factory = new JedisConnectionFactory();
+        factory.setHostName(redisConn.getHost());
+        factory.setPort(redisConn.getPort());
+        factory.setPassword(redisConn.getPassword());
+        factory.setDatabase(3);
+        template.setConnectionFactory(factory);
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        // key采用String的序列化方式
+        template.setKeySerializer(stringRedisSerializer);
+        // hash的key也采用String的序列化方式
+        template.setHashKeySerializer(stringRedisSerializer);
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        template.setHashValueSerializer(stringRedisSerializer);
+        template.afterPropertiesSet();
+        return template;
+
+    }
 }
