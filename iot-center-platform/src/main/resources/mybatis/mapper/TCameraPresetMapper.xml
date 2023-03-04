@@ -341,9 +341,9 @@
             #{instanceId, jdbcType=BIGINT}
         </foreach>
     </delete>
-    <select id="selectForThisPreset" resultType="java.lang.Long">
+    <select id="selectForThisPreset" resultType="java.lang.String">
         SELECT
-	     preset_id
+        preset_img
        FROM
 	    t_camera_preset
        WHERE camera_id=#{cameraId, jdbcType=BIGINT}

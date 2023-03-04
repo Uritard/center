@@ -23,6 +23,7 @@ import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
@@ -239,6 +240,8 @@ public class TCameraPresetService {
         Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
 
+        String picUrl = (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+
         {
             //判断文件大小
             Map<String,String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
@@ -297,20 +300,23 @@ public class TCameraPresetService {
 
             for(Long cameraId: cameraIdList){
                 //找到这个cameraId下的所有预置位
-                if(presetList == null ){
-                    presetList = tCameraPresetDao.selectForThisPreset(cameraId);
-                }
-                log.info("cameraId: "+cameraId);
-                log.info("presetList: "+presetList);
-                if(presetList!=null && presetList.size()>0){
-                    for(Long presetId:presetList){
+                List<String> presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
+                log.info("cameraId: {}", cameraId);
+                log.info("presetImgList: {}", presetImgList);
+                if(!CollectionUtils.isEmpty(presetImgList)){
+                    for(String presetImg : presetImgList){
                         try {
-                        //将所有的文件移动到一个文件内
-                        //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
-                        String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/";
-                        String[] cmds = new String[]{"sh","-c",url};
-                        Runtime.getRuntime().exec(cmds);
-                        } catch (IOException e) {
+                            if (StringUtils.isNotEmpty(presetImg)) {
+                                String realPath = presetImg.replace(picUrl, picPath);
+                                realPath = StringUtils.substringBeforeLast(realPath, "/");
+                                //将所有的文件移动到一个文件内
+                                //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                                FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
+                                // String url = "cp -r " + realPath + " " + zipPath + "/picture/";
+                                // String[] cmds = new String[] {"sh", "-c", url};
+                                // Runtime.getRuntime().exec(cmds);
+                            }
+                        } catch (Exception e) {
                             log.error("复制文件错误："+e);
                         }
                     }
