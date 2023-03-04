@@ -538,8 +538,11 @@ public class PatrolResultHandler {
                             }
                             break;
                         case "2":
+                            if(NumberUtils.isCreatable(resultStringValue)){
+                                log.info("Data non-numeric===={}", resultStringValue);
+                                break;
+                            }
                             Float resultValueMeter = NumberUtils.toFloat(resultStringValue);
-
                             Map<String, String> initInfo = new HashMap<>(16);
                             initInfo.put("valueTemp", String.valueOf(resultValueMeter));
 
@@ -677,7 +680,6 @@ public class PatrolResultHandler {
             log.error("正常识别结果处理异常：", e);
         }
         log.info("cruiseResultMap=={}", cruiseResultMap);
-        //非同源处理
         return cruiseResultMap;
     }
 
