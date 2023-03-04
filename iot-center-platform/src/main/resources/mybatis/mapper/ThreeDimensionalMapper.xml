@@ -171,7 +171,6 @@
         FROM
             t_std_device a
                 LEFT JOIN t_std_devicemete b ON a.device_id = b.device_id
-
                 LEFT JOIN t_warn_info d ON d.std_mete_id = b.device_mete_id
                 LEFT JOIN t_dict_business e ON e.dict_code = d.alarm_source
                 LEFT JOIN t_dict_business f ON f.dict_code = d.warn_level
@@ -181,13 +180,40 @@
             AND
             b.device_mete_id = #{deviceMeteId, jdbcType= VARCHAR}
         </if>
+        union all(
+        SELECT
+        a.device_id,
+        a.device_name,
+        b.custom_name,
+        b.device_mete_id,
+        b.mete_name,
+        d.defect_id as warnId,
+        d.defect_content as warnContent,
+        d.alarm_source,
+        e.dict_note AS alarm_source_name,
+        d.defect_level AS alarm_level,
+        f.dict_note AS alarm_level_name,
+        d.defect_time as warn_time
+        FROM
+        t_std_device a
+        LEFT JOIN t_std_devicemete b ON a.device_id = b.device_id
+        LEFT JOIN t_defect_info d ON d.std_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business e ON e.dict_code = d.alarm_source
+        LEFT JOIN t_dict_business f ON f.dict_code = d.defect_level
+        WHERE
+        d.std_mete_id = b.device_mete_id
+        <if test="deviceMeteId != null and deviceMeteId != ''">
+            AND
+            b.device_mete_id = #{deviceMeteId, jdbcType= VARCHAR}
+        </if>
+        )
         ORDER BY warn_time DESC
     </select>
 
     <select id="viewDeviceInfo" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
             a.device_id ,
-            a.custom_id ,
+            std.custom_id ,
             a.device_code ,
             a.device_name ,
             a.alias_name ,
@@ -487,11 +513,11 @@
         FROM
         t_robot_info a
         <if test="deviceType == null or deviceType == 1">
-        JOIN t_dict_business d ON a.robot_type = d.dict_code
+        left JOIN t_dict_business d ON a.robot_type = d.dict_code
         AND d.col_name = 'robot_type'
         </if>
         <if test="deviceType != null and deviceType == 2">
-            JOIN t_dict_business d ON a.drone_type = d.dict_code
+            left JOIN t_dict_business d ON a.drone_type = d.dict_code
             AND d.col_name = 'drone_type'
         </if>
         LEFT JOIN t_dict_business b ON a.robot_factory = b.dict_code
@@ -506,6 +532,12 @@
         LEFT JOIN t_camera_recorder g ON a.record_id = g.record_id
         WHERE
         1 = 1
+        <if test="deviceType == null or deviceType == 1">
+            AND a.robot_type is not null
+        </if>
+        <if test="deviceType != null and deviceType == 2">
+            AND a.robot_type is null
+        </if>
         AND a.robot_status = '在线'
         ORDER BY
         robot_id
