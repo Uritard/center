@@ -145,7 +145,7 @@ public interface TRobotInfoDao {
      * @param instanceId 巡视点id
      * @return String
      */
-    String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
+    String selectInspectionCode(@Param(value = "instanceId") String instanceId);
     /**
      * 根据任务id查询已组装的任务结果
      * @param taskId 任务id

@@ -39,7 +39,7 @@ public class RobotTaskInstanceInfo implements Serializable {
     private String robotCode;
 
     @ApiModelProperty(value = "机器人巡检点list")
-    private List<Long> instanceList;
+    private List<String> instanceList;
     @ApiModelProperty(value = "执行方式")
     private String ifRun;
     @ApiModelProperty(value = "定期开始时间")
