@@ -445,42 +445,40 @@
     </select>
     <select id="selectCruiseDataResultByList2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
         SELECT
-            e.cruise_result_id,
-            f.cruise_data_id,
+            e.cruise_data_id,
             a.device_mete_id,
             e.cruise_time,
             b.cruise_type,
             h.dict_note as cruise_type_name,
             e.instance_name,
-            g.c_type,
+            g.task_type,
             i.dict_note AS c_type_name,
-            f.person_check,
-            f.result_num,
-            f.identify_result,
+            e.person_check,
+            e.result_num,
+            e.identify_result,
             j.dict_note AS identify_result_name,
-            f.cruise_result,
+            e.cruise_result,
             z.dict_note as cruise_result_name,
-            f.picpath as picPath,
+            e.picpath as picPath,
             a.mete_type,
             m.dict_note as mete_type_name,
             a.meter_type,
             n.dict_note as meter_type_name
-        FROM t_cruise_result g
-        LEFT JOIN t_cruise_task_result_detail e ON e.task_result_id = g.task_result_id
-        LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
+        FROM u_patrol_result g
+        LEFT JOIN u_patrol_data_result e ON e.task_id = g.task_id
         LEFT JOIN t_cruise_point_instance b ON b.instance_id = e.instance_id
         LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
-        LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
-        LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
+        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business j ON e.identify_result = j.dict_code AND j.col_name = "identify_result"
+        LEFT JOIN t_dict_business z ON e.cruise_result=z.dict_code AND z.col_name="cruise_result"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
         WHERE
-        f.result_num IS NOT NULL
+        e.result_num IS NOT NULL
         <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
-        <if test="cType != -1 ">and g.c_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cruiseType != -1 ">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>

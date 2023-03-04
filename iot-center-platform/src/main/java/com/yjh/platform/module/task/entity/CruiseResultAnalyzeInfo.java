@@ -38,7 +38,7 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     private String instanceName;
 
     @ApiModelProperty(value = "巡检类型")
-    private Integer cType;
+    private Integer taskType;
 
     @ApiModelProperty(value = "巡检类型--字典表")
     private String cTypeName;
