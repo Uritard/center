@@ -80,19 +80,19 @@ export default {
   name: "BatchTask",
   data() {
     return {
-      wsIp: 'ws://192.168.20.71:18088/demo/message',
-      ip: "192.168.9.40",
+      wsIp: 'ws://127.0.0.1:18088/demo/message',
+      ip: "172.24.39.9",
       port: 10011,
       ftpPort: 10012,
-      username: "tgy",
-      password: "tt123456tt",
+      username: "Yzzx220",
+      password: "Yzzx@220901",
       localFilePath: "d://1.jpg",
       sleepTime:0,
       keyPw: "1",
       xml: '<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
-          '\t<SendCode>Client01</SendCode>\n' +
-          '\t<ReceiveCode>Server01</ReceiveCode>\n' +
+          '\t<SendCode>Edge01</SendCode>\n' +
+          '\t<ReceiveCode>Region01</ReceiveCode>\n' +
           '\t<Type>251</Type>\n' +
           '\t<Command>2</Command>\n' +
           '\t<Time>2022-07-22 14:36:36</Time>\n' +
@@ -100,12 +100,12 @@ export default {
           '\t\t<Item/></Items>\t\n' +
           '</PatrolDevice >',
       textReceptionList: [],
-      sendCode: "192.168.1.21,client01,12.3.3.3,192.168.1.15",
-      receiveCode: "server01",
+      sendCode: "Edge01,Edge02,Edge03",
+      receiveCode: "Region01",
       resultList: [],
       taskXml: "<PatrolHost>\n" +
-          "\t<SendCode>Client01</SendCode>\n" +
-          "\t<ReceiveCode>Server01</ReceiveCode>\n" +
+          "\t<SendCode>Edge01</SendCode>\n" +
+          "\t<ReceiveCode>Region01</ReceiveCode>\n" +
           "\t<Type>61</Type>\n" +
           "\t<Code>123</Code>\n" +
           "\t<Command/>\n" +

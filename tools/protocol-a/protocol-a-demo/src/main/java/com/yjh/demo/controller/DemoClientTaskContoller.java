@@ -1,6 +1,7 @@
 package com.yjh.demo.controller;
 
 import com.yjh.commons.rxbus.RxBus;
+import com.yjh.demo.config.ClientConfig;
 import com.yjh.demo.entity.BatchClientParam;
 import com.yjh.demo.entity.MessageParam;
 import com.yjh.demo.entity.ResultBean;
@@ -18,9 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -54,10 +53,10 @@ public class DemoClientTaskContoller {
     private List<BaseSocketClient> baseSocketClientList = new ArrayList<>();
 
 
-    private List<String> sendCodeList = new ArrayList<>();
+    private static List<String> sendCodeList = new ArrayList<>();
 
     private List<MessageSender> messageSenderList = new ArrayList<>();
-
+    private static Map<String, MessageSender> messageSenderMap = new HashMap<>();
     private List<DemoBatchTaskHandler> demoBatchTaskHandlerList = new ArrayList<>();
     private String receiveCode;
 
@@ -69,6 +68,8 @@ public class DemoClientTaskContoller {
 
     @PostMapping(value = "/create")
     public ResultBean createClient(@RequestBody BatchClientParam batchClientParam) {
+        log.info("sendBatch: {}", ClientConfig.sendBatch);
+
         ip= batchClientParam.getIp();
         baseSocketClientList.forEach(BaseSocketClient::stop);
         baseSocketClientList.clear();
@@ -110,6 +111,7 @@ public class DemoClientTaskContoller {
             };
             MessageSender messageSender = new MessageSender(new MessageIdGenerator(), identityProvider, rxBus, msg1 -> true);
             messageSenderList.add(messageSender);
+            messageSenderMap.put(sendCode, messageSender);
             DemoBatchTaskHandler demoBatchTaskHandler = new DemoBatchTaskHandler(clientBatchOutboundExecutor, rxBus, messageSender, wsMessageSender, sendCode, receiveCode, i);
             demoBatchTaskHandlerList.add(demoBatchTaskHandler);
         }
@@ -171,5 +173,11 @@ public class DemoClientTaskContoller {
         return new ResultBean(200, "设置成功！");
     }
 
+    public static List<String> getSendCode(){
+        return sendCodeList;
+    }
 
+    public static Map<String, MessageSender> getSender(){
+        return messageSenderMap;
+    }
 }

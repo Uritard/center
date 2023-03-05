@@ -69,10 +69,10 @@ export default {
   name: "BatchSend",
   data() {
     return {
-      ip: "192.168.33.19",
+      ip: "172.24.39.9",
       ftpPort: 10012,
-      username: "ftpuser",
-      password: "ttasdqwe123",
+      username: "Yzzx220",
+      password: "Yzzx@220901",
       filePath: "d://1.jpg",
       remoteFilename: "",
       keyPw: "1",
@@ -81,8 +81,8 @@ export default {
       taskCount: 2,
       xml: '<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
-          '\t<SendCode>Client01</SendCode>\n' +
-          '\t<ReceiveCode>Server01</ReceiveCode>\n' +
+          '\t<SendCode>Edge01</SendCode>\n' +
+          '\t<ReceiveCode>Region01</ReceiveCode>\n' +
           '\t<Type>251</Type>\n' +
           '\t<Code>200</Code>\n' +
           '\t<Command></Command>\n' +
