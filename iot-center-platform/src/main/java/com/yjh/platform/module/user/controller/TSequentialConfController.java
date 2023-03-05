@@ -250,6 +250,19 @@ public class TSequentialConfController {
         return result;
     }
 
+    @ApiOperation(value = "手动干预一静默监视结果")
+    @RequestMapping(value = "/silentMonitorResult",method = RequestMethod.GET)
+    public Result silentMonitorResult(@RequestParam(value = "type", required = false) Integer type){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.setSilentMonitorResult(type));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "触发顺控抓图识别")
     @RequestMapping(value = "/sequentialRec",method = RequestMethod.GET)
     public Result sequentialRec(@RequestParam Map<String,String> meteId){
