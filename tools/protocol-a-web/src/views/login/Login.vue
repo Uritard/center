@@ -49,7 +49,7 @@ export default {
   name: "test",
   data() {
     return {
-      wsIp:'ws://192.168.20.11:18088/demo/message',
+      wsIp:'ws://127.0.0.1:18088/demo/message',
       ws_platform: null,
       textarea:'<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +

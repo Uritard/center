@@ -2,6 +2,8 @@ package com.yjh.demo.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.rxbus.RxBus;
+import com.yjh.demo.config.ClientConfig;
+import com.yjh.demo.controller.DemoClientBatchController;
 import com.yjh.demo.controller.DemoClientTaskContoller;
 import com.yjh.demo.util.FtpsUtil;
 import com.yjh.demo.util.XmlToMessageUtil;
@@ -140,6 +142,12 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             String taskName = String.valueOf(item.get("task_name"));
             String deviceList = item.get("device_list").toString();
             String[] deviceArray = StringUtils.split(deviceList, ",");
+            if (ClientConfig.sendBatch) {
+                DemoClientBatchController.deviceArrayMap.put(sendCode, deviceArray);
+                DemoClientBatchController.taskCodeMap.put(sendCode, taskCode);
+                DemoClientBatchController.taskNameMap.put(sendCode, taskName);
+                continue;
+            }
 
             Map<String, Object> taskResponseItem = taskResponseMsg.getItems().get(0);
             taskResponseItem.put("task_code", taskCode);

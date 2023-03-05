@@ -3,7 +3,7 @@ logging:
     ROOT: info
     com.yjh: info
   file:
-    name: ${user.home}/log/ainterface.log
+    name: ./log/ainterface.log
 
 spring:
   application:
@@ -22,5 +22,8 @@ server:
 platform:
   ip: 127.0.0.1
   port: 10011
-  send-code: Client01
-  receive-code: Server01
+  send-code: Edge01
+  receive-code: Region01
+
+send:
+  batch: true

@@ -8,11 +8,15 @@ import com.yjh.messager.api.channel.MsgChannel;
 import com.yjh.protocol_a.MessageIdGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +41,10 @@ public class DemoClientBatchController {
     @Autowired
     private ExecutorService clientBatchOutboundExecutor;
 
+    public static Map<String, String[]> deviceArrayMap = new ConcurrentHashMap<>();
+    public static Map<String, String> taskCodeMap = new ConcurrentHashMap<>();
+    public static Map<String, String> taskNameMap = new ConcurrentHashMap<>();
+
     public static AtomicInteger errorCount;
 
 
@@ -49,7 +57,7 @@ public class DemoClientBatchController {
     public String batchSendTest(@RequestBody BatchMessageParam batchMessageParam) {
         errorCount = new AtomicInteger(0);
         finishCount = new AtomicInteger(0);
-        totalCount = batchMessageParam.getTaskCount();
+        totalCount = batchMessageParam.getTaskCount() * batchMessageParam.getThreadCount();
 
         ExecutorService executorService = Executors.newFixedThreadPool(batchMessageParam.getThreadCount());
         MessageIdGenerator messageIdGenerator = new MessageIdGenerator();
@@ -73,9 +81,12 @@ public class DemoClientBatchController {
             return "读取文件失败";
         }
 
-        for (int i = 0; i < batchMessageParam.getTaskCount(); i++) {
-            SendTask sendTask = new SendTask(i, batchMessageParam, clientBatchOutboundExecutor, messageIdGenerator, data, clientBatchRxBus, clientBatchMsgChannel);
-            executorService.submit(sendTask);
+        List<String> sendCodeList = DemoClientTaskContoller.getSendCode();
+        for (int i = 0; i < batchMessageParam.getThreadCount(); i++) {
+            int idx = i % sendCodeList.size();
+            String sendCode = sendCodeList.get(idx);
+            SendTask sendTask = new SendTask(i, sendCode, batchMessageParam, clientBatchOutboundExecutor, messageIdGenerator, data, clientBatchRxBus, clientBatchMsgChannel);
+            executorService.execute(sendTask);
         }
         executorService.shutdown();
         try {

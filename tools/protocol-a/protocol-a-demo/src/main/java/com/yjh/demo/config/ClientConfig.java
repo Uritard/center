@@ -38,6 +38,13 @@ public class ClientConfig {
     @Value("${platform.receive-code}")
     String receiveCode;
 
+    public static boolean sendBatch;
+
+    @Value("${send.batch:true}")
+    public void setSendBatch(boolean sendBatch) {
+        ClientConfig.sendBatch = sendBatch;
+    }
+
     @Bean
     public RxBus clientRxBus() {
         return new RxBus();
