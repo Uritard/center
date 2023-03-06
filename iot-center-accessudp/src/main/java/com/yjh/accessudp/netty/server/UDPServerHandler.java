@@ -232,13 +232,11 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 }
             }else {
                 {//遥控信号
+                    Constant.restTemplateGet(Constant.UNION_URL, params);
                     if(meteKind == 3){
                         Constant.restTemplateGet(Constant.SEQUENCE_URL, params);
-                        Constant.restTemplateGet(Constant.UNION_URL, params);
                     }else if(meteKind == 1 && "变位".equals(value)){
                         Constant.restTemplateGet(Constant.SEQUENCE_REC_URL, params);
-                    }else {
-                        Constant.restTemplateGet(Constant.UNION_URL, params);
                     }
                 }
             }

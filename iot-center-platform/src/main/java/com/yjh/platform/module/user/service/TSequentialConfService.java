@@ -200,6 +200,7 @@ public class TSequentialConfService{
     public String sequential(String meteId) throws Exception{
         List<Map<String, Object>> list = sequentialInfo(meteId);
         if (list.isEmpty()){
+            log.info("meteId {} sequential config is empty!", meteId);
             return "ok";
         }
         {
@@ -325,7 +326,11 @@ public class TSequentialConfService{
     public String sequentialRec(String meteId) throws Exception{
         {
             String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-            Map<String,Object> map = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId).get(0);
+            List<Map<String,Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
+            if (list.isEmpty()){
+                log.info("meteId {} sequentialRec config is empty!", meteId);
+                return "fail";
+            }
             Map<String , Object> param = new HashMap<>();
             // 开关
             String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
@@ -370,7 +375,7 @@ public class TSequentialConfService{
                 //收到变位信号抓图
                 try{
                     Thread.sleep(1000);
-                    String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId").toString(), null);
+                    String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  list.get(0).get("cameraId").toString(), null);
                     JSONObject jsonObject =JSONObject.parseObject(services);
                     Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
                     if(!Objects.isNull(re.get("absPath"))){
@@ -412,8 +417,8 @@ public class TSequentialConfService{
                 xmlItem.put("patroldevice_code", "");
                 xmlItem.put("task_name", "一键顺控任务");
                 xmlItem.put("task_code", stationId + meteId);
-                xmlItem.put("device_name", map.get("deviceName"));
-                xmlItem.put("device_id", map.get("instanceId"));
+                xmlItem.put("device_name", list.get(0).get("deviceName"));
+                xmlItem.put("device_id", list.get(0).get("instanceId"));
                 xmlItem.put("value_type", "0");
                 xmlItem.put("value", "");
                 xmlItem.put("value_unit", "");
@@ -440,13 +445,13 @@ public class TSequentialConfService{
                 try{
                     Analysis analysis = new Analysis();
                     analysis.setAnalyseType("6");
-                    analysis.setInstanceId(Long.valueOf(map.get("cfgDeviceId").toString()));
+                    analysis.setInstanceId(Long.valueOf(list.get(0).get("cfgDeviceId").toString()));
                     analysis.setIsAi(1);
                     //模板图片路径
                     Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
                     String picModelPath = (String) mapForPicModelPath.get("content");
-                    analysis.setPicModelPath(picModelPath+"/"+map.get("presetId"));
-                    analysis.setTaskId("yjsk#meteId="+map.get("cfgDeviceId"));
+                    analysis.setPicModelPath(picModelPath+"/"+ list.get(0).get("presetId"));
+                    analysis.setTaskId("yjsk#meteId="+ list.get(0).get("cfgDeviceId"));
                     analysis.setPicPath(param.get("picPath").toString());
                     List<Analysis> analysisList = new ArrayList<>();
                     analysisList.add(analysis);

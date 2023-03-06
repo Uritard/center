@@ -57,15 +57,13 @@ public class LinkageSignalHandler implements MessageHandlerStrategy, Initializin
                 params.put("time", time);
                 log.info("联动信号 {}", params);
                 Constant.mapToOtherServer(params, Constant.DEAL_LINKAGE_SIGNAL_URL);
+                Constant.restTemplateGet(Constant.UNION_URL, params);
                 if ("0".equals(meteKind)) {
                     //告知前端调用接口
                     Constant.restTemplateGet(Constant.SEQUENCE_URL, params);
-                    Constant.restTemplateGet(Constant.UNION_URL, params);
                 } else if ("1".equals(meteKind) && "变位".equals(value)) {
                     //不调用拍照  等边缘节点上报巡检结果（视频文件） 再做分析
-                    log.info("收到一键顺控变位信号，等待边缘节点上报视频结果");
-                } else {
-                    Constant.restTemplateGet(Constant.UNION_URL, params);
+                    log.info("收到一键顺控变位信号 {}，", meteKind);
                 }
             } catch (Exception e) {
                 log.error("联动信号处理失败！", e);
