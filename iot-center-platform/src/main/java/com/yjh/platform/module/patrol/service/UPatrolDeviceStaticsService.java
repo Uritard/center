@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.DeviceStaticsInfo;
 import com.yjh.platform.module.task.dao.StatisticsDao;
@@ -8,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +44,7 @@ public class UPatrolDeviceStaticsService {
                 deviceStaticsInfo.setDeviceName(statisticInfo.get("patroldevice_name"));
                 deviceStaticsInfo.setDeviceType(statisticInfo.get("device_type"));
                 deviceStaticsInfo.setRegionCode(regionCode);
+                deviceStaticsInfo.setDeviceResumeDate(DateTimeUtil.getDateTimeString(new Date()));
                 statisticMap.put(statisticInfo.get("patroldevice_code"),deviceStaticsInfo);
             }
             //处理上报信息
