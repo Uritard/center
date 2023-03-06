@@ -111,6 +111,13 @@ public class SilentAlarmThread implements Runnable {
         }
         log.info("秒级静默监视数据处理 -- xml");
         try {
+            // 静默任务开关
+            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            if (Boolean.FALSE.toString().equals(silentFlag)) {
+                log.info("isSilentTask is false");
+                HttpAysncClientUtil.StopLink();
+                return;
+            }
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
             // 获取根节点
@@ -149,6 +156,13 @@ public class SilentAlarmThread implements Runnable {
         log.info("秒级静默监视数据处理 -- json");
         log.info(content);
         try {
+            // 静默任务开关
+            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            if (Boolean.FALSE.toString().equals(silentFlag)) {
+                log.info("isSilentTask is false");
+                HttpAysncClientUtil.StopLink();
+                return;
+            }
             JSONObject json = JSONObject.parseObject(content);
             if ("inactive".equals(json.getString("eventState"))) {
                 eventState = json.getString("eventState");
@@ -188,6 +202,13 @@ public class SilentAlarmThread implements Runnable {
         }
         log.info("秒级静默监视数据处理 -- img");
         try {
+            // 静默任务开关
+            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            if (Boolean.FALSE.toString().equals(silentFlag)) {
+                log.info("isSilentTask is false");
+                HttpAysncClientUtil.StopLink();
+                return;
+            }
             if (Objects.equals("fielddetection", eventType) || Objects.equals("mixedTargetDetection", eventType) ||
                     Objects.equals("anquanmao", eventType) || Objects.equals("renyuan", eventType)) {
                 Charset charset = StandardCharsets.ISO_8859_1;
