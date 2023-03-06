@@ -134,6 +134,7 @@ public class RobotService {
         NEED_CONFIRM_SET.add("1_3"); // 机器人一键返航
         NEED_CONFIRM_SET.add("1_5"); // 机器人控制模式切换
         NEED_CONFIRM_SET.add("1_6"); // 机器人控制权获得
+        NEED_CONFIRM_SET.add("1_7"); // 机器人控制权释放
         NEED_CONFIRM_SET.add("3_9"); // 机器人云台复位
         NEED_CONFIRM_SET.add("22_8"); // 机器人红外热像仪重启
         NEED_CONFIRM_SET.add("21_8"); // 机器人可见光摄像机重启
@@ -200,6 +201,7 @@ public class RobotService {
             return scmap;
         }
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+        String originCode = robotCode;
         if (StringUtils.equals(OFF_LINE, robotStatus)) {
             log.error("==========该巡视设备处于离线状态,没有成功将控制指令下发到巡视设备==========");
             scmap.put("code", 3);
@@ -227,20 +229,20 @@ public class RobotService {
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
             log.info("生成的控制指令xml是<start>{}<end>", xmlString);
 
-            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
-            Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + originCode + ":61");
+            Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + originCode + ":41");
             String robotTaskStatus = robotTaskStatusMap.get("value");
             String robotPattern = robotStatusMap.get("value");
 
             // 判断当前巡视系统是否拥有巡视设备控制权
-            String controlKey = "RobotStatus:" + robotCode + ":811";
+            String controlKey = "RobotStatus:" + originCode + ":811";
             if (StringUtils.equalsAny(typeCommand, "1_6", "20001_6")) {
                 redisTemplate.opsForValue().set(controlKey, "1");
             } else if (StringUtils.equalsAny(typeCommand, "1_7", "20001_7")) {
                 redisTemplate.opsForValue().set(controlKey, "0");
             } else {
-                String controlStatusMap = (String)redisTemplate.opsForValue().get(controlKey);
-                if (!"1".equals(robotTaskStatus)) {
+                String controlStatus = (String)redisTemplate.opsForValue().get(controlKey);
+                if (!"1".equals(controlStatus)) {
                     log.error("==========当前巡视设备未获取控制权,无法操作==========");
                     scmap.put("code", 3);
                     scmap.put("result", "请先获取当前巡视设备控制权");
