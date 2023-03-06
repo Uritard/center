@@ -3,7 +3,7 @@ logging:
     ROOT: info
     com.yjh: info
   file:
-    name: ./log/ainterface.log
+    name: ./logs/ainterface.log
 
 spring:
   application:
@@ -26,4 +26,4 @@ platform:
   receive-code: Region01
 
 send:
-  batch: true
+  batch: false

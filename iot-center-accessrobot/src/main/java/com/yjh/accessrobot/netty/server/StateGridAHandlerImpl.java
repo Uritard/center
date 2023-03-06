@@ -9,6 +9,7 @@ import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.Message;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
+import com.yjh.accessrobot.threadpool.ThreadPoolUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
@@ -73,7 +74,13 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {
-            doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
+            if (Constant.multiThread) {
+                ThreadPoolUtil.PATROL_POOL.addThread(() -> {
+                    doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
+                });
+            } else {
+                doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
+            }
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
         }
 

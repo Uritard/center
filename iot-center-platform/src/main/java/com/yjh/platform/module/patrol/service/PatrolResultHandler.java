@@ -154,7 +154,7 @@ public class PatrolResultHandler {
                 // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
                 if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
                     log.info("No alarms need to be handled...");
-                }else {
+                }else if(!Constant.fastTurbo()) {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
                 }
@@ -175,7 +175,7 @@ public class PatrolResultHandler {
                 infoMap.put("instanceId", instanceId);
 
                 //机器人是有值的处理非同源
-                if ("2".equals(sysLevel) && instance.getCruiseType() == 228){
+                if ("2".equals(sysLevel) && instance.getCruiseType() == 228 && !Constant.fastTurbo()){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());

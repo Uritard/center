@@ -53,6 +53,8 @@ public class AccessRobotApplication implements CommandLineRunner {
     private String interfaceApi;
     @Value("${netty.handler.new:true}")
     private boolean handlerNew;
+    @Value("${netty.handler.multithread:true}")
+    private boolean multiThread;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -72,6 +74,7 @@ public class AccessRobotApplication implements CommandLineRunner {
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         Constant.handlerNew = handlerNew;
+        Constant.multiThread = multiThread;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address,redisTemplate, robotService);

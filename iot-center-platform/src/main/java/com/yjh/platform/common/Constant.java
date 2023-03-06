@@ -157,9 +157,11 @@ public class Constant {
 
     public static RedisTemplate redisTemplate;
 
-    public static Boolean packetLog;
+    private static Boolean packetLog;
 
-    public static Boolean hasEncoding;
+    private static Boolean hasEncoding;
+
+    private static Boolean fastTurbo;
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
@@ -249,8 +251,25 @@ public class Constant {
         return Constant.voiceChtype() > 0;
     }
 
+    /**
+     * 急速模式，不上传上级系统，减少日志
+     */
+    public static boolean fastTurbo() {
+        if (fastTurbo == null) {
+            try {
+                fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
+                log.warn("fastTurbo is {}", fastTurbo);
+            } catch (Exception e) {
+                fastTurbo = false;
+            }
+        }
+        return fastTurbo;
+    }
+
     public static void refreshPacketLog() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
+        hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
+        fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
     }
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
