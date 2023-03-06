@@ -117,19 +117,20 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             taskResponseMsg = XmlToMessageUtil.decode(DemoClientTaskContoller.taskXml);
         } catch (Exception e) {
             log.error("xml 解析失败", e);
-            return;
         }
         String[] fileName =StringUtils.split(DemoClientTaskContoller.localFilePath, ".");
         if (fileName == null || fileName.length <= 1) {
             log.error("文件名错误  Filename=" + DemoClientTaskContoller.localFilePath);
             return;
         }
-        byte[] data;
+        byte[] data = null;
         try {
             data = IOUtils.toByteArray(Files.newInputStream(Paths.get(DemoClientTaskContoller.localFilePath)));
         } catch (Exception e) {
             log.error("文件 解析失败", e);
-            return;
+            if (!ClientConfig.sendBatch) {
+                return;
+            }
         }
 
         //设置返回 receiveCode  sendCode

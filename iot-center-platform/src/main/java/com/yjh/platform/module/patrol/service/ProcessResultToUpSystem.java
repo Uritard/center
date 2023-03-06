@@ -81,6 +81,10 @@ public class ProcessResultToUpSystem {
      */
     @Async
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
+        if (Constant.fastTurbo()) {
+            // 压测模式，结果不上报上级系统
+            return null;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         try {

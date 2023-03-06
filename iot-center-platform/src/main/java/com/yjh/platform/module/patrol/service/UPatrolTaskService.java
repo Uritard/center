@@ -1774,35 +1774,38 @@ public class UPatrolTaskService {
         int abnormalCounts = patrolTaskResult(taskId, cruiseResult, size);
 
         try {
-            // webSocket通知前端调用巡视监控的接口
-            Map<String, String> jasonMap = new HashMap<>(3);
-            jasonMap.put("type", "finishedOneInstance");
-            jasonMap.put("taskId", taskId);
-            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+            // 压测模式减少非必要消息传输
+            if (!Constant.fastTurbo()) {
+                // webSocket通知前端调用巡视监控的接口
+                Map<String, String> jasonMap = new HashMap<>(3);
+                jasonMap.put("type", "finishedOneInstance");
+                jasonMap.put("taskId", taskId);
+                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
-            // 巡视结果上报上一级系统
-            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
-            //任务状态上报站端
-            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-            Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            int taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
-            int state = 2;
-            switch (taskStatus) {
-                case TASK_STATE_PAUSE:
-                    state = 3;
-                    break;
-                case TASK_STATE_INTERRUPT:
-                case TASK_STATE_ABNORMAL:
-                    state = 4;
-                    break;
-                case TASK_STATE_TIMEOUT:
-                    state = 6;
-                    break;
-                default:
-                    break;
+                // 巡视结果上报上一级系统
+                processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
+                //任务状态上报站端
+                String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+                Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                int taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
+                int state = 2;
+                switch (taskStatus) {
+                    case TASK_STATE_PAUSE:
+                        state = 3;
+                        break;
+                    case TASK_STATE_INTERRUPT:
+                    case TASK_STATE_ABNORMAL:
+                        state = 4;
+                        break;
+                    case TASK_STATE_TIMEOUT:
+                        state = 6;
+                        break;
+                    default:
+                        break;
+                }
+                sendTaskStateToUp(taskId, state);
             }
-            sendTaskStateToUp(taskId, state);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -1928,9 +1931,13 @@ public class UPatrolTaskService {
             int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
+            List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+                robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                return null;
+            });
             List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
-            for (String key : robotInfoKeys) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+            for (Map<String, String> redisInfoMap : taskInfoList) {
+                // Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                 cruiseResultMapList.add(redisInfoMap);
                 boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
                 if (conditionRes) {
