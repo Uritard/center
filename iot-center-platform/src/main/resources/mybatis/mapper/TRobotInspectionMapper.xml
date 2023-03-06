@@ -477,4 +477,14 @@
     <select id="selectRobotIdByRobotCode" resultType="java.lang.Long">
         SELECT robot_id from t_robot_info where robot_code = #{robotCode}
     </select>
+
+    <select id="getCruiseDeviceInfo" resultType="java.lang.Long">
+        select robot_code as robotCode
+        FROM t_robot_info
+        WHERE robot_id IN (
+            SELECT robot_id
+            FROM u_patrol_plan_attr
+            WHERE plan_id IN (SELECT plan_id FROM u_patrol_task WHERE task_code = #{taskId})
+              AND instance_id = #{instanceId}) limit 1
+    </select>
 </mapper>

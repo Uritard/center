@@ -533,6 +533,13 @@ public class UPatrolTaskService {
     public Integer selectRobotType(String robotCode) {
         return tRobotInspectionDao.selectRobotType(robotCode);
     }
+    public Long getCruiseDeviceInfo(String taskId,Long instanceId) {
+        return tRobotInspectionDao.getCruiseDeviceInfo(taskId,instanceId);
+    }
+
+    public Integer getCruiseDeviceInfo(String robotCode) {
+        return tRobotInspectionDao.selectRegion(robotCode);
+    }
 
     /**
      * 处理机器人/无人机任务状态
