@@ -56,6 +56,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,6 +100,9 @@ public class CameraConService {
 
     @Value("${robot.A200.infrared.video}")
     private String robotA200InfraredTem;
+
+    @Value("${nvr.ffmpeg.toMp4}")
+    private String ffmpegToMp4;
 
     @Value("${spring.redis.host}")
     private String hostIp;
@@ -1899,7 +1903,8 @@ public class CameraConService {
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopSaveRealData(lRealPlayHandle);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
-            String ffmUrl = "/usr/local/bin/ffmpeg -i " + path + " -c copy -an -r 25 " + path.replace(".h264", ".mp4");
+            String ffmUrl = String.format(ffmpegToMp4, path, path.replace(".h264", ".mp4"));
+            log.info("h264 to mp4 url is {}", ffmUrl);
             Runtime.getRuntime().exec(ffmUrl);
             Thread.sleep(1000);
             String url = "chmod 777 " + path.replace(".h264", ".mp4");
@@ -3338,6 +3343,9 @@ public class CameraConService {
         if (StringUtils.isNotBlank(rtmpUrl) && rtmpUrl.contains("history")) {
             cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
             manager.terminate(cameraId);
+            log.info("kill all history stream");
+            StreamStopThread streamStopThread = new StreamStopThread();
+            TaskExecutePool.getInstance().execute(streamStopThread);
         }
 //        manager.terminate(cameraId);
         return "stop " + cameraId + " preview success!";
