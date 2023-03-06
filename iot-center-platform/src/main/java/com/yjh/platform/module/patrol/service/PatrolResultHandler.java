@@ -1079,7 +1079,7 @@ public class PatrolResultHandler {
             resultValue = analyseDataOperateService.resolveDefectResult(resultValue);
             log.info("Parse distinguish data is==={}", resultValue);
 
-            cruiseResultMap.put("resultNum", resultValue);
+            cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : resultValue);
             cruiseResultMap.put("picpath", resultImage);
             boolean abnormal = StringUtils.equals("图像有差异", resultValue);
             cruiseResultMap.put("cruiseResult", String.valueOf(abnormal ? CRUISE_RESULT_ABNORMAL : CRUISE_RESULT_NORMAL));
