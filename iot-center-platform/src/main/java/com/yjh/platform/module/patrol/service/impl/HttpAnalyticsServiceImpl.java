@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
@@ -158,17 +159,19 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             if ("11".equals(analyseType)) {
 
                 String imageNormalUrlPath = "";
-                String targetNamePath;
+                // 为了能够让算法返回200 且返回分析结果 所以是null
+                String targetNamePath = "null";
                 // 判别基准图
                 String flag = hashOperations.get("t_sys_param:isEPRI", "content");
                 if (StringUtils.equals("false", flag)) {
                     // 拿提前拍好的预置位作为判别基准图
                     imageNormalUrlPath = analysis.getReferenceImage();
                     log.info("拿提前拍好的预置位作为判别基准图:{}", imageNormalUrlPath);
-                    String[] split = imageNormalUrlPath.split("/");
-                    targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                    if (StringUtils.isNotEmpty(imageNormalUrlPath)) {
+                        String[] split = imageNormalUrlPath.split("/");
+                        targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                    }
                     analyseObject.setImageNormalUrlPath(targetNamePath);
-
                 } else {
                     // 拿电科院给的图
                     log.info("flag:{}", flag);
@@ -185,8 +188,10 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                         }
                     }
                     log.info("拿电科院给的图:{}", imageNormalUrlPath);
-                    String[] split = imageNormalUrlPath.split("/");
-                    targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                    if (StringUtils.isNotEmpty(imageNormalUrlPath)){
+                        String[] split = imageNormalUrlPath.split("/");
+                        targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                    }
                     analyseObject.setImageNormalUrlPath(targetNamePath);
                 }
                 // 上传基准图
@@ -290,7 +295,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      */
     private void uploadFileToFtps(String sourcePath, String targetPathName, IntelAnalysisFtpsConfig ftpsConfig) {
         try {
-            if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
+            if (CommonUtils.isEmptyOrNullstr(sourcePath) || CommonUtils.isEmptyOrNullstr(targetPathName)) {
                 return;
             }
             FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(), ftpsConfig.getKeypw(),

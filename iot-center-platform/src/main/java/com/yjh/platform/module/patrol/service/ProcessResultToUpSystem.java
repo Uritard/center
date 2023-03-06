@@ -344,6 +344,7 @@ public class ProcessResultToUpSystem {
                 String alarmLevel = "2";
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                 TWarnInfo tWarnInfo = new TWarnInfo();
+                tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
 
                 String value = redisInfoMap.get("value");
                 if (value.contains("图像有差异")){
