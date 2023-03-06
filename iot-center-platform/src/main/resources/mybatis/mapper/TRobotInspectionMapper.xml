@@ -471,7 +471,7 @@
     </select>
 
     <select id="selectRegion" resultType="java.lang.Integer">
-        SELECT count(region_id) from t_std_region where region_code = #{robotCode}
+        SELECT count(region_id) from t_std_region where region_code = #{edgeCode}
     </select>
 
     <select id="selectRobotIdByRobotCode" resultType="java.lang.Long">
