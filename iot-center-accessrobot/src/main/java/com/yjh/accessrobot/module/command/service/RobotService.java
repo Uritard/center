@@ -232,8 +232,25 @@ public class RobotService {
             String robotTaskStatus = robotTaskStatusMap.get("value");
             String robotPattern = robotStatusMap.get("value");
 
+            // 判断当前巡视系统是否拥有巡视设备控制权
+            String controlKey = "RobotStatus:" + robotCode + ":811";
+            if (StringUtils.equalsAny(typeCommand, "1_6", "20001_6")) {
+                redisTemplate.opsForValue().set(controlKey, "1");
+            } else if (StringUtils.equalsAny(typeCommand, "1_7", "20001_7")) {
+                redisTemplate.opsForValue().set(controlKey, "0");
+            } else {
+                String controlStatusMap = (String)redisTemplate.opsForValue().get(controlKey);
+                if (!"1".equals(robotTaskStatus)) {
+                    log.error("==========当前巡视设备未获取控制权,无法操作==========");
+                    scmap.put("code", 3);
+                    scmap.put("result", "请先获取当前巡视设备控制权");
+                    return scmap;
+                }
+            }
+            redisTemplate.expire(controlKey, 10, TimeUnit.MINUTES);
+
             if (StringUtils.equals("2", robotTaskStatus) || StringUtils.equals("4", robotTaskStatus)) {
-                String returnMsg = robotTaskStatus.equals("2") ? "巡视状态" : "检修状态";
+                String returnMsg = "2".equals(robotTaskStatus) ? "巡视状态" : "检修状态";
                 log.error("==========当前巡视设备处于" + returnMsg + ",无法操作==========");
                 scmap.put("code", 3);
                 scmap.put("result", "当前巡视设备处于" + returnMsg + ",无法操作");
