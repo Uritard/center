@@ -494,6 +494,13 @@ public class PatrolResultHandler {
                 String meteName = tStdDevicemete.getMeteName();
                 int warnFlag = analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1,
                         highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
+
+                // 正常结果
+                cruiseResultMap.put("isWarn", "0");
+                cruiseResultMap.put("resultNum", resultValue);
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                cruiseResultMap.put("cruiseAbnormal", "--");
+
                 if (warnFlag == 1){
                     Map<String, String> warnMap = new HashMap<>(16);
                     String warnName = "warnInfo:" + cruiseResultMap.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -512,33 +519,31 @@ public class PatrolResultHandler {
                     switch (meteKind){
                         case "1":
                             int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultValue, stateZero, stateOne, alarmState);
-                            if (warnRuleFlag == 1){
-                                log.info("Alarm value is reached(遥信)");
-                                warnMap.put("warnLevel", String.valueOf(tStdDevicemete.getAlarmLevel()));
-                                warnMap.put("warnName", meteName + "状态异常");
-                                warnMap.put("warnTime", DateTimeUtil.format(new Date()));
-                                warnMap.put("outRange", "--");
-                                if (alarmState == 0) {
-                                    warnMap.put("warnContent", meteName + ":" + stateZero + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
-                                } else {
-                                    warnMap.put("warnContent", meteName + ":" + stateOne + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
-                                }
-                                log.info("warnMap=={}", warnMap);
-                                redisTemplate.opsForHash().putAll(warnName, warnMap);
-
-                                cruiseResultMap.put("isWarn", "1");
-                                cruiseResultMap.put("resultNum", resultStringValue);
-                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-                            }else {
+                            if (warnRuleFlag != 1){
                                 log.info("Alarm value is not reached(遥信)");
-                                cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                                cruiseResultMap.put("cruiseAbnormal", "--");
+                                break;
                             }
+                            log.info("Alarm value is reached(遥信)");
+                            warnMap.put("warnLevel", String.valueOf(tStdDevicemete.getAlarmLevel()));
+                            warnMap.put("warnName", meteName + "状态异常");
+                            warnMap.put("warnTime", DateTimeUtil.format(new Date()));
+                            warnMap.put("outRange", "--");
+                            if (alarmState == 0) {
+                                warnMap.put("warnContent", meteName + ":" + stateZero + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
+                            } else {
+                                warnMap.put("warnContent", meteName + ":" + stateOne + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
+                            }
+                            log.info("warnMap=={}", warnMap);
+                            redisTemplate.opsForHash().putAll(warnName, warnMap);
+
+                            cruiseResultMap.put("isWarn", "1");
+                            cruiseResultMap.put("resultNum", resultStringValue);
+                            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                            cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
                             break;
                         case "2":
-                            if(NumberUtils.isCreatable(resultStringValue)){
+                            // 如果不是数字 不用判断是否告警了
+                            if(!NumberUtils.isCreatable(resultStringValue)){
                                 log.info("Data non-numeric===={}", resultStringValue);
                                 break;
                             }
@@ -570,71 +575,69 @@ public class PatrolResultHandler {
                                     highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
                             log.info("warnRuleMeter=={}", warnRuleMeter);
 
-                            if (warnRuleMeter > 0) {
-                                log.info("Alarm value is reached(遥测)");
-                                warnMap.put("warnName", isTemDif ? initInfo.get("warnName") : meteName + "数据异常");
-                                warnMap.put("warnTime", DateTimeUtil.format(new Date()));
-
-                                String warnLevel = "";
-                                String warnContent = "";
-                                String outRange = "";
-
-                                switch (warnRuleMeter) {
-                                    case 1:
-                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "预警");
-                                        warnContent = isTemDif ?
-                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "预警";
-                                        outRange = isTemDif ?
-                                                initInfo.get("outRange") : resultValueMeter >= highLimit1 ?
-                                                String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter);
-                                        break;
-                                    case 2:
-                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "一般告警");
-                                        warnContent = isTemDif ?
-                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "一般告警";
-                                        outRange = isTemDif ?
-                                                initInfo.get("outRange") : resultValueMeter >= highLimit2 ?
-                                                String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter);
-                                        break;
-                                    case 3:
-                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "严重告警");
-                                        warnContent = isTemDif ?
-                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "严重告警";
-                                        outRange = isTemDif ?
-                                                initInfo.get("outRange") : resultValueMeter >= highLimit3 ?
-                                                String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter);
-                                        break;
-                                    case 4:
-                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "危急告警");
-                                        warnContent = isTemDif ?
-                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "危急告警";
-                                        outRange = isTemDif ?
-                                                initInfo.get("outRange") : resultValueMeter >= highLimit4 ?
-                                                String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter);
-                                        break;
-                                    default:
-                                        break;
-                                }
-
-                                warnMap.put("warnLevel", warnLevel);
-                                warnMap.put("warnContent", warnContent);
-                                warnMap.put("outRange", outRange);
-
-                                log.info("warnMap=={}", warnMap);
-                                // 将告警信息放入redis
-                                redisTemplate.opsForHash().putAll(warnName, warnMap);
-
-                                cruiseResultMap.put("isWarn", "1");
-                                cruiseResultMap.put("resultDesc", isTemDif ? initInfo.get("valueTemp") : "");
-                                cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-                            } else {
+                            if (warnRuleMeter == 0){
                                 log.info("Alarm value is not reached(遥测)");
-                                cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                                cruiseResultMap.put("cruiseAbnormal", "--");
+                                break;
                             }
+
+                            log.info("Alarm value is reached(遥测)");
+                            warnMap.put("warnName", isTemDif ? initInfo.get("warnName") : meteName + "数据异常");
+                            warnMap.put("warnTime", DateTimeUtil.format(new Date()));
+
+                            String warnLevel = "";
+                            String warnContent = "";
+                            String outRange = "";
+
+                            switch (warnRuleMeter) {
+                                case 1:
+                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "预警");
+                                    warnContent = isTemDif ?
+                                            initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "预警";
+                                    outRange = isTemDif ?
+                                            initInfo.get("outRange") : resultValueMeter >= highLimit1 ?
+                                            String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter);
+                                    break;
+                                case 2:
+                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "一般告警");
+                                    warnContent = isTemDif ?
+                                            initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "一般告警";
+                                    outRange = isTemDif ?
+                                            initInfo.get("outRange") : resultValueMeter >= highLimit2 ?
+                                            String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter);
+                                    break;
+                                case 3:
+                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "严重告警");
+                                    warnContent = isTemDif ?
+                                            initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "严重告警";
+                                    outRange = isTemDif ?
+                                            initInfo.get("outRange") : resultValueMeter >= highLimit3 ?
+                                            String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter);
+                                    break;
+                                case 4:
+                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "危急告警");
+                                    warnContent = isTemDif ?
+                                            initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "危急告警";
+                                    outRange = isTemDif ?
+                                            initInfo.get("outRange") : resultValueMeter >= highLimit4 ?
+                                            String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            warnMap.put("warnLevel", warnLevel);
+                            warnMap.put("warnContent", warnContent);
+                            warnMap.put("outRange", outRange);
+
+                            log.info("warnMap=={}", warnMap);
+                            // 将告警信息放入redis
+                            redisTemplate.opsForHash().putAll(warnName, warnMap);
+
+                            cruiseResultMap.put("isWarn", "1");
+                            cruiseResultMap.put("resultDesc", isTemDif ? initInfo.get("valueTemp") : "");
+                            cruiseResultMap.put("resultNum", resultValue);
+                            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                            cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
                             break;
                         default:
                             break;
@@ -660,10 +663,6 @@ public class PatrolResultHandler {
                         // 将产生的告警上送至上一级系统
                         alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
                     }
-                }else {
-                    cruiseResultMap.put("resultNum", resultValue);
-                    cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                    cruiseResultMap.put("cruiseAbnormal", "--");
                 }
                 RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
                 robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
