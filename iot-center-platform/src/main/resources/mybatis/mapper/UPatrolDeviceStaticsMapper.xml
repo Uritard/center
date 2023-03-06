@@ -147,7 +147,7 @@
 
     <insert id="batchInsert" parameterType="java.util.List">
         insert into device_statics_info_result
-        (device_code ,device_type,region_code,device_name, duration, offLine_count, normal_day, commission_days, cruise_percent, intact_percent)
+        (device_code ,device_type,region_code,device_name, duration, offLine_count, normal_day, commission_days, cruise_percent, intact_percent,device_resume_date)
         values
         <foreach collection="list" separator="," index="index" item="item">
             (#{item.deviceCode,jdbcType=VARCHAR},
@@ -159,7 +159,8 @@
             #{item.normalDay,jdbcType=VARCHAR},
             #{item.commissionDays,jdbcType=VARCHAR},
             #{item.cruisePercent,jdbcType=VARCHAR},
-            #{item.intactPercent,jdbcType=VARCHAR})
+            #{item.intactPercent,jdbcType=VARCHAR},
+             #{item.deviceResumeDate,jdbcType=VARCHAR})
         </foreach>
     </insert>
 

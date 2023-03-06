@@ -71,7 +71,7 @@
             set device_run = 1,device_resume_date=now()
         </if>
         <if test='deviceRun != null and deviceRun =="1"'>
-            set device_run = 0,CONCAT(commission_days,'天') = REPLACE(commission_days,'天','') + TO_DAYS(now()) - TO_DAYS(device_resume_date)
+            set device_run = 0,commission_days = CONCAT(REPLACE(commission_days,'天','') + TO_DAYS(now()) - TO_DAYS(device_resume_date),'天')
         </if>
             where device_code = #{deviceCode,jdbcType=VARCHAR}
     </update>
