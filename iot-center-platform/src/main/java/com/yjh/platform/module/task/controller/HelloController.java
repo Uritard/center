@@ -18,6 +18,8 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
+import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
@@ -88,6 +90,8 @@ public class HelloController {
 
     @Autowired
     private DeviceStaticsToUpSystem deviceStaticsToUpSystem;
+    @Autowired
+    private IntelAnalysisService intelAnalysisService;
 
     @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
     private String URL;
@@ -636,5 +640,24 @@ public class HelloController {
         redisTemplateForThree.opsForHash().putAll("judge:"+"instance_id:",map);
         Map mmm = redisTemplateForThree.opsForHash().entries("judge:"+"123123:");
     }
+
+    @GetMapping(value = "/qh-test")
+    @ApiOperation(value = "qh-test")
+    @Logs(title = "qh-test",content = "qh-test",logType = 2)
+    public void qhTest(@RequestParam(value = "presetId", required = false) Long presetId,
+                       @RequestParam(value = "tarPath", required = false) String tarPath) {
+        List<Analysis> analysisList = new ArrayList<>();
+        Analysis analysis = new Analysis()
+                // 暂定静默监视识别类型为12,没有实际意义
+                .setAnalyseType("12")
+                .setInstanceId(presetId)
+                .setTaskId("jm")
+                .setPicPath(tarPath);
+        analysisList.add(analysis);
+        List<Response> responseList= intelAnalysisService.picAnalyseNoDetection(analysisList);
+        log.info("param:{} result:{}", org.apache.commons.lang3.StringUtils.join(analysisList),org.apache.commons.lang3.StringUtils.join( responseList));
+
+    }
+
 
 }
