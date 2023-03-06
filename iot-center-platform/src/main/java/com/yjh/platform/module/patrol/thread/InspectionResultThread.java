@@ -224,7 +224,13 @@ public class InspectionResultThread implements Runnable{
             boolean isInterrupt = StringUtils.containsAny(robotPatrolTaskResult.getValue(), "任务终止", "超时");
 
             CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
-            Integer type = uPatrolTaskService.selectRobotType(sendCode);
+            Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
+            String robotCode = sendCode;
+            if (countRegion != 0) {
+                robotCode = String.valueOf(uPatrolTaskService.getCruiseDeviceInfo(taskId,Long .valueOf(instanceId)));
+            }
+            Integer type = uPatrolTaskService.selectRobotType(robotCode);
+
             // 机器人类型为模拟机器人/模拟无人机 为模拟工具
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
