@@ -808,7 +808,24 @@ public class UPatrolTaskService {
             }
             if (inNode && CRUISE_STATE_UN == cruiseState) {
                 //这个点 没有做
-                String rname = TypeEnum.ROBOT.getCode() == cruiseType ? "机器人" : "无人机";
+                CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+                String rname = "";
+                switch (cruiseTypeEnum) {
+                    case ROBOT:
+                        rname = "机器人";
+                        break;
+                    case UAV:
+                        rname = "无人机";
+                        break;
+                    case VIDEO:
+                        rname = "可见光相机";
+                        break;
+                    case INFRARED:
+                        rname = "红外相机";
+                        break;
+                    default:
+                        break;
+                }
                 result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
                 result.put("resultNum", rname + "任务异常");
                 result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
@@ -1450,7 +1467,8 @@ public class UPatrolTaskService {
             log.info("当前任务已经结束:{}, state: {}", taskId, uPatrolResult.getTaskState());
             return 1;
         }
-        List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, uPatrolResult.getTaskLevel());
+        //暂停的任务也考虑进去
+        List<String> highTaskList = uPatrolTaskDao.selectPlanRunningOrPauseTask(null, uPatrolResult.getTaskLevel());
         if (!force && CollectionUtils.isNotEmpty(highTaskList)) {
             log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
             for (String htId : highTaskList) {
