@@ -71,13 +71,15 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
 
     @Override
     protected void analysisExt(Analysis analysis, JSONObject captureResult) {
-        String picPath = captureResult.getString("picPath");
+        /*String picPath = captureResult.getString("picPath");
         String csvPath = captureResult.getString("csvPath");
-        String dataPath = captureResult.getString("dataPath");
+        String dataPath = captureResult.getString("dataPath");*/
+
+        String picPath = captureResult.getString("absPath");
 
         analysis.setPicPath(picPath);
-        analysis.setCsvPath(csvPath);
-        analysis.setDataPath(dataPath);
+        /*analysis.setCsvPath(csvPath);
+        analysis.setDataPath(dataPath);*/
         log.info("算法信息(红外)： {}", JSON.toJSONString(analysis));
     }
 
