@@ -79,7 +79,6 @@ public class DeviceStaticsToUpSystem {
                 packageInfo("cameraId", device, infoMaps, reportDate);
             }
         });
-        log.info("infoMaps:\n{}", JSON.toJSONString(infoMaps));
         sendInfoToUpSystem(infoMaps);
     }
 
@@ -93,7 +92,6 @@ public class DeviceStaticsToUpSystem {
         list.add(xmlBaseModel);
         Map<String, List<XMLBaseModel>> map = new HashMap<>();
         map.put("list", list);
-        log.info("The information to be reported one level up is==={}", map);
         try {
             Constant.otherServer(map, Constant.TCP_URL);
         } catch (Exception e) {
