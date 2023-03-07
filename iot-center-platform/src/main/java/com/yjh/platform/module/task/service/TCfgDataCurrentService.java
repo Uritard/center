@@ -369,8 +369,6 @@ public class TCfgDataCurrentService {
             tCruiseTaskAdd.setCycleExecuteTime("");
 //            tCruiseTaskAdd.setTaskType(218);
             tCruiseTaskAdd.setUnionTaskStatus("1");
-            // 联动任务优先级
-            tCruiseTaskAdd.setTaskLevel(4);
 //            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
             String taskId= StringUtils.substringBetween(uPatrolTaskService.addTask(tCruiseTaskAdd, true),"_");//联动任务ID
             cLogger.info("联动开始执行");
