@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import io.swagger.annotations.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -365,11 +366,13 @@ public class TCruisePlanController {
                     .map(TCruisePlanAttrDetail::getDeviceId)
                     .distinct()
                     .collect(Collectors.toList());
-                if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) {
-                    planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
-                }
-                if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) {
-                    planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
+                if (CollectionUtils.isNotEmpty(tCruisePlanAttrDetailList)) {
+                    if (Objects.nonNull(tCruisePlanAttrDetailList.get(0)) && Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) {
+                        planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
+                    }
+                    if (Objects.nonNull(tCruisePlanAttrDetailList.get(0)) && Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) {
+                        planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
+                    }
                 }
                 planDetailMap.put("instanceList", resultMap.get("list"));
                 planDetailMap.put("count", resultMap.get("count"));

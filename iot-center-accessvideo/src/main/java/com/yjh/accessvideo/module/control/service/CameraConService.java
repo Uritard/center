@@ -2369,6 +2369,8 @@ public class CameraConService {
                         pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
                     }
                     map.put("picPath", hotPicshow + newName + ".jpg");
+                    map.put("urlPath", hotPicshow + newName + ".jpg");
+                    map.put("absPath", hotPic + newName + ".jpg");
                     copyFile(newName + ".jpg", path);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
                 } else {
@@ -2679,8 +2681,12 @@ public class CameraConService {
                     log.info("min {}", min);
                     fos.flush();
                     fos.close();
-                    DecimalFormat df = new DecimalFormat("##0.00");
-                    map.put("resultNum", df.format(max) + "," + df.format(min));
+                    // 红外是否需要算法分析 不需要的话直接给温度值
+                    boolean isInfraredAnalysis = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:isInfraredAnalysis", "content").toString());
+                    if (Boolean.FALSE.equals(isInfraredAnalysis)){
+                        DecimalFormat df = new DecimalFormat("##0.00");
+                        map.put("resultNum", df.format(max) + "," + df.format(min));
+                    }
                     map.put("csvPath", hotFirShow + newName + ".csv");
                     copyFile(newName + ".csv", csvPath);
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
