@@ -1626,6 +1626,8 @@ public class UPatrolTaskService {
             overhaul = Arrays.asList(overhaulString.split(","));
         }
         List<String> finalOverhaul = overhaul;
+        Collections.sort(finalOverhaul);
+        log.info("finalOverhaul: {}", finalOverhaul);
         // 不需要执行的点
         List<Map<String, String>> skipPointList = new ArrayList<>();
         Map<String, List<Map<String, String>>> cruiseGroupMap = new HashMap<>(32);
@@ -1719,6 +1721,30 @@ public class UPatrolTaskService {
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
             ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));
         }
+
+    }
+
+    public static void main(String[] args) {
+        String overhaulString = "100000002843,100000002844,100000002886,100000003044,100000003050,100000003064,100000002695,100000002697,100000002698,100000002699,100000002701,100000002702,100000002703,100000002704,100000002705,100000002715,100000002827,100000002828,100000002837,100000002842";
+        List<String> overhaul = new ArrayList<>();
+        if (StringUtils.isNotEmpty(overhaulString)){
+            overhaul = Arrays.asList(overhaulString.split(","));
+        }
+        List<String> finalOverhaul = overhaul;
+        Collections.sort(finalOverhaul);
+        System.out.println(finalOverhaul);
+        List<Map<String, String>> a = new ArrayList<>();
+        Map<String, String> m2 = new HashMap<>();
+        m2.put("instanceId","100000002695");
+        a.add(m2);
+        Map<String, String> m1 = new HashMap<>();
+        m1.put("instanceId","100000002697");
+        a.add(m1);
+        a.forEach(m->{
+            if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "instanceId")) >= 0) {
+                System.out.println("检修");
+            }
+        });
 
     }
 
