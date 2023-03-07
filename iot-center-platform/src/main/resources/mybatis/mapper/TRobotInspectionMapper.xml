@@ -478,7 +478,7 @@
         SELECT robot_id from t_robot_info where robot_code = #{robotCode}
     </select>
 
-    <select id="getCruiseDeviceInfo" resultType="java.lang.Long">
+    <select id="getCruiseDeviceInfo" resultType="java.lang.String">
         select robot_code as robotCode
         FROM t_robot_info
         WHERE robot_id IN (

@@ -97,5 +97,5 @@ public interface TRobotInspectionDao {
     long selectRobotIdByRobotCode(String robotCode);
 
 
-    Long getCruiseDeviceInfo(@Param(value = "taskId") String taskId,@Param("instanceId")Long instanceId);
+    String getCruiseDeviceInfo(@Param(value = "taskId") String taskId,@Param("instanceId")Long instanceId);
 }

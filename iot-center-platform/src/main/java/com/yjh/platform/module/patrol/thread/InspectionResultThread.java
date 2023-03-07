@@ -227,7 +227,7 @@ public class InspectionResultThread implements Runnable{
             Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
             String robotCode = sendCode;
             if (countRegion != 0) {
-                robotCode = String.valueOf(uPatrolTaskService.getCruiseDeviceInfo(taskId,Long .valueOf(instanceId)));
+                robotCode = uPatrolTaskService.getCruiseDeviceInfo(taskId,Long.valueOf(instanceId));
             }
             Integer type = uPatrolTaskService.selectRobotType(robotCode);
 
