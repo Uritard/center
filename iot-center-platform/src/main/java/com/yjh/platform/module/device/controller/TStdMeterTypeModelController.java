@@ -38,7 +38,15 @@ public class TStdMeterTypeModelController {
     public Result add(@Validated @RequestBody TStdMeterTypeModel tStdMeterTypeModel)  {
         Result result = new Result();
         try {
-            result.setData(tStdMeterTypeModelService.add(tStdMeterTypeModel));
+            if (tStdMeterTypeModel.getId() != null) {
+                int i = tStdMeterTypeModelService.update(tStdMeterTypeModel);
+                if (i == 0) {
+                    result.setMessage("请选择识别类型");
+                    result.setCode(10102);
+                }
+            } else {
+                result.setData(tStdMeterTypeModelService.add(tStdMeterTypeModel));
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
