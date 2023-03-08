@@ -60,6 +60,7 @@ public class TDeviceMaintenanceService {
                     break;
                 //点位
                 case "3":
+                case "4":
                     List<String> instanceList = tDeviceMaintenanceMapper.selectInstanceIdsList(deviceMaintenanceMode.getDeviceList());
                     List<String> deviceLists = tDeviceMaintenanceMapper.selectDeviceIdsByInstanceList(instanceList);
                     tDeviceMaintenance.setDeviceIds(deviceLists.toString().replace("[","").replace("]",""));

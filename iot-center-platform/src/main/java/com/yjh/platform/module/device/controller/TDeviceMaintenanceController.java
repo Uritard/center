@@ -52,7 +52,7 @@ public class TDeviceMaintenanceController {
     public Result add(@Validated @RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
-            result.setData(tDeviceMaintenanceService.add(tDeviceMaintenance, true));
+            result.setData(tDeviceMaintenanceService.add(tDeviceMaintenance));
             //有变动 同步模型
             Constant.modelUpload("8");
         } catch (BusinessException b) {
