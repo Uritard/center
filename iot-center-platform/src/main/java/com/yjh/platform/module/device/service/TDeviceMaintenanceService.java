@@ -44,7 +44,7 @@ public class TDeviceMaintenanceService{
     private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4});){0,3}([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
-    public int add(TDeviceMaintenance tDeviceMaintenance, Boolean flag) {
+    public int add(TDeviceMaintenance tDeviceMaintenance) {
         checkParam(tDeviceMaintenance);
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
@@ -56,19 +56,10 @@ public class TDeviceMaintenanceService{
         for(DeviceAndInstance item:deviceAndInstanceList){
             instanceList.add(item.getInstanceId());
         }
-        //页面传入进行转换 否则直接塞值
-        if (flag && "1".equals(tDeviceMaintenance.getDeviceLevel())){
-            List<String> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList);
-            if (CollectionUtils.isNotEmpty(regionList)) {
-                String deviceListString = StringUtils.join(regionList.toArray(), ",");
-                tDeviceMaintenance.setDeviceIds(deviceListString);
-            }
-        }else {
-            tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
-                    .toString().replace("[","").replace("]","").replace(" ", ""));
-        }
+        tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
+                .toString().replace("[", "").replace("]", "").replace(" ", ""));
         tDeviceMaintenance.setInstanceIds(instanceList
-                .toString().replace("[","").replace("]","").replace(" ", ""));
+                .toString().replace("[", "").replace("]", "").replace(" ", ""));
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         createMaintenance(tDeviceMaintenance, instanceList, deviceList, 1);
         return 1;
@@ -89,7 +80,7 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
-        return this.add(tDeviceMaintenance, true);
+        return this.add(tDeviceMaintenance);
     }
 
     /**
@@ -485,7 +476,7 @@ public class TDeviceMaintenanceService{
         tDeviceMaintenance.setDeviceLevel(deviceLevel);
         tDeviceMaintenance.setDeviceAndInstanceList(lists);
         tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
-        this.add(tDeviceMaintenance, false);
+        this.add(tDeviceMaintenance);
     }
 
     /**
@@ -509,6 +500,8 @@ public class TDeviceMaintenanceService{
                 return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
             case "3":
                 // 监测点
+            case "4":
+                // 部件
                 return idList;
             default:
                 return deviceIdLst;
@@ -527,12 +520,17 @@ public class TDeviceMaintenanceService{
         List<Long> deviceIdLst = new ArrayList<>();
         switch (deviceLevel) {
             case "1":
-            case "2":
                 //区域 间隔
+                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+                break;
+            case "2":
+                //设备
                 deviceIdLst = idList;
                 break;
             case "3":
                 // 监测点
+            case "4":
+                //部件
                 deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
                 break;
             default:

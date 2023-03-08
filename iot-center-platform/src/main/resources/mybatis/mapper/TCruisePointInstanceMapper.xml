@@ -637,18 +637,8 @@
     <select id="selectTimeIsIn" resultType="java.lang.String">
         SELECT DISTINCT
             CASE
-                WHEN a.device_level = 1 THEN
-                    (
-                        SELECT
-                            GROUP_CONCAT(b.instance_id)
-                        FROM
-                            t_cruise_point_instance b
-                                LEFT JOIN t_std_device c ON b.device_id = c.device_id
-                        WHERE
-                            FIND_IN_SET(c.up_region_id, a.device_ids)
-                    )
-                WHEN a.device_level = 2
-                    OR a.device_level = 4 THEN
+                WHEN a.device_level = 1
+                    OR a.device_level = 2 THEN
                     (
                         SELECT
                             GROUP_CONCAT(b.instance_id)
@@ -662,7 +652,7 @@
                     a.instance_ids
                 END AS device_ids
         FROM
-        t_device_maintenance a
+            t_device_maintenance a
         WHERE
         a.maintenance_start &lt;= #{time,jdbcType=TIMESTAMP} AND a.maintenance_stop &gt;=#{time,jdbcType=TIMESTAMP}
     </select>

@@ -487,29 +487,12 @@ public class FtpsUtil {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        String path = "D://test.txt";
-        String fileName = "/3/E200/test.txt";
-        File file = new File(path);
+        String path = "D://1.jpg";
+        String fileName = "/3/1.jpg";
         try {
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-            byte[] b = new byte[1000];
-            int n;
-            while ((n = fis.read(b)) != -1) {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            byte[] data = bos.toByteArray();
-            bos.close();
-            List<byte[]> list1 = new ArrayList<byte[]>();
-            List<String> list2 = new ArrayList<String>();
-            list1.add(data);
-            list2.add(fileName);
-            // FtpsUtil.putFileForList(list1, list2);
-            //
+            putFile(path, fileName, "172.24.39.150", 10012, "1", "Yzzx220", "Yzzx@220901");
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
