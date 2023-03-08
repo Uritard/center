@@ -206,22 +206,9 @@ public class TSequentialConfService{
      * @return result
      */
     public String setSilentMonitorResult(Integer type) {
-        String typeStr = "sly_bjbmyw";
-        switch (type) {
-            case 1:
-                typeStr = "sly_bjbmyw";
-                break;
-            case 2:
-                typeStr = "sly_dmyw";
-                break;
-            case 3:
-                typeStr = "pzqcd";
-                break;
-            case 4:
-                typeStr = "drqgd";
-                break;
-            default:
-                break;
+        String typeStr = getSilentMonitorType(type);
+        if (StringUtils.isEmpty(typeStr)) {
+            typeStr = "sly_bjbmyw";
         }
 
         redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.type", typeStr);
@@ -229,6 +216,25 @@ public class TSequentialConfService{
         // 将人工干预的开关打开
         redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.needManMade", true);
         return "ok";
+    }
+
+    /**
+     * 从redis中获取静默监视AnalyseType映射关系
+     *
+     * @param type type
+     * @return result
+     */
+    private String getSilentMonitorType(Integer type) {
+        String silentMonitorAnalyseMapStr = (String)redisTemplate.opsForHash().get("t_sys_param:silentMonitorAnalyseMap", "content");
+        String[] arr = silentMonitorAnalyseMapStr.split(",");
+
+        Map<Integer, String> map = new HashMap<>();
+        for (int i=0; i<arr.length; i++) {
+            String[] subArr = arr[i].split("\\|");
+            map.put(Integer.valueOf(subArr[0]), subArr[1]);
+        }
+
+        return map.get(type);
     }
 
     @Transactional(rollbackFor = Exception.class)

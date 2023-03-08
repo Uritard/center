@@ -1330,6 +1330,7 @@ INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `
 INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'fileRealPath', '文件映射绝对路径', 'https://172.24.39.9/files/', '文件映射相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
 INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'deviceMaintenance', '检修区域检测', 'false', '检修区域检测项', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'defectAnalyseType', 'AI判别传入的AnalyseType', 'tx_pb', 'AI判别传入的AnalyseType', '{\"rule\":\"^(tx_pb|tx_yzwpy)$\",\"msg\":\"只能填 tx_pb或 tx_yzwpy\"}');
+INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'silentMonitorAnalyseMap', '静默监视AI判别传入的AnalyseType映射关系', '1|drqgd,2|dxdg,3|pzqcd,4|yxdghsg,5|sly_bjbmyw,6|xdwcr,7|hzyw,8|sly_dmyw', '静默监视AI判别传入的AnalyseType映射关系', '{\"rule\":\"^[_a-zA-Z0-9# \\|,]+$\",\"msg\":\"请不要输入特殊字符\"}');
 
 -- ----------------------------
 -- Records of t_version

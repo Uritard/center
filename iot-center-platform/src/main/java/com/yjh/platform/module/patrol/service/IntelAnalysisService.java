@@ -62,6 +62,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.common.Constant.redisTemplate;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -204,10 +205,83 @@ public class IntelAnalysisService {
         List<Response> responseList = new ArrayList<>();
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         for (PicAnalyseRequest request : list) {
-            Response response = picAnalyse(request);
+            Response response = null;
+            if (checkAnalyseNeedPlanB(request)) {
+                response = processAnalysePlanB(request);
+            } else {
+                response = picAnalyse(request);
+            }
+
             responseList.add(response);
         }
         return responseList;
+    }
+
+    private boolean checkAnalyseNeedPlanB(PicAnalyseRequest request) {
+        try {
+            if (request.getRequestId().endsWith("jm")) {
+                return checkAnalyseNeedPlanBJm();
+            } else if (request.getRequestId().endsWith("yjsk")) {
+                return checkAnalyseNeedPlanBYjsk();
+            }
+        } catch (Exception e) {
+            log.error("checkAnalyseNeedPlanB err, ", e);
+        }
+
+        return false;
+    }
+
+    private boolean checkAnalyseNeedPlanBJm() {
+        Object needManMadeObj = redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade");
+        boolean silentMonitorNeedManMade = false;
+        if (needManMadeObj != null) {
+            silentMonitorNeedManMade = (Boolean) needManMadeObj;
+        }
+
+        return silentMonitorNeedManMade;
+    }
+
+    private boolean checkAnalyseNeedPlanBYjsk() {
+        String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
+        return StringUtils.equals("true", sequentialFlag);
+    }
+
+    private Response processAnalysePlanB(PicAnalyseRequest request) {
+        try {
+            PicAnalyseResponse picAnalyseResponse = getAnalyseResp(request);
+            picAnalyseRetNotify(picAnalyseResponse);
+            return new Response(200);
+        } catch (Exception e) {
+            return Response.serverError();
+        }
+    }
+
+    private PicAnalyseResponse getAnalyseResp(PicAnalyseRequest request) {
+        PicAnalyseResponse response = new PicAnalyseResponse();
+        response.setRequestId(request.getRequestId());
+        AnalyseResult analyseResult = getAnalyseResp(request.getObjectList().get(0));
+        response.setResultsList(Arrays.asList(analyseResult));
+
+        return response;
+    }
+
+    private AnalyseResult getAnalyseResp(AnalyseObject analyseObject) {
+        AnalyseResult analyseResult = new AnalyseResult();
+        AnalyseResultItem item = getAnalyseResult(analyseObject);
+        analyseResult.setResults(Arrays.asList(item));
+        analyseResult.setObjectId("111111");
+        return analyseResult;
+    }
+
+    private AnalyseResultItem getAnalyseResult(AnalyseObject analyseObject) {
+        AnalyseResultItem item = new AnalyseResultItem();
+        item.setResImageUrl(analyseObject.getImageUrlList().get(0));
+        item.setCode("2000");
+        item.setConf(0.0f);
+        item.setDesc("未发现异常");
+        item.setValue("1");
+        item.setType(analyseObject.getTypeList().get(0));
+        return item;
     }
 
     /**
