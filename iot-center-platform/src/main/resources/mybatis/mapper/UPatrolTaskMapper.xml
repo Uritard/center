@@ -902,6 +902,45 @@
             LIMIT 1
     </select>
 
+
+    <select id="selectRobotTaskOnStartV2" resultType="java.util.Map">
+        SELECT DISTINCT
+            d.task_code as taskCode,d.task_id as taskId
+        FROM
+            t_robot_inspection a,
+            t_cruise_point_instance b,
+            u_patrol_task_attr c,
+            u_patrol_result d
+        WHERE
+            a.robot_id = #{robotId,jdbcType=BIGINT}
+          AND a.inspection_id = b.cruise_id
+          AND b.instance_id = c.instance_id
+          AND c.task_id = d.task_code
+          AND (
+                    d.task_state = 239
+                OR d.task_state = 241
+            )
+          AND d.task_type != 508 AND d.task_type != 509 AND d.task_type != 456
+        ORDER BY d.create_time DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectCurrentTaskId" resultType="java.lang.String">
+        SELECT DISTINCT
+            d.task_code as taskCode,d.task_id as taskId
+        FROM
+            u_patrol_result d
+        WHERE 1 =1
+          AND d.task_code = #{taskCode,jdbcType=VARCHAR}
+          AND (
+                    d.task_state = 239
+                OR d.task_state = 241
+            )
+          AND d.task_type != 508 AND d.task_type != 509 AND d.task_type != 456
+        ORDER BY d.create_time DESC
+            LIMIT 1
+    </select>
+
     <select id="selectRobotTaskInstanceList" resultType="java.lang.String">
         SELECT DISTINCT
         c.instance_id

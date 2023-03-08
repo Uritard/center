@@ -151,6 +151,9 @@ public interface UPatrolTaskDao {
     List<String> selectRobotTaskInstanceList(@Param(value = "taskId") String taskId);
 
     String selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
+    String selectCurrentTaskId(@Param(value = "taskCode") String taskCode);
+
+    Map<String,String> selectRobotTaskOnStartV2(@Param(value = "robotId") Long robotId);
 
 
     List<Long> selectRobotOrDroneInsByTaskId(@Param("taskId") String taskId);
