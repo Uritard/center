@@ -39,10 +39,11 @@ public class TStdMeterTypeModelController {
         Result result = new Result();
         try {
             if (tStdMeterTypeModel.getId() != null) {
-                int i = tStdMeterTypeModelService.update(tStdMeterTypeModel);
-                if (i == 0) {
-                    result.setMessage("请选择识别类型");
-                    result.setCode(10102);
+                TStdMeterTypeModel old = tStdMeterTypeModelService.selectByPrimaryId(tStdMeterTypeModel.getId());
+                if (old != null) {
+                    result.setData(tStdMeterTypeModelService.update(tStdMeterTypeModel));
+                } else {
+                    result.setData(tStdMeterTypeModelService.add(tStdMeterTypeModel));
                 }
             } else {
                 result.setData(tStdMeterTypeModelService.add(tStdMeterTypeModel));
