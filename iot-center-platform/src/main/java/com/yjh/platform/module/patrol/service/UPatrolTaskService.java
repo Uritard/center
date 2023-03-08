@@ -2637,11 +2637,32 @@ public class UPatrolTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {
+
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         Map<String, Object> reMap = new HashMap<>();
-        String taskId = uPatrolTaskDao.selectRobotTaskOnStart(robotId);
-        if (!org.springframework.util.StringUtils.isEmpty(taskId)) {
+        Map<String,String> taskMap = uPatrolTaskDao.selectRobotTaskOnStartV2(robotId);
+        if ("3".equals(sysLevel)) {
+            if (MapUtils.isEmpty(taskMap)) {
+                taskMap = Maps.newHashMap();
+            }
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+            if (Objects.nonNull(tRobotInfo)) {
+                String taskCode = String.valueOf(redisTemplate.opsForValue().get("robotTaskUpInfo:" + tRobotInfo.getRobotNum()));
+                if (StringUtils.isNotBlank(taskCode)) {
+                    String taskId = uPatrolTaskDao.selectCurrentTaskId(taskCode);
+                    if (StringUtils.isNotBlank(taskId)) {
+                        taskMap.put("taskId",taskId);
+                        taskMap.put("taskCode",taskCode);
+                    }
+                }
+            }
+        }
+
+        if (MapUtils.isNotEmpty(taskMap)) {
+            String taskId = taskMap.get("taskId");
+            String taskCode = taskMap.get("taskCode");
             reMap.put("taskId", taskId);
-            Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+taskId+":"+robotId);
+            Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+taskCode+":"+robotId);
             if (robotOrDroneTaskInfo.size() == 0) {
                 reMap.put("taskProgress", 0);
                 reMap.put("taskName", "");
@@ -2663,7 +2684,7 @@ public class UPatrolTaskService {
                     reMap.put("startTime", robotOrDroneTaskInfo.get("startTime"));
                     String state = robotOrDroneTaskInfo.get("taskState");
                     reMap.put("taskState", taskStatusToString(state));
-                    List<RobotTaskMessage> list = selectRobotTaskMessage(taskId, robotId ,robotOrDroneTaskInfo);
+                    List<RobotTaskMessage> list = selectRobotTaskMessage(sysLevel,taskId,taskCode, robotId ,robotOrDroneTaskInfo);
                     reMap.put("list", list);
                 } else {
                     reMap.put("taskProgress", 0);
@@ -2710,9 +2731,35 @@ public class UPatrolTaskService {
         return state;
     }
 
-    public List<RobotTaskMessage> selectRobotTaskMessage(String taskId, Long robotId,Map<String, String> mapForRobotState) throws Exception {
+    public List<RobotTaskMessage> selectRobotTaskMessage(String sysLevel,String taskId,String taskCode, Long robotId,Map<String, String> mapForRobotState) throws Exception {
         List<RobotTaskMessage> re = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        if ("3".equals(sysLevel)) {
+            // String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
+            String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
+            //处理结果 获取机器人的点
+            Set<String> keys = redisScan(cruiseResultKey);
+            if (!keys.isEmpty()) {
+                for (String item : keys) {
+                    //获取任务数据
+                    Map<String, String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries(item);
+                    RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
+                    robotTaskMessage.setDeviceName(mapForRobotTaskMessage.get("deviceName"));
+                    robotTaskMessage.setInstanceName(mapForRobotTaskMessage.get("instanceName"));
+                    if (mapForRobotTaskMessage.get("cruiseTime") != null && !"null".equals(mapForRobotTaskMessage.get("cruiseTime"))) {
+                        robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
+                        robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
+                    } else {
+                        robotTaskMessage.setCruiseTime("");
+                        robotTaskMessage.setResult("");
+                    }
+                    re.add(robotTaskMessage);
+                }
+            }
+            return re;
+        }
+
         //获取此机器人的巡视点
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         String robotState = mapForRobotState.get("taskState");
@@ -2727,7 +2774,7 @@ public class UPatrolTaskService {
             return null;
         }
 
-        List<String> instanceIdList = uPatrolTaskDao.selectRobotTaskInstanceList(taskId);
+        List<String> instanceIdList = uPatrolTaskDao.selectRobotTaskInstanceList(taskCode);
         //List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
         for (String item : instanceIdList) {
             //获取任务数据

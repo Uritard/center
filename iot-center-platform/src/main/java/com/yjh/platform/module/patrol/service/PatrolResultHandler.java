@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -117,6 +118,16 @@ public class PatrolResultHandler {
 
         String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         log.info("robotPatrolTaskResult resultList=={}", resultList);
+
+        //上级系统处理逻辑，因缺少attr表数据，需将任务信息放入redis
+        if ("3".equals(sysLevel)) {
+            for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
+                if (StringUtils.isNotBlank(robotPatrolTaskResult.getPatrolDeviceCode())) {
+                    redisTemplate.opsForValue().set("robotTaskUpInfo:" + robotPatrolTaskResult.getPatrolDeviceCode() ,robotPatrolTaskResult.getTaskCode());
+                }
+            }
+        }
+
 
         // 将重复的deviceId挑出来
         List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
