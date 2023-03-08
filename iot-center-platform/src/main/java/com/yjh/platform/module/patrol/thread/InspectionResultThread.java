@@ -124,8 +124,13 @@ public class InspectionResultThread implements Runnable{
         String taskId = infoMap.get("taskId");
 
         boolean isnormal = true;
-
-        Integer type = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getSendCode());
+        String sendCode = robotPatrolTaskResult.getSendCode();
+        Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
+        String robotCode = sendCode;
+        if (countRegion != 0) {
+            robotCode = uPatrolTaskService.getCruiseDeviceInfo(taskId, Long.valueOf(instanceId));
+        }
+        Integer type = uPatrolTaskService.selectRobotType(robotCode);
         boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
         // 非模拟工具上来的结果
         if (Boolean.FALSE.equals(isSimulationTool)) {
