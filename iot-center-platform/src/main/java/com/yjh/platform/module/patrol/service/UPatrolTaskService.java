@@ -431,6 +431,7 @@ public class UPatrolTaskService {
                     .setCruiseId(item.getCruiseId())
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
+                    .setIsWarn(0)
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
@@ -1676,7 +1677,6 @@ public class UPatrolTaskService {
                 m.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 // 未审核
                 m.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                m.put("isWarn", "0");
                 m.put("picpath", "--");
                 // 巡检数据状态，未执行
                 m.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));

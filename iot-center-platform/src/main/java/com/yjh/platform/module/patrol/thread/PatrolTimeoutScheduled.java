@@ -130,7 +130,6 @@ public class PatrolTimeoutScheduled {
             m.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             // 未审核
             m.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            m.put("isWarn", "0");
             m.put("picpath", "--");
             // 巡检数据状态，执行失败
             m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));

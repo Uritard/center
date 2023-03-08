@@ -92,7 +92,6 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("voicePath", infoMap.getOrDefault("relativePath", ""));
             }
             tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            tCruiseTaskResultMap.putIfAbsent("isWarn", "0");
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
@@ -288,7 +287,6 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
             tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            tCruiseTaskResultMap.put("isWarn", "0");
             if (TypeEnum.VOICE.getCode() != cruiseType) {
                 tCruiseTaskResultMap.put("origpic", resultImagePath);
                 String picPath =
