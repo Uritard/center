@@ -404,7 +404,6 @@ public class PatrolResultHandler {
             }
 
             cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            cruiseResultMap.put("isWarn", Optional.ofNullable(cruiseResultMap.get("isWarn")).orElse("0"));
             cruiseResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             log.info("cruiseResultMap==={}", cruiseResultMap);
             redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
@@ -507,7 +506,6 @@ public class PatrolResultHandler {
                         highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
 
                 // 正常结果
-                cruiseResultMap.put("isWarn", "0");
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 cruiseResultMap.put("cruiseAbnormal", "--");

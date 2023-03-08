@@ -126,7 +126,6 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
         inspectionMap.put("endTime", DateTimeUtil.getDateTimeString());
         // 未审核
         inspectionMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-        inspectionMap.put("isWarn", "0");
         if (isok) {
             // 录音结果处理
             inspectionMap.put("resultNum", "录音成功");

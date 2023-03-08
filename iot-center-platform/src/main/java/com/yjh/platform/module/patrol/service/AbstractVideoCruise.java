@@ -164,7 +164,6 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                     // 未审核
                     inspectionMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                    inspectionMap.put("isWarn", "0");
                     inspectionMap.put("picpath", "--");
                     // 巡检数据状态，执行失败
                     inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
@@ -183,7 +182,6 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     // 未审核
                     inspectionMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                    inspectionMap.put("isWarn", "0");
                     inspectionMap.put("picpath", urlPath);
                     inspectionMap.put("origpic", absPath);
                     // 巡检数据状态，已经执行
