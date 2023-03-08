@@ -15,6 +15,7 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -91,7 +92,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
 
     @Override
     public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
-        if ("已拍照".equals(resultNum)) {
+        if ("已拍照".equals(resultNum) || "".equals(resultNum)) {
             return super.needAnalysis(deviceMeteId, resultNum);
         }
         // dlt 红外 抓图能直接获取到数值，不需要进行算法处理，直接返回 null
