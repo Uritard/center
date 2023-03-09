@@ -100,6 +100,20 @@ public class TCameraPresetService {
         return this.tCameraPresetDao.insert(tCameraPreset);
     }
 
+    /**
+     * -1 表示非微型相机
+     * 0 表示微型相机
+     * 1 表示微型相机且已经设置预置位
+     */
+    public int microCamera(TCameraPreset tCameraPreset) {
+        TCameraInfo cameraInfo = tCameraInfoDao.selectCamera(tCameraPreset.getCameraId());
+        if (cameraInfo != null && StringUtils.contains(cameraInfo.getCameraName(), "微型")) {
+            List<TCameraPreset> presetList = tCameraPresetDao.selectByCameraId(tCameraPreset.getCameraId());
+            return presetList.size();
+        }
+        return -1;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
         List<Long> instanceIdList = tCameraPresetDao.selectInstanceIdList(presetId);
