@@ -27,11 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 /**
  * @author yc
@@ -67,6 +63,11 @@ public class TCameraPresetController {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
                 return result;
             }else {
+                int isMicro = tCameraPresetService.microCamera(tCameraPreset);
+                if (isMicro > 0) {
+                    result.setMessage(ResultCodeEnum.CODE10009.getCode(), "微型相机只可以设置一个预置位");
+                    return result;
+                }
                 //操作数据库
                 resultNum = tCameraPresetService.insert(tCameraPreset);
 
@@ -80,11 +81,12 @@ public class TCameraPresetController {
                     params.put("meteName",tCameraPreset.getPresetName());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-                    if (!StringUtils.isEmpty(response1.getData().toString())) {
+                    String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
+                    if (!StringUtils.isEmpty(resData) || isMicro == 0) {
                         Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                         JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
                         tCameraPreset.setPresetImg((String) json.get("urlPath"));
-                        tCameraPreset.setPresetPtz(response1.getData().toString());
+                        tCameraPreset.setPresetPtz(resData);
                         tCameraPresetService.update(tCameraPreset);//存图
                         result.setData(resultNum);
                     } else {
