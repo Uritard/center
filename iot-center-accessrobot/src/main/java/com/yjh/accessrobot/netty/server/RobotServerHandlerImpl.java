@@ -282,7 +282,7 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             } else {
                 messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
             }
-            if (Optional.of(messageHandlerStrategy).isPresent()) {
+            if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
                 messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
             }
         } catch (Exception e) {

@@ -159,6 +159,7 @@ public class PatrolResultHandler {
                 infoMap.put("taskCode", taskCode);
 
                 TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
+                instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
 

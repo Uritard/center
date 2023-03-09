@@ -1468,10 +1468,11 @@ public class UPatrolTaskService {
             log.info("当前任务已经结束:{}, state: {}", taskId, uPatrolResult.getTaskState());
             return 1;
         }
+        log.info("当前低优先级任务，force： {}, uPatrolResult: {}", force, JSON.toJSONString(uPatrolResult));
         //暂停的任务也考虑进去
         List<String> highTaskList = uPatrolTaskDao.selectPlanRunningOrPauseTask(null, uPatrolResult.getTaskLevel());
         if (!force && CollectionUtils.isNotEmpty(highTaskList)) {
-            log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
+            log.info("存在高优先级任务，当前任务暂停，taskId: {}, taskLevel: {}, List：{}", taskId, uPatrolResult.getTaskLevel(), JSON.toJSONString(highTaskList));
             for (String htId : highTaskList) {
                 String highKey = TASK_LOWER_REDIS_KEY + htId;
                 redisTemplate.opsForSet().add(highKey, taskId);
@@ -2619,6 +2620,7 @@ public class UPatrolTaskService {
     private void lowTaskGoOn(String taskId){
         String lowTaskKey = TASK_LOWER_REDIS_KEY + taskId;
         Set<String> lowTaskList = redisTemplate.opsForSet().members(lowTaskKey);
+        log.info("低优先级任务继续，lowTaskList: {}", JSON.toJSONString(lowTaskList));
         if (lowTaskList != null && lowTaskList.size() > 0) {
             lowTaskList.forEach(lowTask -> {
                 try {
