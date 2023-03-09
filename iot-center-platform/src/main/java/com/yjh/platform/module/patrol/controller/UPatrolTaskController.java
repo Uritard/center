@@ -135,6 +135,31 @@ public class UPatrolTaskController {
         return result;
     }
 
+    @ApiOperation(value = "一键启动所有任务")
+    @RequestMapping(value = "/startAllTask", method = RequestMethod.POST)
+    @Logs(title = "一键启动所有任务", content = "根据用户传递的参数新增数据", logType = 2, authority = "1235")
+    public Result startAllTask(HttpServletRequest request, @RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
+        Result result = new Result();
+        try {
+            String userId = request.getHeader("userId");
+            tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
+            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
+            if (i == 1) {
+                result.setData(uPatrolTaskService.startAllTask(tCruiseTaskAdd.getCreateUserId()));
+            } else {
+                result.setCode(209);
+                result.setMessage("密码错误");
+            }
+        } catch (BusinessException e) {
+            result.setMessage(e.getCode(), e.getMessage());
+            log.error("新增任务错误: {}", e.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除巡检任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)

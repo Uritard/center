@@ -4,10 +4,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Map;
 
-import com.yjh.platform.module.task.entity.InstanceTree;
-import com.yjh.platform.module.task.entity.TCruisePlan;
-import com.yjh.platform.module.task.entity.TCruisePlanCount;
-import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -49,4 +46,6 @@ public interface TCruisePlanDao {
     List<InstanceTree> queryOperationInstances(@Param(value = "deviceId") String deviceId,
                                                @Param(value = "robotId") Long robotId,
                                                @Param(value = "type") Integer type);
+
+    List<TCruiseTaskAdd> selectAllTask(@Param(value = "createUserId") Long createUserId);
 }

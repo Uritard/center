@@ -147,6 +147,19 @@ public class UPatrolTaskService {
 
     private final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+
+    /**
+     * 一键启动所有任务 压测用
+     * @param createUserId
+     * @return
+     */
+    public String startAllTask(Long createUserId) {
+        List<TCruiseTaskAdd> tCruiseTaskAdds = tCruisePlanDao.selectAllTask(createUserId);
+        tCruiseTaskAdds.forEach(tCruiseTaskAdd -> {
+            this.addTask(tCruiseTaskAdd, true);
+        });
+        return "all task started";
+    }
     /**
      * 任务下发，在外层处理设置定时器逻辑，不走事物，否则会导致定时器延时
      * @param tCruiseTaskAdd 任务组装参数
