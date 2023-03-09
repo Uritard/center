@@ -526,6 +526,7 @@ public class TSequentialConfService{
             try {
                 // 开关
                 String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
+                log.info("一键顺控开关isIntelAlgorithmAnalysis ： {}", flag);
                 if (StringUtils.equals("false", flag)) {
                     String value = "";
                     if (!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")) {
@@ -589,10 +590,11 @@ public class TSequentialConfService{
                 }else{
                     // 一键顺控是否使用自定义结果 true-是
                     String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
+                    log.info("一键顺控开关sequentialFlag ： {}", sequentialFlag);
                     if (StringUtils.equals("true", sequentialFlag)){
                         String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
                         recBack.put("value", sequentialResult);
-
+                        log.info("干预一键顺控结果结束，recBack： {}", JSONUtil.toJSONString(recBack));
                         // 关闭人工干预开关，下次继续走算法分析
                         redisTemplate.opsForHash().put("t_sys_param:sequentialFlag", "content", "false");
                     }
