@@ -416,5 +416,19 @@
          GROUP BY a.instance_id
          ORDER BY a.instance_id asc,a.device_id, a.custom_id
     </select>
+    <select id="selectAllTask" resultType="com.yjh.platform.module.task.entity.TCruiseTaskAdd">
+        SELECT
+            CONCAT(plan_name, '任务') AS taskName,
+            plan_id AS planId,
+            type,
+            173 AS ifRun,
+            1 AS tsakLevel,
+            '' AS cycleExecuteTime,
+            #{createUserId, jdbcType=BIGINT} AS createUserId
+        FROM
+            t_cruise_plan
+        WHERE
+            plan_name LIKE '%变电站%'
+    </select>
 
 </mapper>
