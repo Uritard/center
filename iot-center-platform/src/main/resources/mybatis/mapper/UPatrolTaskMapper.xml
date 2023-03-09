@@ -710,6 +710,7 @@
         SELECT
         a.instance_id,
         a.device_mete_id,
+        b.device_point_id,
         b.analyse_type,
         b.is_ai,
         b.is_judge

@@ -308,7 +308,7 @@ public class InspectionResultThread implements Runnable{
                 jsonForRe.put("absPath", resultImagePath);
                 Long preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
                 if (preset == null){
-                    preset = 0L;
+                    preset = details.getDevicePointId();
                 }
                 log.info("presetId====== {}",preset);
                 abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
