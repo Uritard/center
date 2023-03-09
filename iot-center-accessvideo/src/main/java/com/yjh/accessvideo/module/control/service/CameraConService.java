@@ -1901,7 +1901,7 @@ public class CameraConService {
             String path = videoPath + fileName;
             fileName = fileName.replace(videoPath, "");
             int lRealPlayHandle = Constant.recordLongMap.get(fileName);
-            hCNetSDK.NET_DVR_StopSaveRealData(lRealPlayHandle);
+//            hCNetSDK.NET_DVR_StopSaveRealData(lRealPlayHandle);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String ffmUrl = String.format(ffmpegToMp4, path, path.replace(".h264", ".mp4"));
             log.info("h264 to mp4 url is {}", ffmUrl);

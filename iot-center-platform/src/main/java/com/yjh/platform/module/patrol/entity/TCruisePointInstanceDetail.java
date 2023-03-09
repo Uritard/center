@@ -23,6 +23,9 @@ public class TCruisePointInstanceDetail implements Serializable {
     @ApiModelProperty(value = "测点Id")
     private Long deviceMeteId;
 
+    @ApiModelProperty(value = "检测的ID")
+    private Long devicePointId;
+
     @ApiModelProperty(value = "巡视点Id")
     private Long instanceId;
 
