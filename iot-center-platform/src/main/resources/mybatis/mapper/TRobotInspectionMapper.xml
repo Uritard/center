@@ -463,7 +463,7 @@
         FROM
         t_robot_info
         WHERE
-        robot_code = #{robotCode}
+        robot_code = #{robotCode} limit 1
     </select>
 
     <select id="selectRobotCount" resultType="java.lang.Integer">

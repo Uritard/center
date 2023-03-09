@@ -300,17 +300,18 @@ public class FtpsUtil {
                         log.info("begin to store");
 //                        ftpClient.enterLocalPassiveMode();
                         if (ftpClient.storeFile(fianlName, is)) {
-                            log.info(username + "," + remoteFilename);
+                            log.info("{}, {}, {}", username, remoteFilename, is.available());
                         } else {
                             log.info("code :" + ftpClient.getReplyCode());
                             log.info("message :" + ftpClient.getReplyString());
                             log.info("Could not store file");
                         }
+
                         is.close();
 
                         // Logout
                         ftpClient.logout();
-                        log.info("文件上传完成  执行时间:{}ms",System.currentTimeMillis()-start);
+                        log.info("文件上传完成  执行时间:{}ms",System.currentTimeMillis() - start);
 
                     } else {
                         log.info("FTP login failed---登录失败 ");
