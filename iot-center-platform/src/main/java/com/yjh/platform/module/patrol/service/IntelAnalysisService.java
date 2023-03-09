@@ -202,13 +202,16 @@ public class IntelAnalysisService {
      * @return Response
      */
     public List<Response> picAnalyseNoDetection(List<Analysis> analysisList){
+        log.info("开始，巡视主机请求图像分析--功能，入参：analysisList： {}", JSONUtil.toJSONString(analysisList));
         List<Response> responseList = new ArrayList<>();
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         for (PicAnalyseRequest request : list) {
             Response response = null;
             if (checkAnalyseNeedPlanB(request)) {
+                log.info("PlanB开关打开，入参：request： {}", JSONUtil.toJSONString(request));
                 response = processAnalysePlanB(request);
             } else {
+                log.info("PlanB开关关闭，入参：request： {}", JSONUtil.toJSONString(request));
                 response = picAnalyse(request);
             }
 
@@ -249,9 +252,11 @@ public class IntelAnalysisService {
     private Response processAnalysePlanB(PicAnalyseRequest request) {
         try {
             PicAnalyseResponse picAnalyseResponse = getAnalyseResp(request);
+            log.info("手动拼接PicAnalyseResponse ： {}", JSONUtil.toJSONString(picAnalyseResponse));
             picAnalyseRetNotify(picAnalyseResponse);
             return new Response(200);
         } catch (Exception e) {
+            log.info("processAnalysePlanB出现异常：", e);
             return Response.serverError();
         }
     }
@@ -269,7 +274,8 @@ public class IntelAnalysisService {
         AnalyseResult analyseResult = new AnalyseResult();
         AnalyseResultItem item = getAnalyseResult(analyseObject);
         analyseResult.setResults(Arrays.asList(item));
-        analyseResult.setObjectId("111111");
+        analyseResult.setObjectId(analyseObject.getObjectId());
+        redisTemplate.opsForHash().put("silentMonitorImageUrl", analyseResult.getObjectId(), analyseObject.getImageUrlList().get(0));
         return analyseResult;
     }
 
@@ -278,9 +284,10 @@ public class IntelAnalysisService {
         item.setResImageUrl(analyseObject.getImageUrlList().get(0));
         item.setCode("2000");
         item.setConf(0.0f);
-        item.setDesc("未发现异常");
+        item.setDesc("发现异常");
         item.setValue("1");
-        item.setType(analyseObject.getTypeList().get(0));
+        String type = (String) redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.type");
+        item.setType(type);
         return item;
     }
 
@@ -598,14 +605,17 @@ public class IntelAnalysisService {
      */
     @Async
     public void picAnalyseRetNotify(PicAnalyseResponse response){
+        log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
         String flagId = response.getRequestId().split("#")[1];
         // 静默监视结果
         if (Objects.equals("jm", flagId)){
+            log.info("flagId判断为，静默监视结果");
             silentMonitorHandle(response);
             return;
         }
         // 一键顺控
         if (Objects.equals("yjsk", flagId)){
+            log.info("flagId判断为，一键顺控");
             yjskHandle(response);
             return;
         }
@@ -1037,6 +1047,7 @@ public class IntelAnalysisService {
             recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
             recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
             recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
+            log.info("一键顺控recBack:{}", JSONUtil.toJSONString(recBack));
             String services = tSequentialConfService.sequentialRecBack(recBack);
             log.info("一键顺控services：{}" , services);
         }catch (Exception e){
@@ -1052,6 +1063,7 @@ public class IntelAnalysisService {
     private void silentMonitorHandle(PicAnalyseResponse response) {
         // 遍历多个点的分析结果
         for (AnalyseResult  analyseResult : response.getResultsList()){
+            log.info("遍历当前analyseResult：", JSONUtil.toJSONString(analyseResult));
             StringJoiner content = new StringJoiner(" ");
             StringJoiner resultImg = new StringJoiner(" ");
 
@@ -1062,10 +1074,14 @@ public class IntelAnalysisService {
                 continue;
             }
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
+            log.info("analyseDataOperateDao.selectInstanceInfo入参及结果，ObjectId：{}， map: {}", analyseResult.getObjectId(), JSONUtil.toJSONString(map));
+
             Boolean isHave = false;
 
+            log.info("人工干预静默监视识别结果开始，干预前的结果：{}", JSONUtil.toJSONString(analyseResult));
             // 人工干预静默监视识别结果
             processSilentMonitorResult(analyseResult);
+            log.info("人工干预静默监视识别结果结束，干预后的结果：{}", JSONUtil.toJSONString(analyseResult));
 
             for (AnalyseResultItem result : results) {
                 String code = Optional.ofNullable(result.getCode()).orElse("");
@@ -1118,11 +1134,13 @@ public class IntelAnalysisService {
      * @param analyseResult analyseResult
      */
     private void processSilentMonitorResult(AnalyseResult  analyseResult) {
+        log.info("人工干预静默监视识别结果: {}", JSONUtil.toJSONString(analyseResult));
         try {
             List<AnalyseResultItem> analyseResults = analyseResult.getResults();
             String objectId = analyseResult.getObjectId();
 
             if (CollectionUtils.isEmpty(analyseResults)) {
+                log.info("人工干预静默监视, analyseResults为空，返回");
                 return;
             }
 
@@ -1133,20 +1151,24 @@ public class IntelAnalysisService {
             }
 
             if (!silentMonitorNeedManMade) {
+                log.info("人工干预静默监视识，needManMade开关关闭， 返回");
                 return;
             }
 
             String type = (String) redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.type");
             String imageUrl = (String) redisTemplate.opsForHash().get("silentMonitorImageUrl", objectId);
+            log.info("从redis中获取silentMonitorImageUrl， objectId: {}, imageUrl: {}, type: {}", objectId, imageUrl, type);
+
             String analyseImageUrl = createAnalyseImage(imageUrl, objectId, type);
             for (AnalyseResultItem result : analyseResults) {
                 result.setCode("2000");
                 result.setValue("1");
                 result.setType(type);
                 result.setResImageUrl(analyseImageUrl);
-                setAnalyseArea(result.getPos().get(0));
+                setAnalyseArea(result);
             }
 
+            log.info("人工干预静默监视识,拼接analyseResults，拼接后的结果： {}", JSONUtil.toJSONString(analyseResults));
             redisTemplate.opsForValue().set("t_sys_param.silentMonitorAnalyseResult.needManMade", false);
         } catch (Exception e) {
             log.error("人工干预静默算法识别结果失败：", e);
@@ -1156,15 +1178,16 @@ public class IntelAnalysisService {
     /**
      * 设置Area
      *
-     * @param area area
+     * @param result result
      */
-    private void setAnalyseArea(Area area) {
-        if (CollectionUtils.isEmpty(area.getAreas()) || area.getAreas().get(0).getX() <= 0) {
-            List<Point> points = new ArrayList<>();
-            points.add(new Point(100, 100));
-            points.add(new Point(1820, 980));
-            area.setAreas(points);
-        }
+    private void setAnalyseArea(AnalyseResultItem result) {
+        Area area = new Area();
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(100, 100));
+        points.add(new Point(1820, 980));
+        area.setAreas(points);
+
+        result.setPos(Arrays.asList(area));
     }
 
     /**
@@ -1199,13 +1222,17 @@ public class IntelAnalysisService {
      * @param localPath localPath
      */
     private void downloadFile(String ftpsPath, String localPath){
+        log.info("将图片从ftps下载到本地, ftpsPath: {}, localPath: {}", ftpsPath, localPath);
         try {
             if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
+                log.info("ftpsPath或localPath为空，返回");
                 return;
             }
 
+            log.info("开始执行：FtpsUtil.downloadFile");
             FtpsUtil.downloadFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
                 intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            log.info("结束执行：FtpsUtil.downloadFile");
         } catch (Exception e) {
             log.error("将文件从 platform ftp 服务器下载到本地错误:", e);
         }
@@ -1218,13 +1245,17 @@ public class IntelAnalysisService {
      * @param localPath localPath
      */
     private void uploadFile(String ftpsPath, String localPath){
+        log.info("将本地文件上传到ftps, ftpsPath: {}, localPath: {}", ftpsPath, localPath);
         try {
             if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
+                log.info("ftpsPath或localPath为空，返回");
                 return;
             }
 
+            log.info("开始执行：FtpsUtil.putFile");
             FtpsUtil.putFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
                 intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            log.info("结束执行：FtpsUtil.putFile");
         } catch (Exception e) {
             log.error("将文件上传至 platform ftp 服务器错误:", e);
         }
@@ -1237,6 +1268,7 @@ public class IntelAnalysisService {
      * @param waterMarkContent 水印内容
      */
     private void pictureWaterMark(String filePath, String waterMarkContent) {
+        log.info("给图片设置水印和告警框和水印文字：filePath: {}, waterMarkContent: {}", filePath, waterMarkContent);
         try {
             File file = new File(filePath);
             BufferedImage image = ImageIO.read(file);
@@ -1305,6 +1337,9 @@ public class IntelAnalysisService {
      * @return TWarnInfo
      */
     private List<TWarnInfo> silentAlarmStore(String[] resultArr, Map<String, Object> map, List<String> resultImgList) {
+        log.info("静默监视告警结果存储silentAlarmStore,入参： resultArr： {}， map：{}, resultImgList: {}",
+            JSONUtil.toJSONString(resultArr), JSONUtil.toJSONString(map), JSONUtil.toJSONString(resultImgList));
+
         List<TWarnInfo> list = new ArrayList<>();
         try {
             for (int i = 0; i < resultArr.length; i++) {
