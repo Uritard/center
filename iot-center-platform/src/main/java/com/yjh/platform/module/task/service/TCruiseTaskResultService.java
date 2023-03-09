@@ -281,61 +281,64 @@ public class TCruiseTaskResultService {
         } else {
             videoInfo.put("videoCameraType", "1");
         }
-        if (resultMap.containsKey("robotId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("robotId")))) {
-            //判断当前机器人巡视点的采集设备为 红外或可见光
-            String runningCameraFlag = inspectResult.getSaveTypeList();
-            if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
-                videoInfo.put("videoCameraType", "2");
-            }
-            HashMap<String, Long> robot = new HashMap<>();
-            robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
+        if (!Constant.fastTurbo()) {
+            if (resultMap.containsKey("robotId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("robotId")))) {
+                //判断当前机器人巡视点的采集设备为 红外或可见光
+                String runningCameraFlag = inspectResult.getSaveTypeList();
+                if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
+                    videoInfo.put("videoCameraType", "2");
+                }
+                HashMap<String, Long> robot = new HashMap<>();
+                robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
 
-            switch (videoInfo.get("videoCameraType")) {
-                case "1":
-                    Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                    List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                    if (robotVideoInfo.size() > 0) {
-                        videoInfo.putAll(robotVideoInfo.get(0));
-                    } else {
-                        videoInfo.put("flvUrl", null);
-                        videoInfo.put("rtmpUrl", null);
-                        videoInfo.put("webRtcUrl", null);
-                    }
-                    videoInfo.put("cameraId", robot.get("robotId").toString());
-                    inspectResult.setVideoInfo(videoInfo);
-                    break;
-                case "2":
-                    Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                    List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>) result2.getData();
-                    if (robotInfraredVideoInfo.size() > 1) {
-                        videoInfo.putAll(robotInfraredVideoInfo.get(1));
-                    } else {
-                        videoInfo.put("flvUrl", null);
-                        videoInfo.put("rtmpUrl", null);
-                        videoInfo.put("webRtcUrl", null);
-                    }
-                    videoInfo.put("cameraId", robot.get("robotId").toString());
-                    inspectResult.setVideoInfo(videoInfo);
-                    break;
-                default:
-                    break;
+                switch (videoInfo.get("videoCameraType")) {
+                    case "1":
+                        Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                        List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>)result.getData();
+                        if (robotVideoInfo.size() > 0) {
+                            videoInfo.putAll(robotVideoInfo.get(0));
+                        } else {
+                            videoInfo.put("flvUrl", null);
+                            videoInfo.put("rtmpUrl", null);
+                            videoInfo.put("webRtcUrl", null);
+                        }
+                        videoInfo.put("cameraId", robot.get("robotId").toString());
+                        inspectResult.setVideoInfo(videoInfo);
+                        break;
+                    case "2":
+                        Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                        List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>)result2.getData();
+                        if (robotInfraredVideoInfo.size() > 1) {
+                            videoInfo.putAll(robotInfraredVideoInfo.get(1));
+                        } else {
+                            videoInfo.put("flvUrl", null);
+                            videoInfo.put("rtmpUrl", null);
+                            videoInfo.put("webRtcUrl", null);
+                        }
+                        videoInfo.put("cameraId", robot.get("robotId").toString());
+                        inspectResult.setVideoInfo(videoInfo);
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
-        //todo 摄像机的没写
-        //拉机器人的红外和可见光的视频流
-        if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId"))) && !"null".equals(resultMap.get("cameraId"))) {
-            HashMap<String, Long> cameraId = new HashMap<>();
-            cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId")));
-            Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
-            Map<String, String> cameraVideoInfo = (Map<String, String>) result.getData();
-            if (Objects.nonNull(cameraVideoInfo)) {
-                videoInfo.putAll(cameraVideoInfo);
-            } else {
-                videoInfo.put("flvUrl", null);
-                videoInfo.put("rtmpUrl", null);
-                videoInfo.put("webRtcUrl", null);
+            //todo 摄像机的没写
+            //拉机器人的红外和可见光的视频流
+            if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId"))) && !"null".equals(
+                resultMap.get("cameraId"))) {
+                HashMap<String, Long> cameraId = new HashMap<>();
+                cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId")));
+                Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
+                Map<String, String> cameraVideoInfo = (Map<String, String>)result.getData();
+                if (Objects.nonNull(cameraVideoInfo)) {
+                    videoInfo.putAll(cameraVideoInfo);
+                } else {
+                    videoInfo.put("flvUrl", null);
+                    videoInfo.put("rtmpUrl", null);
+                    videoInfo.put("webRtcUrl", null);
+                }
+                inspectResult.setVideoInfo(videoInfo);
             }
-            inspectResult.setVideoInfo(videoInfo);
         }
     }
 
