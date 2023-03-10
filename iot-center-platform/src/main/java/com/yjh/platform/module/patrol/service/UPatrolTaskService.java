@@ -2018,10 +2018,10 @@ public class UPatrolTaskService {
             uPatrolResultDao.update(uPatrolResult);
             log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
 
-            if (!Constant.fastTurbo()) {
-                // 如果 ended=true,表示巡视结果已经入库过一次，不再重复入库，但需要修改
-                if (CollectionUtils.isNotEmpty(uPatrolDataResultList)) {
-                    batchInsertUPatrolDataResult(uPatrolDataResultList);
+            // 如果 ended=true,表示巡视结果已经入库过一次，不再重复入库，但需要修改
+            if (CollectionUtils.isNotEmpty(uPatrolDataResultList)) {
+                batchInsertUPatrolDataResult(uPatrolDataResultList);
+                if (!Constant.fastTurbo()) {
                     log.info("准备传其他服务的taskId==={}", taskId);
                     uPatrolDataResultService.updateCruiseAnalyze(taskId);
 
@@ -2029,7 +2029,8 @@ public class UPatrolTaskService {
                         updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
                     }
                 }
-
+            }
+            if (!Constant.fastTurbo()) {
                 //低优先任务继续
                 lowTaskGoOn(taskId);
             }
