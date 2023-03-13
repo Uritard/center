@@ -51,6 +51,8 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
 
     private final SimpleMessageSender wsMessageSender;
 
+    private final int threadCount;
+
     public static final byte[] lock = new byte[0];
     public static volatile ExecutorService executorService = null;
     long sessionId = 0L;
@@ -63,6 +65,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
         this.sendCode = sendCode;
         this.receiveCode = receiveCode;
         this.index = index;
+        this.threadCount = threadCount;
         if (executorService == null) {
             synchronized (lock) {
                 if (executorService == null) {
@@ -203,20 +206,20 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
                 executorService.execute(() -> {
                     uplaodAndResponse(remoteFile, taskCode, finalData, deviceId, taskResponseMsgClone, outboundMessage);
                 });
-
+                if (DemoClientTaskContoller.sleepTime > 0 && i > threadCount) {
+                    try {
+                        Thread.sleep(DemoClientTaskContoller.sleepTime);
+                    } catch (InterruptedException e) {
+                        log.error("sleep error", e);
+                    }
+                }
             }
         }
     }
 
     private void uplaodAndResponse(String remoteFile, String taskCode, byte[] finalData, String deviceId, Message taskResponseMsgClone,
         OutboundMessage outboundMessage) {
-        if (DemoClientTaskContoller.sleepTime > 0) {
-            try {
-                Thread.sleep(DemoClientTaskContoller.sleepTime);
-            } catch (InterruptedException e) {
-                log.error("sleep error", e);
-            }
-        }
+
         FtpsUtil.putFile(finalData, remoteFile, DemoClientTaskContoller.ip, DemoClientTaskContoller.ftpPort, DemoClientTaskContoller.keyPw,
             DemoClientTaskContoller.username, DemoClientTaskContoller.password);
         sender.send(outboundMessage);
