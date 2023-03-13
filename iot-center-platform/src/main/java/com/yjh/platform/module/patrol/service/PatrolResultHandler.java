@@ -231,21 +231,21 @@ public class PatrolResultHandler {
                     List<RobotPatrolTaskResult> robotPatrolTaskResults = multipleValuesResultMap.get(key);
                     StringJoiner resultNum = new StringJoiner(",");
                     for (RobotPatrolTaskResult robotPatrolTaskResult : robotPatrolTaskResults){
-                        String valueUnit = robotPatrolTaskResult.getValueUnit();
+                        String value = robotPatrolTaskResult.getValue();
                         switch (robotPatrolTaskResult.getValueType()) {
                             case "11":
-                                valueUnit = "局放频次:" + valueUnit;
+                                value = "局放频次:" + value;
                                 break;
                             case "12":
-                                valueUnit = "放电峰值:" + valueUnit;
+                                value = "放电峰值:" + value;
                                 break;
                             case "13":
-                                valueUnit = "信号均值:" + valueUnit;
+                                value = "信号均值:" + value;
                                 break;
                             default:
                                 break;
                         }
-                        resultNum.add(valueUnit);
+                        resultNum.add(value);
                     }
                     robotPatrolTaskResults.get(0).setValue(resultNum.toString());
                     robotPatrolTaskResult(Collections.singletonList(robotPatrolTaskResults.get(0)));

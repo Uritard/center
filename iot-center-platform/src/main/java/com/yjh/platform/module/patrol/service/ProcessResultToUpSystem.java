@@ -87,11 +87,38 @@ public class ProcessResultToUpSystem {
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
+        List<Map<String, String>> cruiseResultNewList = new ArrayList<>();
         try {
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
             for(Map<String, String> cruiseResultMap : cruiseResultList) {
                 log.info("cruiseResultMap=={}", cruiseResultMap);
+                String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+                // 局放一个点多个结果单独处理
+                if (resultNum.contains("局放频次")){
+                    String[] split = resultNum.split(",");
+                    for (int i = 0; i < split.length; i++) {
+                        Map<String, String> cruiseResultNewMap = new HashMap<>(cruiseResultMap);
+                        String value = "";
+                        String valueType = "";
+                        String valueItem = split[i];
+                        if (valueItem.contains("频次")){
+                            value = split[i].substring(5);
+                            valueType = "11";
+                        }else if (valueItem.contains("峰值")) {
+                            value = split[i].substring(5);
+                            valueType = "12";
+                        }else {
+                            value = split[i].substring(5);
+                            valueType = "13";
+                        }
+                        cruiseResultNewMap.put("resultNum", value);
+                        cruiseResultNewMap.put("valueType", valueType);
+                        cruiseResultNewList.add(cruiseResultNewMap);
+                    }
+                    continue;
+                }
+
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
@@ -136,6 +163,10 @@ public class ProcessResultToUpSystem {
                 analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
 
                 xmlItems.add(xmlItem);
+            }
+
+            if (CollectionUtils.isNotEmpty(cruiseResultNewList)){
+                alarmAndResultToUpSystem(cruiseResultNewList, alarmLevel, tWarnInfo);
             }
             xmlBaseModel.setItems(xmlItems);
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
@@ -278,6 +309,7 @@ public class ProcessResultToUpSystem {
         try {
             String materialId = analyseDataOperateService.selectMaterialId(NumberUtils.toLong(cruiseResultMap.get("deviceId")));
             String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+            String valueType = Optional.ofNullable(cruiseResultMap.get("valueType")).orElse("0");
 
             String cruiseType = Optional.ofNullable(cruiseResultMap.get("cruiseType")).orElse("");
             CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
@@ -307,7 +339,7 @@ public class ProcessResultToUpSystem {
             xmlItem.put("value", resultNum);
             xmlItem.put("unit", "");
             xmlItem.put("value_unit", resultNum);
-            xmlItem.put("value_type", "0");
+            xmlItem.put("value_type", valueType);
             xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
