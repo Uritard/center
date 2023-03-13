@@ -25,5 +25,12 @@ platform:
   send-code: Edge01
   receive-code: Region01
 
+tcp:
+  port: 10013
+
 send:
   batch: false
+
+task:
+  thread:
+    count: 10

@@ -675,8 +675,7 @@
         SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
         FROM t_std_devicemete c
         LEFT JOIN t_std_device e ON c.device_id = e.device_id
-        LEFT JOIN t_std_region d ON e.up_region_id = d.region_id
-        LEFT JOIN u_patrol_task_attr f ON f.device_id = c.device_id
+        LEFT JOIN u_patrol_task_attr f ON f.device_mete_id = c.device_mete_id
         WHERE 1 = 1
         <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>)
     </select>
