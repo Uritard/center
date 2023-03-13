@@ -17,6 +17,7 @@ import com.yjh.protocol_a.impl.MessageCodec;
 import com.yjh.protocol_a.impl.PacketCodecFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -47,9 +48,10 @@ public class DemoClientTaskContoller {
 
     public static  String remoteRootPath;
 
-    public static  String keyPw;
+    public static  String keyPw = "1";
 
     public static long sleepTime;
+
     private List<BaseSocketClient> baseSocketClientList = new ArrayList<>();
 
 
@@ -59,6 +61,9 @@ public class DemoClientTaskContoller {
     private static Map<String, MessageSender> messageSenderMap = new HashMap<>();
     private List<DemoBatchTaskHandler> demoBatchTaskHandlerList = new ArrayList<>();
     private String receiveCode;
+
+    @Value("${task.thread.count:8}")
+    private int threadCount;
 
     @Autowired
     private ExecutorService clientBatchOutboundExecutor;
@@ -112,7 +117,7 @@ public class DemoClientTaskContoller {
             MessageSender messageSender = new MessageSender(new MessageIdGenerator(), identityProvider, rxBus, msg1 -> true);
             messageSenderList.add(messageSender);
             messageSenderMap.put(sendCode, messageSender);
-            DemoBatchTaskHandler demoBatchTaskHandler = new DemoBatchTaskHandler(clientBatchOutboundExecutor, rxBus, messageSender, wsMessageSender, sendCode, receiveCode, i);
+            DemoBatchTaskHandler demoBatchTaskHandler = new DemoBatchTaskHandler(clientBatchOutboundExecutor, rxBus, messageSender, wsMessageSender, sendCode, receiveCode, i, threadCount);
             demoBatchTaskHandlerList.add(demoBatchTaskHandler);
         }
         return new ResultBean(200, "创建客户端成功");

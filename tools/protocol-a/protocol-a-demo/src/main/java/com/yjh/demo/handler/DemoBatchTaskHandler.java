@@ -51,17 +51,26 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
 
     private final SimpleMessageSender wsMessageSender;
 
-    public static ExecutorService executorService = Executors.newFixedThreadPool(8);
+    public static final byte[] lock = new byte[0];
+    public static volatile ExecutorService executorService = null;
     long sessionId = 0L;
 
     public DemoBatchTaskHandler(Executor messageProcessingExecutor, RxBus bus, MessageSender sender, SimpleMessageSender wsMessageSender,
-        String sendCode, String receiveCode, int index) {
+        String sendCode, String receiveCode, int index, int threadCount) {
         super(messageProcessingExecutor, bus);
         this.sender = sender;
         this.wsMessageSender = wsMessageSender;
         this.sendCode = sendCode;
         this.receiveCode = receiveCode;
         this.index = index;
+        if (executorService == null) {
+            synchronized (lock) {
+                if (executorService == null) {
+                    executorService = Executors.newFixedThreadPool(threadCount);
+                    log.info("Executors pool: {}", executorService);
+                }
+            }
+        }
         subscribeInbound(ExtPeerState.class, InboundMessage.class);
 
     }
