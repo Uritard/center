@@ -198,7 +198,7 @@ public abstract class AbstractVideoCruise {
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
-                        isEnded = algorithmAnalysis(inspectionMap, presetId, taskId, jsonForRe, algorithm);
+                        isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, jsonForRe, algorithm);
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
                         resultRecognition(inspectionMap);
@@ -238,7 +238,7 @@ public abstract class AbstractVideoCruise {
     /**
      * 算法分析
      */
-    public boolean algorithmAnalysis(Map<String, String> inspectionMap, long presetId, String taskId, JSONObject jsonForRe,
+    public boolean algorithmAnalysis(Map<String, String> inspectionMap, String presetId, String taskId, JSONObject jsonForRe,
         TAlgorithmMeteInfo algorithm) {
 
         try {
