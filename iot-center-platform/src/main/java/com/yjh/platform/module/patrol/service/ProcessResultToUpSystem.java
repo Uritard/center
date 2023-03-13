@@ -422,6 +422,11 @@ public class ProcessResultToUpSystem {
      * @param msgId
      */
     public void defectToAlgorithmM(String taskId, String instanceId, String msgId) {
+        if (Constant.fastTurbo()) {
+            // 压测模式，结果不上报上级系统
+            return;
+        }
+
         // msg：判别告警 defect：缺陷告警
         Set<String> differentList= redisScan( "msg:" + msgId);
         Set<String> defectList = redisScan("defect:" + msgId);
