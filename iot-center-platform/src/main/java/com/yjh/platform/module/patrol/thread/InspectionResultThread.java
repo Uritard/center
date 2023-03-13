@@ -306,7 +306,7 @@ public class InspectionResultThread implements Runnable{
             if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
-                Long preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
+                String preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
                 if (preset == null){
                     preset = details.getDevicePointId();
                 }
