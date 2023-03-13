@@ -8,6 +8,7 @@ import com.yjh.platform.module.device.entity.*;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -16,6 +17,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -469,20 +471,53 @@ public class TStdDeviceService{
             default:
                 throw new BusinessException("设备树展示层级输入有误！");
         }
+        return assembleTrees(listTree);
+//        List<AreaInfo> areaInfoCountryList = new ArrayList<>();
+//        for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
+//            AreaInfo areaInfoMap = it.next();
+//            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+//                AreaInfo areaInfoCountry = new AreaInfo();
+//                areaInfoCountry.setId(areaInfoMap.getId());
+//                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+//                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+//                areaInfoCountryList.add(areaInfoCountry);
+//            }
+//        }
+//        diGui(areaInfoCountryList, listTree);
+//        return areaInfoCountryList;
+    }
 
-        List<AreaInfo> areaInfoCountryList = new ArrayList<>();
-        for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
-            AreaInfo areaInfoMap = it.next();
-            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
-                AreaInfo areaInfoCountry = new AreaInfo();
-                areaInfoCountry.setId(areaInfoMap.getId());
-                areaInfoCountry.setLabel(areaInfoMap.getLabel());
-                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
-                areaInfoCountryList.add(areaInfoCountry);
-            }
+    public List<AreaInfo> assembleTrees(Collection<AreaInfo> trees) {
+        if (CollectionUtils.isEmpty(trees)) {
+            return Collections.emptyList();
         }
-        diGui(areaInfoCountryList, listTree);
-        return areaInfoCountryList;
+
+        // 构建树主键/实例映射表，并初始化树的子节点集合
+        Map<?, AreaInfo> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
+                .collect(Collectors.toMap(AreaInfo::getId, t -> t, (o, n) -> n));
+
+        // 查找并关联树节点，返回所有没有父节点的树
+        return trees.stream().filter(tree -> {
+            AreaInfo parent = ifNull(tree.getUpId(), mapping::get);
+            if (parent != null) {
+                parent.getChildren().add(tree);
+            }
+            return Objects.isNull(parent);
+        }).collect(Collectors.toList());
+    }
+
+
+    /**
+     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
+     *
+     * @param object   目标对象
+     * @param function 目标对象方法
+     * @param <T>      目标对象类型泛型
+     * @param <R>      返回对象类型泛型
+     * @return 返回对象
+     */
+    public static <T, R> R ifNull(T object, Function<T, R> function) {
+        return object == null || function == null ? null : function.apply(object);
     }
 
 
