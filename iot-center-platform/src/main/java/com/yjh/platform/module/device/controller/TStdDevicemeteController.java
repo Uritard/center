@@ -195,7 +195,7 @@ public class TStdDevicemeteController {
 //                upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
 //            }
 //            Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
-            List<Long> listForPage=tStdDevicemeteService.selectForPage(tStdDeviceMeteDetail);
+//            List<Long> listForPage=tStdDevicemeteService.selectForPage(tStdDeviceMeteDetail);
 //            List<TStdDeviceMeteDetail> list = new ArrayList<>();
 //            if(listForPage != null &&listForPage.size()>0){
 //                list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
@@ -203,7 +203,7 @@ public class TStdDevicemeteController {
 //            resultMap.put("count", page.getTotal());
 //            resultMap.put("list", list);
 //            result.setData(resultMap);
-            result = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
+            result = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,new ArrayList<>());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("标准设备测点分页查询失败描述：", e);
