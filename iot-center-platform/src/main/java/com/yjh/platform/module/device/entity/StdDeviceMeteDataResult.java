@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class StdDeviceMeteDataResult {
 
     @ApiModelProperty(value = "结果集")
     private List<TStdDeviceMeteDetail> list;
+
+    public StdDeviceMeteDataResult() {
+    }
 
     public StdDeviceMeteDataResult(List<TStdDeviceMeteDetail> list, Integer pageNum, Integer pageSize){
 
