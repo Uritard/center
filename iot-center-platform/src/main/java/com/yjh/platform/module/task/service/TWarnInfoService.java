@@ -110,7 +110,6 @@ public class TWarnInfoService{
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
         List<TWarnInfoDetail> list = tWarnInfoDao.WarnConfirm(map);
-        String stationName = (String)redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
         for (TWarnInfoDetail tWarnInfoDetail : list) {
             String thresholdValue = "";
             if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
@@ -126,7 +125,6 @@ public class TWarnInfoService{
                 thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
             }
             tWarnInfoDetail.setThresholdValue(thresholdValue);
-            tWarnInfoDetail.setStationName(stationName);
         }
         return list;
     }
@@ -419,7 +417,6 @@ public class TWarnInfoService{
     public TWarnInfoDetail selectWarnPopUp(String warnId,Integer defectModel){
         TWarnInfoDetail tWarnInfoDetail;
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
-        String stationName = (String)redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
         // 告警信息
         if (defectModel.equals(warnFlag)){
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
@@ -455,6 +452,8 @@ public class TWarnInfoService{
             tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(Long.valueOf(warnId));
             tWarnInfoDetail.setDeviceType(1);
         }
+
+        String stationName = tWarnInfoDao.selectStationNameByDeviceId(tWarnInfoDetail.getDeviceId());
         tWarnInfoDetail.setStationName(stationName);
         return tWarnInfoDetail;
     }

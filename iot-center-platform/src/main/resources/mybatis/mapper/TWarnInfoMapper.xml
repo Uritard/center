@@ -551,7 +551,7 @@
         END
         ) AS video_camera_type,
         k.custom_name,
-        region.region_name as edge_name
+        region.region_name as stationName
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
@@ -608,7 +608,7 @@
         j.camera_id,
         '' AS video_camera_type,
         k.custom_name,
-        region.region_name as edge_name
+        region.region_name as stationName
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
@@ -1011,5 +1011,15 @@
 
     <select id="countByInstanceIdAndTaskId" resultType="java.lang.Integer">
         select count(*) from t_warn_info where task_id = #{taskId} and instance_id = #{instanceId}
+    </select>
+
+    <select id="selectStationNameByDeviceId" resultType="java.lang.String">
+        SELECT a.region_name
+        FROM t_std_region a
+        where a.region_code in (
+            SELECT b.edge_code
+            FROM t_std_device b
+            WHERE b.device_id = #{deviceId,jdbcType=BIGINT}
+        ) and a.state = 1
     </select>
 </mapper>

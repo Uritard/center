@@ -88,4 +88,7 @@ public interface TWarnInfoDao {
                              @Param(value = "endTime")String endTime);
 
     Integer countByInstanceIdAndTaskId(@Param("instanceId")Long instanceId, @Param("taskId")String taskId);
+
+    String selectStationNameByDeviceId(@Param(value = "deviceId")Long deviceId);
+
 }
