@@ -96,7 +96,11 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCruiseResultExpand> list = uPatrolResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
+            List<String> taskIdList = uPatrolResultService.selectTaskByPageByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
+            if (taskIdList.isEmpty()){
+                taskIdList.add("-1");
+            }
+            List<TCruiseResultExpand> list = uPatrolResultService.selectTaskByPage(taskIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
