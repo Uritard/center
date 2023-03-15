@@ -568,8 +568,8 @@ public class IntelAnalysisService {
      */
     public Response algorithmUpdate(UpdateRequest request){
         Map<String, Object> param = new HashMap<>(16);
-        param.put("requestHostIp", request.getRequestHostIp());
-        param.put("requestHostPort", request.getRequestHostPort());
+        param.put("requestHostIp", algorithmConfig.getResultIp());
+        param.put("requestHostPort", algorithmConfig.getResultPort());
         param.put("requestId", request.getRequestId());
 
         String[] split = request.getAlgorithmPath().split("/");
