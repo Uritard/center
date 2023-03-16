@@ -118,7 +118,6 @@ public class ProcessResultToUpSystem {
                     }
                     continue;
                 }
-
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
