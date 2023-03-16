@@ -64,9 +64,12 @@ public class UPatrolResultService {
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
 
-    public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
+    public List<TCruiseResultExpand> selectTaskByPage(List<String> list) {
+        return uPatrolResultDao.selectTaskByPage(list);
+    }
+    public List<String> selectTaskByPageByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
-        return uPatrolResultDao.selectTaskByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
+        return uPatrolResultDao.selectTaskByPageByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
                 isCheck);
     }
 
