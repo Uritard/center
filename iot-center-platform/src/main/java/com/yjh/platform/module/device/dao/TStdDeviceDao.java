@@ -20,6 +20,7 @@ public interface TStdDeviceDao {
     int deleteByPrimaryId(@Param(value = "deviceId") Long deviceId);
     int deleteByUnionKeys(@Param(value = "deviceId")Long deviceId);
     int update(TStdDevice tStdDevice);
+    int updateByTask(@Param(value = "taskId")String taskId);
     List<TStdDevice> selectByPrimaryId(@Param(value = "deviceId") Long deviceId);
     List<TStdDevice> selectListByPrimaryId(@Param(value = "deviceId") Long deviceId);
     List<TStdDevice> select(@Param(value = "deviceId") Long deviceId,
