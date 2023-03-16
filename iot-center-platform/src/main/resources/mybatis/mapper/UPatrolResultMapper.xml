@@ -351,7 +351,7 @@
           AND a.task_id = #{taskId}
     </select>
 
-    <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
+    <select id="selectTaskByPage"
             resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct
         a.task_id,
@@ -373,6 +373,19 @@
         FROM u_patrol_result a
         LEFT JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
         LEFT JOIN t_dict_business e ON a.task_state = e.dict_code and e.col_name='task_state'
+        where 1 = 1
+        <if test="list != null and list.size() > 0">and a.task_id IN
+            <foreach collection="list" item="taskId" separator="," open="(" close=")" index="index">
+                #{taskId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectTaskByPageByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
+            resultType="java.lang.String">
+        select distinct
+        a.task_id
+        FROM u_patrol_result a
         LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
         <if test="deviceType != -1">
             LEFT JOIN t_std_device j on f.device_id = j.device_id
