@@ -841,12 +841,12 @@ public class TCameraPresetService {
         try {
             String localPath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
             String ftpsLocalPath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
-            String romotePath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), "");
+            String romotePath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), "");
 
             FtpsUtil.putFile(ftpsLocalPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
                 intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
 
-            log.info("ftpsUtil.downloadFile(, localPath: {}, romotePath: {}, ftpsLocalPath: {}", localPath, romotePath, ftpsLocalPath);
+            log.info("ftpsUtil.downloadFile(, localPath: {}, romotePath: {}", localPath, romotePath);
             // localPath: 本地需要覆盖到的地址， romotePath:ftps间接地址
             FtpsUtil.downloadFile(localPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
                 intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());

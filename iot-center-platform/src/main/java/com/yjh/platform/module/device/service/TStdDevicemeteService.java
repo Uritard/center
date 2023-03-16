@@ -1,8 +1,5 @@
 package com.yjh.platform.module.device.service;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.enums.AlarmLevelEnum;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -14,7 +11,6 @@ import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
-import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +22,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
 * @author tt
@@ -229,87 +223,63 @@ public class TStdDevicemeteService{
         Integer pageNum = tStdDeviceMeteDetail.getPageNum();
         Integer pageSize = tStdDeviceMeteDetail.getPageSize();
 
-        //        if(listForPage.isEmpty()){
-        //            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
-        //            result.setData(dataResult);
-        //            return result;
-        //        }
+        if(listForPage.isEmpty()){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }
 
-        //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
-        //            if (ids.size() != 0) {
-        //                tStdDeviceMeteDetail.setIds(ids);
-        //            } else {
-        //                ids.add(tStdDeviceMeteDetail.getUpRegionId());
-        //                tStdDeviceMeteDetail.setIds(ids);
-        //            }
-        //        }else {
-        //            //ids.clear();
-        //            ids = new LinkedList<>();
-        //            ids.add(tStdDeviceMeteDetail.getDeviceId());
-        //            tStdDeviceMeteDetail.setIds(ids);
-        //            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
-        //        }
+//        if(tStdDeviceMeteDetail.getDeviceId() == null) {
+//            if (ids.size() != 0) {
+//                tStdDeviceMeteDetail.setIds(ids);
+//            } else {
+//                ids.add(tStdDeviceMeteDetail.getUpRegionId());
+//                tStdDeviceMeteDetail.setIds(ids);
+//            }
+//        }else {
+//            //ids.clear();
+//            ids = new LinkedList<>();
+//            ids.add(tStdDeviceMeteDetail.getDeviceId());
+//            tStdDeviceMeteDetail.setIds(ids);
+//            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
+//        }
         Integer isRedundant = tStdDeviceMeteDetail.getIsRedundant();
+        list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+                tStdDeviceMeteDetail.getRedundantType(), isRedundant, listForPage);
 
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        list = tStdDevicemeteDao
-            .selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(), tStdDeviceMeteDetail.getRedundantType(),
-                isRedundant, listForPage);
+        // 查询当前配置了巡检方式的测点
+        List<Map<String, Object>> mapList = tStdDevicemeteDao.selectAllDeviceMeteIdAndCruiseType();
+        MultiValueMap<Long, String> multiValueMap = new LinkedMultiValueMap<>();
+        for (Map<String, Object> map : mapList){
+            multiValueMap.add(Long.valueOf(String.valueOf(map.get("device_mete_id"))), String.valueOf(map.get("cruise_type")));
+        }
 
-        fillDeviceMeteInfo(list);
+        /*
+        * 冗余配置:摄像机(可见光、红外)、机器人、无人机、声纹两两及以上组合方式均为冗余配置
+        * 同种巡视设备两两及以上组合不为冗余
+        * isRedundant 1-否 0-是
+        * */
+        for (TStdDeviceMeteDetail detail : list){
+            Long deviceMeteId = detail.getDeviceMeteId();
+            if (multiValueMap.containsKey(deviceMeteId)){
+                List<String> cruiseTypeList = multiValueMap.get(deviceMeteId);
+                HashSet<String> hashSet = new HashSet<>(cruiseTypeList);
+                cruiseTypeList.clear();
+                cruiseTypeList.addAll(hashSet);
 
-        StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult();
-        dataResult.setCount(Long.valueOf(page.getTotal()).intValue());
-        dataResult.setCountPage(page.getPages());
-        dataResult.setPageNum(page.getPageNum());
-        dataResult.setPageSize(page.getPageSize());
-        dataResult.setList(list);
-        result.setData(dataResult);
-        return result;
-    }
+                // 可见光 + 红外
+                if (cruiseTypeList.contains("229") && cruiseTypeList.contains("230") && cruiseTypeList.size() ==2){
+                    detail.setIsRedundant(1);
+                    continue;
+                }
 
-    private void fillDeviceMeteInfo(List<TStdDeviceMeteDetail> list) {
-        //填充字典值
-        List<String> colNames = new ArrayList<>();
-        colNames.add("alarm_level");
-        colNames.add("alarm_type");
-        colNames.add("mete_type");
-        colNames.add("mete_kind");
-        colNames.add("custom_type");
-        colNames.add("analyse_type");
-        List<TDictBusiness> tDictBusinesses = tDictBusinessDao.selectQuery(colNames);
-
-        Map<String, String> alarmLevelList = tDictBusinesses.stream().filter(t -> "alarm_level".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> alarmTypeList = tDictBusinesses.stream().filter(t -> "alarm_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> meteTypeList = tDictBusinesses.stream().filter(t -> "mete_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> meteKindList = tDictBusinesses.stream().filter(t -> "mete_kind".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> customTypeList = tDictBusinesses.stream().filter(t -> "custom_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> analyseTypeList = tDictBusinesses.stream().filter(t -> "analyse_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-
-        for (TStdDeviceMeteDetail detail : list) {
-            if (Objects.nonNull(detail.getAlarmLevel())) {
-                detail.setAlarmLevelName(alarmLevelList.get(String.valueOf(detail.getAlarmLevel())));
-            }
-            if (Objects.nonNull(detail.getCustomId())) {
-                detail.setCustomTypeName(customTypeList.get(String.valueOf(detail.getCustomId())));
-            }
-            if (Objects.nonNull(detail.getAlarmType())) {
-                detail.setAlarmTypeName(alarmTypeList.get(String.valueOf(detail.getAlarmType())));
-            }
-            if (Objects.nonNull(detail.getAnalyseType())) {
-                detail.setAnalyseTypeName(analyseTypeList.get(String.valueOf(detail.getAnalyseType())));
-            }
-            if (Objects.nonNull(detail.getMeteKind())) {
-                detail.setMeteKindName(alarmLevelList.get(String.valueOf(detail.getMeteKind())));
-            }
-            if (Objects.nonNull(detail.getMeteType())) {
-                detail.setMeteTypeName(alarmLevelList.get(String.valueOf(detail.getMeteType())));
+                if (cruiseTypeList.size() >= 2){
+                    detail.setIsRedundant(0);
+                }else {
+                    detail.setIsRedundant(1);
+                }
+            }else {
+                detail.setIsRedundant(1);
             }
 
             if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
@@ -318,60 +288,31 @@ public class TStdDevicemeteService{
             }
         }
 
-        //填充告警规则信息
-        list.forEach(tStdDeviceMeteDetail -> {
-            StringBuilder rules = new StringBuilder("--");
-            if (Objects.nonNull(tStdDeviceMeteDetail.getMeteKind()) && tStdDeviceMeteDetail.getMeteKind() == 1) {
-                rules = new StringBuilder(
-                    (StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelName()) ? tStdDeviceMeteDetail.getAlarmLevelName() : ""));
-                if (StringUtils.isNotBlank(rules.toString())) {
-                    rules.append('：').append(tStdDeviceMeteDetail.getAlarmState() == 0 ?
-                        (StringUtils.isNotBlank(tStdDeviceMeteDetail.getStateZero()) ? tStdDeviceMeteDetail.getStateZero() : "") :
-                        (StringUtils.isNotBlank(tStdDeviceMeteDetail.getStateZero()) ? tStdDeviceMeteDetail.getStateZero() : ""));
-                }
-                else {
-                    rules.append("--");
-                }
-            } else if (Objects.nonNull(tStdDeviceMeteDetail.getMeteKind()) && tStdDeviceMeteDetail.getMeteKind() == 2) {
-                if (StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelString())) {
-                    String[] alarmLevels = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
-                    if (alarmLevels.length != 0) {
-                        rules = new StringBuilder();
-                        for (String alarmLevel : alarmLevels) {
-                            String alarmLevelNote = AlarmLevelEnum.getDictNodeByDictCode(alarmLevel);
-                            if (StringUtils.isNotBlank(alarmLevelNote)) {
-                                if (AlarmLevelEnum.ALARM_LEVEL_130.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                        .append(tStdDeviceMeteDetail.getLowLimit1() == null ? "" : tStdDeviceMeteDetail.getLowLimit1())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit1() == null ? "" : tStdDeviceMeteDetail.getHighLimit1())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_131.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit2() == null ? "" : tStdDeviceMeteDetail.getLowLimit2())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit2() == null ? "" : tStdDeviceMeteDetail.getHighLimit2())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_132.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit3() == null ? "" : tStdDeviceMeteDetail.getLowLimit3())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit3() == null ? "" : tStdDeviceMeteDetail.getHighLimit3())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_133.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit4() == null ? "" : tStdDeviceMeteDetail.getLowLimit4())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit4() == null ? "" : tStdDeviceMeteDetail.getHighLimit4())
-                                        .append("；");
-                                }
-                            }
-                        }
-                    }
-                }
+        // 冗余与非冗余分类
+        List<TStdDeviceMeteDetail> resIsRedundantList = new ArrayList<>();
+        List<TStdDeviceMeteDetail> resIsNotRedundantList = new ArrayList<>();
+        for (TStdDeviceMeteDetail detail : list){
+            if (Objects.equals(0, detail.getIsRedundant())){
+                resIsRedundantList.add(detail);
+            }else {
+                resIsNotRedundantList.add(detail);
             }
-            tStdDeviceMeteDetail.setRules(rules.toString());
-        });
+        }
+
+        // 响应满足条件的测点列表数据
+        if (Objects.equals(0, isRedundant)){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsRedundantList, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }else if (Objects.equals(1, isRedundant)){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsNotRedundantList, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }else {
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

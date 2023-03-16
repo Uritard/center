@@ -50,7 +50,6 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private String isJudge;//是否配置判别算法
 
     private Integer isRedundant;//是否冗余配置
-    private String rules;//告警规则
 
 }
 

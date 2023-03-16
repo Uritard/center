@@ -368,19 +368,60 @@ public class UPatrolResultService {
         }
         int result = uPatrolResultDao.updateCheck(taskId, userName, date, "1");
         //审核未被审核的巡视点
-        CruiseManualReview cruiseManualReview = new CruiseManualReview().setCheckUser(userName).setCheckDate(date).setTaskId(taskId);
-        uPatrolResultDao.manualReviewByTask(cruiseManualReview);
-        uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
-        tStdDeviceDao.updateByTask(taskId);
+        List<UPatrolDataResult> list = uPatrolResultDao.selectCruiseDataResult(taskId);
+        log.info("未被审核的点==" + list);
+        List<CruiseManualReview> reviewList = new ArrayList<>();
+        for (UPatrolDataResult res : list) {
+            CruiseManualReview cruiseManualReview =
+                new CruiseManualReview().setCruiseDataId(res.getCruiseDataId()).setCheckUser(userName).setCheckDate(date)
+                    .setPersonCheck(res.getResultNum()).setTaskId(res.getTaskId()).setInstanceId(res.getInstanceId());
+            if (res.getCruiseResult() == 246) {//正常,实际:正常,算法:正确
+                cruiseManualReview.setIdentifyResult(261);
+                cruiseManualReview.setIdentifyState(258);
+            } else {//异常,实际:数据异常,算法:错误
+                cruiseManualReview.setIdentifyResult(264);
+                cruiseManualReview.setIdentifyState(259);
+            }
+            log.info("准备更改的的东西是===" + cruiseManualReview);
+            uPatrolResultDao.manualReview(cruiseManualReview);
 
-        List<CruiseManualReview> reviewList =  uPatrolResultDao.selectManualDetail(taskId);
+            //查询该巡检点审核后的相关信息
+            AfterManualReviewInfo afterManualReviewInfo = uPatrolResultDao.selectJudgeCondition(res.getInstanceId(), res.getTaskId());
+            //若该点生成告警,则核查为属实
+            if (afterManualReviewInfo.getIsWarn() == 1) {
+                List<Long> warnIdList =
+                    uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+                for (Long warnId : warnIdList) {
+                    uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
+                            "程序正常，告警属实", 286, null, userId, date);
+                    sendWebSocket(warnId);
+                }
+            }
+
+            reviewList.add(cruiseManualReview);
+
+            // insert QrDecode as device's real code. by tt.
+            TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
+            if (Objects.nonNull(tCruisePointInstance)) {
+                String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
+                if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                    if (!NumberUtils.isNumber(cruiseManualReview.getPersonCheck())){
+                        throw new BusinessException("实物编码应为纯数字！");
+                    }
+                    TStdDevice tStdDevice = new TStdDevice();
+                    tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
+                    tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
+                    tStdDeviceDao.update(tStdDevice);
+                }
+            }
+        }
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(reviewList, true);
 
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是==" + reportFilePath);
-        return result + reviewList.size();
+        return result + list.size();
     }
 
     /**
