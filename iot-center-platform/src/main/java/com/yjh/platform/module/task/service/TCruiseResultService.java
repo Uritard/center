@@ -91,7 +91,7 @@ public class TCruiseResultService{
         List<TCruiseResultExpand> list =new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
 //            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
-            list = uPatrolResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
+//            list = uPatrolResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
         }
         return list;
     }
