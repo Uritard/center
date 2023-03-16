@@ -487,46 +487,32 @@
         a.state_one,
         a.alarm_state,
         a.redundant_type,
+        g.dict_note as alarmLevelName,
+        f.dict_note as alarmTypeName,
+        i.dict_note as customTypeName,
+        b.dict_note as meteTypeName,
+        d.dict_note as meteKindName,
         e.device_name as deviceName,
         e.up_region_id,
         a.analyse_type,
+        l.dict_note as analyseTypeName,
         a.is_temdif,
         a.redundant_type
         from t_std_devicemete a
+        left join  t_dict_business g on a.alarm_level= g.dict_code
+        left join t_dict_business f on a.alarm_type= f.dict_code
+        left join t_dict_business b on a.mete_type= b.dict_code
+        left join t_dict_business d on a.mete_kind= d.dict_code and d.col_name="mete_kind"
         left join t_std_device e on a.device_id = e.device_id
+        left join t_dict_business i on a.custom_id = i.dict_code
+        left join t_dict_business l on a.analyse_type = l.dict_code and l.col_name="analyse_type"
         where 1=1
-          <choose>
-              <when test="isRedundant == 1">
-                  AND EXISTS (
-                  SELECT
-                  1
-                  FROM
-                  ( SELECT DISTINCT device_mete_id, cruise_type FROM ( SELECT device_mete_id, CASE cruise_type WHEN 229 THEN 230 ELSE cruise_type END cruise_type FROM t_cruise_point_instance ) tcpi ) ttt
-                  WHERE
-                  ttt.device_mete_id = a.device_mete_id
-                  GROUP BY
-                  device_mete_id
-                  HAVING
-                  count(*) > 1
-                  )
-              </when>
-                <when test="isRedundant == 0">
-                    AND NOt EXISTS (
-                    SELECT
-                    1
-                    FROM
-                    ( SELECT DISTINCT device_mete_id, cruise_type FROM ( SELECT device_mete_id, CASE cruise_type WHEN 229 THEN 230 ELSE cruise_type END cruise_type FROM t_cruise_point_instance ) tcpi ) ttt
-                    WHERE
-                    ttt.device_mete_id = a.device_mete_id
-                    GROUP BY
-                    device_mete_id
-                    HAVING
-                    count(*) > 1
-                    )
-                </when>
-          </choose>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+        and a.device_mete_id in
+            <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
+                #{deviceMeteId,jdbcType=BIGINT}
+            </foreach>
         <if test="redundantType != -1"> and a.redundant_type = #{redundantType, jdbcType=VARCHAR}</if>
          order by a.device_mete_id desc
     </select>

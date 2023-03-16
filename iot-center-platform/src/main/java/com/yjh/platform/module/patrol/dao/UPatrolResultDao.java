@@ -129,8 +129,6 @@ public interface UPatrolResultDao {
 
     int manualReview(CruiseManualReview cruiseManualReview);
 
-    int manualReviewByTask(CruiseManualReview cruiseManualReview);
-
     int manualReviewByTaskInstance(CruiseManualReview cruiseManualReview);
 
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
@@ -148,10 +146,6 @@ public interface UPatrolResultDao {
                        @Param(value = "outRange")String outRange,
                        @Param(value = "dealPersonId")String dealPersonId,
                        @Param(value = "dealTime")Date dealTime);
-
-    int updateWarnInfoByTask(@Param(value = "dealPersonId") String dealPersonId,
-                             @Param(value = "dealTime") Date dealTime,
-                             @Param(value = "taskId") String taskId);
 
     List<Long> selectWarnId(@Param(value = "taskId")String taskId,
                             @Param(value = "instanceId")Long instanceId);

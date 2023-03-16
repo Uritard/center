@@ -369,8 +369,7 @@ public class CameraConController {
     @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
     public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
                                        @RequestParam(value = "cameraId") Long cameraId,
-                                       @RequestParam(value = "meteName", required = false) String meteName,
-                                       @RequestParam(value = "edgeCode", required = false) String edgeCode) {
+                                       @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -379,17 +378,8 @@ public class CameraConController {
 
             cameraConService.isCameraControlled(cameraId);
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
-            if (StringUtils.isNotEmpty(edgeCode)) {
-                filePathTem = String.format("/%s%s", edgeCode, filePathTem);
-            }
-
             String filePath = capturePresetPath + filePathTem;
-            log.info("预置位抓图 filePathTem: {},  filePath: {}, edgeCode: {}", filePathTem, filePath, edgeCode);
             String mkdir = "mkdir "+capturePresetPath+"/"+presetId;
-            if (StringUtils.isNotEmpty(edgeCode)) {
-                mkdir = String.format("mkdir -p %s/%s/%s", capturePresetPath, edgeCode, presetId);
-            }
-
             log.info("mkdir: "+mkdir);
             Runtime.getRuntime().exec(mkdir);
             Thread.sleep(2000);

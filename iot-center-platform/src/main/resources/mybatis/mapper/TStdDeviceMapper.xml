@@ -136,39 +136,6 @@
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>
 
-    <update id="updateByTask" parameterType="java.lang.String">
-        UPDATE t_std_device
-        SET real_code = (
-            SELECT
-                a.person_check
-            FROM
-                u_patrol_data_result a
-                    LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
-                    LEFT JOIN t_std_devicemete c ON b.device_mete_id = c.device_mete_id
-            WHERE
-                a.task_id = #{taskId, jdbcType=VARCHAR}
-              AND c.analyse_type = 8
-              AND (
-                      person_check REGEXP '[^0-9.]'
-                      ) = 0
-        )
-        WHERE
-                device_id = (
-                SELECT DISTINCT
-                    a.device_id
-                FROM
-                    u_patrol_data_result a
-                        LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
-                        LEFT JOIN t_std_devicemete c ON b.device_mete_id = c.device_mete_id
-                WHERE
-                    a.task_id = #{taskId, jdbcType=VARCHAR}
-                  AND c.analyse_type = 8
-                  AND (
-                          person_check REGEXP '[^0-9.]'
-                          ) = 0
-            )
-    </update>
-
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">
         select
         a.device_id,
