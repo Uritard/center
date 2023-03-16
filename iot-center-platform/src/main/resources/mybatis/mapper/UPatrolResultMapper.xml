@@ -847,6 +847,21 @@
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 
+    <update id="manualReviewByTask" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        UPDATE u_patrol_data_result
+        SET person_check = result_num,
+        <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
+        <if test="checkUser != null ">check_user = #{checkUser},</if>
+        evaluation_state = 256,
+        identify_result =
+        IF (cruise_result = 246, 261, 264),
+        identify_state =
+        IF (cruise_result = 246, 258, 259)
+        WHERE
+        task_id = #{taskId,jdbcType=VARCHAR}
+        AND evaluation_state = 257;
+    </update>
+
     <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update u_patrol_data_result set
         <if test="personCheck != null ">person_check = #{personCheck},</if>
@@ -933,6 +948,19 @@
     </set>
         WHERE
         a.warn_id = #{warnId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updateWarnInfoByTask">
+        UPDATE t_warn_info a
+        <set>a.conf_mode = 275,
+            a.deal_type = 286,
+            a.deal_info = '程序正常，告警属实',
+            <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+            a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
+        </set>
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        and a.conf_mode = 276
     </update>
 
     <update id="updateIsWarn">
