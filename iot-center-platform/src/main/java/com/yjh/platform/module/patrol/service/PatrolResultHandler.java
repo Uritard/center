@@ -158,6 +158,7 @@ public class PatrolResultHandler {
                 infoMap.put("taskId", taskId);
                 infoMap.put("taskCode", taskCode);
 
+                log.info("deviceId==={}", robotPatrolTaskResult.getDeviceId());
                 TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
                 instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
                 // 文件处理

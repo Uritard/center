@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
@@ -84,9 +85,13 @@ public class RobotInspectionWarnThread implements Runnable{
             // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
             if (instanceId == 0) {
                 String originId = taskAlarm.getDeviceId();
-                TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
-                log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
-                instanceId = insInfo.getInstanceId();
+                if (Constant.standardPoints()){
+                    instanceId = tRobotInspectionDao.selectRealInstanceByDevicePointId(originId);
+                }else {
+                    TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                    log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
+                    instanceId = insInfo.getInstanceId();
+                }
             }
 
             log.info("instanceId=={}", instanceId);

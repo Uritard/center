@@ -451,6 +451,7 @@ public class UPatrolTaskService {
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
             map.put("edgeCode", edgeCode);
+            map.put("devicePointId", item.getDevicePointId());
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
