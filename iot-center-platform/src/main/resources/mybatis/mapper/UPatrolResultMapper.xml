@@ -379,6 +379,7 @@
                 #{taskId}
             </foreach>
         </if>
+        order by a.execute_time desc
     </select>
 
     <select id="selectTaskByPageByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
