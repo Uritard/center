@@ -851,7 +851,7 @@ public class IntelAnalysisService {
                         int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
                         String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
                         String descVal = result.getDesc();
-                        if (StringUtils.contains(descVal, "储能")) {
+                        if (StringUtils.containsAny(descVal, "储能", "红", "蓝")) {
                             resultDescTemp = descVal;
                         }
                         resultValue.add(resultDescTemp);

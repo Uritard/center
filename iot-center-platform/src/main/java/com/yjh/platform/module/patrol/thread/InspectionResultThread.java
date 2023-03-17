@@ -239,7 +239,7 @@ public class InspectionResultThread implements Runnable{
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
             boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
-            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt;
+            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt && "2".equals(sysLevel);
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}, isInterrupt: {}", isSimulationTool, taskId, type, sysLevel, cruiseType, isInterrupt);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
