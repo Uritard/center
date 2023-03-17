@@ -54,9 +54,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -876,10 +873,10 @@ public class UPatrolTaskService {
                     .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
                     .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(edgeDetailList)) {
-                Map<String, List<String>> listMap = Maps.newHashMap();
+                Map<String, LinkedHashSet<String>> listMap = Maps.newHashMap();
                 edgeDetailList.forEach(t -> {
-                    List<String> list = listMap.computeIfAbsent(t.getEdgeCode(), v -> new ArrayList<>());
-                    list.add(Constant.standardPoints() ? t.getDevicePointId() : t.getOriginId());
+                    LinkedHashSet<String> list = listMap.computeIfAbsent(t.getEdgeCode(), v -> new LinkedHashSet<>(512));
+                    list.add(Constant.standardPoints() ? StringUtils.defaultIfEmpty(t.getDevicePointId(), t.getOriginId()) : t.getOriginId());
                 });
 
                 String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
@@ -894,7 +891,7 @@ public class UPatrolTaskService {
                         // 从巡视主机下发至边缘节点的任务等级为3级
                         taskInfo.setPriority(3);
                         taskInfo.setTaskName(task.getTaskName());
-                        taskInfo.setInstanceList(instanceList);
+                        taskInfo.setInstanceList(new ArrayList<>(instanceList));
                         String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
                         taskInfo.setIfRun(ifFun);
                         taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
@@ -903,7 +900,7 @@ public class UPatrolTaskService {
                         edgeTaskInfoList.add(taskInfo);
                     });
 
-                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
                     robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
                     log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
 
@@ -964,7 +961,7 @@ public class UPatrolTaskService {
                     robotTaskInfoList.add(robotTaskInfo);
                 }
 
-                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
                 robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
                 log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
 
@@ -985,14 +982,10 @@ public class UPatrolTaskService {
                 .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(edgeDetailList)) {
-            Map<String, List<String>> listMap = Maps.newHashMap();
+            Map<String, LinkedHashSet<String>> listMap = Maps.newHashMap();
             edgeDetailList.forEach(t -> {
-                List<String> list = new ArrayList<>();
-                if (listMap.containsKey(t.getEdgeCode())) {
-                    list = listMap.get(t.getEdgeCode());
-                }
-                list.add(t.getOriginId());
-                listMap.put(t.getEdgeCode(), list);
+                LinkedHashSet<String> list = listMap.computeIfAbsent(t.getEdgeCode(), v -> new LinkedHashSet<>(512));
+                list.add(Constant.standardPoints() ? StringUtils.defaultIfEmpty(t.getDevicePointId(), t.getOriginId()) : t.getOriginId());
             });
 
             if (StringUtils.isNotEmpty(dateType)) {
@@ -1005,14 +998,14 @@ public class UPatrolTaskService {
                         taskInfo.setTaskId(task.getTaskId());
                         taskInfo.setPriority(task.getTaskLevel());
                         taskInfo.setTaskName(task.getTaskName());
-                        taskInfo.setInstanceList(instanceList);
+                        taskInfo.setInstanceList(new ArrayList<>(instanceList));
                         taskInfo.setIfRun("173");
                         taskInfo.setEdgeCode(edgeCode);
                         taskInfo.setFixedStartTime(format.format(new Date()));
                         edgeTaskInfoList.add(taskInfo);
                     });
 
-                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
                     robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
                     log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
 
@@ -1048,7 +1041,7 @@ public class UPatrolTaskService {
             robotTaskInfo.setFixedStartTime(format.format(new Date()));
             robotTaskInfoList.add(robotTaskInfo);
         }
-        Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
+        Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
         robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
         log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
         //让机器人和无人机做任务

@@ -7,6 +7,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
@@ -46,19 +47,21 @@ public class PatrolResultHandler {
     private final ProcessResultToUpSystem processResultToUpSystem;
     private final UPatrolTaskService uPatrolTaskService;
     private final TVoiceDeviceService tVoiceDeviceService;
+    private final TCruisePointInstanceDao tCruisePointInstanceDao;
 
     private static final String METER = "meter";
 
     Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
-        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService) {
+        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
         this.processResultToUpSystem = processResultToUpSystem;
         this.uPatrolTaskService = uPatrolTaskService;
         this.tVoiceDeviceService = tVoiceDeviceService;
+        this.tCruisePointInstanceDao = tCruisePointInstanceDao;
     }
 
     /**
@@ -156,19 +159,6 @@ public class PatrolResultHandler {
                 infoMap.put("taskId", taskId);
                 infoMap.put("taskCode", taskCode);
 
-                log.info("deviceId==={}", robotPatrolTaskResult.getDeviceId());
-                TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
-                instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
-                // 文件处理
-                Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
-
-                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
-                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
-                    log.info("No alarms need to be handled...");
-                }else if(!Constant.fastTurbo()) {
-                    // 告警处理
-                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
-                }
 
                 //device_id转换
                 String robotCode = robotPatrolTaskResult.getSendCode();
@@ -176,13 +166,34 @@ public class PatrolResultHandler {
                 Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
                 String instanceId = robotInfoKeyMap.get("instanceId");
                 // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
-                TCruisePointInstance insInfo = null;
+                TCruisePointInstance instance;
                 if (StringUtils.isEmpty(instanceId)) {
                     String originId = robotPatrolTaskResult.getDeviceId();
-                    insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
-                    log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
-                    instanceId = String.valueOf(insInfo.getInstanceId());
+                    if (Constant.standardPoints()) {
+                        // 如果上级下发的是 device_point_id，那么用 device_point_id 查询instanceId
+                        instance = tRobotInspectionDao.selectRealInstanceByDevicePoint(originId);
+                    } else {
+                        instance = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                    }
+                    log.info("instanceInfo: {}", JSON.toJSONString(instance));
+                    instanceId = String.valueOf(instance.getInstanceId());
+                } else {
+                    instance = tCruisePointInstanceDao.selectByPrimaryId(NumberUtils.toLong(instanceId));
                 }
+                log.info("taskId===={}, instanceId: {}", taskId, instanceId);
+
+                instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
+                // 文件处理
+                Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
+
+                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
+                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
+                    log.info("No alarms need to be handled...");
+                }else if(!Constant.fastTurbo() && !"3".equals(sysLevel)) {
+                    // 告警处理
+                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
+                }
+
                 infoMap.put("instanceId", instanceId);
 
                 //机器人是有值的处理非同源
@@ -207,13 +218,12 @@ public class PatrolResultHandler {
                 // 巡视结果处理
                 TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
                 if (ArrayUtils.contains(new String[]{"690", "691", "692"}, stdDeviceMete.getMeteType()) && isJFRepeat) {
-                    List<RobotPatrolTaskResult> list = multipleValuesResultMap.getOrDefault(robotPatrolTaskResult.getDeviceId(), new ArrayList<>());
+                    List<RobotPatrolTaskResult> list = multipleValuesResultMap.computeIfAbsent(robotPatrolTaskResult.getDeviceId(), v -> new ArrayList<>());
                     list.add(robotPatrolTaskResult);
-                    multipleValuesResultMap.put(robotPatrolTaskResult.getDeviceId(), list);
                     continue;
                 }
                 InspectionResultThread cruiseResultDealThread =
-                    new InspectionResultThread(robotPatrolTaskResult, infoMap, insInfo, redisTemplate, true);
+                    new InspectionResultThread(robotPatrolTaskResult, infoMap, instance, redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
             } catch (Exception e) {
@@ -259,11 +269,11 @@ public class PatrolResultHandler {
      * @param taskId 任务id
      * @param isAlarmMap 告警信息map
      */
-    private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap) {
+    private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap, String instanceId) {
         try {
             isAlarmMap.put("robotCode", robotPatrolTaskResult.getSendCode());
             isAlarmMap.put("taskCode", taskId);
-            isAlarmMap.put("deviceId", robotPatrolTaskResult.getDeviceId());
+            isAlarmMap.put("instanceId", instanceId);
             isAlarmMap.put("value", robotPatrolTaskResult.getValue());
             isAlarmMap.put("deviceName", robotPatrolTaskResult.getDeviceName());
             isAlarmMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());

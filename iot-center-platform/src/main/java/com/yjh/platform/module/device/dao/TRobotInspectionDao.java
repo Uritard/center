@@ -85,6 +85,8 @@ public interface TRobotInspectionDao {
      */
     TCruisePointInstance selectRealInstance(@Param(value = "originId") String deviceId,@Param(value = "edgeCode") String edgeCode);
 
+    TCruisePointInstance selectRealInstanceByDevicePoint(@Param(value = "devicePointId") String devicePointId);
+
     /**
      * 判断robotCode是上级系统传来的还是下级系统
      * @param robotCode

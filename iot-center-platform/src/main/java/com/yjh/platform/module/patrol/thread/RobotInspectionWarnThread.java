@@ -5,6 +5,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
@@ -46,6 +47,8 @@ public class RobotInspectionWarnThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final String taskCode;
     private final TRobotInspectionDao tRobotInspectionDao;
+    private final TCruisePointInstanceDao tCruisePointInstanceDao;
+
     private final Object waiter = new Object();
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
@@ -56,6 +59,7 @@ public class RobotInspectionWarnThread implements Runnable{
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
+        this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
     }
 
     @Override
@@ -85,13 +89,14 @@ public class RobotInspectionWarnThread implements Runnable{
             // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
             if (instanceId == 0) {
                 String originId = taskAlarm.getDeviceId();
+                TCruisePointInstance insInfo;
                 if (Constant.standardPoints()){
-                    instanceId = tRobotInspectionDao.selectRealInstanceByDevicePointId(originId);
+                    insInfo = tRobotInspectionDao.selectRealInstanceByDevicePoint(originId);
                 }else {
-                    TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
-                    log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
-                    instanceId = insInfo.getInstanceId();
+                    insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
                 }
+                log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
+                instanceId = insInfo.getInstanceId();
             }
 
             log.info("instanceId=={}", instanceId);
