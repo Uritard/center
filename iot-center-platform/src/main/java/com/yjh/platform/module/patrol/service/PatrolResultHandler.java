@@ -1,7 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -13,7 +12,6 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections.MapUtils;
@@ -158,6 +156,7 @@ public class PatrolResultHandler {
                 infoMap.put("taskId", taskId);
                 infoMap.put("taskCode", taskCode);
 
+                log.info("deviceId==={}", robotPatrolTaskResult.getDeviceId());
                 TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
                 instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
                 // 文件处理

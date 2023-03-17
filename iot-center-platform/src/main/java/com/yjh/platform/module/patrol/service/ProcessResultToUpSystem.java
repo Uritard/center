@@ -121,6 +121,7 @@ public class ProcessResultToUpSystem {
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
+                String devicePointId = Optional.ofNullable(cruiseResultMap.get("devicePointId")).orElse("");
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
 
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
@@ -137,7 +138,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
-                xmlItem.put("device_id", instanceId);
+                xmlItem.put("device_id", Constant.standardPoints() ? devicePointId : instanceId);
                 xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
