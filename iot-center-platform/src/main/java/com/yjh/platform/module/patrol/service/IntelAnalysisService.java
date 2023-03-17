@@ -850,6 +850,10 @@ public class IntelAnalysisService {
                     if (ArrayUtils.contains(new String[]{"0","1","2","3","4","5","6"}, value)){
                         int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
                         String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
+                        String descVal = result.getDesc();
+                        if (StringUtils.contains(descVal, "储能")) {
+                            resultDescTemp = descVal;
+                        }
                         resultValue.add(resultDescTemp);
                     }else {
                         resultValue.add("算法返回格式不正确");
