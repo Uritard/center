@@ -26,6 +26,7 @@ import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.DecimalFormat;
@@ -72,33 +73,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
         try {
             log.info("开始判断巡视结果是否告警 >>>>>>> threadMap==={}", threadMap);
             String taskId = threadMap.get("taskCode");
-            String robotCode = threadMap.get("robotCode");
 
-            // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = threadMap.get("taskCode");
-            log.info("robotTaskId==={}", robotTaskId);
-
-            UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
-            log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
-            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
-                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
-                if (moreTime) {
-                    robotTaskId = taskId;
-                }
-            }
-            log.info("robotTaskId=={}", robotTaskId);
-
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + threadMap.get("deviceId");
-            Long instanceId = null;
-            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
-            // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
-            if (isEdge) {
-                instanceId = tCruisePointInstanceDao.selectByEdgeCodeAndOriginId(robotCode,threadMap.get("deviceId")).getInstanceId();
-            }else {
-                Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
-                instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
-            }
+            Long instanceId = NumberUtils.toLong(threadMap.get("instanceId"));
             TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
 
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
