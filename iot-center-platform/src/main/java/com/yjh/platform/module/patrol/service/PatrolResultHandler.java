@@ -187,7 +187,7 @@ public class PatrolResultHandler {
                 infoMap.put("instanceId", instanceId);
 
                 //机器人是有值的处理非同源
-                if ("2".equals(sysLevel) && instance.getCruiseType() == 228 && !Constant.fastTurbo()){
+                if ("2".equals(sysLevel) && Objects.nonNull(instance.getCruiseType()) && instance.getCruiseType() == 228 && !Constant.fastTurbo()){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
