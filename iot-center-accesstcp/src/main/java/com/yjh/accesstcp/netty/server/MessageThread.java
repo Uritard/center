@@ -237,11 +237,12 @@ public class MessageThread {
             if ("1".equals(xmlBaseModel.getCommand())) {
                 log.info("--响应任务 任务下发--");
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
+                // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
+                String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
                 for (Map<String, Object> item : list) {
-                    //如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
-                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, false, edgeLevel);
-                    if ("2".equals(edgeLevel)){
+                    if (standardPoints) {
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
@@ -276,12 +277,13 @@ public class MessageThread {
             if ("1".equals(xmlBaseModel.getCommand())) {
                 //联动任务
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
+                // 如果使用标准点位  点位为机器人的id 需要转为 巡视系统的instanceId
+                String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
                 for (Map<String, Object> item : list) {
                     String taskId = item.get("task_code").toString();
-                    //如果从上级系统下发  点位为机器人的id 需要转为 巡视系统的instanceId
-                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, true, edgeLevel);
-                    if ("2".equals(edgeLevel)){
+                    if (standardPoints) {
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
