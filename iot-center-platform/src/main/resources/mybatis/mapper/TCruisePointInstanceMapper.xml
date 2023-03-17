@@ -532,6 +532,7 @@
         b.analyse_type,
         b.is_ai,
         b.is_judge,
+        b.device_point_id,
         f.device_name,
         f.real_code,
         c.robot_id,
