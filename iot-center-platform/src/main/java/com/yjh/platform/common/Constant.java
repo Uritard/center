@@ -163,6 +163,8 @@ public class Constant {
 
     private static Boolean fastTurbo;
 
+    private static Boolean standardPoints;
+
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
         String json= JSON.toJSONString(map);
@@ -266,10 +268,26 @@ public class Constant {
         return fastTurbo;
     }
 
+    /**
+     * 使用标准点位下发任务
+     */
+    public static boolean standardPoints() {
+        if (standardPoints == null) {
+            try {
+                standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+                log.warn("standardPoints is {}", standardPoints);
+            } catch (Exception e) {
+                standardPoints = false;
+            }
+        }
+        return standardPoints;
+    }
+
     public static void refreshPacketLog() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
+        standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
     }
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();

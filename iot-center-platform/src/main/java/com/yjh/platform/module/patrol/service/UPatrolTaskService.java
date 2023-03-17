@@ -432,7 +432,9 @@ public class UPatrolTaskService {
         uPatrolResultDao.add(uPatrolResult);
 
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
-        log.info("instancesList==={}", detailList);
+        if (!Constant.fastTurbo()) {
+            log.info("instancesList==={}", detailList);
+        }
         Set<String> nodeSet = new HashSet<>(8);
         for (TCruisePointInstanceNameDetail item : detailList) {
             UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
@@ -875,12 +877,8 @@ public class UPatrolTaskService {
             if (CollectionUtils.isNotEmpty(edgeDetailList)) {
                 Map<String, List<String>> listMap = Maps.newHashMap();
                 edgeDetailList.forEach(t -> {
-                    List<String> list = new ArrayList<>();
-                    if (listMap.containsKey(t.getEdgeCode())) {
-                        list = listMap.get(t.getEdgeCode());
-                    }
-                    list.add(t.getOriginId());
-                    listMap.put(t.getEdgeCode(), list);
+                    List<String> list = listMap.computeIfAbsent(t.getEdgeCode(), v -> new ArrayList<>());
+                    list.add(Constant.standardPoints() ? t.getDevicePointId() : t.getOriginId());
                 });
 
                 String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
