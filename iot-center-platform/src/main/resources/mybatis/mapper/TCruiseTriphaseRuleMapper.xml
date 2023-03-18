@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TCruiseTriphaseRuleDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTriphaseRule">
+        <id column="triphase_id" jdbcType="BIGINT" property="triphaseId" />
+        <result column="triphase_name" jdbcType="VARCHAR" property="triphaseName" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="instance_one_id" jdbcType="BIGINT" property="instanceOneId" />
+        <result column="instance_one_name" jdbcType="VARCHAR" property="instanceOneName" />
+        <result column="one_cruise_device_name" jdbcType="VARCHAR" property="oneCruiseDeviceName" />
+        <result column="instance_two_id" jdbcType="BIGINT" property="instanceTwoId" />
+        <result column="instance_two_name" jdbcType="VARCHAR" property="instanceTwoName" />
+        <result column="two_cruise_device_name" jdbcType="VARCHAR" property="twoCruiseDeviceName" />
+        <result column="instance_tri_id" jdbcType="BIGINT" property="instanceTriId" />
+        <result column="instance_tri_name" jdbcType="VARCHAR" property="instanceTriName" />
+        <result column="tri_cruise_device_name" jdbcType="VARCHAR" property="triCruiseDeviceName" />
+        <result column="identify_type" jdbcType="INTEGER" property="identifyType" />
+        <result column="identify_son_type" jdbcType="INTEGER" property="identifySonType" />
+        <result column="triphase_type" jdbcType="INTEGER" property="triphaseType" />
+        <result column="warn_threshold" jdbcType="VARCHAR" property="warnThreshold" />
+        <result column="warn_level" jdbcType="INTEGER" property="warnLevel" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        triphase_id, triphase_name, device_mete_id, device_id, custom_id, instance_one_id, instance_one_name, one_cruise_device_name, instance_two_id, instance_two_name, two_cruise_device_name, instance_tri_id, instance_tri_name, tri_cruise_device_name, identify_type, identify_son_type, triphase_type, warn_threshold, warn_level
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="triphaseId" parameterType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule">
+        insert into t_cruise_triphase_rule(
+            triphase_id,
+            triphase_name,
+            device_mete_id,
+            device_id,
+            custom_id,
+            instance_one_id,
+            instance_one_name,
+            one_cruise_device_name,
+            instance_two_id,
+            instance_two_name,
+            two_cruise_device_name,
+            instance_tri_id,
+            instance_tri_name,
+            tri_cruise_device_name,
+            identify_type,
+            identify_son_type,
+            triphase_type,
+            warn_threshold,
+            warn_level
+        )values(
+                #{triphaseId, jdbcType=BIGINT},
+                #{triphaseName, jdbcType=VARCHAR},
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{deviceId, jdbcType=BIGINT},
+                #{customId, jdbcType=VARCHAR},
+                #{instanceOneId, jdbcType=BIGINT},
+                #{instanceOneName, jdbcType=VARCHAR},
+                #{oneCruiseDeviceName, jdbcType=VARCHAR},
+                #{instanceTwoId, jdbcType=BIGINT},
+                #{instanceTwoName, jdbcType=VARCHAR},
+                #{twoCruiseDeviceName, jdbcType=VARCHAR},
+                #{instanceTriId, jdbcType=BIGINT},
+                #{instanceTriName, jdbcType=VARCHAR},
+                #{triCruiseDeviceName, jdbcType=VARCHAR},
+                #{identifyType, jdbcType=INTEGER},
+                #{identifySonType, jdbcType=INTEGER},
+                #{triphaseType, jdbcType=INTEGER},
+                #{warnThreshold, jdbcType=VARCHAR},
+                #{warnLevel, jdbcType=INTEGER}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_cruise_triphase_rule
+                where triphase_id = #{triphaseId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule">
+        update t_cruise_triphase_rule a <set>
+        <if test="triphaseId != null and triphaseId != ''">a.triphase_id = #{triphaseId, jdbcType=BIGINT},</if>
+        <if test="triphaseName != null and triphaseName != ''">a.triphase_name = #{triphaseName, jdbcType=VARCHAR},</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="customId != null and customId != ''">a.custom_id = #{customId, jdbcType=VARCHAR},</if>
+        <if test="instanceOneId != null and instanceOneId != ''">a.instance_one_id = #{instanceOneId, jdbcType=BIGINT},</if>
+        <if test="instanceOneName != null and instanceOneName != ''">a.instance_one_name = #{instanceOneName, jdbcType=VARCHAR},</if>
+        <if test="oneCruiseDeviceName != null and oneCruiseDeviceName != ''">a.one_cruise_device_name = #{oneCruiseDeviceName, jdbcType=VARCHAR},</if>
+        <if test="instanceTwoId != null and instanceTwoId != ''">a.instance_two_id = #{instanceTwoId, jdbcType=BIGINT},</if>
+        <if test="instanceTwoName != null and instanceTwoName != ''">a.instance_two_name = #{instanceTwoName, jdbcType=VARCHAR},</if>
+        <if test="twoCruiseDeviceName != null and twoCruiseDeviceName != ''">a.two_cruise_device_name = #{twoCruiseDeviceName, jdbcType=VARCHAR},</if>
+        <if test="instanceTriId != null and instanceTriId != ''">a.instance_tri_id = #{instanceTriId, jdbcType=BIGINT},</if>
+        <if test="instanceTriName != null and instanceTriName != ''">a.instance_tri_name = #{instanceTriName, jdbcType=VARCHAR},</if>
+        <if test="triCruiseDeviceName != null and triCruiseDeviceName != ''">a.tri_cruise_device_name = #{triCruiseDeviceName, jdbcType=VARCHAR},</if>
+        <if test="identifyType != null and identifyType != ''">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
+        <if test="identifySonType != null and identifySonType != ''">a.identify_son_type = #{identifySonType, jdbcType=INTEGER},</if>
+        <if test="triphaseType != null and triphaseType != ''">a.triphase_type = #{triphaseType, jdbcType=INTEGER},</if>
+        <if test="warnThreshold != null and warnThreshold != ''">a.warn_threshold = #{warnThreshold, jdbcType=VARCHAR},</if>
+        <if test="warnLevel != null and warnLevel != ''">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+    </set>
+            where a.triphase_id = #{triphaseId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule">
+        select
+        a.triphase_id,
+        a.triphase_name,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.instance_one_id,
+        a.instance_one_name,
+        a.one_cruise_device_name,
+        a.instance_two_id,
+        a.instance_two_name,
+        a.two_cruise_device_name,
+        a.instance_tri_id,
+        a.instance_tri_name,
+        a.tri_cruise_device_name,
+        a.identify_type,
+        a.identify_son_type,
+        a.triphase_type,
+        a.warn_threshold,
+        a.warn_level
+        from t_cruise_triphase_rule a
+        where 1 = 1
+            and a.triphase_id = #{triphaseId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule" resultType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule">
+        select
+        a.triphase_id,
+        a.triphase_name,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.instance_one_id,
+        a.instance_one_name,
+        a.one_cruise_device_name,
+        a.instance_two_id,
+        a.instance_two_name,
+        a.two_cruise_device_name,
+        a.instance_tri_id,
+        a.instance_tri_name,
+        a.tri_cruise_device_name,
+        a.identify_type,
+        a.identify_son_type,
+        a.triphase_type,
+        a.warn_threshold,
+        a.warn_level
+        from t_cruise_triphase_rule a
+        where 1 = 1
+        <if test="triphaseId != null and triphaseId != ''"> and a.triphase_id = #{triphaseId, jdbcType=BIGINT}</if>
+        <if test="triphaseName != null and triphaseName != ''"> and a.triphase_name = #{triphaseName, jdbcType=VARCHAR}</if>
+        <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="instanceOneId != null and instanceOneId != ''"> and a.instance_one_id = #{instanceOneId, jdbcType=BIGINT}</if>
+        <if test="instanceOneName != null and instanceOneName != ''"> and a.instance_one_name = #{instanceOneName, jdbcType=VARCHAR}</if>
+        <if test="oneCruiseDeviceName != null and oneCruiseDeviceName != ''"> and a.one_cruise_device_name = #{oneCruiseDeviceName, jdbcType=VARCHAR}</if>
+        <if test="instanceTwoId != null and instanceTwoId != ''"> and a.instance_two_id = #{instanceTwoId, jdbcType=BIGINT}</if>
+        <if test="instanceTwoName != null and instanceTwoName != ''"> and a.instance_two_name = #{instanceTwoName, jdbcType=VARCHAR}</if>
+        <if test="twoCruiseDeviceName != null and twoCruiseDeviceName != ''"> and a.two_cruise_device_name = #{twoCruiseDeviceName, jdbcType=VARCHAR}</if>
+        <if test="instanceTriId != null and instanceTriId != ''"> and a.instance_tri_id = #{instanceTriId, jdbcType=BIGINT}</if>
+        <if test="instanceTriName != null and instanceTriName != ''"> and a.instance_tri_name = #{instanceTriName, jdbcType=VARCHAR}</if>
+        <if test="triCruiseDeviceName != null and triCruiseDeviceName != ''"> and a.tri_cruise_device_name = #{triCruiseDeviceName, jdbcType=VARCHAR}</if>
+        <if test="identifyType != null and identifyType != ''"> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
+        <if test="identifySonType != null and identifySonType != ''"> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
+        <if test="triphaseType != null and triphaseType != ''"> and a.triphase_type = #{triphaseType, jdbcType=INTEGER}</if>
+        <if test="warnThreshold != null and warnThreshold != ''"> and a.warn_threshold = #{warnThreshold, jdbcType=VARCHAR}</if>
+        <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance">
+        select
+        a.triphase_id as instanceId,
+        a.triphase_name as cruiseName,
+        a.device_mete_id as  deviceMeteId,
+        a.device_id as deviceId,
+        a.custom_id as customId,
+        a.instance_one_id as instanceIdOne,
+        a.instance_one_name,
+        a.one_cruise_device_name,
+        a.instance_two_id as instanceIdTwo,
+        a.instance_two_name,
+        a.two_cruise_device_name,
+        "8" as cruiseType,
+        a.instance_tri_id as instanceIdThree,
+        a.instance_tri_name,
+        a.tri_cruise_device_name as threeCruiseDeviceName,
+        a.identify_type,
+        c.mete_type,
+        a.identify_son_type,
+        a.triphase_type,
+        a.warn_threshold,
+        a.warn_level,
+        b.device_name as deviceName,
+        c.custom_name,
+        c.mete_name as deviceMeteName
+        from t_cruise_triphase_rule a
+        left join t_std_device b on a.device_id = b.device_id
+        left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
+        where 1 = 1
+        <if test="triphaseName != null and triphaseName != ''"> and a.triphase_name = #{triphaseName, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into t_cruise_triphase_rule(
+            triphase_id,
+            triphase_name,
+            device_mete_id,
+            device_id,
+            custom_id,
+            instance_one_id,
+            instance_one_name,
+            one_cruise_device_name,
+            instance_two_id,
+            instance_two_name,
+            two_cruise_device_name,
+            instance_tri_id,
+            instance_tri_name,
+            tri_cruise_device_name,
+            identify_type,
+            identify_son_type,
+            triphase_type,
+            warn_threshold,
+            warn_level
+        )values
+        <foreach collection="list" item="TCruiseTriphaseRule" separator=",">
+            (
+                #{TCruiseTriphaseRule.triphaseId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.triphaseName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.deviceMeteId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.deviceId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.customId, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.instanceOneId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.instanceOneName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.oneCruiseDeviceName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.instanceTwoId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.instanceTwoName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.twoCruiseDeviceName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.instanceTriId, jdbcType=BIGINT},
+                #{TCruiseTriphaseRule.instanceTriName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.triCruiseDeviceName, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.identifyType, jdbcType=INTEGER},
+                #{TCruiseTriphaseRule.identifySonType, jdbcType=INTEGER},
+                #{TCruiseTriphaseRule.triphaseType, jdbcType=INTEGER},
+                #{TCruiseTriphaseRule.warnThreshold, jdbcType=VARCHAR},
+                #{TCruiseTriphaseRule.warnLevel, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from t_cruise_triphase_rule
+        where triphase_id in (
+            <foreach collection="list" item="triphaseId" separator=",">
+                #{triphaseId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+    <select id="checkNonhomologousPointInstanceExist" parameterType="com.yjh.platform.module.task.entity.TCruiseTriphaseRule" resultType="java.lang.Integer">
+        select count(m.triphase_id) from
+            t_cruise_triphase_rule m
+        where m.instance_one_id in (#{instanceOneId},#{instanceTwoId},#{instanceTriId}) or m.instance_two_id in (#{instanceOneId},#{instanceTwoId},#{instanceTriId})
+           or m.instance_tri_id in (#{instanceOneId},#{instanceTwoId},#{instanceTriId})
+    </select>
+
+</mapper>

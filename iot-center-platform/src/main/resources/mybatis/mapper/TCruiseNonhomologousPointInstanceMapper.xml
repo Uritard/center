@@ -147,7 +147,9 @@
         a.cruise_name,
         a.warn_threshold,
         a.warn_level,
-        a.interval_type
+        a.interval_type,
+        '' as instanceIdThree,
+        '' as threeCruiseDeviceName
         from t_cruise_nonhomologous_point_instance a
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         left join t_std_device e on  a.device_id = e.device_id
@@ -164,6 +166,35 @@
         <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name like concat('%',#{cruiseName, jdbcType=VARCHAR},'%') </if>
         <if test="warnThreshold != null and warnThreshold != ''"> and a.warn_threshold = #{warnThreshold, jdbcType=VARCHAR}</if>
         <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=VARCHAR}</if>
+        union all (
+        select
+        a.triphase_id as instanceId,
+        a.instance_one_id as instanceIdOne,
+        a.instance_two_id as instanceIdTwo,
+        a.one_cruise_device_name,
+        a.two_cruise_device_name,
+        a.custom_id as customId,
+        a.device_id as deviceId,
+        c.custom_name,
+        b.device_name as deviceName,
+        c.mete_name as deviceMeteName,
+        c.mete_type,
+        a.identify_type,
+        a.identify_son_type,
+        "8" as cruiseType,
+        a.triphase_name as cruiseName,
+        a.warn_threshold,
+        a.warn_level,
+        a.triphase_type,
+        a.instance_tri_id as instanceIdThree,
+        a.tri_cruise_device_name as threeCruiseDeviceName
+        from t_cruise_triphase_rule a
+        left join t_std_device b on a.device_id = b.device_id
+        left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
+        where 1 = 1
+        <if test="cruiseType != null and cruiseType != ''"> and a.triphase_id = -1 </if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        )
     </select>
 
     <select id="checkNonhomologousPointInstanceExist" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance" resultType="java.lang.Integer">
