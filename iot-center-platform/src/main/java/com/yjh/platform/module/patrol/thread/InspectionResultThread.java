@@ -239,7 +239,7 @@ public class InspectionResultThread implements Runnable{
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
             boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
-            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt && "2".equals(sysLevel);
+            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}, isInterrupt: {}", isSimulationTool, taskId, type, sysLevel, cruiseType, isInterrupt);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
@@ -303,7 +303,9 @@ public class InspectionResultThread implements Runnable{
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
-            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound) {
+            String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+
+            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel)) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
                 String preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
@@ -356,8 +358,7 @@ public class InspectionResultThread implements Runnable{
             }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("resultDesc", "--");
-            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
-                    value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
+            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
