@@ -348,7 +348,7 @@ public class NonhomologousWarnThread implements Runnable{
                     Map<String, Object> robotWarn = new HashMap<>(4);
                     robotWarn.put("taskId", taskCode);
                     robotWarn.put("inspectionId", insId);
-                    robotWarn.put("warnId", warnId);
+                    robotWarn.put("warnId", warnId + triphaseType);
                     insResults.add(robotWarn);
                 }
                 warnInfo.put("resultsInfo", insResults);
