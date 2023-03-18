@@ -454,30 +454,25 @@
 
     <select id="selectRealInstanceByDevicePoint" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         SELECT
-        instance_id,
-        device_mete_id,
-        station_id,
-        station_name,
-        device_id,
-        custom_id,
-        data_format,
-        identify_type,
-        identify_son_type,
-        cruise_type,
-        cruise_id,
-        cruise_name,
-        cruise_content,
-        position_type,
-        unit,
-        if_sy,
-        sy_type,
-        if_videotape,
-        videotape_time,
-        text_desc,
-        sort
+            a.instance_id,
+            a.device_mete_id,
+            station_id,
+            station_name,
+            a.device_id,
+            b.custom_id,
+            data_format,
+            identify_type,
+            identify_son_type,
+            cruise_type,
+            cruise_id,
+            cruise_name,
+            cruise_content,
+            b.position_type
+
         FROM
-        t_cruise_point_instance a left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
-        WHERE device_point_id = #{devicePointId, jdbcType=VARCHAR} limit 1;
+            t_cruise_point_instance a left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
+        WHERE b.device_point_id = #{devicePointId, jdbcType=VARCHAR} limit 1;
+
     </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">
