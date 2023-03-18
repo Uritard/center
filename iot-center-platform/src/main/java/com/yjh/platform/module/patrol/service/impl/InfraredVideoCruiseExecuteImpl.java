@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
@@ -92,7 +93,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
 
     @Override
     public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
-        if ("已拍照".equals(resultNum) || "".equals(resultNum)) {
+        if ("已拍照".equals(resultNum) || CommonUtils.isEmptyOrNullstr(resultNum)) {
             return super.needAnalysis(deviceMeteId, resultNum);
         }
         // dlt 红外 抓图能直接获取到数值，不需要进行算法处理，直接返回 null
