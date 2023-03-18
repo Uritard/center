@@ -500,13 +500,17 @@
         SELECT robot_id from t_robot_info where robot_code = #{robotCode}
     </select>
 
-    <select id="getCruiseDeviceInfo" resultType="java.lang.String">
+    <select id="selectRobotCodeByInstanceId" resultType="java.lang.String">
         select robot_code as robotCode
         FROM t_robot_info
-        WHERE robot_id IN (
-            SELECT robot_id
-            FROM u_patrol_plan_attr
-            WHERE plan_id IN (SELECT plan_id FROM u_patrol_task WHERE task_code = #{taskId})
-              AND instance_id = #{instanceId}) limit 1
+        WHERE
+                robot_id IN (
+                SELECT
+                    robot_id
+                FROM
+                    t_robot_inspection a LEFT JOIN t_cruise_point_instance b on a.inspection_id = b.cruise_id
+                WHERE
+                    b.instance_id = #{instanceId}
+            ) limit 1
     </select>
 </mapper>
