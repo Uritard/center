@@ -11,6 +11,8 @@ import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.service.TCruiseNonhomologousPointInstanceService;
 import com.yjh.platform.module.patrol.entity.NonhomologousWarnEnum;
+import com.yjh.platform.module.task.dao.TCruiseTriphaseRuleDao;
+import com.yjh.platform.module.task.service.TCruiseTriphaseRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.formula.functions.T;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,9 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @Autowired
     private final TCruiseNonhomologousPointInstanceService tCruiseNonhomologousPointInstanceService;
+
+    @Autowired
+    private TCruiseTriphaseRuleService tCruiseTriphaseRuleService;
 
     private Logger log = LoggerFactory.getLogger(TCruiseNonhomologousPointInstanceController.class);
 
@@ -146,9 +152,14 @@ public class TCruiseNonhomologousPointInstanceController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(tCruiseNonhomologousPointInstance.getPageNum()!=null?tCruiseNonhomologousPointInstance.getPageNum():1, tCruiseNonhomologousPointInstance.getPageSize()!=null?tCruiseNonhomologousPointInstance.getPageSize():0,true,null,true);
-            List<TCruiseNonhomologousPointInstance> list = tCruiseNonhomologousPointInstanceService.selectByPage(tCruiseNonhomologousPointInstance);
-            resultMap.put("count", page.getTotal());
+            List<TCruiseNonhomologousPointInstance> list = new ArrayList<>();
+            if (tCruiseNonhomologousPointInstance.getCruiseType() != null && 8 == tCruiseNonhomologousPointInstance.getCruiseType()){
+                list =  tCruiseTriphaseRuleService.selectByPage(tCruiseNonhomologousPointInstance.getCruiseName());
+            } else {
+                list =  tCruiseNonhomologousPointInstanceService.selectByPage(tCruiseNonhomologousPointInstance);
+            }
             resultMap.put("list", list);
+            resultMap.put("count", page.getTotal());
             result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
