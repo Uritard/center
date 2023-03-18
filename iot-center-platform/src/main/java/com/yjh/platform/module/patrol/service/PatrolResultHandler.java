@@ -197,7 +197,7 @@ public class PatrolResultHandler {
                 infoMap.put("instanceId", instanceId);
 
                 //机器人是有值的处理非同源
-                if ("2".equals(sysLevel) && Objects.nonNull(instance.getCruiseType()) && instance.getCruiseType() == 228 && !Constant.fastTurbo()){
+                if ("2".equals(sysLevel) && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
@@ -683,12 +683,15 @@ public class PatrolResultHandler {
                         alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
                     }
                 }
-                RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
-                robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
-                robotPatrolTaskAlarm.setValue(resultStringValue);
-                robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
-                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
-                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+
+                if (!ArrayUtils.contains(new Integer[] {TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
+                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+                    robotPatrolTaskAlarm.setValue(resultStringValue);
+                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                }
             }else {
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
