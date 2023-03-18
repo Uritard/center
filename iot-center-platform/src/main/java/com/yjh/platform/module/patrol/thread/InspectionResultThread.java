@@ -127,7 +127,7 @@ public class InspectionResultThread implements Runnable{
         Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
         String robotCode = sendCode;
         if (countRegion != 0) {
-            robotCode = uPatrolTaskService.getCruiseDeviceInfo(taskId, Long.valueOf(instanceId));
+            robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
         }
         Integer type = uPatrolTaskService.selectRobotType(robotCode);
         boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
@@ -231,7 +231,7 @@ public class InspectionResultThread implements Runnable{
             Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
             String robotCode = sendCode;
             if (countRegion != 0) {
-                robotCode = uPatrolTaskService.getCruiseDeviceInfo(taskId,Long.valueOf(instanceId));
+                robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
             }
             Integer type = uPatrolTaskService.selectRobotType(robotCode);
 

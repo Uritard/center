@@ -549,8 +549,8 @@ public class UPatrolTaskService {
     public Integer selectRobotType(String robotCode) {
         return tRobotInspectionDao.selectRobotType(robotCode);
     }
-    public String getCruiseDeviceInfo(String taskId,Long instanceId) {
-        return tRobotInspectionDao.getCruiseDeviceInfo(taskId,instanceId);
+    public String selectRobotCodeByInstanceId(Long instanceId) {
+        return tRobotInspectionDao.selectRobotCodeByInstanceId(instanceId);
     }
 
     public Integer getCruiseDeviceInfo(String robotCode) {
