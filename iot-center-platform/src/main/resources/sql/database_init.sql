@@ -2440,10 +2440,34 @@ CREATE TABLE `sys_user_device_permission`  (
 
 DROP TABLE IF EXISTS `silent_conf`;
 CREATE TABLE `silent_conf` (
-                               `id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
-                               `preset_type` int(11) DEFAULT NULL COMMENT '预置位类型',
-                               `preset_type_name` varchar(255) DEFAULT NULL COMMENT '预置位类型名称',
-                               `recognize_type` varchar(255) DEFAULT NULL COMMENT '要识别的类型，以逗号隔开 如:wcanm,wcgz',
-                               `chill_time` int(64) DEFAULT -1 COMMENT '此类型识别的时间间隔，单位：秒',
-                               PRIMARY KEY (`id`) USING BTREE
+  `id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `preset_type` int(11) DEFAULT NULL COMMENT '预置位类型',
+  `preset_type_name` varchar(255) DEFAULT NULL COMMENT '预置位类型名称',
+  `recognize_type` varchar(255) DEFAULT NULL COMMENT '要识别的类型，以逗号隔开 如:wcanm,wcgz',
+  `chill_time` int(64) DEFAULT -1 COMMENT '此类型识别的时间间隔，单位：秒',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='静默监视配置表';
+
+DROP TABLE IF EXISTS `t_cruise_triphase_rule`;
+CREATE TABLE `t_cruise_triphase_rule` (
+  `triphase_id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '三相告警规则ID',
+  `triphase_name` varchar(64) DEFAULT '' COMMENT '三相告警规则名称',
+  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
+  `device_id` bigint(32) DEFAULT '1' COMMENT '关联设备id',
+  `custom_id` varchar(32) DEFAULT '' COMMENT '关联部位表id',
+  `instance_one_id` bigint(32) DEFAULT '1' COMMENT '巡视点id 1',
+  `instance_one_name` varchar(128) DEFAULT '' COMMENT '巡视点id 1名称',
+  `one_cruise_device_name` varchar(64) DEFAULT '' COMMENT '巡视点1巡视设备名称',
+  `instance_two_id` bigint(32) DEFAULT '1' COMMENT '巡视点id 2',
+  `instance_two_name` varchar(128) DEFAULT '' COMMENT '巡视点id 2名称',
+  `two_cruise_device_name` varchar(64) DEFAULT '' COMMENT '巡视点2巡视设备名称',
+  `instance_tri_id` bigint(32) DEFAULT '1' COMMENT '巡视点id 3',
+  `instance_tri_name` varchar(128) DEFAULT '' COMMENT '巡视点id 3名称',
+  `tri_cruise_device_name` varchar(64) DEFAULT '' COMMENT '巡视点3巡视设备名称',
+  `identify_type` int(11) DEFAULT '1' COMMENT '点位识别类型 1. 表计读数，2红外测温',
+  `identify_son_type` int(11) DEFAULT '1' COMMENT '点位识别子类型(若选取表计读数再细分)： 1.油位表、2.避雷器动作次数表、3.泄漏电流表、4.档位表、5.SF6压力表、6.油温表、7.开关动作次数表、8.气压表、9液压表',
+  `triphase_type` int(11) DEFAULT '1' COMMENT '三相告警类型 1：三相不平衡 2：三相温差',
+  `warn_threshold` varchar(256) DEFAULT NULL COMMENT '告警阈值',
+  `warn_level` int(11) DEFAULT '1' COMMENT '告警等级：1-预警，2-一般告警，3-严重告警，4-危急告警，',
+  PRIMARY KEY (`triphase_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='三相告警配置实例表';

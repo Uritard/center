@@ -86,4 +86,25 @@
         from  t_robot_inspection
         where inspection_code = #{deviceId, jdbcType=VARCHAR}
     </select>
+
+    <select id="selectTriphaseInspections" resultType="java.util.Map">
+        select
+        a.triphase_id as triphaseId,
+        a.triphase_name as triphaseName,
+        a.device_mete_id as deviceMeteId,
+        a.device_id as deviceId,
+        a.instance_one_id as instanceOneId,
+        a.instance_one_name as instanceOneName,
+        a.instance_two_id as instanceTwoId,
+        a.instance_two_name as instanceTwoName,
+        a.instance_tri_id as instanceTriId,
+        a.instance_tri_name as instanceTriName,
+        a.identify_type as identifyType,
+        a.identify_son_type as identifySonType,
+        a.triphase_type as triphaseType,
+        a.warn_threshold as warnThreshold,
+        a.warn_level as warnLevel
+        from t_cruise_triphase_rule a
+        where a.instance_one_id = #{instanceId} or a.instance_two_id = #{instanceId} or a.instance_tri_id = #{instanceId}
+    </select>
 </mapper>
