@@ -27,4 +27,6 @@ public interface NonhomologousWarnDao {
                                  @Param(value = "taskId") String taskId);
 
     Long getInspectionIdByDeviceId(@Param(value = "deviceId") String deviceId);
+
+    List<Map<String,Object>> selectTriphaseInspections(@Param(value = "instanceId") String instanceId);
 }

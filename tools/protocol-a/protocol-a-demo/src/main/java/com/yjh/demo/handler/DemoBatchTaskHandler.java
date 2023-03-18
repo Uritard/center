@@ -187,6 +187,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             Map<String, Object> taskResponseItem = taskResponseMsg.getItems().get(0);
             taskResponseItem.put("task_code", taskCode);
             taskResponseItem.put("task_name", taskName);
+            boolean random = "random".equals(taskResponseItem.get("value"));
             assert data != null;
             assert fileNames != null;
             int i = 0;
@@ -198,6 +199,10 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
                 taskResponseItem.put("device_id", deviceId);
                 taskResponseItem.put("task_patrolled_id", taskPatrolledId.getAndIncrement());
                 taskResponseItem.put("file_path", remoteFile);
+                if (random) {
+                    String rand = String.valueOf(Math.random() * 100 + 10*i).substring(0,5);
+                    taskResponseItem.put("value", rand);
+                }
                 //深复制 防止消息错误
                 String jsonStr = JSON.toJSONString(taskResponseMsg);
                 Message taskResponseMsgClone = JSON.parseObject(jsonStr, Message.class);
