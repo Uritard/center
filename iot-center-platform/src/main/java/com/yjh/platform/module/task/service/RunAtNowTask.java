@@ -417,10 +417,12 @@ public class RunAtNowTask implements Runnable{
                 tCruiseDataResult.setCruiseName(item.getCruiseName());
 
                 Date now = new Date();
-                String overhaulString = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+                final String[] overhaulString = {""};
+                List<String> overhaulList = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+                overhaulList.forEach(s -> overhaulString[0] = StringUtils.isEmpty(overhaulString[0]) ? s : StringUtils.join(overhaulString[0], ",", s));
                 List<String> overhaul = new ArrayList<>();
-                if (StringUtils.isNotEmpty(overhaulString)){
-                    overhaul = Arrays.asList(overhaulString.split(","));
+                if (StringUtils.isNotEmpty(overhaulString[0])) {
+                    overhaul = Arrays.asList(overhaulString[0].split(","));
                 }
                 if(overhaul != null && overhaul.size()>0){//判断是否检修
                     if(overhaul.contains(item.getInstanceId())){
