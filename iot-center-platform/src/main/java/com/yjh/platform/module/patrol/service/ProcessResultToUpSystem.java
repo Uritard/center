@@ -264,6 +264,9 @@ public class ProcessResultToUpSystem {
             String alarmType = "";
             switch (recognitionType){
                 case "1":
+                case "11":
+                case "12":
+                case "13":
                     //仪表越限报警
                     alarmType = "7";
                     break;
