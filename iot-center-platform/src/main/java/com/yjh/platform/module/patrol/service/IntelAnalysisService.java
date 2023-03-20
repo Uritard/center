@@ -22,6 +22,7 @@ import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
+import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.service.TSequentialConfService;
@@ -598,14 +599,24 @@ public class IntelAnalysisService {
         return new Response(code);
     }
 
+    public void picAnalyseRetNotify(PicAnalyseResponse response){
+        log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
+        String flagId = response.getRequestId().split("#")[1];
+        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666", "presetCheck"}, flagId)){
+            picResAnalyse(response);
+        }else {
+            AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
+            ThreadPoolUtil.PATROL_POOL.addThread(analyseThread);
+        }
+    }
+
     /**
      *  巡视主机收到分析结果开始解析
      *
      * @param response 参数
      */
     @Async
-    public void picAnalyseRetNotify(PicAnalyseResponse response){
-        log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
+    public void picResAnalyse(PicAnalyseResponse response){
         String flagId = response.getRequestId().split("#")[1];
         // 静默监视结果
         if (Objects.equals("jm", flagId)){
@@ -630,8 +641,8 @@ public class IntelAnalysisService {
             return;
         }
         // 普通图像分析
-        List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
-        patrolResultHandler.analysePatrolTaskResult(resultList);
+//        List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
+//        patrolResultHandler.analysePatrolTaskResult(resultList);
     }
 
     /**
@@ -639,7 +650,7 @@ public class IntelAnalysisService {
      * @param response 算法返回结果
      * @param taskId 任务id
      */
-    private List<AnalysePatrolTaskResult> sendAnalysePatrolTaskResult(PicAnalyseResponse response, String taskId){
+    public List<AnalysePatrolTaskResult> sendAnalysePatrolTaskResult(PicAnalyseResponse response, String taskId){
         // 遍历多个点的分析结果,不同的巡视点
         List<AnalysePatrolTaskResult> resultList = new ArrayList<>();
         try {
