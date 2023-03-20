@@ -126,4 +126,6 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
 
     private Long instanceIdThree;
     private String threeCruiseDeviceName;
+
+    private Integer triphaseType;
 }

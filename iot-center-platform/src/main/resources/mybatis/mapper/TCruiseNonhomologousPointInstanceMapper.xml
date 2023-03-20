@@ -149,7 +149,8 @@
         a.warn_level,
         a.interval_type,
         '' as instanceIdThree,
-        '' as threeCruiseDeviceName
+        '' as threeCruiseDeviceName,
+        '' as triphase_type
         from t_cruise_nonhomologous_point_instance a
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         left join t_std_device e on  a.device_id = e.device_id
@@ -187,7 +188,8 @@
         a.warn_level,
         a.triphase_type,
         a.instance_tri_id as instanceIdThree,
-        a.tri_cruise_device_name as threeCruiseDeviceName
+        a.tri_cruise_device_name as threeCruiseDeviceName,
+        a.triphase_type
         from t_cruise_triphase_rule a
         left join t_std_device b on a.device_id = b.device_id
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
