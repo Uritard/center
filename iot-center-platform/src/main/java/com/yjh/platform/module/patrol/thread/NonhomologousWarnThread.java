@@ -1,7 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
-import cn.hutool.core.math.MathUtil;
 import com.alibaba.fastjson.JSON;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -10,19 +10,15 @@ import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_DONE;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -310,53 +306,88 @@ public class NonhomologousWarnThread implements Runnable{
                     triphaseRetMap.put(MapUtils.getString(map, "instanceTwoId"), "");
                     triphaseRetMap.put(MapUtils.getString(map, "instanceTriId"), "");
                 }
-                if (NumberUtils.isCreatable(robotInsResult)) {
-                    triphaseRetMap.put(instanceId, robotInsResult);
-                } else {
-                    log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
-                }
+//                if (NumberUtils.isCreatable(robotInsResult)) {
+//                    triphaseRetMap.put(instanceId, robotInsResult);
+//                } else {
+//                    log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
+//                }
+                triphaseRetMap.put(instanceId, robotInsResult);
+
                 redisTemplate.opsForHash().putAll(triphaseKey, triphaseRetMap);
 
                 if (triphaseRetMap.containsValue("")) {
                     continue;
                 }
-                double[] triphaseResults = triphaseRetMap.values().stream().mapToDouble(NumberUtils::toFloat).toArray();
-                float max = (float)NumberUtils.max(triphaseResults);
-                float min = (float)NumberUtils.min(triphaseResults);
-                switch (triphaseType) {
-                    case 1:
-                        fruit = (max - 0F > 0.01D) ? (max - min) * 100 / max : 0.0F;
-                        triphaseName = "三相不平衡";
-                        break;
-                    case 2:
-                    default:
-                        fruit = max - min;
-                        triphaseName = "三相温差";
-                        break;
+
+                if (NumberUtils.isCreatable(robotInsResult)){
+                    double[] triphaseResults = triphaseRetMap.values().stream().mapToDouble(NumberUtils::toFloat).toArray();
+                    float max = (float)NumberUtils.max(triphaseResults);
+                    float min = (float)NumberUtils.min(triphaseResults);
+                    switch (triphaseType) {
+                        case 1:
+                            fruit = (max - 0F > 0.01D) ? (max - min) * 100 / max : 0.0F;
+                            triphaseName = "三相不平衡";
+                            break;
+                        case 2:
+                        default:
+                            fruit = max - min;
+                            triphaseName = "三相温差";
+                            break;
+                    }
+                    log.info("三相告警结果值 ===max: {}, min: {}, fruit:{}, threshold: {}, {}", max, min, fruit, warnThreshold, JSON.toJSONString(triphaseRetMap));
+
+                    TRIPHASE_LOCK.remove(triphaseKey);
+                    if (fruit > warnThreshold) {
+                        Map<String, Object> warnInfo = new HashMap<>(8);
+                        warnInfo.put("warnId", warnId + triphaseType);
+                        warnInfo.put("warnType", 5);
+                        warnInfo.put("instanceId", triphaseId);
+                        warnInfo.put("warnContent", triphaseName + "告警：" + CommonUtils.percentFormat(fruit - warnThreshold, "#.##"));
+                        List<Map<String, Object>> insResults = new ArrayList<>();
+                        for (String insId : triphaseRetMap.keySet()) {
+                            Map<String, Object> robotWarn = new HashMap<>(4);
+                            robotWarn.put("taskId", taskCode);
+                            robotWarn.put("inspectionId", insId);
+                            robotWarn.put("warnId", warnId + triphaseType);
+                            insResults.add(robotWarn);
+                        }
+                        warnInfo.put("resultsInfo", insResults);
+                        insertNonhomologousWarnInfo(warnInfo);
+                        retFlag = true;
+                    }
+                }else {
+                    log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
+                    Map<String, String> triphaseRetMapItem = new HashMap<>(4);
+                    long valueIsNotEmptyCount = triphaseRetMap.values().stream().filter(trm -> !trm.isEmpty()).count();
+                    triphaseRetMap.forEach((key, value) -> {
+                        if (valueIsNotEmptyCount > 1 && StringUtils.isNotEmpty(value)){
+                            triphaseRetMapItem.put(value, key);
+                        }
+                    });
+                    triphaseName = "三相不一致";
+                    TRIPHASE_LOCK.remove(triphaseKey);
+
+                    if (triphaseRetMapItem.size() > 1){
+                        Map<String, Object> warnInfo = new HashMap<>(8);
+                        warnInfo.put("warnId", warnId + triphaseType);
+                        warnInfo.put("warnType", 5);
+                        warnInfo.put("instanceId", triphaseId);
+                        warnInfo.put("warnContent", triphaseName + "告警");
+                        List<Map<String, Object>> insResults = new ArrayList<>();
+                        for (String insId : triphaseRetMap.keySet()) {
+                            Map<String, Object> robotWarn = new HashMap<>(4);
+                            robotWarn.put("taskId", taskCode);
+                            robotWarn.put("inspectionId", insId);
+                            robotWarn.put("warnId", warnId + triphaseType);
+                            insResults.add(robotWarn);
+                        }
+                        warnInfo.put("resultsInfo", insResults);
+                        insertNonhomologousWarnInfo(warnInfo);
+                        retFlag = true;
+                    }
                 }
-                log.info("三相告警结果值 ===max: {}, min: {}, fruit:{}, threshold: {}, {}", max, min, fruit, warnThreshold, JSON.toJSONString(triphaseRetMap));
-            }
-            TRIPHASE_LOCK.remove(triphaseKey);
-            if (fruit > warnThreshold) {
-                Map<String, Object> warnInfo = new HashMap<>(8);
-                warnInfo.put("warnId", warnId + triphaseType);
-                warnInfo.put("warnType", 5);
-                warnInfo.put("instanceId", triphaseId);
-                warnInfo.put("warnContent", triphaseName + "告警：" + CommonUtils.percentFormat(fruit - warnThreshold, "#.##"));
-                List<Map<String, Object>> insResults = new ArrayList<>();
-                for (String insId : triphaseRetMap.keySet()) {
-                    Map<String, Object> robotWarn = new HashMap<>(4);
-                    robotWarn.put("taskId", taskCode);
-                    robotWarn.put("inspectionId", insId);
-                    robotWarn.put("warnId", warnId + triphaseType);
-                    insResults.add(robotWarn);
-                }
-                warnInfo.put("resultsInfo", insResults);
-                insertNonhomologousWarnInfo(warnInfo);
-                retFlag = true;
             }
         }
-
         return retFlag;
     }
 
