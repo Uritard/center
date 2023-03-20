@@ -1629,10 +1629,12 @@ public class UPatrolTaskService {
         log.info("taskInfoList size: {}", taskInfoList.size());
 
         // 查询检修区域
-        String overhaulString = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        final String[] overhaulString = {""};
+        List<String> overhaulList = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        overhaulList.forEach(s -> overhaulString[0] = StringUtils.isEmpty(overhaulString[0]) ? s : StringUtils.join(overhaulString[0], ",", s));
         List<String> overhaul = new ArrayList<>();
-        if (StringUtils.isNotEmpty(overhaulString)){
-            overhaul = Arrays.asList(overhaulString.split(","));
+        if (StringUtils.isNotEmpty(overhaulString[0])) {
+            overhaul = Arrays.asList(overhaulString[0].split(","));
         }
         List<String> finalOverhaul = overhaul;
         Collections.sort(finalOverhaul);
