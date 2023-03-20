@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.ModelFileEnum;
+import com.yjh.accessrobot.common.handler.MyException;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
@@ -57,6 +58,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.yjh.accessrobot.module.command.CruiseConstant.*;
+import static com.yjh.accessrobot.module.command.CruiseConstant.CruiseTypeEnum.LINKAGE_TASK;
+import static com.yjh.accessrobot.module.command.CruiseConstant.CruiseTypeEnum.NORMAL_TASK;
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
@@ -1056,13 +1060,13 @@ public class RobotService {
     private boolean checkRobotStatus(RobotTaskInstanceInfo item) throws InterruptedException {
         String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(item.getRobotCode());
         if (OFF_LINE.equals(robotOnlineStatus)) {
-            log.info("==========" + item.getRobotCode() + "该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========");
+            log.info("=========={}该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========", item.getRobotCode());
             return false;
         } else {
             Map<String, String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + item.getRobotCode() + ":41");
             String robotStatus = mapForRobotState.get("value");
             if ("4".equals(robotStatus)) {
-                log.info("==========" + item.getRobotCode() + "该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========");
+                log.info("=========={}该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========", item.getRobotCode());
                 return false;
             } else {
                 // 控制权获得
@@ -1113,7 +1117,7 @@ public class RobotService {
     private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
         try {
-            // 将instanceIdLkist放缓存，以备后续使用
+            // 将instanceIdList放缓存，以备后续使用
             Map<String, Object> instanceListMap = new HashMap<>(5);
             instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
             instanceListMap.put("taskId", taskId);
@@ -1151,7 +1155,7 @@ public class RobotService {
         String edgeOnlineStatus = tRobotInfoDao.selectStatusByEdgeCode(edgeCode);
 
         if (StringUtils.equals(OFF_LINE, edgeOnlineStatus)){
-            log.info("=========="+ edgeCode +"该边缘节点处于离线状态,没有成功将任务下发到边缘节点,巡视结果数据默认==========");
+            log.info("=========={}该边缘节点处于离线状态,没有成功将任务下发到边缘节点,巡视结果数据默认==========", edgeCode);
             return false;
         }
         return true;
@@ -1296,97 +1300,67 @@ public class RobotService {
         String deviceIdList = str.toString();
 
         try {
+            map.put("task_code", Optional.ofNullable(taskId).orElse(""));
+            map.put("task_name", Optional.ofNullable(item.getTaskName()).orElse(""));
+            map.put("device_list", Optional.ofNullable(deviceIdList).orElse(""));
             if (Objects.isNull(item.getUnionTaskStatus())) {
                 log.info("This is a normal task！！！！！！！！！！！！！");
-                // 巡视类型
-                Integer planType = null;
+                String planType = null;
                 switch (item.getCruiseType()) {
-                    // 全面
-                    case 213:
-                        // 自定义
-                    case 218:
-                        planType = 4;
+                    case ROUTINE_PATROL:
+                        planType = "1";
                         break;
-                    // 例行
-                    case 214:
-                        planType = 1;
+                    case SPECIAL_PATROL:
+                        planType = "2";
                         break;
-                    // 熄灯
-                    case 215:
-                        // 专项
-                    case 217:
-                        planType = 3;
+                    case LIGHTS_OUT_PATROL:
+                    case SPECIAL_PROJECT_PATROL:
+                        planType = "3";
                         break;
-                    // 特殊
-                    case 216:
-                        planType = 2;
+                    case TOTAL_PATROL:
+                    case CUSTOM_PATROL:
+                        planType = "4";
                         break;
-                    // 操作-操作票
-                    case 456:
-                        // 操作-单设备
-                    case 508:
-                        // 操作-紧急分合闸
-                    case 509:
-                        planType = 5;
+                    case OPERATION_ORDER_PATROL:
+                    case SINGLE_DEVICE_PATROL:
+                    case EMERGENCY_PATROL:
+                        planType = "5";
                         break;
                     default:
                         break;
                 }
-                map.put("type", planType);
-                map.put("task_code", taskId);
-                //                map.put("plan_code", item.getPlanCode());
-                map.put("task_name", item.getTaskName());
-                map.put("priority", item.getPriority());
+                map.put("type", Optional.ofNullable(planType).orElse(""));
+                map.put("priority", Optional.ofNullable(item.getPriority()).orElse(""));
                 map.put("device_level", item.getDeviceLevel());
-                map.put("device_list", deviceIdList);
-                // 周期任务参数
-                if ("172".equals(item.getIfRun())) {
-                    map.put("cycle_month", Optional.ofNullable(item.getCycleMonth()).orElse(""));
-                    map.put("cycle_week", Optional.ofNullable(item.getCycleWeek()).orElse(""));
-                    map.put("cycle_execute_time", Optional.ofNullable(item.getCycleExecuteTime()).orElse(""));
-                    map.put("cycle_start_time", Optional.ofNullable(item.getCycleStartTime()).orElse(""));
-                    map.put("cycle_end_time", Optional.ofNullable(item.getCycleEndTime()).orElse(""));
-                    map.put("interval_number", Optional.ofNullable(item.getIntervalNumber()).orElse(""));
-                    map.put("interval_type", Optional.ofNullable(item.getIntervalType()).orElse(""));
-                    map.put("interval_execute_time", Optional.ofNullable(item.getIntervalExecuteTime()).orElse(""));
-                    map.put("interval_start_time", Optional.ofNullable(item.getIntervalStartTime()).orElse(""));
-                    map.put("interval_end_time", Optional.ofNullable(item.getIntervalEndTime()).orElse(""));
-                    map.put("fixed_start_time", "");
-                }
                 // 定期和立即任务参数
-                else {
-                    map.put("fixed_start_time", item.getFixedStartTime());
-                    //                    map.put("isocr", item.getIsOcr());
-                    map.put("cycle_month", "");
-                    map.put("cycle_week", "");
-                    map.put("cycle_execute_time", "");
-                    map.put("cycle_start_time", "");
-                    map.put("cycle_end_time", "");
-                    map.put("interval_number", "");
-                    map.put("interval_type", "");
-                    map.put("interval_execute_time", "");
-                    map.put("interval_start_time", "");
-                    map.put("interval_end_time", "");
-                }
-                map.put("invalid_start_time", "");
-                map.put("invalid_end_time", "");
-                map.put("isenable", "0");
-                map.put("creator", "1");
-                map.put("create_time", DateTimeUtil.format(new Date()));
-                mapList.add(map);
+                map.put("fixed_start_time", Optional.ofNullable(item.getFixedStartTime()).orElse(""));
+                // 周期任务参数
+                map.put("cycle_month", Optional.ofNullable(item.getCycleMonth()).orElse(""));
+                map.put("cycle_week", Optional.ofNullable(item.getCycleWeek()).orElse(""));
+                map.put("cycle_execute_time", Optional.ofNullable(item.getCycleExecuteTime()).orElse(""));
+                map.put("cycle_start_time", Optional.ofNullable(item.getCycleStartTime()).orElse(""));
+                map.put("cycle_end_time", Optional.ofNullable(item.getCycleEndTime()).orElse(""));
+                // 间隔任务参数
+                map.put("interval_number", Optional.ofNullable(item.getIntervalNumber()).orElse(""));
+                map.put("interval_type", Optional.ofNullable(item.getIntervalType()).orElse(""));
+                map.put("interval_execute_time", Optional.ofNullable(item.getIntervalExecuteTime()).orElse(""));
+                map.put("interval_start_time", Optional.ofNullable(item.getIntervalStartTime()).orElse(""));
+                map.put("interval_end_time", Optional.ofNullable(item.getIntervalEndTime()).orElse(""));
 
-                taskItemMap.put("type", "101");
+                map.put("invalid_start_time", Optional.ofNullable(item.getInvalidStartTime()).orElse(""));
+                map.put("invalid_end_time", Optional.ofNullable(item.getInvalidEndTime()).orElse(""));
+                map.put("isenable", Optional.ofNullable(item.getIsenable()).orElse("0"));
+                map.put("creator", Optional.ofNullable(item.getCreator()).orElse("1"));
+                map.put("create_time", Optional.ofNullable(item.getCreator()).orElse(DateTimeUtil.format(new Date())));
+                mapList.add(map);
+                taskItemMap.put("type", NORMAL_TASK);
                 taskItemMap.put("mapList", mapList);
             } else {
                 log.info("This is a linkage task！！！！！！！！！！！！！");
-                map.put("task_code", taskId);
-                map.put("task_name", item.getTaskName());
-                map.put("priority", 4);
+                map.put("priority", "4");
                 map.put("device_level", 3);
-                map.put("device_list", deviceIdList);
                 mapList.add(map);
-
-                taskItemMap.put("type", "102");
+                taskItemMap.put("type", LINKAGE_TASK);
                 taskItemMap.put("mapList", mapList);
             }
         } catch (Exception e) {
@@ -1409,11 +1383,11 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public Result sendConfirmMsg(Map<String, Object> confirmMessageMap) {
         Result result = new Result();
-        log.info("confirmMessageMap===" + confirmMessageMap);
+        log.info("confirmMessageMap==={}", confirmMessageMap);
         String robotCode = confirmMessageMap.get("robotCode").toString();
         if (StringUtils.isEmpty(robotCode)) {
             log.error("机器人编码为空,robotCode：{}", robotCode);
-            throw new RuntimeException("机器人编码为空");
+            throw new MyException("机器人编码为空");
         }
         String taskId = confirmMessageMap.get("taskId").toString();
         List<Map<String, Object>> cfmList = (List<Map<String, Object>>) confirmMessageMap.get("confirmMsgList");
@@ -1452,7 +1426,7 @@ public class RobotService {
             result.setMessage(209, "该机器人处于离线状态,没有成功将确认消息下发到机器人......");
             return result;
         } else {
-            if (cfmList.size() > 0) {
+            if (!cfmList.isEmpty()) {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("51")
                         .setSendCode(Constant.sendCode)
@@ -1461,7 +1435,7 @@ public class RobotService {
                         .setCommand("1")
                         .setTime(DateTimeUtil.format(new Date()))
                         .setItems(cfmList);
-                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
                 log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
                 Map<String, String> robotControlModelMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
                 String robotPattern = robotControlModelMap.get("value");

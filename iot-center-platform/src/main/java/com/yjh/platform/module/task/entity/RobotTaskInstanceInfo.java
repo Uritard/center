@@ -27,7 +27,7 @@ public class RobotTaskInstanceInfo implements Serializable {
 
     private String taskName;
 
-    private Integer priority;
+    private String priority;
 
     private Integer deviceLevel = 3;
 

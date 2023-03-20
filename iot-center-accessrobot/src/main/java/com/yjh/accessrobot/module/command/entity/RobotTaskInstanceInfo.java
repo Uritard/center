@@ -27,7 +27,7 @@ public class RobotTaskInstanceInfo implements Serializable {
     private String taskName;
 
     @ApiModelProperty(value = "优先级")
-    private Integer priority;
+    private String priority;
 
     @ApiModelProperty(value = "设备层级")
     private Integer deviceLevel;
@@ -42,7 +42,7 @@ public class RobotTaskInstanceInfo implements Serializable {
     private List<String> instanceList;
     @ApiModelProperty(value = "执行方式")
     private String ifRun;
-    @ApiModelProperty(value = "定期开始时间")
+    @ApiModelProperty(value = "开始时间-定期与立即")
     private String fixedStartTime;
     @ApiModelProperty(value = "周期（月）")
     private String cycleMonth;
@@ -64,8 +64,23 @@ public class RobotTaskInstanceInfo implements Serializable {
     private String intervalStartTime;
     @ApiModelProperty(value = "间隔结束时间")
     private String intervalEndTime;
-    @ApiModelProperty(value = "是否为联动任务（1表达联动任务，正常任务为空）")
+    @ApiModelProperty(value = "是否为联动任务（1表示联动任务，空值表示正常任务）")
     private String unionTaskStatus;
     @ApiModelProperty(value = "边缘节点ID")
     private String edgeCode;
+
+    @ApiModelProperty(value = "不可用开始时间")
+    private String invalidStartTime;
+
+    @ApiModelProperty(value = "不可用结束时间")
+    private String invalidEndTime;
+
+    @ApiModelProperty(value = "是否可用：0-可用（启用）1-不可用（禁用）")
+    private String isenable;
+
+    @ApiModelProperty(value = "编制人")
+    private String creator;
+
+    @ApiModelProperty(value = "编制时间")
+    private String createTime;
 }

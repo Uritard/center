@@ -274,7 +274,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         robotTaskInfo.setCruiseType(tCruiseTask.getType());
                         robotTaskInfo.setTaskId(taskId);
                         robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
-                        robotTaskInfo.setPriority(tCruiseTask.getTaskLevel());//优先级
+                        robotTaskInfo.setPriority(String.valueOf(tCruiseTask.getTaskLevel()));//优先级
                         robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                         List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                         robotTaskInfo.setInstanceList(robotTaskInstanceList);
