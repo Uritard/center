@@ -306,8 +306,9 @@ public class NonhomologousWarnThread implements Runnable{
             long triphaseId = MapUtils.getLong(map, "triphaseId");
             String triphaseKey = TRIPHASE_PREFIX + taskCode + ":" + triphaseId;
             Object lock = TRIPHASE_LOCK.computeIfAbsent(triphaseKey, v -> new Object());
+
             int triphaseType = MapUtils.getInteger(map, "triphaseType");
-            float warnThreshold = MapUtils.getFloat(map, "warnThreshold");
+            float warnThreshold = MapUtils.getFloat(map, "warnThreshold", 0.0f);
             float fruit;
             String triphaseName;
             Map<String, String> triphaseRetMap;
@@ -319,11 +320,6 @@ public class NonhomologousWarnThread implements Runnable{
                     triphaseRetMap.put(MapUtils.getString(map, "instanceTwoId"), "");
                     triphaseRetMap.put(MapUtils.getString(map, "instanceTriId"), "");
                 }
-//                if (NumberUtils.isCreatable(robotInsResult)) {
-//                    triphaseRetMap.put(instanceId, robotInsResult);
-//                } else {
-//                    log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
-//                }
                 triphaseRetMap.put(instanceId, robotInsResult);
 
                 redisTemplate.opsForHash().putAll(triphaseKey, triphaseRetMap);
