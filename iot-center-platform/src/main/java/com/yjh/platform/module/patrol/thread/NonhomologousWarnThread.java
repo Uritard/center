@@ -341,7 +341,7 @@ public class NonhomologousWarnThread implements Runnable{
                 Map<String, Object> warnInfo = new HashMap<>(8);
                 warnInfo.put("warnId", warnId + triphaseType);
                 warnInfo.put("warnType", 5);
-                warnInfo.put("instanceId", instanceId);
+                warnInfo.put("instanceId", triphaseId);
                 warnInfo.put("warnContent", triphaseName + "告警：" + CommonUtils.percentFormat(fruit - warnThreshold, "#.##"));
                 List<Map<String, Object>> insResults = new ArrayList<>();
                 for (String insId : triphaseRetMap.keySet()) {
