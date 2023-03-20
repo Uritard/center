@@ -3,10 +3,16 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson.JSON;
 import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -33,6 +39,10 @@ public class NonhomologousWarnThread implements Runnable{
     private final RobotPatrolTaskAlarm robotPatrolTaskAlarm;
     private final int isResult;
     private final NonhomologousWarnDao nonhomologousWarnDao;
+
+    private static final String CCD_PATH = "/CCD/";
+    private static final String FIR_PATH = "/FIR/";
+    private static final String AUDIO_PATH = "/Audio/";
 
     public static final String TRIPHASE_PREFIX = "TRIPHASE_RULE:";
     private static final Map<String, Object> TRIPHASE_LOCK = new ConcurrentHashMap<>(32);
@@ -396,6 +406,9 @@ public class NonhomologousWarnThread implements Runnable{
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
+        log.info("非同源上报参数：warnContent={}，warnType={}，taskId={},instanceId={}",warn.get("warnContent").toString(),warn.get("warnType").toString(),robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
+        warnToUpSystem(warn.get("warnContent").toString(),warn.get("warnType").toString(),
+                robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
         return true;
     }
 
@@ -448,6 +461,180 @@ public class NonhomologousWarnThread implements Runnable{
 
         warn.put("resultsInfo", insResults);
         insertNonhomologousWarnInfo(warn);
+    }
+
+    private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){
+        try {
+            Map<String, Object> xmlItem = new HashMap<>(16);
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            log.info("cruiseResultMap=={}", cruiseResultMap);
+            String devicePointId = Optional.ofNullable(cruiseResultMap.get("devicePointId")).orElse("");
+            String simpleDateFormat = DateTimeUtil.format3(new Date());
+
+            Map<String, String> patrolDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectPatrolDevice(instanceId);
+            HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
+            String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
+            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
+            String taskPatrolledIdTemp = taskId;
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+
+            xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
+            xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
+            xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
+            xmlItem.put("device_id", Constant.standardPoints() ? devicePointId : instanceId);
+            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
+            xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
+            xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
+            xmlItem.put("task_code", taskCode);
+            xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+
+            // 文件后缀
+            String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
+            fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
+            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+            String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
+            xmlBaseModel.setType("62");
+
+            String value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+            String imgPath = Optional.ofNullable(cruiseResultMap.get("picPath")).orElse("");
+            String alarmLevel = "2";
+
+            Map<String, String> resMap = packageAlarmInfo(alarmLevel, value, warnContent, imgPath, warnType,xmlItem, tagPath);
+            log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
+            StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            if (StringUtils.equals("1", sysLevel)) {
+                xmlBaseModel.setCommand("1");
+            }
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            map.put("list", list);
+            log.info("The {} information to be reported one level up is==={}",
+                    StringUtils.equals("61", xmlBaseModel.getType()) ? "cruiseResult" : "alarm", map);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.info("非同源告警上报出错：",e);
+        }
+    }
+
+    /**
+     * 组装告警信息
+     *
+     * @param alarmLevel 告警等级
+     * @param xmlItem
+     * @param tagPath
+     * @return Map<String, String>
+     */
+    private Map<String, String> packageAlarmInfo(String alarmLevel,
+                                                 String value,
+                                                 String warnContent,
+                                                 String imagePath,
+                                                 String warType,
+                                                 Map<String, Object> xmlItem, String tagPath) {
+        Map<String, String> resultPathMap = new HashMap<>(4);
+        log.info("imagePath=={}", imagePath);
+        imagePath = replaceResultImgPath(imagePath, false);
+
+        try {
+            String alarmType = "";
+            switch (warType){
+                case "1":
+                    alarmType = "1";
+                    break;
+                case "2":
+                    alarmType = "10";
+                    break;
+                case "5":
+                    alarmType = "3";
+                    break;
+                case "3":
+                case "4":
+                case "7":
+                case "6":
+                    alarmType = "10";
+                    break;
+                default:
+                    break;
+            }
+            tagPath = "alarm/" + tagPath;
+            xmlItem.put("file_path", tagPath);
+            // 1-预警 2-一般 3-严重 4-危急
+            xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
+            xmlItem.put("alarm_type", alarmType);
+            xmlItem.put("value", Optional.ofNullable(value).orElse(""));
+            xmlItem.put("unit", "");
+            xmlItem.put("value_unit", "");
+            xmlItem.put("content", warnContent);
+            xmlItem.put("defect_type", "");
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        resultPathMap.put("imgPath", imagePath);
+        resultPathMap.put("tagPath", tagPath);
+        return resultPathMap;
+    }
+
+    /**
+     * 图片路径的绝对地址与相对地址的转换
+     *
+     * @param analyseResultImg 图片路径
+     * @param flag true-绝对转相对 false-相对转绝对
+     * @return java.lang.String
+     */
+    public String replaceResultImgPath(String analyseResultImg, boolean flag) {
+        String resultImage = analyseResultImg;
+        try {
+            HashOperations<String, String, String> operations = redisTemplate.opsForHash();
+            Map<String,String> map = operations.entries("t_sys_param:prefixAbsolutePath");
+            String absPath = map.get("content");
+            Map<String,String> entries = operations.entries("t_sys_param:prefixRelativePath");
+            String relPath = entries.get("content");
+            if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
+                resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
+            } else {
+                String filePath = operations.get("t_sys_param:fileAbsPath", "content");
+                String fileUrl = operations.get("t_sys_param:fileRealPath", "content");
+                assert fileUrl != null; assert filePath != null;
+                resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
+            }
+
+            log.info("The image path after replacement is=={}", resultImage);
+        }catch (Exception e){
+            log.error("图片路径转换异常", e);
+        }
+        return resultImage;
+    }
+
+    /**
+     * 组装识别类型和文件类型
+     *
+     * @param cruiseResultMap redis的数据
+     * @return Map<String, String>
+     */
+    private HashMap<String, String> getTypeAndPathName(Map<String, String> cruiseResultMap){
+        HashMap<String, String> map = new HashMap<>(4);
+        // 识别类型、文件类型、文件名命名
+        String recognitionType = cruiseResultMap.getOrDefault("recognitionType", "3");
+        String fileType = cruiseResultMap.getOrDefault("fileType", "2");
+
+        String fileNamePath = CCD_PATH;
+        if (StringUtils.equals("4", recognitionType)){
+            fileNamePath = FIR_PATH;
+        }else if (StringUtils.equals("5", recognitionType)){
+            fileNamePath = AUDIO_PATH;
+        }
+        map.put("recognitionType", recognitionType);
+        map.put("fileNamePath", fileNamePath);
+        map.put("fileType", fileType);
+        return map;
     }
 
 }
