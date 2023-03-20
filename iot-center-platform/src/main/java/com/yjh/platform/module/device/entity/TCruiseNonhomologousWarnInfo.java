@@ -105,6 +105,7 @@ public class TCruiseNonhomologousWarnInfo implements Serializable {
 
     private String oneCruiseDeviceName;
     private String twoCruiseDeviceName;
+    private String threeCruiseDeviceName;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "告警类型")

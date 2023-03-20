@@ -178,6 +178,7 @@
         a.state,
         a.log_type as logType,
         a.content,
+        a.user_id,
         a.create_time as createTime
         from sys_logs a
         where 1 = 1

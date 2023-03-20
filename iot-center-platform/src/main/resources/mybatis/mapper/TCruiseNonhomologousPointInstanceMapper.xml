@@ -232,13 +232,15 @@
         a.warn_type,
         n.warn_level,
         n.one_cruise_device_name,
-        n.two_cruise_device_name
+        n.two_cruise_device_name,
+        null as threeCruiseDeviceName
         from t_cruise_nonhomologous_warn a
         left join t_cruise_nonhomologous_point_instance n on n.instance_id =a.instance_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
         left join t_std_device e on e.device_id = d.device_id
         left join t_dict_business k on k.dict_code = e.device_type
-        where 1 = 1<if test="instanceId != null and instanceId != ''">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        where 1 = 1 and a.warn_type != 5
+        <if test="instanceId != null and instanceId != ''">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and e.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''">and e.device_name like concat(
             '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
@@ -251,6 +253,46 @@
                 #{endTime,jdbcType=TIMESTAMP}
             </if>
         </if>
+        union all(
+        select distinct
+        a.warn_id,
+        a.instance_id,
+        a.warn_content,
+        a.warn_time,
+        d.device_mete_id,
+        d.custom_id,
+        e.device_id,
+        d.mete_name as device_mete_name,
+        d.custom_name,
+        e.device_name,
+        e.device_type,
+        k.dict_note as device_type_name,
+        a.warn_type,
+        n.warn_level,
+        n.one_cruise_device_name,
+        n.two_cruise_device_name,
+        n.tri_cruise_device_name as threeCruiseDeviceName
+        FROM
+        t_cruise_nonhomologous_warn a
+        LEFT JOIN t_cruise_triphase_rule n ON n.triphase_id = a.instance_id
+        LEFT JOIN t_std_devicemete d ON d.device_mete_id = n.device_mete_id
+        LEFT JOIN t_std_device e ON e.device_id = d.device_id
+        LEFT JOIN t_dict_business k ON k.dict_code = e.device_type
+        where 1 = 1 and a.warn_type = 5
+        <if test="instanceId != null and instanceId != ''">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="deviceType != null "> and e.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''">and e.device_name like concat(
+            '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+        <if test="deviceMeteName != null and deviceMeteName != ''">and d.mete_name like
+            concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%')
+        </if>
+        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="startTime != null  ">
+            <if test="endTime != null ">and a.warn_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        )
         ) warn order by warn.warn_time desc
     </select>
 

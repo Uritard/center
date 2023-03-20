@@ -24,6 +24,7 @@ public class SysLogDetail {
     private String logType;
     private String content;
     private String state;
+    private Long userId;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

@@ -95,7 +95,7 @@ public class TCruiseNonhomologousPointInstanceService {
         for (TCruiseNonhomologousWarnInfo info: list) {
             if(NonhomologousWarnEnum.SANXIANG.getCode().equals(info.getWarnType())) {
                 List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(info.getWarnId());
-                if (CollectionUtils.isNotEmpty(listMaps)) {
+                if (CollectionUtils.isNotEmpty(listMaps) && StringUtils.isEmpty(info.getOneCruiseDeviceName())) {
                     String taskCode = listMaps.get(0).get("task_id").toString();
                     Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
                     String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
