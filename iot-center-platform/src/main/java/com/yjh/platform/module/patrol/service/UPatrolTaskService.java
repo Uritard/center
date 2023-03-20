@@ -467,6 +467,7 @@ public class UPatrolTaskService {
                 nodeSet.add(edgeCode);
             }
 
+            map.put("isTemdif", String.valueOf(item.getIsTemdif()));
             // 初始化识别类型和采集文件类型,默认值为位置状态识别和识别图片
             map.put("recognitionType", StringUtils.isNotEmpty(item.getMeteType()) ?
                     RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize() : "2");

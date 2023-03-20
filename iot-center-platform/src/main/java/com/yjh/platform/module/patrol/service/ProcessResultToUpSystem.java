@@ -157,7 +157,8 @@ public class ProcessResultToUpSystem {
                     resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
                 } else {
                     xmlBaseModel.setType("62");
-                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath);
+                    String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
+                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif);
                 }
                 log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
                 analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
@@ -227,7 +228,7 @@ public class ProcessResultToUpSystem {
         // 识别类型、文件类型、文件名命名
         String recognitionType = cruiseResultMap.getOrDefault("recognitionType", "3");
         String fileType = cruiseResultMap.getOrDefault("fileType", "2");
-
+        String isTemdif = cruiseResultMap.getOrDefault("isTemdif", "0");
         String fileNamePath = CCD_PATH;
         if (StringUtils.equals("4", recognitionType)){
             fileNamePath = FIR_PATH;
@@ -237,6 +238,7 @@ public class ProcessResultToUpSystem {
         map.put("recognitionType", recognitionType);
         map.put("fileNamePath", fileNamePath);
         map.put("fileType", fileType);
+        map.put("isTemdif", isTemdif);
         return map;
     }
 
@@ -249,27 +251,42 @@ public class ProcessResultToUpSystem {
      * @param tagPath
      * @return Map<String, String>
      */
-    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath) {
+    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath, String isTemdif) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
         log.info("imagePath=={}", imagePath);
         imagePath = replaceResultImgPath(imagePath, false);
 
+        //是否为温差任务标志位 0否 1是
+        String zero = "0";
         try {
             String recognitionType = String.valueOf(xmlItem.get("recognition_type"));
             String alarmType = "";
             switch (recognitionType){
                 case "1":
+                    //仪表越限报警
                     alarmType = "7";
                     break;
                 case "2":
+                    //变位报警
                     alarmType = "10";
                     break;
                 case "3":
+                    //外观异常
                     alarmType = "6";
                     break;
                 case "4":
-                    alarmType = "1";
+                    if (zero.equals(isTemdif)) {
+                        //超温报警
+                        alarmType = "1";
+                    } else {
+                        //温升报警
+                        alarmType = "2";
+                    }
+                    break;
+                case "5":
+                    //声音异常
+                    alarmType = "5";
                     break;
                 default:
                     break;
