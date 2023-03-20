@@ -12,6 +12,8 @@ import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.task.dao.TCruiseTriphaseRuleDao;
+import com.yjh.platform.module.task.entity.TCruiseTriphaseRule;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -407,9 +409,11 @@ public class NonhomologousWarnThread implements Runnable{
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
-        log.info("非同源上报参数：warnContent={}，warnType={}，taskId={},instanceId={}",warn.get("warnContent").toString(),warn.get("warnType").toString(),robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
+        log.info("非同源上报参数：warnContent={}，warnType={}，taskId={},instanceId={},triphase_id={}",
+                warn.get("warnContent").toString(),warn.get("warnType").toString(),robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId(),warn.get("instanceId"));
         warnToUpSystem(warn.get("warnContent").toString(),warn.get("warnType").toString(),
-                robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
+                robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId(),
+                warn.get("instanceId").toString());
         return true;
     }
 
@@ -464,7 +468,7 @@ public class NonhomologousWarnThread implements Runnable{
         insertNonhomologousWarnInfo(warn);
     }
 
-    private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){
+    private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId,String triphaseId){
         try {
             Map<String, Object> xmlItem = new HashMap<>(16);
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -505,7 +509,7 @@ public class NonhomologousWarnThread implements Runnable{
             String imgPath = Optional.ofNullable(cruiseResultMap.get("picPath")).orElse("");
             String alarmLevel = "2";
 
-            Map<String, String> resMap = packageAlarmInfo(alarmLevel, value, warnContent, imgPath, warnType,xmlItem, tagPath);
+            Map<String, String> resMap = packageAlarmInfo(alarmLevel, value, warnContent, imgPath, warnType,triphaseId,xmlItem, tagPath);
             log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
             StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
             xmlItems.add(xmlItem);
@@ -539,6 +543,7 @@ public class NonhomologousWarnThread implements Runnable{
                                                  String warnContent,
                                                  String imagePath,
                                                  String warType,
+                                                 String triphaseId,
                                                  Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         log.info("imagePath=={}", imagePath);
@@ -554,7 +559,11 @@ public class NonhomologousWarnThread implements Runnable{
                     alarmType = "10";
                     break;
                 case "5":
+                    TCruiseTriphaseRule rule = StaticContextAccessor.getBean(TCruiseTriphaseRuleDao.class).selectByPrimaryId(Long.valueOf(triphaseId));
                     alarmType = "3";
+                    if (rule.getTriphaseType() == 3){
+                        alarmType = "4";
+                    }
                     break;
                 case "3":
                 case "4":
