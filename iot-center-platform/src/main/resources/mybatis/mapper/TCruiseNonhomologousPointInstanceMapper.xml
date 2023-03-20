@@ -367,7 +367,20 @@
 
 
     <select id="getTCruiseNonhomologousWarnByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO">
-        select warn_id,instance_id,warn_type,warn_content,warn_time from t_cruise_nonhomologous_warn where warn_id = #{warnId}
+        SELECT
+            a.warn_id,
+            a.instance_id,
+            a.warn_type,
+            a.warn_content,
+            a.warn_time,
+            n.one_cruise_device_name,
+            n.two_cruise_device_name,
+            n.tri_cruise_device_name AS threeCruiseDeviceName
+        FROM
+            t_cruise_nonhomologous_warn a
+                LEFT JOIN t_cruise_triphase_rule n ON n.triphase_id = a.instance_id
+        WHERE
+            warn_id = #{warnId}
     </select>
 
 </mapper>
