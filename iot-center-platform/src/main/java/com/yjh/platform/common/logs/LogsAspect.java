@@ -2,10 +2,12 @@ package com.yjh.platform.common.logs;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.constant.ModelTypeEnum;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
+import jdk.nashorn.internal.scripts.JO;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -102,6 +104,15 @@ public class LogsAspect {
             }
 
             content.append(contentStr);
+            //处理导出模型文件
+            if ("导出模型文件".equals(title)) {
+                JSONObject parameters = getRequestParams(request,args,paramAnnotations);
+                String modelName = ModelTypeEnum.exportMap().get(parameters.getString("type"));
+                if (StringUtils.isNotBlank(modelName)) {
+                    content.append("-").append(modelName);
+                }
+            }
+
             params.set("userId", userId);
             params.set("userName", userName);
             params.set("requestOrigin", request.getRequestURL());
