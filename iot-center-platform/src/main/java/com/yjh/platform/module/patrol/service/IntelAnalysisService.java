@@ -677,9 +677,11 @@ public class IntelAnalysisService {
                     taskResult.setTaskId(taskId);
                     taskResult.setInstanceId(instanceId);
                     taskResult.setResultDesc("");
-                    taskResult.setAnalyseResultImg(originPicPath);
                     taskResult.setAnalyseType(algorithmType);
                     taskResult.setConf("0.0");
+                    // 去画框
+                    pictureWaterMark(originPicPath, "27OfPoints");
+                    taskResult.setAnalyseResultImg(originPicPath);
                     resultList.add(taskResult);
                     continue;
                 }
