@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
@@ -7,12 +8,14 @@ import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -29,6 +32,8 @@ public class UPatrolPlanAttrService {
     private TCruisePlanDao tCruisePlanDao;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private LogsRecord logsRecord;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -124,7 +129,9 @@ public class UPatrolPlanAttrService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(Long planId) {
+    public int deleteByPrimaryId(Long planId, HttpServletRequest request) {
+        TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(planId);
+        logsRecord.LogsSend(request, "4", "删除预案", "删除预案-" + tCruisePlanCount.getPlanName());
         uPatrolPlanAttrDao.deleteByPrimaryId(planId);
         return this.tCruisePlanDao.deleteByPrimaryId(planId);
     }

@@ -42,7 +42,7 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
     public ThreadPoolTaskScheduler taskScheduler(){
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(4);
-        scheduler.setThreadNamePrefix("scheduling-platform-");
+        scheduler.setThreadNamePrefix("scheduling-tcp-");
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
@@ -55,12 +55,12 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
     @Bean(name = "asyncExecutor")
     public ThreadPoolTaskExecutor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
+        executor.setCorePoolSize(20);
         executor.setQueueCapacity(100);
 //        executor.setKeepAliveSeconds(600);
         executor.setMaxPoolSize(20);
-        executor.setThreadNamePrefix("taskExecutor-platform-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setThreadNamePrefix("taskExecutor-tcp-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
         executor.initialize();
         return executor;
     }

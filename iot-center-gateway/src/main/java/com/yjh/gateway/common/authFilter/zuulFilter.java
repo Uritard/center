@@ -361,7 +361,7 @@ public class zuulFilter extends ZuulFilter {
                     jsonMap.put("userName", userName);
                     jsonMap.put("content", "用户[" + userName + "]在未绑定的IP地址访问系统!");
                     WebSocketServer.sendMsg(jsonMap.toJSONString());
-                    logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
+                    logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 3);
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
                 }
             }

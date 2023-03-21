@@ -169,7 +169,25 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", content.toString());
-                if (!"修改系统用户数据".equals(title) && !"删除系统用户数据".equals(title)) {
+                boolean flag = true;
+                switch (title){
+                    case "修改系统用户数据":
+                    case "删除系统用户数据":
+                    case "新增任务":
+                    case "删除任务":
+                    case "任务启动":
+                    case "任务暂停":
+                    case "任务恢复":
+                    case "任务终止":
+                    case "新增预案":
+                    case "删除预案":
+                    case "修改预案":
+                        flag =false;
+                        break;
+                    default:
+                        break;
+                }
+                if (flag) {
                     post(params);
                 }
                 return result;

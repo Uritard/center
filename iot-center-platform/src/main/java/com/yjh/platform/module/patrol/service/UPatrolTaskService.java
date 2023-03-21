@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
@@ -134,6 +135,8 @@ public class UPatrolTaskService {
     @Autowired
     private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
 
+    @Autowired
+    private LogsRecord logsRecord;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
@@ -1226,9 +1229,11 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskConfirmation(String userId, String password, HttpServletRequest request, String identifier) throws Exception {
+    public int taskConfirmation(String userId, TCruiseTaskAdd tCruiseTaskAdd, HttpServletRequest request) throws Exception {
         String iP = request.getHeader("HTTP_X_FORWARDED_FOR");
         SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
+        String password = tCruiseTaskAdd.getpCode();
+        String identifier = tCruiseTaskAdd.getIdentifier();
         //判断开关
         Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         Boolean flag = Boolean.valueOf(map.get("content"));
@@ -1263,7 +1268,7 @@ public class UPatrolTaskService {
             MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
             params.set("logType", "2");
             params.set("ip", iP);
-            params.set("title", "任务下发");
+            params.set("title", "任务" + tCruiseTaskAdd.getTaskName() + "下发");
             params.set("state", 2);
             params.set("userId", Long.valueOf(userId));
             params.set("userName", sysUser.getUserName());
@@ -1279,8 +1284,11 @@ public class UPatrolTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String taskId, String startTime) {
+    public int deleteByPrimaryId(String taskId, String startTime,HttpServletRequest request) {
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+        if (Optional.ofNullable(request).isPresent()) {
+            logsRecord.LogsSend(request, "4", "删除任务", "删除任务-" + task.getTaskName());
+        }
         if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
             if (!startTime.equals("-1")) {
                 TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
@@ -1370,11 +1378,14 @@ public class UPatrolTaskService {
     }
 
 //    @Transactional(rollbackFor = Exception.class)
-    public String taskStart(String taskId) {
+    public String taskStart(String taskId, HttpServletRequest request) {
         String taskPatrolledId = "";
         try {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+            if (Optional.ofNullable(request).isPresent()) {
+                logsRecord.LogsSend(request, "29", "任务启动", "任务启动-" + uPatrolTask.getTaskName());
+            }
             TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
             if (Objects.nonNull(uPatrolTask.getPlanId())){
                 tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
@@ -1421,8 +1432,11 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskPause(String taskId) {
+    public int taskPause(String taskId, HttpServletRequest request) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
+        if (Optional.ofNullable(request).isPresent()) {
+            logsRecord.LogsSend(request, "11", "任务暂停", "任务暂停-" + uPatrolResult.getTaskName());
+        }
         uPatrolResult.setTaskState(TASK_STATE_PAUSE);
         try {
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -1470,8 +1484,11 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskGoOn(String taskId, boolean force) {
+    public int taskGoOn(String taskId, boolean force, HttpServletRequest request) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
+        if (Optional.ofNullable(request).isPresent()) {
+            logsRecord.LogsSend(request, "12", "任务恢复", "任务恢复-" + uPatrolResult.getTaskName());
+        }
         if (ArrayUtils.contains(new int[] {TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, uPatrolResult.getTaskState())) {
             log.info("当前任务已经结束:{}, state: {}", taskId, uPatrolResult.getTaskState());
             return 1;
@@ -1534,8 +1551,11 @@ public class UPatrolTaskService {
      * 任务终止，异步执行
      */
     @Async
-    public void taskShutDown(String taskId) {
+    public void taskShutDown(String taskId, HttpServletRequest request) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        if (Optional.ofNullable(request).isPresent()) {
+            logsRecord.LogsSend(request, "13", "任务终止", "任务终止-" + uPatrolResult.getTaskName());
+        }
         if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
             return;
         }
@@ -2636,7 +2656,7 @@ public class UPatrolTaskService {
         if (lowTaskList != null && lowTaskList.size() > 0) {
             lowTaskList.forEach(lowTask -> {
                 try {
-                    taskGoOn(lowTask, false);
+                    taskGoOn(lowTask, false, null);
                 }catch (Exception e){
                     log.info("低优先级任务继续出错：",e);
                 }
@@ -2856,13 +2876,13 @@ public class UPatrolTaskService {
         log.info("taskId : {} control", taskId);
         switch (com) {
             case "1":
-                return this.taskStart(taskId);
+                return this.taskStart(taskId, null);
             case "2":
-                return String.valueOf(this.taskPause(taskId));
+                return String.valueOf(this.taskPause(taskId, null));
             case "3":
-                return String.valueOf(this.taskGoOn(taskId, true));
+                return String.valueOf(this.taskGoOn(taskId, true, null));
             case "4":
-                this.taskShutDown(taskId);
+                this.taskShutDown(taskId, null);
                 return "1";
             default:
                 return "-1";
