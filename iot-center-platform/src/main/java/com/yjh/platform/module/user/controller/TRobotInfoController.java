@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -36,6 +37,8 @@ public class TRobotInfoController {
     private final TRobotInfoService tRobotInfoService;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private LogsRecord logsRecord;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -267,9 +270,9 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "分页模糊查询")
     @GetMapping(value = "/selectByPage")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1,authority = "1234", codeName="type")
+//    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1,authority = "1234", codeName="type")
     public Result selectByPage(@RequestParam(value = "robotName", required = false) String robotName,
-                                @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                               @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                                @RequestParam(value = "buildingUser", required = false) String buildingUser,
                                @RequestParam(value = "robotFactory", required = false) Integer robotFactory,
                                @RequestParam(value = "robotType", required = false) Integer robotType,
@@ -280,10 +283,16 @@ public class TRobotInfoController {
                                @RequestParam(value = "address", required = false) String address,
                                @RequestParam(value = "type", required = false) Integer type,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            String deviceTypeName = (type != null && type == 2) ? "无人机" : "机器人";
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出",deviceTypeName + "台账信息导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查询" + deviceTypeName + "台账信息","根据用户传递的参数分页查询" + deviceTypeName + "台账信息");
+            }
 //            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
             List<Long> regionIdList =  tStdRegionDao.selectDownId(upRegionId);
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);

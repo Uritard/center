@@ -240,7 +240,7 @@ public class StatisticsService {
         if (countMap.get("totalNum") != null && countMap.get("validNum") != null) {
             double totalNum = Double.parseDouble(countMap.get("totalNum").toString());
             double validNum = Double.parseDouble(countMap.get("validNum").toString());
-            String percent = String.format("%.2f", validNum * 100 / totalNum);
+            String percent = String.format("%.3f", validNum * 100 / totalNum);
             reMap.put("total_num", totalNum);
             reMap.put("valid_num", validNum);
             reMap.put("percent", percent + "%");
@@ -590,7 +590,7 @@ public class StatisticsService {
         if (statistics.getTotalNum() != null) {
             Double totalNum = Double.valueOf(statistics.getTotalNum());
             Double validNum = Double.valueOf(statistics.getValidNum());
-            String percent = String.format("%.2f", validNum * 100 / totalNum);
+            String percent = String.format("%.3f", validNum * 100 / totalNum);
             statistics.setPercent(percent + "%");
         }
     }
@@ -650,7 +650,7 @@ public class StatisticsService {
                 double totalNum = Double.parseDouble(map.get("totalNum").toString());
                 double lossNum = Double.parseDouble(map.get("lossNum").toString());
                 if (totalNum != 0) {
-                    String lossPercent = String.format("%.2f", lossNum * 100 / totalNum);
+                    String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
                     map.put("lossPercent", lossPercent + "%");
                 }
 
@@ -680,7 +680,7 @@ public class StatisticsService {
                         int intactTime = (int) mapChannel.get("intactTime");
                         int ipChanNum = (int) mapChannel.get("ipChanNum");
                         if (intactTime != 0) {
-                            String intactPercent = String.format("%.2f", intactTime / 100d);
+                            String intactPercent = String.format("%.3f", intactTime / 100d);
                             percentMap.put(ipChanNum, intactPercent + "%");
                         }
                     }
