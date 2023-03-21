@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.module.patrol.service.UPatrolPlanAttrService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.entity.input.CruisePlanReq;
@@ -23,6 +24,8 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author tt
@@ -39,6 +42,8 @@ public class TCruisePlanController {
     private TCruisePlanAttrService tCruisePlanAttrService;
     @Autowired
     private UPatrolPlanAttrService uPatrolPlanAttrService;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanController.class);
 
@@ -49,10 +54,11 @@ public class TCruisePlanController {
     @ApiOperation(value = "新增预案")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增预案",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2,authority = "1235")
-    public Result insert(@RequestBody Map<String, Object> map) {
+    public Result insert(HttpServletRequest request, @RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
 //            result.setData(tCruisePlanService.insert(map));
+            logsRecord.LogsSend(request, "2", "新增预案", "新增预案-" + map.get("planName"));
             result.setData(uPatrolPlanAttrService.insert(map));
             if(result.getData().equals(ResultCodeEnum.CODE10010.getCode())){
                 result.setCode(ResultCodeEnum.CODE10010.getCode(),ResultCodeEnum.CODE10010.getName());
@@ -69,11 +75,11 @@ public class TCruisePlanController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除预案",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4,authority = "1235")
-    public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
+    public Result delete(HttpServletRequest request, @RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
 //            result.setData(tCruisePlanService.deleteByPrimaryId(planId));
-            result.setData(uPatrolPlanAttrService.deleteByPrimaryId(planId));
+            result.setData(uPatrolPlanAttrService.deleteByPrimaryId(planId, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除预案异常:", e);
@@ -87,10 +93,11 @@ public class TCruisePlanController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改预案",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3,authority = "1235")
-    public Result update(@RequestBody Map<String, Object> planDetailMap) {
+    public Result update(HttpServletRequest request, @RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
 //            result.setData(tCruisePlanService.update(planDetailMap));
+            logsRecord.LogsSend(request, "3", "修改预案", "修改预案-" + planDetailMap.get("planName"));
             result.setData(uPatrolPlanAttrService.update(planDetailMap));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

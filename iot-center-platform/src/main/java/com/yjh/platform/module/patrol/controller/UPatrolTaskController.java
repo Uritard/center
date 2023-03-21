@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -51,6 +52,8 @@ public class UPatrolTaskController {
     private RedisTemplate redisTemplate;
     @Autowired
     private TPeriodModelDao tPeriodModelDao;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
@@ -115,9 +118,10 @@ public class UPatrolTaskController {
     public Result taskConfirmation(HttpServletRequest request, @RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
+            logsRecord.LogsSend(request, "2", "新增任务", "新增任务-"+ tCruiseTaskAdd.getTaskName());
             String userId = request.getHeader("userId");
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
-            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
+            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd, request);
             if (i == 1) {
                 result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
             } else {
@@ -143,7 +147,7 @@ public class UPatrolTaskController {
         try {
             String userId = request.getHeader("userId");
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
-            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
+            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd, request);
             if (i == 1) {
                 result.setData(uPatrolTaskService.startAllTask(tCruiseTaskAdd.getCreateUserId()));
             } else {
@@ -162,12 +166,13 @@ public class UPatrolTaskController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Logs(title = "删除巡检任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
-    public Result delete(@RequestParam(value = "taskId", required = true) String taskId,
+    @Logs(title = "删除任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
+    public Result delete(HttpServletRequest request,
+                         @RequestParam(value = "taskId", required = true) String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime));
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime,request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);
@@ -181,10 +186,10 @@ public class UPatrolTaskController {
     @ApiOperation(value = "任务启动")
     @RequestMapping(value = "/taskStart", method = RequestMethod.GET)
     @Logs(title = "任务启动",content = "任务启动",logType = 29,authority = "1235")
-    public Result taskStart(@RequestParam(value = "taskId") String taskId) {
+    public Result taskStart(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskStart(taskId));
+            result.setData(uPatrolTaskService.taskStart(taskId, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务启动异常:", e);
@@ -197,10 +202,10 @@ public class UPatrolTaskController {
     @ApiOperation(value = "任务暂停")
     @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
     @Logs(title = "任务暂停",content = "任务暂停",logType = 11,authority = "1235")
-    public Result taskPause(@RequestParam(value = "taskId") String taskId) {
+    public Result taskPause(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskPause(taskId));
+            result.setData(uPatrolTaskService.taskPause(taskId, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务暂停异常:", e);
@@ -214,10 +219,10 @@ public class UPatrolTaskController {
     @ApiOperation(value = "任务继续")
     @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
     @Logs(title = "任务恢复",content = "任务恢复",logType = 12,authority = "1235")
-    public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
+    public Result taskGoOn(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskGoOn(taskId, true));
+            result.setData(uPatrolTaskService.taskGoOn(taskId, true, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务继续异常:", e);
@@ -231,10 +236,10 @@ public class UPatrolTaskController {
     @ApiOperation(value = "任务终止")
     @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
     @Logs(title = "任务终止",content = "任务终止",logType = 13,authority = "1235")
-    public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
+    public Result taskShutDown(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            uPatrolTaskService.taskShutDown(taskId);
+            uPatrolTaskService.taskShutDown(taskId, request);
             result.setData(1);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -361,7 +366,7 @@ public class UPatrolTaskController {
         try {
             lowTaskIdList.forEach(taskId->{
                 try {
-                    uPatrolTaskService.taskGoOn(taskId, false);
+                    uPatrolTaskService.taskGoOn(taskId, false, null);
                 }catch (Exception e){
                     log.info("其他服务调低优先级任务继续出错:{}",e);
                 }
