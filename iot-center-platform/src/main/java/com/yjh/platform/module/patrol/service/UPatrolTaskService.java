@@ -889,7 +889,7 @@ public class UPatrolTaskService {
                         taskInfo.setCruiseType(task.getTaskType());
                         taskInfo.setTaskId(task.getTaskId());
                         // 从巡视主机下发至边缘节点的任务等级为3级
-                        taskInfo.setPriority(3);
+                        taskInfo.setPriority("3");
                         taskInfo.setTaskName(task.getTaskName());
                         taskInfo.setInstanceList(new ArrayList<>(instanceList));
                         String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
@@ -945,7 +945,7 @@ public class UPatrolTaskService {
                     robotTaskInfo.setCruiseType(task.getTaskType());
                     robotTaskInfo.setTaskId(task.getTaskId());
                     // 从巡视主机下发至机器人的任务等级都暂定3级
-                    robotTaskInfo.setPriority(3);
+                    robotTaskInfo.setPriority("3");
                     robotTaskInfo.setTaskName(task.getTaskName());
                     List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
                     robotTaskInfo.setInstanceList(robotTaskInstanceList);
@@ -996,7 +996,7 @@ public class UPatrolTaskService {
                         RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
                         taskInfo.setCruiseType(task.getTaskType());
                         taskInfo.setTaskId(task.getTaskId());
-                        taskInfo.setPriority(task.getTaskLevel());
+                        taskInfo.setPriority(String.valueOf(task.getTaskLevel()));
                         taskInfo.setTaskName(task.getTaskName());
                         taskInfo.setInstanceList(new ArrayList<>(instanceList));
                         taskInfo.setIfRun("173");
@@ -1032,7 +1032,7 @@ public class UPatrolTaskService {
             RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
             robotTaskInfo.setCruiseType(task.getTaskType());
             robotTaskInfo.setTaskId(task.getTaskId());
-            robotTaskInfo.setPriority(task.getTaskLevel());
+            robotTaskInfo.setPriority(String.valueOf(task.getTaskLevel()));
             robotTaskInfo.setTaskName(task.getTaskName());
             List<String> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
             robotTaskInfo.setInstanceList(robotTaskInstanceList);
