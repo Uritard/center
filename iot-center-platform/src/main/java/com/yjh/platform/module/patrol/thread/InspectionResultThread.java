@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.CruiseConstant.AbnormalResDescEnum.CAPTURE_FAILURE;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -336,19 +337,20 @@ public class InspectionResultThread implements Runnable{
         log.info("====This is the result of no algorithm===");
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            switch (value){
+            CruiseConstant.AbnormalResDescEnum abnormalEnum = AbnormalResDescEnum.getEnum(value);
+            switch (abnormalEnum){
                 // 目前异常情况会出现的结果 后续再更新
-                case "抓图失败":
+                case CAPTURE_FAILURE:
                     tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
                     break;
-                case "机器人离线,未执行":
+                case ROBOT_OFFLINE:
                     tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
                     break;
-                case "机器人处于检修状态,未执行":
-                case "设备检修中":
+                case ROBOT_OVERHAUL:
+                case EQUIPMENT_MAINTENANCE:
                     tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
                     break;
-                case "任务终止":
+                case TERMINATION_OF_TASK:
                     tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
                     break;
                 default:

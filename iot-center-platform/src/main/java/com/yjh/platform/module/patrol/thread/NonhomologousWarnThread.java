@@ -292,6 +292,12 @@ public class NonhomologousWarnThread implements Runnable{
         if (CollectionUtils.isEmpty(list)) {
             return false;
         }
+
+        CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(robotInsResult);
+        if (resDescEnum != null){
+            return false;
+        }
+
         boolean retFlag = false;
         for (Map<String, Object> map : list) {
             long triphaseId = MapUtils.getLong(map, "triphaseId");
