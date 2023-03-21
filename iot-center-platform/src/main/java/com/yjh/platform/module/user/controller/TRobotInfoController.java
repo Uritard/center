@@ -289,7 +289,7 @@ public class TRobotInfoController {
         try {
             String deviceTypeName = (type != null && type == 2) ? "无人机" : "机器人";
             if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出",deviceTypeName + "台账信息导出");
+                logsRecord.LogsSend(request,"9","导出",deviceTypeName + "台账导出");
             }else{
                 logsRecord.LogsSend(request,"1","查询" + deviceTypeName + "台账信息","根据用户传递的参数分页查询" + deviceTypeName + "台账信息");
             }
