@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,8 @@ public class TCameraInfoController {
     private final TCameraInfoService tCameraInfoService;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private LogsRecord logsRecord;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -263,7 +267,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1,authority = "1234")
+//    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                 @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "address", required = false) String address,
@@ -273,10 +277,15 @@ public class TCameraInfoController {
                                @RequestParam(value = "cameraName", required = false) String cameraName,
                                @RequestParam(value = "regionId", required = false) Long regionId,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","相机信息导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查询相机信息","根据用户传递的参数分页查询相机信息");
+            }
 //            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
             List<Long> regionIdList =  tStdRegionDao.selectDownId(regionId);
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);

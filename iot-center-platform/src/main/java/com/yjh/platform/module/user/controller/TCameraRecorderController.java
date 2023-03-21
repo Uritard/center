@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -14,6 +15,7 @@ import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.service.TCameraRecorderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,8 @@ import java.util.Map;
 @Api(value = "/tCameraRecorder", description = "录像服务器表操作接口")
 public class TCameraRecorderController {
 
+    @Autowired
+    private LogsRecord logsRecord;
     @Autowired
     private final TCameraRecorderService tCameraRecorderService;
 
@@ -197,18 +201,23 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数分页查询录像服务器信息",logType = 1,authority = "1234")
+//    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数分页查询录像服务器信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "vendorId", required = false) Integer vendorId,
                                @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
                                @RequestParam(value = "recordType", required = false) Integer recordType,
                                @RequestParam(value = "recordName", required = false) String recordName,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","录像服务器信息导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查询录像服务器信息","根据用户传递的参数分页查询录像服务器信息");
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TCameraRecorderByDict> list = tCameraRecorderService.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
             resultMap.put("count", page.getTotal());

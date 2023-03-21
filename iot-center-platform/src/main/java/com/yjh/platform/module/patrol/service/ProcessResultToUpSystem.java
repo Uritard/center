@@ -539,7 +539,7 @@ public class ProcessResultToUpSystem {
             log.info("判别告警发送算法管理平台结束");
 
             // 判别上报上一级系统
-//            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
 
         if(CollectionUtils.isNotEmpty(defectList) && ("1".equals(flag))) {
