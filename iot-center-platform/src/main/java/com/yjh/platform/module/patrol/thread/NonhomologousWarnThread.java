@@ -18,6 +18,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.HashOperations;
@@ -301,6 +302,12 @@ public class NonhomologousWarnThread implements Runnable{
         if (CollectionUtils.isEmpty(list)) {
             return false;
         }
+
+        CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(robotInsResult);
+        if (resDescEnum != null){
+            return false;
+        }
+
         boolean retFlag = false;
         for (Map<String, Object> map : list) {
             long triphaseId = MapUtils.getLong(map, "triphaseId");

@@ -210,4 +210,52 @@ public interface CruiseConstant {
         }
     }
 
+    /**
+     * 巡检异常结果描述
+     */
+    enum AbnormalResDescEnum{
+        /**
+         * 抓图失败
+         */
+        CAPTURE_FAILURE("抓图失败"),
+        /**
+         * 机器人离线,未执行
+         */
+        ROBOT_OFFLINE("机器人离线,未执行"),
+        /**
+         * 机器人处于检修状态,未执行
+         */
+        ROBOT_OVERHAUL("机器人处于检修状态,未执行"),
+        /**
+         * 设备检修中
+         */
+        EQUIPMENT_MAINTENANCE("设备检修中"),
+        /**
+         * 任务终止
+         */
+        TERMINATION_OF_TASK("任务终止");
+
+        public String getDesc() {
+            return desc;
+        }
+
+        final String desc;
+
+        AbnormalResDescEnum(String desc){
+            this.desc = desc;
+        }
+
+        private static final Map<String, AbnormalResDescEnum> ABNORMAL_ENUM_MAP = new HashMap<>();
+
+        static {
+            for (AbnormalResDescEnum value : AbnormalResDescEnum.values()) {
+                ABNORMAL_ENUM_MAP.put(value.getDesc(), value);
+            }
+        }
+
+        public static AbnormalResDescEnum getEnum(String desc) {
+            return ABNORMAL_ENUM_MAP.get(desc);
+        }
+    }
+
 }
