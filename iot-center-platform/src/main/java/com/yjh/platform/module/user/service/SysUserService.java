@@ -425,8 +425,9 @@ public class SysUserService {
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
                         if (lockTime < Integer.valueOf(lockTimes.get("content")) * 60) { //如果锁定时间小于1200S
-                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
+                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                            sendToWs(ip, userId, userName);
                             long surplusTime=(lockTime/60+1)!=(lockTimeOne+1)?(lockTime/60+1):lockTimeOne;
                             //  mapResult.put("errorCount", "账户也被锁定，剩余锁定时间"+surplusTime+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
@@ -441,8 +442,9 @@ public class SysUserService {
                             sysUserDao.update(user);
                             redisTemplate.opsForValue().increment(key, 1);
                             num = num + 1;
-                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
+                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                            sendToWs(ip, userId, userName);
                             mapResult.put("info", "账户已被锁定，剩余锁定时间"+lockTimeOne+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             return mapResult;
@@ -465,7 +467,7 @@ public class SysUserService {
                             // }
                             redisTemplate.opsForValue().increment(key, 1);
                             num = num + 1;
-                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
+                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             sendToWs(ip, userId, userName);
                             mapResult.put("info","账户已被锁定，剩余锁定时间"+lockTimeOne+"分钟");
@@ -481,7 +483,7 @@ public class SysUserService {
                             sysUserDao.update(user);
                             redisTemplate.opsForValue().increment(key, 1);
                             num = num + 1;
-                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
+                            logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             sendToWs(ip, userId, userName);
                             mapResult.put("errorCount", "账户已被锁定！");
