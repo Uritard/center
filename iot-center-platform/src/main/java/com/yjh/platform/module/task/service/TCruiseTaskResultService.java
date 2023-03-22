@@ -146,7 +146,7 @@ public class TCruiseTaskResultService {
             MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
 
             ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
+            scanParams.match(key + "*");
             scanParams.count(1000);
             ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
             while (null != scan.getStringCursor()) {
@@ -183,7 +183,7 @@ public class TCruiseTaskResultService {
 
         List<CruiseInspectResult> inspectPageResults = new ArrayList<>();
         if (CollectionUtils.isEmpty(cruiseInspectResults)){
-            Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
+            Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
             if (keyResult.size() != 0) {
                 List<String> pageKeys = keyResult.stream().skip(start).limit(pageSize).collect(Collectors.toList());
                 for (String keys : pageKeys) {
@@ -476,7 +476,7 @@ public class TCruiseTaskResultService {
         Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
         List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
-        Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
+        Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
 
 
 //        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
@@ -588,7 +588,7 @@ public class TCruiseTaskResultService {
         int abnormalCounts = 0;
         int normalCounts = 0;
 
-        Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
+        Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId + ":");
         for (String key : robotInfoKeys) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
             boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
@@ -670,7 +670,7 @@ public class TCruiseTaskResultService {
         List<Object> finalResult = new ArrayList<>();//最终结果集(封装机器人、可见光、红外相机的信息)
 
 
-        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX+"*");
+        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
         Set<String> robotKeys = redisScan("robot_info*");
         for (String robotKey : robotKeys) {
             Map<String, Object> robotInfo = redisTemplate.opsForHash().entries(robotKey);
