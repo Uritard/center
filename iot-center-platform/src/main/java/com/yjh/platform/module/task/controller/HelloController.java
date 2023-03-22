@@ -703,7 +703,6 @@ public class HelloController {
             HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
             String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
-            String taskPatrolledIdTemp = taskId;
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
 
             xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
@@ -715,14 +714,14 @@ public class HelloController {
             xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
             xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
             xmlItem.put("task_code", taskCode);
-            xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+            xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
 
             // 文件后缀
             String fileExt = org.apache.commons.lang3.StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
             fileExt = org.apache.commons.lang3.StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
             String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
+                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
             xmlBaseModel.setType("62");
 
             String value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");

@@ -370,7 +370,9 @@ public class TCfgDataCurrentService {
 //            tCruiseTaskAdd.setTaskType(218);
             tCruiseTaskAdd.setUnionTaskStatus("1");
 //            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
-            String taskId= StringUtils.substringBetween(uPatrolTaskService.addTask(tCruiseTaskAdd, true),"_");//联动任务ID
+            Map<String, Object> taskMap = uPatrolTaskService.addTask(tCruiseTaskAdd, true);
+            //联动任务ID
+            String taskId= String.valueOf(taskMap.get("taskId"));
             cLogger.info("联动开始执行");
             //联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));

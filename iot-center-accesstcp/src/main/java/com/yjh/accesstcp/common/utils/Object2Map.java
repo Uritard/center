@@ -9,6 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Object2Map {
+
+    public static Map<?, ?> objectsToMap(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        return new org.apache.commons.beanutils.BeanMap(obj);
+    }
     /**
      *
      * @Title: objectToMap

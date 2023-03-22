@@ -8,7 +8,6 @@ import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -130,7 +129,6 @@ public class ProcessResultToUpSystem {
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
                 String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
                 UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskByTaskCode(taskCode);
-                String taskPatrolledIdTemp = taskId;
                 /*if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                     taskPatrolledIdTemp = taskCode;
                 }*/
@@ -144,14 +142,14 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
-                xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+                xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
                 xmlItem.put("unit", Optional.ofNullable(cruiseResultMap.get("unit")).orElse(""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + fileExt;
+                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + fileExt;
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {
