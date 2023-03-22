@@ -1981,7 +1981,7 @@ public class UPatrolTaskService {
 
             int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
-            Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
+            Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId + ":");
             List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
