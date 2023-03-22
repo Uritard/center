@@ -166,7 +166,7 @@ public class UPatrolTaskService {
      * @param issueFlag 是否往下级节点发送
      * @return 任务执行ID
      */
-    public String addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
+    public Map<String,Object> addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
         // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
         UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
         assert proxy != null;
@@ -176,7 +176,11 @@ public class UPatrolTaskService {
         setQuartzTask(uPatrolTask);
 
         String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-        return stationCode + "_" + uPatrolTask.getTaskId() + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
+        Map<String,Object> taskMap = new HashMap<>();
+        String taskPatrolledId = stationCode + "_" + uPatrolTask.getTaskCode() + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
+        taskMap.put("taskId", uPatrolTask.getTaskId());
+        taskMap.put("taskPatrolledId", taskPatrolledId);
+        return taskMap;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1185,7 +1189,7 @@ public class UPatrolTaskService {
         xmlBaseModel.setType("41");
         try {
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            String taskPatrolledIdTemp = task.getTaskId();
+            String taskPatrolledIdTemp = task.getTaskCode();
 /*
             UPatrolTask uPatrolTask = selectTaskByTaskCode(task.getTaskCode());
             if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
@@ -1402,7 +1406,8 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
             tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
             tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
-            taskPatrolledId = this.addTask(tCruiseTaskAdd, false);
+            Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
+            taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());

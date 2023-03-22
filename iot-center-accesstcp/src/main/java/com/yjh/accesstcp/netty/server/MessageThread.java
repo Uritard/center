@@ -6,6 +6,7 @@ package com.yjh.accesstcp.netty.server;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.Object2Map;
 import com.yjh.accesstcp.common.utils.StaticContextAccessor;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
@@ -18,6 +19,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.TCameraPresetService;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -216,7 +218,8 @@ public class MessageThread {
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             if (StringUtils.equals("1", xmlBaseModel.getCommand())){
-                item.put("task_patrolled_id", re.getData());
+                String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
+                item.put("task_patrolled_id", taskPatrolledId);
             }else{
                 item.put("task_patrolled_id", xmlBaseModel.getCode());
             }
@@ -309,7 +312,8 @@ public class MessageThread {
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     } else if (200 == re.getCode()) {
-                        xmlItem.put("task_patrolled_id", re.getData());
+                        String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
+                        item.put("task_patrolled_id", taskPatrolledId);
                         xmlItem.put("error_code", "0");
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
