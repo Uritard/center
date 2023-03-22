@@ -155,6 +155,8 @@ public class Constant {
 
     public static String WEBSOCKET_URL="";
 
+    public static String nonhomologousWarn = "分,合,开,关,储能,非储能,远方,就地";
+
     public static RedisTemplate redisTemplate;
 
     private static Boolean packetLog;
