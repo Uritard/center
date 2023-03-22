@@ -240,21 +240,21 @@ public class PatrolResultHandler {
                     List<RobotPatrolTaskResult> robotPatrolTaskResults = multipleValuesResultMap.get(key);
                     StringJoiner resultNum = new StringJoiner(",");
                     for (RobotPatrolTaskResult robotPatrolTaskResult : robotPatrolTaskResults){
-                        String value = robotPatrolTaskResult.getValue();
+                        String valueUnit = robotPatrolTaskResult.getValueUnit();
                         switch (robotPatrolTaskResult.getValueType()) {
                             case "11":
-                                value = "局放频次:" + value;
+                                valueUnit = "局放频次:" + valueUnit;
                                 break;
                             case "12":
-                                value = "放电峰值:" + value;
+                                valueUnit = "放电峰值:" + valueUnit;
                                 break;
                             case "13":
-                                value = "信号均值:" + value;
+                                valueUnit = "信号均值:" + valueUnit;
                                 break;
                             default:
                                 break;
                         }
-                        resultNum.add(value);
+                        resultNum.add(valueUnit);
                     }
                     robotPatrolTaskResults.get(0).setValue(resultNum.toString());
                     robotPatrolTaskResult(Collections.singletonList(robotPatrolTaskResults.get(0)));
@@ -302,10 +302,20 @@ public class PatrolResultHandler {
         String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
+        boolean isAlarm = false;
+        String descFilePath = "";
+        String descRelativeUrl = "";
 
         try {
             // 文件路径
             String filePath = robotPatrolTaskResult.getFilePath();
+            if (StringUtils.isEmpty(filePath)){
+                infoMap.put("relativePath", descRelativeUrl);
+                infoMap.put("absolutePath", descFilePath);
+                isAlarmMap.put("relativePath", descRelativeUrl);
+                isAlarmMap.put("absolutePath", descFilePath);
+                return isAlarmMap;
+            }
             String temporaryFilePath = ftpsFilePath + "/" + filePath;
             log.info("temporaryFilePath==={}", temporaryFilePath);
             String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
@@ -315,9 +325,7 @@ public class PatrolResultHandler {
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
 
-            boolean isAlarm = false;
-            String descFilePath;
-            String descRelativeUrl;
+
             switch (fileType) {
                 case "1":
                     descFilePath = developAbsoluteUrl + "/FIR/" + fileName;

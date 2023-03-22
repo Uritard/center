@@ -8,6 +8,7 @@ import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -103,13 +104,13 @@ public class ProcessResultToUpSystem {
                         String valueType = "";
                         String valueItem = split[i];
                         if (valueItem.contains("频次")){
-                            value = split[i].substring(5);
+                            value = getNumeric(split[i]);
                             valueType = "11";
                         }else if (valueItem.contains("峰值")) {
-                            value = split[i].substring(5);
+                            value = getNumeric(split[i]);
                             valueType = "12";
                         }else {
-                            value = split[i].substring(5);
+                            value = getNumeric(split[i]);
                             valueType = "13";
                         }
                         cruiseResultNewMap.put("resultNum", value);
@@ -145,6 +146,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
                 xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+                xmlItem.put("unit", Optional.ofNullable(cruiseResultMap.get("unit")).orElse(""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
@@ -281,8 +283,8 @@ public class ProcessResultToUpSystem {
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
             xmlItem.put("alarm_type", alarmType);
             xmlItem.put("value", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
-            xmlItem.put("unit", "");
-            xmlItem.put("value_unit", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
+            String resultNum = Optional.ofNullable(tWarnInfo.getValue()).orElse("");
+            xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
             xmlItem.put("defect_type", Optional.ofNullable(String.valueOf(tWarnInfo.getWarnSubtype())).orElse(""));
         }catch (Exception e){
@@ -338,8 +340,7 @@ public class ProcessResultToUpSystem {
             xmlItem.put("file_path", tagPath);
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
             xmlItem.put("value", resultNum);
-            xmlItem.put("unit", "");
-            xmlItem.put("value_unit", resultNum);
+            xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("value_type", valueType);
             xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
             xmlItem.put("data_type", cruiseType);
@@ -688,6 +689,9 @@ public class ProcessResultToUpSystem {
      * @return java.lang.String
      */
     public String replaceResultImgPath(String analyseResultImg, boolean flag) {
+        if (CommonUtils.isEmptyOrNullstr(analyseResultImg)){
+            return "";
+        }
         String resultImage = analyseResultImg;
         try {
             HashOperations<String, String, String> operations = redisTemplate.opsForHash();
@@ -709,5 +713,23 @@ public class ProcessResultToUpSystem {
             log.error("图片路径转换异常", e);
         }
         return resultImage;
+    }
+
+    /**
+     * 从字符串中获取数字
+     * @param str 传入的值
+     * @return java.lang.String
+     */
+    public static String getNumeric(String str){
+        str = str.trim();
+        String str2 = "";
+        if(str != null && !"".equals(str)){
+            for(int i = 0; i < str.length(); i++){
+                if(str.charAt(i) >= 48 && str.charAt(i) <= 57){
+                    str2 += str.charAt(i);
+                }
+            }
+        }
+        return str2;
     }
 }
