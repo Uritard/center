@@ -24,10 +24,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -97,6 +94,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
             tCruiseTaskResultMap.put("valueType", robotPatrolTaskResult.getValueType());
+            tCruiseTaskResultMap.put("unit", Optional.ofNullable(robotPatrolTaskResult.getUnit()).orElse(""));
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
             if (Objects.nonNull(waiter)) {

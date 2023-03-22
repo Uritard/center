@@ -164,7 +164,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setConfMode(276);
             warnInfo.setDefectModel(Integer.valueOf(uPatrolTaskService.selectDictCodeByNote("其他", "defect_model")));
             warnInfo.setAlarmSource(282);
-            warnInfo.setImagePath(threadMap.get("relativePath"));
+            warnInfo.setImagePath(threadMap.getOrDefault("relativePath", ""));
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);
             warnInfo.setDeviceCode(tStdDeviceDao.selectByUnionKeys(tStdDevicemete.getDeviceId()).getDeviceCode());
