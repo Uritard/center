@@ -183,7 +183,20 @@ public class NonhomologousWarnThread implements Runnable{
                         break;
                     case "6":
                         if(!isNumeric(robotInsResult)){
-                            log.info("区间非同源告警--数据非数字");
+                            //特殊走特殊的逻辑
+                            if (Constant.nonhomologousWarn.contains(robotInsResult)){
+                               String lastValue = nonhomologousWarnDao.selectLastResultNum(robotInstanceId,Constant.nonhomologousWarn.split(","));
+                                if (StringUtils.isNotEmpty(lastValue) && !lastValue.equals(robotInsResult)){
+                                    //告警
+                                    Map<String,Object> warn = new HashMap<>(4);
+                                    warn.put("warnId", warnId);
+                                    warn.put("warnType", 6);
+                                    warn.put("instanceId", Long.parseLong(instanceId));
+                                    warn.put("warnContent", "时间范围内识别结果趋势不一致：" + warnThreshold);
+                                    insertNonhomologousWarnInfo(warn);
+                                }
+                            }
+                            log.info("区间非同源告警--数据非指定汉字");
                             break;
                         }
                         // 1-天 2-周 3-月

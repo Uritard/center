@@ -19,7 +19,9 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
+import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -95,6 +97,8 @@ public class HelloController {
     TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TCameraPresetService tCameraPresetService;
+    @Autowired
+    private NonhomologousWarnDao nonhomologousWarnDao;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -679,7 +683,8 @@ public class HelloController {
                        @RequestParam(value = "taskId", required = false) String taskId,
                        @RequestParam(value = "instanceId", required = false) String instanceId
                           ) {
-        warnToUpSystem(warnContent,warnType,taskId,instanceId);
+//        warnToUpSystem(warnContent,warnType,taskId,instanceId);
+        log.info(nonhomologousWarnDao.selectLastResultNum(instanceId,Constant.nonhomologousWarn.split(",")));
 
     }
 

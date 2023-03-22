@@ -72,6 +72,18 @@
             limit 4
         </if>
     </select>
+    <select id="selectLastResultNum"  resultType="java.lang.String">
+        select
+        a.result_num
+        from u_patrol_data_result a
+        where a.instance_id = #{instanceId}
+        and result_num in
+        <foreach collection="list" separator="," open="(" close=")" item="resultNum">
+        #{resultNum}
+        </foreach>
+        order by a.cruise_time desc
+        limit 1
+    </select>
 
     <select id="getInstanceIdByDeviceId" resultType="java.lang.Long">
         select a.instance_id
