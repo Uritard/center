@@ -8,6 +8,7 @@ import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
