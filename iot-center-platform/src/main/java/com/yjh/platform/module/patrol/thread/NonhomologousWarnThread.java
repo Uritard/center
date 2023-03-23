@@ -336,9 +336,9 @@ public class NonhomologousWarnThread implements Runnable{
                 triphaseRetMap = redisTemplate.opsForHash().entries(triphaseKey);
                 if (MapUtils.isEmpty(triphaseRetMap)) {
                     triphaseRetMap = new HashMap<>();
-                    triphaseRetMap.put(MapUtils.getString(map, "instanceOneId"), "");
-                    triphaseRetMap.put(MapUtils.getString(map, "instanceTwoId"), "");
-                    triphaseRetMap.put(MapUtils.getString(map, "instanceTriId"), "");
+                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceOneId"), ","), "");
+                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceTwoId"), ","), "");
+                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceTriId"), ","), "");
                 }
                 triphaseRetMap.put(instanceId, robotInsResult);
 
