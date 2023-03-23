@@ -360,7 +360,7 @@ public class ProcessResultToUpSystem {
             xmlItem.put("value", resultNum);
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("value_type", valueType);
-            xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
+            xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse("1,1;2,2;3,3;4,4"));
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
