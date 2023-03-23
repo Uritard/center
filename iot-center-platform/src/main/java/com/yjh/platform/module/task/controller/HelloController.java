@@ -12,10 +12,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.QrCodeUtils;
-import com.yjh.platform.common.utils.ResultHandleUtils;
-import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -682,10 +679,11 @@ public class HelloController {
                        @RequestParam(value = "warnType", required = false) String warnType,
                        @RequestParam(value = "taskId", required = false) String taskId,
                        @RequestParam(value = "instanceId", required = false) String instanceId
-                          ) {
+                          ) throws Exception{
 //        warnToUpSystem(warnContent,warnType,taskId,instanceId);
-        log.info(nonhomologousWarnDao.selectLastResultNum(instanceId,Constant.nonhomologousWarn.split(",")));
-
+        List<String> originalImgList = new ArrayList<>();
+        originalImgList.add("C:\\robotData\\reportPath\\1.jpg");
+        FileUtil.zip(originalImgList, taskId + ".zip", taskId, "C:\\robotData\\reportPath");
     }
 
     private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){

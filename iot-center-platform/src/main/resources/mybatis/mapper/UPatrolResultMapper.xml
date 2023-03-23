@@ -1265,6 +1265,7 @@
         f.identify_result,
         z.dict_note as identify_result_name,
         f.cruise_type,
+        f.origpic as ori_img,
         n.dict_note as dataType,
         b.custom_id,
         b.custom_name as componentName,

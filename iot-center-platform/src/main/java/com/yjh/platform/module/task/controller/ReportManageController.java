@@ -179,12 +179,7 @@ public class ReportManageController {
     public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            String res = reportManageService.downLoadCruiseReport(taskId);
-            if ("0".equals(res)){
-                result.setCode(209,"该任务未被审核或任务下有巡视点未被审核");
-            }else {
-                result.setData(res);
-            }
+            result.setData(reportManageService.downLoadCruiseReport(taskId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
