@@ -516,8 +516,8 @@ public class NonhomologousWarnThread implements Runnable{
             String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
             fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-            String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
+            String tagPath = "alarm/"+stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
             xmlBaseModel.setType("62");
 
             String value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
@@ -526,7 +526,8 @@ public class NonhomologousWarnThread implements Runnable{
 
             Map<String, String> resMap = packageAlarmInfo(alarmLevel, value, warnContent, imgPath, warnType,triphaseId,xmlItem, tagPath);
             log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
-            StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
+            StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), tagPath);
+            xmlItem.put("file_path", tagPath);
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
@@ -589,8 +590,6 @@ public class NonhomologousWarnThread implements Runnable{
                 default:
                     break;
             }
-            tagPath = "alarm/" + tagPath;
-            xmlItem.put("file_path", tagPath);
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
             xmlItem.put("alarm_type", alarmType);

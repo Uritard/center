@@ -87,4 +87,9 @@ public class TCruiseDataResultDetail implements Serializable {
      * 数据来源
      */
     private String dataType;
+
+    /**
+     * 原始图片
+     */
+    private String oriImg;
 }

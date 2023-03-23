@@ -471,7 +471,7 @@ public class TSequentialConfService{
                 xmlItem.put("file_path", stationId + "/videoFile" + "/" + fileName);
                 xmlItem.put("rectangle", "");
                 xmlItem.put("task_patrolled_id", meteId);
-                xmlItem.put("data_type", "01");
+                xmlItem.put("data_type", "1");
                 xmlItem.put("valid", "1");
                 xmlItems.add(xmlItem);
                 xmlBaseModel.setItems(xmlItems);

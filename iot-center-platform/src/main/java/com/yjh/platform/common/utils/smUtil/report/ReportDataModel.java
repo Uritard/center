@@ -284,7 +284,8 @@ public class ReportDataModel {
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 巡视图像
             String file = StringUtils.isEmpty(detail.getPicPath()) ? null : detail.getPicPath();
-            elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{file},
+            String oriFile = StringUtils.isEmpty(detail.getOriImg()) ? null : detail.getOriImg();
+            elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{file,oriFile},
                     TableCellElement.TYPE_PICTURE));
 
             rowIndex++;

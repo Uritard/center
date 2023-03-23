@@ -337,19 +337,19 @@ public class ProcessResultToUpSystem {
             switch (cruiseTypeEnum){
                 case VIDEO:
                 case INFRARED:
-                    cruiseType = "0x01";
+                    cruiseType = "1";
                     break;
                 case ROBOT:
-                    cruiseType = "0x02";
+                    cruiseType = "2";
                     break;
                 case UAV:
-                    cruiseType = "0x03";
+                    cruiseType = "3";
                     break;
                 case VOICE:
-                    cruiseType = "0x04";
+                    cruiseType = "4";
                     break;
                 case ONLINE:
-                    cruiseType = "0x05";
+                    cruiseType = "5";
                     break;
                 default:
                     break;
