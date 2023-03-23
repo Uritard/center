@@ -11,7 +11,6 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -24,11 +23,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
-import static com.yjh.platform.module.patrol.CruiseConstant.AbnormalResDescEnum.CAPTURE_FAILURE;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -94,7 +94,9 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
             tCruiseTaskResultMap.put("valueType", robotPatrolTaskResult.getValueType());
-            tCruiseTaskResultMap.put("unit", Optional.ofNullable(robotPatrolTaskResult.getUnit()).orElse(""));
+            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getUnit())){
+                tCruiseTaskResultMap.put("unit", robotPatrolTaskResult.getUnit());
+            }
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
             if (Objects.nonNull(waiter)) {
@@ -336,25 +338,30 @@ public class InspectionResultThread implements Runnable{
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             CruiseConstant.AbnormalResDescEnum abnormalEnum = AbnormalResDescEnum.getEnum(value);
-            switch (abnormalEnum){
-                // 目前异常情况会出现的结果 后续再更新
-                case CAPTURE_FAILURE:
-                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
-                    break;
-                case ROBOT_OFFLINE:
-                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
-                    break;
-                case ROBOT_OVERHAUL:
-                case EQUIPMENT_MAINTENANCE:
-                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
-                    break;
-                case TERMINATION_OF_TASK:
-                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
-                    break;
-                default:
-                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                    tCruiseTaskResultMap.put("cruiseAbnormal", "null");
-                    break;
+            if (!Objects.isNull(abnormalEnum)) {
+                switch (abnormalEnum) {
+                    // 目前异常情况会出现的结果 后续再更新
+                    case CAPTURE_FAILURE:
+                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
+                        break;
+                    case ROBOT_OFFLINE:
+                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
+                        break;
+                    case ROBOT_OVERHAUL:
+                    case EQUIPMENT_MAINTENANCE:
+                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                        break;
+                    case TERMINATION_OF_TASK:
+                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
+                        break;
+                    default:
+                        tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                        tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                        break;
+                }
+            }else {
+                tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                tCruiseTaskResultMap.put("cruiseAbnormal", "null");
             }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("resultDesc", "--");

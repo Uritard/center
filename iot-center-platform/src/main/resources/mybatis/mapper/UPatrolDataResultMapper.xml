@@ -534,7 +534,8 @@
         m.dict_note AS mete_type_name,
         n.dict_note AS meter_type_name,
         y.dict_note AS device_type_name,
-        x.dict_note AS alarm_level_name
+        x.dict_note AS alarm_level_name,
+        h.dict_note as cruise_type_name
         from (SELECT DISTINCT a.device_mete_id,
         a.mete_type,
         a.meter_type,
