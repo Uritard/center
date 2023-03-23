@@ -144,7 +144,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
                 xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
-                xmlItem.put("unit", Optional.ofNullable(cruiseResultMap.get("unit")).orElse(""));
+                xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;

@@ -29,4 +29,5 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
      * 是否温差测试
      */
     private Integer isTemdif;
+    private String unit;
 }

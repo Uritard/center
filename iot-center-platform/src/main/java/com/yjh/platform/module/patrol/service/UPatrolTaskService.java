@@ -479,6 +479,7 @@ public class UPatrolTaskService {
             map.put("recognitionType", StringUtils.isNotEmpty(item.getMeteType()) ?
                     RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize() : "2");
             map.put("fileType", "5");
+            map.put("unit", Optional.ofNullable(item.getUnit()).orElse(""));
             switch (item.getMeteType()){
                 case "222":
                     map.put("fileType", "1");
