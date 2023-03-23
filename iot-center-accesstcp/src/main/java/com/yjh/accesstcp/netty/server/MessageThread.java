@@ -286,8 +286,10 @@ public class MessageThread {
                 for (Map<String, Object> item : list) {
                     String taskId = item.get("task_code").toString();
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, true, edgeLevel);
+                    boolean isRobotFlag = false;
                     if (standardPoints) {
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
+                        isRobotFlag = sendToUpSystemServices.selectIsRobotDevice(instanceIds);
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
                         tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
@@ -302,26 +304,29 @@ public class MessageThread {
                     taskList.add(tCruiseTaskAdd);
                     map.put("list", taskList);
                     Result re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
-                    List<Map<String, Object>> xmlItems = new ArrayList<>();
-                    Map<String, Object> xmlItem = new HashMap<>();
-                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                    String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-                    if (re == null) {
-                        xmlItem.put("error_code", "3");
-                        xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
-                        xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
-                    } else if (200 == re.getCode()) {
-                        String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
-                        item.put("task_patrolled_id", taskPatrolledId);
-                        xmlItem.put("error_code", "0");
-                        xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
-                    } else {
-                        xmlItem.put("error_code", "1");
-                        xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
-                        xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
+                    //非机器人的直接返回 机器人点的等待机器人返回结果
+                    if (!isRobotFlag) {
+                        List<Map<String, Object>> xmlItems = new ArrayList<>();
+                        Map<String, Object> xmlItem = new HashMap<>();
+                        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+                        if (re == null) {
+                            xmlItem.put("error_code", "3");
+                            xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
+                            xmlItems.add(xmlItem);
+                            sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
+                        } else if (200 == re.getCode()) {
+                            String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
+                            item.put("task_patrolled_id", taskPatrolledId);
+                            xmlItem.put("error_code", "0");
+                            xmlItems.add(xmlItem);
+                            sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
+                        } else {
+                            xmlItem.put("error_code", "1");
+                            xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
+                            xmlItems.add(xmlItem);
+                            sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
+                        }
                     }
                     log.info("--联动任务响应--" + re);
                 }
