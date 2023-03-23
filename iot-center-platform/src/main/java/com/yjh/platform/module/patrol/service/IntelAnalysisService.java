@@ -1571,10 +1571,10 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
                 String targetNamePath = imgPath.replace(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
-
-                log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 String edgeId = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-                uploadFileToUpFtps(imgPath, edgeId + "/jm/" + targetNamePath, upFtpsConfig);
+                targetNamePath = edgeId + "/jm/" + targetNamePath;
+                log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
+                uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
                 xmlItem.put("time", warnTime);
