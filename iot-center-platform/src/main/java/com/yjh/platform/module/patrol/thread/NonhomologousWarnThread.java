@@ -517,7 +517,7 @@ public class NonhomologousWarnThread implements Runnable{
             fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
             String tagPath = "alarm/"+stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
+                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
             xmlBaseModel.setType("62");
 
             String value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
