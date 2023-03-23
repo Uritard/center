@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.scheduled;
 
-import com.alibaba.fastjson.JSON;
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
@@ -308,6 +307,7 @@ public class DeviceStaticsToUpSystem {
         infoMap.put("report_time", reportDate);
         infoMap.put("type", type);
         infoMap.put("device_type", device.get("device_type"));
+        infoMap.put("value_unit", String.valueOf(infoMap.get("value")) + infoMap.get("unit"));
     }
 
     private Long parseDate(String dateString, String target) {

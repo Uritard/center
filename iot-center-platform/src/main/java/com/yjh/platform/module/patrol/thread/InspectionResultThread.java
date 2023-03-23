@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -92,7 +93,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
-            tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
+            tCruiseTaskResultMap.put("rectangle", Optional.ofNullable(robotPatrolTaskResult.getRectangle()).orElse("1,1;2,2;3,3;4,4"));
             tCruiseTaskResultMap.put("valueType", robotPatrolTaskResult.getValueType());
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getUnit())){
                 tCruiseTaskResultMap.put("unit", robotPatrolTaskResult.getUnit());
