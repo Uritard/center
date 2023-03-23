@@ -1496,4 +1496,13 @@ public class SendToUpSystemServices {
         map.put("cycle_start_time", map.get("fixed_start_time"));
         map.put("cycle_end_time", map.get("end_time"));
     }
+
+    /**
+     * 查询点位是否有给机器人发送的
+     * @param instanceIds
+     * @return
+     */
+    public boolean selectIsRobotDevice(List<String> instanceIds) {
+        return sendToUpSystemDao.selectIsRobotDevice(instanceIds) > 0;
+    }
 }
