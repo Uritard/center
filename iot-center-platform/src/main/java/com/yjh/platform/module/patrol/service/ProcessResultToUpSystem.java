@@ -631,40 +631,44 @@ public class ProcessResultToUpSystem {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 
-        try {
+        String robotTaskStatusUp =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"));
 
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            for(CruiseManualReview cruiseResultMap : cruiseResultList) {
-                log.info("cruiseResultMap=={}", cruiseResultMap);
-                Map<String, Object> xmlItem = new HashMap<>(16);
-                String taskId = cruiseResultMap.getTaskId();
-                String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
-                String simpleDateFormat = DateTimeUtil.format3(new Date());
+        if ("true".equals(robotTaskStatusUp)) {
+            try {
 
-                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
-                xmlItem.put("task_code", taskId);
-                xmlItem.put("device_id", instanceId);
-                xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
-                xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
-                xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
-                xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
-                xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
-                xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
-                xmlItem.put("value", cruiseResultMap.getPersonCheck());
-                xmlItem.put("check_user", cruiseResultMap.getCheckUser());
-                xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
-                xmlItems.add(xmlItem);
+                String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+                for (CruiseManualReview cruiseResultMap : cruiseResultList) {
+                    log.info("cruiseResultMap=={}", cruiseResultMap);
+                    Map<String, Object> xmlItem = new HashMap<>(16);
+                    String taskId = cruiseResultMap.getTaskId();
+                    String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
+                    String simpleDateFormat = DateTimeUtil.format3(new Date());
+
+                    xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
+                    xmlItem.put("task_code", taskId);
+                    xmlItem.put("device_id", instanceId);
+                    xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
+                    xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
+                    xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
+                    xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
+                    xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
+                    xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
+                    xmlItem.put("value", cruiseResultMap.getPersonCheck());
+                    xmlItem.put("check_user", cruiseResultMap.getCheckUser());
+                    xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                    xmlItems.add(xmlItem);
+                }
+                xmlBaseModel.setItems(xmlItems);
+                xmlBaseModel.setType("611");
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>();
+                map.put("list", list);
+                log.info("The review information to be reported one level up is==={}", map);
+                Constant.otherServer(map, Constant.TCP_URL);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
-            xmlBaseModel.setItems(xmlItems);
-            xmlBaseModel.setType("611");
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> map = new HashMap<>();
-            map.put("list", list);
-            log.info("The review information to be reported one level up is==={}", map);
-            Constant.otherServer(map, Constant.TCP_URL);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
         }
         return xmlBaseModel;
     }
