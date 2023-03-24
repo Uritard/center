@@ -165,4 +165,5 @@ public interface UPatrolTaskDao {
     void updateTaskPriorityConfig(@Param(value = "type")Integer type,
                                   @Param(value = "level")Integer level);
 
+    String selectTaskName(@Param(value = "taskId") String taskId);
 }

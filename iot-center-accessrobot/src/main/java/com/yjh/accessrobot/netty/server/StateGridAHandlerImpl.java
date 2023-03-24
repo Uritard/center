@@ -14,6 +14,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -107,7 +108,8 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
                 //判断本节点是巡视主机下级为边缘节点
                 String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
                 boolean isEdge = robotService.selectByRegionCodeAndState(xmlBaseModel.getSendCode(), 1);
-                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel) && isEdge) {
+                boolean is102 = CollectionUtils.isNotEmpty(xmlBaseModel.getItems()) && xmlBaseModel.getItems().get(0).containsKey("error_code");
+                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel) && isEdge && !is102) {
                     if ("3".equals(command)){
                         command = "4";
                     }else if ("4".equals(command)){

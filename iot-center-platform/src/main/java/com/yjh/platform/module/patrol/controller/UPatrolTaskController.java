@@ -239,7 +239,11 @@ public class UPatrolTaskController {
     public Result taskShutDown(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            uPatrolTaskService.taskShutDown(taskId, request);
+            if (Optional.ofNullable(request).isPresent() && Optional.ofNullable(request.getHeader("userId")).isPresent()) {
+                String taskName = uPatrolTaskService.selectTaskName(taskId);
+                logsRecord.LogsSend(request, "13", "任务终止", "任务终止-" + taskName);
+            }
+            uPatrolTaskService.taskShutDown(taskId);
             result.setData(1);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
