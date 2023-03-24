@@ -596,6 +596,10 @@
         LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
         LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
         WHERE 1 = 1
+          and
+        b.cruise_abnormal != '250'
+          and
+        b.cruise_abnormal != '409'
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}
         </if>
 
