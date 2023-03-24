@@ -602,7 +602,7 @@ public class IntelAnalysisService {
     public void picAnalyseRetNotify(PicAnalyseResponse response){
         log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
         String flagId = response.getRequestId().split("#")[1];
-        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666", "presetCheck"}, flagId)){
+        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || flagId.contains( "presetCheck")){
             picResAnalyse(response);
         }else {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
