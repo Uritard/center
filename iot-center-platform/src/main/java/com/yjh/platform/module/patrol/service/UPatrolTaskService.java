@@ -1557,16 +1557,12 @@ public class UPatrolTaskService {
      * 任务终止，异步执行
      */
     @Async
-    public void taskShutDown(String taskId, HttpServletRequest request) {
+    public void taskShutDown(String taskId) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (Optional.ofNullable(request).isPresent()) {
-            logsRecord.LogsSend(request, "13", "任务终止", "任务终止-" + uPatrolResult.getTaskName());
-        }
         if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
             return;
         }
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
-        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
         // 机器人任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
@@ -2888,10 +2884,19 @@ public class UPatrolTaskService {
             case "3":
                 return String.valueOf(this.taskGoOn(taskId, true, null));
             case "4":
-                this.taskShutDown(taskId, null);
+                this.taskShutDown(taskId);
                 return "1";
             default:
                 return "-1";
         }
+    }
+
+    /**
+     * 根据任务id查询名称
+     * @param taskId
+     * @return
+     */
+    public String selectTaskName(String taskId) {
+        return uPatrolTaskDao.selectTaskName(taskId);
     }
 }

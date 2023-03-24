@@ -218,8 +218,7 @@ public class MessageThread {
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             if (StringUtils.equals("1", xmlBaseModel.getCommand())){
-                String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
-                item.put("task_patrolled_id", taskPatrolledId);
+                item.put("task_patrolled_id", re.getData());
             }else{
                 item.put("task_patrolled_id", xmlBaseModel.getCode());
             }

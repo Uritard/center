@@ -2968,5 +2968,17 @@ public class RobotService {
     public List<Long> selectInstanceIdByDeviceId(List<String> deviceIds,String taskCode) {
         return tRobotInspectionDao.selectInstanceIdByDeviceId(deviceIds,taskCode);
     }
+
+    /**
+     * 查询是否是无人机
+     * @return List<String>
+     */
+    public boolean selectIsDrone(String robotCode) {
+        return Objects.nonNull(tRobotInfoDao.selectIsDrone(robotCode));
+    }
+
+    public String selectRealTaskId(String taskCode, Date date) {
+        return tRobotInfoDao.selectRealTaskIdByTime(taskCode, date);
+    }
 }
 

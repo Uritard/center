@@ -164,6 +164,8 @@ public interface TRobotInfoDao {
      * @return String
      */
     String selectRealTaskId(@Param(value = "robotTaskId")String robotTaskId);
+
+    String selectRealTaskIdByTime(@Param(value = "robotTaskId")String robotTaskId, @Param(value = "executeTime") Date executeTime);
     /**
      * 通过巡视主机上的任务id查询机器人上报的任务id
      * @param robotTaskId 任务id

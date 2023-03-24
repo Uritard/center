@@ -1016,5 +1016,13 @@
         WHERE
         b.col_name = "prioritized_task_type"
     </select>
+    <select id="selectTaskName" resultType="java.lang.String">
+        SELECT
+            task_name
+        FROM
+            u_patrol_task
+        WHERE
+            task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
 
 </mapper>

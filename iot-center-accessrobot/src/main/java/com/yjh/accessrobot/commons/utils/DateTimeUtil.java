@@ -28,6 +28,7 @@ public class DateTimeUtil {
     private static final String DATETIMEMSFORMATTPL = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String TIMESIMPLEFORMATTPL = "HH:mm";
     private static final String TIMEFORMATTPL = "HH:mm:ss";
+    private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
     private static ResourceBundle resource = null;
 
     private DateTimeUtil() {
@@ -135,6 +136,21 @@ public class DateTimeUtil {
     public static String getTimeString(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         return sdf.format(date);
+    }
+
+    public static String getDateTimePattern3() {
+        return TIMEFORMAT2;
+    }
+
+    public static Date parseFormat(String source, String format) {
+        Date rtn = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            rtn = sdf.parse(source);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return rtn;
     }
 
     /**

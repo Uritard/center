@@ -6,6 +6,8 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.netty.thread.TaskShutDownThread;
+import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -88,11 +90,9 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         //<3>: = 其它异常
                         //taskPatrolledId 不为空 且 error_code 不为 0 边缘节点任务终止
                         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-                        if (StringUtils.isNotEmpty(taskPatrolledId) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
-                            String taskId = StringUtils.substringBetween(taskPatrolledId, "_");
-                            Map<String, Object> params = new HashMap<>(1);
-                            params.put("taskId", taskId);
-                            Constant.restTemplateGet(Constant.TASK_SHUT_DOWN_URL, params);
+                        if (StringUtils.isNotEmpty(taskPatrolledId) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
+                            TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskPatrolledId, errorCode);
+                            TaskExecutePool.getInstance().execute(taskShutDownThread);
                         }
                     }
                 } else if (firstKey.endsWith("_file_path")) {
