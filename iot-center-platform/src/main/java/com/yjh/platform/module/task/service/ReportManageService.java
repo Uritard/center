@@ -161,12 +161,13 @@ public class ReportManageService {
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
-        // 概况
-        TaskVO taskVO = getTaskVO(taskId);
-        recordData.setTaskVO(taskVO);
 
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+        // 概况
+        TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList);
+        recordData.setTaskVO(taskVO);
+
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
         String absPath = map.get("content");
         Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
@@ -217,8 +218,71 @@ public class ReportManageService {
         return newReportPath;
     }
 
-    public TaskVO getTaskVO(String taskId) {
+    private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> tCDRDList){
+        List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
+        List<TCruiseDataResultDetail> normalList = new ArrayList<>();
+        List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
+//        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+//            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                cbsInspectionResultVo.setIdentifyResultName("异常");
+//                abnormalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                normalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
+//                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+//                unReviewList.add(cbsInspectionResultVo);
+//            }
+//
+//        }
+        //根据要求 识别出来是异常 放在异常里
+        // 点位状态 未执行、执行失败、未知 放在待人工确认里面
+        // 正常的挡在正常里面
+        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+                // i
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                }
+            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    normalList.add(cbsInspectionResultVo);
+                }
+            }
+        }
+
+        taskVO.setAbnormal(abnormalList.size());
+        taskVO.setNormal(normalList.size());
+        taskVO.setUnReview(unReviewList.size());
+    }
+
+    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
+        delaCount(taskVO,tCruiseDataResultDetailList);
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));

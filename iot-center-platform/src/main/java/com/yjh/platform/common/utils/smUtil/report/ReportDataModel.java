@@ -200,17 +200,57 @@ public class ReportDataModel {
         List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
+//        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+//            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                cbsInspectionResultVo.setIdentifyResultName("异常");
+//                abnormalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                normalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
+//                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+//                unReviewList.add(cbsInspectionResultVo);
+//            }
+//
+//        }
+        //根据要求 识别出来是异常 放在异常里
+        // 点位状态 未执行、执行失败、未知 放在待人工确认里面
+        // 正常的挡在正常里面
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
             if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                cbsInspectionResultVo.setIdentifyResultName("异常");
-                abnormalList.add(cbsInspectionResultVo);
+                // i
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                    cbsInspectionResultVo.getCruiseState() == 254 ||
+                    cbsInspectionResultVo.getCruiseState() == 255 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                    cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                }
             }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                normalList.add(cbsInspectionResultVo);
-            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
-                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-                unReviewList.add(cbsInspectionResultVo);
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    normalList.add(cbsInspectionResultVo);
+                }
             }
-
         }
 
         for (int i = 0; i < TASK_TITLE_CONTENT.length; i++) {
