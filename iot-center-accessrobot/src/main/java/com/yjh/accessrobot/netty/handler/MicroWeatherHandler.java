@@ -62,7 +62,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         info.put("robotCode", robotCode);
         DecimalFormat decimalFormat = new DecimalFormat("#0.0");
         List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
-        xmlBaseModel.getItems().forEach(res -> {
+        for(Map<String,Object > res :xmlBaseModel.getItems()) {
             Map<String, String> weatherMap = new HashMap<>(16);
             // 2022过检 robot_name -> patroldevice_name
             weatherMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
@@ -73,33 +73,47 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             weatherMap.put("unit", res.get("unit").toString());
             weatherMap.put("value", res.get("value").toString());
             weatherMap.put("valueUnit", res.get("value_unit").toString());
-            weatherMap.put("unit", res.get("unit").toString());
 
             weatherList.add(weatherMap);
             // 2022过检 环境类型修改
             // 1:环境温度 2:环境湿度 3:=风速 4:=雨量 5:=风向 6:=气压 7:=氧气 8:=SF6
             String weatherType = weatherMap.get("type");
             if ("1".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("temperature", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
 //                    info.put("temperatureUnit", "℃");
                 info.put("temperatureUnit",weatherMap.get("unit"));
             }
             if ("2".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("humidity", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
 //                    info.put("humidityUnit", "%");
                 info.put("humidityUnit", weatherMap.get("unit"));
             }
             if ("3".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("windSpeed", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
 //                    info.put("windSpeedUnit", "m/s");
                 info.put("windSpeedUnit", weatherMap.get("unit"));
             }
             if ("4".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("precipitation", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
 //                    info.put("precipitationUnit", "mm");
                 info.put("precipitationUnit", weatherMap.get("unit"));
             }
             if ("5".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 if ("".equals(weatherMap.get("value")) || null == weatherMap.get("value")) {
                     info.put("windDirection", "--");
                 } else {
@@ -108,16 +122,25 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 // info.put("precipitationUnit","mm");
             }
             if ("6".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
 //                    info.put("airPressureUnit", "kPa");
                 info.put("airPressureUnit", weatherMap.get("unit"));
             }
             if ("7".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("oxygen", weatherMap.get("value"));
 //                    info.put("oxygenUnit", "ppm");
                 info.put("oxygenUnit", weatherMap.get("unit"));
             }
             if ("8".equals(weatherType)) {
+                if (!unitCheck(weatherMap)) {
+                    return;
+                }
                 info.put("sf6", weatherMap.get("value"));
                 info.put("sf6Unit", weatherMap.get("unit"));
             }
@@ -168,7 +191,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 }
                 envDeviceStatusList.add(env);
             }
-        });
+        }
 
         if (envDeviceStatusList.size() > 0) {
             JSONObject json = new JSONObject();
@@ -192,5 +215,46 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
     @Override
     public void afterPropertiesSet() throws Exception {
         MessageHandlerStrategyFactory.register(HandlerEnum.MICRO_WEATHER_DATA.getCode(), this);
+    }
+
+    private static boolean unitCheck(Map<String,String> weatherMap) {
+        String type = weatherMap.get("type");
+        String unit = weatherMap.get("unit");
+        String value = weatherMap.get("value");
+        String valueUnit = weatherMap.get("valueUnit");
+
+        if (StringUtils.isNotBlank(type)) {
+            switch (type) {
+                //环境温度
+                case "1":
+                    return "℃".equals(unit) && valueUnit.equals(value + unit);
+                //环境湿度
+                case "2":
+                    return "%".equals(unit) && valueUnit.equals(value + unit);
+                //风速
+                case "3":
+                    return "m/s".equals(unit) && valueUnit.equals(value + unit);
+                //雨量
+                case "4":
+                    return "mm".equals(unit) && valueUnit.equals(value + unit);
+                //风向
+                case "5":
+                    return "".equals(unit) && valueUnit.equals(value);
+                //气压
+                case "6":
+                    return ("Pa".equalsIgnoreCase(unit)||"kPa".equalsIgnoreCase(unit)||"hPa".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                //氧气
+                case "7":
+                    return "ppm".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //SF6
+                case "8":
+                    return "ppm".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //其他
+                default:
+                    return false;
+            }
+
+        }
+        return false;
     }
 }
