@@ -19,7 +19,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.TCameraPresetService;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -191,6 +191,13 @@ public class MessageThread {
         //发给无人机
         if ("20001".equals(xmlBaseModel.getType()) || "20002".equals(xmlBaseModel.getType()) || "20003".equals(xmlBaseModel.getType())
             || "20004".equals(xmlBaseModel.getType()) || "20005".equals(xmlBaseModel.getType())) {
+            // 无人机机巢控制参数校验
+            if (("20005".equals(xmlBaseModel.getType()))
+                    && !ArrayUtils.contains(new String[]{"1","2","3"}, xmlBaseModel.getCommand())
+                    && !ArrayUtils.contains(new String[]{"1", "2"}, xmlBaseModel.getItems().get(0).get("value"))){
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "400", null, false);
+                return;
+            }
             log.info("--响应控制 无人机控制下发--");
             Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
             List<XMLBaseModel> list = new ArrayList<>();
