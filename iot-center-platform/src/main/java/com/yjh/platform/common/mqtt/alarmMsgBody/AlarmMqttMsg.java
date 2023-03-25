@@ -9,7 +9,7 @@ import java.util.List;
 public class AlarmMqttMsg {
     String province_name;
     String city_name;
-    String volt_level;
+    int volt_level;
     String  station_name;
     String  section_name;
     String section_ip;

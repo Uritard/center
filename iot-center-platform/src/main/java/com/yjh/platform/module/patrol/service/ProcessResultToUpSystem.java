@@ -462,10 +462,11 @@ public class ProcessResultToUpSystem {
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
             // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImagebak = "analyseResultImg";
+            String resultImage;
             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
             String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
             String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
+            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
 
             String remoteorigfilepath = ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
             //,获取结果路径.并拼接算法管理平台对应远程文件路径
@@ -521,19 +522,22 @@ public class ProcessResultToUpSystem {
             // 判别基准图片上传
             ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
             // 判别结果图片上传
-            ftpsservice.uploadFile("判别告警", resultImagebak, remotefilepath);
-            log.info("判别预算法主机origpicpath:{}， remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
-            log.info("判别预算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
-            log.info("判别预算法主机resultImagebak:{}， remotefilepath:{}", resultImagebak, remotefilepath);
+            ftpsservice.uploadFile("判别告警", resultImage, remotefilepath);
+            log.info("判别与算法主机origpicpath:{}， remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+            log.info("判别与算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
+            log.info("判别与算法主机resultImage:{}， remotefilepath:{}", resultImage, remotefilepath);
             //可靠性 文件是否传输成功
             if( !ftpsservice.fileExits(remoteorigfilepath)){
+                log.info("原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
                 ftpsservice.uploadFile("判别告警", origPicPath, remoteorigfilepath);
             }
             if( !ftpsservice.fileExits(remotebaseimagicpath)){
+                log.info("判别基准图上传失败，再次上传， judgeBaseImagepath:{}, remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
                 ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
             }
             if( !ftpsservice.fileExits(remotefilepath)){
-                ftpsservice.uploadFile("判别告警", resultImagebak, remotefilepath);
+                log.info("判别告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
+                ftpsservice.uploadFile("判别告警", resultImage, remotefilepath);
             }
             alarmService.PushMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
@@ -549,10 +553,11 @@ public class ProcessResultToUpSystem {
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
             // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImagebak = "analyseResultImg";
+            String resultImage;
             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
             String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
+            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
 
             //拼接算法管理平台原始图片推送地址
             String remoteorigfilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
@@ -601,20 +606,20 @@ public class ProcessResultToUpSystem {
                 alarmDetail.setPic_defect(remotefilepath);
             }
             // 原始图片上传
-            ftpsservice.uploadFile("遥信告警", origPicPath, remoteorigfilepath);
+            ftpsservice.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
             // 缺陷结果图片上传
-            ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
+            ftpsservice.uploadFile("缺陷告警", resultImage, remotefilepath);
             if (!ftpsservice.fileExits(remoteorigfilepath)) {
-                ftpsservice.uploadFile("遥信告警", origPicPath, remoteorigfilepath);
+                log.info("缺陷原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+                ftpsservice.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
             }
             if (!ftpsservice.fileExits(remotefilepath)) {
-                ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
+                log.info("缺陷告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
+                ftpsservice.uploadFile("缺陷告警", resultImage, remotefilepath);
             }
 
-            log.info("巡视主机与智能分析主机：origpicpath:{}", origPicPath);
-            log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
-            log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
-            log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
+            log.info("缺陷与算法主机：origpicpath:{}，remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+            log.info("缺陷与算法主机：resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
             alarmService.PushMsg(alarmDetail);
             log.info("缺陷告警发送算法管理平台结束");
 

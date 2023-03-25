@@ -1,9 +1,6 @@
 package com.yjh.platform.common.mqtt;
 
-
 import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
-import com.yjh.platform.threadpool.TaskExecutePool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +30,14 @@ public class FtpsService {
 
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String alarmType, String filePath,String remoteFileName) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if ("".equals(alarmType)) {
-                        return;
-                    }
-                    FtpsUtil.putFile(filePath, remoteFileName, serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
-                } catch (Exception e) {
-                    log.error("上传至ftps错误: " + e);
-                }
+        try {
+            if ("".equals(alarmType)) {
+                return;
             }
-        };
-        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
+            FtpsUtil.putFile(filePath, remoteFileName, serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+        } catch (Exception e) {
+            log.error("上传至ftps错误: " + e);
+        }
     }
 
     public boolean fileExits(String filepath){
