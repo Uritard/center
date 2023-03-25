@@ -5,6 +5,8 @@ import com.yjh.platform.common.mqtt.PostMsgBody.PostBodyMsg;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.AlarmMqttMsg;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 public class AlarmService {
     public static final String HEART = "heart";
     @Value("${mqtt.topic}")
-    private String Topic;
+    private String topic;
 
     @Value("${mqtt.province_name}")
     private String provinceName;
@@ -35,13 +37,17 @@ public class AlarmService {
     private String nodeId;
 
     @Value("${mqtt.volt_level}")
-    private String voltLevel;
-    private AlarmMqttMsg alarmMqttMsg;
+    private int voltLevel;
+
+    @Qualifier("algorithmMqtt")
+    @Autowired
+    MqttUtilsServer mqttUtilsServer;
+
     private PostBodyMsg postBodyMsg;
-    private void  getMessgerInfo() {
-        alarmMqttMsg =new AlarmMqttMsg();
+    private AlarmMqttMsg getMessgerInfo() {
+        AlarmMqttMsg alarmMqttMsg =new AlarmMqttMsg();
         postBodyMsg=  new PostBodyMsg();
-        postBodyMsg.setTopic(Topic);
+        postBodyMsg.setTopic(topic);
         alarmMqttMsg.setMsg_type("alarm");
         alarmMqttMsg.setProvince_name(encode(provinceName));
         alarmMqttMsg.setCity_name(encode(cityName));
@@ -51,6 +57,8 @@ public class AlarmService {
         alarmMqttMsg.setNode_id(encode(nodeId));
         alarmMqttMsg.setVolt_level(voltLevel);
         alarmMqttMsg.setAlarm(new ArrayList<>());
+
+        return alarmMqttMsg;
     }
 
     private String encode(String str){
@@ -60,16 +68,13 @@ public class AlarmService {
      * 转发给platform的mqtt/postMqttMsg接口。后续需要各模块统一一下，是否都走platform
      * @param alarm 告警具体内推，再这里根据alarm拼装mqqt的告警消息postBodyMsg
      */
-    public void PushMsg(Alarm alarm ){
-        getMessgerInfo();
+    public void PushMsg(Alarm alarm){
+        AlarmMqttMsg alarmMqttMsg = getMessgerInfo();
         System.out.println("cityname---:"+alarmMqttMsg.getCity_name());
         alarmMqttMsg.addAlarm(alarm);
-       final String MQTT_URL = "http://iot-center-platform/mqtt/postMqttMsg";
-        ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         postBodyMsg.setObject(alarmMqttMsg);
-        if (null != serviceRestTemplate) {
-           serviceRestTemplate.postForObject(MQTT_URL, postBodyMsg, Boolean.class);
-        }
+
+        mqttUtilsServer.pushMsg(topic, alarmMqttMsg,1);
 
     }
 }
