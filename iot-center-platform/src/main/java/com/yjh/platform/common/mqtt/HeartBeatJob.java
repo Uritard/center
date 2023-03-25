@@ -42,7 +42,7 @@ public class HeartBeatJob {
     private String nodeId;
 
     @Value("${mqtt.volt_level}")
-    private String voltLevel;
+    private int voltLevel;
 
     private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
