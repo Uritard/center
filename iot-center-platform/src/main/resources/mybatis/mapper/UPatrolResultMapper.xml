@@ -1144,7 +1144,9 @@
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
-        m.region_name as regionName
+        m.region_name as regionName,
+        f.cruise_status as cruiseState,
+        f.cruise_abnormal as cruiseAbnormal
         from u_patrol_data_result f
         LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
@@ -1274,7 +1276,9 @@
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
-        m.region_name as regionName
+        m.region_name as regionName,
+        f.cruise_status as cruiseState,
+        f.cruise_abnormal as cruiseAbnormal
         from u_patrol_data_result f
         LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id

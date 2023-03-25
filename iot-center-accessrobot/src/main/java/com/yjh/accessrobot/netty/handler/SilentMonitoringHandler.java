@@ -87,6 +87,10 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
 
         List<SilentInfo> silentInfos = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
+            if (!checkParam(item)){
+                log.info("静默监视参数非法！{}",item);
+                continue;
+            }
             SilentInfo silentInfo = new SilentInfo();
             silentInfo.setPatrolDeviceCode(String.valueOf(item.get("patroldevice_code")))
                     .setDeviceName(String.valueOf(item.get("device_name")))
@@ -122,6 +126,26 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
 //            // 生成告警 ，发送上级系统
 //            processAlarm(sendCode, absPath, presetId, monitorType, tCameraPreset, desc);
 //        }
+    }
+
+    private Boolean checkParam(Map<String, Object> item){
+        String fileType = String.valueOf(item.get("file_type"));
+        String filePath = String.valueOf(item.get("file_path"));
+        String typeAll = "24";
+        if (! typeAll.contains(fileType)){
+            return false;
+        }
+        if (fileType.equals("2")){
+            if(!filePath.endsWith(".jpg")){
+                return false;
+            }
+        }
+        if (fileType.equals("4")){
+            if(!filePath.endsWith(".mp4")){
+                return false;
+            }
+        }
+        return true;
     }
 
     private void processAlarm(String sendCode, String absPath, String presetId, String monitorType, TCameraPreset tCameraPreset, String desc) {
