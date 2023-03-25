@@ -322,7 +322,7 @@ public class TStdMetemodelController {
         try {
             result=tStdMetemodelService.insertModel(file);
             if (result.getCode() == 200){
-                logsRecord.LogsSend(request,"8","导入","点位导未成功");
+                logsRecord.LogsSend(request,"8","导入","点位导入成功");
             } else {
                 logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 点位导入未成功，" + result.getMessage());
             }
