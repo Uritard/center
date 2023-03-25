@@ -156,7 +156,7 @@ public class NumToStringUtil {
             return "删除用户";
         }
         if("24".equals(str)){
-            return "用户越权访问";
+            return "越权访问";
         }
         if("25".equals(str)){
             return "数据备份";
