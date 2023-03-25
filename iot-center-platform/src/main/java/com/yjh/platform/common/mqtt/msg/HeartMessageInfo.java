@@ -17,7 +17,7 @@ public class HeartMessageInfo {
     @JsonProperty("city_name")
     private String cityName;
     @JsonProperty("volt_level")
-    private String voltLevel;
+    private int voltLevel;
     @JsonProperty("station_name")
     private String stationName;
     @JsonProperty("section_name")
