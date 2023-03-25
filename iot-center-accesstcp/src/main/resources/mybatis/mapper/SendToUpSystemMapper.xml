@@ -120,7 +120,8 @@
         left join t_dict_business k on a.cruise_type = k.dict_code
         LEFT JOIN t_dict_business m ON b.custom_id = m.dict_code
         LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
-        where a.edge_code = 'Edge01'
+        where 1=1
+        <if test="edgeCode != null and edgeCode != ''"> and a.edge_code = #{edgeCode}</if>
     </select>
 
     <select id="selectRobotInfo" resultType="java.util.LinkedHashMap">

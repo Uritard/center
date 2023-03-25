@@ -19,6 +19,7 @@ import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -53,6 +54,8 @@ public class TStdDeviceService{
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -460,9 +463,15 @@ public class TStdDeviceService{
                 break;
             case "9":
                 if(StringUtils.isNotEmpty(deviceType)){
+                    Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
+                    String selectEdge = selectEdgeMap.get("content");
+                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                    if ("1".equals(edgeLevel)){
+                        selectEdge = null;
+                    }
                     if (Objects.equals(deviceShow, "camera")) { listTree = this.tStdDeviceDao.selectCameraMeteCruiseTree(deviceType,analyseType); }
                     else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotMeteCruiseTree(deviceType,analyseType); }
-                    else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteCruiseTree(deviceType,analyseType); }
+                    else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteCruiseTree(deviceType,analyseType,selectEdge); }
                     else { throw new BusinessException("设备树展示内容输入有误！"); }
                 }else{
                     throw new BusinessException("设备树展示内容传参有误！");
