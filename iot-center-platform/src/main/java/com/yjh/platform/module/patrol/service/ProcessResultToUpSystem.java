@@ -101,19 +101,24 @@ public class ProcessResultToUpSystem {
                         Map<String, String> cruiseResultNewMap = new HashMap<>(cruiseResultMap);
                         String value = "";
                         String valueType = "";
+                        String unit = "";
                         String valueItem = split[i];
                         if (valueItem.contains("频次")){
                             value = getNumeric(split[i]);
                             valueType = "11";
+                            unit = split[i].endsWith("dB") ? "dB" : "";
                         }else if (valueItem.contains("峰值")) {
                             value = getNumeric(split[i]);
                             valueType = "12";
+                            unit = split[i].endsWith("dB") ? "dB" : "";
                         }else {
                             value = getNumeric(split[i]);
                             valueType = "13";
+                            unit = split[i].endsWith("dB") ? "dB" : "";
                         }
                         cruiseResultNewMap.put("resultNum", value);
                         cruiseResultNewMap.put("valueType", valueType);
+                        cruiseResultNewMap.put("unit", unit);
                         cruiseResultNewList.add(cruiseResultNewMap);
                     }
                     continue;
