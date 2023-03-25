@@ -625,7 +625,8 @@
             SELECT DISTINCT dm.device_mete_id AS Id, dm.mete_name AS label, dm.device_id AS upId,	sd.device_name AS upName,"devicemete" AS infoType
                 FROM t_std_devicemete dm
                 LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
-                where 1=1 and dm.edge_code = 'Edge01'
+                where 1=1
+        <if test="edgeCode != null and edgeCode != ''"> and dm.edge_code = #{edgeCode}</if>
         <if test="deviceType != null and deviceType != '' and deviceType != -1">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
         )
@@ -635,7 +636,8 @@
 			when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
 		    FROM  t_cruise_point_instance cpi
             LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
-        where 1=1 and cpi.edge_code = 'Edge01'
+        where 1=1
+        <if test="edgeCode != null and edgeCode != ''"> and cpi.edge_code = #{edgeCode}</if>
         <if test="deviceType != null and deviceType != '' and deviceType != -1">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>);
     </select>
