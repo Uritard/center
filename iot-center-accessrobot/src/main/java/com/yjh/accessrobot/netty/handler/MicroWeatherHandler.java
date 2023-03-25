@@ -52,6 +52,18 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         }
 
         // 给下级响应
+        String robotCodeForRefuse = robotService.selectRobotOrEdgeRobot(xmlBaseModel, robotCode);
+        String onlineStatus = String.valueOf(redisTemplate.opsForValue().get("onlineStatus:"+ robotCode));
+
+        if ("1".equals(onlineStatus)) {
+            // 给下级响应
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(robotCode));
+            byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+            RobotServerHandler.send(statusProtocol, robotCode);
+            log.info("本级系统给下级{}响应了", robotCode);
+            return;
+        }
+
         String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
         RobotServerHandler.send(weatherProtocol, robotCode);

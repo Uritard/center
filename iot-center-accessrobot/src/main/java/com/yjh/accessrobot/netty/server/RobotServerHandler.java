@@ -83,6 +83,25 @@ public interface RobotServerHandler {
 
 
     /**
+     * 快速创建command=3 的消息体
+     *
+     * @param sendCode 接收方唯一标识
+     * @return XMLBaseModel
+     */
+    static XMLBaseModel sendMessageForCommandThreeFlase(String sendCode) {
+        XMLBaseModel xmlBaseModelEmpty = new XMLBaseModel();
+        xmlBaseModelEmpty.setCommand("3");
+        xmlBaseModelEmpty.setTime(DateTimeUtil.getDateTimeString(false));
+        xmlBaseModelEmpty.setType("251");
+        xmlBaseModelEmpty.setCode("500");
+//        xmlBaseModelEmpty.setCode(flag ? "200" : "500");
+        xmlBaseModelEmpty.setSendCode(Constant.sendCode);
+        xmlBaseModelEmpty.setReceiveCode(sendCode);
+        return xmlBaseModelEmpty;
+    }
+
+
+    /**
      * 发送消息
      *
      * @param bytes     发送的内容
