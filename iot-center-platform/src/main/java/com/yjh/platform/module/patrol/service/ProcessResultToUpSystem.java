@@ -80,7 +80,6 @@ public class ProcessResultToUpSystem {
      * @param alarmLevel 告警等级
      * @param tWarnInfo 告警信息
      */
-    @Async
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
         if (Constant.fastTurbo()) {
             // 压测模式，结果不上报上级系统
