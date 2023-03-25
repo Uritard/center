@@ -36,10 +36,11 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
     private RobotService robotService;
 
     @Override
-    public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
+    public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId,
+        long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++收到下级的运行数据了+++++++++++++++++");
         // Deal with robot operation data
-        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         xmlBaseModel.setCode(stationCode);
         String sendCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(sendCode)) {
@@ -54,12 +55,13 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
         // 给下级响应
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send( operationProtocol, sendCode);
+        RobotServerHandler.send(operationProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotOperationList = new ArrayList<>();
-        xmlBaseModel.getItems().forEach(res -> {
+
+        for (Map<String, Object> res : xmlBaseModel.getItems()) {
             Map<String, String> robotOperationMap = new HashMap<>(16);
             // 2022过检 修改robot_name为patroldevice_name
             robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
@@ -70,8 +72,11 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             robotOperationMap.put("value", res.get("value").toString());
             robotOperationMap.put("valueUnit", res.get("value_unit").toString());
             robotOperationMap.put("unit", res.get("unit").toString());
+            if (!unitCheck(robotOperationMap)) {
+                return;
+            }
             robotOperationList.add(robotOperationMap);
-        });
+        }
         log.info("robotOperationList: {}", JSON.toJSONString(robotOperationList));
 
         for (int i = 0; i < robotOperationList.size(); i++) {
@@ -84,5 +89,55 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
     @Override
     public void afterPropertiesSet() throws Exception {
         MessageHandlerStrategyFactory.register(HandlerEnum.ROBOT_RUN_DATA.getCode(), this);
+    }
+
+    private static boolean unitCheck(Map<String, String> weatherMap) {
+        String type = weatherMap.get("type");
+        String unit = weatherMap.get("unit");
+        String value = weatherMap.get("value");
+        String valueUnit = weatherMap.get("valueUnit");
+
+        if (StringUtils.isNotBlank(type)) {
+            switch (type) {
+                //水平速度
+                case "1":
+                    return "m/s".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //行驶里程
+                case "2":
+                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //电池电量
+                case "3":
+                    return "%".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //垂直速度
+                case "4":
+                    return "m/s".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //飞行距离
+                case "5":
+                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //飞行高度
+                case "6":
+                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //飞行时长
+                case "7":
+                    return ("分钟".equalsIgnoreCase(unit) || "min".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                //云台俯仰角
+                case "8":
+                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                //云台俯仰角
+                case "9":
+                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                //云台俯仰角
+                case "10":
+                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                //云台俯仰角
+                case "11":
+                    return "A".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //其他
+                default:
+                    return false;
+            }
+
+        }
+        return false;
     }
 }
