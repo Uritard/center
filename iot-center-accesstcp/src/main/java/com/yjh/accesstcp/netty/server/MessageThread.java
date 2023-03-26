@@ -192,11 +192,26 @@ public class MessageThread {
         if ("20001".equals(xmlBaseModel.getType()) || "20002".equals(xmlBaseModel.getType()) || "20003".equals(xmlBaseModel.getType())
             || "20004".equals(xmlBaseModel.getType()) || "20005".equals(xmlBaseModel.getType())) {
             // 无人机机巢控制参数校验
-            if (("20005".equals(xmlBaseModel.getType()))
-                    && !ArrayUtils.contains(new String[]{"1","2","3"}, xmlBaseModel.getCommand())
-                    && !ArrayUtils.contains(new String[]{"1", "2"}, xmlBaseModel.getItems().get(0).get("value"))){
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "400", null, false);
-                return;
+            if (StringUtils.equals("20005", xmlBaseModel.getType())){
+                String value = String.valueOf(xmlBaseModel.getItems().get(0).get("value"));
+                switch (xmlBaseModel.getCommand()){
+                    case "1":
+                    case "3":
+                        if (!ArrayUtils.contains(new String[]{"1","2","3"}, value)){
+                            sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "400", null, false);
+                            return;
+                        }
+                        break;
+                    case "2":
+                        if (!ArrayUtils.contains(new String[]{"1","2"}, value)){
+                            sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "400", null, false);
+                            return;
+                        }
+                        break;
+                    default:
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "400", null, false);
+                        return;
+                }
             }
             log.info("--响应控制 无人机控制下发--");
             Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
