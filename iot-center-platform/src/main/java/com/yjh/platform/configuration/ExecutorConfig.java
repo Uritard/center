@@ -69,7 +69,7 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
-            log.error("异步任务执行出现异常, message {}, emthod {}, params {}", throwable, method, objects);
+            log.error("异步任务执行出现异常, message {}, emthod {}, params {}", throwable.getMessage(), method, objects, throwable);
         };
     }
 
