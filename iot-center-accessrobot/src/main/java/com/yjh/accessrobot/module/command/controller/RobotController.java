@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.commons.logs.Logs;
+import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
@@ -25,11 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import java.util.*;
 
 /**
  * @author tt
@@ -48,6 +45,8 @@ public class RobotController {
     private RedisTemplate redisTemplate;
     @Autowired
     private Demo demo;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
@@ -293,15 +292,23 @@ public class RobotController {
     }
     @ApiOperation(value = "离线情况同步机器人模型信息-上传文件")
     @PostMapping(value = "/upLoadRobotModel")
-    @Logs(title = "导入文件",content = "导入机器人模型信息文件",logType = 8)
-    public Result upLoadRobotModel(@RequestParam(value="file", required=false) MultipartFile file,
+//    @Logs(title = "导入文件",content = "导入机器人模型信息文件",logType = 8)
+    public Result upLoadRobotModel(HttpServletRequest request,@RequestParam(value="file", required=false) MultipartFile file,
                                    @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
             result = robotService.upLoadRobotModel(file, robotCode);
+            if (ResultCodeEnum.UPDATEERROR.getCode() == result.getCode()) {
+                logsRecord.LogsSend(request,"8","模型文件导入失败",result.getMessage(),2);
+            }
+            else {
+                logsRecord.LogsSend(request,"8","导入文件","导入机器人模型信息文件",1);
+            }
         } catch (BusinessException b) {
+            logsRecord.LogsSend(request,"8","模型文件导入失败",b.getMessage(),2);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
+            logsRecord.LogsSend(request,"8","模型文件导入失败",e.getMessage(),2);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("离线情况同步机器人模型文件-上传文件接口发生错误:", e);
         }
@@ -309,15 +316,24 @@ public class RobotController {
     }
     @ApiOperation(value = "离线情况同步机器人设备文件-上传文件")
     @PostMapping(value = "/upLoadRobotDevice")
-    @Logs(title = "导入文件",content = "导入机器人设备点位文件",logType = 8)
-    public Result upLoadRobotDevice(@RequestParam(value="file", required=false) MultipartFile file,
+//    @Logs(title = "导入文件",content = "导入机器人设备点位文件",logType = 8)
+    public Result upLoadRobotDevice(HttpServletRequest request,@RequestParam(value="file", required=false) MultipartFile file,
                                     @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
             result = robotService.upLoadRobotDevice(file, robotCode);
+            if (ResultCodeEnum.UPDATEERROR.getCode() == result.getCode()) {
+                logsRecord.LogsSend(request,"8","模型文件导入失败",result.getMessage(),2);
+            }
+            else {
+
+                logsRecord.LogsSend(request,"8","导入文件","导入机器人设备点位文件",1);
+            }
         } catch (BusinessException b) {
+            logsRecord.LogsSend(request,"8","模型文件导入失败",b.getMessage(),2);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
+            logsRecord.LogsSend(request,"8","模型文件导入失败",e.getMessage(),2);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("离线情况同步机器人模型信息-上传文件接口发生错误:", e);
         }
