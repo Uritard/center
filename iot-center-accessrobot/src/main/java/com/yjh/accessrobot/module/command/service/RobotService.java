@@ -190,14 +190,17 @@ public class RobotService {
             map.put("direction", direction);
         }
         item.add(map);
-        //记录控制巡视设备具体操作
-        if (StringUtils.isNotEmpty(content)) {
-            logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 1);
-        }
+
         if (StringUtils.isEmpty(robotCode)) {
             log.error("==========没有设置巡视设备编码==========");
             scmap.put("code", 3);
             scmap.put("result", "当前不存在该巡视设备编码,请先添加");
+
+            //记录控制巡视设备具体操作，操作失败
+            if (StringUtils.isNotEmpty(content)) {
+                logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 2);
+            }
+
             return scmap;
         }
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
@@ -206,6 +209,12 @@ public class RobotService {
             log.error("==========该巡视设备处于离线状态,没有成功将控制指令下发到巡视设备==========");
             scmap.put("code", 3);
             scmap.put("result", "巡视设备不在线");
+
+            //记录控制巡视设备具体操作，操作失败
+            if (StringUtils.isNotEmpty(content)) {
+                logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 2);
+            }
+
             return scmap;
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
@@ -246,6 +255,12 @@ public class RobotService {
                     log.error("==========当前巡视设备未获取控制权,无法操作==========");
                     scmap.put("code", 3);
                     scmap.put("result", "请先获取当前巡视设备控制权");
+
+                    //记录控制巡视设备具体操作，操作失败
+                    if (StringUtils.isNotEmpty(content)) {
+                        logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 2);
+                    }
+
                     return scmap;
                 }
             }
@@ -256,6 +271,12 @@ public class RobotService {
                 log.error("==========当前巡视设备处于" + returnMsg + ",无法操作==========");
                 scmap.put("code", 3);
                 scmap.put("result", "当前巡视设备处于" + returnMsg + ",无法操作");
+
+                //记录控制巡视设备具体操作，操作失败
+                if (StringUtils.isNotEmpty(content)) {
+                    logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 2);
+                }
+
                 return scmap;
             }
             boolean flag = StringUtils.equals("1", robotPattern)
@@ -293,6 +314,11 @@ public class RobotService {
                 scmap.put("result", "指令下发成功");
                 scmap.put("path", filePath);
             }
+
+        //记录控制巡视设备具体操作
+        if (StringUtils.isNotEmpty(content)) {
+            logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 1);
+        }
             return scmap;
         }
     }
