@@ -182,6 +182,7 @@ public class LogsAspect {
                     case "新增预案":
                     case "删除预案":
                     case "修改预案":
+                    case "审核任务":
                         flag =false;
                         break;
                     default:

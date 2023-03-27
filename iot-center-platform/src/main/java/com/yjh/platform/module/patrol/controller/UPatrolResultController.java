@@ -256,7 +256,7 @@ public class UPatrolResultController {
 
     @ApiOperation(value = "人工复核")
     @PostMapping(value = "/manualReview")
-    @Logs(title = "人工复核",content = "人工复核",logType = 5,authority = "1235")
+    @Logs(title = "人工复核",content = "人工复核",logType = 5, authority = "1235")
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
 
         String userId = request.getHeader("userId");
@@ -288,7 +288,7 @@ public class UPatrolResultController {
     }
     @ApiOperation(value = "一键审核--任务下的所有巡视点")
     @GetMapping(value = "/manualReviewTask")
-    @Logs(title = "审核任务",content = "一键审核",logType = 5)
+    @Logs(title = "审核任务",content = "一键审核",logType = 5, authority = "1235")
     public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
         String userId = request.getHeader("userId");
         Result result=new Result();

@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -63,6 +64,8 @@ public class UPatrolResultService {
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
+    @Autowired
+    private LogsRecord logsRecord;
 
     public List<TCruiseResultExpand> selectTaskByPage(List<String> list) {
         return uPatrolResultDao.selectTaskByPage(list);
@@ -362,6 +365,7 @@ public class UPatrolResultService {
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        logsRecord.LogsSend(request, "5", "审核任务", "一键审核任务-" + uPatrolResult.getTaskName());
         if (StringUtils.isNotEmpty(uPatrolResult.getCheckUser()) ){
             if (uPatrolResult.getCheckUser().contains(userName)){
                 userName = uPatrolResult.getCheckUser();
