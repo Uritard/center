@@ -286,7 +286,7 @@ public class SysUser implements Serializable {
     @ApiModelProperty(value = "性别0女，1 男，2未知")
     private Integer sex;
 
-    @Length(max = 20, message = "eMail长度必须小于等于20")
+    @Length(max = 64, message = "eMail长度必须小于等于64")
     @ApiModelProperty(value = "eMail")
     private String eMail;
 
