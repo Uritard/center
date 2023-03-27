@@ -1,9 +1,9 @@
 
-package com.yjh.accessvideo.common.handler;
+package com.yjh.platform.common.aop.handler;
 
-import com.yjh.accessvideo.commons.result.BusinessException;
-import com.yjh.accessvideo.commons.result.Result;
-import com.yjh.accessvideo.commons.result.ResultCodeEnum;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
-
 
 /**
  * 
@@ -35,21 +34,21 @@ public class ControllerExceptionHandler {
    @ExceptionHandler(value = { ConstraintViolationException.class })
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public Result constraintViolationException(ConstraintViolationException ex) {
-       logger.info(ex.getMessage());
+       logger.info(ex.getMessage(), ex);
        return new Result(HttpStatus.BAD_REQUEST.value(),"参数错误");
    }
    
    @ExceptionHandler(value = { IllegalArgumentException.class })
    @ResponseStatus(HttpStatus.BAD_REQUEST)
    public Result IllegalArgumentException(IllegalArgumentException ex) {
-       logger.info(ex.getMessage());
-       return new Result(HttpStatus.BAD_REQUEST.value(), "参数错误");
+       logger.info(ex.getMessage(), ex);
+       return new Result(HttpStatus.BAD_REQUEST.value(), "参数错误，请检查参数是否合规");
    }
 
    @ExceptionHandler(value = { NoHandlerFoundException.class})
    @ResponseStatus(HttpStatus.NOT_FOUND)
    public Result noHandlerFoundException(Exception ex) {
-       logger.info(ex.getMessage());
+       logger.info(ex.getMessage(), ex);
        return new Result(HttpStatus.NOT_FOUND.value(), "资源不存在或无权限");
    }
     /**
@@ -58,7 +57,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public Result handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        //logger.error("缺少请求参数", e);
+        logger.error("缺少请求参数", e);
         return new Result(HttpStatus.NOT_FOUND.value(), "缺少请求参数");
     }
 
