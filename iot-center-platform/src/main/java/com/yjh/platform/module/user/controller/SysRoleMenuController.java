@@ -182,7 +182,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "根据角色查询菜单权限树")
     @GetMapping(value = "/selectRoleMenuTree")
-    @Logs(title = "根据角色查询菜单权限树",content = "根据角色查询菜单权限树",logType = 2)
+    @Logs(title = "根据角色查询菜单权限树",content = "根据角色查询菜单权限树",logType = 1)
     public Result selectRoleMenuTree() {
         Result result = new Result();
         try {
