@@ -324,16 +324,16 @@ public class TStdMetemodelController {
             if (result.getCode() == 200){
                 logsRecord.LogsSend(request,"8","导入","点位导入成功");
             } else {
-                logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 点位导入未成功，" + result.getMessage());
+                logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!" ,2);
             }
         }  catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("生成模板异常:", e);
-            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 点位导入未成功，" + result.getMessage());
+            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!",2);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("生成模板错误:", e);
-            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 点位导入未成功，" + result.getMessage());
+            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!" ,2);
         }
 
         return  result;

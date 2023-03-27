@@ -388,7 +388,7 @@ public class UPatrolTaskController {
 
     @ApiOperation(value = "查询任务优先级")
     @RequestMapping(value = "/selectTaskPriorityConfigList", method = RequestMethod.GET)
-    @Logs(title = "查询任务优先级",content = "查询任务优先级",logType = 2,authority = "1234")
+//    @Logs(title = "查询任务优先级",content = "查询任务优先级",logType = 2,authority = "1234")
     public Result selectTaskPriorityConfigList() {
         Result result = new Result();
         try{

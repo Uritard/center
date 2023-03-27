@@ -282,7 +282,7 @@ public class TCameraInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","摄像机台账导出");
+                logsRecord.LogsSend(request,"9","导出台账信息","摄像机台账导出");
             }else{
                 logsRecord.LogsSend(request,"1","查询相机信息","根据用户传递的参数分页查询相机信息");
             }

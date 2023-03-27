@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +39,8 @@ public class TUnionTaskController {
 
     @Autowired
     private final TUnionTaskService tUnionTaskService;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TUnionTaskController.class);
 
@@ -173,18 +177,24 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "查看联动历史记录")
     @RequestMapping(value = "/selectHistory", method = RequestMethod.GET)
-    @Logs(title = "查看联动历史记录",content = "根据用户传递的参数查询联动历史记录",logType = 1,authority = "1234,1235")
+//    @Logs(title = "查看联动历史记录",content = "根据用户传递的参数查询联动历史记录",logType = 1,authority = "1234,1235")
     public Result selectHistory(@RequestParam(value = "ruleName", required = false) String ruleName,
                                 @RequestParam(value = "endDate", required = false) String endDate,
                                 @RequestParam(value = "startDate", required = false) String startDate,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,
+                                HttpServletRequest request) {
         Result result = new Result();
         /*SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date endDateTemp = new Date();
         Date startDateTemp = new Date();*/
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","联动历史信息导出","联动历史信息导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查看联动历史记录","根据用户传递的参数查询联动历史记录");
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             /*if (("".equals(endDate) && "".equals(startDate)) || (endDate == null && startDate == null) ) {
                 endDateTemp = null;
