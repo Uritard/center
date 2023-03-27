@@ -169,7 +169,7 @@ public class VideoIntercomContrller {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","可视对讲设备台账导出");
+                logsRecord.LogsSend(request,"9","导出台账信息","可视对讲设备台账导出");
             }else{
                 logsRecord.LogsSend(request,"1","查询可视对讲设备台账数据","根据用户传递的参数分页查询可视对讲设备台账信息");
             }

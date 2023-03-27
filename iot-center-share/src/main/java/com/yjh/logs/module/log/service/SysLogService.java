@@ -188,14 +188,14 @@ public class SysLogService {
             Random random = new Random();
             if (state == 1) {
                 new Thread(() -> {
-                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
-                    long mathLong = Long.valueOf(mathRandom);
-                    log.info("mathLong: " + mathLong);
-                    try {
-                        Thread.sleep(mathLong);
-                    } catch (Exception e) {
-                        e.getMessage();
-                    }
+//                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
+//                    long mathLong = Long.valueOf(mathRandom);
+//                    log.info("mathLong: " + mathLong);
+//                    try {
+//                        Thread.sleep(mathLong);
+//                    } catch (Exception e) {
+//                        e.getMessage();
+//                    }
                     result.setData(sysLogDao.insert(sysLog));
                 }).start();
             } else {
@@ -215,14 +215,14 @@ public class SysLogService {
                     if(state==3){
                         redisTemplate.opsForValue().set("errorLog", content, 5, TimeUnit.MINUTES);
                     }
-                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
-                    long mathLong = Long.valueOf(mathRandom);
-                    log.info("mathLong: " + mathLong);
-                    try {
-                        Thread.sleep(mathLong);
-                    } catch (Exception e) {
-                        e.getMessage();
-                    }
+//                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
+//                    long mathLong = Long.valueOf(mathRandom);
+//                    log.info("mathLong: " + mathLong);
+//                    try {
+//                        Thread.sleep(mathLong);
+//                    } catch (Exception e) {
+//                        e.getMessage();
+//                    }
                     result.setData(sysLogDao.insert(sysLog));
                 }).start();
             }

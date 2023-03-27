@@ -174,7 +174,7 @@ public class TVoiceDeviceController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","声纹设备台账导出");
+                logsRecord.LogsSend(request,"9","导出台账信息","声纹设备台账导出");
             }else{
                 logsRecord.LogsSend(request,"1","查询声纹设备数据","根据用户传递的参数分页查询声纹设备");
             }

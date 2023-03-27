@@ -214,7 +214,7 @@ public class TCameraRecorderController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","录像机台账导出");
+                logsRecord.LogsSend(request,"9","导出台账信息","录像机台账导出");
             }else{
                 logsRecord.LogsSend(request,"1","查询录像服务器信息","根据用户传递的参数分页查询录像服务器信息");
             }
