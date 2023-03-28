@@ -418,7 +418,7 @@ public class TCruiseTaskResultService {
                     Date date2 = o2.getCruiseTime();
                     return Long.compare(date2.getTime(), date1.getTime());
                 }
-        ).collect(Collectors.toList());
+        ).distinct().collect(Collectors.toList());
 
     }
 

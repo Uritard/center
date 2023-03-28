@@ -86,8 +86,7 @@ public class LogsAspect {
                 try {
                     if (!"".equals(annotation.authority())) {
                         String ans = annotation.authority();
-                        assert userRole != null;
-                        if (!ans.contains(userRole)) {
+                        if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
                             //todo 越权访问入日志
                             params.set("logType", "24");
                             params.set("ip", ip);

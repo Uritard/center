@@ -6,6 +6,7 @@ import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.http.IPUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -87,8 +88,7 @@ public class LogsAspect {
                 try {
                     if (!"".equals(annotation.authority())) {
                         String ans = annotation.authority();
-                        assert userRole != null;
-                        if (!ans.contains(userRole)) {
+                        if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
                             //todo 越权访问入日志
                             params.set("logType", "24");
                             params.set("ip", ip);
