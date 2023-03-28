@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.thread;
 
+import cn.hutool.core.compiler.CompilerUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
@@ -18,6 +19,7 @@ import com.yjh.platform.module.task.entity.TCruiseTriphaseRule;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileSystemUtils;
 import org.apache.commons.io.FileUtils;
@@ -33,6 +35,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -331,7 +335,7 @@ public class NonhomologousWarnThread implements Runnable{
         }
     }
 
-    private boolean judgeTriphaseWarn(String taskCode, String robotInsResult, String warnId) {
+    private boolean judgeTriphaseWarn(String taskCode, String robotResult, String warnId) {
         // 查询非同源告警规则
         String instanceId = robotPatrolTaskAlarm.getDeviceId();
         List<Map<String, Object>> list = nonhomologousWarnDao.selectTriphaseInspections(instanceId);
@@ -340,11 +344,11 @@ public class NonhomologousWarnThread implements Runnable{
             return false;
         }
 
-        CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(robotInsResult);
+        CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(robotResult);
         if (resDescEnum != null){
             return false;
         }
-
+        String robotInsResult = StringUtils.substringBefore(robotResult, ",");
         boolean retFlag = false;
         for (Map<String, Object> map : list) {
             long triphaseId = MapUtils.getLong(map, "triphaseId");
@@ -356,13 +360,17 @@ public class NonhomologousWarnThread implements Runnable{
             float fruit;
             String triphaseName;
             Map<String, String> triphaseRetMap;
+            Map<String, String> triphaseNameMap = new HashMap<>();
+            triphaseNameMap.put(MapUtils.getString(map, "instanceOneId"), MapUtils.getString(map, "instanceOneName"));
+            triphaseNameMap.put(MapUtils.getString(map, "instanceTwoId"), MapUtils.getString(map, "instanceTwoName"));
+            triphaseNameMap.put(MapUtils.getString(map, "instanceTriId"), MapUtils.getString(map, "instanceTriName"));
             synchronized (lock) {
                 triphaseRetMap = redisTemplate.opsForHash().entries(triphaseKey);
                 if (MapUtils.isEmpty(triphaseRetMap)) {
                     triphaseRetMap = new HashMap<>();
-                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceOneId"), ","), "");
-                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceTwoId"), ","), "");
-                    triphaseRetMap.put(StringUtils.substringBefore(MapUtils.getString(map, "instanceTriId"), ","), "");
+                    triphaseRetMap.put(MapUtils.getString(map, "instanceOneId"), "");
+                    triphaseRetMap.put(MapUtils.getString(map, "instanceTwoId"), "");
+                    triphaseRetMap.put(MapUtils.getString(map, "instanceTriId"), "");
                 }
                 triphaseRetMap.put(instanceId, robotInsResult);
 
@@ -373,10 +381,13 @@ public class NonhomologousWarnThread implements Runnable{
                 }
                 String unit = "";
                 if (NumberUtils.isCreatable(robotInsResult)) {
-                    double[] triphaseResults = triphaseRetMap.values().stream().mapToDouble(NumberUtils::toFloat).toArray();
-                    float max = (float)NumberUtils.max(triphaseResults);
-                    float min = (float)NumberUtils.min(triphaseResults);
-                    // triphaseRetMap.
+                    Stream<Map.Entry<String, String>> triphaseStream = triphaseRetMap.entrySet().stream();
+                    Map.Entry<String, String> maxRet = triphaseStream.max(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
+                    Map.Entry<String, String> minRet = triphaseStream.min(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
+                    float max = NumberUtils.toFloat(maxRet.getValue());
+                    float min = NumberUtils.toFloat(minRet.getValue());
+                    float avg = (float)triphaseStream.mapToDouble(v -> NumberUtils.toFloat(v.getValue())).average().orElse(0.0D);
+                    boolean chooseMax = max - avg >= avg -min;
                     String alarmType = "4";
                     switch (triphaseType) {
                         case 1:
@@ -399,7 +410,8 @@ public class NonhomologousWarnThread implements Runnable{
                         warnInfo.put("warnId", warnId + triphaseType);
                         warnInfo.put("warnType", 5);
                         warnInfo.put("instanceId", triphaseId);
-                        String warnContent = triphaseName + "告警，告警值：" + CommonUtils.percentFormat(fruit, "#.##") + unit + ", 阈值: " + warnThreshold + unit  + ", 越限: " + CommonUtils.percentFormat(fruit - warnThreshold, "#.##");
+                        String insName = chooseMax ? triphaseNameMap.get(maxRet.getKey()) + "偏高" : triphaseNameMap.get(minRet.getKey()) + "偏低";
+                        String warnContent = triphaseName + insName + "告警，告警值：" + CommonUtils.percentFormat(fruit, "#.##") + unit + ", 阈值: " + warnThreshold + unit  + ", 越限: " + CommonUtils.percentFormat(fruit - warnThreshold, "#.##");
                         warnInfo.put("warnContent", warnContent);
                         List<Map<String, Object>> insResults = new ArrayList<>();
                         for (String insId : triphaseRetMap.keySet()) {
@@ -416,22 +428,30 @@ public class NonhomologousWarnThread implements Runnable{
                     }
                 } else if (Constant.nonhomologousWarn.contains(robotInsResult)) {
                     log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
-                    Map<String, String> triphaseRetMapItem = new HashMap<>(4);
-                    long valueIsNotEmptyCount = triphaseRetMap.values().stream().filter(trm -> !trm.isEmpty()).count();
-                    triphaseRetMap.forEach((key, value) -> {
-                        if (valueIsNotEmptyCount > 1 && StringUtils.isNotEmpty(value)){
-                            triphaseRetMapItem.put(value, key);
+                    Map<Object, Long> countDiff = triphaseRetMap.entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue, Collectors.counting()));
+                    String diffVal = "";
+                    for (Map.Entry<Object, Long> entry:countDiff.entrySet()) {
+                        if (entry.getValue() == 1) {
+                            diffVal = (String)entry.getKey();
                         }
-                    });
-                    triphaseName = "三相不一致";
+                    }
+                    String name = "";
+                    for (Map.Entry<String, String> entry:triphaseRetMap.entrySet()) {
+                        if (StringUtils.equals(entry.getValue(), diffVal)) {
+                            String key = entry.getKey();
+                            name = triphaseNameMap.get(key);
+                            break;
+                        }
+                    }
+                    triphaseName = "三相不一致, " + name + "不一致告警: " + diffVal;
                     TRIPHASE_LOCK.remove(triphaseKey);
 
-                    if (triphaseRetMapItem.size() > 1){
+                    if (countDiff.size() > 1){
                         Map<String, Object> warnInfo = new HashMap<>(8);
                         warnInfo.put("warnId", warnId + triphaseType);
                         warnInfo.put("warnType", 5);
                         warnInfo.put("instanceId", triphaseId);
-                        warnInfo.put("warnContent", triphaseName + "告警");
+                        warnInfo.put("warnContent", triphaseName);
                         List<Map<String, Object>> insResults = new ArrayList<>();
                         for (String insId : triphaseRetMap.keySet()) {
                             Map<String, Object> robotWarn = new HashMap<>(4);

@@ -5,6 +5,7 @@ import com.yjh.videosg.common.Constant;
 import com.yjh.videosg.common.restTemplate.ServiceRestTemplate;
 import com.yjh.videosg.common.result.BusinessException;
 import com.yjh.videosg.common.result.Result;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
