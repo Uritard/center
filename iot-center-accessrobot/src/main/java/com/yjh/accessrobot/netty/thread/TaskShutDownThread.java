@@ -18,27 +18,38 @@ import java.util.*;
  */
 public class TaskShutDownThread implements Runnable{
 
-    private final String taskPatrolledId;
+    private final String taskCode;
     private final String errorCode;
     private final RobotService robotService;
+    private final Date date;
 
-    public TaskShutDownThread(RobotService robotService, String taskPatrolledId, String errorCode){
+    public TaskShutDownThread(RobotService robotService, String taskCode, String errorCode, Date date){
         this.robotService = robotService;
-        this.taskPatrolledId = taskPatrolledId;
+        this.taskCode = taskCode;
         this.errorCode = errorCode;
+        this.date = date;
     }
 
     @Override
     public void run() {
         // 增加时间判断，避免预先初始化导致数据传入下一个任务
-        String taskCode = StringUtils.substringBetween(taskPatrolledId, "_");
-        String[] patrolledIds = taskPatrolledId.split("_");
-        String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
-        Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
         String taskId = robotService.selectRealTaskId(taskCode, date);
         if (Optional.ofNullable(taskId).isPresent()){
             Map<String, Object> params = new HashMap<>(1);
             params.put("taskId", taskId);
+            String content;
+            switch (errorCode) {
+                case "1":
+                    content = "巡视设备异常";
+                    break;
+                case "2":
+                    content = "无权限(或高优先级任务存在)";
+                    break;
+                default:
+                    content = "其它异常";
+                    break;
+            }
+            params.put("content", content);
             Constant.restTemplateGet(Constant.TASK_SHUT_DOWN_URL, params);
         }
     }

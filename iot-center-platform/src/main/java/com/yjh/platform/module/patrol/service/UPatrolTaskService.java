@@ -1557,7 +1557,7 @@ public class UPatrolTaskService {
      * 任务终止，异步执行
      */
     @Async
-    public void taskShutDown(String taskId) {
+    public void taskShutDown(String taskId, String content) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
         if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
             return;
@@ -1609,7 +1609,7 @@ public class UPatrolTaskService {
                             taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
                             taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
                             taskInfo.put("cruiseTime",simpleDateFormat.format(new Date()));
-                            taskInfo.put("resultNum", "任务终止");
+                            taskInfo.put("resultNum", StringUtils.isNotEmpty(content) ? content : "任务终止");
                             skipPointList.add(taskInfo);
                         }
                         // todo 任务终止 上报站端
@@ -2884,7 +2884,7 @@ public class UPatrolTaskService {
             case "3":
                 return String.valueOf(this.taskGoOn(taskId, true, null));
             case "4":
-                this.taskShutDown(taskId);
+                this.taskShutDown(taskId, "");
                 return "1";
             default:
                 return "-1";

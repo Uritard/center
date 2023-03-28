@@ -1507,7 +1507,7 @@ public class SendToUpSystemServices {
      * @param instanceIds
      * @return
      */
-    public boolean selectIsRobotDevice(List<String> instanceIds) {
-        return sendToUpSystemDao.selectIsRobotDevice(instanceIds) > 0;
+    public String selectIsRobotDevice(List<String> instanceIds) {
+        return sendToUpSystemDao.selectIsRobotDevice(instanceIds);
     }
 }

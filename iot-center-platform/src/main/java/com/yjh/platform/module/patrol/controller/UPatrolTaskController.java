@@ -235,15 +235,17 @@ public class UPatrolTaskController {
 
     @ApiOperation(value = "任务终止")
     @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
-    @Logs(title = "任务终止",content = "任务终止",logType = 13,authority = "1235")
-    public Result taskShutDown(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
+    @Logs(title = "任务终止",content = "任务终止",logType = 13, authority = "1235")
+    public Result taskShutDown(HttpServletRequest request,
+                               @RequestParam(value = "taskId") String taskId,
+                               @RequestParam(value = "content") String content) {
         Result result = new Result();
         try {
             if (Optional.ofNullable(request).isPresent() && Optional.ofNullable(request.getHeader("userId")).isPresent()) {
                 String taskName = uPatrolTaskService.selectTaskName(taskId);
                 logsRecord.LogsSend(request, "13", "任务终止", "任务终止-" + taskName);
             }
-            uPatrolTaskService.taskShutDown(taskId);
+            uPatrolTaskService.taskShutDown(taskId, content);
             result.setData(1);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());

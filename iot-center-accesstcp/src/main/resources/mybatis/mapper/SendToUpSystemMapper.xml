@@ -502,13 +502,16 @@
         WHERE
             FIND_IN_SET(b.device_point_id,#{devicePointId, jdbcType = VARCHAR})
     </select>
-    <select id="selectIsRobotDevice" resultType="java.lang.Integer">
+    <select id="selectIsRobotDevice" resultType="java.lang.String">
         SELECT
-        count(1)
+        GROUP_CONCAT( DISTINCT c.robot_code) AS robot
         FROM
         `t_cruise_point_instance` a
-        RIGHT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id WHERE 1=1
-        and a.instance_id IN
+        RIGHT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+        RIGHT JOIN t_robot_info c ON c.robot_id = b.robot_id
+        WHERE
+        1 = 1
+        AND a.instance_id IN
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId, jdbcType=VARCHAR}
         </foreach>

@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.EdgeEnum;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -17,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author YChen
@@ -90,8 +91,24 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         //<3>: = 其它异常
                         //taskPatrolledId 不为空 且 error_code 不为 0 边缘节点任务终止
                         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-                        if (StringUtils.isNotEmpty(taskPatrolledId) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
-                            TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskPatrolledId, errorCode);
+                        AtomicReference<String> taskCode = new AtomicReference<>("");
+                        Date date = null;
+                        if (StringUtils.isNotEmpty(taskPatrolledId) ) {
+                            taskCode.set(StringUtils.substringBetween(taskPatrolledId, "_"));
+                            String[] patrolledIds = taskPatrolledId.split("_");
+                            String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
+                            date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+                        }else {
+                            Map<String, String> unionTaskMap = redisTemplate.opsForHash().entries("UnionTask");
+                            unionTaskMap.forEach((key,value ) -> {
+                                if (key.contains(sendCode)){
+                                    taskCode.set(value);
+                                    redisTemplate.opsForHash().delete("UnionTask", key);
+                                }
+                            });
+                        }
+                        if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+                            TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskCode.get(), errorCode, date);
                             TaskExecutePool.getInstance().execute(taskShutDownThread);
                         }
                     }
