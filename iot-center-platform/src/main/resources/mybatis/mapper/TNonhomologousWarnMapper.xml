@@ -119,4 +119,21 @@
         from t_cruise_triphase_rule a
         where a.instance_one_id = #{instanceId} or a.instance_two_id = #{instanceId} or a.instance_tri_id = #{instanceId}
     </select>
+
+    <select id="selectInsList" resultType="java.util.HashMap">
+        select
+            instance_id_one as one,
+            instance_id_two as two
+        from t_cruise_nonhomologous_point_instance
+        where instance_id = #{instanceId}
+    </select>
+
+    <select id="selectInsListByTri" resultType="java.util.HashMap">
+        select
+            instance_one_id as one,
+            instance_two_id as two,
+            instance_tri_id as three
+        from t_cruise_triphase_rule
+        where triphase_id = #{instanceId}
+    </select>
 </mapper>

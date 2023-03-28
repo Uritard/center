@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.dao;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +33,8 @@ public interface NonhomologousWarnDao {
     Long getInspectionIdByDeviceId(@Param(value = "deviceId") String deviceId);
 
     List<Map<String,Object>> selectTriphaseInspections(@Param(value = "instanceId") String instanceId);
+
+    HashMap<String,String> selectInsList(@Param(value = "instanceId") String instanceId);
+
+    HashMap<String,String> selectInsListByTri(@Param(value = "instanceId") String instanceId);
 }
