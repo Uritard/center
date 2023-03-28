@@ -90,6 +90,7 @@ public class NonhomologousWarnThread implements Runnable{
                         insResults.add(robotWarn);
                     }
                     warnInfo.put("resultsInfo", insResults);
+                    warnInfo.put("value","");
                     insertNonhomologousWarnInfo(warnInfo, "9");
                 }
 
@@ -199,6 +200,21 @@ public class NonhomologousWarnThread implements Runnable{
                                     warn.put("warnType", 6);
                                     warn.put("instanceId", Long.parseLong(instanceId));
                                     warn.put("warnContent", "时间范围内识别结果趋势不一致：" + warnThreshold);
+                                    warn.put("value",warnThreshold);
+
+                                    List<Map<String,Object>> resultsInfo = new ArrayList<>();
+                                    HashMap<String,Object> mapItem1 = new HashMap<>();
+                                    mapItem1.put("warnId",warnId);
+                                    mapItem1.put("taskId",taskCode);
+                                    mapItem1.put("inspectionId",robotInstanceId);
+                                    resultsInfo.add(mapItem1);
+
+                                    HashMap<String,Object> mapItem2 = new HashMap<>();
+                                    mapItem2.put("warnId",warnId);
+                                    mapItem2.put("taskId",taskCode);
+                                    mapItem2.put("inspectionId",robotInstanceId);
+                                    resultsInfo.add(mapItem2);
+                                    warn.put("resultsInfo",resultsInfo);
                                     insertNonhomologousWarnInfo(warn, "10");
                                 }
                             }
@@ -255,9 +271,10 @@ public class NonhomologousWarnThread implements Runnable{
                         Optional<Map<String,Object>> maxValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         Optional<Map<String,Object>> minValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo, warnThreshold);
-                        if((Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString()) -
-                                Double.parseDouble(minValueResultInfo.get().get("resultValue").toString())) >
-                                Double.parseDouble(warnThreshold)){
+                        Double val = (Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString()) -
+                                Double.parseDouble(minValueResultInfo.get().get("resultValue").toString())) -
+                        Double.parseDouble(warnThreshold);
+                        if(val > 0){
                             Map<String,Object> warn = new HashMap<>(4);
                             warn.put("warnId", warnId);
                             warn.put("warnType", 6);
@@ -266,6 +283,7 @@ public class NonhomologousWarnThread implements Runnable{
                             intervalResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(numResults);
                             warn.put("resultsInfo", insResults);
+                            warn.put("value",CommonUtils.percentFormat(val.floatValue(), "#.##"));
                             insertNonhomologousWarnInfo(warn, "7");
                         }
                         break;
@@ -302,6 +320,7 @@ public class NonhomologousWarnThread implements Runnable{
                             fiveResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(fiveResults);
                             warn.put("resultsInfo", insResults);
+                            warn.put("value",latestResult);
                             insertNonhomologousWarnInfo(warn, "10");
                         }
                         break;
@@ -391,6 +410,7 @@ public class NonhomologousWarnThread implements Runnable{
                             insResults.add(robotWarn);
                         }
                         warnInfo.put("resultsInfo", insResults);
+                        warnInfo.put("value",CommonUtils.percentFormat(fruit, "#.##"));
                         insertNonhomologousWarnInfo(warnInfo, alarmType);
                         retFlag = true;
                     }
@@ -421,6 +441,7 @@ public class NonhomologousWarnThread implements Runnable{
                             insResults.add(robotWarn);
                         }
                         warnInfo.put("resultsInfo", insResults);
+                        warnInfo.put("value",robotInsResult);
                         insertNonhomologousWarnInfo(warnInfo, "4");
                         retFlag = true;
                     }
@@ -439,10 +460,11 @@ public class NonhomologousWarnThread implements Runnable{
         nonhomologousWarnDao.insertWarnInspections(insResults);
         log.info("非同源上报参数：warnContent={}，warnType={}，taskId={},instanceId={},triphase_id={}",
                 warn.get("warnContent").toString(),warn.get("warnType").toString(),robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId(),warn.get("instanceId"));
-        warnToUpSystem(warn.get("warnContent").toString(), alarmType,
+        warnToUpSystem(warn, alarmType,
                 robotPatrolTaskAlarm.getTaskCode(), robotPatrolTaskAlarm.getDeviceId());
         return true;
     }
+
 
     private boolean checkWarnExist(String instanceId, String taskId, String nonInstanceId){
         boolean result = false;
@@ -495,8 +517,26 @@ public class NonhomologousWarnThread implements Runnable{
         insertNonhomologousWarnInfo(warn, alarmType);
     }
 
-    private void warnToUpSystem(String warnContent, String alarmType, String taskId, String instanceId){
+    private void warnToUpSystem(Map<String,Object> warn, String alarmType, String taskId,
+                                String instanceId){
         try {
+            String warnContent = warn.get("warnContent").toString();
+            String warnType = warn.get("warn_type").toString();
+            String value = warn.get("value").toString();
+            String warnInstanceId = warn.get("instanceId").toString();
+            List<String> insList = new ArrayList<>();
+            HashMap<String,String> insMap;
+            if ("5".equals(warnType)){
+                insMap = nonhomologousWarnDao.selectInsListByTri(warnInstanceId);
+            } else {
+                insMap = nonhomologousWarnDao.selectInsList(warnInstanceId);
+            }
+            if (!insMap.isEmpty()){
+                insList.add(insMap.get("one"));
+                insList.add(insMap.get("two"));
+                insList.add(insMap.get("three"));
+            }
+
             Map<String, Object> xmlItem = new HashMap<>(16);
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             List<Map<String, Object>> xmlItems = new ArrayList<>();
@@ -510,7 +550,6 @@ public class NonhomologousWarnThread implements Runnable{
             HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
             String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
 
             xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
             xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
@@ -523,25 +562,13 @@ public class NonhomologousWarnThread implements Runnable{
             xmlItem.put("task_code", taskCode);
             xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
 
-            // 文件后缀
-            String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
-            fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
-            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-            String tagPath = "alarm/"+stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
-            xmlBaseModel.setType("62");
+            dealImg(xmlItem,insList,taskId);
 
-            String value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
-            String imgPath = Optional.ofNullable(cruiseResultMap.get("picPath")).orElse("");
+            xmlBaseModel.setType("62");
             String alarmLevel = "2";
             String unit = cruiseResultMap.getOrDefault("unit", "");
-            Map<String, String> resMap = packageAlarmInfo(alarmLevel, value, unit, warnContent, imgPath, alarmType, xmlItem, tagPath);
-            log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
-            StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), tagPath);
-            if (!FileUtil.exist(resMap.get("imgPath"))) {
-                tagPath = "";
-            }
-            xmlItem.put("file_path", tagPath);
+            packageAlarmInfo(alarmLevel, value, unit, warnContent,  alarmType, xmlItem);
+
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
@@ -560,23 +587,54 @@ public class NonhomologousWarnThread implements Runnable{
         }
     }
 
+    private void dealImg(Map<String, Object> xmlItem,List<String> insList,String taskId){
+        StringBuilder allTar = new StringBuilder("");
+        StringBuilder allFileType = new StringBuilder("");
+        String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
+        String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
+        String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+        String simpleDateFormat = DateTimeUtil.format3(new Date());
+        insList.forEach(instanceId -> {
+            if (StringUtils.isNotEmpty(instanceId)){
+                Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+                log.info("多张图片 cruiseResultMap=={}", cruiseResultMap);
+                if (StringUtils.isNotEmpty(cruiseResultMap.get("picpath"))){
+                    HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
+                    // 文件后缀
+                    String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
+                    fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
+                    // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+                    String tagPath = "alarm/"+stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                            8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
+
+                    String imgPath = Optional.ofNullable(cruiseResultMap.get("picpath")).orElse("");
+                    imgPath = replaceResultImgPath(imgPath, false);
+                    String fileType= typeAndPathName.getOrDefault("fileType", "2");
+
+                    log.info("多张图片 imgPath==={},tagPath==={}", imgPath, tagPath);
+                    StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(imgPath, tagPath);
+                    allTar.append(","+tagPath);
+                    allFileType.append(","+fileType);
+                }
+            }
+        });
+        xmlItem.put("file_path", allTar.toString().replaceFirst(",",""));
+        xmlItem.put("file_type", allFileType.toString().replaceFirst(",",""));
+    }
+
     /**
      * 组装告警信息
      *
      * @param alarmLevel 告警等级
      * @param xmlItem
-     * @param tagPath
      * @return Map<String, String>
      */
     private Map<String, String> packageAlarmInfo(String alarmLevel,
                                                  String value, String unit,
                                                  String warnContent,
-                                                 String imagePath,
                                                  String alarmType,
-                                                 Map<String, Object> xmlItem, String tagPath) {
+                                                 Map<String, Object> xmlItem) {
         Map<String, String> resultPathMap = new HashMap<>(4);
-        log.info("imagePath=={}", imagePath);
-        imagePath = replaceResultImgPath(imagePath, false);
 
         try {
             String val = Optional.ofNullable(value).orElse("");
@@ -586,13 +644,11 @@ public class NonhomologousWarnThread implements Runnable{
             xmlItem.put("value", val);
             xmlItem.put("unit", unit);
             xmlItem.put("value_unit", val + unit);
-            xmlItem.put("content", warnContent);
+            xmlItem.put("content", warnContent+"。巡视结果："+ val + unit);
             xmlItem.put("defect_type", "");
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-        resultPathMap.put("imgPath", imagePath);
-        resultPathMap.put("tagPath", tagPath);
         return resultPathMap;
     }
 
