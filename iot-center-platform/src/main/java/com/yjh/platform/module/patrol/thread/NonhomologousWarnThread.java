@@ -381,12 +381,12 @@ public class NonhomologousWarnThread implements Runnable{
                 }
                 String unit = "";
                 if (NumberUtils.isCreatable(robotInsResult)) {
-                    Stream<Map.Entry<String, String>> triphaseStream = triphaseRetMap.entrySet().stream();
-                    Map.Entry<String, String> maxRet = triphaseStream.max(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
-                    Map.Entry<String, String> minRet = triphaseStream.min(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
+                    Set<Map.Entry<String, String>> triphaseStream = triphaseRetMap.entrySet();
+                    Map.Entry<String, String> maxRet = triphaseStream.stream().max(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
+                    Map.Entry<String, String> minRet = triphaseStream.stream().min(Comparator.comparingDouble(v->NumberUtils.toFloat(v.getValue()))).get();
                     float max = NumberUtils.toFloat(maxRet.getValue());
                     float min = NumberUtils.toFloat(minRet.getValue());
-                    float avg = (float)triphaseStream.mapToDouble(v -> NumberUtils.toFloat(v.getValue())).average().orElse(0.0D);
+                    float avg = (float)triphaseStream.stream().mapToDouble(v -> NumberUtils.toFloat(v.getValue())).average().orElse(0.0D);
                     boolean chooseMax = max - avg >= avg -min;
                     String alarmType = "4";
                     switch (triphaseType) {
