@@ -97,24 +97,23 @@ public class ProcessResultToUpSystem {
                 // 局放一个点多个结果单独处理
                 if (resultNum.contains("局放频次")){
                     String[] split = resultNum.split(",");
-                    for (int i = 0; i < split.length; i++) {
+                    for (String s : split) {
                         Map<String, String> cruiseResultNewMap = new HashMap<>(cruiseResultMap);
                         String value = "";
                         String valueType = "";
                         String unit = "";
-                        String valueItem = split[i];
-                        if (valueItem.contains("频次")){
-                            value = getNumeric(split[i]);
+                        if (s.contains("频次")) {
+                            value = getNumeric(s);
                             valueType = "11";
-                            unit = split[i].endsWith("dB") ? "dB" : "";
-                        }else if (valueItem.contains("峰值")) {
-                            value = getNumeric(split[i]);
+                            unit = s.endsWith("dB") ? "dB" : "";
+                        } else if (s.contains("峰值")) {
+                            value = getNumeric(s);
                             valueType = "12";
-                            unit = split[i].endsWith("dB") ? "dB" : "";
-                        }else {
-                            value = getNumeric(split[i]);
+                            unit = s.endsWith("dB") ? "dB" : "";
+                        } else {
+                            value = getNumeric(s);
                             valueType = "13";
-                            unit = split[i].endsWith("dB") ? "dB" : "";
+                            unit = s.endsWith("dB") ? "dB" : "";
                         }
                         cruiseResultNewMap.put("resultNum", value);
                         cruiseResultNewMap.put("valueType", valueType);
@@ -153,8 +152,8 @@ public class ProcessResultToUpSystem {
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-                String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + fileExt;
+                String tagPath = StringUtils.isEmpty(String.valueOf(xmlItem.getOrDefault("file_type", ""))) ? "" : stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                        8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {
@@ -163,6 +162,9 @@ public class ProcessResultToUpSystem {
                 } else {
                     xmlBaseModel.setType("62");
                     String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
+                    if (StringUtils.isNotEmpty(tagPath)){
+                        tagPath = "alarm/" + tagPath;
+                    }
                     resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif);
                 }
                 log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
@@ -299,7 +301,6 @@ public class ProcessResultToUpSystem {
                 default:
                     break;
             }
-            tagPath = "alarm/" + tagPath;
             xmlItem.put("file_path", tagPath);
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));

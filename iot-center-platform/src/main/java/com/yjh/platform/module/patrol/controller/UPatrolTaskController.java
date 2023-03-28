@@ -238,7 +238,7 @@ public class UPatrolTaskController {
     @Logs(title = "任务终止",content = "任务终止",logType = 13, authority = "1235")
     public Result taskShutDown(HttpServletRequest request,
                                @RequestParam(value = "taskId") String taskId,
-                               @RequestParam(value = "content") String content) {
+                               @RequestParam(value = "content", required = false) String content) {
         Result result = new Result();
         try {
             if (Optional.ofNullable(request).isPresent() && Optional.ofNullable(request.getHeader("userId")).isPresent()) {
