@@ -972,7 +972,7 @@ public class PatrolResultHandler {
                     pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + defectNames);
                 }
             }else {
-                cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "--");
+                cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "未见异常");
                 cruiseResultMap.put("cruiseResult", StringUtils.equals("异常", resultDesc) ? String.valueOf(CRUISE_RESULT_ABNORMAL): String.valueOf(CRUISE_RESULT_NORMAL));
                 cruiseResultMap.put("cruiseAbnormal", StringUtils.equals("异常", resultDesc) ? String.valueOf(CRUISE_ABNORMAL_DEFECT) : "--");
             }
