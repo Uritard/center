@@ -34,7 +34,7 @@ public interface NonhomologousWarnDao {
 
     List<Map<String,Object>> selectTriphaseInspections(@Param(value = "instanceId") String instanceId);
 
-    HashMap<String,String> selectInsList(@Param(value = "instanceId") String instanceId);
+    HashMap<String,Object> selectInsList(@Param(value = "instanceId") String instanceId);
 
-    HashMap<String,String> selectInsListByTri(@Param(value = "instanceId") String instanceId);
+    HashMap<String,Object> selectInsListByTri(@Param(value = "instanceId") String instanceId);
 }

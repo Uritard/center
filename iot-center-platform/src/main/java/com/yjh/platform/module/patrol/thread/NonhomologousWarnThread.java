@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.thread;
 import cn.hutool.core.compiler.CompilerUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -197,14 +198,15 @@ public class NonhomologousWarnThread implements Runnable{
                             //特殊走特殊的逻辑
                             if (Constant.nonhomologousWarn.contains(robotInsResult)){
                                String lastValue = nonhomologousWarnDao.selectLastResultNum(robotInstanceId,Constant.nonhomologousWarn.split(","));
+                               log.info("lastValue===={}  thisValue==={}",lastValue,robotInsResult);
                                 if (StringUtils.isNotEmpty(lastValue) && !lastValue.equals(robotInsResult)){
                                     //告警
                                     Map<String,Object> warn = new HashMap<>(4);
                                     warn.put("warnId", warnId);
                                     warn.put("warnType", 6);
                                     warn.put("instanceId", Long.parseLong(instanceId));
-                                    warn.put("warnContent", "时间范围内识别结果趋势不一致：" + warnThreshold);
-                                    warn.put("value",warnThreshold);
+                                    warn.put("warnContent", "时间范围内识别结果趋势不一致：" + lastValue+"->"+robotInsResult);
+                                    warn.put("value",robotInsResult);
 
                                     List<Map<String,Object>> resultsInfo = new ArrayList<>();
                                     HashMap<String,Object> mapItem1 = new HashMap<>();
@@ -478,8 +480,8 @@ public class NonhomologousWarnThread implements Runnable{
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
-        log.info("非同源上报参数：warnContent={}，warnType={}，taskId={},instanceId={},triphase_id={}",
-                warn.get("warnContent").toString(),warn.get("warnType").toString(),robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId(),warn.get("instanceId"));
+        log.info("非同源上报参数：warn={}，taskId={},instanceId={}",
+                warn,robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
         warnToUpSystem(warn, alarmType,
                 robotPatrolTaskAlarm.getTaskCode(), robotPatrolTaskAlarm.getDeviceId());
         return true;
@@ -534,6 +536,7 @@ public class NonhomologousWarnThread implements Runnable{
         insResults.add(videoWarn);
 
         warn.put("resultsInfo", insResults);
+        warn.put("value","");
         insertNonhomologousWarnInfo(warn, alarmType);
     }
 
@@ -541,20 +544,20 @@ public class NonhomologousWarnThread implements Runnable{
                                 String instanceId){
         try {
             String warnContent = warn.get("warnContent").toString();
-            String warnType = warn.get("warn_type").toString();
+            String warnType = warn.get("warnType").toString();
             String value = warn.get("value").toString();
             String warnInstanceId = warn.get("instanceId").toString();
             List<String> insList = new ArrayList<>();
-            HashMap<String,String> insMap;
+            HashMap<String,Object> insMap;
             if ("5".equals(warnType)){
                 insMap = nonhomologousWarnDao.selectInsListByTri(warnInstanceId);
             } else {
                 insMap = nonhomologousWarnDao.selectInsList(warnInstanceId);
             }
             if (!insMap.isEmpty()){
-                insList.add(insMap.get("one"));
-                insList.add(insMap.get("two"));
-                insList.add(insMap.get("three"));
+                insList.add(Optional.ofNullable(insMap.get("one")).orElse("").toString());
+                insList.add(Optional.ofNullable(insMap.get("two")).orElse("").toString());
+                insList.add(Optional.ofNullable(insMap.get("three")).orElse("").toString());
             }
 
             Map<String, Object> xmlItem = new HashMap<>(16);
@@ -587,6 +590,9 @@ public class NonhomologousWarnThread implements Runnable{
             xmlBaseModel.setType("62");
             String alarmLevel = "2";
             String unit = cruiseResultMap.getOrDefault("unit", "");
+            if (StringUtils.isEmpty(value)){
+                value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+            }
             packageAlarmInfo(alarmLevel, value, unit, warnContent,  alarmType, xmlItem);
 
             xmlItems.add(xmlItem);
@@ -599,8 +605,7 @@ public class NonhomologousWarnThread implements Runnable{
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("The {} information to be reported one level up is==={}",
-                    StringUtils.equals("61", xmlBaseModel.getType()) ? "cruiseResult" : "alarm", map);
+            log.info("非同源告警上报==={}", map);
             Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.info("非同源告警上报出错：",e);
@@ -608,13 +613,14 @@ public class NonhomologousWarnThread implements Runnable{
     }
 
     private void dealImg(Map<String, Object> xmlItem,List<String> insList,String taskId){
+        log.info("处理图片：{}",insList);
         StringBuilder allTar = new StringBuilder("");
         StringBuilder allFileType = new StringBuilder("");
         String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
         String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
         String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
         String simpleDateFormat = DateTimeUtil.format3(new Date());
-        insList.forEach(instanceId -> {
+        for (String instanceId:insList) {
             if (StringUtils.isNotEmpty(instanceId)){
                 Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
                 log.info("多张图片 cruiseResultMap=={}", cruiseResultMap);
@@ -637,7 +643,7 @@ public class NonhomologousWarnThread implements Runnable{
                     allFileType.append(","+fileType);
                 }
             }
-        });
+        }
         xmlItem.put("file_path", allTar.toString().replaceFirst(",",""));
         xmlItem.put("file_type", allFileType.toString().replaceFirst(",",""));
     }
