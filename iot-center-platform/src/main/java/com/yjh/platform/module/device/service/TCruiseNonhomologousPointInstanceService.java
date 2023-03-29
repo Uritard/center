@@ -151,6 +151,7 @@ public class TCruiseNonhomologousPointInstanceService {
         for(Map<String,Object> m : warnDetailInfo){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
+                redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
                 m.putAll(redisInfoMap);
             }
         }
@@ -158,6 +159,30 @@ public class TCruiseNonhomologousPointInstanceService {
             tCruiseNonhomologousWarnInfo.put("warnInspectionsInfo",warnDetailInfo);
         }
         return tCruiseNonhomologousWarnInfo;
+    }
+
+    private String dealResultNum(String resultNum){
+        String re = "";
+        if(StringUtils.isEmpty(resultNum)){
+            return re;
+        }
+        switch (resultNum){
+            case "分":
+            case "开":
+            case "储能":
+            case "远方":
+                re="0";
+                break;
+            case "合":
+            case "关":
+            case "非储能":
+            case "就地":
+                re="1";
+                break;
+            default:
+                break;
+        }
+        return re;
     }
 
 }

@@ -295,7 +295,7 @@ public class NonhomologousWarnThread implements Runnable{
                             List<Map<String, Object>> insResults = new ArrayList<>(numResults);
                             warn.put("resultsInfo", insResults);
                             warn.put("value", dvalStr);
-                            insertNonhomologousWarnInfo(warn, "7");
+                            insertNonhomologousWarnInfo(warn, "10");
                         }
                         break;
                     case "7":
