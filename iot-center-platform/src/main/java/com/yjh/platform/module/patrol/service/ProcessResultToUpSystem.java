@@ -301,7 +301,7 @@ public class ProcessResultToUpSystem {
                 default:
                     break;
             }
-            xmlItem.put("file_path", tagPath);
+            xmlItem.put("file_path", StringUtils.contains(imagePath, ".") ? tagPath : "");
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
             xmlItem.put("alarm_type", alarmType);
@@ -360,12 +360,12 @@ public class ProcessResultToUpSystem {
                     break;
             }
 
-            xmlItem.put("file_path", tagPath);
+            xmlItem.put("file_path", StringUtils.contains(picPath, ".") ? tagPath : "");
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
             xmlItem.put("value", resultNum);
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("value_type", valueType);
-            xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse("1,1;2,2;3,3;4,4"));
+            xmlItem.put("rectangle", StringUtils.isBlank(cruiseResultMap.get("rectangle")) ? "1,1;2,2;3,3;4,4" : cruiseResultMap.get("rectangle"));
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {

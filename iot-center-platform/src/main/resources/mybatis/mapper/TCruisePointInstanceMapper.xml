@@ -498,7 +498,8 @@
     </select>
 
     <select id="selectForTask"  resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail">
-        select a.*,
+        select a.instance_id, a.edge_code, a.origin_id, a.device_mete_id, a.station_id, a.station_name, a.device_id, a.custom_id,
+        a.data_format, a.identify_type, a.identify_son_type, a.cruise_type, a.cruise_id, a.cruise_name, a.cruise_content,
         (
         CASE
         WHEN ISNULL(b.mete_name)

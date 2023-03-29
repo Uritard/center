@@ -478,7 +478,7 @@ public class UPatrolTaskService {
             // 初始化识别类型和采集文件类型,默认值为位置状态识别和识别图片
             map.put("recognitionType", StringUtils.isNotEmpty(item.getMeteType()) ?
                     RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize() : "2");
-            map.put("fileType", "");
+            map.put("fileType", "5");
             map.put("unit", Optional.ofNullable(item.getUnit()).orElse(""));
             switch (item.getMeteType()){
                 case "222":
@@ -490,6 +490,11 @@ public class UPatrolTaskService {
                 case "220":
                 case "433":
                     map.put("fileType", "2");
+                    break;
+                case "690":
+                case "691":
+                case "692":
+                    map.put("fileType", "");
                     break;
                 default:
                     break;
