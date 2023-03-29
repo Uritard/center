@@ -43,4 +43,7 @@ public class AnalysePatrolTaskResult implements Serializable {
     @ApiModelProperty(value = "置信度")
     private String conf;
 
+    @ApiModelProperty(value = "区域坐标")
+    private String rectangle;
+
 }
