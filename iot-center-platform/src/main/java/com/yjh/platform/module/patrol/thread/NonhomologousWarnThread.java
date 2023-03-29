@@ -95,7 +95,7 @@ public class NonhomologousWarnThread implements Runnable{
                         insResults.add(robotWarn);
                     }
                     warnInfo.put("resultsInfo", insResults);
-                    warnInfo.put("value","");
+                    warnInfo.put("value", robotPatrolTaskAlarm.getValue());
                     insertNonhomologousWarnInfo(warnInfo, "9");
                 }
 
@@ -120,6 +120,7 @@ public class NonhomologousWarnThread implements Runnable{
             if (!Objects.isNull(map.get("oneCruiseName")) && !Objects.isNull(map.get("warnType"))){
                 String warnType = String.valueOf(map.get("warnType"));
                 String warnThreshold = String.valueOf(map.get("warnThreshold"));
+                float threshold = NumberUtils.toFloat(warnThreshold);
                 String robotInstanceId = String.valueOf(map.get("instanceIdOne"));
                 String videoInstanceId = String.valueOf(map.get("instanceIdTwo"));
                 String instanceId = String.valueOf(map.get("instanceId"));
@@ -141,9 +142,11 @@ public class NonhomologousWarnThread implements Runnable{
 
                             videoInsResult = StringUtils.substringBefore(videoInsResult, ",");
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
-                                if(Math.abs(Double.parseDouble(robotInsResult) - Double.parseDouble(videoInsResult)) > Double.parseDouble(warnThreshold)){
-                                    String warnContent = "红外测温非同源结果差值超过阈值：" + warnThreshold;
-                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 1, "1");
+                                float dval = Math.abs(NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(videoInsResult));
+                                if(dval - threshold > 1e-5){
+                                    String dvalStr = CommonUtils.percentFormat(dval, "#.##");
+                                    String warnContent = "红外测温非同源结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold;
+                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 1, "1", dvalStr);
                                 }
                             }else{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},红外非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
@@ -156,8 +159,8 @@ public class NonhomologousWarnThread implements Runnable{
                         if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
-                                String warnContent = "位置状态非同源结果不一致";
-                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 2, "10");
+                                String warnContent = "位置状态非同源结果不一致: " + robotInsResult + " —— " + videoInsResult;
+                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 2, "10", robotInsResult);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果", robotInsResult, videoInsResult);
                             }
@@ -169,8 +172,8 @@ public class NonhomologousWarnThread implements Runnable{
                         if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
-                                String warnContent = "数显类表计识别非同源结果不一致";
-                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 3, "7");
+                                String warnContent = "数显类表计识别非同源结果不一致: " + robotInsResult + " —— " + videoInsResult;
+                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 3, "7", robotInsResult);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},表计-数显非同源告警--结果不一致", robotInsResult, videoInsResult);
                             }
@@ -182,12 +185,14 @@ public class NonhomologousWarnThread implements Runnable{
                         if(!checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
-                                if(Math.abs(Double.parseDouble(robotInsResult) - Double.parseDouble(videoInsResult)) > Double.parseDouble(warnThreshold)){
-                                    String warnContent = "指针类表计识别非同源结果差值超过阈值：" + warnThreshold;
-                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 4, "7");
+                                float dval = Math.abs(NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(videoInsResult));
+                                if(dval - threshold > 1e-5){
+                                    String dvalStr = CommonUtils.percentFormat(dval, "#.##");
+                                    String warnContent = "指针类表计识别非同源结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold;
+                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 4, "7", dvalStr);
                                 }
                             }else{
-                                log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},表计-指针非同源告警--数据非数字", robotInsResult, videoInsResult,warnThreshold);
+                                log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},表计-指针非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
                             }
                         }else{
                             log.info("非同源告警---结果为空或告警已存在!");
@@ -277,19 +282,19 @@ public class NonhomologousWarnThread implements Runnable{
                         Optional<Map<String,Object>> maxValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         Optional<Map<String,Object>> minValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo, warnThreshold);
-                        Double val = (Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString()) -
-                                Double.parseDouble(minValueResultInfo.get().get("resultValue").toString())) -
-                        Double.parseDouble(warnThreshold);
-                        if(val > 0){
+                        float dval = NumberUtils.toFloat(maxValueResultInfo.get().get("resultValue").toString()) -
+                                NumberUtils.toFloat(minValueResultInfo.get().get("resultValue").toString());
+                        if(dval - threshold > 1e-5){
+                            String dvalStr = CommonUtils.percentFormat(dval, "#.##");
                             Map<String,Object> warn = new HashMap<>(4);
                             warn.put("warnId", warnId);
                             warn.put("warnType", 6);
                             warn.put("instanceId", Long.parseLong(instanceId));
-                            warn.put("warnContent", "时间范围内表计识别结果差值超过阈值：" + warnThreshold);
+                            warn.put("warnContent", "时间范围内表计识别结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold);
                             intervalResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(numResults);
                             warn.put("resultsInfo", insResults);
-                            warn.put("value",CommonUtils.percentFormat(val.floatValue(), "#.##"));
+                            warn.put("value", dvalStr);
                             insertNonhomologousWarnInfo(warn, "7");
                         }
                         break;
@@ -322,7 +327,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("warnId", warnId);
                             warn.put("warnType", 7);
                             warn.put("instanceId", Long.parseLong(instanceId));
-                            warn.put("warnContent", "累计五次表计结果一致");
+                            warn.put("warnContent", "累计五次表计结果一致告警：" + distinctResults.get(0).get("resultValue"));
                             fiveResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(fiveResults);
                             warn.put("resultsInfo", insResults);
@@ -407,13 +412,13 @@ public class NonhomologousWarnThread implements Runnable{
                     log.info("三相告警结果值 ===max: {}, min: {}, fruit:{}, threshold: {}, {}", max, min, fruit, warnThreshold, JSON.toJSONString(triphaseRetMap));
 
                     TRIPHASE_LOCK.remove(triphaseKey);
-                    if (fruit > warnThreshold) {
+                    if (fruit - warnThreshold > 1e-5) {
                         Map<String, Object> warnInfo = new HashMap<>(8);
                         warnInfo.put("warnId", warnId + triphaseType);
                         warnInfo.put("warnType", 5);
                         warnInfo.put("instanceId", triphaseId);
                         String insName = chooseMax ? triphaseNameMap.get(maxRet.getKey()) + "偏高" : triphaseNameMap.get(minRet.getKey()) + "偏低";
-                        String warnContent = triphaseName + insName + "告警，告警值：" + CommonUtils.percentFormat(fruit, "#.##") + unit + ", 阈值: " + warnThreshold + unit  + ", 越限: " + CommonUtils.percentFormat(fruit - warnThreshold, "#.##");
+                        String warnContent = triphaseName + "【" + insName + "】告警：" + CommonUtils.percentFormat(fruit, "#.##") + unit + ", 阈值: " + warnThreshold + unit;
                         warnInfo.put("warnContent", warnContent);
                         List<Map<String, Object>> insResults = new ArrayList<>();
                         for (String insId : triphaseRetMap.keySet()) {
@@ -432,23 +437,27 @@ public class NonhomologousWarnThread implements Runnable{
                     log.info("三相告警值不是数字 === instanceId: {}, {}", instanceId, robotInsResult);
                     Map<Object, Long> countDiff = triphaseRetMap.entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue, Collectors.counting()));
                     String diffVal = "";
-                    for (Map.Entry<Object, Long> entry:countDiff.entrySet()) {
-                        if (entry.getValue() == 1) {
-                            diffVal = (String)entry.getKey();
-                        }
-                    }
-                    String name = "";
-                    for (Map.Entry<String, String> entry:triphaseRetMap.entrySet()) {
-                        if (StringUtils.equals(entry.getValue(), diffVal)) {
-                            String key = entry.getKey();
-                            name = triphaseNameMap.get(key);
-                            break;
-                        }
-                    }
-                    triphaseName = "三相不一致, " + name + "不一致告警: " + diffVal;
+
                     TRIPHASE_LOCK.remove(triphaseKey);
 
                     if (countDiff.size() > 1){
+                        for (Map.Entry<Object, Long> entry:countDiff.entrySet()) {
+                            if (entry.getValue() == 1) {
+                                diffVal = (String)entry.getKey();
+                                break;
+                            }
+                        }
+                        String name = triphaseNameMap.get(instanceId);
+                        for (Map.Entry<String, String> entry : triphaseRetMap.entrySet()) {
+                            if (StringUtils.equals(entry.getValue(), diffVal)) {
+                                String key = entry.getKey();
+                                name = triphaseNameMap.get(key);
+                                break;
+                            }
+                        }
+                        diffVal = StringUtils.isEmpty(diffVal) ? robotInsResult : diffVal;
+                        triphaseName = "三相不一致,【" + name + "】告警: " + diffVal;
+
                         Map<String, Object> warnInfo = new HashMap<>(8);
                         warnInfo.put("warnId", warnId + triphaseType);
                         warnInfo.put("warnType", 5);
@@ -463,7 +472,7 @@ public class NonhomologousWarnThread implements Runnable{
                             insResults.add(robotWarn);
                         }
                         warnInfo.put("resultsInfo", insResults);
-                        warnInfo.put("value",robotInsResult);
+                        warnInfo.put("value", diffVal);
                         insertNonhomologousWarnInfo(warnInfo, "4");
                         retFlag = true;
                     }
@@ -516,7 +525,7 @@ public class NonhomologousWarnThread implements Runnable{
         return pattern.matcher(str).matches();
     }
 
-    private void insertWarnInfo(String warnId, String instanceId, String warnContent, String taskCode, String robotInstanceId, String videoInstanceId, int warnType, String alarmType){
+    private void insertWarnInfo(String warnId, String instanceId, String warnContent, String taskCode, String robotInstanceId, String videoInstanceId, int warnType, String alarmType, String value){
         Map<String,Object> warn = new HashMap<>(4);
         warn.put("warnId", warnId);
         warn.put("warnType", warnType);
@@ -536,7 +545,7 @@ public class NonhomologousWarnThread implements Runnable{
         insResults.add(videoWarn);
 
         warn.put("resultsInfo", insResults);
-        warn.put("value","");
+        warn.put("value", value);
         insertNonhomologousWarnInfo(warn, alarmType);
     }
 
