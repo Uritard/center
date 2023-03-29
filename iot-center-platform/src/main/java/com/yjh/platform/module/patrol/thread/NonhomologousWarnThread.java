@@ -679,7 +679,7 @@ public class NonhomologousWarnThread implements Runnable{
             xmlItem.put("value", val);
             xmlItem.put("unit", unit);
             xmlItem.put("value_unit", val + unit);
-            xmlItem.put("content", warnContent+"。巡视结果："+ val + unit);
+            xmlItem.put("content", warnContent);
             xmlItem.put("defect_type", "");
         }catch (Exception e){
             log.error(e.getMessage(), e);
