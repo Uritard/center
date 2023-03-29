@@ -704,6 +704,7 @@ public class IntelAnalysisService {
                 taskResult.setTaskId(taskId);
                 taskResult.setInstanceId(instanceId);
                 taskResult.setAnalyseType(algorithmType);
+                taskResult.setRectangle(getRectangleByAnalyseResult(results.get(0)));
                 for (AnalyseResultItem result : results) {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
@@ -739,6 +740,27 @@ public class IntelAnalysisService {
         }
         log.info("resultList=={}", resultList);
         return resultList;
+    }
+
+    /**
+     * 将算法返回的坐标信息填写到rectangle中
+     *
+     * @param result AnalyseResultItem
+     * @return result
+     */
+    private String getRectangleByAnalyseResult(AnalyseResultItem result) {
+        if (CollectionUtils.isEmpty(result.getPos())) {
+            return null;
+        }
+
+        List<Point> areas = result.getPos().get(0).getAreas();
+        if (CollectionUtils.isEmpty(areas) || areas.size() != 2) {
+            return null;
+        }
+        Point p1 = areas.get(0);
+        Point p2 = areas.get(1);
+
+        return String.format("%.1f,%.1f;%.1f,%.1f;%.1f,%.1f;%.1f,%.1f", p1.getX(), p1.getY(), p2.getX(), p1.getY(), p1.getX(), p2.getY(), p2.getX(), p2.getY());
     }
 
     /**
