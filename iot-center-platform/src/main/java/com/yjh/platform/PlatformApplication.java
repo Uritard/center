@@ -89,6 +89,8 @@ public class PlatformApplication  implements CommandLineRunner {
      */
     @Value("${netty.server.url}")
     private String serverUrl;
+    @Value("${nonhomologous.warn}")
+    private String nonhomologousWarn;
     @Autowired
     private TCameraPresetService tCameraPresetService;
 
@@ -114,6 +116,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tStdRegionService.loadRegionIntoRedis();
         tRobotInfoService.initAllRobotCode(); // RobotCode初始化
         Constant.WEBSOCKET_URL = url;
+        Constant.nonhomologousWarn = nonhomologousWarn;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         tDeviceTypeImgService.findPic();//本地启动把此行注掉

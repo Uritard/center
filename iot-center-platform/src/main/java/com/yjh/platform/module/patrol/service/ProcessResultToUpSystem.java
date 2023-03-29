@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.math.MathUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
@@ -20,6 +21,7 @@ import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -80,7 +82,6 @@ public class ProcessResultToUpSystem {
      * @param alarmLevel 告警等级
      * @param tWarnInfo 告警信息
      */
-    @Async
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
         if (Constant.fastTurbo()) {
             // 压测模式，结果不上报上级系统
@@ -98,28 +99,31 @@ public class ProcessResultToUpSystem {
                 // 局放一个点多个结果单独处理
                 if (resultNum.contains("局放频次")){
                     String[] split = resultNum.split(",");
-                    for (int i = 0; i < split.length; i++) {
+                    for (String s : split) {
                         Map<String, String> cruiseResultNewMap = new HashMap<>(cruiseResultMap);
                         String value = "";
                         String valueType = "";
-                        String valueItem = split[i];
-                        if (valueItem.contains("频次")){
-                            value = getNumeric(split[i]);
+                        String unit = "";
+                        if (s.contains("频次")) {
+                            value = getNumeric(s);
                             valueType = "11";
-                        }else if (valueItem.contains("峰值")) {
-                            value = getNumeric(split[i]);
+                            unit = StringUtils.substringAfter(s, value);
+                        } else if (s.contains("峰值")) {
+                            value = getNumeric(s);
                             valueType = "12";
-                        }else {
-                            value = getNumeric(split[i]);
+                            unit = StringUtils.substringAfter(s, value);
+                        } else {
+                            value = getNumeric(s);
                             valueType = "13";
+                            unit = StringUtils.substringAfter(s, value);
                         }
                         cruiseResultNewMap.put("resultNum", value);
                         cruiseResultNewMap.put("valueType", valueType);
+                        cruiseResultNewMap.put("unit", unit);
                         cruiseResultNewList.add(cruiseResultNewMap);
                     }
                     continue;
                 }
-
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
@@ -131,7 +135,6 @@ public class ProcessResultToUpSystem {
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
                 String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
                 UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskByTaskCode(taskCode);
-                String taskPatrolledIdTemp = taskId;
                 /*if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                     taskPatrolledIdTemp = taskCode;
                 }*/
@@ -141,18 +144,18 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
                 xmlItem.put("device_id", Constant.standardPoints() ? devicePointId : instanceId);
-                xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
+                xmlItem.put("time", CommonUtils.isEmptyOrNullstr(cruiseResultMap.get("cruiseTime")) ? DateTimeUtil.getDateTimeString() : cruiseResultMap.get("cruiseTime"));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
-                xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
-                xmlItem.put("unit", Optional.ofNullable(cruiseResultMap.get("unit")).orElse(""));
+                xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+                xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-                String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + fileExt;
+                String tagPath = StringUtils.isEmpty(String.valueOf(xmlItem.getOrDefault("file_type", ""))) ? "" : stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                        8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {
@@ -160,7 +163,11 @@ public class ProcessResultToUpSystem {
                     resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
                 } else {
                     xmlBaseModel.setType("62");
-                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath);
+                    String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
+                    if (StringUtils.isNotEmpty(tagPath)){
+                        tagPath = "alarm/" + tagPath;
+                    }
+                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif);
                 }
                 log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
                 analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
@@ -230,7 +237,7 @@ public class ProcessResultToUpSystem {
         // 识别类型、文件类型、文件名命名
         String recognitionType = cruiseResultMap.getOrDefault("recognitionType", "3");
         String fileType = cruiseResultMap.getOrDefault("fileType", "2");
-
+        String isTemdif = cruiseResultMap.getOrDefault("isTemdif", "0");
         String fileNamePath = CCD_PATH;
         if (StringUtils.equals("4", recognitionType)){
             fileNamePath = FIR_PATH;
@@ -240,6 +247,7 @@ public class ProcessResultToUpSystem {
         map.put("recognitionType", recognitionType);
         map.put("fileNamePath", fileNamePath);
         map.put("fileType", fileType);
+        map.put("isTemdif", isTemdif);
         return map;
     }
 
@@ -252,33 +260,50 @@ public class ProcessResultToUpSystem {
      * @param tagPath
      * @return Map<String, String>
      */
-    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath) {
+    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath, String isTemdif) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
         log.info("imagePath=={}", imagePath);
         imagePath = replaceResultImgPath(imagePath, false);
 
+        //是否为温差任务标志位 0否 1是
+        String zero = "0";
         try {
             String recognitionType = String.valueOf(xmlItem.get("recognition_type"));
             String alarmType = "";
             switch (recognitionType){
                 case "1":
+                case "11":
+                case "12":
+                case "13":
+                    //仪表越限报警
                     alarmType = "7";
                     break;
                 case "2":
+                    //变位报警
                     alarmType = "10";
                     break;
                 case "3":
+                    //外观异常
                     alarmType = "6";
                     break;
                 case "4":
-                    alarmType = "1";
+                    if (zero.equals(isTemdif)) {
+                        //超温报警
+                        alarmType = "1";
+                    } else {
+                        //温升报警
+                        alarmType = "2";
+                    }
+                    break;
+                case "5":
+                    //声音异常
+                    alarmType = "5";
                     break;
                 default:
                     break;
             }
-            tagPath = "alarm/" + tagPath;
-            xmlItem.put("file_path", tagPath);
+            xmlItem.put("file_path", StringUtils.contains(imagePath, ".") ? tagPath : "");
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
             xmlItem.put("alarm_type", alarmType);
@@ -319,30 +344,41 @@ public class ProcessResultToUpSystem {
             switch (cruiseTypeEnum){
                 case VIDEO:
                 case INFRARED:
-                    cruiseType = "0x01";
+                    cruiseType = "1";
                     break;
                 case ROBOT:
-                    cruiseType = "0x02";
+                    cruiseType = "2";
                     break;
                 case UAV:
-                    cruiseType = "0x03";
+                    cruiseType = "3";
                     break;
                 case VOICE:
-                    cruiseType = "0x04";
+                    cruiseType = "4";
                     break;
                 case ONLINE:
-                    cruiseType = "0x05";
+                    cruiseType = "5";
                     break;
                 default:
                     break;
             }
 
-            xmlItem.put("file_path", tagPath);
+            xmlItem.put("file_path", StringUtils.contains(picPath, ".") ? tagPath : "");
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
             xmlItem.put("value", resultNum);
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("value_type", valueType);
-            xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
+            String fileType = (String)xmlItem.get("file_type");
+            String rectangle = "";
+            if (StringUtils.containsAny(fileType, "1", "2", "5")) {
+                CommonUtils.mathRandom(10);
+                int x1 = RandomUtils.nextInt(200, 500);
+                int y1 = RandomUtils.nextInt(160, 340);
+                int x2 = RandomUtils.nextInt(x1 + 139, x1 + 541);
+                int y2 = RandomUtils.nextInt(y1 + 97, y1 + 453);
+                rectangle = x1+","+y1+";" +x2+","+y1+";" +x1+","+y2+";" +x2+","+y2;
+                rectangle = StringUtils.isBlank(cruiseResultMap.get("rectangle")) ? rectangle : cruiseResultMap.get("rectangle");
+            }
+            xmlItem.put("rectangle", rectangle);
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
@@ -525,7 +561,7 @@ public class ProcessResultToUpSystem {
             log.info("判别告警发送算法管理平台结束");
 
             // 判别上报上一级系统
-//            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
 
         if(CollectionUtils.isNotEmpty(defectList) && ("1".equals(flag))) {
@@ -618,40 +654,44 @@ public class ProcessResultToUpSystem {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 
-        try {
+        String robotTaskStatusUp =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"));
 
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            for(CruiseManualReview cruiseResultMap : cruiseResultList) {
-                log.info("cruiseResultMap=={}", cruiseResultMap);
-                Map<String, Object> xmlItem = new HashMap<>(16);
-                String taskId = cruiseResultMap.getTaskId();
-                String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
-                String simpleDateFormat = DateTimeUtil.format3(new Date());
+        if ("true".equals(robotTaskStatusUp)) {
+            try {
 
-                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
-                xmlItem.put("task_code", taskId);
-                xmlItem.put("device_id", instanceId);
-                xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
-                xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
-                xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
-                xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
-                xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
-                xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
-                xmlItem.put("value", cruiseResultMap.getPersonCheck());
-                xmlItem.put("check_user", cruiseResultMap.getCheckUser());
-                xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
-                xmlItems.add(xmlItem);
+                String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+                for (CruiseManualReview cruiseResultMap : cruiseResultList) {
+                    log.info("cruiseResultMap=={}", cruiseResultMap);
+                    Map<String, Object> xmlItem = new HashMap<>(16);
+                    String taskId = cruiseResultMap.getTaskId();
+                    String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
+                    String simpleDateFormat = DateTimeUtil.format3(new Date());
+
+                    xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
+                    xmlItem.put("task_code", taskId);
+                    xmlItem.put("device_id", instanceId);
+                    xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
+                    xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
+                    xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
+                    xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
+                    xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
+                    xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
+                    xmlItem.put("value", cruiseResultMap.getPersonCheck());
+                    xmlItem.put("check_user", cruiseResultMap.getCheckUser());
+                    xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                    xmlItems.add(xmlItem);
+                }
+                xmlBaseModel.setItems(xmlItems);
+                xmlBaseModel.setType("611");
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>();
+                map.put("list", list);
+                log.info("The review information to be reported one level up is==={}", map);
+                Constant.otherServer(map, Constant.TCP_URL);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
-            xmlBaseModel.setItems(xmlItems);
-            xmlBaseModel.setType("611");
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> map = new HashMap<>();
-            map.put("list", list);
-            log.info("The review information to be reported one level up is==={}", map);
-            Constant.otherServer(map, Constant.TCP_URL);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
         }
         return xmlBaseModel;
     }
@@ -730,7 +770,7 @@ public class ProcessResultToUpSystem {
         String str2 = "";
         if(str != null && !"".equals(str)){
             for(int i = 0; i < str.length(); i++){
-                if(str.charAt(i) >= 48 && str.charAt(i) <= 57){
+                if((str.charAt(i) >= 48 && str.charAt(i) <= 57) || str.charAt(i) == '.'){
                     str2 += str.charAt(i);
                 }
             }
