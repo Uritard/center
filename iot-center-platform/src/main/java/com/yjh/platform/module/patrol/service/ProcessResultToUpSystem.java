@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.math.MathUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
@@ -20,6 +21,7 @@ import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -365,7 +367,18 @@ public class ProcessResultToUpSystem {
             xmlItem.put("value", resultNum);
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("value_type", valueType);
-            xmlItem.put("rectangle", StringUtils.isBlank(cruiseResultMap.get("rectangle")) ? "1,1;2,2;3,3;4,4" : cruiseResultMap.get("rectangle"));
+            String fileType = (String)xmlItem.get("file_type");
+            String rectangle = "";
+            if (StringUtils.containsAny(fileType, "1", "2", "5")) {
+                CommonUtils.mathRandom(10);
+                int x1 = RandomUtils.nextInt(200, 500);
+                int y1 = RandomUtils.nextInt(160, 340);
+                int x2 = RandomUtils.nextInt(x1 + 139, x1 + 541);
+                int y2 = RandomUtils.nextInt(y1 + 97, y1 + 453);
+                rectangle = x1+","+y1+";" +x2+","+y1+";" +x1+","+y2+";" +x2+","+y2;
+                rectangle = StringUtils.isBlank(cruiseResultMap.get("rectangle")) ? rectangle : cruiseResultMap.get("rectangle");
+            }
+            xmlItem.put("rectangle", rectangle);
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
