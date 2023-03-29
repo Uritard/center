@@ -4,17 +4,17 @@
 
     <insert id="insertNonhomologousWarnInfo"  parameterType="java.util.Map">
         insert into t_cruise_nonhomologous_warn(
-            warn_id,
-            instance_id,
-            warn_content,
-            warn_time,
-            warn_type
+        warn_id,
+        instance_id,
+        warn_content,
+        warn_time,
+        warn_type
         )values(
-                #{warnId, jdbcType=VARCHAR},
-                #{instanceId, jdbcType=VARCHAR},
-                #{warnContent, jdbcType=VARCHAR},
-                sysdate(),
-                #{warnType, jdbcType=INTEGER}
+        #{warnId, jdbcType=VARCHAR},
+        #{instanceId, jdbcType=VARCHAR},
+        #{warnContent, jdbcType=VARCHAR},
+        sysdate(),
+        #{warnType, jdbcType=INTEGER}
         )
     </insert>
 
@@ -72,11 +72,23 @@
             limit 4
         </if>
     </select>
+    <select id="selectLastResultNum"  resultType="java.lang.String">
+        select
+        a.result_num
+        from u_patrol_data_result a
+        where a.instance_id = #{instanceId}
+        and result_num in
+        <foreach collection="list" separator="," open="(" close=")" item="resultNum">
+            #{resultNum}
+        </foreach>
+        order by a.cruise_time desc
+        limit 1
+    </select>
 
     <select id="getInstanceIdByDeviceId" resultType="java.lang.Long">
         select a.instance_id
         from t_cruise_point_instance a
-                 left join u_patrol_task_attr c ON c.instance_id = a.instance_id
+        left join u_patrol_task_attr c ON c.instance_id = a.instance_id
         where a.origin_id = #{deviceId, jdbcType=VARCHAR}
         and c.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
@@ -106,5 +118,22 @@
         a.warn_level as warnLevel
         from t_cruise_triphase_rule a
         where a.instance_one_id = #{instanceId} or a.instance_two_id = #{instanceId} or a.instance_tri_id = #{instanceId}
+    </select>
+
+    <select id="selectInsList" resultType="java.util.HashMap">
+        select
+        instance_id_one as one,
+        instance_id_two as two
+        from t_cruise_nonhomologous_point_instance
+        where instance_id = #{instanceId}
+    </select>
+
+    <select id="selectInsListByTri" resultType="java.util.HashMap">
+        select
+        instance_one_id as one,
+        instance_two_id as two,
+        instance_tri_id as three
+        from t_cruise_triphase_rule
+        where triphase_id = #{instanceId}
     </select>
 </mapper>
