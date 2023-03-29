@@ -651,6 +651,10 @@ public class AnalyseDataOperateService {
                     defectValue = defectValue + "门窗墙地面损坏" + " ";
                     flags.add("1");
                     break;
+                case "dmcj":
+                    defectValue = defectValue + "地面沉降" + " ";
+                    flags.add("1");
+                    break;
                 case "gbps":
                     defectValue = defectValue + "盖板破损" + " ";
                     flags.add("1");
