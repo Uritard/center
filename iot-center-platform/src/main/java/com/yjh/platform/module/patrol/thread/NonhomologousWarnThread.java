@@ -401,12 +401,12 @@ public class NonhomologousWarnThread implements Runnable{
                             fruit = (max - 0F > 0.01D) ? (max - min) * 100 / max : 0.0F;
                             triphaseName = "三相不平衡";
                             unit = "%";
-                            alarmType = "3";
                             break;
                         case 2:
                         default:
                             fruit = max - min;
                             triphaseName = "三相温差";
+                            alarmType = "3";
                             break;
                     }
                     log.info("三相告警结果值 ===max: {}, min: {}, fruit:{}, threshold: {}, {}", max, min, fruit, warnThreshold, JSON.toJSONString(triphaseRetMap));
