@@ -202,32 +202,34 @@ public class NonhomologousWarnThread implements Runnable{
                         if(!isNumeric(robotInsResult)){
                             //特殊走特殊的逻辑
                             if (Constant.nonhomologousWarn.contains(robotInsResult)){
-                               String lastValue = nonhomologousWarnDao.selectLastResultNum(robotInstanceId,Constant.nonhomologousWarn.split(","));
-                               log.info("lastValue===={}  thisValue==={}",lastValue,robotInsResult);
-                                if (StringUtils.isNotEmpty(lastValue) && !lastValue.equals(robotInsResult)){
-                                    //告警
-                                    Map<String,Object> warn = new HashMap<>(4);
-                                    warn.put("warnId", warnId);
-                                    warn.put("warnType", 6);
-                                    warn.put("instanceId", Long.parseLong(instanceId));
-                                    warn.put("warnContent", "时间范围内识别结果趋势不一致：" + lastValue+"->"+robotInsResult);
-                                    warn.put("value",robotInsResult);
+                               Map<String,String> lastValue = nonhomologousWarnDao.selectLastResultNum(robotInstanceId,Constant.nonhomologousWarn.split(","));
+                               if (lastValue != null){
+                                   log.info("lastValue===={}  thisValue==={} lastTaskId==={}",lastValue.get("lastValue"),robotInsResult,lastValue.get("taskId"));
+                                   if (StringUtils.isNotEmpty(lastValue.get("lastValue")) && !robotInsResult.equals(lastValue.get("lastValue"))){
+                                       //告警
+                                       Map<String,Object> warn = new HashMap<>(4);
+                                       warn.put("warnId", warnId);
+                                       warn.put("warnType", 6);
+                                       warn.put("instanceId", Long.parseLong(instanceId));
+                                       warn.put("warnContent", "时间范围内识别结果趋势不一致：" + lastValue.get("lastValue")+"->"+robotInsResult);
+                                       warn.put("value",robotInsResult);
 
-                                    List<Map<String,Object>> resultsInfo = new ArrayList<>();
-                                    HashMap<String,Object> mapItem1 = new HashMap<>();
-                                    mapItem1.put("warnId",warnId);
-                                    mapItem1.put("taskId",taskCode);
-                                    mapItem1.put("inspectionId",robotInstanceId);
-                                    resultsInfo.add(mapItem1);
+                                       List<Map<String,Object>> resultsInfo = new ArrayList<>();
+                                       HashMap<String,Object> mapItem1 = new HashMap<>();
+                                       mapItem1.put("warnId",warnId);
+                                       mapItem1.put("taskId",taskCode);
+                                       mapItem1.put("inspectionId",robotInstanceId);
+                                       resultsInfo.add(mapItem1);
 
-                                    HashMap<String,Object> mapItem2 = new HashMap<>();
-                                    mapItem2.put("warnId",warnId);
-                                    mapItem2.put("taskId",taskCode);
-                                    mapItem2.put("inspectionId",robotInstanceId);
-                                    resultsInfo.add(mapItem2);
-                                    warn.put("resultsInfo",resultsInfo);
-                                    insertNonhomologousWarnInfo(warn, "10");
-                                }
+                                       HashMap<String,Object> mapItem2 = new HashMap<>();
+                                       mapItem2.put("warnId",warnId);
+                                       mapItem2.put("taskId",lastValue.get("taskId"));
+                                       mapItem2.put("inspectionId",robotInstanceId);
+                                       resultsInfo.add(mapItem2);
+                                       warn.put("resultsInfo",resultsInfo);
+                                       insertNonhomologousWarnInfo(warn, "10");
+                                   }
+                               }
                             }
                             log.info("区间非同源告警--数据非指定汉字");
                             break;
