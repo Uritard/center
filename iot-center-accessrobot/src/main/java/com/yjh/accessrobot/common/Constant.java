@@ -87,6 +87,8 @@ public class Constant {
 
     public static String SEND_ROBOT_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
+    public static String TASK_SHUT_DOWN_URL = "http://iot-center-platform/uPatrolTask/v1/taskShutDown?taskId={taskId}&content={content}";
+
     /**
      * platform接收机器人/无人机巡视结果接口
      */

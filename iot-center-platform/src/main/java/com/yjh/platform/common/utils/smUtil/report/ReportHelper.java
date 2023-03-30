@@ -3,6 +3,8 @@ package com.yjh.platform.common.utils.smUtil.report;
 import com.google.common.base.Strings;
 import com.yjh.platform.module.task.entity.TableCellElement;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -133,7 +135,23 @@ public class ReportHelper {
     private static int calculateCellWidth(int CHChars, int ENChars, boolean bold) {
         return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars)) * 256;
     }
-    public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest) {
+    public static void appendHyperLink(Workbook wb, Cell cell, String url, String linkText) {
+        CellStyle hlink_style = wb.createCellStyle();
+        Font hlink_font = wb.createFont();
+        hlink_font.setUnderline(Font.U_SINGLE);
+        hlink_font.setColor(IndexedColors.BLUE.getIndex());
+        hlink_style.setFont(hlink_font);
+        hlink_style.setAlignment(HorizontalAlignment.CENTER);
+
+        CreationHelper createHelper = wb.getCreationHelper();
+        cell.setCellValue(linkText);
+
+        Hyperlink link = createHelper.createHyperlink(HyperlinkType.URL);
+        link.setAddress(url);
+        cell.setHyperlink(link);
+        cell.setCellStyle(hlink_style);
+    }
+    public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest,String taskId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook(rowNum);
         final Sheet sheet = wb.createSheet("巡检报告");
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
@@ -230,7 +248,7 @@ public class ReportHelper {
                 final int ANCHOR_DX1 = PoiUtils.pixelToEMU(5);
                 final int ANCHOR_DX2 = PoiUtils.pixelToEMU(245);
                 final int ANCHOR_DY1 = PoiUtils.pixelToEMU(5);
-                final int ANCHOR_DY2 = PoiUtils.pixelToEMU(136);
+                final int ANCHOR_DY2 = PoiUtils.pixelToEMU(106);
                 final float ROW_HEIGHT = (float) PoiUtils.pixelToPoints(140);
                 final int COLUMN_WIDTH = (int) (31.1f * 256);
 
@@ -262,6 +280,22 @@ public class ReportHelper {
                         sheet.setColumnWidth(colStart, COLUMN_WIDTH);
                         imageColumnWidthSet[colStart] = true;
                     }
+                    if (StringUtils.isNotEmpty(taskId)){
+                        //插入超链接
+                        String oriImg = element.getValue()[1];
+                        if (StringUtils.isNotEmpty(oriImg)){
+                            String[] fileStr = oriImg.split("/");
+                            if (fileStr.length > 1){
+                                String fileUrl = fileStr[fileStr.length-1];
+
+                                appendHyperLink(wb, cell, taskId+"/"+fileUrl, fileUrl);
+                            }
+                        }
+
+
+                    }
+
+
                 } catch (Exception e) {
                     logger.info("createDocument, error to insert img.", e);
                 }

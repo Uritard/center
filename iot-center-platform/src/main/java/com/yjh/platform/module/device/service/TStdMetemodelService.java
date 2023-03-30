@@ -478,7 +478,8 @@ public class TStdMetemodelService {
                 //第2列
                 if (row.getCell(1) == null || row.getCell(1).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(1).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(1).getStringCellValue()))) {
                     errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列不能为空<br>");
-                    result.setMessage(errMsg.toString());
+                    log.error("文件内容不对："+errMsg);
+                    result.setMessage("文件内容不对！");
                     return result;
                 }
 //                //第3列
@@ -490,7 +491,8 @@ public class TStdMetemodelService {
                 //第5列
                 if (row.getCell(4) == null || row.getCell(4).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(4).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(4).getStringCellValue()))) {
                     errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列不能为空<br>");
-                    result.setMessage(errMsg.toString());
+                    log.error("文件内容不对："+errMsg);
+                    result.setMessage("文件内容不对！");
                     return result;
                 }
                 Cell cell = row.getCell(1);
@@ -500,7 +502,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setDeviceType(NumberUtils.toInt(nameMap.get(item)));
@@ -513,7 +516,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setMeteType(nameMap.get(item).toString());
@@ -526,7 +530,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (4) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     Integer meteKind = item.contains("遥信") ? 1 : (item.contains("遥测") ? 2 : (item.contains("遥控") ? 3 : (item.contains("遥调") ? 4 : null)));
@@ -541,7 +546,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setMeteName(item);
@@ -569,7 +575,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (7) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setAlarmExplain(item);
@@ -597,7 +604,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (9) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setAnalyseType(NumberUtils.toInt(nameMap.get(item)));
@@ -611,7 +619,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (10) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setUnit(item);
@@ -624,7 +633,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (11) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setUpEffect(NumberUtils.toFloat(item));
@@ -638,7 +648,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (12) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setDownEffect(NumberUtils.toFloat(item));
@@ -652,7 +663,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (13) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setAlarmLevel(NumberUtils.toInt(nameMap.get(item)));
@@ -666,7 +678,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (14) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setAlarmLimit(NumberUtils.toInt(item));
@@ -693,7 +706,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (16) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setStateZero(item);
@@ -706,7 +720,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (17) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setStateOne(item);
@@ -720,7 +735,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (18) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setHighLimit1(NumberUtils.toFloat(item));
@@ -734,7 +750,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (19) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setLowLimit1(NumberUtils.toFloat(item));
@@ -748,7 +765,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (20) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setHighLimit2(NumberUtils.toFloat(item));
@@ -762,7 +780,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (21) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setLowLimit2(NumberUtils.toFloat(item));
@@ -776,7 +795,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (22) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setHighLimit3(NumberUtils.toFloat(item));
@@ -790,7 +810,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (23) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setLowLimit3(NumberUtils.toFloat(item));
@@ -804,7 +825,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (24) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setHighLimit4(NumberUtils.toFloat(item));
@@ -818,7 +840,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (25) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setLowLimit4(NumberUtils.toFloat(item));
@@ -846,7 +869,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (27) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setThresholdAbs(BigDecimal.valueOf(NumberUtils.toLong(item)));
@@ -860,7 +884,8 @@ public class TStdMetemodelService {
                     item = cell.getStringCellValue();
                     if (checkString(item)) {
                         errMsg.append("第" + (i + 1) + "行," + "第" + (28) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
                         return result;
                     }
                     tStdMete.setThresholdPer(BigDecimal.valueOf(NumberUtils.toLong(item)));

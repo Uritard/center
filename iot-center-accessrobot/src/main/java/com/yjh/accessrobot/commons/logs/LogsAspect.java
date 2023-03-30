@@ -8,6 +8,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.http.IPUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -108,12 +109,11 @@ public class LogsAspect {
                         String ans = annotation.authority();
 //                        List<String> ans = new ArrayList<String>(annotation.authority().split(","));
 //                        for (String an : ans) {
-                            assert userRole != null;
-                            if (!ans.contains(userRole)) {
+                            if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
                                 //todo 越权访问入日志
                                 params.set("logType", "24");
                                 params.set("ip", ip);
-                                params.set("title", annotation.title());
+                                params.set("title", "用户越权访问");
                                 params.set("state", 3);
                                 Map<String, String> jsonMap = new HashMap<>(8);
                                 jsonMap.put("type", "alarmPopUp");

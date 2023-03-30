@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -35,7 +36,8 @@ public class TVoiceDeviceController {
 
     @Autowired
     private final TVoiceDeviceService tVoiceDeviceService;
-
+    @Autowired
+    private LogsRecord logsRecord;
     @Autowired
     private RedisTemplate  redisTemplate;
 
@@ -159,7 +161,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数分页查询声纹设备", logType = 1,authority = "1234")
+//    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数分页查询声纹设备", logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
                                @RequestParam(value = "deviceType", required = false) String deviceType,
                                @RequestParam(value = "upRegionId", required = false) Long upRegionId,
@@ -167,10 +169,15 @@ public class TVoiceDeviceController {
                                @RequestParam(value = "voiceModel", required = false) String voiceModel,
                                @RequestParam(value = "voiceFactory", required = false) String voiceFactory,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出台账信息","声纹设备台账导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查询声纹设备数据","根据用户传递的参数分页查询声纹设备");
+            }
             result = tVoiceDeviceService.selectByPage(voiceDeviceName,deviceType,upRegionId, voiceType, voiceModel, voiceFactory,pageNum,pageSize);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

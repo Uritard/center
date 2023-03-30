@@ -57,5 +57,8 @@ public class TCruiseNonhomologousWarnDO  implements Serializable {
     private String warnTime;
 
 
+    private String oneCruiseDeviceName;
+    private String twoCruiseDeviceName;
+    private String threeCruiseDeviceName;
 
 }

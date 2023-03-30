@@ -79,7 +79,7 @@
         where a.instance_id = #{instanceId}
         and result_num in
         <foreach collection="list" separator="," open="(" close=")" item="resultNum">
-            #{resultNum}
+        #{resultNum}
         </foreach>
         order by a.cruise_time desc
         limit 1
@@ -122,17 +122,17 @@
 
     <select id="selectInsList" resultType="java.util.HashMap">
         select
-        instance_id_one as one,
-        instance_id_two as two
+            instance_id_one as one,
+            instance_id_two as two
         from t_cruise_nonhomologous_point_instance
         where instance_id = #{instanceId}
     </select>
 
     <select id="selectInsListByTri" resultType="java.util.HashMap">
         select
-        instance_one_id as one,
-        instance_two_id as two,
-        instance_tri_id as three
+            instance_one_id as one,
+            instance_two_id as two,
+            instance_tri_id as three
         from t_cruise_triphase_rule
         where triphase_id = #{instanceId}
     </select>

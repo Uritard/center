@@ -25,4 +25,9 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private Long cameraId;
     private String meteType;
     private String devicePointId;
+    /**
+     * 是否温差测试
+     */
+    private Integer isTemdif;
+    private String unit;
 }

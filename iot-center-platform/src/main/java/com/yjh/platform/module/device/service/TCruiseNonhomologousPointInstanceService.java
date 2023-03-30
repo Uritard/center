@@ -95,7 +95,7 @@ public class TCruiseNonhomologousPointInstanceService {
         for (TCruiseNonhomologousWarnInfo info: list) {
             if(NonhomologousWarnEnum.SANXIANG.getCode().equals(info.getWarnType())) {
                 List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(info.getWarnId());
-                if (CollectionUtils.isNotEmpty(listMaps)) {
+                if (CollectionUtils.isNotEmpty(listMaps) && StringUtils.isEmpty(info.getOneCruiseDeviceName())) {
                     String taskCode = listMaps.get(0).get("task_id").toString();
                     Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
                     String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
@@ -117,7 +117,7 @@ public class TCruiseNonhomologousPointInstanceService {
         Map<String,Object> tCruiseNonhomologousWarnInfo = Maps.newHashMap();
         if (NonhomologousWarnEnum.SANXIANG.getCode().equals(tCruiseNonhomologousWarnDO.getWarnType())) {
             List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(warnId);
-            if (CollectionUtils.isNotEmpty(listMaps)) {
+            if (CollectionUtils.isNotEmpty(listMaps) && StringUtils.isEmpty(tCruiseNonhomologousWarnDO.getOneCruiseDeviceName())) {
                 String taskCode = listMaps.get(0).get("task_id").toString();
                 Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
                 String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
@@ -125,6 +125,18 @@ public class TCruiseNonhomologousPointInstanceService {
                 listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
                 tCruiseNonhomologousWarnInfo.put("deviceName",listMaps.get(0) == null ? null : listMaps.get(0).get("device_name"));
                 tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",robotName);
+                tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
+                tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
+                tCruiseNonhomologousWarnInfo.put("delayName", listMaps.get(0) == null ? null : listMaps.get(0).get("region_name"));
+                tCruiseNonhomologousWarnInfo.put("customName", listMaps.get(0) == null ? null : listMaps.get(0).get("custom_name"));
+                tCruiseNonhomologousWarnInfo.put("warnContent", tCruiseNonhomologousWarnDO.getWarnContent());
+            } else {
+                tCruiseNonhomologousWarnInfo.put("deviceName",listMaps.get(0) == null ? null : listMaps.get(0).get("device_name"));
+                tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",tCruiseNonhomologousWarnDO.getOneCruiseDeviceName());
+                tCruiseNonhomologousWarnInfo.put("twoCruiseDeviceName",tCruiseNonhomologousWarnDO.getTwoCruiseDeviceName());
+                tCruiseNonhomologousWarnInfo.put("threeCruiseDeviceName",tCruiseNonhomologousWarnDO.getThreeCruiseDeviceName());
+                StringJoiner meteNames = new StringJoiner("/");
+                listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
                 tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
                 tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
                 tCruiseNonhomologousWarnInfo.put("delayName", listMaps.get(0) == null ? null : listMaps.get(0).get("region_name"));
@@ -139,6 +151,7 @@ public class TCruiseNonhomologousPointInstanceService {
         for(Map<String,Object> m : warnDetailInfo){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
+                redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
                 m.putAll(redisInfoMap);
             }
         }
@@ -146,6 +159,30 @@ public class TCruiseNonhomologousPointInstanceService {
             tCruiseNonhomologousWarnInfo.put("warnInspectionsInfo",warnDetailInfo);
         }
         return tCruiseNonhomologousWarnInfo;
+    }
+
+    private String dealResultNum(String resultNum){
+        String re = "";
+        if(StringUtils.isEmpty(resultNum)){
+            return re;
+        }
+        switch (resultNum){
+            case "分":
+            case "开":
+            case "储能":
+            case "远方":
+                re="0";
+                break;
+            case "合":
+            case "关":
+            case "非储能":
+            case "就地":
+                re="1";
+                break;
+            default:
+                break;
+        }
+        return re;
     }
 
 }

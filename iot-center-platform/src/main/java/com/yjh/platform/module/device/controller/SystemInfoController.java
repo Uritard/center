@@ -219,7 +219,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取审计日志存储容量信息")
     @RequestMapping(value = "/getLogsStorage",method = RequestMethod.GET)
-    @Logs(title = "获取审计日志存储容量信息", content = "获取审计日志存储容量信息", logType =29, authority = "1234")
+    @Logs(title = "获取审计日志存储容量信息", content = "获取审计日志存储容量信息", logType =1, authority = "1234")
     public Result getSysLogsStorageInfo(HttpServletRequest request){
         Result result = new Result();
         try {

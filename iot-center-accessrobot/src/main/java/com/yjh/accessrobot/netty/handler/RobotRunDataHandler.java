@@ -51,14 +51,23 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
+        String onlineStatus = String.valueOf(redisTemplate.opsForValue().get("onlineStatus:"+ robotCode));
 
+        if ("1".equals(onlineStatus)) {
+            // 给下级响应
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(sendCode));
+            byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+            RobotServerHandler.send(statusProtocol, sendCode);
+            log.info("本级系统给下级{}响应了", sendCode);
+            return;
+        }
         // 给下级响应
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
         RobotServerHandler.send(operationProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
-        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotOperationList = new ArrayList<>();
 
         for (Map<String, Object> res : xmlBaseModel.getItems()) {

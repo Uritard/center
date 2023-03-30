@@ -6,6 +6,7 @@ import com.yjh.logs.commons.result.BusinessException;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.module.log.controller.SysLogController;
 import com.yjh.logs.module.log.service.SysLogService;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -91,12 +92,11 @@ public class LogsAspect {
                 try {
                     if (!"".equals(annotation.authority())) {
                         String ans = annotation.authority();
-                        assert userRole != null;
-                        if (!ans.contains(userRole)) {
+                        if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
                             //todo 越权访问入日志
                             params.put("logType", "24");
                             params.put("ip", ip);
-                            params.put("title", annotation.title());
+                            params.put("title", "用户越权访问");
                             params.put("state", "3");
                             Map<String, String> jsonMap = new HashMap<>(8);
                             jsonMap.put("type", "alarmPopUp");

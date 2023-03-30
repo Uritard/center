@@ -768,6 +768,10 @@ public class AnalyseDataOperateService {
                     defectValue="图像无差异";
                     flags.add("1");
                     break;
+                case "dmcj":
+                    defectValue = defectValue + "地面沉降" + " ";
+                    flags.add("1");
+                    break;
                 case "abnormal":
                     defectValue="图像有差异";
                     flags.add("1");

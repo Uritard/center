@@ -473,7 +473,13 @@ public class SendToUpSystemServices {
     }
 
     public String createDeviceModel(String path, String stationCode) throws Exception {
-        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
+        Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
+        String selectEdge = selectEdgeMap.get("content");
+        String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+        if ("1".equals(edgeLevel)){
+            selectEdge = null;
+        }
+        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(selectEdge);
         list.forEach(item->{
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
@@ -513,7 +519,6 @@ public class SendToUpSystemServices {
             item.remove("inspection_id");
             jsonArray.add(jsonObject);
             item.put("video_pos",jsonArray.toJSONString());
-            String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
             if ("1".equals(edgeLevel) && Objects.nonNull(item.get("preset_img")) && Objects.nonNull(item.get("local_path"))){
                 item.put("preset_img", "/" + stationCode + item.get("preset_img"));
                 String localPath = String.valueOf(item.get("local_path"));
@@ -1495,5 +1500,14 @@ public class SendToUpSystemServices {
         processCycleDate(timeStr, map);
         map.put("cycle_start_time", map.get("fixed_start_time"));
         map.put("cycle_end_time", map.get("end_time"));
+    }
+
+    /**
+     * 查询点位是否有给机器人发送的
+     * @param instanceIds
+     * @return
+     */
+    public String selectIsRobotDevice(List<String> instanceIds) {
+        return sendToUpSystemDao.selectIsRobotDevice(instanceIds);
     }
 }

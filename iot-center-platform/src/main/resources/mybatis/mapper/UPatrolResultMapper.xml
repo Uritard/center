@@ -596,6 +596,10 @@
         LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
         LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
         WHERE 1 = 1
+          and
+        b.cruise_abnormal != '250'
+          and
+        b.cruise_abnormal != '409'
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}
         </if>
 
@@ -1140,7 +1144,9 @@
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
-        m.region_name as regionName
+        m.region_name as regionName,
+        f.cruise_status as cruiseState,
+        f.cruise_abnormal as cruiseAbnormal
         from u_patrol_data_result f
         LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
@@ -1265,11 +1271,14 @@
         f.identify_result,
         z.dict_note as identify_result_name,
         f.cruise_type,
+        f.origpic as ori_img,
         n.dict_note as dataType,
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
-        m.region_name as regionName
+        m.region_name as regionName,
+        f.cruise_status as cruiseState,
+        f.cruise_abnormal as cruiseAbnormal
         from u_patrol_data_result f
         LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id

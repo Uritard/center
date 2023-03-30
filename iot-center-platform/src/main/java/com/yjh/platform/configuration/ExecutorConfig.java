@@ -56,7 +56,7 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
 //        executor.setKeepAliveSeconds(600);
         executor.setMaxPoolSize(20);
         executor.setThreadNamePrefix("taskExecutor-platform-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
         executor.initialize();
         return executor;
     }

@@ -823,7 +823,7 @@ public class CameraConService {
 
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
         lpJpegPara.wPicSize = 0xff;
-        lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
+        lpJpegPara.wPicQuality = 0;/* 图片质量系数 0-最好 1-较好 2-一般 */
         if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
             int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
             log.info("lUserIDLong: {}", lUserIDLong);
@@ -897,8 +897,8 @@ public class CameraConService {
                     // 返回图片大小
                     IntByReference a = new IntByReference();
                     // 图片缓冲区大小
-                    ByteBuffer jpegBuffer = ByteBuffer.allocate(1024 * 1024);
-                    flag = hCNetSDK.NET_DVR_CaptureJPEGPicture_NEW(lUserIDLong, iChanNum, lpJpegPara, jpegBuffer, 1024 * 1024, a);
+                    ByteBuffer jpegBuffer = ByteBuffer.allocate(1920 * 1080);
+                    flag = hCNetSDK.NET_DVR_CaptureJPEGPicture_NEW(lUserIDLong, iChanNum, lpJpegPara, jpegBuffer, 1920 * 1080, a);
                     // 图片输出流
                     inputStream = new ByteArrayInputStream(jpegBuffer.array(), 0, a.getValue());
                 }

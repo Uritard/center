@@ -49,6 +49,7 @@ public class RestTemplateConfig {
         factory.setHttpClient(httpClientBuilder().build());
         factory.setReadTimeout(20000);
         factory.setConnectTimeout(20000);
+        factory.setConnectionRequestTimeout(20000);
         return factory;
     }
 

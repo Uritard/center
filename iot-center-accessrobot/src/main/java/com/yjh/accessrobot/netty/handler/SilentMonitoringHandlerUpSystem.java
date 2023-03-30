@@ -3,14 +3,20 @@ package com.yjh.accessrobot.netty.handler;
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
+import com.yjh.accessrobot.module.command.dao.TCameraPresetMapper;
+import com.yjh.accessrobot.module.command.dao.TCruisePointInstanceMapper;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
-import com.yjh.accessrobot.module.command.entity.TStdDevice;
-import com.yjh.accessrobot.module.command.entity.TWarnInfo;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,10 +26,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
+import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <功能描述> 上级系统接收巡视主机消息
@@ -42,6 +50,10 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
     private TWarnInfoMapper tWarnInfoMapper;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private RobotService robotService;
+    @Autowired
+    private UpFtpsConfig upFtpsConfig;
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("上级系统接收到静默告警数据 xmlBaseModel:{}", JSON.toJSONString(xmlBaseModel));
@@ -96,6 +108,39 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setAlarmSource(689)
                 .setImagePath(defectResultRealImg);
         tWarnInfoMapper.insert(tWarnInfo);
+        sendUpSystem(xmlBaseModel);
+
+    }
+
+    private void sendUpSystem(XMLBaseModel xmlBaseModel) {
+        try{
+        //图片上传
+        // 图片在ftps上的全路径
+        String ftpPath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
+        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + File.separator+ ftpPath;
+        uploadFileToUpFtps(resultAbsolutePath,ftpPath,upFtpsConfig);
+        robotService.upToCruise(xmlBaseModel);
+        }catch (Exception e){
+            log.error("上传静默监视告警数据出错：",e);
+        }
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath     源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+        try {
+            if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
+                return;
+            }
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误：", e);
+        }
     }
 
     @Override

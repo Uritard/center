@@ -1,6 +1,9 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.entity.ModelCreator;
 import com.yjh.platform.module.device.entity.ModelInfo;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
@@ -9,7 +12,11 @@ import com.yjh.platform.module.device.entity.TStdMeteModel;
 import java.util.HashMap;
 import java.util.List;
 
+import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import io.swagger.annotations.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * @author tt
@@ -36,6 +45,11 @@ public class TStdMetemodelController {
 
     @Autowired
     private final TStdMetemodelService tStdMetemodelService;
+    @Autowired
+    private SysUserDao sysUserDao;
+    @Autowired
+    private LogsRecord logsRecord;
+    private static final String LOG_URL = "http://iot-center-share/sysLog/v1/add";
 
     private Logger log = LoggerFactory.getLogger(TStdMetemodelController.class);
 
@@ -302,20 +316,39 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
-    @Logs(title = "导入模板",content = "导入标准点位库",logType = 8)
-    public Result upload (@RequestParam(value="file", required=false) MultipartFile file) {
+//    @Logs(title = "导入模板",content = "导入标准点位库",logType = 8)
+    public Result upload (HttpServletRequest request, @RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {
             result=tStdMetemodelService.insertModel(file);
+            if (result.getCode() == 200){
+                logsRecord.LogsSend(request,"8","导入","点位导入成功");
+            } else {
+                logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!" ,2);
+            }
         }  catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("生成模板异常:", e);
+            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!",2);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("生成模板错误:", e);
+            logsRecord.LogsSend(request,"8","点位导入失败","异常信息: 请上传指定格式!" ,2);
         }
 
         return  result;
+    }
+
+    public void post(MultiValueMap<String, Object> params) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                System.out.println("platformLogAdd...");
+                serviceRestTemplate.postForObject(LOG_URL, params, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
 

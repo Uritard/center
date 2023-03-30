@@ -1,22 +1,27 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.module.command.entity.EdgeEnum;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.netty.thread.TaskShutDownThread;
+import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author YChen
@@ -28,6 +33,8 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
 
     @Autowired
     private RobotService robotService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -72,9 +79,38 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                                 break;
                         }
                     }
-                    String taskId = MapUtils.getString(resultMap, "task_patrolled_id");
+                    String taskPatrolledId = MapUtils.getString(resultMap, "task_patrolled_id");
                     if (StringUtils.isNotEmpty(errorCode)) {
-                        log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskId);
+                        log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskPatrolledId);
+                        // 联动的返回结果直接向上反
+                        robotService.upToCruise(xmlBaseModel);
+                        String success = "0";
+                        //<0>: =成功
+                        //<1>: =巡视设备异常
+                        //<2>: = 无权限（或高优先级任务存在）
+                        //<3>: = 其它异常
+                        //taskPatrolledId 不为空 且 error_code 不为 0 边缘节点任务终止
+                        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+                        AtomicReference<String> taskCode = new AtomicReference<>("");
+                        Date date = null;
+                        if (StringUtils.isNotEmpty(taskPatrolledId) ) {
+                            taskCode.set(StringUtils.substringBetween(taskPatrolledId, "_"));
+                            String[] patrolledIds = taskPatrolledId.split("_");
+                            String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
+                            date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+                        }else {
+                            Map<String, String> unionTaskMap = redisTemplate.opsForHash().entries("UnionTask");
+                            unionTaskMap.forEach((key,value ) -> {
+                                if (key.contains(sendCode)){
+                                    taskCode.set(value);
+                                    redisTemplate.opsForHash().delete("UnionTask", key);
+                                }
+                            });
+                        }
+                        if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+                            TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskCode.get(), errorCode, date);
+                            TaskExecutePool.getInstance().execute(taskShutDownThread);
+                        }
                     }
                 } else if (firstKey.endsWith("_file_path")) {
                     log.info("机器人收到模型指令了,这是机器人的响应");

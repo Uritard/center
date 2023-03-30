@@ -1,7 +1,9 @@
 package com.yjh.platform.module.task.service;
 
+import cn.hutool.core.util.ZipUtil;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
@@ -75,7 +77,7 @@ public class ReportManageService {
 
         ContentData contentData = ReportDataRepo.getData(recordData);
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                contentData.getElements(), file);
+                contentData.getElements(), file,null);
 
         TReportInfo reportInfo = new TReportInfo()
                 .setReportId(String.valueOf(UUID.randomUUID()).replace("-", ""))
@@ -159,20 +161,23 @@ public class ReportManageService {
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
         ReportData recordData = new ReportData();
-        // 概况
-        TaskVO taskVO = getTaskVO(taskId);
-        recordData.setTaskVO(taskVO);
 
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+        // 概况
+        TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList);
+        recordData.setTaskVO(taskVO);
+
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
         String absPath = map.get("content");
         Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
         String relPath = entries.get("content");
+        List<String>  originalImgList = new ArrayList<>();
         // 相对路径替换绝对路径
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
             detail.setPicPath(resultPath);
+            originalImgList.add(detail.getOriImg());
         });
         recordData.setTCDRDList(tCruiseDataResultDetailList);
 
@@ -194,7 +199,7 @@ public class ReportManageService {
             ContentData contentData = ReportDataModel.getData(recordData);
 
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                    contentData.getElements(), file);
+                    contentData.getElements(), file,taskId);
         }else {
             newReportPath = reportPath+"/"+reportName;
             log.info("存在，该文件绝对路径是==={}", newReportPath);
@@ -202,13 +207,82 @@ public class ReportManageService {
             ContentData contentData = ReportDataModel.getData(recordData);
 
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                    contentData.getElements(), file);
+                    contentData.getElements(), file,taskId);
+        }
+        try {
+            //将任务下的巡视原图图片 打包成一份zip
+            FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
+        }catch (Exception e){
+            log.info("压缩任务下图片失败：",e);
         }
         return newReportPath;
     }
 
-    public TaskVO getTaskVO(String taskId) {
+    private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> tCDRDList){
+        List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
+        List<TCruiseDataResultDetail> normalList = new ArrayList<>();
+        List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
+//        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+//            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                cbsInspectionResultVo.setIdentifyResultName("异常");
+//                abnormalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+//                normalList.add(cbsInspectionResultVo);
+//            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
+//                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+//                unReviewList.add(cbsInspectionResultVo);
+//            }
+//
+//        }
+        //根据要求 识别出来是异常 放在异常里
+        // 点位状态 未执行、执行失败、未知 放在待人工确认里面
+        // 正常的挡在正常里面
+        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+                // i
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                }
+            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                ){
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    normalList.add(cbsInspectionResultVo);
+                }
+            }
+        }
+
+        taskVO.setAbnormal(abnormalList.size());
+        taskVO.setNormal(normalList.size());
+        taskVO.setUnReview(unReviewList.size());
+    }
+
+    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
+        delaCount(taskVO,tCruiseDataResultDetailList);
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
@@ -259,17 +333,25 @@ public class ReportManageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String downLoadCruiseReport(String taskId){
+    public Map<String,String> downLoadCruiseReport(String taskId){
 //        String flag = reportManageDao.selectReviewTaskFlag(taskId);
         String flag = uPatrolResultDao.selectReviewTaskFlag(taskId);
         if ("0".equals(flag)) {
-            return "0";
+            throw new BusinessException("该任务未被审核或任务下有巡视点未被审核");
         }
         String reportName = taskId + ".xlsx";
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String fileRelativePath = map.get("content") + "/" + reportName;
-        log.info("该文件相对路径是==="+fileRelativePath);
-        return fileRelativePath;
+        log.info("excel文件相对路径是==="+fileRelativePath);
+
+        String zipName = taskId+".zip";
+        String zipRelativePath = map.get("content") + "/" + zipName;
+        log.info("zip文件相对路径是==="+zipRelativePath);
+
+        Map<String,String> fileMap = new HashMap<>(2);
+        fileMap.put("reportPath",fileRelativePath);
+        fileMap.put("zipPath",zipRelativePath);
+        return fileMap;
     }
 
 }

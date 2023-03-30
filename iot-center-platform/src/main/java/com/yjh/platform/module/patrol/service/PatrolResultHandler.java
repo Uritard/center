@@ -196,8 +196,14 @@ public class PatrolResultHandler {
 
                 infoMap.put("instanceId", instanceId);
 
-                //机器人是有值的处理非同源
-                if ("2".equals(sysLevel) && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()){
+                Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(robotCode);
+                if (countRegion != 0) {
+                    robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
+                }
+                Integer type = uPatrolTaskService.selectRobotType(robotCode);
+                boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
+                //机器人是有值的处理非同源/模拟机器人需要算法处理不走这里的非同源
+                if ("2".equals(sysLevel) && !isSimulationTool && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
@@ -412,13 +418,13 @@ public class PatrolResultHandler {
             String msgId = String.valueOf(UUID.randomUUID());
             if (StringUtils.equals("11", analyseType)) {
                 log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
-                distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap);
+                distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, resultDesc);
             } else if (StringUtils.equals("398", analyseType)) {
                 log.info("taskId is {} instanceId is {}:defect", taskId, instanceId);
-                defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+                defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, resultDesc);
             } else {
                 log.info("taskId is {} instanceId is {}:recognition", taskId, instanceId);
-                recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
+                recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath, resultDesc);
             }
 
             cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
@@ -447,7 +453,7 @@ public class PatrolResultHandler {
      */
     private void recognitionHandler(String analyseResultImg, String resultValue,
                                       Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
-                                      String firDocPath) {
+                                      String firDocPath, String resultDesc) {
         String resultImage;
         try {
             if(StringUtils.contains(analyseResultImg, METER)){
@@ -463,7 +469,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            } else if (AlgorithmExceptionEnum.isIncludeContent(resultValue)){
+            } else if (AlgorithmExceptionEnum.isIncludeContent(resultValue) || StringUtils.equals("异常", resultDesc)){
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
@@ -691,8 +697,19 @@ public class PatrolResultHandler {
                         alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
                     }
                 }
-
-                if (!ArrayUtils.contains(new Integer[] {TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
+                boolean isSimulationTool = false;
+                String edgeCode = cruiseResultMap.get("edgeCode");
+                if (StringUtils.isNotEmpty(edgeCode)){
+                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
+                    String robotCode = edgeCode;
+                    if (countRegion != 0) {
+                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
+                    }
+                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
+                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
+                }
+                //检测工具上报的调用算法的需要走非同源逻辑
+                if (isSimulationTool || !ArrayUtils.contains(new Integer[] {TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
                     RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
                     robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
                     robotPatrolTaskAlarm.setValue(resultStringValue);
@@ -879,8 +896,10 @@ public class PatrolResultHandler {
      * @param resultValueItem  巡视结果值
      * @param cruiseResultMap  redis中巡视点结果信息
      * @param tStdDevicemete   测点信息
+     * @param resultDesc       结果描述
      */
-    private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
+    private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap,
+                               TStdDeviceMete tStdDevicemete, String resultDesc)  {
         String resultImage;
         try {
             resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
@@ -953,9 +972,9 @@ public class PatrolResultHandler {
                     pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + defectNames);
                 }
             }else {
-                cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "--");
-                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                cruiseResultMap.put("cruiseAbnormal", "--");
+                cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "未见异常");
+                cruiseResultMap.put("cruiseResult", StringUtils.equals("异常", resultDesc) ? String.valueOf(CRUISE_RESULT_ABNORMAL): String.valueOf(CRUISE_RESULT_NORMAL));
+                cruiseResultMap.put("cruiseAbnormal", StringUtils.equals("异常", resultDesc) ? String.valueOf(CRUISE_ABNORMAL_DEFECT) : "--");
             }
         }catch (Exception e){
             log.error("缺陷结果处理异常：", e);
@@ -1101,8 +1120,9 @@ public class PatrolResultHandler {
      * @param analyseResultImg 巡视结构图
      * @param resultValue      巡视结果值
      * @param cruiseResultMap  redis中巡视点结果信息
+     * @param resultDesc       结果描述
      */
-    private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap) {
+    private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, String resultDesc) {
         String resultImage;
         try {
             resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
@@ -1111,7 +1131,7 @@ public class PatrolResultHandler {
 
             cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : resultValue);
             cruiseResultMap.put("picpath", resultImage);
-            boolean abnormal = StringUtils.equals("图像有差异", resultValue);
+            boolean abnormal = StringUtils.equals("图像有差异", resultValue) || StringUtils.equals("异常", resultDesc);
             cruiseResultMap.put("cruiseResult", String.valueOf(abnormal ? CRUISE_RESULT_ABNORMAL : CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", abnormal ? String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL) : "--");
 

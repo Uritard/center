@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @Repository
 public interface SendToUpSystemDao {
-    List<Map<String,Object>> selectDeviceModel();
+    List<Map<String,Object>> selectDeviceModel(@Param(value = "edgeCode") String edgeCode);
     List<Map<String,Object>> selectRobotInfo();
     List<Map<String,Object>> selectDroneInfo();
     List<Map<String,Object>> selectVoiceInfo();
@@ -52,4 +52,5 @@ public interface SendToUpSystemDao {
 
     List<String> selectForTaskInstanceId(@Param(value = "devicePointId") String devicePointId);
 
+    String selectIsRobotDevice(@Param(value = "list") List<String> list);
 }

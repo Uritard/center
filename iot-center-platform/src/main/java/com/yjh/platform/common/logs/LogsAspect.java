@@ -2,10 +2,12 @@ package com.yjh.platform.common.logs;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.constant.ModelTypeEnum;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
+import jdk.nashorn.internal.scripts.JO;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -102,6 +104,15 @@ public class LogsAspect {
             }
 
             content.append(contentStr);
+            //处理导出模型文件
+            if ("导出模型文件".equals(title)) {
+                JSONObject parameters = getRequestParams(request,args,paramAnnotations);
+                String modelName = ModelTypeEnum.exportMap().get(parameters.getString("type"));
+                if (StringUtils.isNotBlank(modelName)) {
+                    content.append("-").append(modelName);
+                }
+            }
+
             params.set("userId", userId);
             params.set("userName", userName);
             params.set("requestOrigin", request.getRequestURL());
@@ -111,12 +122,11 @@ public class LogsAspect {
                 try {
                     if (StringUtils.isNotEmpty(annotation.authority())) {
                         String ans = annotation.authority();
-                        assert userRole != null;
-                        if (!ans.contains(userRole)) {
+                        if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
                             //todo 越权访问入日志
                             params.set("logType", "24");
                             params.set("ip", ip);
-                            params.set("title", annotation.title());
+                            params.set("title", "用户越权访问");
                             params.set("state", 3);
                             Map<String, String> jsonMap = new HashMap<>(8);
                             jsonMap.put("type", "alarmPopUp");
@@ -158,7 +168,26 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", content.toString());
-                if (!"修改系统用户数据".equals(title) && !"删除系统用户数据".equals(title)) {
+                boolean flag = true;
+                switch (title){
+                    case "修改系统用户数据":
+                    case "删除系统用户数据":
+                    case "新增任务":
+                    case "删除任务":
+                    case "任务启动":
+                    case "任务暂停":
+                    case "任务恢复":
+                    case "任务终止":
+                    case "新增预案":
+                    case "删除预案":
+                    case "修改预案":
+                    case "审核任务":
+                        flag =false;
+                        break;
+                    default:
+                        break;
+                }
+                if (flag) {
                     post(params);
                 }
                 return result;

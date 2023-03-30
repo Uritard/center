@@ -20,8 +20,9 @@ import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
-import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
+import com.yjh.platform.module.patrol.entity.interlanalysis.*;
+import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.service.TSequentialConfService;
@@ -52,17 +53,17 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.yjh.platform.common.Constant.redisTemplate;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -598,14 +599,24 @@ public class IntelAnalysisService {
         return new Response(code);
     }
 
+    public void picAnalyseRetNotify(PicAnalyseResponse response){
+        log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
+        String flagId = response.getRequestId().split("#")[1];
+        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || flagId.contains( "presetCheck")){
+            picResAnalyse(response);
+        }else {
+            AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
+            ThreadPoolUtil.PATROL_POOL.addThread(analyseThread);
+        }
+    }
+
     /**
      *  巡视主机收到分析结果开始解析
      *
      * @param response 参数
      */
     @Async
-    public void picAnalyseRetNotify(PicAnalyseResponse response){
-        log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
+    public void picResAnalyse(PicAnalyseResponse response){
         String flagId = response.getRequestId().split("#")[1];
         // 静默监视结果
         if (Objects.equals("jm", flagId)){
@@ -630,8 +641,8 @@ public class IntelAnalysisService {
             return;
         }
         // 普通图像分析
-        List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
-        patrolResultHandler.analysePatrolTaskResult(resultList);
+//        List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
+//        patrolResultHandler.analysePatrolTaskResult(resultList);
     }
 
     /**
@@ -639,9 +650,10 @@ public class IntelAnalysisService {
      * @param response 算法返回结果
      * @param taskId 任务id
      */
-    private List<AnalysePatrolTaskResult> sendAnalysePatrolTaskResult(PicAnalyseResponse response, String taskId){
+    public List<AnalysePatrolTaskResult> sendAnalysePatrolTaskResult(PicAnalyseResponse response, String taskId){
         // 遍历多个点的分析结果,不同的巡视点
         List<AnalysePatrolTaskResult> resultList = new ArrayList<>();
+        List<String> falseDataCruiseList = new ArrayList<>();
         try {
             for (AnalyseResult analyseResult : response.getResultsList()) {
                 AnalysePatrolTaskResult taskResult = new AnalysePatrolTaskResult();
@@ -652,7 +664,6 @@ public class IntelAnalysisService {
                 String instanceId = analyseResult.getObjectId();
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
-//                log.info("originPicPath===={}", originPicPath);
 
                 String algorithmType = getAlgorithmTypeMap(instanceId);
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不用判断返回的巡视结果
@@ -660,19 +671,32 @@ public class IntelAnalysisService {
                 boolean flag = StringUtils.equals("398", algorithmType)
                         && !generateMapFormat().isEmpty()
                         && generateMapFormat().containsKey(devicePointId);
-                if (Boolean.TRUE.equals(flag)){
-                    resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
+                if (Boolean.TRUE.equals(flag) && falseDataCruiseList.isEmpty()){
+                    falseDataCruiseList.add(instanceId);
+                    // json格式："123":"避雷器--正常"
+                    String jsonValue= String.valueOf(generateMapFormat().get(devicePointId));
+                    resultValue.add(jsonValue.split("--")[0]);
                     taskResult.setResultValue(String.valueOf(resultValue));
                     taskResult.setTaskId(taskId);
                     taskResult.setInstanceId(instanceId);
-                    taskResult.setResultDesc("");
+                    taskResult.setResultDesc(jsonValue.split("--")[1]);
                     taskResult.setAnalyseType(algorithmType);
                     taskResult.setConf("0.0");
-                    // 去画框
-                    pictureWaterMark(originPicPath, "27OfPoints");
                     taskResult.setAnalyseResultImg(originPicPath);
+                    // 拿图并复制
+                    String falseDataPicPath = (String) redisTemplate.opsForHash().get("t_sys_param:falseDataPicPath", "content");
+                    String resultImagePath = (String) redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content");
+                    File folder = new File(falseDataPicPath);
+                    File[] listFiles = folder.listFiles();
+                    for (File direFile : listFiles) {
+                        if (direFile.getName().contains(devicePointId)) {
+                            direFile.getAbsolutePath();
+                            FileUtil.copyFileUsingStream(direFile.getAbsolutePath(), resultImagePath + direFile.getName());
+                            taskResult.setAnalyseResultImg(resultImagePath + direFile.getName());
+                        }
+                    }
                     resultList.add(taskResult);
-                    continue;
+                    break;
                 }
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
@@ -680,6 +704,7 @@ public class IntelAnalysisService {
                 taskResult.setTaskId(taskId);
                 taskResult.setInstanceId(instanceId);
                 taskResult.setAnalyseType(algorithmType);
+                taskResult.setRectangle(getRectangleByAnalyseResult(results.get(0)));
                 for (AnalyseResultItem result : results) {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
@@ -688,16 +713,14 @@ public class IntelAnalysisService {
                             boolean includeDesc = AlgorithmExceptionEnum.isIncludeDesc(result.getDesc());
                             taskResult.setResultValue(includeDesc ?
                                     AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc());
-                            taskResult.setResultDesc(result.getDesc());
+                            taskResult.setResultDesc("异常");
                             taskResult.setAnalyseResultImg(originPicPath);
                         }else {
                             Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
 
                             if (StringUtils.isBlank(map.get("resultValue"))) {
-//                                log.info("没有识别出来任何缺陷");
                                 taskResult.setAnalyseResultImg(originPicPath);
                             }else {
-//                                log.info("识别出来了缺陷");
                                 List<String> resultImgList = new ArrayList<>();
                                 Collections.addAll(resultImgList, StringUtils.split(map.get("resultImg"), " "));
                                 resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
@@ -717,6 +740,27 @@ public class IntelAnalysisService {
         }
         log.info("resultList=={}", resultList);
         return resultList;
+    }
+
+    /**
+     * 将算法返回的坐标信息填写到rectangle中
+     *
+     * @param result AnalyseResultItem
+     * @return result
+     */
+    private String getRectangleByAnalyseResult(AnalyseResultItem result) {
+        if (CollectionUtils.isEmpty(result.getPos())) {
+            return null;
+        }
+
+        List<Point> areas = result.getPos().get(0).getAreas();
+        if (CollectionUtils.isEmpty(areas) || areas.size() != 2) {
+            return null;
+        }
+        Point p1 = areas.get(0);
+        Point p2 = areas.get(1);
+
+        return String.format("%.1f,%.1f;%.1f,%.1f;%.1f,%.1f;%.1f,%.1f", p1.getX(), p1.getY(), p2.getX(), p1.getY(), p1.getX(), p2.getY(), p2.getX(), p2.getY());
     }
 
     /**
@@ -1549,10 +1593,10 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
                 String targetNamePath = imgPath.replace(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
-
-                log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 String edgeId = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-                uploadFileToUpFtps(imgPath, edgeId + "/jm/" + targetNamePath, upFtpsConfig);
+                targetNamePath = edgeId + "/jm/" + targetNamePath;
+                log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
+                uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
                 xmlItem.put("time", warnTime);

@@ -120,6 +120,8 @@
         left join t_dict_business k on a.cruise_type = k.dict_code
         LEFT JOIN t_dict_business m ON b.custom_id = m.dict_code
         LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
+        where 1=1
+        <if test="edgeCode != null and edgeCode != ''"> and a.edge_code = #{edgeCode}</if>
     </select>
 
     <select id="selectRobotInfo" resultType="java.util.LinkedHashMap">
@@ -499,5 +501,19 @@
                 LEFT JOIN t_std_devicemete b on b.device_mete_id = a.device_mete_id
         WHERE
             FIND_IN_SET(b.device_point_id,#{devicePointId, jdbcType = VARCHAR})
+    </select>
+    <select id="selectIsRobotDevice" resultType="java.lang.String">
+        SELECT
+        GROUP_CONCAT( DISTINCT c.robot_code) AS robot
+        FROM
+        `t_cruise_point_instance` a
+        RIGHT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+        RIGHT JOIN t_robot_info c ON c.robot_id = b.robot_id
+        WHERE
+        1 = 1
+        AND a.instance_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
+            #{instanceId, jdbcType=VARCHAR}
+        </foreach>
     </select>
 </mapper>

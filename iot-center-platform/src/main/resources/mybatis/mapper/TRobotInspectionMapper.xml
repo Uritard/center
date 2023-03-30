@@ -472,7 +472,6 @@
         FROM
             t_cruise_point_instance a left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
         WHERE b.device_point_id = #{devicePointId, jdbcType=VARCHAR} limit 1;
-
     </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">
