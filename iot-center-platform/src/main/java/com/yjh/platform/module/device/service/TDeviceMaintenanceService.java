@@ -96,23 +96,23 @@ public class TDeviceMaintenanceService{
             String deviceListString = "";
             switch (tDeviceMaintenance.getDeviceLevel()) {
                 case "1":
-                    List<String> robotRegionList = tDeviceMaintenanceDao.selectRobotRegionIdList(instanceList);
+                    List<String> robotRegionList = tDeviceMaintenanceDao.selectRobotRegionIdList(instanceList, robot);
                     if (CollectionUtils.isNotEmpty(robotRegionList)) {
                         deviceListString = StringUtils.join(robotRegionList.toArray(), ",");
                     }
                     break;
                 case "2":
-                    List<String> robotMainDeviceList = tDeviceMaintenanceDao.selectRobotMainDeviceIdList(instanceList);
+                    List<String> robotMainDeviceList = tDeviceMaintenanceDao.selectRobotMainDeviceIdList(instanceList, robot);
                     if (CollectionUtils.isNotEmpty(robotMainDeviceList)) {
                         deviceListString = StringUtils.join(robotMainDeviceList.toArray(), ",");
                     }
                     break;
                 case "3":
-                    List<String> robotInstanceIdList = tDeviceMaintenanceDao.selectRobotInstanceIdList(instanceList);
+                    List<String> robotInstanceIdList = tDeviceMaintenanceDao.selectRobotInstanceIdList(instanceList, robot);
                     deviceListString = StringUtils.join(robotInstanceIdList.toArray(), ",");
                     break;
                 case "4":
-                    List<String> robotComponentIdList = tDeviceMaintenanceDao.selectRobotComponentIdList(instanceList);
+                    List<String> robotComponentIdList = tDeviceMaintenanceDao.selectRobotComponentIdList(instanceList, robot);
                     deviceListString = StringUtils.join(robotComponentIdList.toArray(), ",");
                     break;
                 default:
@@ -128,20 +128,20 @@ public class TDeviceMaintenanceService{
             String deviceListString = "";
             switch (tDeviceMaintenance.getDeviceLevel()) {
                 case "1":
-                    List<String> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList);
+                    List<String> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList, edge);
                     if (CollectionUtils.isNotEmpty(regionList)) {
                         deviceListString = StringUtils.join(regionList.toArray(), ",");
                     }
                     break;
                 case "2":
-                    List<String> mainDeviceList = tDeviceMaintenanceDao.selectMainDeviceIdList(deviceList);
+                    List<String> mainDeviceList = tDeviceMaintenanceDao.selectMainDeviceIdList(deviceList, edge);
                     if (CollectionUtils.isNotEmpty(mainDeviceList)) {
                         deviceListString = StringUtils.join(mainDeviceList.toArray(), ",");
                     }
                     break;
                 case "3":
                 case "4":
-                    List<String> instanceIdList = tDeviceMaintenanceDao.selectInstanceIdList(instanceList);
+                    List<String> instanceIdList = tDeviceMaintenanceDao.selectInstanceIdList(instanceList, edge);
                     if (CollectionUtils.isNotEmpty(instanceIdList)) {
                         deviceListString = StringUtils.join(instanceIdList.toArray(), ",");
                     }
