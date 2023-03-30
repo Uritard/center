@@ -918,7 +918,7 @@ public class PatrolResultHandler {
                     log.info("Only one defect is generated！！！");
                     // 缺陷信息存redis
                     String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                    Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
+                    Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, StringUtils.trim(resultValue));
                     cruiseResultMap.put("isWarn", "1");
                     log.info("defectMap=={}", JSON.toJSONString(defectMap));
                     redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
@@ -1095,8 +1095,9 @@ public class PatrolResultHandler {
         log.info("resultImage:{},resultValue:{}", resultImage, resultValue);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
-            defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
-            defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
+            String defectType = analyseDataOperateService.selectDictCode("defect_model", resultValue);
+            defectMap.put("defectType", defectType);
+            defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectType));
             defectMap.put("defectContent", resultValue);
             defectMap.put("deviceId", cruiseResultMap.get("deviceId"));
             defectMap.put("instanceId", cruiseResultMap.get("instanceId"));

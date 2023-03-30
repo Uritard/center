@@ -226,7 +226,7 @@ INSERT INTO `t_algorithm_info` VALUES ('1000054', '套管胶合部油污', 'sly_
 INSERT INTO `t_algorithm_info` VALUES ('1000055', '汇控柜凝露', 'hkgnl', '', '', '398', '0', '686', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000056', '膨胀器冲顶', 'pzqcd', '', '', '398', '0', '687', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
-
+INSERT INTO `t_algorithm_info` VALUES ('1000057', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------
@@ -593,6 +593,7 @@ INSERT INTO `t_dict_business` VALUES ('300496', '685', 'defect_model', '套管�
 INSERT INTO `t_dict_business` VALUES ('300497', '686', 'defect_model', '汇控柜凝露', '0', '缺陷类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300498', '687', 'defect_model', '膨胀器冲顶', '0', '缺陷类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300499', '688', 'defect_model', '电容器鼓肚', '0', '缺陷类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ( '689', 'defect_model', '地面沉降', '0', '缺陷类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300500', '13', 'analyse_type', '声音', '0', '算法类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300501', '689', 'alarm_source', '静默监视', '0', '告警来源', '1');
 INSERT INTO `t_dict_business` VALUES ('300600', '700', 'custom_type', '本体', '0', '设备部位', '1');
