@@ -265,6 +265,7 @@
         LEFT JOIN t_std_device b ON b.up_region_id = a.region_id
         WHERE
         1 = 1
+        and b.edge_code = #{edge, jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
@@ -278,8 +279,10 @@
         t_robot_region a
         LEFT JOIN t_robot_inspection b ON a.region_id = b.main_device_id
         LEFT JOIN t_cruise_point_instance c ON b.inspection_id = c.cruise_id
+        LEFT JOIN t_robot_info d ON b.robot_id = d.robot_id
         WHERE
         1 = 1
+        and d.robot_code = #{robot,jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and c.instance_id IN
             <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
                 #{instanceIds,jdbcType=BIGINT}
@@ -310,6 +313,7 @@
         t_std_device a
         WHERE
         1 = 1
+        AND a.edge_code = #{edge,jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and a.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
@@ -320,9 +324,11 @@
         SELECT DISTINCT
         a.main_device_id
         FROM t_robot_inspection a
+        LEFT JOIN t_robot_info d ON a.robot_id = d.robot_id
         LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
         WHERE
         1 = 1
+        and d.robot_code = #{robot,jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and c.instance_id IN
             <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
                 #{instanceIds,jdbcType=BIGINT}
@@ -346,9 +352,11 @@
         SELECT DISTINCT
         a.inspection_code
         FROM t_robot_inspection a
+        LEFT JOIN t_robot_info d ON a.robot_id = d.robot_id
         LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
         WHERE
         1 = 1
+        and d.robot_code = #{robot,jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and c.instance_id IN
             <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
                 #{instanceIds,jdbcType=BIGINT}
@@ -359,9 +367,11 @@
         SELECT DISTINCT
         a.component_id
         FROM t_robot_inspection a
+        LEFT JOIN t_robot_info d ON a.robot_id = d.robot_id
         LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
         WHERE
         1 = 1
+        AND d.robot_code = #{robot,jdbcType=VARCHAR}
         <if test="list != null and list.size() > 0">and c.instance_id IN
             <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
                 #{instanceIds,jdbcType=BIGINT}
