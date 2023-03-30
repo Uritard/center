@@ -151,7 +151,9 @@ public class TCruiseNonhomologousPointInstanceService {
         for(Map<String,Object> m : warnDetailInfo){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
-                redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
+                if (tCruiseNonhomologousWarnDO.getWarnType() == 6){
+                    redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
+                }
                 m.putAll(redisInfoMap);
             }
         }
@@ -180,6 +182,7 @@ public class TCruiseNonhomologousPointInstanceService {
                 re="1";
                 break;
             default:
+                re = resultNum;
                 break;
         }
         return re;
