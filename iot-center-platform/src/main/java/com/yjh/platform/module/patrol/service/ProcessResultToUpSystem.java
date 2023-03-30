@@ -107,15 +107,15 @@ public class ProcessResultToUpSystem {
                         if (s.contains("频次")) {
                             value = getNumeric(s);
                             valueType = "11";
-                            unit = s.endsWith("dB") ? "dB" : "";
+                            unit = StringUtils.substringAfter(s, value);
                         } else if (s.contains("峰值")) {
                             value = getNumeric(s);
                             valueType = "12";
-                            unit = s.endsWith("dB") ? "dB" : "";
+                            unit = StringUtils.substringAfter(s, value);
                         } else {
                             value = getNumeric(s);
                             valueType = "13";
-                            unit = s.endsWith("dB") ? "dB" : "";
+                            unit = StringUtils.substringAfter(s, value);
                         }
                         cruiseResultNewMap.put("resultNum", value);
                         cruiseResultNewMap.put("valueType", valueType);
@@ -144,7 +144,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
                 xmlItem.put("device_id", Constant.standardPoints() ? devicePointId : instanceId);
-                xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
+                xmlItem.put("time", CommonUtils.isEmptyOrNullstr(cruiseResultMap.get("cruiseTime")) ? DateTimeUtil.getDateTimeString() : cruiseResultMap.get("cruiseTime"));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
@@ -770,7 +770,7 @@ public class ProcessResultToUpSystem {
         String str2 = "";
         if(str != null && !"".equals(str)){
             for(int i = 0; i < str.length(); i++){
-                if(str.charAt(i) >= 48 && str.charAt(i) <= 57){
+                if((str.charAt(i) >= 48 && str.charAt(i) <= 57) || str.charAt(i) == '.'){
                     str2 += str.charAt(i);
                 }
             }
