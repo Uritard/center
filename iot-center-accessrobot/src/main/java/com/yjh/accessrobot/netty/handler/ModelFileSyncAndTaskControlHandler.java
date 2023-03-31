@@ -83,7 +83,6 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     if (StringUtils.isNotEmpty(errorCode)) {
                         log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskPatrolledId);
                         // 联动的返回结果直接向上反
-                        robotService.upToCruise(xmlBaseModel);
                         String success = "0";
                         //<0>: =成功
                         //<1>: =巡视设备异常
@@ -94,6 +93,7 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         AtomicReference<String> taskCode = new AtomicReference<>("");
                         Date date = null;
                         if (StringUtils.isNotEmpty(taskPatrolledId) ) {
+                            robotService.upToCruise(xmlBaseModel);
                             taskCode.set(StringUtils.substringBetween(taskPatrolledId, "_"));
                             String[] patrolledIds = taskPatrolledId.split("_");
                             String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
