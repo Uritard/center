@@ -214,7 +214,7 @@ public class DeviceStaticsToUpSystem {
                         break;
                     }
                     deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
-                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : parseDate(deviceStaticsInfo.get("duration").toString(), MINUTE));
+                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : deviceStaticsInfo.get("duration").toString());
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "分");
                     dealFuncInfo(device, reportDate, type, infoMap);

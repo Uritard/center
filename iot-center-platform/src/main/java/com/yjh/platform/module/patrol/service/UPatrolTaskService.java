@@ -413,7 +413,10 @@ public class UPatrolTaskService {
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         log.info("instanceList {}", instanceList);
-        Constant.modelUpload("7");
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        if (!"2".equals(edgeLevel)) {
+            Constant.modelUpload("7");
+        }
         return instanceList;
     }
 
@@ -508,7 +511,10 @@ public class UPatrolTaskService {
             redisTemplate.opsForHash().putAll(str, map);
         }
         initializeThisTaskInfo(task, instanceList, nodeSet);
-        sendTaskStateToUp(task, 5);
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        if (!"2".equals(edgeLevel)) {
+            sendTaskStateToUp(task, 5);
+        }
         return detailList;
     }
 
@@ -628,11 +634,11 @@ public class UPatrolTaskService {
 
             updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
 
-            if (robotEnd) {
-                String taskIdFinal = taskId;
-                // 机器人/下级系统任务终止
-                ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId));
-            }
+//            if (robotEnd) {
+//                String taskIdFinal = taskId;
+//                // 机器人/下级系统任务终止
+//                ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId));
+//            }
 
             if (robotId != null){
                 //放入redis

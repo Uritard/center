@@ -94,6 +94,7 @@ public class Constant {
     //任务状态控制
     public static final String TASK_STATE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemCtrl";
 
+    public static  final Map<String, Long> getParamMap = new ConcurrentHashMap<>();
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     public static  XMLBaseModel weatherXmlModel = null;

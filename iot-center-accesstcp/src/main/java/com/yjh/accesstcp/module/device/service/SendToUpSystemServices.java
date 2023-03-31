@@ -452,7 +452,13 @@ public class SendToUpSystemServices {
 
     @Transactional(rollbackFor = Exception.class)
     public int sendXML(XMLBaseModel xmlBaseModel) {
-        return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), true);
+        long sessionId =0L;
+        boolean isSend = true;
+        if (CollectionUtils.isNotEmpty(xmlBaseModel.getItems()) && xmlBaseModel.getItems().get(0).containsKey("error_code")){
+            sessionId = Constant.getParamMap.get("sendSessionId");
+            isSend = false;
+        }
+        return this.sendResponse(sessionId, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), isSend);
     }
 
     @Transactional(rollbackFor = Exception.class)

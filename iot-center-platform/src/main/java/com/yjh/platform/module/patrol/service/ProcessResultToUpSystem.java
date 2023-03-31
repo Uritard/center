@@ -183,6 +183,9 @@ public class ProcessResultToUpSystem {
             if (StringUtils.equals("1", sysLevel)) {
                 xmlBaseModel.setCommand("1");
             }
+            if (StringUtils.isBlank(xmlBaseModel.getType())){
+                return null;
+            }
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
