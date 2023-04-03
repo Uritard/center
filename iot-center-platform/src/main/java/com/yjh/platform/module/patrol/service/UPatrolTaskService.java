@@ -270,7 +270,7 @@ public class UPatrolTaskService {
                     }
                     // 时: 秒 分 */时 * * ？
                     else {
-                        cronExpressionDate = String.format("%s %s */%s * * ?", second, min, intervalNumber);
+                        cronExpressionDate = String.format("%s %s %s/%s * * ?", second, min, hour,intervalNumber);
                     }
                 }
                 log.info("cronExpressionDate==================: {}", cronExpressionDate);
