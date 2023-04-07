@@ -68,6 +68,10 @@ public class TStdRegionService{
                 throw new BusinessException(209,"编码与其他厂站区域重复");
             }
         }
+        TStdRegion oldStdRegion = tStdRegionDao.selectByPrimaryId(tStdRegion.getRegionId());
+        if (!oldStdRegion.getRegionCode().equals(tStdRegion.getRegionCode()) && StringUtils.isNotEmpty(oldStdRegion.getEdgeStatus())) {
+            tStdRegion.setEdgeStatus("离线");
+        }
         return this.tStdRegionDao.update(tStdRegion);
     }
 

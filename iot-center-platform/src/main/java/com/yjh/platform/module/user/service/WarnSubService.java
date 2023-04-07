@@ -32,9 +32,7 @@ public class WarnSubService {
                 return true;
             } else if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
                 List<String> subWarnLevelList = Arrays.asList(warnSub.getSubWarnLevel().split(","));
-                if (subWarnLevelList.contains(level)) {
-                    return true;
-                }
+                return subWarnLevelList.contains(level);
             }
         }
         return false;

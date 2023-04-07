@@ -40,7 +40,7 @@
 
     <select id="selectAlarmNote" resultType="java.lang.String">
         select
-               mete.alarm_level_string
+            IF (mete.alarm_level_string = '', mete.alarm_level, mete.alarm_level_string) AS alarm_level_string
         from  t_warn_info info
         left join t_std_devicemete mete on info.std_mete_id = mete.device_mete_id
         where info.warn_id = #{warnId}
