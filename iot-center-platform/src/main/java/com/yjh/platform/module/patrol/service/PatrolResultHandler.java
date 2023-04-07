@@ -418,7 +418,7 @@ public class PatrolResultHandler {
             String msgId = String.valueOf(UUID.randomUUID());
             if (StringUtils.equals("11", analyseType)) {
                 log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
-                distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, resultDesc);
+                distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath, resultDesc);
             } else if (StringUtils.equals("398", analyseType)) {
                 log.info("taskId is {} instanceId is {}:defect", taskId, instanceId);
                 defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, resultDesc);
@@ -1123,7 +1123,8 @@ public class PatrolResultHandler {
      * @param cruiseResultMap  redis中巡视点结果信息
      * @param resultDesc       结果描述
      */
-    private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, String resultDesc) {
+    private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
+                                    String firDocPath, String resultDesc) {
         String resultImage;
         try {
             resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
@@ -1141,6 +1142,7 @@ public class PatrolResultHandler {
                 String msgName = "msg:" + msgID + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                 redisTemplate.opsForHash().put(msgName, "value", resultValue);
             }
+            normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
         }catch (Exception e){
             log.error("判别结果处理异常：", e);
         }
