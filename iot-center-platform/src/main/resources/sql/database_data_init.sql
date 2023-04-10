@@ -1335,7 +1335,7 @@ INSERT INTO `t_sys_param` VALUES ('100131', '404', 'isInfraredAnalysis', '红外
 INSERT INTO `t_sys_param` VALUES ('100132', '404', 'standardPoints', '是否使用标准点位ID', 'true', '标准点位ID，巡视主机和边缘节点使用统一的点位ID，不使用自增ID，此情况一个测点只可以绑定一个巡视设备，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100133', '404', 'fastTurbo', '是否启用极速模式', 'false', '极速模式，减少日志和不必要消息上报，开启后会影响问题定位，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100134', '404', 'selectEdge', '要查询的edgeCode', 'Edge01', '要查询的edgeCode', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
-
+INSERT INTO `t_sys_param` VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false', '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

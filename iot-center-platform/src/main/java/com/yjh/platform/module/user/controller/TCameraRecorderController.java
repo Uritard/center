@@ -66,7 +66,9 @@ public class TCameraRecorderController {
             } else {
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
                 sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
-                Constant.modelUpload("1002");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1002");
+                }
             }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -88,7 +90,9 @@ public class TCameraRecorderController {
                 result.setCode(209,"此录像服务器下存在摄像机");
             }else {
                 result.setData(re);
-                Constant.modelUpload("1002");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1002");
+                }
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -111,7 +115,9 @@ public class TCameraRecorderController {
                 result.setCode(209,"录像服务器下存在摄像机");
             }else {
                 result.setData(re);
-                Constant.modelUpload("1002");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1002");
+                }
             }
             //result.setData(tCameraRecorderService.deleteSelectedRecord(recordIds));
         } catch (BusinessException e) {
@@ -138,7 +144,9 @@ public class TCameraRecorderController {
                 log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
                 sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
-                Constant.modelUpload("1002");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1002");
+                }
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

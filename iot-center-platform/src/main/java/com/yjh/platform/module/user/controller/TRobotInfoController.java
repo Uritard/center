@@ -110,9 +110,10 @@ public class TRobotInfoController {
             }
             result.setData(tRobotInfoService.insert(tRobotInfo,userId));
             //有变动 同步模型
-//            String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload(modelType);
+            if (Constant.updateSyncModel()) {
+                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -134,8 +135,9 @@ public class TRobotInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-//                Constant.modelUpload("1001");
-//                Constant.modelUpload(String.valueOf(re));
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload(String.valueOf(re));
+                }
             }
             //result.setData(tRobotInfoService.deleteByPrimaryId(robotId));
         } catch (BusinessException e) {
@@ -186,10 +188,10 @@ public class TRobotInfoController {
 
             result.setData(tRobotInfoService.update(tRobotInfo,userId));
             //有变动 同步模型
-//            String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload(modelType);
-
+            if (Constant.updateSyncModel()) {
+                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新机器人异常:", e);
@@ -364,8 +366,9 @@ public class TRobotInfoController {
             }
             result.setData(re);
             //有变动 同步模型
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload("3");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("3");
+            }
             //result.setData(tRobotInfoService.batchDelete(robotIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
