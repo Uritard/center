@@ -107,4 +107,8 @@ public class TCruiseDataResultDetail implements Serializable {
      * 状态:0-已执行 1-未执行 2-执行失败 3-未知
      */
     private Integer cruiseAbnormal;
+
+    private Integer mergeCount;
+
+    private String meteName;
 }

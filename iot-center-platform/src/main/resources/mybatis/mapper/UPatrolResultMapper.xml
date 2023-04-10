@@ -1273,6 +1273,7 @@
         f.cruise_type,
         f.origpic as ori_img,
         n.dict_note as dataType,
+        b.mete_name,
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
@@ -1292,7 +1293,7 @@
         LEFT JOIN t_dict_business n on n.dict_code = f.cruise_type and n.col_name = 'cruise_type'
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        ORDER by cruise_time
+        ORDER by f.device_name,b.mete_name,cruise_time
     </select>
 
     <select id="selectMeteNumByTask" resultType="java.lang.Integer">
