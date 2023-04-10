@@ -55,7 +55,9 @@ public class TStdRegionController {
         try {
             tStdRegion.setState(Constant.STATE_LOCAL);
             result.setData(tStdRegionService.insert(tStdRegion));
-            Constant.modelUpload("1001");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("1001");
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -76,7 +78,9 @@ public class TStdRegionController {
                 result.setCode(209,"此区域下存在子区域或者设备");
             }else {
                 result.setData(re);
-                Constant.modelUpload("1001");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1001");
+                }
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -95,7 +99,9 @@ public class TStdRegionController {
         Result result = new Result();
         try {
             result.setData(tStdRegionService.update(tStdRegion));
-            Constant.modelUpload("1001");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("1001");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新区域异常:", e);

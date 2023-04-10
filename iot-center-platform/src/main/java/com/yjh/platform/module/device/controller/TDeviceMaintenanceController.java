@@ -54,7 +54,9 @@ public class TDeviceMaintenanceController {
         try {
             result.setData(tDeviceMaintenanceService.add(tDeviceMaintenance));
             //有变动 同步模型
-            Constant.modelUpload("8");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("8");
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -72,7 +74,9 @@ public class TDeviceMaintenanceController {
         try {
             result.setData(tDeviceMaintenanceService.deleteByPrimaryId(maintenanceId));
             //有变动 同步模型
-            Constant.modelUpload("8");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("8");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             // log.error("删除异常:", e);
@@ -91,7 +95,9 @@ public class TDeviceMaintenanceController {
         try {
             result.setData(tDeviceMaintenanceService.update(tDeviceMaintenance));
             //有变动 同步模型
-            Constant.modelUpload("8");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("8");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             // log.error("更新异常:", e);
@@ -167,8 +173,10 @@ public class TDeviceMaintenanceController {
         Result result = new Result();
         try {
             result.setData(tDeviceMaintenanceService.batchAdd(list));
-            //有变动 同步模型
-            Constant.modelUpload("8");
+            if (Constant.updateSyncModel()) {
+                //有变动 同步模型
+                Constant.modelUpload("8");
+            }
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量插入失败：" + e);
@@ -183,8 +191,10 @@ public class TDeviceMaintenanceController {
     Result result = new Result();
     try {
         result.setData(tDeviceMaintenanceService.batchDelete(maintenanceIds));
-        //有变动 同步模型
-        Constant.modelUpload("8");
+        if (Constant.updateSyncModel()) {
+            //有变动 同步模型
+            Constant.modelUpload("8");
+        }
     } catch (BusinessException e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         log.error("批量删除失败：" + e);

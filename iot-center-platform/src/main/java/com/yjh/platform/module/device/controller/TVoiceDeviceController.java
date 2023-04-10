@@ -62,8 +62,9 @@ public class TVoiceDeviceController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-//                Constant.modelUpload("1001");
-//                Constant.modelUpload("6");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("6");
+                }
             }
 
         } catch (BusinessException b) {
@@ -83,8 +84,9 @@ public class TVoiceDeviceController {
         try {
             result.setData(tVoiceDeviceService.deleteByPrimaryId(voiceDeviceId));
             //有变动 同步模型
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload("6");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("6");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -107,8 +109,9 @@ public class TVoiceDeviceController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-//                Constant.modelUpload("1001");
-//                Constant.modelUpload("6");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("6");
+                }
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -194,8 +197,9 @@ public class TVoiceDeviceController {
         try {
             result.setData(tVoiceDeviceService.batchAdd(list));
             //有变动 同步模型
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload("6");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("6");
+            }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量插入失败：" + e);
@@ -211,8 +215,9 @@ public class TVoiceDeviceController {
         try {
             result.setData(tVoiceDeviceService.batchDelete(voiceDeviceIds));
             //有变动 同步模型
-//            Constant.modelUpload("1001");
-//            Constant.modelUpload("6");
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("6");
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量删除失败：" + e);

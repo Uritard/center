@@ -166,6 +166,10 @@ public class Constant {
     private static Boolean fastTurbo;
 
     private static Boolean standardPoints;
+    /**
+     * 是否开启修改同步模型
+     */
+    private static Boolean updateSyncModel;
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
@@ -215,6 +219,18 @@ public class Constant {
             }
         }
         return hasEncoding;
+    }
+
+    public static boolean updateSyncModel() {
+        if (updateSyncModel == null) {
+            try {
+                updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
+                log.warn("updateSyncModel is {}", updateSyncModel);
+            } catch (Exception e) {
+                updateSyncModel = false;
+            }
+        }
+        return updateSyncModel;
     }
 
     /**

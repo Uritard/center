@@ -223,13 +223,9 @@ public class TCruisePointInstanceController {
             } else {
                 result.setData(i);
                 //巡视点有变动 同步模型
-//                Constant.modelUpload("1001");
-//                Constant.modelUpload("1002");
-//                Constant.modelUpload("4");
-//                Constant.modelUpload("3");
-//                Constant.modelUpload("5");
-//                Constant.modelUpload("6");
-//                Constant.modelUpload("1");
+                if (Constant.updateSyncModel()) {
+                    Constant.modelUpload("1");
+                }
             }
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
