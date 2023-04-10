@@ -1026,9 +1026,14 @@ DROP TABLE IF EXISTS `t_cruise_nonhomologous_warn`;
 CREATE TABLE `t_cruise_nonhomologous_warn` (
   `warn_id` varchar(64) NOT NULL COMMENT '告警ID',
   `instance_id` bigint(64) DEFAULT NULL COMMENT '非同源告警规则ID',
+  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
   `warn_type` int(11) DEFAULT '1' COMMENT '非同源类型 1：红外 2：位置 3：数显表计 4：指针表计 5：三相 6：区间 7：5次',
   `warn_content` varchar(256) DEFAULT NULL COMMENT '告警内容',
   `warn_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '告警时间',
+  `warn_level` int(11) DEFAULT '1' COMMENT '告警等级：1-预警，2-一般告警，3-严重告警，4-危急告警，',
+  `one_cruise_device_name` varchar(50) DEFAULT '' COMMENT '巡视点1巡视设备',
+  `two_cruise_device_name` varchar(50) DEFAULT '' COMMENT '巡视点2巡视设备',
+  `three_cruise_device_name` varchar(50) DEFAULT '' COMMENT '巡视点3巡视设备名称',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='非同源告警表';
 

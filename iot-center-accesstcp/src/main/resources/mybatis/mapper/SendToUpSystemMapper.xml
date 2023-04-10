@@ -97,6 +97,7 @@
         ""               as video_pos,
         a.cruise_type,
         c.inspection_id AS inspection_id,
+        c.inspection_code AS inspection_code,
         d.preset_id AS preset_id,
         d.preset_num,
         d.preset_type,

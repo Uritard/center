@@ -232,13 +232,12 @@
         e.device_type,
         k.dict_note as device_type_name,
         a.warn_type,
-        n.warn_level,
-        n.one_cruise_device_name,
-        n.two_cruise_device_name,
+        a.warn_level,
+        a.one_cruise_device_name,
+        a.two_cruise_device_name,
         null as threeCruiseDeviceName
         from t_cruise_nonhomologous_warn a
-        left join t_cruise_nonhomologous_point_instance n on n.instance_id =a.instance_id
-        left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
+        left join t_std_devicemete d on d.device_mete_id = a.device_mete_id
         left join t_std_device e on e.device_id = d.device_id
         left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1 and a.warn_type != 5
@@ -271,13 +270,13 @@
         k.dict_note as device_type_name,
         a.warn_type,
         n.warn_level,
-        n.one_cruise_device_name,
-        n.two_cruise_device_name,
-        n.tri_cruise_device_name as threeCruiseDeviceName
+        a.warn_level,
+        a.one_cruise_device_name,
+        a.two_cruise_device_name,
+        a.three_cruise_device_name as threeCruiseDeviceName
         FROM
         t_cruise_nonhomologous_warn a
-        LEFT JOIN t_cruise_triphase_rule n ON n.triphase_id = a.instance_id
-        LEFT JOIN t_std_devicemete d ON d.device_mete_id = n.device_mete_id
+        LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
         LEFT JOIN t_std_device e ON e.device_id = d.device_id
         LEFT JOIN t_dict_business k ON k.dict_code = e.device_type
         where 1 = 1 and a.warn_type = 5
