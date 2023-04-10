@@ -345,6 +345,7 @@ public class TStdDeviceModelService {
         String keyCode = "01".equals(device.get("data_type")) ? "robot_code" : "uav_code";
         tRobotInspection.setEdgeCode(edgeCode);
         tRobotInspection.setOriginId(String.valueOf(cruiseId));
+        tRobotInspection.setInspectionCode(String.valueOf(device.getOrDefault("inspection_code", "")));
         TRobotInfo tRobotInfo = tRobotInfoList.stream().filter(t ->
                 String.valueOf(robotArray.getJSONObject(0).get(keyCode)).equals(String.valueOf(t.getRobotNum())))
                 .collect(Collectors.toList()).get(0);

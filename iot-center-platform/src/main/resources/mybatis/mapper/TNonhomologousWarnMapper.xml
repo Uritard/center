@@ -4,18 +4,26 @@
 
     <insert id="insertNonhomologousWarnInfo"  parameterType="java.util.Map">
         insert into t_cruise_nonhomologous_warn(
-        warn_id,
-        instance_id,
-        warn_content,
-        warn_time,
-        warn_type
+            warn_id,
+            instance_id,
+            device_mete_id,
+            warn_content,
+            warn_time,
+            warn_type,
+            one_cruise_device_name,
+            two_cruise_device_name,
+            three_cruise_device_name
         )values(
-        #{warnId, jdbcType=VARCHAR},
-        #{instanceId, jdbcType=VARCHAR},
-        #{warnContent, jdbcType=VARCHAR},
-        sysdate(),
-        #{warnType, jdbcType=INTEGER}
-        )
+                   #{warnId, jdbcType=VARCHAR},
+                   #{instanceId, jdbcType=VARCHAR},
+                   #{deviceMeteId, jdbcType=BIGINT},
+                   #{warnContent, jdbcType=VARCHAR},
+                   sysdate(),
+                   #{warnType, jdbcType=INTEGER},
+                   #{oneCruiseDeviceName, jdbcType=VARCHAR},
+                   #{twoCruiseDeviceName, jdbcType=VARCHAR},
+                   #{threeCruiseDeviceName, jdbcType=VARCHAR}
+               )
     </insert>
 
     <insert id="insertWarnInspections"  parameterType="java.util.List">
@@ -86,12 +94,18 @@
         limit 1
     </select>
 
-    <select id="getInstanceIdByDeviceId" resultType="java.lang.Long">
-        select a.instance_id
-        from t_cruise_point_instance a
-        left join u_patrol_task_attr c ON c.instance_id = a.instance_id
-        where a.origin_id = #{deviceId, jdbcType=VARCHAR}
-        and c.task_id = #{taskId, jdbcType=VARCHAR}
+    <select id="getInstanceIdByDeviceId" resultType="java.util.Map">
+        SELECT DISTINCT
+            a.instance_id AS inspectionId,
+            b.inspection_name AS inspectionName,
+            a.device_mete_id AS deviceMeteId,
+            c.task_id AS taskId
+        FROM
+            t_cruise_point_instance a
+                LEFT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+                LEFT JOIN u_patrol_task_attr c ON c.instance_id = a.instance_id
+        WHERE FIND_IN_SET(b.inspection_code, #{deviceId, jdbcType=VARCHAR})
+          and c.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 
     <select id="getInspectionIdByDeviceId" resultType="java.lang.Long">

@@ -75,9 +75,9 @@ public class TCameraInfoController {
                 } else {
                     result.setData(state);
                     //有变动 同步模型
-                    Constant.modelUpload("1001");
-                    Constant.modelUpload("1002");
-                    Constant.modelUpload("4");
+//                    Constant.modelUpload("1001");
+//                    Constant.modelUpload("1002");
+//                    Constant.modelUpload("4");
                 }
             }
         } catch (BusinessException b) {
@@ -103,9 +103,9 @@ public class TCameraInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-                Constant.modelUpload("1001");
-                Constant.modelUpload("1002");
-                Constant.modelUpload("4");
+//                Constant.modelUpload("1001");
+//                Constant.modelUpload("1002");
+//                Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
         } catch (BusinessException e) {
@@ -132,9 +132,9 @@ public class TCameraInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-                Constant.modelUpload("1001");
-                Constant.modelUpload("1002");
-                Constant.modelUpload("4");
+//                Constant.modelUpload("1001");
+//                Constant.modelUpload("1002");
+//                Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
         } catch (BusinessException e) {
@@ -165,9 +165,9 @@ public class TCameraInfoController {
                     tCameraInfoService.stopStream(tCameraInfo.getCameraId());
                     result.setData(state);
                     //有变动 同步模型
-                    Constant.modelUpload("1001");
-                    Constant.modelUpload("1002");
-                    Constant.modelUpload("4");
+//                    Constant.modelUpload("1001");
+//                    Constant.modelUpload("1002");
+//                    Constant.modelUpload("4");
                 }
             }
         } catch (BusinessException e) {
