@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,4 +39,9 @@ public class ReportData {
      * 明细
      */
     List<TCruiseDataResultDetail> tCDRDList;
+    /**
+     * 非同源告警测点信息
+     */
+    List<NonhomologousInfo> nonList;
+
 }

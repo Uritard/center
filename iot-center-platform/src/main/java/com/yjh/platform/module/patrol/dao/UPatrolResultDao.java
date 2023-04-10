@@ -2,16 +2,14 @@ package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
 import com.yjh.platform.module.device.entity.TaskInfoBean;
+import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author lqh
@@ -207,5 +205,5 @@ public interface UPatrolResultDao {
 
     Map<String,Object> selectMeteInfoByInstanceId(@Param("instanceId")Long instanceId);
 
-
+    List<NonhomologousInfo> selectWarnByTaskId(@Param(value = "taskId")String taskId);
 }

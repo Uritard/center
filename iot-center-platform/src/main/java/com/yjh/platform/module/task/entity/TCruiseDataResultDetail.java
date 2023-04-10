@@ -110,5 +110,6 @@ public class TCruiseDataResultDetail implements Serializable {
 
     private Integer mergeCount;
 
-    private String meteName;
+    private Long instanceId;
+
 }
