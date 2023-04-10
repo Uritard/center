@@ -600,7 +600,7 @@ public class TCruiseTaskResultService {
         }
         Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
 
-        if (Objects.nonNull(countResult)) {
+        if (Objects.nonNull(countResult) && countResult.size() > 0) {
             //获取任务开始时间
             String startTime = countResult.get("taskStart").toString();
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
