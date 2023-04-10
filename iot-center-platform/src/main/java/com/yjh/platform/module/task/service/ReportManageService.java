@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author YC
@@ -218,6 +219,18 @@ public class ReportManageService {
         return newReportPath;
     }
 
+    private List<TCruiseDataResultDetail> setCpResultList(List<TCruiseDataResultDetail> cpResultList){
+        if(cpResultList != null && cpResultList.size() > 2){
+            for (int i = 1; i < cpResultList.size(); i++) {
+                if(cpResultList.get(i-1).getMeteName().equals(cpResultList.get(i).getMeteName())){
+                    cpResultList.get(i-1).setMergeCount(1);
+                }
+            }
+        }
+        return cpResultList;
+    }
+
+
     private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> tCDRDList){
         List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
@@ -278,6 +291,9 @@ public class ReportManageService {
         taskVO.setAbnormal(abnormalList.size());
         taskVO.setNormal(normalList.size());
         taskVO.setUnReview(unReviewList.size());
+        setCpResultList(abnormalList);
+        setCpResultList(normalList);
+        setCpResultList(unReviewList);
     }
 
     public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {

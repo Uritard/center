@@ -129,7 +129,7 @@ public class ReportHelper {
     }
 
     public static void mergeCell(Sheet sheet, int rowFrom, int rowTo, int columnFrom, int columnTo) {
-        sheet.addMergedRegion(new CellRangeAddress(rowFrom, rowTo, columnFrom, columnTo));
+        sheet.addMergedRegionUnsafe(new CellRangeAddress(rowFrom, rowTo, columnFrom, columnTo));
     }
 
     private static int calculateCellWidth(int CHChars, int ENChars, boolean bold) {

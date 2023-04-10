@@ -283,27 +283,31 @@ public class ReportDataModel {
 
     private static Map<String, Integer> getRowCount(List<TableCellElement> elements, int rowIndex, int rowCount, List<TCruiseDataResultDetail> tCDRDList) {
         Map<String, Integer> map = new HashMap<>(16);
+        int index = 0;
         for (TCruiseDataResultDetail detail : tCDRDList) {
-            int index = tCDRDList.indexOf(detail);
             int colorIndex = IndexedColors.BLACK.index;
             boolean bold = false;
+            int mergeCount = 0;
+            if (null != detail.getMergeCount()){
+                mergeCount = detail.getMergeCount();
+            }
             // 编号
-            elements.add(new TableCellElement(rowIndex, rowIndex, 0, 0, new String[]{String.valueOf(index + 1)},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 0, 0, new String[]{String.valueOf(index + 1)},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 区域
-            elements.add(new TableCellElement(rowIndex, rowIndex, 1, 1, new String[]{Optional.ofNullable(detail.getRegionName()).orElse("")},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 1, 1, new String[]{Optional.ofNullable(detail.getRegionName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 间隔
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 2, new String[]{Optional.ofNullable(detail.getIntervalName()).orElse("")},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 2, 2, new String[]{Optional.ofNullable(detail.getIntervalName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 设备
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 3, new String[]{Optional.ofNullable(detail.getDeviceName()).orElse("")},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 3, 3, new String[]{Optional.ofNullable(detail.getDeviceName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 部件
-            elements.add(new TableCellElement(rowIndex, rowIndex, 4, 4, new String[]{Optional.ofNullable(detail.getComponentName()).orElse("本体")},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 4, 4, new String[]{Optional.ofNullable(detail.getComponentName()).orElse("本体")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 点位
-            elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{Optional.ofNullable(detail.getInstanceName()).orElse("")},
+            elements.add(new TableCellElement(rowIndex, rowIndex + mergeCount, 5, 5, new String[]{Optional.ofNullable(detail.getInstanceName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 数据来源
             elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{Optional.ofNullable(detail.getDataType()).orElse("")},
@@ -328,8 +332,10 @@ public class ReportDataModel {
             elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{file,oriFile},
                     TableCellElement.TYPE_PICTURE));
 
+            index = index -mergeCount;
             rowIndex++;
             rowCount++;
+            index++;
         }
         map.put("rowIndex", rowIndex);
         map.put("rowCount", rowCount);
