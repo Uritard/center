@@ -30,4 +30,9 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
      */
     private Integer isTemdif;
     private String unit;
+
+    private String customId;
+
+    private String customName;
+
 }
