@@ -387,7 +387,7 @@
         select distinct
         a.task_id
         FROM u_patrol_result a
-        LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
+        LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
         <if test="deviceType != -1">
             LEFT JOIN t_std_device j on f.device_id = j.device_id
         </if>
