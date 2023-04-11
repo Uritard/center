@@ -272,4 +272,11 @@ public class TRobotInfo implements Serializable {
      * 原始id(下级同步的id)
      */
     private String originId;
+
+    /**
+     * 机器人地图图片尺寸
+     */
+    @ApiModelProperty(value = "机器人地图图片尺寸")
+    @TableField(value = "image_size", updateStrategy = FieldStrategy.IGNORED)
+    private String imageSize;
 }
