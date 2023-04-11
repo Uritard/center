@@ -1273,7 +1273,6 @@
         f.cruise_type,
         f.origpic as ori_img,
         n.dict_note as dataType,
-        b.mete_name,
         b.custom_id,
         b.custom_name as componentName,
         a.up_region_name as intervalName,
@@ -1293,7 +1292,7 @@
         LEFT JOIN t_dict_business n on n.dict_code = f.cruise_type and n.col_name = 'cruise_type'
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>
-        ORDER by f.device_name,b.mete_name,cruise_time
+        ORDER by cruise_time
     </select>
 
     <select id="selectMeteNumByTask" resultType="java.lang.Integer">
@@ -1401,6 +1400,29 @@
                     t_cruise_point_instance
                 WHERE
                     instance_id = #{instanceId})
+    </select>
+
+    <select id="selectWarnByTaskId" resultType="com.yjh.platform.module.patrol.entity.NonhomologousInfo">
+        SELECT DISTINCT
+            ins.warn_id,
+            poi.instance_id_one one,
+            poi.instance_id_two two,
+            '' three
+        from t_cruise_nonhomologous_warn_inspection ins
+                 left join t_cruise_nonhomologous_warn warn on ins.warn_id = warn.warn_id
+                 left join t_cruise_nonhomologous_point_instance poi on warn.instance_id = poi.instance_id
+        where task_id = #{taskId}
+        union all(
+            SELECT DISTINCT
+                ins.warn_id,
+                rule.instance_one_id one,
+                rule.instance_two_id two,
+                rule.instance_tri_id three
+            from t_cruise_nonhomologous_warn_inspection ins
+                     left join t_cruise_nonhomologous_warn warn on ins.warn_id = warn.warn_id
+                     left join t_cruise_triphase_rule rule on warn.instance_id = rule.triphase_id
+            where task_id = #{taskId}
+        )
     </select>
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -253,6 +254,12 @@ public class ReportDataModel {
             }
         }
 
+        List<NonhomologousInfo> nonList = param.getNonList();
+        setCpResultList(abnormalList,nonList);
+        setCpResultList(normalList,nonList);
+        setCpResultList(unReviewList,nonList);
+
+
         for (int i = 0; i < TASK_TITLE_CONTENT.length; i++) {
             elements.add(new TableCellElement(rowIndex, rowIndex, 0, TASK_PORT_INFO.length-1, new String[]{TASK_TITLE_CONTENT[i]},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER));
@@ -280,6 +287,26 @@ public class ReportDataModel {
 
         return rowCount;
     }
+
+    private static List<TCruiseDataResultDetail> setCpResultList(List<TCruiseDataResultDetail> cpResultList,List<NonhomologousInfo> nonList){
+        for (NonhomologousInfo nonItem:nonList) {
+            List<TCruiseDataResultDetail> newList = new ArrayList<>();
+            for (TCruiseDataResultDetail resultItem:cpResultList) {
+                if(Objects.equals(resultItem.getInstanceId(), nonItem.getOne()) ||
+                        Objects.equals(resultItem.getInstanceId(), nonItem.getTwo()) ||
+                        Objects.equals(resultItem.getInstanceId(), nonItem.getThree())){
+                    newList.add(resultItem);
+                }
+            }
+            if (newList.size() >= 2){
+                cpResultList.removeAll(newList);
+                newList.get(0).setMergeCount(newList.size()-1);
+                cpResultList.addAll(newList);
+            }
+        }
+        return cpResultList;
+    }
+
 
     private static Map<String, Integer> getRowCount(List<TableCellElement> elements, int rowIndex, int rowCount, List<TCruiseDataResultDetail> tCDRDList) {
         Map<String, Integer> map = new HashMap<>(16);

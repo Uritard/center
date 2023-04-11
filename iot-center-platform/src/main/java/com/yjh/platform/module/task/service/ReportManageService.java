@@ -8,6 +8,7 @@ import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
@@ -165,6 +166,8 @@ public class ReportManageService {
 
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+        //顺便处理非同源合并问题
+        List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
         // 概况
         TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList);
         recordData.setTaskVO(taskVO);
@@ -181,6 +184,7 @@ public class ReportManageService {
             originalImgList.add(detail.getOriImg());
         });
         recordData.setTCDRDList(tCruiseDataResultDetailList);
+        recordData.setNonList(nonList);
 
         // 巡视报告名称
         String reportName =  taskId +".xlsx";
@@ -218,18 +222,6 @@ public class ReportManageService {
         }
         return newReportPath;
     }
-
-    private List<TCruiseDataResultDetail> setCpResultList(List<TCruiseDataResultDetail> cpResultList){
-        if(cpResultList != null && cpResultList.size() > 2){
-            for (int i = 1; i < cpResultList.size(); i++) {
-                if(cpResultList.get(i-1).getMeteName().equals(cpResultList.get(i).getMeteName())){
-                    cpResultList.get(i-1).setMergeCount(1);
-                }
-            }
-        }
-        return cpResultList;
-    }
-
 
     private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> tCDRDList){
         List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
@@ -291,9 +283,6 @@ public class ReportManageService {
         taskVO.setAbnormal(abnormalList.size());
         taskVO.setNormal(normalList.size());
         taskVO.setUnReview(unReviewList.size());
-        setCpResultList(abnormalList);
-        setCpResultList(normalList);
-        setCpResultList(unReviewList);
     }
 
     public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
