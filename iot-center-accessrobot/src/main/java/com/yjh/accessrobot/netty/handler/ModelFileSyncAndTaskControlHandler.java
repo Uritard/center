@@ -98,14 +98,6 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                             String[] patrolledIds = taskPatrolledId.split("_");
                             String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
                             date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
-                        }else {
-                            Map<String, String> unionTaskMap = redisTemplate.opsForHash().entries("UnionTask");
-                            unionTaskMap.forEach((key,value ) -> {
-                                if (key.contains(sendCode)){
-                                    taskCode.set(value);
-                                    redisTemplate.opsForHash().delete("UnionTask", key);
-                                }
-                            });
                         }
                         if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
                             TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskCode.get(), errorCode, date);

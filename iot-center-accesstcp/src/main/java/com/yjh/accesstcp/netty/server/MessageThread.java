@@ -327,8 +327,6 @@ public class MessageThread {
                     taskList.add(tCruiseTaskAdd);
                     map.put("list", taskList);
                     Result re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
-                    redisTemplate.opsForHash().put("UnionTask", robotDevice, taskId);
-                    redisTemplate.expire(robotDevice, 7, TimeUnit.DAYS);
                     //非机器人的直接返回 机器人点的等待机器人返回结果
                     Constant.getParamMap.put("sendSessionId",sendSessionId);
                     if (!isRobotFlag) {
