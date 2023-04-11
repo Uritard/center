@@ -453,6 +453,9 @@ public class UPatrolTaskService {
                     .setCruiseId(item.getCruiseId())
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
+                    .setCustomId(item.getCustomId())
+                    .setCustomName(item.getCustomName())
+                    .setDevicePointId(item.getDevicePointId())
                     .setIsWarn(0)
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
@@ -2009,6 +2012,11 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setTaskId(taskId);
                     uPatrolDataResult.setDeviceId(NumberUtils.toLong(redisInfoMap.get("deviceId")));
                     uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
+                    uPatrolDataResult.setDeviceMeteId(NumberUtils.toLong(redisInfoMap.get("deviceMeteId")));
+                    uPatrolDataResult.setDeviceMeteName(redisInfoMap.get("deviceMeteName"));
+                    uPatrolDataResult.setCustomId(redisInfoMap.get("customId"));
+                    uPatrolDataResult.setCustomName(redisInfoMap.get("customName"));
+                    uPatrolDataResult.setDevicePointId(redisInfoMap.get("devicePointId"));
                     uPatrolDataResult.setInstanceId(NumberUtils.toLong(redisInfoMap.get("instanceId")));
                     uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
                     uPatrolDataResult.setCruiseId(NumberUtils.toLong(redisInfoMap.get("cruiseId")));

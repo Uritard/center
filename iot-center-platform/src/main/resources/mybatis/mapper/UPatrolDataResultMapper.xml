@@ -8,6 +8,11 @@
         <result column="task_id" jdbcType="VARCHAR" property="taskId" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
         <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="device_mete_name" jdbcType="VARCHAR" property="deviceMeteName" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="custom_name" jdbcType="VARCHAR" property="customName" />
+        <result column="device_point_id" jdbcType="VARCHAR" property="devicePointId" />
         <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
         <result column="instance_name" jdbcType="VARCHAR" property="instanceName" />
         <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
@@ -44,7 +49,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cruise_data_id, task_id, device_id, device_name, instance_id, instance_name, cruise_id, cruise_name, cruise_time, cruise_status, cruise_type, result_desc, result_num, modify_num, picpath, confirm_pic_path, pic_path_anl, person_check, origpic, orig_confirm_pic_path, orig_pic_anl, cruise_abnormal, evaluation_state, identify_state, identify_result, createtime, remark, check_user, check_date, is_warn, cruise_result, fir_name, fir_date, result_pic, points, voice_path
+        cruise_data_id, task_id, device_id, device_name, device_mete_id, device_mete_name, custom_id, custom_name, device_point_id, instance_id, instance_name, cruise_id, cruise_name, cruise_time, cruise_status, cruise_type, result_desc, result_num, modify_num, picpath, confirm_pic_path, pic_path_anl, person_check, origpic, orig_confirm_pic_path, orig_pic_anl, cruise_abnormal, evaluation_state, identify_state, identify_result, createtime, remark, check_user, check_date, is_warn, cruise_result, fir_name, fir_date, result_pic, points, voice_path
     </sql>
 
 
@@ -54,6 +59,11 @@
             task_id,
             device_id,
             device_name,
+            device_mete_id,
+            device_mete_name,
+            custom_id,
+            custom_name,
+            device_point_id,
             instance_id,
             instance_name,
             cruise_id,
@@ -91,6 +101,11 @@
                 #{taskId, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
                 #{deviceName, jdbcType=VARCHAR},
+                #{deviceMeteId, jdbcType=BIGINT},
+                #{deviceMeteName, jdbcType=VARCHAR},
+                #{custonId, jdbcType=VARCHAR},
+                #{customName, jdbcType=VARCHAR},
+                #{devicePointId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=BIGINT},
                 #{instanceName, jdbcType=VARCHAR},
                 #{cruiseId, jdbcType=BIGINT},
@@ -379,6 +394,11 @@
             task_id,
             device_id,
             device_name,
+            device_mete_id,
+            device_mete_name,
+            custom_id,
+            custom_name,
+            device_point_id,
             instance_id,
             instance_name,
             cruise_id,
@@ -418,6 +438,11 @@
                 #{UPatrolDataResult.taskId, jdbcType=VARCHAR},
                 #{UPatrolDataResult.deviceId, jdbcType=BIGINT},
                 #{UPatrolDataResult.deviceName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.deviceMeteId, jdbcType=BIGINT},
+                #{UPatrolDataResult.deviceMeteName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.customId, jdbcType=VARCHAR},
+                #{UPatrolDataResult.customName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.devicePointId, jdbcType=VARCHAR},
                 #{UPatrolDataResult.instanceId, jdbcType=BIGINT},
                 #{UPatrolDataResult.instanceName, jdbcType=VARCHAR},
                 #{UPatrolDataResult.cruiseId, jdbcType=BIGINT},
@@ -648,6 +673,11 @@
         task_id,
         device_id,
         device_name,
+        device_mete_id,
+        device_mete_name,
+        custom_id,
+        custom_name,
+        device_point_id,
         instance_id,
         instance_name,
         cruise_id,
@@ -687,6 +717,11 @@
             #{uPatrolDataResult.taskId, jdbcType=VARCHAR},
             #{uPatrolDataResult.deviceId, jdbcType=BIGINT},
             #{uPatrolDataResult.deviceName, jdbcType=VARCHAR},
+            #{UPatrolDataResult.deviceMeteId, jdbcType=BIGINT},
+            #{UPatrolDataResult.deviceMeteName, jdbcType=VARCHAR},
+            #{UPatrolDataResult.customId, jdbcType=VARCHAR},
+            #{UPatrolDataResult.customName, jdbcType=VARCHAR},
+            #{UPatrolDataResult.devicePointId, jdbcType=VARCHAR},
             #{uPatrolDataResult.instanceId, jdbcType=BIGINT},
             #{uPatrolDataResult.instanceName, jdbcType=VARCHAR},
             #{uPatrolDataResult.cruiseId, jdbcType=BIGINT},

@@ -37,6 +37,21 @@ public class UPatrolDataResult implements Serializable {
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
 
+    @ApiModelProperty(value = "测点ID")
+    private Long deviceMeteId;
+
+    @ApiModelProperty(value = "测点名称")
+    private String deviceMeteName;
+
+    @ApiModelProperty(value = "部位ID")
+    private String customId;
+
+    @ApiModelProperty(value = "部位名称")
+    private String customName;
+
+    @ApiModelProperty(value = "设备点位id")
+    private String devicePointId;
+
     @ApiModelProperty(value = "巡检点实例ID")
     private Long instanceId;
 
