@@ -52,6 +52,7 @@
         <result property="offLineCount" column="off_line_count" jdbcType="BIGINT"/>
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="imageSize" column="image_size" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -92,7 +93,7 @@
         ,defect_record,repair_record,exit_putInto_record
         ,remarks,record_id,channel_num_light
         ,channel_num_inferad,last_online_time,duration
-        ,off_line_count,edge_code,origin_id
+        ,off_line_count,edge_code,origin_id,image_size
         )
         values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
                ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
@@ -109,7 +110,7 @@
                ,#{defectRecord,jdbcType=VARCHAR},#{repairRecord,jdbcType=VARCHAR},#{exitPutintoRecord,jdbcType=VARCHAR}
                ,#{remarks,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},#{channelNumLight,jdbcType=INTEGER}
                ,#{channelNumInferad,jdbcType=INTEGER},#{lastOnlineTime,jdbcType=BIGINT},#{duration,jdbcType=BIGINT}
-               ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
+               ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{imageSize,jdbcType=VARCHAR}
                )
     </insert>
 
@@ -189,6 +190,7 @@
         </choose>
         <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
         <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
+        <if test="imageSize != null ">a.image_size = #{imageSize},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -646,8 +648,8 @@
     AND b.robot_id = #{robotId,jdbcType=BIGINT}
     </select>
 
-    <select id="selectMapPathByCode" resultType="java.lang.String">
-        select a.phote_path
+    <select id="selectMapPathByCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select a.phote_path,a.image_size
         FROM t_robot_info a
         WHERE a.robot_code = #{robotCode,jdbcType=VARCHAR}
     </select>

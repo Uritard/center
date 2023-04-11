@@ -1651,6 +1651,7 @@ CREATE TABLE `t_robot_info` (
   `last_online_time` bigint(20) DEFAULT NULL COMMENT '上次登录时间(毫秒数)',
   `duration` bigint(20) DEFAULT NULL COMMENT '在线时长累积(毫秒)',
   `off_line_count` int(10) DEFAULT NULL COMMENT '离线次数',
+  `image_size` varchar(20) DEFAULT '' COMMENT '机器人地图图片尺寸',
   PRIMARY KEY (`robot_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人表';

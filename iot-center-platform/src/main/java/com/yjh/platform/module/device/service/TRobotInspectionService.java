@@ -16,6 +16,7 @@ import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -765,8 +766,9 @@ public class TRobotInspectionService {
         }
 
         // 机器人建站地图
-        String mapPath = tRobotInfoDao.selectMapPathByCode(robotCode);
-        re.put("mapPath", mapPath);
+        TRobotInfo robotInfo = tRobotInfoDao.selectMapPathByCode(robotCode);
+        re.put("mapPath", robotInfo.getPhotePath());
+        re.put("imageSize", robotInfo.getImageSize());
 
         return re;
     }
