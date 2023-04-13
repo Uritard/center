@@ -36,6 +36,9 @@ public interface TCameraScreenDao {
     List<AreaInfoDetail> selectCameraTreeWithRobot(@Param(value = "cameraName") String cameraName,
                                                    @Param(value = "robotFlag") String robotFlag,
                                                    @Param(value = "userId")Long userId);
+    List<AreaInfoDetail> selectCameraCruiseTreeWithRobot(@Param(value = "cruiseName") String cameraName,
+                                                   @Param(value = "robotFlag") String robotFlag,
+                                                   @Param(value = "userId")Long userId);
 
     List<AreaInfoOfMonitorDevice> selectRegionMonitorDevice();
     List<AreaInfoOfMonitorDevice> selectAllMonitorDevice();

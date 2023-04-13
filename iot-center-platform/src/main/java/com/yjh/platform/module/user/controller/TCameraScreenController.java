@@ -196,6 +196,22 @@ public class TCameraScreenController {
         return result;
     }
 
+    @ApiOperation(value = "视频监控巡视点列表查询")
+    @RequestMapping(value = "/cameraCruiseTree", method = RequestMethod.GET)
+    public Result cameraCruiseTree(@RequestParam(value = "cruiseName",required = false) String cruiseName,
+                                  @RequestParam(value = "flag",required = false) Integer flag,
+                                  HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            result.setData(tCameraScreenService.selectCameraCruiseTree(cruiseName,flag, "1",userId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "摄像机状态树")
     @RequestMapping(value = "/selectCameraTreeWithRobot", method = RequestMethod.GET)
     @Logs(title = "查询摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1234,1235")
