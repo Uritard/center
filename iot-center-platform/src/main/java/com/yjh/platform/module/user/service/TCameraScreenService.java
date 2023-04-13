@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
 * @author lqh
@@ -230,6 +231,113 @@ public class TCameraScreenService{
         return re;
     }
 
+    /**
+     * 获取当前用户所属的所有巡视点
+     *
+     * @param cruiseName cruiseName
+     * @param flag flag
+     * @param robotFlag robotFlag
+     * @param userId userId
+     * @return result
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfoDetail> selectCameraCruiseTree(String cruiseName, Integer flag, String robotFlag, Long userId) {
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+
+        List<AreaInfoDetail> listTree = new ArrayList<>();
+        if (1234L == sysUser.getRoleId() || 1235L == sysUser.getRoleId()) {
+            listTree = tCameraScreenDao.selectCameraCruiseTreeWithRobot(cruiseName, robotFlag, userId);
+        } else {
+            throw  new BusinessException("当前用户角色不可查看");
+        }
+
+        List<AreaInfoDetail> treeRootList = getTreeRoot(listTree);
+        Map<String,String> cameraStatusMap = getCameraStatusMap();
+        diGuiWithRobot(treeRootList, listTree,cameraStatusMap,flag);
+        return treeRootList;
+    }
+
+    /**
+     * 获取根节点
+     *
+     * @param listTree listTree
+     * @return result
+     */
+    private List<AreaInfoDetail> getTreeRoot(List<AreaInfoDetail> listTree) {
+        if (CollectionUtils.isEmpty(listTree)) {
+            return null;
+        }
+
+        List<AreaInfoDetail> treeRootList = new ArrayList<>();
+        for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
+            AreaInfoDetail areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfoDetail areaInfoCountry = new AreaInfoDetail();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountry.setCameraId(areaInfoMap.getCameraId());
+                treeRootList.add(areaInfoCountry);
+            }
+        }
+
+        return treeRootList;
+    }
+
+    /**
+     * 获取相机状态列表
+     *
+     * @return result
+     */
+    private Map<String,String> getCameraStatusMap() {
+        Map<String,String> cameraStatusMap = new HashMap<>();
+        //获取相机的状态
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re != null && re.getData() != null){
+                cameraStatusMap.putAll((Map<String,String>)re.getData());
+            }
+        }
+
+        return cameraStatusMap;
+    }
+
+    /**
+     * 处理巡视点是否在线
+     *
+     * @param areaInfoMap areaInfoMap
+     * @param areaInfoTem areaInfoTem
+     * @param childrenList childrenList
+     * @param flag flag
+     * @param map map
+     */
+    private void processCruisePointStatus(AreaInfoDetail areaInfoMap, AreaInfoDetail areaInfoTem, List<AreaInfoDetail> childrenList, Integer flag, Map<String,String> map) {
+        if (!StringUtils.isEmpty(areaInfoTem.getCameraId())) {
+            if (map.containsKey(areaInfoTem.getCameraId())) {
+                areaInfoTem.setState(Integer.valueOf(map.get(areaInfoTem.getCameraId().toString())));
+            } else {
+                areaInfoTem.setState(0);
+            }
+        }
+
+        if(flag != null && flag == 1){
+            if(1 == areaInfoTem.getState()){
+                //在线
+                childrenList.add(areaInfoTem);
+            }
+        } else if(flag != null && flag == 0){
+            if(0 == areaInfoTem.getState()){
+                //不在线
+                childrenList.add(areaInfoTem);
+            }
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName, Integer flag, String robotFlag, Long userId) {
@@ -258,6 +366,7 @@ public class TCameraScreenService{
                 areaInfoCountry.setId(areaInfoMap.getId());
                 areaInfoCountry.setLabel(areaInfoMap.getLabel());
                 areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountry.setCameraId(areaInfoMap.getCameraId());
                 areaInfoCountryList.add(areaInfoCountry);
             }
         }
@@ -292,6 +401,7 @@ public class TCameraScreenService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    areaInfoTem.setCameraId(areaInfoMap.getCameraId());
                     if("camera".equals(areaInfoMap.getInfoType())){
                         if(map.get(areaInfoMap.getId().toString()) != null){
                             areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
@@ -380,6 +490,10 @@ public class TCameraScreenService{
                             }
                         }
                     }
+                    if ("cruisePoint".equals(areaInfoMap.getInfoType())) {
+                        processCruisePointStatus(areaInfoMap, areaInfoTem, childrenList, flag, map);
+                    }
+
                     childrenList.add(areaInfoTem);
                 }
             }

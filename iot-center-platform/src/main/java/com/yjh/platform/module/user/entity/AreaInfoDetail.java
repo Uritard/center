@@ -41,4 +41,7 @@ public class AreaInfoDetail implements Serializable {
 
     @ApiModelProperty(value = "设备状态")
     private Integer state;
+
+    @ApiModelProperty(value = "相机ID")
+    private String cameraId;
 }
