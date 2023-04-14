@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * @author hyh
@@ -47,8 +48,15 @@ public class ModelUpdateHandler implements MessageHandlerStrategy, InitializingB
             log.info("巡视主机收到边缘节点{}的模型更新指令了", sendCode);
             if (xmlBaseModel.getItems().get(0).containsKey("type") && xmlBaseModel.getItems().get(0).containsKey("file_path")) {
                 String type = String.valueOf(xmlBaseModel.getItems().get(0).get("type"));
-                String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-                robotService.syncModelUpdate(type, filePath, sendCode);
+                if ("9".equals(type)) {
+                    for(Map<String,Object> map:xmlBaseModel.getItems()) {
+                        String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
+                        robotService.syncModelUpdate(type, filePath, sendCode);
+                    }
+                } else {
+                    String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
+                    robotService.syncModelUpdate(type, filePath, sendCode);
+                }
             }
         }
         String reXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
