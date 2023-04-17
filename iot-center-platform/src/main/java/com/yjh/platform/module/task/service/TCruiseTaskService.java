@@ -16,6 +16,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -67,54 +68,20 @@ public class TCruiseTaskService {
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
-    private TCameraPresetDao tCameraPresetDao;
-    @Autowired
     private TCruiseResultDao tCruiseResultDao;
     @Autowired
-    private TAlgorithmConfDao tAlgorithmConfDao;
-    @Autowired
-    private TAlgorithmInfoDao tAlgorithmInfoDao;
-    @Autowired
-    private TCruiseTaskResultDao tCruiseTaskResultDao;
-    @Autowired
-    private TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao;
-    @Autowired
-    private TCruiseDataResultDao tCruiseDataResultDao;
-    @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
-    @Autowired
-    private TSysParamDao tSysParamDao;
+
     @Autowired
     private SysUserDao sysUserDao;
     @Autowired
-    private TAlgorithmConfBakDao tAlgorithmConfBakDao;
-    @Autowired
     private Demo demo;
-    private RunAtNowTask runAtNowTask;
-
-    @Autowired
-    private AudioDeviceManager audioDeviceManager;
-
-    @Autowired
-    private TVoiceDeviceService tVoiceDeviceService;
-    @Autowired
-    private JobManager jobManager;
-
-    //模板图片路径
-    private String picModelPath;
-    //等待相机转到预置位时间
-    private Long waitTime;
-    ;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
-    /**
-     * 变电站编码
-     */
-    @Value("${station.code}")
-    private String stationCode;
-    @Value("${taskToRobot}")
-    private boolean taskToRobot;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
     //任务超期时间
     private Float tasksAreTime;
     //算法接口
@@ -128,7 +95,7 @@ public class TCruiseTaskService {
 
     @PostConstruct
     public void toRedis(){
-        redisTemplate.opsForValue().set("RobotTask.taskToRobot", taskToRobot);
+        redisTemplate.opsForValue().set("RobotTask.taskToRobot", applicationProperties.getOtherConfig().getTaskToRobot());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -421,20 +388,13 @@ public class TCruiseTaskService {
                 try {
                     //模板图片路径
                     Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-                    picModelPath = (String) mapForPicModelPath.get("content");
+//                    picModelPath = (String) mapForPicModelPath.get("content");
                     //等待相机转到预置位时间
                     Map<String, Object> mapForWaitTime = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
-                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+//                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                     //任务超期时间
                     Map<String, Object> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                     tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
-                    RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
-                            tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
-                            tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
-                    Thread thread = new Thread(runAtNowTask);
-                    thread.setDaemon(true);
-                    thread.start();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -442,22 +402,13 @@ public class TCruiseTaskService {
                 //定时
                 quartzTask.setStartTime(tCruiseTask.getStartTime());
                 //quartzTask.setStartTime(new Date());
-                try {
-                    jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
             }
         } else {
             //周期 0 */10 * * * ?
             quartzTask.setCronExpression(tCruiseTask.getDateType());
             //quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: " + quartzTask.getCronExpression());
-            try {
-                jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+
         }
 
         //任务状态上报站端
@@ -1299,20 +1250,13 @@ public class TCruiseTaskService {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         //模板图片路径
         Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-        picModelPath = (String) mapForPicModelPath.get("content");
+//        picModelPath = (String) mapForPicModelPath.get("content");
         //等待相机转到预置位时间
         Map<String, Object> mapForWaitTime = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
-        waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+//        waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
         //任务超期时间
         Map<String, Object> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
         tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
-        RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
-                tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
-                tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, true, tasksAreTime,
-                tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
-        Thread thread = new Thread(runAtNowTask);
-        thread.setDaemon(true);
-        thread.start();
 
 
         Map<String,String> jasonMapOnFinished=new HashMap<>();
@@ -1352,7 +1296,6 @@ public class TCruiseTaskService {
             quartzTaskForAre.setJobName(tCruiseTask.getTaskName() + "-" + System.currentTimeMillis());
             quartzTaskForAre.setJobGroup("jiancha");
             quartzTaskForAre.setStartTime(new Date());
-            jobManager.taskShutDown(quartzTaskForAre, tCruiseTask.getTaskId());
             log.info("任务终止创建成功=="+taskId);
         } catch (Exception e) {
             log.info("任务终止创建失败" + e);
@@ -1792,20 +1735,13 @@ public class TCruiseTaskService {
             try {
                 //模板图片路径
                 Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-                picModelPath = (String) mapForPicModelPath.get("content");
+//                picModelPath = (String) mapForPicModelPath.get("content");
                 //等待相机转到预置位时间
                 Map<String, Object> mapForWaitTime = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
-                waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+//                waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                 //任务超期时间
                 Map<String, Object> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                 tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
-                RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
-                        tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
-                        tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                        tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
-                Thread thread = new Thread(runAtNowTask);
-                thread.setDaemon(true);
-                thread.start();
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
@@ -1875,20 +1811,13 @@ public class TCruiseTaskService {
                 try {
                     //模板图片路径
                     Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-                    picModelPath = (String) mapForPicModelPath.get("content");
+//                    picModelPath = (String) mapForPicModelPath.get("content");
                     //等待相机转到预置位时间
                     Map<String, Object> mapForWaitTime = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
-                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
+//                    waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                     //任务超期时间
                     Map<String, Object> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                     tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
-                    RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
-                            tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
-                            tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
-                    Thread thread = new Thread(runAtNowTask);
-                    thread.setDaemon(true);
-                    thread.start();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -1896,22 +1825,14 @@ public class TCruiseTaskService {
                 //定时
                 quartzTask.setStartTime(tCruiseTask.getStartTime());
                 //quartzTask.setStartTime(new Date());
-                try {
-                    jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+
             }
         } else {
             //周期 0 */10 * * * ?
             quartzTask.setCronExpression(tCruiseTask.getDateType());
             //quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: " + quartzTask.getCronExpression());
-            try {
-                jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+
         }
 
         //任务状态上报站端

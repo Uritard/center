@@ -9,6 +9,7 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
@@ -50,7 +51,9 @@ public class AnalysisController {
     @Autowired
     private AlarmService alarmService;
     @Autowired
-    private FtpsService ftpsservice;
+    private FtpsService ftpsService;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
@@ -59,18 +62,6 @@ public class AnalysisController {
         this.intelAnalysisService = intelAnalysisService;
         this.abstractVideoCruise = abstractVideoCruise;
     }
-
-    /**
-     * 识别算法端口
-     */
-    @Value("${netty.recognize.port}")
-    private int recognizePort;
-
-    /**
-     * 缺陷算法端口
-     */
-    @Value("${netty.ai.port}")
-    private int aiPort;
 
     private static final String FLAG = "false";
 
@@ -86,15 +77,15 @@ public class AnalysisController {
             List<Analysis> analysisList = analysisMap.get("list");
             log.info("---------发送算法信息中");
             log.info("算法数据列表：{}", analysisList);
-            log.info("端口号：{}", recognizePort);
+            log.info("端口号：{}", applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort());
             if (analysisList.get(0).getInstanceId() == -1) {
-                result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
+                result.setData(analysisService.feignAlgorithm(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort()));
             }else {
                 // 开关
                 String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
                 if (StringUtils.equals(FLAG, flag)){
                     // 原来的socket协议
-                    result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
+                    result.setData(analysisService.feignAlgorithm(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort()));
                 }else {
                     // 调用智能分析主机接口进行分析
                     try {
@@ -125,12 +116,12 @@ public class AnalysisController {
             List<Analysis> analysisList = analysisMap.get("list");
             log.info("---------发送算法信息中");
             log.info("缺陷接口数据列表：{}", analysisList);
-            log.info("端口号：{}", aiPort);
+            log.info("端口号：{}", applicationProperties.getAlgorithmServerConfig().getNettyAiPort());
             // 开关
             String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
             if (StringUtils.equals(FLAG, flag)){
                 // 原来的socket协议
-                result.setData(analysisService.feignDefect(analysisList, aiPort));
+                result.setData(analysisService.feignDefect(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyAiPort()));
             }else {
                 // 调用智能分析主机接口进行分析
                 try {
@@ -297,15 +288,15 @@ public class AnalysisController {
 
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
-            String remoteImgPath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
-            String remoteBaseImgPath = ftpsservice.getFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
-            String remoteDifResultPath = ftpsservice.getFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
-            String remoteDefectFilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
+            String remoteImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            String remoteBaseImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
+            String remoteDifResultPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
+            String remoteDefectFilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
-            ftpsservice.uploadFile("原始图片",path+"/img.jpg",remoteImgPath);  //原始图片上传
-            ftpsservice.uploadFile("缺陷告警结果图片",path+"/defectResultImg.jpg",remoteDefectFilepath);  //缺陷告警
-            ftpsservice.uploadFile("判别基准图片",path+"/diffBaseImg.jpg",remoteBaseImgPath);  //判别基准图片上传
-            ftpsservice.uploadFile("判别结果图片",path+"/differentResulImg.jpg",remoteDifResultPath);  //判别结果图片
+            ftpsService.uploadFile("原始图片",path+"/img.jpg",remoteImgPath);  //原始图片上传
+            ftpsService.uploadFile("缺陷告警结果图片",path+"/defectResultImg.jpg",remoteDefectFilepath);  //缺陷告警
+            ftpsService.uploadFile("判别基准图片",path+"/diffBaseImg.jpg",remoteBaseImgPath);  //判别基准图片上传
+            ftpsService.uploadFile("判别结果图片",path+"/differentResulImg.jpg",remoteDifResultPath);  //判别结果图片
 
             alarmDetail.setPic_raw(remoteImgPath);         //图片原图
             alarmDetail.setPic_diff_base(remoteBaseImgPath);               //判别基准图路径

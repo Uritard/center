@@ -11,12 +11,10 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
-import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdRegion;
-import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
@@ -24,7 +22,6 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,9 +46,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private Map<String, String> threadMap;
     private RedisTemplate redisTemplate;
     private UPatrolTaskService uPatrolTaskService;
-    private FtpsService ftpsservice;
+    private FtpsService ftpsService;
     private AlarmService alarmService;
     private PatrolResultHandler patrolResultHandler;
+    private ApplicationProperties applicationProperties;
     private TStdRegionDao tStdRegionDao;
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     private TStdDeviceDao tStdDeviceDao;
@@ -60,12 +58,13 @@ public class IsWarnAfterCruiseThread implements Runnable {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-        ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
+        ftpsService = StaticContextAccessor.getBean(FtpsService.class);
         alarmService = StaticContextAccessor.getBean(AlarmService.class);
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.tStdRegionDao = StaticContextAccessor.getBean(TStdRegionDao.class);
         this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
         this.tStdDeviceDao = StaticContextAccessor.getBean(TStdDeviceDao.class);
+        this.applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             log.info("taskId is {} uPatrolTask is: {}", taskId, uPatrolTask);
 
             // 该巡视点无了,找不到对应
-            if (Objects.isNull(tStdDevicemete)){
+            if (Objects.isNull(tStdDevicemete)) {
                 return;
             }
 
@@ -200,7 +199,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -211,51 +210,48 @@ public class IsWarnAfterCruiseThread implements Runnable {
      *
      * @param warnMap 告警信息
      */
-    private void alarmToAmPlatform (Map<String, String> warnMap) {
-        try{
+    private void alarmToAmPlatform(Map<String, String> warnMap) {
+        try {
             log.info("开始与算法管理平台交互");
-            String flag = ftpsservice.getFlag();
-            if (StringUtils.equals("1", flag)) {
-                Alarm alarm = new Alarm();
-                alarm.setBay_name(warnMap.get(""));
-                alarm.setTime(warnMap.get("warnTime"));
-                //获取原始路径
-                String year = Integer.toString(LocalDate.now().getYear());
-                String month = Integer.toString(LocalDate.now().getMonthValue());
-                String taskidbak = warnMap.get("taskId");
-                String instanceIdbak = warnMap.get("instanceId");
-                Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskidbak + ":" + instanceIdbak);
-                String devicename= threadMap.get("deviceName");
-                alarm.setDevice_name(devicename);
-                String origpicpath = cruiseResult2.get("origpic").toString();
-                String[] str2 = origpicpath.split("/");
-                String origpcimagename = str2[str2.length - 1];
-                String remoteorigfilepath = ftpsservice.getFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
-                //结果文件
-                String resultImagebak = threadMap.get("absolutePath");
-                String[] str3 = resultImagebak.split("/");
-                //获取结果图名称，然后拼接远程文件全路径
-                String resultimagename = str3[str3.length - 1];
-                String remoteresultfilepath = ftpsservice.getFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
-                //原图  算法管理平台对应的原始文件路径
-                alarm.setPic_raw(remoteresultfilepath);
-                //机器人分析结果图 算法管理平台对应的原始文件路径
-                alarm.setPic_different(remoteorigfilepath);
-                //原始图片上传
-                ftpsservice.uploadFile("判别告警", origpicpath, remoteorigfilepath);
-                //判别结果图片
-                ftpsservice.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
+            Alarm alarm = new Alarm();
+            alarm.setBay_name(warnMap.get(""));
+            alarm.setTime(warnMap.get("warnTime"));
+            //获取原始路径
+            String year = Integer.toString(LocalDate.now().getYear());
+            String month = Integer.toString(LocalDate.now().getMonthValue());
+            String taskidbak = warnMap.get("taskId");
+            String instanceIdbak = warnMap.get("instanceId");
+            Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskidbak + ":" + instanceIdbak);
+            String devicename = threadMap.get("deviceName");
+            alarm.setDevice_name(devicename);
+            String origpicpath = cruiseResult2.get("origpic").toString();
+            String[] str2 = origpicpath.split("/");
+            String origpcimagename = str2[str2.length - 1];
+            String remoteorigfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
+            //结果文件
+            String resultImagebak = threadMap.get("absolutePath");
+            String[] str3 = resultImagebak.split("/");
+            //获取结果图名称，然后拼接远程文件全路径
+            String resultimagename = str3[str3.length - 1];
+            String remoteresultfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
+            //原图  算法管理平台对应的原始文件路径
+            alarm.setPic_raw(remoteresultfilepath);
+            //机器人分析结果图 算法管理平台对应的原始文件路径
+            alarm.setPic_different(remoteorigfilepath);
+            //原始图片上传
+            ftpsService.uploadFile("判别告警", origpicpath, remoteorigfilepath);
+            //判别结果图片
+            ftpsService.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
 
-                if( !ftpsservice.fileExits(remoteorigfilepath)){
-                    //原始图片上传
-                    ftpsservice.uploadFile("判别告警", origpicpath, remoteorigfilepath);
-                }
-                if( !ftpsservice.fileExits(remoteorigfilepath)){
-                    //判别结果图片
-                    ftpsservice.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
-                }
-                alarmService.PushMsg(alarm);
+            if (!ftpsService.fileExits(remoteorigfilepath)) {
+                //原始图片上传
+                ftpsService.uploadFile("判别告警", origpicpath, remoteorigfilepath);
             }
+            if (!ftpsService.fileExits(remoteorigfilepath)) {
+                //判别结果图片
+                ftpsService.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
+            }
+            alarmService.PushMsg(alarm);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -264,9 +260,9 @@ public class IsWarnAfterCruiseThread implements Runnable {
     /**
      * 将告警信息放入redis
      *
-     * @param taskId 任务id
+     * @param taskId   任务id
      * @param warnInfo 告警信息
-     * @return  Map<String, String>
+     * @return Map<String, String>
      */
     private Map<String, String> putWarnToRedis(String taskId, TWarnInfo warnInfo) {
         String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -289,7 +285,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("outRange", Objects.nonNull(warnInfo.getOutRange()) ? warnInfo.getOutRange() : "");
             log.info("warnMap==={}", warnMap);
             redisTemplate.opsForHash().putAll(warnName, warnMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("将告警信息放入redis异常：", e);
         }
         return warnMap;

@@ -2,6 +2,8 @@ package com.yjh.platform.context;
 
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.module.config.entity.SystemConfig;
+import com.yjh.platform.module.config.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -10,6 +12,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,9 +25,14 @@ public class Context {
 
     private final RedisTemplate redisTemplate;
 
-    public Context(BaseSocketServer socketServer,RedisTemplate redisTemplate) {
+    private final SystemConfigService systemConfigService;
+
+    private final String systemConfigKey="systemConfigKey:";
+
+    public Context(BaseSocketServer socketServer,RedisTemplate redisTemplate,SystemConfigService systemConfigService) {
         this.socketServer = socketServer;
         this.redisTemplate = redisTemplate;
+        this.systemConfigService = systemConfigService;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -32,6 +41,8 @@ public class Context {
         try {
             socketServer.start();
             deleteSecondSilentRedisConf();
+            systemConfigInfoToRedis();
+            systemConfigService.flushCatch();
         } catch (Exception e) {
             throw new RuntimeException("Socket服务启动失败", e);
         }
@@ -44,6 +55,15 @@ public class Context {
         if (CollectionUtils.isNotEmpty(keys)) {
             redisTemplate.delete(keys);
         }
+    }
+
+    private void systemConfigInfoToRedis(){
+        List<SystemConfig> configList = systemConfigService.selectAll();
+        configList.forEach(systemConfig ->{
+            Map<String,String> map = new HashMap<>();
+            map.put(systemConfig.getConfigKey(),systemConfig.getConfigValue());
+            redisTemplate.opsForHash().putAll(systemConfigKey+systemConfig.getConfigType(),map);
+        });
     }
 
     @EventListener

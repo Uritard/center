@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Chenfei
  * @date 2022/10/20
- * @since [产品/模块版本] （可选）
+ * @since [产品/模块版本] （可选）-
  */
 public interface AnalyticsService extends InitializingBean {
     Logger log = LoggerFactory.getLogger(AnalyticsService.class);

@@ -9,6 +9,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -50,13 +51,8 @@ import static com.yjh.platform.common.Constant.redisTemplate;
 @Service
 public class TSequentialConfService{
 
-    @Value("${sequential.videocfmresult}")
-    private String videocfmresultFile;
-
-    @Value("${sequential.returnlinkage}")
-    private String returnlinkageFile;
-    @Value("${sequential.fileCharset:GB2312}")
-    private String fileCharset;
+    @Autowired
+    private ApplicationProperties applicationProperties;
     @Value("${sequential.cameraCapture}")
     private String cameraCapture;
 
@@ -667,7 +663,7 @@ public class TSequentialConfService{
             String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
-            String devicePath = path + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
+            String devicePath = path + applicationProperties.getSequentialConfig().getSequentialVideocfmResult().replace("{{date}}", simpleDateFormat2.format(new Date()));
 
             File txt=new File(devicePath);
             if(txt.delete()){
@@ -679,7 +675,7 @@ public class TSequentialConfService{
             String meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(txt,true), fileCharset));
+                    new FileOutputStream(txt,true), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
             bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::设备状态>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
@@ -723,7 +719,7 @@ public class TSequentialConfService{
             String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
-            String devicePath = path + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}",simpleDateFormat2.format(new Date()));
             log.info("unionTask devicePath {}", devicePath);
             File txt=new File(devicePath);
 
@@ -739,7 +735,7 @@ public class TSequentialConfService{
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
             BufferedWriter bw = new BufferedWriter(
                     new OutputStreamWriter(
-                            new FileOutputStream(txt), fileCharset));
+                            new FileOutputStream(txt), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
 
             bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::控制状态信息>\r\n");

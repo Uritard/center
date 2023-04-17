@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.service.TSequentialConfService;
 import com.yjh.platform.module.user.entity.TSequentialConf;
@@ -35,8 +36,8 @@ public class TSequentialConfController {
 
     @Autowired
     private final TSequentialConfService tSequentialConfService;
-    @Value("${sequential.result.flag}")
-    private String flag;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private Logger log = LoggerFactory.getLogger(TSequentialConfController.class);
 
@@ -285,7 +286,7 @@ public class TSequentialConfController {
 //            recBack.put("meteId","1001");
 //            recBack.put("code","200");
 //            recBack.put("desc","合");
-            if(flag != null && "1".equals(flag)){
+            if(applicationProperties.getSequentialConfig().getSequentialResultFlag() != null && "1".equals(applicationProperties.getSequentialConfig().getSequentialResultFlag())){
                 recBack.put("code","200");
                 recBack.put("desc",String.valueOf(Constant.sequentialState.get("meteResult")));
             }

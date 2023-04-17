@@ -7,7 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -44,7 +44,7 @@ public class SilentTaskJob implements Runnable {
 
     private Integer presetType;
 
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
 
     private String stationCode;
 
@@ -52,13 +52,13 @@ public class SilentTaskJob implements Runnable {
                          RedisTemplate redisTemplate,
                          IntelAnalysisService intelAnalysisService,
                          Integer presetType,
-                         UpFtpsConfig upFtpsConfig,
+                         ApplicationProperties applicationProperties,
                          String stationCode){
         this.tCameraPresetDao = tCameraPresetDao;
         this.redisTemplate = redisTemplate;
         this.intelAnalysisService = intelAnalysisService;
         this.presetType = presetType;
-        this.upFtpsConfig = upFtpsConfig;
+        this.applicationProperties = applicationProperties;
         this.stationCode = stationCode;
     }
     /**
@@ -189,8 +189,8 @@ public class SilentTaskJob implements Runnable {
             String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
             String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
-            FtpsUtil.putFile(absPath, ftpsTarPath, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            FtpsUtil.putFile(absPath, ftpsTarPath, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
+                    applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
             xmlItem.put("file_path", ftpsTarPath);
             xmlItem.put("monitor_type", "");
 

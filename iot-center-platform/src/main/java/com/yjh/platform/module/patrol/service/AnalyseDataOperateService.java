@@ -4,7 +4,7 @@ package com.yjh.platform.module.patrol.service;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
@@ -33,7 +33,7 @@ public class AnalyseDataOperateService {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
 
     private final Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
@@ -899,8 +899,8 @@ public class AnalyseDataOperateService {
             if (StringUtils.equals("--", sourcePath)) {
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
+                    applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
