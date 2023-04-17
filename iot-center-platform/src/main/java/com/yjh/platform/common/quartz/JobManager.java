@@ -28,8 +28,7 @@ public class JobManager {
 
     @Autowired
     private Scheduler scheduler;
-    @Value("${data.period.upload.interval}")
-    private String dataUploadInterval;
+
 
     /**
      * 任务是否存在
@@ -76,7 +75,6 @@ public class JobManager {
             logger.error(" Job already exist");
             return "false";
         }
-        logger.info("dataUploadInterval :" + dataUploadInterval);
 
         //创建一个jobDetail的实例，将该实例与HelloJob Class绑定
         JobDetail jobDetail = JobBuilder.newJob(DeviceDataJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).build();
@@ -89,97 +87,6 @@ public class JobManager {
         return "success";
     }
 
-    /**
-     *新建一个周期巡视任务
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public String addCruiseTaskJob(QuartzTask quartzTask, String taskId) throws Exception {
-        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-//        logger.info("dataUploadInterval :" + dataUploadInterval);
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", taskId).build();
-        taskMap.put("taskId",taskId);
-        taskMap.put("jobName",quartzTask.getJobName()+System.currentTimeMillis());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
-        CronTrigger cronTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(str, quartzTask.getJobGroup())
-                .withSchedule(cronSchedule(quartzTask.getCronExpression()))
-                .build();
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, cronTrigger);
-        logger.info("周期任务创建成功");
-        return "success";
-    }
-
-    /**
-     *新建一个立即巡视任务
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public String addCruiseTaskJobNow(QuartzTask quartzTask, String taskId) throws Exception {
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", taskId).build();
-        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
-                .startNow()
-                .withSchedule(
-                        SimpleScheduleBuilder.simpleSchedule()
-                                .withIntervalInSeconds(3)
-                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                .build();
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
-        logger.info("立即任务创建成功");
-        return "success";
-    }
-
-    /**
-     *新建一个定时巡视任务
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public String addCruiseTaskJobAtTime(QuartzTask quartzTask, String taskId) throws Exception {
-        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", taskId).build();
-        taskMap.put("taskId",taskId);
-        taskMap.put("jobName",quartzTask.getJobName()+System.currentTimeMillis());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
-        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(str, quartzTask.getJobGroup())
-                .startAt(quartzTask.getStartTime())
-                .withSchedule(
-                        SimpleScheduleBuilder.simpleSchedule()
-                                .withIntervalInSeconds(3)
-                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                .build();
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
-        logger.info("定时任务创建成功");
-        return "success";
-    }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void pauseJob(QuartzTask quartzTask, String triggerName) throws Exception {
@@ -220,72 +127,6 @@ public class JobManager {
             throw new RuntimeException(e);
         }
 
-    }
-
-    /**
-     *检查暂停的任务是否超期
-     */
-    public String checkTaskIsOver(QuartzTask quartzTask, String taskId) throws Exception {
-        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-        JobDetail jobDetail = JobBuilder.newJob(CheckTaskAreJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", taskId).build();
-        taskMap.put("taskId",taskId);
-        taskMap.put("jobName",quartzTask.getJobName());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
-        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(str, quartzTask.getJobGroup())
-                .startAt(quartzTask.getStartTime())
-                .withSchedule(
-                        SimpleScheduleBuilder.simpleSchedule()
-                                .withIntervalInSeconds(3)
-                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                .build();
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
-        logger.info("定时任务创建成功");
-        return "success";
-    }
-    /**
-     *任务终止
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public String taskShutDown(QuartzTask quartzTask, String taskId) throws Exception {
-        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-        JobDetail jobDetail = JobBuilder.newJob(TaskShutDownJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", taskId).build();
-        taskMap.put("taskId",taskId);
-        taskMap.put("jobName",quartzTask.getJobName());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
-        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(str, quartzTask.getJobGroup())
-                .startAt(quartzTask.getStartTime())
-                .withSchedule(
-                        SimpleScheduleBuilder.simpleSchedule()
-                                .withIntervalInSeconds(3)
-                                .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                .build();
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
-        logger.info("定时任务创建成功");
-        return "success";
     }
 
     /**

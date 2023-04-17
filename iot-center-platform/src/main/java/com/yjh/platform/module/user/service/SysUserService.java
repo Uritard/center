@@ -11,8 +11,6 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.configuration.RedisAndYxsjUtil;
-import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;

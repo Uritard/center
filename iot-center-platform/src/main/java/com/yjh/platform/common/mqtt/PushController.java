@@ -2,6 +2,7 @@ package com.yjh.platform.common.mqtt;
 
 import com.yjh.platform.common.mqtt.msg.HeartMessageInfo;
 import com.yjh.platform.common.mqtt.msg.PushMsgbody;
+import com.yjh.platform.configuration.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,12 +16,12 @@ public class PushController {
     @Autowired
     MqttUtilsServer mqttUtilsServer;
 
-    @Value("${mqtt.heart.topic}")
-    private String topic;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @PostMapping("/postMsg")
     public Boolean postjosnMsg2(@RequestBody Object msg) {
-        Boolean pushflag = mqttUtilsServer.pushMsg(topic, msg,1);
+        Boolean pushflag = mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttTopic(), msg,1);
         return pushflag;
     }
 

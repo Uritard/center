@@ -12,7 +12,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
-import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -41,16 +41,16 @@ import java.util.*;
 public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+    private final ApplicationProperties applicationProperties;
     private final IntelligentAlgorithmConfig algorithmConfig;
 
     private HashOperations<String, String, String> hashOperations;
     private Map<String, List<String>> analyseTypeMap = new HashMap<>(16);
 
-    public HttpAnalyticsServiceImpl(RedisTemplate<String, Object> redisTemplate, IntelAnalysisFtpsConfig intelAnalysisFtpsConfig,
+    public HttpAnalyticsServiceImpl(RedisTemplate<String, Object> redisTemplate, ApplicationProperties applicationProperties,
         IntelligentAlgorithmConfig algorithmConfig) {
         this.redisTemplate = redisTemplate;
-        this.intelAnalysisFtpsConfig = intelAnalysisFtpsConfig;
+        this.applicationProperties = applicationProperties;
         this.algorithmConfig = algorithmConfig;
         this.hashOperations = redisTemplate.opsForHash();
         reloadAnalyseType();
@@ -195,7 +195,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                     analyseObject.setImageNormalUrlPath(targetNamePath);
                 }
                 // 上传基准图
-                uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+                uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
                 analyseObject.setImageNormalUrlPath(presetId);
@@ -250,7 +250,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
             String[] split = analysis.getPicPath().split("/");
             String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
-            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
+            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);
             analyseObject.setImageUrlList(imageUrlList);
@@ -293,13 +293,13 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * @param sourcePath     源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToFtps(String sourcePath, String targetPathName, IntelAnalysisFtpsConfig ftpsConfig) {
+    private void uploadFileToFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig ftpsConfig) {
         try {
             if (CommonUtils.isEmptyOrNullstr(sourcePath) || CommonUtils.isEmptyOrNullstr(targetPathName)) {
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(), ftpsConfig.getKeypw(),
-                ftpsConfig.getUsername(), ftpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
+                ftpsConfig.getUserName(), ftpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至巡视主机ftp服务器错误:", e);
         }

@@ -1405,14 +1405,14 @@ public class RobotService {
                 map.put("creator", Optional.ofNullable(item.getCreator()).orElse("1"));
                 map.put("create_time", Optional.ofNullable(item.getCreator()).orElse(DateTimeUtil.format(new Date())));
                 mapList.add(map);
-                taskItemMap.put("type", NORMAL_TASK);
+                taskItemMap.put("type", NORMAL_TASK.getType());
                 taskItemMap.put("mapList", mapList);
             } else {
                 log.info("This is a linkage task！！！！！！！！！！！！！");
                 map.put("priority", "4");
                 map.put("device_level", 3);
                 mapList.add(map);
-                taskItemMap.put("type", LINKAGE_TASK);
+                taskItemMap.put("type", LINKAGE_TASK.getType());
                 taskItemMap.put("mapList", mapList);
             }
         } catch (Exception e) {

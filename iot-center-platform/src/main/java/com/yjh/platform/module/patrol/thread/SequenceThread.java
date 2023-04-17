@@ -3,7 +3,7 @@ package com.yjh.platform.module.patrol.thread;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -28,7 +28,7 @@ public class SequenceThread implements Runnable {
     private final String meteId;
     private final UPatrolTaskService uPatrolTaskService;
     private final String filePath;
-    private final IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+    private final ApplicationProperties applicationProperties;
     private final IntelAnalysisService intelAnalysisService;
 
     public SequenceThread(RedisTemplate redisTemplate, String meteId, String filePath) {
@@ -36,7 +36,7 @@ public class SequenceThread implements Runnable {
         this.meteId = meteId;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.filePath = filePath;
-        this.intelAnalysisFtpsConfig = StaticContextAccessor.getBean(IntelAnalysisFtpsConfig.class);
+        this.applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
         this.intelAnalysisService = StaticContextAccessor.getBean(IntelAnalysisService.class);
     }
 
@@ -73,11 +73,10 @@ public class SequenceThread implements Runnable {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    public void uploadFileToFtps(String sourcePath, String targetPathName, IntelAnalysisFtpsConfig ftpsConfig) {
+    public void uploadFileToFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig ftpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
-                    ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(), ftpsConfig.getUserName(), ftpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至巡视主机ftp服务器错误:{}", e);
         }

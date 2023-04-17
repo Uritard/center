@@ -7,12 +7,14 @@ package com.yjh.platform.module.patrol.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyticsService;
 import com.yjh.platform.netty.client.AnalysisClientHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,17 +36,8 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    /**
-     * 表计算法端口
-     */
-    @Value("${netty.recognize.port}")
-    int recognizePort;
-
-    /**
-     * 缺陷算法端口
-     */
-    @Value("${netty.ai.port}")
-    int aiPort;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     AtomicLong algorithmMsgId = new AtomicLong(100000000L);
     AtomicLong defectMsgId = new AtomicLong(200000000L);
@@ -66,13 +59,13 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
     public Result analytics(List<Analysis> analysisList) {
         Result result = new Result();
         log.info("analysisList____-----____: {}", JSON.toJSONString(analysisList));
-        log.info("recognizePort-----: {}", recognizePort);
+        log.info("recognizePort-----: {}", applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort());
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
         log.info("进入识别算法方法----------");
         long msgId = algorithmMsgId.incrementAndGet();
         analysisObject.put("msgID", String.valueOf(msgId));
-        analysisObject.put("port", recognizePort);
+        analysisObject.put("port", applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort());
         log.info("algorithmMsgId: {}", msgId);
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
@@ -109,7 +102,7 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             }
             analysisObject.put("msgData", msgDataObject);
             log.info("analysisObject----: {}", analysisObject);
-            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort);
+            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort());
             if(handler != null) {
                 handler.sendDataReguest(analysisObject);
                 result.setCode(200, "SUCCESS");
@@ -197,9 +190,9 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             }
             msgDataObject.put("data", pictureInfoObject);
             analysisObject.put("msgData", msgDataObject);
-            log.info("aiPort---------: {}", aiPort);
+            log.info("aiPort---------: {}", applicationProperties.getAlgorithmServerConfig().getNettyAiPort());
 
-            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort);
+            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(applicationProperties.getAlgorithmServerConfig().getNettyAiPort());
             if(handler != null) {
                 handler.sendDataReguest(analysisObject);
                 result.setCode(200, "SUCCESS");

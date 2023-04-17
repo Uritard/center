@@ -3,7 +3,7 @@ package com.yjh.platform.module.task.scheduled;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.quartz.SilentAlarmThread;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
-import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class SecondLevelSilentTaskScheduled {
     @Autowired
     private TCameraPresetService tCameraPresetService;
     @Autowired
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
     @Value("${spring.websocket.send.url}")
     private String syncWebsocketUrl;
     @Autowired
@@ -81,7 +81,7 @@ public class SecondLevelSilentTaskScheduled {
 
             log.info("静默数据 ---------------- " + ip + ":" + port);
             HttpAysncClientUtil.HttpAysncInit(user, password);
-            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, upFtpsConfig, syncWebsocketUrl, tWarnInfoDao);
+            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, applicationProperties, syncWebsocketUrl, tWarnInfoDao);
             Thread thread = new Thread(silentAlarmThread);
             thread.setDaemon(true);
             thread.start();

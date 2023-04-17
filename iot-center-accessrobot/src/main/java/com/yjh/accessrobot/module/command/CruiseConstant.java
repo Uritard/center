@@ -54,6 +54,10 @@ public interface CruiseConstant {
          */
         LINKAGE_TASK("102");
 
+        public String getType() {
+            return type;
+        }
+
         final String type;
 
         CruiseTypeEnum(String type) {this.type = type;}

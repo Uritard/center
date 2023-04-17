@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.scheduled;
 
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.dao.StatisticsDao;
@@ -43,6 +44,8 @@ public class DeviceStaticsToUpSystem {
 
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

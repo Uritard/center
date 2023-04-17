@@ -22,7 +22,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -133,7 +133,7 @@ public class UPatrolTaskService {
     @Autowired
     private JobManager jobManager;
     @Autowired
-    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+    private ApplicationProperties applicationProperties;
 
     @Autowired
     private LogsRecord logsRecord;
@@ -2881,8 +2881,7 @@ public class UPatrolTaskService {
 
     public String downloadPicture(String source,String target) {
         try {
-            FtpsUtil.downloadFile(source, target, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
-                    intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            FtpsUtil.downloadFile(source, target, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

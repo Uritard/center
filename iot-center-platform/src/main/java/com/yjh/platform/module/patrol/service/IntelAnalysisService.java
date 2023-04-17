@@ -11,9 +11,8 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.*;
-import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
-import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
@@ -77,11 +76,6 @@ public class IntelAnalysisService {
      */
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
-    /**
-     * 27大类假数据读取来源
-     */
-    @Value("${conf.file.name}")
-    private String fileName;
 
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -90,13 +84,11 @@ public class IntelAnalysisService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
     @Autowired
-    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
-    @Autowired
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
     @Autowired
     private IntelligentAlgorithmConfig algorithmConfig;
     @Autowired
-    private FtpsService ftpsservice;
+    private FtpsService ftpsService;
     @Autowired
     private PatrolResultHandler patrolResultHandler;
     @Autowired
@@ -389,7 +381,7 @@ public class IntelAnalysisService {
         try {
             String[] split = httpPath.split("/");
             String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
-            uploadFileToFtps(httpPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+            uploadFileToFtps(httpPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             return targetNamePath;
         } catch (Exception e) {
             log.error("upLoadFileByHttpPath err, httpPath: {}, msg: {}", httpPath, e.getMessage());
@@ -407,7 +399,7 @@ public class IntelAnalysisService {
     public String upLoadFileToCoverHttpPath(String urlPath, String httpPath) {
         try {
             String targetNamePath = httpPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), "");
-            uploadFileToFtps(urlPath, targetNamePath, intelAnalysisFtpsConfig);
+            uploadFileToFtps(urlPath, targetNamePath, applicationProperties.getIntelAnalysisFtps());
             return targetNamePath;
         } catch (Exception e) {
             log.error("upLoadFileToHttpPath err, httpPath: {}, msg: {}", urlPath, e.getMessage());
@@ -461,7 +453,7 @@ public class IntelAnalysisService {
                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")));
                         String[] split = imageNormalUrlPath.split("/");
                         String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
-                        uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+                        uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
                         analyseObject.setImageNormalUrlPath(targetNamePath);
                     }else {
                         // 拿电科院给的图
@@ -478,7 +470,7 @@ public class IntelAnalysisService {
                         }
                         String[] split = imageNormalUrlPath.split("/");
                         String targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
-                        uploadFileToFtps(imageNormalUrlPath, targetNamePath, intelAnalysisFtpsConfig);
+                        uploadFileToFtps(imageNormalUrlPath, targetNamePath, applicationProperties.getIntelAnalysisFtps());
                         analyseObject.setImageNormalUrlPath(targetNamePath);
                     }
 
@@ -548,7 +540,7 @@ public class IntelAnalysisService {
 
             String[] split = analysis.getPicPath().split("/");
             String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
+            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);
             analyseObject.setImageUrlList(imageUrlList);
@@ -575,7 +567,7 @@ public class IntelAnalysisService {
 
         String[] split = request.getAlgorithmPath().split("/");
         String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
+        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
         param.put("algorithmPath", targetNamePath);
 
@@ -933,7 +925,7 @@ public class IntelAnalysisService {
 
             String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
             //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+origpcimagename;
+            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+origpcimagename;
 
             String resImageUrl = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(),
                     response.getResultsList().get(0).getResults().get(0).getResImageUrl());
@@ -944,11 +936,11 @@ public class IntelAnalysisService {
 
             String imgF = nowTime+"_测试间隔_测试设备_测试测点_判别告警.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgF;
+            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgF;
 
             String imgBase =nowTime+ "_测试间隔_测试设备_测试测点_判别基准.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remoteBaseFilePath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgBase;
+            String remoteBaseFilePath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgBase;
 
             //基准图
             String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(Long.valueOf(response.getResultsList().get(0).getObjectId()));
@@ -995,9 +987,9 @@ public class IntelAnalysisService {
             alarmDetail.setPic_width(1920);
             log.info("判别消息：{}",alarmDetail);
 
-            ftpsservice.uploadFile("原图",Constant.algorithmTestPicPath,remoteorigfilepath);
-            ftpsservice.uploadFile("基准",basePath,remoteBaseFilePath);
-            ftpsservice.uploadFile("结果",resImageUrl,remotefilepath);
+            ftpsService.uploadFile("原图",Constant.algorithmTestPicPath,remoteorigfilepath);
+            ftpsService.uploadFile("基准",basePath,remoteBaseFilePath);
+            ftpsService.uploadFile("结果",resImageUrl,remotefilepath);
 
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
@@ -1009,13 +1001,13 @@ public class IntelAnalysisService {
 
             String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
             //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+origpcimagename;
+            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+origpcimagename;
 
             String resImageUrl = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(),
                     response.getResultsList().get(0).getResults().get(0).getResImageUrl());
             String imgF = nowTime +"_测试间隔_测试设备_测试测点_缺陷告警.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+imgF;
+            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+imgF;
 
             Alarm alarmDetail=new Alarm();
 
@@ -1062,8 +1054,8 @@ public class IntelAnalysisService {
             alarmDetail.setPic_width(1920);
             log.info("缺陷测试消息：{}",alarmDetail);
 
-            ftpsservice.uploadFile("原图", Constant.algorithmTestPicPath,remoteorigfilepath);
-            ftpsservice.uploadFile("结果图",resImageUrl,remotefilepath);
+            ftpsService.uploadFile("原图", Constant.algorithmTestPicPath,remoteorigfilepath);
+            ftpsService.uploadFile("结果图",resImageUrl,remotefilepath);
 
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
@@ -1280,8 +1272,7 @@ public class IntelAnalysisService {
             }
 
             log.info("开始执行：FtpsUtil.downloadFile");
-            FtpsUtil.downloadFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
-                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            FtpsUtil.downloadFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
             log.info("结束执行：FtpsUtil.downloadFile");
         } catch (Exception e) {
             log.error("将文件从 platform ftp 服务器下载到本地错误:", e);
@@ -1303,8 +1294,7 @@ public class IntelAnalysisService {
             }
 
             log.info("开始执行：FtpsUtil.putFile");
-            FtpsUtil.putFile(localPath, ftpsPath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
-                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort() , applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
             log.info("结束执行：FtpsUtil.putFile");
         } catch (Exception e) {
             log.error("将文件上传至 platform ftp 服务器错误:", e);
@@ -1433,86 +1423,6 @@ public class IntelAnalysisService {
         return null;
     }
 
-    private void alarmToSFZJ(Boolean isHave, String instanceId, List<AnalyseResultItem> results){
-        try{
-            String flag= ftpsservice.getFlag();
-            if("1".equals(flag) && isHave) {
-                log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
-                Alarm alarmDetail = new Alarm();
-                String year = Integer.toString(LocalDate.now().getYear());
-                String month = Integer.toString(LocalDate.now().getMonthValue());
-
-                // 获取原始图路径 resultImgRealPath
-                String origpicpath = redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content") + instanceId + ".jpg";
-                String[] str2 = origpicpath.split("/");
-                String origpcimagename = str2[str2.length - 1];
-                //拼接算法管理平台原始图片推送地址
-                String remoteorigfilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + year + "/" + month + "/" + origpcimagename;
-                log.info("开始向算法管理平台发送图片和mqtt消息");
-                HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
-                List<Defect> defectList1 = new ArrayList<>();
-                String targetPath= "";
-                for (AnalyseResultItem result : results) {
-                    String code = Optional.ofNullable(result.getCode()).orElse("");
-                    String value = Optional.ofNullable(result.getValue()).orElse("");
-                    String type = Optional.ofNullable(result.getType()).orElse("");
-                    String desc = Optional.ofNullable(result.getDesc()).orElse("");
-                    int conf = (int)(result.getConf() * 100);
-                    targetPath = copyFileFromFtps(type, result.getResImageUrl());
-                    if("1".equals(value)){
-                        Defect defect = new Defect();
-                        defect.setX1((int)result.getPos().get(0).getAreas().get(0).getX());
-                        defect.setY1((int)result.getPos().get(0).getAreas().get(0).getY());
-                        defect.setX2((int)result.getPos().get(0).getAreas().get(1).getX());
-                        defect.setY2((int)result.getPos().get(0).getAreas().get(1).getY());
-                        defect.setType(type);
-                        defect.setDesc(desc);
-                        defect.setConfidence(conf);
-                        defectList1.add(defect);
-                    }
-                }
-                //先取出算法平台返回的resultinfo中的结果图片路径
-                String resultImagebak = targetPath;
-                String[] str = resultImagebak.split("/");
-                String imagename = str[str.length - 1];
-                //拼接算法管理平台分析告警结果图片地址
-                String remotefilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + year + "/" + month + "/" + imagename;
-
-                alarmDetail.setDefect(defectList1);
-                alarmDetail.setBay_name(nameMap.get("upRegionName"));
-                //需要修改位devicename
-                alarmDetail.setDevice_name(nameMap.get("deviceName"));
-                alarmDetail.setPoint_name(nameMap.get("meteName"));
-                alarmDetail.setTime(DateTimeUtil.format(new Date()));
-                //图片原图
-                alarmDetail.setPic_raw(remoteorigfilepath);
-                //判别基准图路径
-                alarmDetail.setPic_diff_base("");
-                //判别告警图路径,即分析结果图
-                alarmDetail.setPic_different("");
-                //缺陷告警图路径
-                alarmDetail.setPic_defect(remotefilepath);
-                ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);
-                ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
-                if (!ftpsservice.fileExits(remoteorigfilepath)) {
-                    //原始图片上传
-                    ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);
-                }
-                if (!ftpsservice.fileExits(remotefilepath)) {
-                    ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
-                }
-
-                log.info("巡视主机与智能分析主机：origpicpath:{}", origpicpath);
-                log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
-                log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
-                log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
-                alarmService.PushMsg(alarmDetail);
-                log.info("发送算法管理平台结束");
-            }
-        }catch (Exception e){
-            log.warn("发送给算法主机错误");
-        }
-    }
 
     /**
      * 静默监视告警向上级系统上报
@@ -1596,7 +1506,7 @@ public class IntelAnalysisService {
                 String edgeId = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
                 targetNamePath = edgeId + "/jm/" + targetNamePath;
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
-                uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
+                uploadFileToUpFtps(imgPath, targetNamePath, applicationProperties.getUpSystemFtps());
 
                 xmlItem.put("file_path", targetNamePath);
                 xmlItem.put("time", warnTime);
@@ -1622,7 +1532,7 @@ public class IntelAnalysisService {
      */
     private Map<String, Object> generateMapFormat() {
         Map<String, Object> map = new HashMap<>(16);
-        String path = String.valueOf(this.getClass().getClassLoader().getResource(fileName));
+        String path = String.valueOf(this.getClass().getClassLoader().getResource(applicationProperties.getAlgorithmServerConfig().getConfFileName()));
         if (CommonUtils.isEmptyOrNullstr(path)){
             return map;
         }
@@ -1738,11 +1648,11 @@ public class IntelAnalysisService {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToFtps(String sourcePath, String targetPathName, IntelAnalysisFtpsConfig ftpsConfig) {
+    private void uploadFileToFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig ftpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
-                    ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort()
+                    , ftpsConfig.getUserName(), ftpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至巡视主机ftp服务器错误: ", e);
         }
@@ -1754,11 +1664,10 @@ public class IntelAnalysisService {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(), upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

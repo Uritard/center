@@ -9,8 +9,7 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
-import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
-import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
@@ -66,22 +65,8 @@ public class TCameraPresetService {
     @Autowired
     private IntelAnalysisService intelAnalysisService;
     @Autowired
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
 
-    @Autowired
-    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
-
-    /**
-     * 变电站编码
-     */
-    @Value("${station.code}")
-    private String stationCode;
-
-    /**
-     * 是否调用调用算法组相机偏移校验功能
-     */
-    @Value("${camera.preset.second.check}")
-    private boolean cameraPresetSecondCheck;
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;
 
@@ -489,7 +474,7 @@ public class TCameraPresetService {
             executor.setRemoveOnCancelPolicy(true);
         }
         SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
-                silentConf.getPresetType(),upFtpsConfig,stationCode);
+                silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode());
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }
@@ -665,7 +650,7 @@ public class TCameraPresetService {
             }
 
             // 判断是都需要调用算法接口进行图片比对
-            if (cameraPresetSecondCheck) {
+            if (applicationProperties.getOtherConfig().getCameraPresetSecondCheck()) {
                 String idStr = String.format("%d_%d", tCameraPreset.getCameraId(), tCameraPreset.getPresetId());
                 sendPicToAnalyse(picOnline, tCameraPreset.getPresetImg(), idStr);
             }
@@ -843,13 +828,13 @@ public class TCameraPresetService {
             String ftpsLocalPath = urlPath.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content").toString());
             String romotePath = presetImgHttpUrl.replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content").toString(), "");
 
-            FtpsUtil.putFile(ftpsLocalPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
-                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            FtpsUtil.putFile(ftpsLocalPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(),
+                applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
 
             log.info("ftpsUtil.downloadFile(, localPath: {}, romotePath: {}, ftpsLocalPath: {}", localPath, romotePath, ftpsLocalPath);
             // localPath: 本地需要覆盖到的地址， romotePath:ftps间接地址
-            FtpsUtil.downloadFile(localPath, romotePath, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
-                intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+            FtpsUtil.downloadFile(localPath, romotePath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(),
+                applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
             return romotePath;
         } catch (Exception e) {
             log.info("将相机采集到的图片覆盖到原预置位图片失败, ", e);

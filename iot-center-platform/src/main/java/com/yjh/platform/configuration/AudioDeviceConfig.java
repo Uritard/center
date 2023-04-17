@@ -15,10 +15,12 @@ import com.yjh.platform.audiodevice.impl.standard.StandardAudioDeviceMonitor;
 import com.yjh.platform.audiodevice.impl.standard.tcp.MessageCodec;
 import com.yjh.platform.audiodevice.impl.standard.tcp.PacketCodecFactory;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,11 +33,9 @@ import java.util.concurrent.Executors;
  */
 @Configuration
 public class AudioDeviceConfig {
-    @Value("${audio.tcp.server.port}")
-    private int port;
 
-    @Value("${audio.tcp.byteorder-little-endian-enabled}")
-    private boolean byteOrderLittleFlag;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @Bean
     public RxBus serverRxBus() {
@@ -64,7 +64,7 @@ public class AudioDeviceConfig {
 
     @Bean
     public BaseSocketServer socketServer(MsgChannel serverMsgChannel) {
-        return new BaseSocketServer("0.0.0.0", port, serverMsgChannel, new PacketCodecFactory(byteOrderLittleFlag)
+        return new BaseSocketServer("0.0.0.0", applicationProperties.getAudioConfig().getAudioTcpServerPort(), serverMsgChannel, new PacketCodecFactory(applicationProperties.getAudioConfig().getAudioTcpByteOrderLittleEndianEnabled())
         );
     }
 

@@ -1,6 +1,7 @@
 package com.yjh.platform.common.mqtt;
 
 import com.yjh.platform.common.mqtt.msg.HeartMessageInfo;
+import com.yjh.platform.configuration.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,49 +21,28 @@ public class HeartBeatJob {
     private MqttUtilsServer mqttUtilsServer;
 
     private HeartMessageInfo heartMsg;
-
-    @Value("${mqtt.heart.topic}")
-    private String heartTopic;
-
-    @Value("${mqtt.province_name}")
-    private String provinceName;
-
-    @Value("${mqtt.city_name}")
-    private String cityName;
-
-    @Value("${mqtt.station_name}")
-    private String stationName;
-    @Value("${mqtt.section_name}")
-    private String sectionName;
-
-    @Value("${mqtt.section_ip}")
-    private String sectionIP;
-
-    @Value("${mqtt.node_id}")
-    private String nodeId;
-
-    @Value("${mqtt.volt_level}")
-    private int voltLevel;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Scheduled(cron = " */30 * * * * ?")
     public void heartTest() {
         initMssageInfo();
-        mqttUtilsServer.pushMsg(heartTopic, heartMsg,1);
+        mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttHeartTopic(), heartMsg,1);
     }
 
     private void initMssageInfo() {
         heartMsg = new HeartMessageInfo();
         heartMsg.setMsgType(HEART);
-        heartMsg.setProvinceName(encode(provinceName));
-        heartMsg.setCityName(encode(cityName));
-        heartMsg.setStationName(encode(stationName));
-        heartMsg.setSectionName(sectionName);
+        heartMsg.setProvinceName(encode(applicationProperties.getManagerMqttConfig().getMqttProvinceName()));
+        heartMsg.setCityName(encode(applicationProperties.getManagerMqttConfig().getMqttCityName()));
+        heartMsg.setStationName(encode(applicationProperties.getManagerMqttConfig().getMqttStationName()));
+        heartMsg.setSectionName(applicationProperties.getManagerMqttConfig().getMqttSectionName());
         heartMsg.setTime(LocalDateTime.now().format(pattern));
-        heartMsg.setSectionIp(sectionIP);
-        heartMsg.setNodeId(nodeId);
-        heartMsg.setVoltLevel(voltLevel);
+        heartMsg.setSectionIp(applicationProperties.getManagerMqttConfig().getMqttSectionIp());
+        heartMsg.setNodeId(applicationProperties.getManagerMqttConfig().getMqttNodeId());
+        heartMsg.setVoltLevel(applicationProperties.getManagerMqttConfig().getVoltLevel());
     }
 
     private String encode(String str){

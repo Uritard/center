@@ -1,6 +1,5 @@
 package com.yjh.platform.module.patrol.service;
 
-import cn.hutool.core.math.MathUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
@@ -12,6 +11,7 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
@@ -54,7 +54,8 @@ public class ProcessResultToUpSystem {
     private final RedisTemplate redisTemplate;
     private final AnalyseDataOperateDao analyseDataOperateDao;
     private final AnalyseDataOperateService analyseDataOperateService;
-    private final FtpsService ftpsservice;
+    private final FtpsService ftpsService;
+    private final ApplicationProperties applicationProperties;
     private final AlarmService alarmService;
 
     private static final String CCD_PATH = "/CCD/";
@@ -63,12 +64,15 @@ public class ProcessResultToUpSystem {
 
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
-    public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao, AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsservice, AlarmService alarmService) {
+    public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
+                                   AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
+                                   AlarmService alarmService,ApplicationProperties applicationProperties) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
-        this.ftpsservice = ftpsservice;
+        this.ftpsService = ftpsService;
         this.alarmService = alarmService;
+        this.applicationProperties = applicationProperties;
     }
 
     public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
@@ -471,12 +475,11 @@ public class ProcessResultToUpSystem {
         // msg：判别告警 defect：缺陷告警
         Set<String> differentList= redisScan( "msg:" + msgId);
         Set<String> defectList = redisScan("defect:" + msgId);
-        String flag= ftpsservice.getFlag();
-        String ftpsRemotePath = ftpsservice.getFtpsRemotePath();
+        String ftpsRemotePath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath();
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-        if(CollectionUtils.isNotEmpty(differentList) && ("1".equals(flag))){
+        if(CollectionUtils.isNotEmpty(differentList)){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -539,26 +542,26 @@ public class ProcessResultToUpSystem {
             }
             alarmDetail.setDifferent(defectTempList);
             // 原始图片上传
-            ftpsservice.uploadFile("判别告警", origPicPath, remoteorigfilepath);
+            ftpsService.uploadFile("判别告警", origPicPath, remoteorigfilepath);
             // 判别基准图片上传
-            ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
+            ftpsService.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
             // 判别结果图片上传
-            ftpsservice.uploadFile("判别告警", resultImage, remotefilepath);
+            ftpsService.uploadFile("判别告警", resultImage, remotefilepath);
             log.info("判别与算法主机origpicpath:{}， remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
             log.info("判别与算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
             log.info("判别与算法主机resultImage:{}， remotefilepath:{}", resultImage, remotefilepath);
             //可靠性 文件是否传输成功
-            if( !ftpsservice.fileExits(remoteorigfilepath)){
+            if( !ftpsService.fileExits(remoteorigfilepath)){
                 log.info("原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
-                ftpsservice.uploadFile("判别告警", origPicPath, remoteorigfilepath);
+                ftpsService.uploadFile("判别告警", origPicPath, remoteorigfilepath);
             }
-            if( !ftpsservice.fileExits(remotebaseimagicpath)){
+            if( !ftpsService.fileExits(remotebaseimagicpath)){
                 log.info("判别基准图上传失败，再次上传， judgeBaseImagepath:{}, remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
-                ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
+                ftpsService.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
             }
-            if( !ftpsservice.fileExits(remotefilepath)){
+            if( !ftpsService.fileExits(remotefilepath)){
                 log.info("判别告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
-                ftpsservice.uploadFile("判别告警", resultImage, remotefilepath);
+                ftpsService.uploadFile("判别告警", resultImage, remotefilepath);
             }
             alarmService.PushMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
@@ -567,7 +570,7 @@ public class ProcessResultToUpSystem {
             defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
 
-        if(CollectionUtils.isNotEmpty(defectList) && ("1".equals(flag))) {
+        if(CollectionUtils.isNotEmpty(defectList)) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -627,16 +630,16 @@ public class ProcessResultToUpSystem {
                 alarmDetail.setPic_defect(remotefilepath);
             }
             // 原始图片上传
-            ftpsservice.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
+            ftpsService.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
             // 缺陷结果图片上传
-            ftpsservice.uploadFile("缺陷告警", resultImage, remotefilepath);
-            if (!ftpsservice.fileExits(remoteorigfilepath)) {
+            ftpsService.uploadFile("缺陷告警", resultImage, remotefilepath);
+            if (!ftpsService.fileExits(remoteorigfilepath)) {
                 log.info("缺陷原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
-                ftpsservice.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
+                ftpsService.uploadFile("缺陷告警", origPicPath, remoteorigfilepath);
             }
-            if (!ftpsservice.fileExits(remotefilepath)) {
+            if (!ftpsService.fileExits(remotefilepath)) {
                 log.info("缺陷告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
-                ftpsservice.uploadFile("缺陷告警", resultImage, remotefilepath);
+                ftpsService.uploadFile("缺陷告警", resultImage, remotefilepath);
             }
 
             log.info("缺陷与算法主机：origpicpath:{}，remoteorigfilepath:{}", origPicPath, remoteorigfilepath);

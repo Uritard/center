@@ -9,7 +9,7 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
@@ -66,7 +66,7 @@ public class SilentAlarmThread implements Runnable {
 
     private RedisTemplate redisTemplate;
     private TCameraPresetService tCameraPresetService;
-    private UpFtpsConfig upFtpsConfig;
+    private ApplicationProperties applicationProperties;
 
     private TWarnInfoDao tWarnInfoDao;
 
@@ -82,14 +82,14 @@ public class SilentAlarmThread implements Runnable {
     }
 
     public SilentAlarmThread(String ip, String port, String presetId, String cameraId, RedisTemplate redisTemplate,
-                             TCameraPresetService tCameraPresetService,UpFtpsConfig upFtpsConfig, String syncWebsocketUrl,TWarnInfoDao tWarnInfoDao) {
+                             TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties, String syncWebsocketUrl,TWarnInfoDao tWarnInfoDao) {
         this.ip = ip;
         this.port = port;
         this.presetId = presetId;
         this.cameraId = cameraId;
         this.redisTemplate = redisTemplate;
         this.tCameraPresetService = tCameraPresetService;
-        this.upFtpsConfig = upFtpsConfig;
+        this.applicationProperties = applicationProperties;
         this.syncWebsocketUrl = syncWebsocketUrl;
         this.tWarnInfoDao=tWarnInfoDao;
     }
@@ -392,8 +392,8 @@ public class SilentAlarmThread implements Runnable {
     private void copyFile(String ftpsPath, String localPath){
         try {
             if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
-            FtpsUtil.putFile(localPath, ftpsPath, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
+                    applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
@@ -534,7 +534,7 @@ public class SilentAlarmThread implements Runnable {
                 String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                 String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+"_"+System.currentTimeMillis()+".jpg";
 
-                uploadFileToUpFtps(imgPath, ftpsTarPath, upFtpsConfig);
+                uploadFileToUpFtps(imgPath, ftpsTarPath, applicationProperties.getUpSystemFtps());
 
                 xmlItem.put("file_path", ftpsTarPath);
                 xmlItem.put("time", warnTime);
@@ -575,11 +575,11 @@ public class SilentAlarmThread implements Runnable {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+                    upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

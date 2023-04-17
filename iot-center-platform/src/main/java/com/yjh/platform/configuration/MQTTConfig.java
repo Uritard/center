@@ -1,6 +1,7 @@
 package com.yjh.platform.configuration;
 
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,32 +20,21 @@ import java.net.UnknownHostException;
 @Configuration
 public class MQTTConfig {
 
-    @Value("${audio.mqtt.host}")
-    private String voiceHost;
-    @Value("${mqtt.host}")
-    private String host;
+    @Autowired
+    private ApplicationProperties applicationProperties;
     @Value("${spring.application.name}")
     private String appName;
     @Value("${server.port}")
     private String appPort;
-    @Value("${mqtt.user:}")
-    private String user;
-    @Value("${mqtt.pwd:}")
-    private String pwd;
-    @Value("${audio.mqtt.user:}")
-    private String voiceUser;
-    @Value("${audio.mqtt.pwd:}")
-    private String voicePwd;
-
 
     @Bean("algorithmMqtt")
     public MqttUtilsServer getAlgorithmMQTTServer() {
-        return new MqttUtilsServer(host, getIp() + "#" + appName + "#" + appPort, user, pwd);
+        return new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd());
     }
 
     @Bean("voiceMqtt")
     public MqttUtilsServer getVoiceMQTTServer() {
-        return new MqttUtilsServer(voiceHost, getIp() + "#" + appName + "#" + appPort, voiceUser, voicePwd);
+        return new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd());
     }
 
     /**
