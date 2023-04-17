@@ -29,6 +29,7 @@ public interface TCameraPresetDao {
 
     List<TCameraPreset> selectByPrimaryIds(@Param(value = "list") List<Long> cameraId);
     List<TCameraPreset> selectByCameraId(@Param(value = "cameraId") Long cameraId);
+    List<TCameraPreset> selectPresetByCruiseId(@Param(value = "cruiseId") Long cruiseId);
 
     List<TCameraPreset> selectByPresetName(@Param(value = "presetName") String presetName);
 

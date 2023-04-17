@@ -169,6 +169,11 @@ public class TStdDevicemeteService{
             tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
         }
 
+        // 非表计类型时，meter_type字段需要清空
+        if (!tStdDeviceMeteDetail.getMeteType().equals("221")) {
+            tStdDeviceMeteDetail.setMeterType(null);
+        }
+
         return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
 
@@ -299,46 +304,43 @@ public class TStdDevicemeteService{
                     rules.append("--");
                 }
             } else if (Objects.nonNull(tStdDeviceMeteDetail.getMeteKind()) && tStdDeviceMeteDetail.getMeteKind() == 2) {
-                if (StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelString())) {
-                    String[] alarmLevels = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
-                    if (alarmLevels.length != 0) {
-                        rules = new StringBuilder();
-                        for (String alarmLevel : alarmLevels) {
-                            String alarmLevelNote = AlarmLevelEnum.getDictNodeByDictCode(alarmLevel);
-                            if (StringUtils.isNotBlank(alarmLevelNote)) {
-                                if (AlarmLevelEnum.ALARM_LEVEL_130.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                        .append(tStdDeviceMeteDetail.getLowLimit1() == null ? "" : tStdDeviceMeteDetail.getLowLimit1())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit1() == null ? "" : tStdDeviceMeteDetail.getHighLimit1())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_131.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit2() == null ? "" : tStdDeviceMeteDetail.getLowLimit2())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit2() == null ? "" : tStdDeviceMeteDetail.getHighLimit2())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_132.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit3() == null ? "" : tStdDeviceMeteDetail.getLowLimit3())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit3() == null ? "" : tStdDeviceMeteDetail.getHighLimit3())
-                                        .append("；");
-                                } else if (AlarmLevelEnum.ALARM_LEVEL_133.getDictCode().equals(alarmLevel)) {
-                                    rules.append(alarmLevelNote).append("：")
-                                    .append(tStdDeviceMeteDetail.getLowLimit4() == null ? "" : tStdDeviceMeteDetail.getLowLimit4())
-                                        .append("--")
-                                        .append(tStdDeviceMeteDetail.getHighLimit4() == null ? "" : tStdDeviceMeteDetail.getHighLimit4())
-                                        .append("；");
-                                }
-                            }
-                        }
-                    }
+                rules = new StringBuilder();
+                String ruleStr = getRules(tStdDeviceMeteDetail);
+                if (StringUtils.isNotEmpty(ruleStr)) {
+                    rules.append(ruleStr);
+                } else {
+                    rules.append("--");
                 }
+
             }
             tStdDeviceMeteDetail.setRules(rules.toString());
         });
     }
+
+    /**
+     * 拼接告警规则
+     *
+     * @param tStdDeviceMeteDetail tStdDeviceMeteDetail
+     * @return result
+     */
+    private String getRules(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+        String level130 = getOneLevelRules(AlarmLevelEnum.ALARM_LEVEL_130.getDictNote(), tStdDeviceMeteDetail.getLowLimit1(), tStdDeviceMeteDetail.getHighLimit1());
+        String level131 = getOneLevelRules(AlarmLevelEnum.ALARM_LEVEL_131.getDictNote(), tStdDeviceMeteDetail.getLowLimit2(), tStdDeviceMeteDetail.getHighLimit2());
+        String level132 = getOneLevelRules(AlarmLevelEnum.ALARM_LEVEL_132.getDictNote(), tStdDeviceMeteDetail.getLowLimit3(), tStdDeviceMeteDetail.getHighLimit3());
+        String level133 = getOneLevelRules(AlarmLevelEnum.ALARM_LEVEL_133.getDictNote(), tStdDeviceMeteDetail.getLowLimit4(), tStdDeviceMeteDetail.getHighLimit4());
+
+        StringBuilder rules = new StringBuilder();
+        return rules.append(level130).append(level131).append(level132).append(level133).toString();
+    }
+
+    private String getOneLevelRules(String levelName, Float lowLimit, Float highLimit) {
+        if (lowLimit != null && highLimit != null) {
+            return String.format("%s：%s--%s；", levelName, lowLimit.toString(), highLimit.toString());
+        } else {
+            return "";
+        }
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TStdDeviceMete> list) {

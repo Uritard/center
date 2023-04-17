@@ -368,6 +368,20 @@ public class TCameraPresetController {
         return result;
     }
 
+    @ApiOperation(value = "根据巡视点，查询预置位树")
+    @GetMapping(value = "/selectPresetTreeList")
+    @Logs(title = "根据巡视点，查询预置位树",content = "根据用户传递的参数查询预置位树信息",logType = 1)
+    public Result selectPresetTreeList(@RequestParam(value = "cruisePoint", required = false) Long cruisePoint) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.selectPresetTreeList(cruisePoint));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "启动执行相机预置位校验")
     @GetMapping(value = "/startPresetCheck")
     @Logs(title = "启动执行相机预置位校验",content = "根据用户传递的相机ID，启动执行相机预置位校验",logType = 1)

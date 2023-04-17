@@ -192,11 +192,13 @@
         LEFT JOIN t_std_device e ON c.device_id = e.device_id)
 
         UNION ALL (
-        SELECT DISTINCT h.cruise_id AS Id, j.preset_name AS label, h.device_id AS upLd, g.device_name AS upName, "cruisePoint" AS infoType, j.camera_id AS cameraId
-        FROM t_cruise_point_instance h
-        LEFT JOIN t_std_device g ON h.device_id = g.device_id
-        LEFT JOIN t_camera_preset j ON h.cruise_id = j.preset_id WHERE j.preset_name IS NOT NULL
-        );
+        SELECT DISTINCT h.device_mete_id AS Id, h.custom_name AS label, h.device_id AS upId, j.device_name AS upName, "cruisePoint" AS infoType, g.camera_id AS cameraId
+        FROM t_std_devicemete h
+        LEFT JOIN t_std_device j ON h.device_id = j.device_id
+        LEFT JOIN t_cruise_point_instance k ON k.device_mete_id = h.device_mete_id
+        LEFT JOIN t_camera_preset g ON k.cruise_id = g.preset_id
+        GROUP BY h.device_mete_id,h.device_id
+        )
     </select>
 
     <select id="infraredCameraStateTree" resultType="com.yjh.platform.module.user.entity.AreaInfoDetail">
