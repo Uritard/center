@@ -315,7 +315,12 @@ public class UPatrolResultService {
         warnInfo.setDealInfo("程序正常，告警属实");
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
         warnInfo.setDefectModel(warnFlag);
-        warnInfo.setAlarmSource(282);
+        String type = tRobotInspectionDao.selectTypeByInstanceId(afterManualReviewInfo.getInstanceId());
+        int alarmSource= 998;
+        if (StringUtils.isNotEmpty(type)){
+            alarmSource = Integer.parseInt(tWarnInfoDao.selectDictCodeByNote(type, "alarm_source"));
+        }
+        warnInfo.setAlarmSource(alarmSource);
         warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
         warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
         warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
@@ -327,8 +332,9 @@ public class UPatrolResultService {
                 uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
             for (Long warnId : warnIdList) {
                 //存在
-                //判断该点是否产生告警以及告警信息
-                if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                //判断该点是否产生告警以及告警信息(机器人上报告警默认有告警信息)
+                //触发告警
+                if (Boolean.TRUE.equals(isWarN) || 279 == alarmSource || 997 == alarmSource) {
                     // 修改告警信息表
                     uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")),
                         Integer.valueOf(map.get("warnLevel").toString()), isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")),

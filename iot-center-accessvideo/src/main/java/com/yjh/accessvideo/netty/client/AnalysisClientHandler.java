@@ -228,7 +228,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //                                    warnMap.put("ifWarnDisable", String.valueOf(0));
 //                                    warnMap.put("value", jsonObjectResult.get("resultValue").toString());
 //                                    warnMap.put("imagePath", cruiseResult.get("picpath").toString());
-//                                    warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+//                                    warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
 //                                    log.info("开始告警判断");
 //                                    log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
 //                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

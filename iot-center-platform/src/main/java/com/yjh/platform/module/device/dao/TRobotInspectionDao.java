@@ -100,4 +100,6 @@ public interface TRobotInspectionDao {
 
 
     String selectRobotCodeByInstanceId(@Param("instanceId")Long instanceId);
+
+    String selectTypeByInstanceId(Long instanceId);
 }
