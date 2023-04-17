@@ -23,7 +23,10 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -2250,6 +2253,10 @@ public class CameraConService {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
+        }
+
+        if (CollectionUtils.isNotEmpty(fileMapList)) {
+            Collections.reverse(fileMapList);
         }
         return fileMapList;
     }
