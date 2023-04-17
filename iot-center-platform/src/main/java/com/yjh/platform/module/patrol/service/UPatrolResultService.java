@@ -13,6 +13,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -67,8 +68,15 @@ public class UPatrolResultService {
     @Autowired
     private LogsRecord logsRecord;
 
-    public List<TCruiseResultExpand> selectTaskByPage(List<String> list) {
-        return uPatrolResultDao.selectTaskByPage(list);
+    public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
+        String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
+        List<TCruiseResultExpand> resultExpandList =
+            uPatrolResultDao.selectTaskByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
+                isCheck);
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("planType", "cType", "planType").add("taskState", "cState", "taskState");
+        DictConvertUtil.DICT.covertToDict(resultExpandList, optional);
+
+        return resultExpandList;
     }
     public List<String> selectTaskByPageByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -78,10 +86,14 @@ public class UPatrolResultService {
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
         String startTime, String endTime, List<Long> deviceIdList, String customId) {
-        List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
-            cruiseResultDetailList =
+        List<CruiseResultDetail> cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
                     customId);
+
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
+            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("alarmLevel").add("meteKind");
+        DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
+
             String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
             cruiseResultDetailList.forEach(c -> {
                 if (StringUtils.isBlank(c.getEdgeName())) {

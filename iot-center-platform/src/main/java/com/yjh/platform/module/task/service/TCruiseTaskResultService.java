@@ -169,12 +169,12 @@ public class TCruiseTaskResultService {
         Map<String, Object> resultsMap = new HashMap<>();
 
         List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
-        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
+        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null);
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness : tDictBusinessList) {
             tDictMap.put("cruise_data_state_" + tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }
-        List<TDictBusiness> tDictCruiseTypeList = tDictBusinessDao.select(null, "", "cruise_type", "", null, null, null);
+        List<TDictBusiness> tDictCruiseTypeList = tDictBusinessDao.select(null, "", "cruise_type", "", null);
         for (TDictBusiness tDictBusiness : tDictCruiseTypeList) {
             tDictMap.put("cruise_type_" + tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }

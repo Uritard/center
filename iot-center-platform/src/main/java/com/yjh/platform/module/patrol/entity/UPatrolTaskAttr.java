@@ -39,17 +39,17 @@ public class UPatrolTaskAttr implements Serializable {
     @ApiModelProperty(value = "关联巡视点表id")
     private String pointTaskId;
 
-    @ApiModelProperty(value = "是否支持机器人巡视（暂时没用）")
-    private Integer ifRobot;
+    @ApiModelProperty(value = "巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
+    private Integer pointType;
 
-    @ApiModelProperty(value = "是否支持视频巡视（暂时没用）")
-    private Integer ifVideo;
+    @ApiModelProperty(value = "设备类型")
+    private Integer deviceType;
 
-    @ApiModelProperty(value = "是否支持红外巡视（暂时没用）")
-    private Integer ifInferad;
+    @ApiModelProperty(value = "识别类型")
+    private Integer meteType;
 
-    @ApiModelProperty(value = "是否支持人工巡视（暂时没用）")
-    private Integer ifArtificial;
+    @ApiModelProperty(value = "设备所属区域")
+    private Integer regionId;
 
 
 }
