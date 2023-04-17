@@ -80,6 +80,24 @@ public class TRobotInspection implements Serializable {
     @TableField(value = "property_pic_path",updateStrategy = FieldStrategy.IGNORED)
     private String propertyPicPath;
 
+    private String bayName;
+
+    private String areaName;
+
+    private String areaId;
+
+    private String bayId;
+
+    private String componentName;
+
+    private String mainDeviceName;
+
+    private String deviceType;
+
+    private String deviceName;
+
+    private Long deviceId;
+
     /**
      * 节点编码
      */

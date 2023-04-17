@@ -14,6 +14,8 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author tt
@@ -31,6 +33,8 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备测点实例ID")
     @TableId(value = "device_mete_id", type = IdType.AUTO)
     private Long deviceMeteId;
+
+
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "设备ID")
@@ -205,6 +209,9 @@ public class TStdDeviceMete implements Serializable {
      * 原始id(下级同步的id)
      */
     private String originId;
+
+    private List<TRobotInspection> tRobotInspections = new ArrayList<>();
+    private String inspectionName;
 
     private Integer pageNum = 1;
 

@@ -86,6 +86,8 @@ public class RobotService {
     private TRobotInspectionAttrService TRobotInspectionService;
     @Autowired
     private TRobotRegionDao tRobotRegionDao;
+    @Autowired
+    private TCruisePointInstanceService tCruisePointInstanceService;
     @Resource
     private SysUserDao sysUserDao;
     @Value("${other.webSocketUrl}")
@@ -701,18 +703,28 @@ public class RobotService {
      * @return void
      */
     private void addDevicePoint(List<Map<String, Object>> deviceMapList, Long robotId) {
-        List<TRobotInspection> deviceList = new ArrayList<>();
+        List<TRobotInspection> tRobotInspectionsInfoModelFile = new ArrayList<>();
+
+        String linkMete = redisTemplate.opsForHash().entries("t_sys_param:linkMete").get("content").toString();
         for (Map<String, Object> deviceMap : deviceMapList) {
             try {
                 TRobotInspection tRobotInspection = new TRobotInspection();
                 tRobotInspection.setInspectionCode(String.valueOf(deviceMap.getOrDefault("device_id", "")));
                 tRobotInspection.setRobotId(robotId);
-                tRobotInspection.setInspectionName(deviceMap.getOrDefault("main_device_name", "")
-                        + "/" + deviceMap.getOrDefault("device_name", ""));
+                tRobotInspection
+                    .setInspectionName(deviceMap.getOrDefault("main_device_name", "") + "/" + deviceMap.getOrDefault("device_name", ""));
                 // save_type_list和recognition_type_list为空的话，容错  默认为jpg和1
+                tRobotInspection.setDeviceName(String.valueOf(deviceMap.getOrDefault("device_name", "")));
                 tRobotInspection.setSaveTypeList(String.valueOf(deviceMap.getOrDefault("save_type_list", "jpg")));
                 tRobotInspection.setComponentId(String.valueOf(deviceMap.getOrDefault("component_id", "")));
+                tRobotInspection.setComponentName(String.valueOf(deviceMap.getOrDefault("component_name", "")));
                 tRobotInspection.setMainDeviceId(String.valueOf(deviceMap.getOrDefault("main_device_id", "")));
+                tRobotInspection.setMainDeviceName(String.valueOf(deviceMap.getOrDefault("main_device_name", "")));
+                tRobotInspection.setBayId(String.valueOf(deviceMap.getOrDefault("bay_id", "")));
+                tRobotInspection.setBayName(String.valueOf(deviceMap.getOrDefault("bay_name", "")));
+                tRobotInspection.setAreaName(String.valueOf(deviceMap.getOrDefault("area_name", "")));
+                tRobotInspection.setAreaId(String.valueOf(deviceMap.getOrDefault("area_id", "")));
+                tRobotInspection.setDeviceType(String.valueOf(deviceMap.getOrDefault("device_type", "")));
                 tRobotInspection.setRecognitionTypeList(String.valueOf(deviceMap.getOrDefault("recognition_type_list", "1")));
                 int inspectionType = 1;
                 if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
@@ -724,11 +736,13 @@ public class RobotService {
                     tRobotInspection.setMeterType(meterType);
                 }
                 if (!"".equals(deviceMap.get("appearance_type").toString())) {
-                    Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
+                    Integer appearanceType =
+                        selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
                     tRobotInspection.setAppearanceType(appearanceType);
                 }
                 if (deviceMap.containsKey("main_operation_type") && !"".equals(deviceMap.get("main_operation_type").toString())) {
-                    Integer mainOperationType = selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
+                    Integer mainOperationType =
+                        selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
                     tRobotInspection.setMainOperationType(mainOperationType);
                 }
                 if (deviceMap.containsKey("operation_type") && !"".equals(deviceMap.get("operation_type").toString())) {
@@ -746,58 +760,70 @@ public class RobotService {
                     tRobotInspection.setPropertyPicPath(relativePropertyPicPath);
                 }
 
-                deviceList.add(tRobotInspection);
-    //            log.info("获得的deviceList是：" + deviceList);
-            }catch (Exception e){
+                tRobotInspectionsInfoModelFile.add(tRobotInspection);
+                //            log.info("获得的deviceList是：" + deviceList);
+            } catch (Exception e) {
                 log.error("获取设备点位信息异常:", e);
             }
         }
 
         // 该机器人现有的巡检点
-        List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);
-//        log.info("机器人现有的deviceList是：" + nowList);
+        List<String> nowInspectionList = tRobotInspectionDao.selectAllByRobotId(robotId);
+        //        log.info("机器人现有的deviceList是：" + nowList);
 
-        List<TRobotInspection> addList = new ArrayList<>();
-        for (TRobotInspection str : deviceList) {
-            if (nowList.contains(str.getInspectionCode())) {
-                nowList.remove(str.getInspectionCode());
+        List<TRobotInspection> newInspectionList = new ArrayList<>();
+        for (TRobotInspection tRobotInspection : tRobotInspectionsInfoModelFile) {
+            if (nowInspectionList.contains(tRobotInspection.getInspectionCode())) {
+                nowInspectionList.remove(tRobotInspection.getInspectionCode());
             } else {
-                addList.add(str);
+                newInspectionList.add(tRobotInspection);
             }
         }
-        log.info("最后要插库的deviceList是==={}", addList.size());
-        log.info("准备要删除的inspectionCodeList是==={}", nowList.size());
-        if (CollectionUtils.isNotEmpty(nowList)) {
-            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
-//            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
+        log.info("最后要插库的deviceList是==={}", newInspectionList.size());
+        log.info("准备要删除的inspectionCodeList是==={}", nowInspectionList.size());
+        if (CollectionUtils.isNotEmpty(nowInspectionList)) {
+            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowInspectionList);
+            //            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
             List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
-//            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
+            //            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
 
             // 删库TRI
-            int res1 = 0, res2 = 0, res3 = 0;
+            int deleteCountTRI = 0, deleteCountTCPI = 0, deleteCountTCPA = 0, deleteCountTDM = 0;
             if (CollectionUtils.isNotEmpty(inspectionIdList)) {
-                res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList);
+                deleteCountTRI = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList);
             }
             if (CollectionUtils.isNotEmpty(instanceIdList)) {
+                //查询出instanceId对应的设备测点信息
+                List<Long> deviceMeteIds = tRobotInspectionDao.selectDeviceMeteIdByInstanceId(instanceIdList);
                 // 删库TCPI
-                res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);
+                deleteCountTCPI = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);
                 // 删库TCPA
-                res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);
+                deleteCountTCPA = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);
+                //查询出清理后的无绑定关系的测点
+                List<Long> deviceMeteIdsDeleted = tRobotInspectionDao.selectDeviceMeteIdByDeviceMeteId(deviceMeteIds);
+                deleteCountTDM = tRobotInspectionDao.batchDeleteTDeviceMete(deviceMeteIdsDeleted);
             }
-            log.info("TRI删除条数=={},TCPI删除条数=={},TCPA删除条数=={}", res1, res2, res3);
+            log.info("TRI删除条数=={},TCPI删除条数=={},TCPA删除条数=={},TDM删除条数=={}", deleteCountTRI, deleteCountTCPI, deleteCountTCPA,deleteCountTDM);
         }
-        if (CollectionUtils.isNotEmpty(addList)) {
+        if (CollectionUtils.isNotEmpty(newInspectionList)) {
             // 插库TRI
-            int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
+            int res = tRobotInspectionDao.batchInsertTRobotInspection(newInspectionList);
             log.info("TRI插入条数=={}", res);
         }
-        if (deviceList.containsAll(addList)) {
-            deviceList.removeAll(addList);
-        }
-        log.info("准备更新的deviceList是=={}", deviceList.size());
-        for (TRobotInspection item : deviceList) {
+        List<TRobotInspection> updateInspections = tRobotInspectionsInfoModelFile
+            .stream()
+            .filter(o->newInspectionList.contains(o))
+            .collect(Collectors.toList());;
+
+        log.info("准备更新的deviceList是=={}", updateInspections.size());
+        for (TRobotInspection item : updateInspections) {
             // 更新TRI
             tRobotInspectionDao.update(item);
+        }
+
+        //自动建立并连接测点
+        if ("true".equals(linkMete)) {
+            tCruisePointInstanceService.instanceLinkAuto(tRobotInspectionsInfoModelFile,robotId);
         }
     }
 

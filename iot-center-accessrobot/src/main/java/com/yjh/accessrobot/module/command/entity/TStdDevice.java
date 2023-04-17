@@ -107,6 +107,10 @@ public class TStdDevice implements Serializable {
      */
     private String realCode;
 
+    private TStdDeviceAttr tStdDeviceAttr;
+
+    private String mainDeviceId;
+
     private static final long serialVersionUID = 1L;
 
 }
