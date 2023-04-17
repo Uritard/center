@@ -546,7 +546,7 @@ public class PatrolResultHandler {
                     warnMap.put("value", resultStringValue);
                     warnMap.put("imagePath", cruiseResultMap.get("picpath"));
                     warnMap.put("confMode", "276");
-                    warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                    warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
                     warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
 
                     switch (meteKind){
@@ -780,7 +780,7 @@ public class PatrolResultHandler {
             warnMap.put("imagePath", cruiseResultMap.get("picpath"));
             warnMap.put("voicePath", cruiseResultMap.get("voicePath"));
             warnMap.put("confMode", "276");
-            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
             warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
 
             log.info("Alarm value is reached(遥测)");
@@ -1105,7 +1105,7 @@ public class PatrolResultHandler {
             defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
             defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
             defectMap.put("imagePath", resultImage);
-            defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+            defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", resultValueItem);
         }catch (Exception e){

@@ -513,4 +513,14 @@
                     b.instance_id = #{instanceId}
             ) limit 1
     </select>
+    <select id="selectTypeByInstanceId" resultType="java.lang.String">
+        SELECT
+            IF (c.robot_type = NULL,'无人机','机器人') AS type
+        FROM
+            t_robot_inspection a
+                LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
+                LEFT JOIN t_robot_info c ON a.robot_id = c.robot_id
+        WHERE
+                b.instance_id = #{instanceId})
+    </select>
 </mapper>

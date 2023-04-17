@@ -148,7 +148,12 @@ public class RobotInspectionWarnThread implements Runnable{
             tDefectInfo.setInstanceId(instanceId);
             tDefectInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
             tDefectInfo.setConfMode(276);
-            tDefectInfo.setAlarmSource(282);
+            String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
+            int alarmSource = 998;
+            if (StringUtils.isNotEmpty(type)){
+                alarmSource = analyseDataOperateService.selectDictCodeByUpDict("alarm_source", type);
+            }
+            tDefectInfo.setAlarmSource(alarmSource);
             tDefectInfo.setValue(taskAlarm.getValue());
             tDefectInfo.setDefectType(Integer.valueOf(taskAlarm.getDefectType()));
 
@@ -174,7 +179,12 @@ public class RobotInspectionWarnThread implements Runnable{
             warnInfo.setConfMode(276);
             Integer warnFlag = Integer.valueOf(analyseDataOperateService.selectDictCode("defect_model", "其他"));
             warnInfo.setDefectModel(warnFlag);
-            warnInfo.setAlarmSource(282);
+            String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
+            int alarmSource = 998;
+            if (StringUtils.isNotEmpty(type)) {
+                alarmSource = analyseDataOperateService.selectDictCodeByUpDict("alarm_source", type);
+            }
+            warnInfo.setAlarmSource(alarmSource);
             warnInfo.setValue(taskAlarm.getValue());
             warnInfo.setTaskId(taskId);
             String robotId = String.valueOf(StaticContextAccessor.getBean(TRobotInfoDao.class).selectRobotIdByCode(robotCode));

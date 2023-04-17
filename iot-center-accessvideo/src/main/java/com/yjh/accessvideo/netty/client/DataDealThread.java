@@ -278,7 +278,7 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("value", resultString);
                                             warnMap.put("imagePath", analyseResultPic);
                                             warnMap.put("confMode", "276");
-                                            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
                                             warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
 
                                             log.info("开始告警判断");
@@ -659,7 +659,7 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", analyseResultImg);
-                                        defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                        defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
                                         defectMap.put("defectTime", simpleDateFormat.format(new Date()));
                                         defectMap.put("value", jsonObjectResult.get("resultValue").toString());
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
@@ -739,7 +739,7 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                             defectMap.put("confMode", "276");//确认状态--未核查
                                             defectMap.put("imagePath", analyseResultImg);
-                                            defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+                                            defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
                                             defectMap.put("defectTime", defectTime);
                                             defectMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             log.info("defectMap:"+defectMap);
