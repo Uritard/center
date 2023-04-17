@@ -199,12 +199,11 @@ public class TCameraScreenController {
     @ApiOperation(value = "视频监控巡视点列表查询")
     @RequestMapping(value = "/cameraCruiseTree", method = RequestMethod.GET)
     public Result cameraCruiseTree(@RequestParam(value = "cruiseName",required = false) String cruiseName,
-                                  @RequestParam(value = "flag",required = false) Integer flag,
                                   HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId=Long.valueOf(request.getHeader("userId"));
-            result.setData(tCameraScreenService.selectCameraCruiseTree(cruiseName,flag, "1",userId));
+            result.setData(tCameraScreenService.selectCameraCruiseTree(cruiseName, "1",userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

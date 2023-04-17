@@ -235,13 +235,12 @@ public class TCameraScreenService{
      * 获取当前用户所属的所有巡视点
      *
      * @param cruiseName cruiseName
-     * @param flag flag
      * @param robotFlag robotFlag
      * @param userId userId
      * @return result
      */
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfoDetail> selectCameraCruiseTree(String cruiseName, Integer flag, String robotFlag, Long userId) {
+    public List<AreaInfoDetail> selectCameraCruiseTree(String cruiseName, String robotFlag, Long userId) {
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
             throw new BusinessException("用户不存在或已删除");
@@ -256,7 +255,7 @@ public class TCameraScreenService{
 
         List<AreaInfoDetail> treeRootList = getTreeRoot(listTree);
         Map<String,String> cameraStatusMap = getCameraStatusMap();
-        diGuiWithRobot(treeRootList, listTree,cameraStatusMap,flag);
+        diGuiWithRobot(treeRootList, listTree,cameraStatusMap,1);
         return treeRootList;
     }
 
@@ -490,9 +489,9 @@ public class TCameraScreenService{
                             }
                         }
                     }
-                    if ("cruisePoint".equals(areaInfoMap.getInfoType())) {
-                        processCruisePointStatus(areaInfoMap, areaInfoTem, childrenList, flag, map);
-                    }
+//                    if ("cruisePoint".equals(areaInfoMap.getInfoType())) {
+//                        processCruisePointStatus(areaInfoMap, areaInfoTem, childrenList, flag, map);
+//                    }
 
                     childrenList.add(areaInfoTem);
                 }

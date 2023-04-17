@@ -219,6 +219,73 @@ public class TCameraPresetService {
 
         return tree;
     }
+
+    /**
+     * 根据测点，获取测点下关联的所有相机
+     *
+     * @param cruiseId cruiseId
+     * @return result
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> selectPresetTreeList(Long cruiseId) {
+        List<TCameraPreset> presetList = tCameraPresetDao.selectPresetByCruiseId(cruiseId);
+        if (CollectionUtils.isEmpty(presetList)) {
+            return null;
+        }
+
+        Map<Long, List<TCameraPreset>> groupBy = presetList.stream().collect(Collectors.groupingBy(TCameraPreset::getCameraId));
+        if (groupBy == null || groupBy.size() == 0) {
+            return null;
+        }
+
+        List<AreaInfo> tree = new LinkedList<>();
+        groupBy.entrySet().stream().forEach((Map.Entry<Long, List<TCameraPreset>> entry) -> {
+            AreaInfo areaInfo = getCameraAreaInfoTree(entry.getValue(), entry.getKey());
+            if (areaInfo != null) {
+                tree.add(areaInfo);
+            }
+        });
+
+        return tree;
+    }
+
+    /**
+     * 将某个相机下的预置位转成树结构
+     *
+     * @param presetList presetList
+     * @param cameraId cameraId
+     * @return result
+     */
+    private AreaInfo getCameraAreaInfoTree(List<TCameraPreset> presetList, Long cameraId) {
+        if (CollectionUtils.isEmpty(presetList)) {
+            return null;
+        }
+
+        TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(cameraId);
+        if(tCameraInfo == null){
+            return null;
+        }
+
+        AreaInfo camera = new AreaInfo();
+        camera.setUpId(-1L);
+        camera.setId(cameraId);
+        camera.setLabel(tCameraInfo.getCameraName());
+        camera.setInfoType("camera");
+        List<AreaInfo> child = new LinkedList<>();
+        presetList.forEach(item -> {
+            AreaInfo preset = new AreaInfo();
+            preset.setUpId(cameraId);
+            preset.setId(item.getPresetId());
+            preset.setLabel(item.getPresetName());
+            preset.setInfoType("preset");
+            preset.setUpName(tCameraInfo.getCameraName());
+            child.add(preset);
+        });
+
+        camera.setChildren(child);
+        return camera;
+    }
+
     public boolean judgePresentNum(Long cameraId,Integer presentNum) {
         boolean flag = false;
         List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, cameraId, presentNum, null, null, null, null, null, null, null,null);
