@@ -19,6 +19,8 @@ public interface TRobotInspectionDao {
     int insert(TRobotInspection tRobotInspection);
     int deleteByPrimaryId(@Param(value = "inspectionId") Long inspectionId);
     int update(TRobotInspection tRobotInspection);
+    int batchUpdate(@Param("list")List<TRobotInspection> list);
+    int batchInsert(List<TRobotInspection> list);
     TRobotInspection selectByPrimaryId(@Param(value = "inspectionId") Long inspectionId);
     List<TRobotInspection> select(@Param(value = "inspectionId") Long inspectionId,
                                   @Param(value = "inspectionCode")String inspectionCode,
@@ -42,7 +44,10 @@ public interface TRobotInspectionDao {
     List<Long> selectInspectionIdList(List<String> list);
     List<Long> selectInstanceIdList(List<Long> list);
     int batchDeleteTRobotInspection(List<Long> list);
+    int batchDeleteTDeviceMete(List<Long> list);
     int batchDeleteTCruisePointInstance(List<Long> list);
+    List<Long> selectDeviceMeteIdByInstanceId(List<Long> list);
+    List<Long> selectDeviceMeteIdByDeviceMeteId(List<Long> list);
     int batchDeleteTCruisePlanAttr(List<Long> list);
     Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
 

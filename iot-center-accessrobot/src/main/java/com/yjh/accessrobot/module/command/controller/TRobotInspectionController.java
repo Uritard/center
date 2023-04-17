@@ -1,20 +1,27 @@
 package com.yjh.accessrobot.module.command.controller;
 
+import com.alibaba.excel.EasyExcelFactory;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.accessrobot.common.utils.ModelExcelListener;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.command.entity.ExcelEntity;
 import com.yjh.accessrobot.module.command.entity.TRobotInspection;
+import com.yjh.accessrobot.module.command.service.TCruisePointInstanceService;
 import com.yjh.accessrobot.module.command.service.TRobotInspectionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +38,9 @@ public class TRobotInspectionController {
 
     @Autowired
     private final TRobotInspectionService tRobotInspectionService;
+
+    @Autowired
+    private TCruisePointInstanceService tCruisePointInstanceService;
 
     private Logger log = LoggerFactory.getLogger(TRobotInspectionController.class);
 
@@ -158,6 +168,24 @@ public class TRobotInspectionController {
             log.error("批量插入失败：" + e);
         }
         return result;
+    }
+
+    @ApiOperation(value = "excel文件模型导入")
+    @PostMapping(value = "/importExcel")
+    public void importExcel(MultipartFile file,@RequestParam("robotId") Long robotId) {
+        try {
+            InputStream inputStream = file.getInputStream();
+            ModelExcelListener modelExcelListener = new ModelExcelListener();
+            EasyExcelFactory.read(inputStream, ExcelEntity.class,modelExcelListener).headRowNumber(1).build().readAll();
+            List<ExcelEntity> excelEntities = modelExcelListener.getExcelEntities();
+
+            if (CollectionUtils.isNotEmpty(excelEntities)) {
+                tCruisePointInstanceService.importExcel(excelEntities,robotId);
+            }
+
+        }catch (Exception e) {
+            log.error("发生异常:", e);
+        }
     }
 
 }
