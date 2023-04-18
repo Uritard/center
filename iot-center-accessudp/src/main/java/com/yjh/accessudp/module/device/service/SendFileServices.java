@@ -4,9 +4,11 @@ package com.yjh.accessudp.module.device.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,16 +23,8 @@ import java.util.List;
 @Service
 public class SendFileServices {
 
-
-    @Value("${spring.union.sendTo.ip}")
-    private String SERVER_HOSTNAME;
-
-    // 服务器端口
-    @Value("${spring.send.server.port}")
-    private String SERVER_PORT;
-    // 本地发送端口
-    @Value("${spring.send.local.port}")
-    private String LOCAL_PORT;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private String data;
 
@@ -76,14 +70,17 @@ public class SendFileServices {
 
     private int Device(String info)  {
         try {
-            log.info("开始发送"+LOCAL_PORT);
-            log.info("开始发送"+SERVER_PORT);
-            log.info("开始发送"+SERVER_HOSTNAME);
-            DatagramSocket socket = new DatagramSocket(Integer.valueOf(LOCAL_PORT).intValue());
+            String localSendPort = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig", "springUnionLocalSendPort"));
+            String springUnionSendToPort = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig", "springUnionSendToPort"));
+            String springUnionSendToIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig", "springUnionSendToIp"));
+            log.info("开始发送"+localSendPort);
+            log.info("开始发送"+springUnionSendToPort);
+            log.info("开始发送"+springUnionSendToIp);
+            DatagramSocket socket = new DatagramSocket(Integer.valueOf(localSendPort));
             log.info("ok了");
             udpForDevice(info,socket);
             log.info("结束发送");
-            log.info("InetAddress.getByName(SERVER_HOSTNAME): "+ InetAddress.getByName(SERVER_HOSTNAME));
+            log.info("InetAddress.getByName(springUnionSendToIp): "+ InetAddress.getByName(springUnionSendToIp));
             socket.close();
         } catch (Exception e) {
             log.error("发送错误" + e);
@@ -93,6 +90,8 @@ public class SendFileServices {
 
     private void udpForDevice(String info,DatagramSocket socket) throws Exception{
         try{
+            String springUnionSendToPort = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig", "springUnionSendToPort"));
+            String springUnionSendToIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig", "springUnionSendToIp"));
             int i = 0;
 
             List<Byte> list = new ArrayList<>();
@@ -161,8 +160,8 @@ public class SendFileServices {
                     uspRe[zui] = item;
                     zui++;
                 }
-                DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(SERVER_HOSTNAME),
-                        Integer.valueOf(SERVER_PORT));
+                DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(springUnionSendToIp),
+                        Integer.valueOf(springUnionSendToPort));
                 socket.send(dp);
                 System.out.println(j);
 
@@ -203,8 +202,8 @@ public class SendFileServices {
                     uspRe[zui] = item;
                     zui++;
                 }
-                DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(SERVER_HOSTNAME),
-                        Integer.valueOf(SERVER_PORT));
+                DatagramPacket dp = new DatagramPacket(uspRe, uspRe.length, InetAddress.getByName(springUnionSendToIp),
+                        Integer.valueOf(springUnionSendToPort));
                 socket.send(dp);
             }
         } catch (Exception e) {
