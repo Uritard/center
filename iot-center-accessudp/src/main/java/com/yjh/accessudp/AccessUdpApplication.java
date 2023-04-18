@@ -41,21 +41,6 @@ import java.util.regex.Pattern;
 @Slf4j
 public class AccessUdpApplication implements CommandLineRunner {
 
-    @Value("${netty.server.port}")
-    private int port;
-    @Value("${spring.union.url}")
-    private String UNION_URL;
-    @Value("${spring.sequence.url}")
-    private String SEQUENCE_URL;
-    @Value("${spring.sequenceRec.url}")
-    private String SEQUENCEREC_URL;
-    @Value("${spring.encoding.style}")
-    private String encoding;
-    @Value("${spring.encoding.isBig}")
-    private String isBig;
-    @Value("${spring.union.file.sort}")
-    private String sort;
-
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -75,12 +60,13 @@ public class AccessUdpApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
 //        loadDeviceInfo();
-        Constant.encoding = encoding;
-        Constant.isBig = Boolean.valueOf(isBig);
-        Constant.sort = Boolean.valueOf(sort);
+        Constant.encoding = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig","springEncodingStyle"));
+        Constant.isBig = Boolean.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig","springEncodingisBig")));
+        Constant.sort = Boolean.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig","springUnionFileSort")));
+        int port = Integer.parseInt(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:udpServerConfig","nettyServerPort")));
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL, SEQUENCE_URL,SEQUENCEREC_URL);
+        nettyServer.start(address, redisTemplate,tCfgMeteService);
     }
 
 

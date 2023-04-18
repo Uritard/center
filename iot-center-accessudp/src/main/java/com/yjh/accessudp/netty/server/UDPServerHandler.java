@@ -40,25 +40,17 @@ import java.util.regex.Pattern;
 @Slf4j
 public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    private RedisTemplate redisTemplate;
-    private TCfgMeteService tCfgMeteService;
-    private String UNION_URL;
-    private String SEQUENCE_URL;
-    private String SEQUENCEREC_URL;
-    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL,String SEQUENCE_URL,String SEQUENCEREC_URL) {
+    private final RedisTemplate redisTemplate;
+    private final TCfgMeteService tCfgMeteService;
+    private ChannelHandlerContext ctx;
+
+    public UDPServerHandler(RedisTemplate redisTemplate, TCfgMeteService tCfgMeteService) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService = tCfgMeteService;
-        this.UNION_URL=UNION_URL;
-        this.SEQUENCE_URL =SEQUENCE_URL;
-        this.SEQUENCEREC_URL = SEQUENCEREC_URL;
     }
-    private boolean isThreadStart = true;
-    public boolean getIsThreadStart() { return isThreadStart; }
-
     //场站号
     private String strChannelID = "TT";
 
-    private ChannelHandlerContext ctx;
 
 
     @Override
