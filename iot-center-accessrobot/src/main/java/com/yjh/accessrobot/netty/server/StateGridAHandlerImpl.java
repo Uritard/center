@@ -75,13 +75,9 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {
-            if (Constant.multiThread) {
-                ThreadPoolUtil.PATROL_POOL.addThread(() -> {
-                    doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
-                });
-            } else {
+            ThreadPoolUtil.PATROL_POOL.addThread(() -> {
                 doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
-            }
+            });
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
         }
 

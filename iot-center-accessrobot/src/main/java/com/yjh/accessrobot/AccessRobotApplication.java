@@ -4,7 +4,6 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -66,7 +65,6 @@ public class AccessRobotApplication implements CommandLineRunner {
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         Constant.handlerNew = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew")));
-        Constant.multiThread =  Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerMultithread")));
         int port = Integer.parseInt(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyServerPort")));
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);

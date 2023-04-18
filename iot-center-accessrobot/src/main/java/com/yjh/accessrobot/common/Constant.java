@@ -189,8 +189,6 @@ public class Constant {
 
     public static boolean handlerNew = true;
 
-    public static boolean multiThread = true;
-
     public static String REGION_REFRESH_URL = "http://iot-center-platform/tStdRegion/v1/refreshRegion";
 
     public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
