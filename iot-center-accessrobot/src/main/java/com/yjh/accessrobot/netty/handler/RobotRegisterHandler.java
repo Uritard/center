@@ -35,19 +35,6 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     private RobotService robotService;
     @Autowired
     private RedisTemplate redisTemplate;
-
-    @Value("${heart.beat.interval}")
-    private Integer heartBeatInterval;
-
-    @Value("${patroldevice.run.interval}")
-    private String patroldeviceRunInterval;
-
-    @Value("${env.interval}")
-    private String envInterval;
-
-    @Value("${nest.run.interval}")
-    private String nestRunInterval;
-
     @Autowired
     private TStdRegionDao tStdRegionDao;
 
@@ -84,13 +71,16 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         List<Map<String, Object>> itemsList = new ArrayList<>();
         Map<String, Object> items = new HashMap<>(5);
         // heart beat interval
+        String heartBeatInterval = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:intervalConfig","heartBeatInterval"));
         items.put("heart_beat_interval", heartBeatInterval);
         // robot run interval
         //巡视设备运行时间间隔 2022过检 robot_run_interval修改为patroldevice_run_interval
+        String patroldeviceRunInterval = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:intervalConfig","patroldeviceRunInterval"));
         items.put("patroldevice_run_interval", patroldeviceRunInterval);
         //环境数据间隔 2022过检  weather interval 修改为 env_interval
         // 220kv改为weather_interval
         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        String envInterval = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:intervalConfig","envInterval"));
         if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
             items.put("env_interval", envInterval);
         }else {
@@ -98,6 +88,7 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         }
         // 220kv过检
         if (isEdge || robotService.selectIsDrone(robotCode)) {
+            String nestRunInterval = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:intervalConfig","nestRunInterval"));
             //2022过检新增 无人机机巢运行数据间隔
             items.put("nest_run_interval", nestRunInterval);
         }
@@ -127,13 +118,6 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
         RobotServerHandler.send(registerProtocol, robotCode);
 
-//        // Start heatBreakDealThread
-//        HeartBeatThread dataDealThread = new HeartBeatThread(robotServerHandler, robotCode, redisTemplate, heartBeatInterval);
-//        Thread thread = new Thread(dataDealThread);
-//        thread.setDaemon(true);
-//        thread.start();
-
-        // Check whether there are unfinished tasks on the inspection host
         try {
             robotService.hasStandTaskIsFinish(xmlBaseModel.getSendCode());
         } catch (Exception e) {

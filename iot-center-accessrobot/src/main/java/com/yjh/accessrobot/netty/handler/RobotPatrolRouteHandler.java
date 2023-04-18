@@ -5,7 +5,6 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
-import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -33,8 +32,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private UpFtpsConfig upFtpsConfig;
     @Autowired
     private RobotService robotService;
 
@@ -130,7 +127,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                 String filePath = String.valueOf(item.get("file_path"));
                 // 这是机器人放在巡视主机ftps服务下的路径
                 String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + filePath;
-                uploadFileToUpFtps(imgPath, filePath, upFtpsConfig);
+                uploadFileToUpFtps(imgPath, filePath);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -146,13 +143,18 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
      * @param targetPathName 目标文件地址名称
      */
     @Async
-    public void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+            String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+            String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+            String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                    upSystemFtpsUsername, upSystemFtpsPassword);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

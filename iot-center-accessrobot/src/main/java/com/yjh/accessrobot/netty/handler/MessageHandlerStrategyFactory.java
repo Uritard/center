@@ -13,16 +13,16 @@ public class MessageHandlerStrategyFactory {
     /**
      * 缓存所有的策略，当前是无状态的，可以共享策略类对象
      */
-    private static Map<String,MessageHandlerStrategy> strategies = new ConcurrentHashMap<String,MessageHandlerStrategy>();
+    private static final Map<String,MessageHandlerStrategy> STRATEGIES = new ConcurrentHashMap<String,MessageHandlerStrategy>();
 
     public static MessageHandlerStrategy getStrategyType(String type) {
         Assert.notNull(type, "type should not be empty...");
-        return strategies.get(type);
+        return STRATEGIES.get(type);
     }
 
     public static void register(String type,MessageHandlerStrategy strategy){
         Assert.notNull(type, "type should not be empty...");
-        strategies.put(type,strategy);
+        STRATEGIES.put(type,strategy);
     }
 
 }

@@ -92,18 +92,6 @@ public class RobotService {
     private SysUserDao sysUserDao;
     @Value("${other.webSocketUrl}")
     private String webSocketUrl;
-    @Value("${netty.server.url}")
-    private String serverUrl;
-    @Value("${netty.server.ftps.port}")
-    private String ftpsPort;
-    @Value("${netty.server.ftps.username}")
-    private String ftpsUserName;
-    @Value("${netty.server.ftps.password}")
-    private String ftpsPassWord;
-    @Value("${netty.server.ftps.keypw}")
-    private String key;
-    @Value("${netty.server.ftps.local.path}")
-    private String ftpsLocalPath;
 
     @Resource
     LogsRecord logsRecord;
@@ -2234,26 +2222,19 @@ public class RobotService {
                     if ("".equals(localPath)) {
                         return;
                     }
-                    FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName,
-                            serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+                    Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+                    String ftpsLocalPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+                    String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+                    String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+                    String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+                    String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+                    FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort), upSystemFtpsUsername, upSystemFtpsPassword);
                 } catch (Exception e) {
                     log.error("上传至ftps错误 " + e);
                 }
             }
         };
         TaskExecutePool.getInstance().execute(runnable);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void sendToEdgeFile(String localPath, String targetName, String serverUrl, Integer port, String userName, String password) {
-        try {
-            if ("".equals(localPath)) {
-                return;
-            }
-            FtpsUtil.putFile(localPath, targetName, serverUrl, port, key, userName, password);
-        } catch (Exception e) {
-            log.error("上传至ftps错误 " + e);
-        }
     }
 
     /**
