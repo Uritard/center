@@ -84,23 +84,14 @@ public class UPatrolResultController {
                 }else {
                     List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
                     if (regionIdList != null && !regionIdList.isEmpty()) {
-                        deviceIdList = tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
-                        if (deviceIdList.isEmpty()){
-                            //此区域下没有设备
-                            deviceIdList.add(-1L);
-                        }
-
+                        deviceIdList.addAll(regionIdList);
                     } else {
-                        deviceIdList.add(regionId);
+                        deviceIdList = null;
                     }
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<String> taskIdList = uPatrolResultService.selectTaskByPageByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
-            if (taskIdList.isEmpty()){
-                taskIdList.add("-1");
-            }
-            List<TCruiseResultExpand> list = uPatrolResultService.selectTaskByPage(taskIdList);
+            List<TCruiseResultExpand> list = uPatrolResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

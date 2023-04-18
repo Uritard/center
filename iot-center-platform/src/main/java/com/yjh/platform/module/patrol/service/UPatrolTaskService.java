@@ -353,7 +353,12 @@ public class UPatrolTaskService {
                 uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
                 uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
                 uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
-                uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
+                uPatrolTaskAttr.setPointTaskId(uPatrolPlanAttr.getPointTaskId());
+                uPatrolTaskAttr.setPointType(uPatrolPlanAttr.getPointType());
+                uPatrolTaskAttr.setDeviceType(uPatrolPlanAttr.getDeviceType());
+                uPatrolTaskAttr.setMeteType(uPatrolPlanAttr.getMeteType());
+                uPatrolTaskAttr.setRegionId(uPatrolPlanAttr.getUpRegionId());
+
                 instanceList.add(uPatrolPlanAttr.getInstanceId());
                 uPatrolTaskAttrs.add(uPatrolTaskAttr);
                 if (uPatrolTaskAttrs.size() % 2000 == 0) {

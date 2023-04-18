@@ -61,7 +61,16 @@ public interface UPatrolResultDao {
     AfterManualReviewInfo selectJudgeCondition(@Param(value = "instanceId") Long instanceId,
                                                @Param(value = "taskId") String taskId);
 
-    List<TCruiseResultExpand> selectTaskByPage(@Param(value = "list") List<String> list);
+    List<TCruiseResultExpand> selectTaskByPage(@Param(value = "taskName") String taskName,
+        @Param(value = "cState") Integer cState,
+        @Param(value = "cType") Integer cType,
+        @Param(value = "deviceType") Integer deviceType,
+        @Param(value = "startDate") String startDate,
+        @Param(value = "endDate") String endDate,
+        @Param(value = "list") List<Long> list,
+        @Param(value = "meteType") Integer meteType,
+        @Param(value = "customId") String customId,
+        @Param(value = "isCheck") Integer isCheck);
     List<String> selectTaskByPageByPage(@Param(value = "taskName") String taskName,
                                                @Param(value = "cState") Integer cState,
                                                @Param(value = "cType") Integer cType,

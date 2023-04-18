@@ -351,15 +351,13 @@
           AND a.task_id = #{taskId}
     </select>
 
-    <select id="selectTaskByPage"
+    <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
             resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
-        select distinct
+        select
         a.task_id,
         a.task_name,
         a.task_type as cType,
-        d.dict_note as plan_type,
         a.task_state as cState,
-        e.dict_note as task_state,
         a.task_count,
         a.task_count-a.task_wait as cruise_data_state1,
         a.task_wait as cruise_data_state2,
@@ -371,14 +369,29 @@
         a.task_wait,a.create_time,
         a.remark
         FROM u_patrol_result a
-        LEFT JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
-        LEFT JOIN t_dict_business e ON a.task_state = e.dict_code and e.col_name='task_state'
+        LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
         where 1 = 1
-        <if test="list != null and list.size() > 0">and a.task_id IN
-            <foreach collection="list" item="taskId" separator="," open="(" close=")" index="index">
-                #{taskId}
+        <if test="taskName != null and taskName != ''">and a.task_name like
+            concat('%',#{taskName, jdbcType=VARCHAR},'%')
+        </if>
+        <if test="cType != null and cType != -1">and a.task_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="cState != null and cState != -1">and a.task_state = #{cState, jdbcType=INTEGER}</if>
+        <if test="startDate != null and endDate != null">and a.execute_time BETWEEN #{startDate, jdbcType=TIMESTAMP} AND
+            #{endDate, jdbcType=TIMESTAMP}
+        </if>
+        <if test="list != null and list.size() > 0">and f.region_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
+        <if test="deviceType != -1">and f.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="meteType != -1 ">and f.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="customId != -1 and customId != null">and f.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="isCheck != null and isCheck == 1">and a.remark != 1</if>
+        <if test="isCheck != null and isCheck == 2">and a.remark = 1</if>
+
+        and a.task_state != 239 and a.task_state != 241 and a.task_state != 238
+        GROUP BY task_id
         order by a.execute_time desc
     </select>
 
@@ -388,35 +401,23 @@
         a.task_id
         FROM u_patrol_result a
         LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
-        <if test="deviceType != -1">
-            LEFT JOIN t_std_device j on f.device_id = j.device_id
-        </if>
-        LEFT JOIN t_cruise_point_instance m on m.instance_id = f.instance_id
-        LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
         where 1 = 1
         <if test="taskName != null and taskName != ''">and a.task_name like
             concat('%',#{taskName, jdbcType=VARCHAR},'%')
         </if>
-
         <if test="cType != null and cType != -1">and a.task_type = #{cType, jdbcType=INTEGER}</if>
-
         <if test="cState != null and cState != -1">and a.task_state = #{cState, jdbcType=INTEGER}</if>
-
         <if test="startDate != null and endDate != null">and a.execute_time BETWEEN #{startDate, jdbcType=TIMESTAMP} AND
             #{endDate, jdbcType=TIMESTAMP}
         </if>
-
         <if test="list != null and list.size() > 0">and f.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-
-        <if test="deviceType != -1">and j.device_type = #{deviceType, jdbcType=INTEGER}</if>
-
-        <if test="meteType != -1 ">and k.mete_type = #{meteType, jdbcType=VARCHAR}</if>
-
-        <if test="customId != -1 and customId != null">and m.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="deviceType != -1">and f.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="meteType != -1 ">and f.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="customId != -1 and customId != null">and f.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="isCheck != null and isCheck == 1">and a.check_user is null</if>
         <if test="isCheck != null and isCheck == 2">and a.check_user is not null</if>
 
@@ -433,24 +434,17 @@
         b.instance_name,
         b.cruise_data_id,
         b.cruise_type,
-        h.dict_note as cruise_type_name,
         b.result_num,
         b.result_desc,
         b.cruise_result,
-        j.dict_note as cruise_result_name,
         b.cruise_time,
         b.cruise_abnormal,
-        p.dict_note as abnormal_type1,
-        IF(ISNULL(b.remark),p.dict_note,CONCAT(p.dict_note,',',x.dict_note)) as abnormal_type,
         b.remark,
-        x.dict_note as abnormal_type2,
         b.evaluation_state,
-        i.dict_note as evaluation_state_name,
         b.check_user,
         b.check_date,
         b.picpath as pic_path,
         b.identify_result,
-        w.dict_note as identify_result_name,
         b.identify_state,
         b.person_check,
         b.device_id,
@@ -471,7 +465,6 @@
         q.mete_kind,
         q.meter_type,
         q.mete_type,
-        m.dict_note as mete_kind_name,
         e.cruise_id as preset_id,
         k.camera_id,
         b.is_warn,
@@ -479,26 +472,16 @@
         q.alarm_level,
         q.is_temdif,
         q.custom_name as customName,
-        s.dict_note as alarm_level_name,
         n.device_type,
         b.voice_path,
         conf.db_value as dbValue,
         conf.f_value as fValue,
         region.region_name  as  edge_name
-        FROM u_patrol_result a
-        LEFT JOIN u_patrol_data_result b on a.task_id = b.task_id
+        FROM u_patrol_data_result b
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
         LEFT JOIN t_std_device n on n.device_id = b.device_id
-        LEFT JOIN t_dict_business h on h.dict_code = b.cruise_type and h.col_name = 'cruise_type'
-        LEFT JOIN t_dict_business i on i.dict_code = b.evaluation_state and i.col_name = 'evaluation_state'
-        LEFT JOIN t_dict_business j on j.dict_code = b.cruise_result and j.col_name = 'cruise_result'
-        LEFT JOIN t_dict_business p ON p.dict_code = b.cruise_abnormal and p.col_name = 'abnormal_type'
         LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
-        LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
         LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
-        LEFT JOIN t_dict_business w on w.dict_code = b.identify_result and w.col_name ='identify_result'
-        LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
-        LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
         left join t_voice_device voice on e.cruise_id = voice.voice_device_id
         left join t_voice_config conf on voice.config_id = conf.config_id
         left join t_std_region region on ifnull(n.edge_code,'0')=region.region_code and region.state=1

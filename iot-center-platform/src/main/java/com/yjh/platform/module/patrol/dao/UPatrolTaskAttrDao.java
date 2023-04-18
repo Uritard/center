@@ -24,10 +24,10 @@ public interface UPatrolTaskAttrDao {
                                 @Param(value = "deviceId") Long deviceId,
                                 @Param(value = "customId") String customId,
                                 @Param(value = "pointTaskId") String pointTaskId,
-                                @Param(value = "ifRobot") Integer ifRobot,
-                                @Param(value = "ifVideo") Integer ifVideo,
-                                @Param(value = "ifInferad") Integer ifInferad,
-                                @Param(value = "ifArtificial") Integer ifArtificial);
+                                @Param(value = "pointType") Integer pointType,
+                                @Param(value = "deviceType") Integer deviceType,
+                                @Param(value = "meteType") Integer meteType,
+                                @Param(value = "regionId") Integer regionId);
     List<UPatrolTaskAttr> selectByPage(UPatrolTaskAttr uPatrolTaskAttr);
 
     int batchAdd(List<UPatrolTaskAttr> list);

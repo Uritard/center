@@ -22,9 +22,7 @@ public interface TDictBusinessDao {
                                 @Param(value = "dictCode") String dictCode,
                                 @Param(value = "colName") String colName,
                                 @Param(value = "dictNote") String dictNote,
-                                @Param(value = "upDict") Integer upDict,
-                                @Param(value = "remark") String remark,
-                                @Param(value = "sort") Long sort);
+                                @Param(value = "upDict") Integer upDict);
     List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness);
 
     int batchInsert(@Param("list") List<TDictBusiness> list);

@@ -3,7 +3,7 @@ package com.yjh.platform;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
@@ -65,6 +65,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TDeviceTypeImgService tDeviceTypeImgService;
     @Autowired
     private TRobotInfoService tRobotInfoService;
+    @Autowired
+    private TDictBusinessService dictBusinessService;
 
 
     private NettyClient nettyClient = new NettyClient();
@@ -83,6 +85,7 @@ public class PlatformApplication  implements CommandLineRunner {
         sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis(true);
         tCameraInfoService.intoRedis();
+        DictConvertUtil.DICT.loadDict(dictBusinessService);
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         tCameraPresetService.startSilentTask();//开启摄像头静默任务
         sysUserService.insertIntoRedis();

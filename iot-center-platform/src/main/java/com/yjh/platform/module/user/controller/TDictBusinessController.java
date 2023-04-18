@@ -126,12 +126,10 @@ public class TDictBusinessController {
                             @RequestParam(value = "dictCode", required = false) String dictCode,
                             @RequestParam(value = "colName", required = false) String colName,
                             @RequestParam(value = "dictNote", required = false) String dictNote,
-                            @RequestParam(value = "upDict", required = false) Integer upDict,
-                            @RequestParam(value = "remark", required = false) String remark,
-                            @RequestParam(value = "sort", required = false) Long sort) {
+                            @RequestParam(value = "upDict", required = false) Integer upDict) {
         Result result = new Result();
         try {
-            List<TDictBusiness> list = tDictBusinessService.select(dictId, dictCode, colName, dictNote, upDict, remark, sort);
+            List<TDictBusiness> list = tDictBusinessService.select(dictId, dictCode, colName, dictNote, upDict);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

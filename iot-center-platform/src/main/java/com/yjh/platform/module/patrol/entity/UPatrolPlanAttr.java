@@ -70,4 +70,13 @@ public class UPatrolPlanAttr implements Serializable {
 
     private String customId;
 
+    @ApiModelProperty(value = "设备类型")
+    private Integer deviceType;
+
+    @ApiModelProperty(value = "识别类型")
+    private Integer meteType;
+
+    @ApiModelProperty(value = "设备所属区域")
+    private Integer upRegionId;
+
 }

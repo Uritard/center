@@ -44,9 +44,13 @@ public class TDictBusinessService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TDictBusiness> select(Integer dictId, String dictCode, String colName, String dictNote, Integer upDict, String remark, Long sort) {
-        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(dictId, dictCode, colName, dictNote, upDict, remark, sort);
+    public List<TDictBusiness> select(Integer dictId, String dictCode, String colName, String dictNote, Integer upDict) {
+        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(dictId, dictCode, colName, dictNote, upDict);
         return tDictBusinessList;
+    }
+
+    public List<TDictBusiness> selectAll() {
+        return tDictBusinessDao.select(null, null, null, null, null);
     }
 
     @Transactional(rollbackFor = Exception.class)

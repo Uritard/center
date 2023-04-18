@@ -2259,17 +2259,17 @@ CREATE TABLE `t_warn_info` (
 DROP TABLE IF EXISTS `u_patrol_task_attr`;
 CREATE TABLE `u_patrol_task_attr` (
   `task_id` varchar(50) NOT NULL COMMENT '关联任务表id',
-  `instance_id` bigint(48) NOT NULL COMMENT '巡检点实例ID',
-  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
-  `device_id` bigint(32) DEFAULT '1' COMMENT '关联设备id',
+  `instance_id` bigint NOT NULL COMMENT '巡检点实例ID',
+  `device_mete_id` bigint DEFAULT '1' COMMENT '测点实例ID',
+  `device_id` bigint DEFAULT '1' COMMENT '关联设备id',
   `custom_id` varchar(32) DEFAULT '' COMMENT '关联部位表id',
   `point_task_id` varchar(32) DEFAULT '' COMMENT '关联巡视点表id',
-  `if_robot` int(11) DEFAULT '1' COMMENT '是否支持机器人巡视（暂时没用）',
-  `if_video` int(11) DEFAULT '1' COMMENT '是否支持视频巡视（暂时没用）',
-  `if_inferad` int(11) DEFAULT '1' COMMENT '是否支持红外巡视（暂时没用）',
-  `if_artificial` int(11) DEFAULT '1' COMMENT '是否支持人工巡视（暂时没用）',
+  `point_type` int DEFAULT '1' COMMENT '巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
+  `device_type` int DEFAULT '1' COMMENT '设备类型',
+  `mete_type` int DEFAULT '1' COMMENT '识别类型',
+  `region_id` bigint DEFAULT NULL COMMENT '设备所属区域',
   PRIMARY KEY (`task_id`,`instance_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
 
 
 -- ----------------------------
