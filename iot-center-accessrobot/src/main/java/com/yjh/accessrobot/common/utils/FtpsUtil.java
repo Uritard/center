@@ -24,11 +24,6 @@ public class FtpsUtil {
 
     private static String key_path = "D://ftp//apache-ftpserver-1.1.1//res//ftpserver.jks";
 
-    // private static String host = "192.168.100.9";
-    // private static int port = 10012;
-    // private static String username = "jysp";
-    // private static String password = "jydw";
-
 
     // FTP协议里面，规定文件名编码为iso-8859-1
     private static String SERVER_CHARSET = "ISO-8859-1";
@@ -56,167 +51,8 @@ public class FtpsUtil {
         return tm[0];
     }
 
-/*
-    public static void putFileForList(List<byte[]> file,
-                                      List<String> remoteFilename) throws NoSuchAlgorithmException {
-        try {
-            log.info("-------------------------------文件上传开始");
-            FTPSClient ftpClient = new FTPSClient(true);
-//            ftpClient.setTrustManager(getTrustManager());
-//            ftpClient.setKeyManager(getKeyManager());
-            ftpClient.connect(host, port);
-            // Connect to host
-            int reply = ftpClient.getReplyCode();
-            if (FTPReply.isPositiveCompletion(reply)) {
-
-                // Login
-                if (ftpClient.login(username, password)) {
-                    if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
-                            "OPTS UTF8", "ON"))) {
-                        // 开启服务器对UTF-8的支持，
-                        LOCAL_CHARSET = "UTF-8";
-                    }
-
-                    ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                    ftpClient.setControlEncoding(LOCAL_CHARSET);
-                    // Set protection buffer size
-                    ftpClient.execPBSZ(0);
-                    // Set data channel protection to private
-                    ftpClient.execPROT("P");
-                    // Enter local passive mode
-                    ftpClient.enterLocalPassiveMode();
-
-                    // Store file on host
-                    for (int i = 0; i < file.size(); i++) {
-                        String fileName = remoteFilename.get(i);
-                        // 上传文件名编码转换
-                        fileName = new String(remoteFilename.get(i).getBytes(LOCAL_CHARSET), SERVER_CHARSET);
-                        InputStream is = new ByteArrayInputStream(file.get(i));
-                        String[] dirs = fileName.split("/");
-                        for (String dir : dirs) {
-                            ftpClient.mkd(dir);
-                            ftpClient.changeWorkingDirectory(dir);
-                        }
-
-                        if (ftpClient.storeFile(fileName, is)) {
-                            log.info(username + "," + remoteFilename.get(i));
-                        } else {
-                            log.info("Could not store file");
-                        }
-                        is.close();
-                    }
-                    // Logout
-                    ftpClient.logout();
-                } else {
-                    System.out.println("FTP login failed");
-                }
-
-                // Disconnect
-                ftpClient.disconnect();
-
-            } else {
-                System.out.println("FTP connect to host failed");
-            }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            System.out.println("FTP client received network error");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-*/
-
-
-//    public static void putFile(String filepath,
-//                               String remoteFilename) throws NoSuchAlgorithmException {
-//        try {
-//            log.info("-------------------------------文件上传开始");
-//
-//            File file = new File(filepath);
-//            try {
-//                FileInputStream fis = new FileInputStream(file);
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-//                byte[] b = new byte[1000];
-//                int n;
-//                while ((n = fis.read(b)) != -1) {
-//                    bos.write(b, 0, n);
-//                }
-//                fis.close();
-//                byte[] data = bos.toByteArray();
-//                bos.close();
-//                FTPSClient ftpClient = new FTPSClient(true);
-//
-////                ftpClient.setTrustManager(getTrustManager());
-////                ftpClient.setKeyManager(getKeyManager());
-//                ftpClient.connect(host, port);
-//                // Connect to host
-//                int reply = ftpClient.getReplyCode();
-//
-//                SSLContext sslContext = SSLContext.getInstance("SSL");
-//
-//                if (FTPReply.isPositiveCompletion(reply)) {
-//
-//                    // Login
-//                    if (ftpClient.login(username, password)) {
-//                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
-//                                "OPTS UTF8", "ON"))) {
-//                            // 开启服务器对UTF-8的支持，
-//                            LOCAL_CHARSET = "UTF-8";
-//                        }
-//
-//                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-//
-//                        ftpClient.setControlEncoding(LOCAL_CHARSET);
-//                        // Set protection buffer size
-//                        ftpClient.execPBSZ(0);
-//                        // Set data channel protection to private
-//                        ftpClient.execPROT("P");
-//                        // Enter local passive mode
-//                        ftpClient.enterLocalPassiveMode();
-//
-//                        // Store file on host
-//                        String fileName = remoteFilename;
-//                        // 上传文件名编码转换
-//                        fileName = new String(remoteFilename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
-//                        InputStream is = new ByteArrayInputStream(data);
-//                        String[] dirs = fileName.split("/");
-//                        String fianlName = dirs[dirs.length - 1];
-//                        for (int i = 0; i < dirs.length - 1; i++) {
-//                            ftpClient.mkd(dirs[i]);
-//                            ftpClient.changeWorkingDirectory(dirs[i]);
-//                        }
-//                        if (ftpClient.storeFile(fianlName, is)) {
-//                            log.info(username + "," + remoteFilename);
-//                        } else {
-//                            log.info("Could not store file");
-//                        }
-//                        is.close();
-//
-//                        // Logout
-//                        ftpClient.logout();
-//                    } else {
-//                        System.out.println("FTP login failed");
-//                    }
-//
-//                    // Disconnect
-//                    ftpClient.disconnect();
-//                } else {
-//                    System.out.println("FTP connect to host failed");
-//                }
-//            } catch (IOException ioe) {
-//                ioe.printStackTrace();
-//                System.out.println("FTP client received network error");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public static void putFile(String filepath,
-                               String remoteFilename,String host,int port,String key_pw,String username,String password) throws NoSuchAlgorithmException {
+                               String remoteFilename,String host,int port, String username,String password) throws NoSuchAlgorithmException {
         try {
             log.info("-------------------------------文件上传开始");
             log.info("filepath:{},remoteFilename:{},host:{},port:{},key_pw:{},username:{},password:{}",
@@ -319,102 +155,6 @@ public class FtpsUtil {
         }
     }
 
-/*
-    public static void putFileTest(String filepath,
-                               String remoteFilename) throws NoSuchAlgorithmException {
-        try {
-            log.info("-------------------------------文件上传开始");
-            host = "192.168.9.226";
-            port = 10012;
-            username = "admin";
-            password = "1";
-            File file = new File(filepath);
-            try {
-                FileInputStream fis = new FileInputStream(file);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-                byte[] b = new byte[1000];
-                int n;
-                while ((n = fis.read(b)) != -1) {
-                    bos.write(b, 0, n);
-                }
-                fis.close();
-                byte[] data = bos.toByteArray();
-                bos.close();
-
-                FTPSClient ftpClient = new FTPSClient("TLS",true);
-                ftpClient.setAuthValue("TLS");
-                //        ftpClient.setTrustManager(getTrustManager());
-                //      ftpClient.setKeyManager(getKeyManager());
-                ftpClient.connect(host, port);
-                // Connect to host
-                int reply = ftpClient.getReplyCode();
-
-                SSLContext sslContext = SSLContext.getInstance("SSL");
-
-                if (FTPReply.isPositiveCompletion(reply)) {
-
-                    // Login
-                    if (ftpClient.login(username, password)) {
-                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
-                                "OPTS UTF8", "ON"))) {
-                            // 开启服务器对UTF-8的支持，
-                            LOCAL_CHARSET = "UTF-8";
-                        }
-
-                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                        ftpClient.setControlEncoding(LOCAL_CHARSET);
-                            // Set protection buffer size
-                            ftpClient.execPBSZ(0);
-                            // Set data channel protection to private
-                            ftpClient.execPROT("P");
-                            // Enter local passive mode
-                            ftpClient.enterLocalPassiveMode();
-                        ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
-                        // Store file on host
-                        String fileName = remoteFilename;
-                        // 上传文件名编码转换
-                        fileName = new String(remoteFilename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
-                        InputStream is = new ByteArrayInputStream(data);
-                        String[] dirs = fileName.split("/");
-                        String fianlName = dirs[dirs.length - 1];
-                        for (int i = 0; i < dirs.length - 1; i++) {
-                            ftpClient.mkd(dirs[i]);
-                            ftpClient.changeWorkingDirectory(dirs[i]);
-                        }
-//                        ftpClient.enterLocalPassiveMode();
-                        if (ftpClient.storeFile(fianlName, is)) {
-                            log.info(username + "," + remoteFilename);
-                        } else {
-                            log.info("code :"+ftpClient.getReplyCode());
-                            log.info("message :"+ftpClient.getReplyString());
-                            log.info("Could not store file");
-                        }
-                        is.close();
-
-                        // Logout
-                        ftpClient.logout();
-                    } else {
-                        log.info("FTP login failed---登录失败");
-                    }
-
-                    // Disconnect
-                    ftpClient.disconnect();
-                } else {
-                    log.info("FTP connect to host failed---连接失败");
-                }
-            } catch (IOException ioe) {
-                log.error("FTPS上传文件失败"+ioe);
-            } catch (Exception e) {
-                log.error("FTPS上传文件错误"+e);
-            }
-        } catch (Exception e) {
-            log.error("FTPS上传文件参数有误"+e);
-        }
-    }
-*/
-
-
     public static boolean isFTPFileExist(String filePath,String host,int port,String key_pw,String username,String password) {
         try {
             FTPSClient ftpClient = null;
@@ -490,7 +230,7 @@ public class FtpsUtil {
         String path = "D://1.jpg";
         String fileName = "/3/1.jpg";
         try {
-            putFile(path, fileName, "172.24.39.150", 10012, "1", "Yzzx220", "Yzzx@220901");
+            putFile(path, fileName, "172.24.39.150", 10012, "Yzzx220", "Yzzx@220901");
         } catch (Exception e) {
             e.printStackTrace();
         }

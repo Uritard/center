@@ -11,7 +11,6 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.dao.TCameraPresetMapper;
 import com.yjh.accessrobot.module.command.dao.TCruisePointInstanceMapper;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
@@ -61,8 +60,6 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     private TStdDeviceMapper tStdDeviceMapper;
     @Autowired
     private TWarnInfoMapper tWarnInfoMapper;
-    @Autowired
-    private UpFtpsConfig upFtpsConfig;
     @Resource
     private ServiceRestTemplate serviceRestTemplate;
 
@@ -204,7 +201,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         String imgPath = tWarnInfo.getImagePath().replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
         String targetNamePath = imgPath.replace(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
         log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
-        uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
+        uploadFileToUpFtps(imgPath, "jm/" + targetNamePath);
         xmlItem.put("file_path", targetNamePath);
         xmlItem.put("time", warnTime);
         xmlItem.put("content", tWarnInfo.getWarnContent());
@@ -279,13 +276,18 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
      * @param sourcePath     源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+            String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+            String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+            String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                    upSystemFtpsUsername, upSystemFtpsPassword);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误：", e);
         }

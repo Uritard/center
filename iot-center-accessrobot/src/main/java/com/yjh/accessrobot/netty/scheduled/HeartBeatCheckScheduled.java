@@ -38,7 +38,6 @@ public class HeartBeatCheckScheduled {
         this.robotServerHandler = robotServerHandler;
     }
 
-//    @Scheduled(cron = "*/${heart.beat.interval} * * * * ?")
     @Scheduled(fixedDelayString = "#{@getIntervalValue}", initialDelayString = "#{@getIntervalValue}")
     public void checkHeartBeat() {
         try {

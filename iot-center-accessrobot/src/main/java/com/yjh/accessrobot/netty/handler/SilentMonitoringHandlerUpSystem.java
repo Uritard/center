@@ -6,13 +6,7 @@ import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessrobot.commons.result.Result;
-import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.configuration.UpFtpsConfig;
-import com.yjh.accessrobot.module.command.dao.TCameraPresetMapper;
-import com.yjh.accessrobot.module.command.dao.TCruisePointInstanceMapper;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
 import com.yjh.accessrobot.module.command.entity.*;
@@ -26,9 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -52,8 +44,6 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
-    @Autowired
-    private UpFtpsConfig upFtpsConfig;
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("上级系统接收到静默告警数据 xmlBaseModel:{}", JSON.toJSONString(xmlBaseModel));
@@ -118,7 +108,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         // 图片在ftps上的全路径
         String ftpPath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
         String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + File.separator+ ftpPath;
-        uploadFileToUpFtps(resultAbsolutePath,ftpPath,upFtpsConfig);
+        uploadFileToUpFtps(resultAbsolutePath,ftpPath);
         robotService.upToCruise(xmlBaseModel);
         }catch (Exception e){
             log.error("上传静默监视告警数据出错：",e);
@@ -131,13 +121,18 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
      * @param sourcePath     源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+            String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+            String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+            String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            FtpsUtil.putFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                    upSystemFtpsUsername, upSystemFtpsPassword);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误：", e);
         }

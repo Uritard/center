@@ -38,23 +38,15 @@ import java.util.Enumeration;
 @EnableAsync
 public class AccessRobotApplication implements CommandLineRunner {
 
-    @Value("${netty.server.port}")
-    private int port;
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
 
+    //WS调用接口地址
     @Value("${other.webSocketUrl}")
-    private String syncWebsocketUrl;//WS调用接口地址
-
-    @Value("${spring.interface.api}")
-    private String interfaceApi;
-    @Value("${netty.handler.new:true}")
-    private boolean handlerNew;
-    @Value("${netty.handler.multithread:true}")
-    private boolean multiThread;
+    private String syncWebsocketUrl;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -66,15 +58,16 @@ public class AccessRobotApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         Constant.WEBSOCKET_URL = syncWebsocketUrl;
         Constant.redisTemplate = redisTemplate;
-        Constant.apiPermissions= Boolean.valueOf(interfaceApi);
+        Constant.apiPermissions= Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi")));
         robotService.updateAllRobotStatus();
         String url = getLocalIp();
 //        String url = "192.168.40.71";
 
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-        Constant.handlerNew = handlerNew;
-        Constant.multiThread = multiThread;
+        Constant.handlerNew = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew")));
+        Constant.multiThread =  Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerMultithread")));
+        int port = Integer.parseInt(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyServerPort")));
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address,redisTemplate, robotService);
