@@ -2213,7 +2213,6 @@ public class RobotService {
         return tRobotInfoDao.selectInstanceForTaskGoOn(taskId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String localPath, String targetName) {
         Runnable runnable = new Runnable() {
             @Override

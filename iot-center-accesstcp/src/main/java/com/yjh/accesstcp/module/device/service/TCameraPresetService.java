@@ -30,10 +30,6 @@ public class TCameraPresetService {
 
     @Autowired
     private RedisTemplate redisTemplate;
-
-    @Autowired
-    private FtpsUtil ftpsUtil;
-
     /**
      * 处理相机预置位同步消息
      *
@@ -83,10 +79,29 @@ public class TCameraPresetService {
         TCameraPreset tCameraPreset = tCameraPresetMapper.selectByPrimaryKey(Long.parseLong(presetInfoMap.get("presetId").toString()));
         String devPath = getImageLocalPath(tCameraPreset.getPresetImg());
         String oriFtpsPath = presetInfoMap.get("presetImg").toString();
-
-        ftpsUtil.downloadFile(devPath, oriFtpsPath);
+        downloadFile(devPath, oriFtpsPath);
     }
-
+    /**
+     * ftps下载
+     * @param sourcePath
+     * @param targetPathName
+     */
+    private void downloadFile(String sourcePath, String targetPathName) {
+        try {
+            if (org.apache.commons.lang3.StringUtils.isEmpty(sourcePath) || org.apache.commons.lang3.StringUtils.isEmpty(targetPathName)) {
+                return;
+            }
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+            String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+            String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+            String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            FtpsUtil.downloadFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                    upSystemFtpsUsername, upSystemFtpsPassword);
+        } catch (Exception e) {
+            log.error("将文件从上级系统ftp服务器下载错误：", e);
+        }
+    }
     /**
      * 将presetImg路劲从ftps路径变成绝对路径
      *

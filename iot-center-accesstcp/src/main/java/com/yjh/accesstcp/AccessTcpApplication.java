@@ -42,10 +42,6 @@ public class AccessTcpApplication implements CommandLineRunner {
     private String serverUrl;
     @Value("${a.interface.flag}")
     private String flag;
-    @Value("${spring.union.stationCode}")
-    private String stationCode;
-    @Value("${netty.handler.new:true}")
-    private boolean handlerNew;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -66,7 +62,7 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        Constant.handlerNew = handlerNew;
+        Constant.handlerNew = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew")));
         if("1".equals(flag)) {
             InetSocketAddress address = new InetSocketAddress(serverUrl, port);
             log.info("accesstcp is running, url is : " + url);
