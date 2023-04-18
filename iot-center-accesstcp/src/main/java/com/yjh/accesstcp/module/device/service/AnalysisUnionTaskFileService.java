@@ -30,9 +30,6 @@ import java.util.*;
 public class AnalysisUnionTaskFileService {
 
     @Autowired
-    private FtpsUtil ftpsUtil;
-
-    @Autowired
     private UnionTaskDao unionTaskDao;
 
     @Autowired
@@ -46,7 +43,7 @@ public class AnalysisUnionTaskFileService {
             log.info("联动配置文件 fileName {}", fileName);
             String localFilePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/linkage/" ;
             FileUtil.createDirectory(localFilePath);
-            ftpsUtil.downloadFile(localFilePath + fileName, filePath);
+            downloadFile(localFilePath + fileName, filePath);
             List<Map<String, Object>> itemList = readUnionTaskXml(localFilePath + fileName);
             if (CollectionUtils.isNotEmpty(itemList)){
                 deleteData(itemList);
@@ -58,6 +55,28 @@ public class AnalysisUnionTaskFileService {
             log.info("handleUnionTaskFile success,filePath:{}", filePath);
         } catch (Exception e) {
             log.error("handleUnionTaskFile failed,filePath:{},error message:", filePath, e);
+        }
+    }
+
+    /**
+     * ftps下载
+     * @param sourcePath
+     * @param targetPathName
+     */
+    private void downloadFile(String sourcePath, String targetPathName) {
+        try {
+            if (org.apache.commons.lang3.StringUtils.isEmpty(sourcePath) || org.apache.commons.lang3.StringUtils.isEmpty(targetPathName)) {
+                return;
+            }
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
+            String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
+            String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
+            String upSystemFtpsPassword = upSystemFtps.get("upSystemFtpsPassword");
+            FtpsUtil.downloadFile(sourcePath, targetPathName, upSystemFtpsIp, Integer.parseInt(upSystemFtpsPort),
+                    upSystemFtpsUsername, upSystemFtpsPassword);
+        } catch (Exception e) {
+            log.error("将文件从上级系统ftp服务器下载错误：", e);
         }
     }
 
