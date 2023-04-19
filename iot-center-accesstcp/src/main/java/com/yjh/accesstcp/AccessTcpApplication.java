@@ -72,10 +72,6 @@ public class AccessTcpApplication implements CommandLineRunner {
             nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise, registerManager);
         }
     }
-    public void loadDeviceInfo()throws IOException{
-
-    }
-
     private static String getLocalIp() throws SocketException {
         String ip = "";
         try {

@@ -63,8 +63,6 @@ public class Constant {
 
     public static boolean apiPermissions;
 
-    public static String WEBSOCKET_URL="";
-
     public static RedisTemplate redisTemplate;
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {

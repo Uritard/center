@@ -103,7 +103,8 @@ public class LogsAspect {
                             jsonMap.put("userName", userName);
                             jsonMap.put("title", annotation.title());
                             jsonMap.put("content", String.valueOf(content));
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                            String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
+                            Constant.websocketSendMsg(webSocketUrl, jsonMap);
                             content.append(";用户").append(userName).append("存在越权访问!");
                             params.set("content", content.toString());
                             post(params);

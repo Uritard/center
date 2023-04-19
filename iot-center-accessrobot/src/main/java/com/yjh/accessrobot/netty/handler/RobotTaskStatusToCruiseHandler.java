@@ -35,9 +35,6 @@ import java.util.*;
 public class RobotTaskStatusToCruiseHandler implements MessageHandlerStrategy, InitializingBean {
     public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
 
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
-
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
     @Autowired

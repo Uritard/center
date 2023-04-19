@@ -10,6 +10,7 @@ import com.yjh.accessrobot.module.command.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -38,9 +39,11 @@ public class StatisticsUtil {
   @Autowired private TRobotInfoDao tRobotInfoDao;
 
   @Resource
+  private RedisTemplate redisTemplate;
+
+  @Resource
   private ServiceRestTemplate serviceRestTemplate;
-  @Value("${other.webSocketUrl}")
-  private String syncWebsocketUrl;
+
   /**
    * 刷新机器人/无人机状态的同时，刷新缓存，统计在线时长及离线次数 <br>
    * isOnline - 是否在线 <br>
@@ -164,7 +167,8 @@ public class StatisticsUtil {
     String json = JSON.toJSONString(jasonMaps);
     log.info("发送给前端的消息：{}", json);
     try {
-      String result = serviceRestTemplate.postForObject(syncWebsocketUrl, json, String.class);
+      String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
+      String result = serviceRestTemplate.postForObject(webSocketUrl, json, String.class);
       log.info("param:{} result:{}", json, result);
     } catch (Exception e) {
       log.error("发送前端失败", e);

@@ -38,15 +38,6 @@ public class CameraConController {
     @Autowired
     private CameraConService cameraConService;
 
-    @Value("${nginx.picture.reflact}")
-    private String capturePath;//图片路径
-
-    @Value("${nvr.capture.result}")
-    private String captureResultPath;//结果路径
-
-    @Value("${give.pic}")
-    private String givePic;
-
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
@@ -276,6 +267,8 @@ public class CameraConController {
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
+            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId, meteName);
@@ -308,6 +301,8 @@ public class CameraConController {
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
+            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId, meteName);
@@ -662,6 +657,7 @@ public class CameraConController {
                              @RequestParam(value = "meteName",required = false) String meteName) {
         Result result = new Result();
         Map<String,String> map;
+        String givePic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:givePic", "content"));
         if ("1".equals(givePic)){
             map = cameraConService.givePicFir(cameraId,presetId,meteName);
         }else {

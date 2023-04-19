@@ -12,6 +12,7 @@ import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -46,19 +47,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Autowired
     private CameraConService cameraConService;
 
-    @Value("${nginx.picture.reflact}")
-    private String capturePath;//图片路径
-
-    @Value("${nvr.capture.result}")
-    private String captureResultPath;//结果路径
-
-    @Value("${nvr.sdk.path}")
-    private String sdkPath;
-    /**
-     * WS调用接口地址
-     */
-    @Value("${system.webSocket.url}")
-    private String syncWebsocketUrl;
     /**
      * 用户句柄
      */
@@ -93,7 +81,6 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Constant.WEBSOCKET_URL = syncWebsocketUrl;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi")));
         log.info("videoAccess is running...");
@@ -112,6 +99,7 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     private void setSDKCom() {
         //设置HCNetSDKCom组件库所在路径
+        String sdkPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:sdkPath", "content"));
         String sdkComPath = System.getProperty("user.dir") + sdkPath;
         log.info("sdkComPath {} ", sdkComPath);
         HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
@@ -159,6 +147,8 @@ public class AccessVideoApplication implements CommandLineRunner {
 
         cameraConService.refreshRecordsOnSchedule();
         log.info("NVR list: " + recorderConInfoList);
+        String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+        String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
         new Thread(() -> {
             for (RecorderConInfo recorderConInfo : recorderConInfoList) {
                 //设备信息
