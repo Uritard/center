@@ -17,6 +17,7 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tt
@@ -998,6 +1000,54 @@ public class TRobotInspectionService {
             reList.add(node);
         }
         return reList;
+    }
+
+
+    public List<TRobotInfo> getTRobotWithInspection() {
+        return this.tRobotInspectionDao.getTRobotWithInspection();
+    }
+
+
+    public List<Map<String, Object>> nameLikeTree(Integer type,String name,Long robotId) {
+        TRobotInspection tRobotInspection = new TRobotInspection();
+        tRobotInspection.setRobotId(robotId);
+        tRobotInspection.setInspectionName(name);
+        tRobotInspection.setType(type);
+        List<TRobotInspectionTree> tRobotInspections =this.tRobotInspectionDao.selectInspectionNameLike(tRobotInspection);
+
+        Map<String, Object> robotInspectionTree = new HashMap<>();
+        if(type == null){
+            robotInspectionTree.put("label", "机器人测点列表");
+        }else if (type == 1){
+            if (type == 1) {
+                robotInspectionTree.put("label", "机器人巡检点列表");
+            }else {
+                robotInspectionTree.put("label", "无人机巡检点列表");
+            }
+        }else {
+            robotInspectionTree.put("label", "机器人操作点列表");
+        }
+        robotInspectionTree.put("infoType", "tree");
+        robotInspectionTree.put("id", "-1");
+        List<Map<String, Object>> robotInspectionList = new ArrayList<>();
+
+        Set<Long> robotIdSet = new HashSet<>();
+        List<TRobotInspectionTree> tRobotInspectionTrees= tRobotInspections.stream().filter(o -> robotIdSet.add(o.getRobotId())).collect(
+            Collectors.toList());
+
+        List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
+        for (TRobotInspectionTree tRobot : tRobotInspectionTrees) {
+            Map<String, Object> robotPresetTreeTem = new HashMap<>();
+            Long tRobotRobotId = tRobot.getRobotId();
+            robotPresetTreeTem.put("id", tRobotRobotId);
+            robotPresetTreeTem.put("label", tRobot.getRobotName());
+            robotPresetTreeTem.put("position", tRobot.getRobotPosition());
+            robotPresetTreeTem.put("infoType", "robot");
+            robotPresetTreeTemList.add(robotPresetTreeTem);
+        }
+        robotInspectionTree.put("children",robotPresetTreeTemList);
+
+        return Collections.singletonList(robotInspectionTree);
     }
 
 }

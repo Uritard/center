@@ -539,32 +539,35 @@
     <select id="selectInspectionTree" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, a.robot_name from t_robot_info a
         where 1 = 1
-<!--         <if test="upRegionId != -1">-->
-<!--             and a.up_region_id = #{upRegionId, jdbcType=BIGINT}-->
-<!--         </if>-->
          <if test="type == 1">
              and a.robot_type is not null
          </if>
          <if test="type == 2">
              and a.drone_type is not null
          </if>
+<if test="robotId != null and robotId != -1">
+    and a.robot_id = #{robotId,jdbcType=BIGINT}
+</if>
     </select>
 
     <select id="batchSelectInspection" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, b.robot_name, b.robot_position, b.drone_position, a.inspection_id, a.inspection_name from t_robot_inspection a
-        LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
+        inner JOIN t_robot_info b ON a.robot_id = b.robot_id
         WHERE 1 = 1
         <if test="inspectionType != null and inspectionType != ''">
             and a.inspection_type = #{inspectionType, jdbcType=INTEGER}
         </if>
-<!--        <if test="upRegionId != -1">-->
-<!--            and b.up_region_id = #{upRegionId, jdbcType=BIGINT}-->
-<!--        </if>-->
+        <if test="name != null and name != ''">
+            and a.inspection_name like CONCAT('%',CONCAT(#{name,jdbcType=VARCHAR},'%'))
+        </if>
         <if test="type == 1">
             and b.robot_type is not null
         </if>
         <if test="type == 2">
             and b.drone_type is not null
+        </if>
+        <if test="robotId != null and robotId != -1">
+            and a.robot_id = #{robotId,jdbcType=BIGINT}
         </if>
     </select>
 

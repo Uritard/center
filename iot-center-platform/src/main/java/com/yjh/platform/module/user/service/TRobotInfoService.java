@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.service;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -12,6 +14,7 @@ import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import org.apache.regexp.RE;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -345,52 +348,104 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> selectInspectionTree(Integer inspectionType, Long upRegionId, Integer type) {
-        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree(upRegionId, type);
-        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, upRegionId, type);
-        List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
-        for (TRobotInspectionTree tRobot : robotList) {
-            Map<String, Object> robotPresetTreeTem = new HashMap<>();
-            List<Map<String, Object>> presetList = new ArrayList<>();
-            Long robotId = tRobot.getRobotId();
-            for (TRobotInspectionTree tRobotInspectionTree : tRobotInspectionTreeList) {
-                Long robotIdTem = tRobotInspectionTree.getRobotId();
-                if (Objects.nonNull(robotIdTem) && Objects.equals(robotId, robotIdTem)) {
+    public List<Map<String, Object>> selectInspectionTree(Integer inspectionType, Long robotId, Integer type,String name) {
+        if (name != null && !"".equals(name.trim())) {
+            //查询机器人下的测点
+            List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, name, type,robotId);
+            Multimap<Long,Map<String,Object>> multimap = HashMultimap.create();
+            List<Map<String,Object>> robotList = new LinkedList<>();
+                Set<Long> set = new HashSet<>();
+            tRobotInspectionTreeList.forEach(o ->{
+                if (set.add(o.getRobotId())) {
+                    Map<String,Object> robot = new HashMap<>();
+                    robot.put("id", o.getRobotId());
+                    robot.put("label", o.getRobotName());
+                    robot.put("position", type == 1? o.getRobotPosition():o.getDronePosition());
+                    robot.put("infoType", "robot");
+                    robotList.add(robot);
+                };
+                Map<String, Object> inspectionMap = new HashMap<>();
+                inspectionMap.put("id", o.getInspectionId());
+                inspectionMap.put("label", o.getInspectionName());
+                inspectionMap.put("infoType", "inspection");
+                multimap.put(o.getRobotId(),inspectionMap);
+            });
+
+
+            //查询根节点
+            Map<String, Object> robotInspectionTree = new HashMap<>();
+            if(inspectionType == null){
+                robotInspectionTree.put("label", "机器人巡检点列表");
+            }else if (inspectionType == 1){
+                if (type == 1) {
+                    robotInspectionTree.put("label", "机器人巡检点列表");
+                }else {
+                    robotInspectionTree.put("label", "无人机巡检点列表");
+                }
+            }else {
+                robotInspectionTree.put("label", "机器人操作点列表");
+            }
+            robotInspectionTree.put("infoType", "tree");
+            robotInspectionTree.put("id", "-1");
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(robotList)) {
+                robotList.forEach(o -> {
+                    o.put("children",multimap.get((Long)o.get("id")));
+                });
+                robotInspectionTree.put("children",robotList);
+            }
+            List<Map<String, Object>> robotInspectionList = new ArrayList<>();
+            robotInspectionList.add(robotInspectionTree);
+            return robotInspectionList;
+        } else {
+            if (robotId == null) {
+                //查询根节点
+                Map<String, Object> robotInspectionTree = new HashMap<>();
+                if(inspectionType == null){
+                    robotInspectionTree.put("label", "机器人测点列表");
+                }else if (inspectionType == 1){
+                    if (type == 1) {
+                        robotInspectionTree.put("label", "机器人巡检点列表");
+                    }else {
+                        robotInspectionTree.put("label", "无人机巡检点列表");
+                    }
+                }else {
+                    robotInspectionTree.put("label", "机器人操作点列表");
+                }
+                robotInspectionTree.put("infoType", "tree");
+                robotInspectionTree.put("id", "-1");
+                List<Map<String, Object>> robotInspectionList = new ArrayList<>();
+                robotInspectionList.add(robotInspectionTree);
+                return robotInspectionList;
+            }
+            else if (robotId == -1L) {
+                //查询根节点下机器人列表
+                List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
+                List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree(robotId, type);
+                for (TRobotInspectionTree tRobot : robotList) {
+                    Map<String, Object> robotPresetTreeTem = new HashMap<>();
+                    Long tRobotRobotId = tRobot.getRobotId();
+                    robotPresetTreeTem.put("id", tRobotRobotId);
+                    robotPresetTreeTem.put("label", tRobot.getRobotName());
+                    robotPresetTreeTem.put("position", tRobot.getRobotPosition());
+                    robotPresetTreeTem.put("infoType", "robot");
+                    robotPresetTreeTemList.add(robotPresetTreeTem);
+                }
+                return robotPresetTreeTemList;
+            }
+            else {
+                //查询机器人下的测点
+                List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, name, type,robotId);
+                List<Map<String, Object>> presetList = new ArrayList<>();
+                for (TRobotInspectionTree tRobotInspectionTree : tRobotInspectionTreeList) {
                     Map<String, Object> inspectionMap = new HashMap<>();
                     inspectionMap.put("id", tRobotInspectionTree.getInspectionId());
                     inspectionMap.put("label", tRobotInspectionTree.getInspectionName());
                     inspectionMap.put("infoType", "inspection");
                     presetList.add(inspectionMap);
                 }
+                return presetList;
             }
-            robotPresetTreeTem.put("id", robotId);
-            robotPresetTreeTem.put("label", tRobot.getRobotName());
-            robotPresetTreeTem.put("position", tRobot.getRobotPosition());
-            if(presetList == null || presetList.size()==0){
-                continue;
-            }
-            robotPresetTreeTem.put("children", presetList);
-            robotPresetTreeTem.put("infoType", "robot");
-            robotPresetTreeTemList.add(robotPresetTreeTem);
         }
-        Map<String, Object> robotInspectionTree = new HashMap<>();
-        robotInspectionTree.put("children", robotPresetTreeTemList);
-        if(inspectionType == null){
-            robotInspectionTree.put("label", "机器人测点列表");
-        }else if (inspectionType == 1){
-            if (type == 1) {
-                robotInspectionTree.put("label", "机器人巡检点列表");
-            }else {
-                robotInspectionTree.put("label", "无人机巡检点列表");
-            }
-        }else {
-            robotInspectionTree.put("label", "机器人操作点列表");
-        }
-        robotInspectionTree.put("infoType", "tree");
-        robotInspectionTree.put("id", "-1");
-        List<Map<String, Object>> robotInspectionList = new ArrayList<>();
-        robotInspectionList.add(robotInspectionTree);
-        return robotInspectionList;
     }
 
     @Transactional(rollbackFor = Exception.class)

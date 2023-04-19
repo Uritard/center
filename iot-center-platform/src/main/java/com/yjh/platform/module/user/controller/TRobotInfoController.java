@@ -341,10 +341,12 @@ public class TRobotInfoController {
     @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234", codeName="type")
     public Result selectInspectionTree(@RequestParam(value = "inspectionType", required = false) Integer inspectionType,
                                        @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                                       @RequestParam(value = "robotId", required = false) Long robotId,
+                                       @RequestParam(value = "name", required = false) String name,
                                        @RequestParam(value = "type", required = true) Integer type) {
         Result result = new Result();
         try {
-            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree(inspectionType, upRegionId, type);
+            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree(inspectionType, robotId, type, name);
             result.setData(robotInspectionTree);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

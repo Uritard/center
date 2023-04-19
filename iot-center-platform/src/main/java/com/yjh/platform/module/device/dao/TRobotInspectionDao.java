@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.ConfirmImmediately;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +34,7 @@ public interface TRobotInspectionDao {
                                   @Param(value = "phase") String phase,
                                   @Param(value = "deviceInfo") String deviceInfo);
     List<TRobotInspection> selectByPage(TRobotInspection tRobotInspection);
+    List<TRobotInspectionTree> selectInspectionNameLike(TRobotInspection tRobotInspection);
 
     int batchInsert(List<TRobotInspection> list);
     List<String> selectForRobotTask(@Param(value = "list") List<Long> list);
@@ -100,6 +102,8 @@ public interface TRobotInspectionDao {
 
 
     String selectRobotCodeByInstanceId(@Param("instanceId")Long instanceId);
+
+    List<TRobotInfo> getTRobotWithInspection();
 
     String selectTypeByInstanceId(Long instanceId);
 }

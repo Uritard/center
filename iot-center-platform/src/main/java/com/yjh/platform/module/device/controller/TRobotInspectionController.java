@@ -298,4 +298,24 @@ public class TRobotInspectionController {
         }
         return result;
     }
+
+    @ApiOperation(value = "模糊查询巡检点树")
+    @RequestMapping(value = "/listRobotWithInspection", method = RequestMethod.GET)
+    @Logs(title = "模糊查询巡检点树", content = "根据用户传递的参数模糊查询巡检点树", logType = 1, authority = "1235,1237")
+    public Result listRobotWithInspection(@RequestParam(value = "inspectionName", required = false) String name,
+        @RequestParam(value = "robotId", required = false) Long id,
+        @RequestParam(value = "type", required = false) Integer type, HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.nameLikeTree(type,name,id));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("根据用户传递的参数模糊查询巡检点树失败描述：", e);
+        }
+        return result;
+    }
+
+
+
+
 }
