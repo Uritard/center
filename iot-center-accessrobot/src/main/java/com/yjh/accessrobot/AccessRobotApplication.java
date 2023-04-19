@@ -43,10 +43,6 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Autowired
     private RobotService robotService;
 
-    //WS调用接口地址
-    @Value("${other.webSocketUrl}")
-    private String syncWebsocketUrl;
-
     private NettyServer nettyServer = new NettyServer();
 
     public static void main(String[] args) {
@@ -55,13 +51,10 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Constant.WEBSOCKET_URL = syncWebsocketUrl;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi")));
         robotService.updateAllRobotStatus();
         String url = getLocalIp();
-//        String url = "192.168.40.71";
-
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         Constant.handlerNew = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew")));

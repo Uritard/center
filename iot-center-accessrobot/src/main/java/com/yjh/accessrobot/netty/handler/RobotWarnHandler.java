@@ -33,8 +33,6 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
     private RobotService robotService;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Value("${other.webSocketUrl}")
-    private String syncWebsocketUrl;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -66,7 +64,8 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 
         // Start alarmResultDealThread
-        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService,syncWebsocketUrl);
+        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
+        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService,webSocketUrl);
         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
         // 国网要求

@@ -90,8 +90,6 @@ public class RobotService {
     private TCruisePointInstanceService tCruisePointInstanceService;
     @Resource
     private SysUserDao sysUserDao;
-    @Value("${other.webSocketUrl}")
-    private String webSocketUrl;
 
     @Resource
     LogsRecord logsRecord;
@@ -1446,6 +1444,7 @@ public class RobotService {
                 String jsons = JSON.toJSONString(robotConfirmMsg);
                 log.info("确认消息生成-前端推送：" + jsons);
                 try {
+                    String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
                     Constant.postUrl(webSocketUrl, jsons);
                 } catch (IOException | URISyntaxException e) {
                     log.error(e.getMessage(), e);
@@ -2075,6 +2074,7 @@ public class RobotService {
         //webSocket通知前端确认消息
         String jsons = JSON.toJSONString(jasonMaps);
         log.info("确认消息生成-前端推送：" + jsons);
+        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
         Constant.postUrl(webSocketUrl, jsons);
     }
 

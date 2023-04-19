@@ -35,9 +35,6 @@ import java.util.*;
 @Slf4j
 public class RobotTaskStatusHandler implements MessageHandlerStrategy, InitializingBean {
 
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
-
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -87,7 +84,8 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
                 jasonMap.put("type", "newTask");
                 jasonMap.put("taskId", taskCode);
                 String json = JSON.toJSONString(jasonMap);
-                Constant.postUrl(websocketUrl, json);
+                String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
+                Constant.postUrl(webSocketUrl, json);
 
                 // StandTaskDealThread standTaskDealThread = new StandTaskDealThread(redisTemplate, taskCode, robotCode);
                 // TaskExecutePool.getInstance().execute(standTaskDealThread);

@@ -162,8 +162,6 @@ public class Constant {
 
     public static boolean apiPermissions;
 
-    public static String WEBSOCKET_URL="";
-
     public static RedisTemplate redisTemplate;
 
     //请求webSocket发送方法
