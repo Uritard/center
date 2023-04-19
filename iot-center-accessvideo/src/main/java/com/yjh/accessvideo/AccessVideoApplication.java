@@ -52,6 +52,8 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Value("${nvr.capture.result}")
     private String captureResultPath;//结果路径
 
+    @Value("${nvr.sdk.path}")
+    private String sdkPath;
     /**
      * WS调用接口地址
      */
@@ -110,30 +112,30 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     private void setSDKCom() {
         //设置HCNetSDKCom组件库所在路径
-        String sdkPath = System.getProperty("user.dir") + "/config/lib/";
-        log.info("sdkPath {} ", sdkPath);
+        String sdkComPath = System.getProperty("user.dir") + sdkPath;
+        log.info("sdkComPath {} ", sdkComPath);
         HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
-        System.arraycopy(sdkPath.getBytes(), 0, struComPath.sPath, 0, sdkPath.length());
+        System.arraycopy(sdkComPath.getBytes(), 0, struComPath.sPath, 0, sdkComPath.length());
         struComPath.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
 
         //设置libcrypto.so所在路径
         HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
-        String strPathCrypto = sdkPath + "/libcrypto.so";
+        String strPathCrypto = sdkComPath + "/libcrypto.so";
         System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
         ptrByteArrayCrypto.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
 
         //设置libssl.so所在路径
         HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
-        String strPathSsl = sdkPath + "/libssl.so";
+        String strPathSsl = sdkComPath + "/libssl.so";
         System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
         ptrByteArraySsl.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
 
         //设置libPlayCtrl.so所在路径
         HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
-        String ptrPlayCtrlPath = sdkPath + "/libPlayCtrl.so";
+        String ptrPlayCtrlPath = sdkComPath + "/libPlayCtrl.so";
         System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
         ptrPlayCtrl.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
