@@ -50,18 +50,4 @@ public class CommonUtils {
             return false;
         }
     }
-
-    public static  String getProFilePath (){
-        String profile=null;
-        try {
-            Properties props = new Properties();
-            String filePath = System.getProperty("user.dir") + File.separator + "config" + File.separator + "application.properties";
-            props.load(new FileInputStream(filePath));
-            profile=props.getProperty("spring.profiles.active");
-        }catch (Exception e){
-            logger.error("获取配置文件路径失败");
-        }
-        return profile==null||"".equals(profile)?"pubc":profile;
-    }
-
 }

@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -45,19 +46,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Autowired
     private CameraConService cameraConService;
 
-    /**
-     * sdk路径
-     */
-    @Value("${nvr.sdk.path}")
-    private String sdkPath;
-
-    /**
-     * sdk日志路径
-     */
-    @Value("${nvr.log.path}")
-    private String sdkLogPath;
-
-
     @Value("${nginx.picture.reflact}")
     private String capturePath;//图片路径
 
@@ -65,44 +53,10 @@ public class AccessVideoApplication implements CommandLineRunner {
     private String captureResultPath;//结果路径
 
     /**
-     * sdk日志等级
-     */
-    @Value("${nvr.log.level}")
-    private int logLevel;
-
-    /**
-     * 识别算法端口
-     */
-    @Value("${netty.recognize.port}")
-    private int recognizePort;
-
-    /**
-     * 缺陷算法端口
-     */
-    @Value("${netty.ai.port}")
-    private int aiPort;
-
-    /**
-     * 算法服务端IP
-     */
-    @Value("${netty.server.url}")
-    private String serverUrl;
-
-    /**
      * WS调用接口地址
      */
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
-
-    @Value("${spring.interface.api}")
-    private String interfaceApi;
-
-    /**
-     * 变电站编码
-     */
-    @Value("${station.code}")
-    private String stationCode;
-
     /**
      * 用户句柄
      */
@@ -131,8 +85,6 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
 
-    private NettyClient nettyClient = new NettyClient();
-
     public static void main(String[] args) {
         SpringApplication.run(AccessVideoApplication.class, args);
     }
@@ -141,7 +93,7 @@ public class AccessVideoApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         Constant.WEBSOCKET_URL = syncWebsocketUrl;
         Constant.redisTemplate = redisTemplate;
-        Constant.apiPermissions = Boolean.valueOf(interfaceApi);
+        Constant.apiPermissions = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi")));
         log.info("videoAccess is running...");
         setSDKCom();
         if (!hCNetSDK.NET_DVR_Init()) {
@@ -149,19 +101,19 @@ public class AccessVideoApplication implements CommandLineRunner {
             return;
         }
         log.info("init success..");
-        hCNetSDK.NET_DVR_SetLogToFile(logLevel, sdkLogPath, false);
+        String sdkLogPath = System.getProperty("user.dir") + "/logs/sdk_log/";;
+        log.info("sdkLogPath {} ", sdkLogPath);
+        hCNetSDK.NET_DVR_SetLogToFile(3, sdkLogPath, false);
         register();
-        // InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
-        // InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        // nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,
-        // syncWebsocketUrl, stationCode);
     }
+
 
     private void setSDKCom() {
         //设置HCNetSDKCom组件库所在路径
-        String strPathCom = sdkPath;
+        String sdkPath = System.getProperty("user.dir") + "/config/lib/";
+        log.info("sdkPath {} ", sdkPath);
         HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
-        System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
+        System.arraycopy(sdkPath.getBytes(), 0, struComPath.sPath, 0, sdkPath.length());
         struComPath.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
 

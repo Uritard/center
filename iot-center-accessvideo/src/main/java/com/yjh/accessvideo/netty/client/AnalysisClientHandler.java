@@ -10,7 +10,6 @@ import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
-import com.yjh.accessvideo.module.device.service.AnalysisService;
 import com.yjh.accessvideo.thread.TaskExecutePool;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;

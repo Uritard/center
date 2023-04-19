@@ -38,17 +38,12 @@ public class CameraConController {
     @Autowired
     private CameraConService cameraConService;
 
-   /* @Autowired
-    private DoorMachineService doorMachineService;*/
-
     @Value("${nginx.picture.reflact}")
     private String capturePath;//图片路径
 
     @Value("${nvr.capture.result}")
     private String captureResultPath;//结果路径
 
-    @Value("${srs.stop.url}")
-    private String srsStopUrl;//srs停止播流
     @Value("${give.pic}")
     private String givePic;
 
@@ -72,36 +67,6 @@ public class CameraConController {
             log.error("相机播放失败:", e);
         }
         return result;
-    }
-
-    @ApiOperation(value = "视频进程关闭")
-    @RequestMapping(value = "/stopProcess", method = RequestMethod.POST)
-    public void stopProcess(){
-
-        try {
-            //获取所有视频流信息
-            //发送请求获取所有STREAM
-//            log.info("关闭流接口回调：");
-//            String getInfoUrl="http://"+srsStopUrl+":1985/api/v1/streams/";
-//            //SRS服务器有延迟，大概50-60秒 才更新管理数据
-////            Thread.sleep(1000*70);
-//            JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-//            assert jsonList != null;
-//
-//            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-//            int streamListSize = streamsJsonObjectList.size();
-//            log.info("streamListSize：{}", streamListSize);
-//            if (streamListSize==0) {
-//                Constant.mapsForCamera.clear();
-//                Constant.mapsForHistory.clear();
-//            } else {
-//                StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
-//                Thread thread = new Thread(streamStopThread);
-//                thread.setDaemon(true);
-//                thread.start();
-//            }
-        } catch (Exception e) {e.getMessage();}
-
     }
 
     @ApiOperation(value = "结束推流")
@@ -714,72 +679,72 @@ public class CameraConController {
         return result;
     }
 
-    @ApiOperation(value = "开启可视对讲")
-    @RequestMapping(value = "/startVoiceTalk", method = RequestMethod.GET)
-    public Result startVoiceTalk( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
-    {
-        Result result = new Result();
-        int re=cameraConService.startVoiceTalk(videoIntercomId);
-        if (re>0)
-        {
-            result.setData("开启对讲");
-        }else
-            {
-                result.setData("无法开启对讲");
-            }
+//    @ApiOperation(value = "开启可视对讲")
+//    @RequestMapping(value = "/startVoiceTalk", method = RequestMethod.GET)
+//    public Result startVoiceTalk( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+//    {
+//        Result result = new Result();
+//        int re=cameraConService.startVoiceTalk(videoIntercomId);
+//        if (re>0)
+//        {
+//            result.setData("开启对讲");
+//        }else
+//            {
+//                result.setData("无法开启对讲");
+//            }
+//
+//        return result;
+//    }
+//    @ApiOperation(value = "关闭可视对讲")
+//    @RequestMapping(value = "/stopVoiceTalk", method = RequestMethod.GET)
+//    public Result stopVoiceTalk()
+//    {
+//        Result result = new Result();
+//        try {
+//            cameraConService.stopVoiceTalk();
+//            result.setData("关闭对讲");
+//
+//        }catch (Exception e){
+//            result.setData("系统异常");
+//        }
+//        return result;
+//    }
+//
+//    @ApiOperation(value = "可视对讲播放")
+//    @RequestMapping(value = "/startVideoRealPlay", method = RequestMethod.GET)
+//    public Result startVideoRealPlay( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+//    {
+//        Result result = new Result();
+//       try {
+//           Map<String, Object> map=cameraConService.startVideoRealPlay(videoIntercomId);
+//           if (map.size()>0)
+//           {
+//               result.setData(map);
+//           }else
+//               {
+//                   result.setData("地址不存在");
+//               }
+//       }catch (Exception e)
+//       {
+//           result.setData("系统异常");
+//           log.info(e.getMessage());
+//       }
+//
+//        return result;
+//    }
 
-        return result;
-    }
-    @ApiOperation(value = "关闭可视对讲")
-    @RequestMapping(value = "/stopVoiceTalk", method = RequestMethod.GET)
-    public Result stopVoiceTalk()
-    {
-        Result result = new Result();
-        try {
-            cameraConService.stopVoiceTalk();
-            result.setData("关闭对讲");
-
-        }catch (Exception e){
-            result.setData("系统异常");
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "可视对讲播放")
-    @RequestMapping(value = "/startVideoRealPlay", method = RequestMethod.GET)
-    public Result startVideoRealPlay( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
-    {
-        Result result = new Result();
-       try {
-           Map<String, Object> map=cameraConService.startVideoRealPlay(videoIntercomId);
-           if (map.size()>0)
-           {
-               result.setData(map);
-           }else
-               {
-                   result.setData("地址不存在");
-               }
-       }catch (Exception e)
-       {
-           result.setData("系统异常");
-           log.info(e.getMessage());
-       }
-
-        return result;
-    }
-
-    /**
-     * \获取可视对讲在  状态
-     * @param videoIntercomId
-     * @return
-     */
-    @RequestMapping(value = "/getVidemoIntercomStatus", method = RequestMethod.GET)
-    public Result  getVidemoIntercomStatus ( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
-    {
-        Result result = new Result();
-        result.setData(cameraConService.getVidemoIntercomStatus(videoIntercomId));
-        return result;
-    }
+//    /**
+//     * \获取可视对讲在  状态
+//     * @param videoIntercomId
+//     * @return
+//     */
+//    @RequestMapping(value = "/getVidemoIntercomStatus", method = RequestMethod.GET)
+//    public Result  getVidemoIntercomStatus ( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+//    {
+//        Result result = new Result();
+//        result.setData(cameraConService.getVidemoIntercomStatus(videoIntercomId));
+//        return result;
+//    }
 
     /**
      *
