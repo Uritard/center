@@ -41,6 +41,7 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -56,6 +57,8 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -74,6 +77,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -134,6 +138,8 @@ public class UPatrolTaskService {
     private JobManager jobManager;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     @Autowired
     private LogsRecord logsRecord;
@@ -642,11 +648,20 @@ public class UPatrolTaskService {
 
             updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
 
-//            if (robotEnd) {
-//                String taskIdFinal = taskId;
-//                // 机器人/下级系统任务终止
-//                ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId));
-//            }
+            if (robotEnd) {
+                String taskIdFinal = taskId;
+                // 机器人/下级系统任务终止
+                ScheduledFuture scheduledFuture = threadPoolTaskScheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        dealRobotTaskShutDown(taskIdFinal, robotCode, robotId);
+                        ScheduledMapConfig.countAndClean(taskIdFinal);
+                    }
+                }, new CronTrigger("0/15 * * * * ?"));
+
+                // 将定时任务句柄存储缓存队列，方便后续取消定时任务操作
+                ScheduledMapConfig.add(taskIdFinal, scheduledFuture);
+            }
 
             if (robotId != null){
                 //放入redis
@@ -812,13 +827,15 @@ public class UPatrolTaskService {
         }
     }
 
-    private void dealRobotTaskShutDown(String taskId, String robotCode, Long robotId) {
-        try {
-            //等待30秒
-            Thread.sleep(15 * 1000);
-        } catch (Exception e) {
-            log.error("等待出错：", e);
-        }
+    /**
+     * 处理机器人上报任务结束
+     *
+     * @param taskId taskId
+     * @param robotCode robotCode
+     * @param robotId robotId
+     */
+    public void dealRobotTaskShutDown(String taskId, String robotCode, Long robotId) {
+        log.info("处理机器人上报任务结束,参数：taskId:{}, robotCode:{}, robotId:{},", taskId, robotCode, robotId);
 
         String key = PATROL_SUMMARY_PREFIX + taskId;
         String taskSource = (String)redisTemplate.opsForHash().get(key, "taskSource");
@@ -827,62 +844,107 @@ public class UPatrolTaskService {
             return;
         }
 
-        // String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
         String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
         //处理结果 获取机器人的点
         Set<String> keys = redisScan(cruiseResultKey);
-
         List<Map<String, String>> resultMap = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
             keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
 
         resultMap.forEach(result -> {
-            //判断是不是机器人的点以及还是否完成
-            int cruiseType = MapUtils.getIntValue(result, "cruiseType");
-            int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
-            String instanceId = result.get("instanceId");
-            boolean inNode; // 判断当前节点是否在任务结束节点范围内，包括机器人/无人机/下级节点
-            if (robotId == null) {
-                // 是下级节点
-                inNode = StringUtils.equals(robotCode, result.get("edgeCode"));
-            } else {
-                // 无人机或机器人节点
-                inNode = robotId == MapUtils.getLongValue(result, "robotId");
-            }
-            if (inNode && CRUISE_STATE_UN == cruiseState) {
-                //这个点 没有做
-                CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-                String rname = "";
-                switch (cruiseTypeEnum) {
-                    case ROBOT:
-                        rname = "机器人";
-                        break;
-                    case UAV:
-                        rname = "无人机";
-                        break;
-                    case VIDEO:
-                        rname = "可见光相机";
-                        break;
-                    case INFRARED:
-                        rname = "红外相机";
-                        break;
-                    default:
-                        break;
-                }
-                result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
-                result.put("resultNum", rname + "任务异常");
-                result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
-                result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
-                result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
-                result.put("cruiseTime",DateTimeUtil.format(new Date()));
-
-                String instanceKey = cruiseResultKey + instanceId;
-                redisTemplate.opsForHash().putAll(instanceKey, result);
-
-                patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
-            }
+            dealOneRobotTask(result, taskId, robotCode, robotId, cruiseResultKey);
         });
+    }
+
+    /**
+     * 判断任务等待时间是否超时（调用算法），任务是否异常
+     *
+     * @param result result
+     * @param robotCode robotCode
+     * @param robotId robotId
+     * @param cruiseResultKey cruiseResultKey
+     * @return result
+     */
+    private boolean checkProcessTime(Map<String, String> result, String robotCode, Long robotId, String cruiseResultKey) {
+        int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
+        String instanceId = result.get("instanceId");
+        boolean inNode; // 判断当前节点是否在任务结束节点范围内，包括机器人/无人机/下级节点
+        if (robotId == null) {
+            // 是下级节点
+            inNode = StringUtils.equals(robotCode, result.get("edgeCode"));
+        } else {
+            // 无人机或机器人节点
+            inNode = robotId == MapUtils.getLongValue(result, "robotId");
+        }
+
+        if (inNode && CRUISE_STATE_UN == cruiseState) {
+            return false;
+        }
+
+        if (inNode && CRUISE_STATE_ANALYSE_DOING == cruiseState) {
+            String instanceKey = cruiseResultKey + instanceId;
+            Integer attempts = 1;
+            String attemptStr = result.get("attempts");
+            if (attemptStr != null) {
+                attempts = Integer.valueOf(attemptStr);
+            }
+
+            // 将重试次数写回redis
+            redisTemplate.opsForHash().put(instanceKey, "attempts", (++attempts).toString());
+            if (attempts > 8) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 处理单个需要结束的任务，吴国时未结束状态需要任务置为异常
+     *
+     * @param result result
+     * @param taskId taskId
+     * @param robotCode robotCode
+     * @param robotId robotId
+     * @param cruiseResultKey cruiseResultKey
+     */
+    private void dealOneRobotTask(Map<String, String> result, String taskId, String robotCode, Long robotId, String cruiseResultKey) {
+        //判断是不是机器人的点以及还是否完成
+        int cruiseType = MapUtils.getIntValue(result, "cruiseType");
+        String instanceId = result.get("instanceId");
+        if (!checkProcessTime(result, robotCode, robotId, cruiseResultKey)) {
+            //这个点 没有做
+            CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+            String rname = "";
+            switch (cruiseTypeEnum) {
+                case ROBOT:
+                    rname = "机器人";
+                    break;
+                case UAV:
+                    rname = "无人机";
+                    break;
+                case VIDEO:
+                    rname = "可见光相机";
+                    break;
+                case INFRARED:
+                    rname = "红外相机";
+                    break;
+                default:
+                    break;
+            }
+            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
+            result.put("resultNum", rname + "任务异常");
+            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
+            result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
+            result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
+            result.put("cruiseTime",DateTimeUtil.format(new Date()));
+
+            String instanceKey = cruiseResultKey + instanceId;
+            redisTemplate.opsForHash().putAll(instanceKey, result);
+
+            patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+        }
     }
 
     /**

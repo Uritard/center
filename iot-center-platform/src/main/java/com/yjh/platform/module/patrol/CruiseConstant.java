@@ -68,22 +68,6 @@ public interface CruiseConstant {
      * 异常原因，超时
      */
     int CRUISE_ABNORMAL_TIMEOUT = 251;
-    /**
-     * 异常原因，缺陷异常
-     */
-    int CRUISE_ABNORMAL_DEFECT = 409;
-    /**
-     * 异常原因，检修
-     */
-    int CRUISE_ABNORMAL_OVERHAUL = 410;
-    /**
-     * 异常原因，离线
-     */
-    int CRUISE_ABNORMAL_OFFLINE = 411;
-    /**
-     * 异常原因，任务终止
-     */
-    int CRUISE_ABNORMAL_INTERRUPT = 412;
 
     /**
      * 巡检数据状态，已执行
@@ -106,6 +90,28 @@ public interface CruiseConstant {
      * 审核状态，未审核
      */
     int EVALUATION_STATE_UN = 257;
+
+    /**
+     * 任务状态，调用算法调用中
+     */
+    int CRUISE_STATE_ANALYSE_DOING = 258;
+
+    /**
+     * 异常原因，缺陷异常
+     */
+    int CRUISE_ABNORMAL_DEFECT = 409;
+    /**
+     * 异常原因，检修
+     */
+    int CRUISE_ABNORMAL_OVERHAUL = 410;
+    /**
+     * 异常原因，离线
+     */
+    int CRUISE_ABNORMAL_OFFLINE = 411;
+    /**
+     * 异常原因，任务终止
+     */
+    int CRUISE_ABNORMAL_INTERRUPT = 412;
 
     enum TypeEnum {
 
