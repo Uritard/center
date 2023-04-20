@@ -47,11 +47,32 @@
         <result column="voice_path" jdbcType="VARCHAR" property="voicePath" />
     </resultMap>
 
+    <resultMap id="cruiseDataReport" type="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="mete_type" jdbcType="BIGINT" property="meteType" />
+        <result column="meter_type" jdbcType="BIGINT" property="meterType" />
+        <result column="cruise_time" jdbcType="BIGINT" property="cruiseTime" />
+        <result column="cruise_type" jdbcType="BIGINT" property="cruiseType" />
+        <result column="instance_name" jdbcType="BIGINT" property="instanceName" />
+        <result column="result_num" jdbcType="BIGINT" property="resultNum" />
+        <result column="person_check" jdbcType="BIGINT" property="personCheck" />
+        <result column="identify_result" jdbcType="BIGINT" property="identifyResult" />
+        <result column="cruise_result" jdbcType="BIGINT" property="cruiseResult" />
+        <result column="picpath" jdbcType="BIGINT" property="picPath" />
+        <result column="device_name" jdbcType="BIGINT" property="deviceName" />
+        <result column="evaluation_state" jdbcType="BIGINT" property="deviceName" />
+        <result column="device_type" jdbcType="BIGINT" property="deviceType" />
+        <result column="up_region_name" jdbcType="BIGINT" property="upRegionName" />
+        <association property="alarmLevel" select="selectWarnByTaskAndInstance" column="{taskId=task_id,instanceId=instance_id}" />
+    </resultMap>
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         cruise_data_id, task_id, device_id, device_name, device_mete_id, device_mete_name, custom_id, custom_name, device_point_id, instance_id, instance_name, cruise_id, cruise_name, cruise_time, cruise_status, cruise_type, result_desc, result_num, modify_num, picpath, confirm_pic_path, pic_path_anl, person_check, origpic, orig_confirm_pic_path, orig_pic_anl, cruise_abnormal, evaluation_state, identify_state, identify_result, createtime, remark, check_user, check_date, is_warn, cruise_result, fir_name, fir_date, result_pic, points, voice_path
     </sql>
-
+<select id="selectWarnByTaskAndInstance" resultType="java.lang.String">
+    select warn_level from t_warn_info where task_id = #{taskId} and instance_id = #{instanceId} limit 1
+</select>
 
     <insert id="add" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
         insert into u_patrol_data_result(
@@ -531,37 +552,8 @@
         ORDER BY f.cruise_time DESC
     </select>
 
-    <select id="selectCruiseDataReport" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
-        select result.device_mete_id,
-        result.mete_type,
-        result.meter_type,
-        result.cruise_time,
-        result.cruise_type,
-        result.instance_name,
-        result.result_num,
-        result.person_check,
-        result.identify_result,
-        result.cruise_result,
-        result.picPath,
-        result.device_name,
-        result.evaluation_state,
-        result.task_type,
-        result.device_type,
-        result.up_region_name,
-        result.region_id,
-        result.station_id,
-        result.region_name,
-        result.alarm_level,
-        result.station_name,
-        i.dict_note AS c_type_name,
-        j.dict_note AS identify_result_name,
-        z.dict_note AS cruise_result_name,
-        m.dict_note AS mete_type_name,
-        n.dict_note AS meter_type_name,
-        y.dict_note AS device_type_name,
-        x.dict_note AS alarm_level_name,
-        h.dict_note as cruise_type_name
-        from (SELECT DISTINCT a.device_mete_id,
+    <select id="selectCruiseDataReport" resultMap="cruiseDataReport">
+        SELECT a.device_mete_id,
         a.mete_type,
         a.meter_type,
         e.cruise_time,
@@ -571,46 +563,35 @@
         e.person_check,
         e.identify_result,
         e.cruise_result,
-        e.picpath          AS picPath,
-        e.device_name      AS device_name,
+        e.picpath AS picPath,
+        e.device_name AS device_name,
         e.evaluation_state AS evaluation_state,
-        g.task_type,
-        k.device_type      AS device_type,
-        k.up_region_name   AS up_region_name,
-        k.up_region_id     AS region_id,
-        v.station_id       AS station_id,
-        l.region_name      AS region_name,
-        q.warn_level       AS alarm_level,
-        v.station_name     AS station_name
+        e.task_id,
+        e.instance_id,
+        e.device_id,
+        tsd.device_type      AS device_type,
+        tsd.up_region_name   AS up_region_name,
+        tsd.up_region_id     AS region_id
         FROM u_patrol_data_result e
-        LEFT JOIN t_cruise_point_instance v ON e.instance_id = v.instance_id
-        LEFT JOIN t_std_devicemete a ON a.device_mete_id = v.device_mete_id
-        LEFT JOIN t_warn_info q ON q.task_id = e.task_id
-        AND q.instance_id = e.instance_id
-        LEFT JOIN t_std_device k ON k.device_id = a.device_id
-        LEFT JOIN u_patrol_task g ON e.task_id = g.task_id
-        LEFT JOIN t_std_region l ON l.region_id = g.area_id
+        LEFT JOIN t_std_devicemete a ON a.device_mete_id = e.device_mete_id
+        Left Join t_std_device tsd on e.device_id = tsd.device_id
         WHERE 1 = 1
         <if test="list != null and list.size() > 0">and e.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
-        <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
         <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
-        <if test="instanceName != null and instanceName != '' ">and e.instance_name LIKE CONCAT('%',#{instanceName, jdbcType=VARCHAR},'%')</if>
-        <if test="stationName != null and stationName != '' ">and v.station_name LIKE CONCAT('%',#{stationName, jdbcType=VARCHAR},'%')</if>
-        ORDER BY e.cruise_time DESC) result
-        LEFT JOIN t_dict_business h ON result.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_dict_business i ON result.task_type = i.dict_code AND i.col_name = "plan_type"
-        LEFT JOIN t_dict_business j ON result.identify_result = j.dict_code AND j.col_name = "identify_result"
-        LEFT JOIN t_dict_business z ON result.cruise_result = z.dict_code AND z.col_name = "cruise_result"
-        LEFT JOIN t_dict_business m ON m.dict_code = result.mete_type AND m.col_name = "mete_type"
-        LEFT JOIN t_dict_business n ON n.dict_code = result.meter_type AND n.col_name = "meter_type"
-        LEFT JOIN t_dict_business y ON y.dict_code = result.device_type AND y.col_name = "device_type"
-        LEFT JOIN t_dict_business x ON x.dict_code = result.alarm_level AND x.col_name = "alarm_level"
+        <if test="instanceName != null and instanceName != ''">
+            and e.instance_name like CONCAT('%',CONCAT(#{instanceName},'%'))
+        </if>
+        ORDER BY e.cruise_time DESC
     </select>
 
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">

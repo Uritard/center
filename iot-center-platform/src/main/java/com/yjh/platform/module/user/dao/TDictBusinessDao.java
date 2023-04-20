@@ -24,6 +24,7 @@ public interface TDictBusinessDao {
                                 @Param(value = "dictNote") String dictNote,
                                 @Param(value = "upDict") Integer upDict);
     List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness);
+    List<TDictBusiness> selectAll();
 
     int batchInsert(@Param("list") List<TDictBusiness> list);
 

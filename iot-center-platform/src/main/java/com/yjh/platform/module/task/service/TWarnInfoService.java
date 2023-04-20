@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictBusinessCache;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +127,16 @@ public class TWarnInfoService{
                 thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
             }
             tWarnInfoDetail.setThresholdValue(thresholdValue);
+        }
+
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.forEach(tWarnInfoDetail -> {
+                tWarnInfoDetail.setAlarmLevelName(DictBusinessCache.getDictNode("alarm_level",String.valueOf(tWarnInfoDetail.getAlarmLevel())));
+                tWarnInfoDetail.setAlarmSourceName(DictBusinessCache.getDictNode("alarm_source",String.valueOf(tWarnInfoDetail.getAlarmSource())));
+                tWarnInfoDetail.setConfModeName(DictBusinessCache.getDictNode("conf_mode",String.valueOf(tWarnInfoDetail.getConfMode())));
+                tWarnInfoDetail.setDefectModelName(DictBusinessCache.getDictNode("defect_model",String.valueOf(tWarnInfoDetail.getDefectModel())));
+                tWarnInfoDetail.setDealTypeName(DictBusinessCache.getDictNode("deal_type",String.valueOf(tWarnInfoDetail.getDealType())));
+            });
         }
         return list;
     }

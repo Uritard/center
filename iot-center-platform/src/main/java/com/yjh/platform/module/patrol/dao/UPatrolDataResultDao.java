@@ -21,6 +21,7 @@ public interface UPatrolDataResultDao {
     int add(UPatrolDataResult uPatrolDataResult);
     int deleteByPrimaryId(@Param(value = "cruiseDataId") Long cruiseDataId);
     int update(UPatrolDataResult uPatrolDataResult);
+    String selectWarnByTaskAndInstance(String taskId, Long instanceId);
     UPatrolDataResult selectByPrimaryId(@Param(value = "cruiseDataId") Long cruiseDataId);
     List<UPatrolDataResult> select(@Param(value = "cruiseDataId") Long cruiseDataId,
                                 @Param(value = "taskId") String taskId,

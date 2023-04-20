@@ -72,6 +72,18 @@
         limit 1
     </select>
 
+    <select id="selectAll"  resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        a.dict_id,
+        a.dict_code,
+        a.col_name,
+        a.dict_note,
+        a.up_dict,
+        a.remark,
+        a.sort
+        from t_dict_business a
+    </select>
+
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TDictBusiness" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
         select
         a.dict_id,
