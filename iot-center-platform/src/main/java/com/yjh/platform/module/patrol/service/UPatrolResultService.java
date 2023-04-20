@@ -145,6 +145,22 @@ public class UPatrolResultService {
                 uPatrolResultDao.selectAbnormalResult(taskResultId, cruiseType, cruiseResult, deviceType, instanceName, startTime, endTime,
                     deviceIdList, customId);
         }
+        DictConvertUtil.DictOptional dictOptional = DictConvertUtil.optional("cruiseType")
+            .add("evaluationState")
+            .add("cruiseResult")
+            .add("abnormalType","cruiseAbnormal","abnormalType1")
+            .add("abnormalType","remark","abnormalType2")
+            .add("identifyResult")
+            .add("meteKind")
+            .add("alarmLevel");
+
+        DictConvertUtil.DICT.covertToDict(cruiseResultDetailList,dictOptional);
+
+        cruiseResultDetailList.forEach(cruiseResultDetail -> {
+            if (StringUtils.isNotBlank(cruiseResultDetail.getRemark())) {
+                cruiseResultDetail.setAbnormalType(cruiseResultDetail.getAbnormalType1() + "," + cruiseResultDetail.getAbnormalType2());
+            }
+        });
         return cruiseResultDetailList;
     }
 
