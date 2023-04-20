@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -103,6 +104,17 @@ public class UPatrolDataResultService {
                 cruiseResultAnalyzeInfo.setEvaluationState("257".equals(cruiseResultAnalyzeInfo.getEvaluationState()) ? "未审核" : "已审核");
             }
         }
+        DictConvertUtil.DictOptional optional = DictConvertUtil
+            .optional("cruiseType")
+            .add("planType","taskType","cTypeName")
+            .add("identifyResult")
+            .add("cruiseResult")
+            .add("meteType")
+            .add("meterType")
+            .add("deviceType")
+            .add("alarmLevel");
+        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList,optional);
+
         return cruiseResultAnalyzeInfoList;
     }
 
