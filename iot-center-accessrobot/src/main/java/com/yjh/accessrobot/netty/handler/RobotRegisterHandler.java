@@ -81,9 +81,10 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         // 220kv改为weather_interval
         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
         String envInterval = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:intervalConfig","envInterval"));
-        if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+        boolean envFlag = EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel) || (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel) && !isEdge);
+        if (envFlag) {
             items.put("env_interval", envInterval);
-        }else {
+        } else {
             items.put("weather_interval", envInterval);
         }
         // 220kv过检
