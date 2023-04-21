@@ -351,6 +351,21 @@ public class Constant {
         return re;
     }
 
+    /**
+     * 更新缓存 通知 tcp服务重新建立连接
+     */
+    public static final String UPDATE_TCP_CONTENT = "http://iot-center-accesstcp/sendToUpSystem/v1/updateTcpContent";
+
+    /**
+     * 更新缓存 通知 robot服务重新建立连接
+     */
+    public static final String UPDATE_ROBOT_SERVER = "http://iot-center-accessrobot/robot/v1/updateRobotServer";
+
+    public static<T> void getToOtherServer(String url) throws Exception{
+        Result re = new Result();
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class);
+    }
+
     public static String algorithmTestPicPath= "";
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
