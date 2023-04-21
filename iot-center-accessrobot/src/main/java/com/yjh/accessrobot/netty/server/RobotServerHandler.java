@@ -76,7 +76,7 @@ public interface RobotServerHandler {
         xmlBaseModelEmpty.setType("251");
         xmlBaseModelEmpty.setCode("200");
 //        xmlBaseModelEmpty.setCode(flag ? "200" : "500");
-        xmlBaseModelEmpty.setSendCode(Constant.sendCode);
+        xmlBaseModelEmpty.setSendCode(Constant.sendCode());
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
     }
@@ -95,7 +95,7 @@ public interface RobotServerHandler {
         xmlBaseModelEmpty.setType("251");
         xmlBaseModelEmpty.setCode("500");
 //        xmlBaseModelEmpty.setCode(flag ? "200" : "500");
-        xmlBaseModelEmpty.setSendCode(Constant.sendCode);
+        xmlBaseModelEmpty.setSendCode(Constant.sendCode());
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
     }

@@ -1,10 +1,16 @@
 package com.yjh.accesstcp.common;
 
+import com.fasterxml.jackson.databind.deser.impl.PropertyBasedCreator;
 import com.yjh.accesstcp.common.utils.StaticContextAccessor;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.EventLoopGroup;
+import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Slf4j
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -99,8 +106,126 @@ public class Constant {
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     public static  XMLBaseModel weatherXmlModel = null;
 
-    public static String stationCode="";
-    public static boolean handlerNew = true;
+    public static RedisTemplate redisTemplate;
+
+    /**
+     * 变电站名称
+     */
+    public static String stationCode;
+
+    /**
+     * 获取变电站名称
+     */
+    public static String stationCode() {
+        try {
+            stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+            log.info("stationCode is {}", stationCode);
+        } catch (Exception e) {
+            stationCode = "";
+        }
+        return stationCode;
+    }
+
+    public static Boolean handlerNew = true;
+
+    /**
+     * handlerNew
+     */
+    public static boolean handlerNew() {
+        try {
+            handlerNew = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew"));
+            log.info("handlerNew is {}", handlerNew);
+        } catch (Exception e) {
+            handlerNew = true;
+        }
+        return handlerNew;
+    }
+
+    public static String cruise;
+
+    public static String cruise() {
+        try {
+            cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
+            log.info("cruise is {}", cruise);
+        } catch (Exception e) {
+            cruise = "Client01";
+        }
+        return cruise;
+    }
+
+    public static String server;
+
+    public static String server() {
+        try {
+            server = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+            log.info("server is {}", server);
+        } catch (Exception e) {
+            server = "Server01";
+        }
+        return server;
+    }
+
+    public static String upSystemFlag;
+
+    /**
+     * 上级系统连接开关 1开 0关
+     * @return
+     */
+    public static String upSystemFlag() {
+        if (upSystemFlag == null) {
+            try {
+                upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+                log.info("upSystemFlag is {}", upSystemFlag);
+            } catch (Exception e) {
+                upSystemFlag = "1";
+            }
+        }
+        return upSystemFlag;
+    }
+
+    /**
+     * 上级系统IP
+     */
+    public static String upSystemIp;
+
+    /**
+     * 上级系统IP
+     * @return
+     */
+    public static String upSystemIp() {
+        if (upSystemIp == null) {
+            try {
+                upSystemIp = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
+                log.info("upSystemIp is {}", upSystemIp);
+            } catch (Exception e) {
+                upSystemIp = "127.0.0.1";
+            }
+        }
+        return upSystemIp;
+    }
+
+
+    /**
+     * 上级系统端口
+     */
+    public static Integer upSystemPort;
+
+    /**
+     * 上级系统端口
+     * @return
+     */
+    public static Integer upSystemPort() {
+        if (upSystemPort == null) {
+            try {
+                upSystemPort = (Integer) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
+                log.info("upSystemIp is {}", upSystemPort);
+            } catch (Exception e) {
+                upSystemPort = 10011;
+            }
+        }
+        return upSystemPort;
+    }
+
 
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人

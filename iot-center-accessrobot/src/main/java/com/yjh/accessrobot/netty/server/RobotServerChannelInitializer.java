@@ -38,7 +38,7 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
     protected void initChannel(SocketChannel channel) throws Exception {
         // netty自带心跳检测
         /*channel.pipeline().addLast(new IdleStateHandler(30,0,0, TimeUnit.SECONDS));*/
-        if (Constant.handlerNew) {
+        if (Constant.handlerNew()) {
             channel.pipeline().addLast(new StateGridADecoder());
             StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl();
             robotServerHandler.setRedisTemplate(redisTemplate);

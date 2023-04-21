@@ -13,6 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @lombok.extern.slf4j.Slf4j
 public class NettyClient {
 
-    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, String server, String cruise, RegisterManager registerManager) {
+    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -31,7 +32,7 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise, registerManager));
+                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, registerManager));
 
             Constant.bootstrapHashMap.put(1, bootstrap);
             bootstrap.connect(address).addListener((ChannelFuture futureListener) -> {
@@ -48,8 +49,11 @@ public class NettyClient {
         }catch (Exception e) {e.getMessage();}
     }
 
-    //重新连接tcp服务端
-    private void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
+    /**
+     *
+     * 重新连接tcp服务端
+     */
+    public static void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
         try {
             if (bootstrap != null) {
                 bootstrap.remoteAddress(remoteAddress);

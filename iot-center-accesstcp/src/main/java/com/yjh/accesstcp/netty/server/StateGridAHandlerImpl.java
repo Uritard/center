@@ -33,18 +33,14 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
 
     private RedisTemplate redisTemplate;
     private SendToUpSystemServices sendToUpSystemServices;
-    private String server;
-    private String cruise;
     private RegisterManager registerManager;
     private ChannelHandlerContext ctx;
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
 
-    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise, RegisterManager registerManager) {
+    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
         this.analysisUnionTaskFileService = analysisUnionTaskFileService;
-        this.server = server;
-        this.cruise =cruise;
         this.registerManager =registerManager;
 
     }
@@ -99,9 +95,9 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         log.info("analysisClientHandlerHashMap: " + TCPClientHandlerHashMap);
         String serverUrl = remoteAdds.substring(0, remoteAdds.indexOf(":"));
         log.info("serverUrl: " + serverUrl.substring(1));
-        InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
         //使用过程中断线重连
         if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
+            InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
             doConnect(remoteAddress, Constant.bootstrapHashMap.get(1));
         }
     }
@@ -140,13 +136,18 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
     }
 
     @Override
+    public void setIsThreadStart(Boolean status) {
+        this.isThreadStart = status;
+    }
+
+    @Override
     public String getCruise() {
-        return cruise;
+        return Constant.cruise();
     }
 
     @Override
     public String getServer() {
-        return server;
+        return Constant.server();
     }
 
     @Override

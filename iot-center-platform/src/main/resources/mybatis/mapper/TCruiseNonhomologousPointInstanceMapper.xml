@@ -269,7 +269,6 @@
         e.device_type,
         k.dict_note as device_type_name,
         a.warn_type,
-        n.warn_level,
         a.warn_level,
         a.one_cruise_device_name,
         a.two_cruise_device_name,

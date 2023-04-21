@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -12,6 +13,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by tt on 2019/7/31
@@ -45,6 +48,9 @@ public class NettyServer {
             // 4.绑定端口，开始接收进来的连接.绑定地址,bind返回future(异步),加上sync阻塞在获取连接处
             ChannelFuture future = bootstrap.bind(address).sync();
             log.info("Server start listen at " + address.getPort());
+            Map<ChannelFuture, ServerBootstrap> map = new HashMap<>(1);
+            map.put(future, bootstrap);
+            Constant.futureServerBootstrapHashMap.put(1, map);
             // 等待关闭,加上sync阻塞在关闭请求处
             future.channel().closeFuture().sync();
         } catch (Exception e) {

@@ -34,8 +34,9 @@ public class WeatherThread implements Runnable{
 
                 if (!tcpClientHandler.getIsThreadStart()) {
                     isThreadStart = false;
-                    log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
-                    log.info("Thread stop success!");
+                    log.info("WeatherThread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
+                    log.info("WeatherThread stop success!");
+                    break;
                 }
                 String s = Constant.paramMap.get("weather_interval");
                 if(s == null){
@@ -81,7 +82,7 @@ public class WeatherThread implements Runnable{
                             Map<String, Object> map8 = createMap(now, 8, mapForSf6, device);
                             list.add(map8);
                         }
-                        sendToUpSystemServices.sendResponse(0L, "21","",Constant.stationCode,list, true);
+                        sendToUpSystemServices.sendResponse(0L, "21","",Constant.stationCode(),list, true);
                     }
                     log.info("--天气信息已发送--");
                 }

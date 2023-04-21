@@ -32,8 +32,9 @@ public class NestRunThread implements Runnable{
 
                 if (!tcpClientHandler.getIsThreadStart()) {
                     isThreadStart = false;
-                    log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
-                    log.info("Thread stop success!");
+                    log.info("NestRunThread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
+                    log.info("NestRunThread stop success!");
+                    break;
                 }
                 String s = Constant.paramMap.get("nest_run_interval");
                 if(s == null){
@@ -72,7 +73,7 @@ public class NestRunThread implements Runnable{
                     Map<String, Object> map10 = createMap(6, mapForHeadYawAngle);
                     list.add(map10);
 
-                    sendToUpSystemServices.sendResponse(0L, "10004","",Constant.stationCode,list, true);
+                    sendToUpSystemServices.sendResponse(0L, "10004","",Constant.stationCode(),list, true);
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
