@@ -218,7 +218,7 @@ public class Constant {
         if (upSystemPort == null) {
             try {
                 upSystemPort = (Integer) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
-                log.info("upSystemIp is {}", upSystemPort);
+                log.info("upSystemPort is {}", upSystemPort);
             } catch (Exception e) {
                 upSystemPort = 10011;
             }
