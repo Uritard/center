@@ -4,30 +4,30 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TWarnInfo">
-        <id column="warn_id" jdbcType="BIGINT" property="warnId" />
-        <result column="warn_level" jdbcType="INTEGER" property="warnLevel" />
-        <result column="warn_time" jdbcType="TIMESTAMP" property="warnTime" />
-        <result column="warn_type" jdbcType="INTEGER" property="warnType" />
-        <result column="warn_name" jdbcType="VARCHAR" property="warnName" />
-        <result column="warn_content" jdbcType="VARCHAR" property="warnContent" />
-        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
-        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId" />
-        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
-        <result column="std_mete_id" jdbcType="BIGINT" property="stdMeteId" />
-        <result column="conf_mode" jdbcType="INTEGER" property="confMode" />
-        <result column="is_warn" jdbcType="INTEGER" property="isWarn" />
-        <result column="deal_type" jdbcType="INTEGER" property="dealType" />
-        <result column="deal_info" jdbcType="VARCHAR" property="dealInfo" />
-        <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId" />
-        <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime" />
-        <result column="defect_model" jdbcType="INTEGER" property="defectModel" />
-        <result column="alarm_source" jdbcType="INTEGER" property="alarmSource" />
-        <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype" />
-        <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
-        <result column="image_path" jdbcType="VARCHAR" property="imagePath" />
-        <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
-        <result column="value" jdbcType="VARCHAR" property="value" />
-        <result column="out_range" jdbcType="VARCHAR" property="outRange" />
+        <id column="warn_id" jdbcType="BIGINT" property="warnId"/>
+        <result column="warn_level" jdbcType="INTEGER" property="warnLevel"/>
+        <result column="warn_time" jdbcType="TIMESTAMP" property="warnTime"/>
+        <result column="warn_type" jdbcType="INTEGER" property="warnType"/>
+        <result column="warn_name" jdbcType="VARCHAR" property="warnName"/>
+        <result column="warn_content" jdbcType="VARCHAR" property="warnContent"/>
+        <result column="device_id" jdbcType="BIGINT" property="deviceId"/>
+        <result column="cunstom_id" jdbcType="VARCHAR" property="cunstomId"/>
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId"/>
+        <result column="std_mete_id" jdbcType="BIGINT" property="stdMeteId"/>
+        <result column="conf_mode" jdbcType="INTEGER" property="confMode"/>
+        <result column="is_warn" jdbcType="INTEGER" property="isWarn"/>
+        <result column="deal_type" jdbcType="INTEGER" property="dealType"/>
+        <result column="deal_info" jdbcType="VARCHAR" property="dealInfo"/>
+        <result column="deal_person_id" jdbcType="VARCHAR" property="dealPersonId"/>
+        <result column="deal_time" jdbcType="TIMESTAMP" property="dealTime"/>
+        <result column="defect_model" jdbcType="INTEGER" property="defectModel"/>
+        <result column="alarm_source" jdbcType="INTEGER" property="alarmSource"/>
+        <result column="warn_subtype" jdbcType="INTEGER" property="warnSubtype"/>
+        <result column="device_code" jdbcType="VARCHAR" property="deviceCode"/>
+        <result column="image_path" jdbcType="VARCHAR" property="imagePath"/>
+        <result column="video_path" jdbcType="VARCHAR" property="videoPath"/>
+        <result column="value" jdbcType="VARCHAR" property="value"/>
+        <result column="out_range" jdbcType="VARCHAR" property="outRange"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -35,143 +35,133 @@
         warn_id, warn_level, warn_time, warn_type, warn_name, warn_content, device_id, cunstom_id, instance_id, std_mete_id, conf_mode, is_warn, deal_type, deal_info, deal_person_id, deal_time, defect_model, alarm_source, warn_subtype, device_code, image_path, video_path, value, out_range, link_message
     </sql>
     <sql id="TongYong">
-           (
-            SELECT
-            a.warn_id,
-            a.warn_time AS alarm_time,
-            a.warn_content,
-            a.device_id,
-            b.device_name,
-            a.warn_level AS alarm_level,
-            c.dict_note AS alarm_level_name,
-            a.conf_mode,
-            e.dict_note AS conf_mode_name,
-            a.alarm_source,
-            d.dict_note AS alarm_source_name,
-            a.std_mete_id,
-            k.mete_name,
-            a.image_path,
-            a.deal_info,
-            a.deal_type,
-            g.dict_note as deal_type_name,
-            a.deal_person_id,
-            h.user_name as deal_person_name,
-            a.deal_time,
-            a.defect_model,
-            b.real_code
-            FROM
-            t_warn_info a
-            LEFT JOIN t_std_device b ON a.device_id = b.device_id
-            LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code
-            LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
-            LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
-            LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
-            LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
-            LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
-            WHERE
-            1 = 1
+        (
+            SELECT a.warn_id,
+                   a.warn_time  AS alarm_time,
+                   a.warn_content,
+                   a.device_id,
+                   b.device_name,
+                   a.warn_level AS alarm_level,
+                   c.dict_note  AS alarm_level_name,
+                   a.conf_mode,
+                   e.dict_note  AS conf_mode_name,
+                   a.alarm_source,
+                   d.dict_note  AS alarm_source_name,
+                   a.std_mete_id,
+                   k.mete_name,
+                   a.image_path,
+                   a.deal_info,
+                   a.deal_type,
+                   g.dict_note  as deal_type_name,
+                   a.deal_person_id,
+                   h.user_name  as deal_person_name,
+                   a.deal_time,
+                   a.defect_model,
+                   b.real_code
+            FROM t_warn_info a
+                     LEFT JOIN t_std_device b ON a.device_id = b.device_id
+                     LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code
+                     LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
+                     LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
+                     LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
+                     LEFT JOIN t_dict_business g on a.deal_type = g.dict_code
+                     LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
+            WHERE 1 = 1
             UNION ALL
             (
-            SELECT
-            h.camera_alarm_id AS warn_id,
-            h.alarm_time,
-            h.alarm_name AS warn_content,
-            h.camera_id,
-            b.camera_name,
-            h.alarm_level,
-            c.dict_note AS alarm_level_name,
-            h.alarm_state AS conf_mode,
-            e.dict_note AS conf_mode_name,
-            888 AS alarm_source,
-            'visual' AS alarm_source_name,
-            001 as std_mete_id,
-            '无' as mete_name,
-            '无' as image_path,
-            h.deal_info,
-            h.deal_type,
-            g.dict_note as deal_type_name,
-            h.deal_person_id,
-            j.user_name as deal_person_name,
-            h.deal_time,
-            1 as defect_model,
-            h.camera_id as real_code
-            FROM
-            t_camera_alarm h
-            LEFT JOIN t_camera_info b ON h.camera_id = b.camera_id
-            LEFT JOIN t_dict_business e ON h.alarm_state = e.dict_code
-            LEFT JOIN t_dict_business c ON h.alarm_level = c.dict_code
-            LEFT JOIN t_dict_business g on h.deal_type = g.dict_code
-            LEFT JOIN sys_user j ON j.user_id = h.deal_person_id
-            WHERE
-            1 = 1
+                SELECT h.camera_alarm_id AS warn_id,
+                       h.alarm_time,
+                       h.alarm_name      AS warn_content,
+                       h.camera_id,
+                       b.camera_name,
+                       h.alarm_level,
+                       c.dict_note       AS alarm_level_name,
+                       h.alarm_state     AS conf_mode,
+                       e.dict_note       AS conf_mode_name,
+                       888               AS alarm_source,
+                       'visual'          AS alarm_source_name,
+                       001               as std_mete_id,
+                       '无'               as mete_name,
+                       '无'               as image_path,
+                       h.deal_info,
+                       h.deal_type,
+                       g.dict_note       as deal_type_name,
+                       h.deal_person_id,
+                       j.user_name       as deal_person_name,
+                       h.deal_time,
+                       1                 as defect_model,
+                       h.camera_id       as real_code
+                FROM t_camera_alarm h
+                         LEFT JOIN t_camera_info b ON h.camera_id = b.camera_id
+                         LEFT JOIN t_dict_business e ON h.alarm_state = e.dict_code
+                         LEFT JOIN t_dict_business c ON h.alarm_level = c.dict_code
+                         LEFT JOIN t_dict_business g on h.deal_type = g.dict_code
+                         LEFT JOIN sys_user j ON j.user_id = h.deal_person_id
+                WHERE 1 = 1
             )
             UNION ALL
             (
-            SELECT
-            f.robot_alarm_id AS warn_id,
-            f.alarm_time,
-            f.alarm_name AS warn_content,
-            f.robot_id AS deviceId,
-            g.robot_name AS device_name,
-            f.alarm_level,
-            c.dict_note AS alarm_level_name,
-            f.alarm_state AS conf_mode,
-            e.dict_note AS conf_mode_name,
-            279 AS alarm_source,
-            '机器人' AS alarm_source_name,
-            002 as std_mete_id,
-            '无' as mete_name,
-            '无' as image_path,
-            f.deal_info,
-            f.deal_type,
-            h.dict_note as deal_type_name,
-            f.deal_person_id,
-            k.user_name as deal_person_name,
-            f.deal_time,
-            1 as defect_model,
-            f.robot_id as real_code
-            FROM
-            t_robot_alarm f
-            LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
-            LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
-            LEFT JOIN t_robot_info g ON f.robot_id = g.robot_id
-            LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
-            LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
-            WHERE
-            1 = 1
+                SELECT f.robot_alarm_id AS warn_id,
+                       f.alarm_time,
+                       f.alarm_name     AS warn_content,
+                       f.robot_id       AS deviceId,
+                       g.robot_name     AS device_name,
+                       f.alarm_level,
+                       c.dict_note      AS alarm_level_name,
+                       f.alarm_state    AS conf_mode,
+                       e.dict_note      AS conf_mode_name,
+                       279              AS alarm_source,
+                       '机器人'            AS alarm_source_name,
+                       002              as std_mete_id,
+                       '无'              as mete_name,
+                       '无'              as image_path,
+                       f.deal_info,
+                       f.deal_type,
+                       h.dict_note      as deal_type_name,
+                       f.deal_person_id,
+                       k.user_name      as deal_person_name,
+                       f.deal_time,
+                       1                as defect_model,
+                       f.robot_id       as real_code
+                FROM t_robot_alarm f
+                         LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
+                         LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
+                         LEFT JOIN t_robot_info g ON f.robot_id = g.robot_id
+                         LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
+                         LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
+                WHERE 1 = 1
             )
-            ) big_table
+        )
+        big_table
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
-        insert into t_warn_info(
-            warn_id,
-            warn_level,
-            warn_time,
-            warn_type,
-            warn_name,
-            warn_content,
-            device_id,
-            cunstom_id,
-            instance_id,
-            std_mete_id,
-            conf_mode,
-            is_warn,
-            deal_type,
-            deal_info,
-            deal_person_id,
-            deal_time,
-            defect_model,
-            alarm_source,
-            warn_subtype,
-            device_code,
-            image_path,
-            video_path,
-            value,
-            out_range,
-            task_id
-        )values(
-                #{warnId, jdbcType=BIGINT},
+        insert into t_warn_info(warn_id,
+                                warn_level,
+                                warn_time,
+                                warn_type,
+                                warn_name,
+                                warn_content,
+                                device_id,
+                                cunstom_id,
+                                instance_id,
+                                std_mete_id,
+                                conf_mode,
+                                is_warn,
+                                deal_type,
+                                deal_info,
+                                deal_person_id,
+                                deal_time,
+                                defect_model,
+                                alarm_source,
+                                warn_subtype,
+                                device_code,
+                                image_path,
+                                video_path,
+                                value,
+                                out_range,
+                                task_id)
+        values (#{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
                 #{warnTime, jdbcType=TIMESTAMP},
                 #{warnType, jdbcType=INTEGER},
@@ -195,80 +185,81 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR}
-        )
+                #{taskId, jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_warn_info
-                where warn_id = #{warnId, jdbcType=BIGINT}
+        delete
+        from t_warn_info
+        where warn_id = #{warnId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
-        update t_warn_info a <set>
-        <if test="warnId != null ">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
-        <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
-        <if test="warnTime != null ">a.warn_time = #{warnTime, jdbcType=TIMESTAMP},</if>
-        <if test="warnType != null ">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
-        <if test="warnName != null ">a.warn_name = #{warnName},</if>
-        <if test="warnContent != null">a.warn_content = #{warnContent},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
-        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
-        <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
-        <if test="isWarn != null ">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
-        <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
-        <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
-        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
-        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
-        <if test="defectModel != null ">a.defect_model = #{defectModel, jdbcType=INTEGER},</if>
-        <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
-        <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
-        <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
-        <if test="imagePath != null ">a.image_path = #{imagePath},</if>
-        <if test="videoPath != null ">a.video_path = #{videoPath},</if>
-        <if test="value != null ">a.value = #{value},</if>
-        <if test="outRange != null ">a.out_range = #{outRange},</if>
-        <if test="taskId != null ">a.task_id = #{taskId},</if>
-    </set>
-            where a.warn_id = #{warnId, jdbcType=BIGINT}
+        update t_warn_info a
+        <set>
+            <if test="warnId != null ">a.warn_id = #{warnId, jdbcType=BIGINT},</if>
+            <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+            <if test="warnTime != null ">a.warn_time = #{warnTime, jdbcType=TIMESTAMP},</if>
+            <if test="warnType != null ">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
+            <if test="warnName != null ">a.warn_name = #{warnName},</if>
+            <if test="warnContent != null">a.warn_content = #{warnContent},</if>
+            <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+            <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
+            <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+            <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+            <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
+            <if test="isWarn != null ">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+            <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+            <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
+            <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+            <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+            <if test="defectModel != null ">a.defect_model = #{defectModel, jdbcType=INTEGER},</if>
+            <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
+            <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
+            <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
+            <if test="imagePath != null ">a.image_path = #{imagePath},</if>
+            <if test="videoPath != null ">a.video_path = #{videoPath},</if>
+            <if test="value != null ">a.value = #{value},</if>
+            <if test="outRange != null ">a.out_range = #{outRange},</if>
+            <if test="taskId != null ">a.task_id = #{taskId},</if>
+        </set>
+        where a.warn_id = #{warnId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
-        select
-        a.warn_id,
-        a.warn_level,
-        a.warn_time,
-        a.warn_type,
-        a.warn_name,
-        a.warn_content,
-        a.device_id,
-        a.cunstom_id,
-        a.instance_id,
-        a.std_mete_id,
-        a.conf_mode,
-        a.is_warn,
-        a.deal_type,
-        a.deal_info,
-        a.deal_person_id,
-        a.deal_time,
-        a.defect_model,
-        a.alarm_source,
-        a.warn_subtype,
-        a.device_code,
-        a.image_path,
-        a.video_path,
-        a.value,
-        a.out_range,
-        a.task_id
+        select a.warn_id,
+               a.warn_level,
+               a.warn_time,
+               a.warn_type,
+               a.warn_name,
+               a.warn_content,
+               a.device_id,
+               a.cunstom_id,
+               a.instance_id,
+               a.std_mete_id,
+               a.conf_mode,
+               a.is_warn,
+               a.deal_type,
+               a.deal_info,
+               a.deal_person_id,
+               a.deal_time,
+               a.defect_model,
+               a.alarm_source,
+               a.warn_subtype,
+               a.device_code,
+               a.image_path,
+               a.video_path,
+               a.value,
+               a.out_range,
+               a.task_id
         from t_warn_info a
         where 1 = 1
-            and a.warn_id = #{warnId, jdbcType=BIGINT}
+          and a.warn_id = #{warnId, jdbcType=BIGINT}
         limit 1
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.task.entity.TWarnInfo" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+    <select id="select" parameterType="com.yjh.platform.module.task.entity.TWarnInfo"
+            resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         select
         a.warn_id,
         a.warn_level,
@@ -297,34 +288,35 @@
         a.task_id
         from t_warn_info a
         where 1 = 1
-        <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
-        <if test="warnLevel != null "> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="warnTime != null "> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null "> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
-        <if test="warnName != null and warnName != ''"> and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
-        <if test="warnContent != null and warnContent != ''"> and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="isWarn != null "> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
-        <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
-        <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
-        <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
-        <if test="defectModel != null "> and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
-        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
-        <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
-        <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
-        <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
-        <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
-        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="warnId != null ">and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnLevel != null ">and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnTime != null ">and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnType != null ">and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="warnName != null and warnName != ''">and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
+        <if test="warnContent != null and warnContent != ''">and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null ">and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="cunstomId != null and cunstomId != ''">and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null ">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null ">and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="confMode != null ">and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="isWarn != null ">and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
+        <if test="dealType != null ">and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
+        <if test="dealInfo != null and dealInfo != ''">and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
+        <if test="dealPersonId != null and dealPersonId != ''">and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
+        <if test="dealTime != null ">and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="defectModel != null ">and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null ">and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null ">and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="deviceCode != null and deviceCode != ''">and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="imagePath != null and imagePath != ''">and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
+        <if test="videoPath != null and videoPath != ''">and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
+        <if test="value != null and value != ''">and a.value = #{value, jdbcType=VARCHAR}</if>
+        <if test="outRange != null and outRange != ''">and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TWarnInfo" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TWarnInfo"
+            resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         select
         a.warn_id,
         a.warn_level,
@@ -353,88 +345,88 @@
         a.task_id
         from t_warn_info a
         where 1 = 1
-        <if test="warnId != null "> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
-        <if test="warnLevel != null "> and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="warnTime != null "> and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
-        <if test="warnType != null "> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
-        <if test="warnName != null and warnName != ''"> and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
-        <if test="warnContent != null and warnContent != ''"> and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
-        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="cunstomId != null and cunstomId != ''"> and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="stdMeteId != null "> and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-        <if test="confMode != null "> and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="isWarn != null "> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
-        <if test="dealType != null "> and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
-        <if test="dealInfo != null and dealInfo != ''"> and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
-        <if test="dealPersonId != null and dealPersonId != ''"> and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
-        <if test="dealTime != null "> and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
-        <if test="defectModel != null "> and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
-        <if test="alarmSource != null "> and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
-        <if test="warnSubtype != null "> and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
-        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
-        <if test="imagePath != null and imagePath != ''"> and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
-        <if test="videoPath != null and videoPath != ''"> and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
-        <if test="value != null and value != ''"> and a.value = #{value, jdbcType=VARCHAR}</if>
-        <if test="outRange != null and outRange != ''"> and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
-        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="warnId != null ">and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnLevel != null ">and a.warn_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="warnTime != null ">and a.warn_time = #{warnTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnType != null ">and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="warnName != null and warnName != ''">and a.warn_name = #{warnName, jdbcType=VARCHAR}</if>
+        <if test="warnContent != null and warnContent != ''">and a.warn_content = #{warnContent, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null ">and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="cunstomId != null and cunstomId != ''">and a.cunstom_id = #{cunstomId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null ">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="stdMeteId != null ">and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        <if test="confMode != null ">and a.conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="isWarn != null ">and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
+        <if test="dealType != null ">and a.deal_type = #{dealType, jdbcType=INTEGER}</if>
+        <if test="dealInfo != null and dealInfo != ''">and a.deal_info = #{dealInfo, jdbcType=VARCHAR}</if>
+        <if test="dealPersonId != null and dealPersonId != ''">and a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR}</if>
+        <if test="dealTime != null ">and a.deal_time = #{dealTime, jdbcType=TIMESTAMP}</if>
+        <if test="defectModel != null ">and a.defect_model = #{defectModel, jdbcType=INTEGER}</if>
+        <if test="alarmSource != null ">and a.alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
+        <if test="warnSubtype != null ">and a.warn_subtype = #{warnSubtype, jdbcType=INTEGER}</if>
+        <if test="deviceCode != null and deviceCode != ''">and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
+        <if test="imagePath != null and imagePath != ''">and a.image_path = #{imagePath, jdbcType=VARCHAR}</if>
+        <if test="videoPath != null and videoPath != ''">and a.video_path = #{videoPath, jdbcType=VARCHAR}</if>
+        <if test="value != null and value != ''">and a.value = #{value, jdbcType=VARCHAR}</if>
+        <if test="outRange != null and outRange != ''">and a.out_range = #{outRange, jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
     <insert id="batchInsert">
         insert into t_warn_info(
-            warn_id,
-            warn_level,
-            warn_time,
-            warn_type,
-            warn_name,
-            warn_content,
-            device_id,
-            cunstom_id,
-            instance_id,
-            std_mete_id,
-            conf_mode,
-            is_warn,
-            deal_type,
-            deal_info,
-            deal_person_id,
-            deal_time,
-            defect_model,
-            alarm_source,
-            warn_subtype,
-            device_code,
-            image_path,
-            video_path,
-            value,
-            out_range,
-            task_id
+        warn_id,
+        warn_level,
+        warn_time,
+        warn_type,
+        warn_name,
+        warn_content,
+        device_id,
+        cunstom_id,
+        instance_id,
+        std_mete_id,
+        conf_mode,
+        is_warn,
+        deal_type,
+        deal_info,
+        deal_person_id,
+        deal_time,
+        defect_model,
+        alarm_source,
+        warn_subtype,
+        device_code,
+        image_path,
+        video_path,
+        value,
+        out_range,
+        task_id
         )values
         <foreach collection="list" item="TWarnInfo" separator=",">
             (
-                #{TWarnInfo.warnId, jdbcType=BIGINT},
-                #{TWarnInfo.warnLevel, jdbcType=INTEGER},
-                #{TWarnInfo.warnTime, jdbcType=TIMESTAMP},
-                #{TWarnInfo.warnType, jdbcType=INTEGER},
-                #{TWarnInfo.warnName, jdbcType=VARCHAR},
-                #{TWarnInfo.warnContent, jdbcType=VARCHAR},
-                #{TWarnInfo.deviceId, jdbcType=BIGINT},
-                #{TWarnInfo.cunstomId, jdbcType=VARCHAR},
-                #{TWarnInfo.instanceId, jdbcType=BIGINT},
-                #{TWarnInfo.stdMeteId, jdbcType=BIGINT},
-                #{TWarnInfo.confMode, jdbcType=INTEGER},
-                #{TWarnInfo.isWarn, jdbcType=INTEGER},
-                #{TWarnInfo.dealType, jdbcType=INTEGER},
-                #{TWarnInfo.dealInfo, jdbcType=VARCHAR},
-                #{TWarnInfo.dealPersonId, jdbcType=VARCHAR},
-                #{TWarnInfo.dealTime, jdbcType=TIMESTAMP},
-                #{TWarnInfo.defectModel, jdbcType=INTEGER},
-                #{TWarnInfo.alarmSource, jdbcType=INTEGER},
-                #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
-                #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
-                #{TWarnInfo.imagePath, jdbcType=VARCHAR},
-                #{TWarnInfo.videoPath, jdbcType=VARCHAR},
-                #{TWarnInfo.value, jdbcType=VARCHAR},
-                #{TWarnInfo.outRange, jdbcType=VARCHAR},
-                #{TWarnInfo.taskId, jdbcType=VARCHAR}
+            #{TWarnInfo.warnId, jdbcType=BIGINT},
+            #{TWarnInfo.warnLevel, jdbcType=INTEGER},
+            #{TWarnInfo.warnTime, jdbcType=TIMESTAMP},
+            #{TWarnInfo.warnType, jdbcType=INTEGER},
+            #{TWarnInfo.warnName, jdbcType=VARCHAR},
+            #{TWarnInfo.warnContent, jdbcType=VARCHAR},
+            #{TWarnInfo.deviceId, jdbcType=BIGINT},
+            #{TWarnInfo.cunstomId, jdbcType=VARCHAR},
+            #{TWarnInfo.instanceId, jdbcType=BIGINT},
+            #{TWarnInfo.stdMeteId, jdbcType=BIGINT},
+            #{TWarnInfo.confMode, jdbcType=INTEGER},
+            #{TWarnInfo.isWarn, jdbcType=INTEGER},
+            #{TWarnInfo.dealType, jdbcType=INTEGER},
+            #{TWarnInfo.dealInfo, jdbcType=VARCHAR},
+            #{TWarnInfo.dealPersonId, jdbcType=VARCHAR},
+            #{TWarnInfo.dealTime, jdbcType=TIMESTAMP},
+            #{TWarnInfo.defectModel, jdbcType=INTEGER},
+            #{TWarnInfo.alarmSource, jdbcType=INTEGER},
+            #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
+            #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
+            #{TWarnInfo.imagePath, jdbcType=VARCHAR},
+            #{TWarnInfo.videoPath, jdbcType=VARCHAR},
+            #{TWarnInfo.value, jdbcType=VARCHAR},
+            #{TWarnInfo.outRange, jdbcType=VARCHAR},
+            #{TWarnInfo.taskId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -445,17 +437,21 @@
         <include refid="TongYong"></include>
         where 1 = 1
 
-        <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
-        <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
-        <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="warnLevel != null">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''">and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        <if test="startTime != null and endTime != null">and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+            #{endTime, jdbcType=TIMESTAMP}
+        </if>
         <if test="alarmSource != null">
-        AND (CASE
-        WHEN #{alarmSource, jdbcType=INTEGER} = 888 THEN alarm_source = 888
-        WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
-        WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and alarm_source != 279
-            END)</if>
+            AND (CASE
+            WHEN #{alarmSource, jdbcType=INTEGER} = 888 THEN alarm_source = 888
+            WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
+            WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and
+            alarm_source != 279
+            END)
+        </if>
         ORDER BY alarm_time DESC
     </select>
     <!--机器人本体告警-->
@@ -491,14 +487,14 @@
         LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
         where 1 = 1
         <if test="warnLevel != null">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-          <choose>
-              <when test="alarmSource == 279" >
-                  and a.robot_type is not null
-              </when>
-              <when test="alarmSource == 820" >
-                  and a.robot_type is null
-              </when>
-          </choose>
+        <choose>
+            <when test="alarmSource == 279">
+                and a.robot_type is not null
+            </when>
+            <when test="alarmSource == 820">
+                and a.robot_type is null
+            </when>
+        </choose>
         <if test="confMode != null">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''">and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''">and mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
@@ -508,13 +504,48 @@
 
         ORDER BY alarm_time DESC
     </select>
+    <select id="selectCruiseInfoByInstanceId" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        select a.instance_id,a.cruise_id,b.robot_id as camera_id,(CASE
+        WHEN (b.save_type_list='jpg') THEN
+        1
+        WHEN (b.save_type_list='fir') THEN
+        2
+        ELSE
+        ''
+        END )
+        AS video_camera_type from t_cruise_point_instance a inner join t_robot_inspection b on a.cruise_id = b.inspection_id and
+        a.instance_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        UNION
+        select a.instance_id,a.cruise_id,b.camera_id as camera_id,
+        ''
+        AS video_camera_type from t_cruise_point_instance a inner join t_camera_preset b on a.cruise_id = b.preset_id and a.instance_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectEdgeNameByEdgeCode" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        select a.region_code as edgeCode, a.region_name as stationName from t_std_region a where a.region_code in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        and a.state = 1
+    </select>
     <!--告警确认-->
     <select id="WarnConfirm" parameterType="java.util.Map" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
-        SELECT * FROM (
+        SELECT warn_id,instance_id, device_id, device_name, mete_name, warn_content, alarm_level, alarm_source, alarm_time, conf_mode,
+        deal_person_id,
+        deal_person_name, deal_time, std_mete_id, real_code, image_path, deal_info, deal_type, defect_model, regionName,
+        custom_name,edge_code FROM (
         ( SELECT
         a.warn_id,
+        a.instance_id,
         a.device_id,
         b.device_name,
+        b.edge_code,
         k.mete_name,
         a.warn_content,
         a.warn_level AS alarm_level,
@@ -530,45 +561,12 @@
         a.deal_info,
         a.deal_type,
         a.defect_model,
-        n.cruise_id as preset_id,
-        b.up_region_name as regionName,
-        k.low_limit1,
-        k.low_limit2,
-        k.low_limit3,
-        k.low_limit4,
-        k.high_limit1,
-        k.high_limit2,
-        k.high_limit3,
-        k.high_limit4,
-        (
-        CASE
-        WHEN (j.camera_id IS NOT NULL) THEN
-        j.camera_id
-        ELSE
-        o.robot_id
-        END
-        ) AS camera_id,
-        (
-        CASE
-        WHEN (o.save_type_list='jpg') THEN
-        1
-        WHEN (o.save_type_list='fir') THEN
-        2
-        ELSE
-        ''
-        END
-        ) AS video_camera_type,
-        k.custom_name,
-        region.region_name as stationName
+        b.up_region_name as regionName, k.custom_name
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
-        LEFT JOIN t_cruise_point_instance n on n.instance_id = a.instance_id
-        LEFT JOIN t_robot_inspection o ON o.inspection_id = n.cruise_id
-        LEFT JOIN t_camera_preset j on j.preset_id = n.cruise_id
-        left join t_std_region region on ifnull(b.edge_code,'0')=region.region_code and region.state=1
         WHERE
         1 = 1
         AND a.warn_type != '507' OR a.warn_type IS NULL
@@ -576,8 +574,10 @@
         UNION ALL
         (SELECT
         a.defect_id,
+        a.instance_id,
         a.device_id,
         b.device_name,
+        b.edge_code,
         k.mete_name,
         a.defect_content,
         a.defect_level AS alarm_level,
@@ -593,36 +593,20 @@
         a.deal_info,
         a.deal_type,
         a.defect_type as defect_model,
-        n.cruise_id as preset_id,
-        b.up_region_name as regionName,
-        null as low_limit1,
-        null as low_limit2,
-        null as low_limit3,
-        null as low_limit4,
-        null as high_limit1,
-        null as high_limit2,
-        null as high_limit3,
-        null as high_limit4,
-        j.camera_id,
-        '' AS video_camera_type,
-        k.custom_name,
-        region.region_name as stationName
+        b.up_region_name as regionName, k.custom_name
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
-        LEFT JOIN t_cruise_point_instance n on n.instance_id = a.instance_id
-        LEFT JOIN t_camera_preset j on j.preset_id = n.cruise_id
-        left join t_std_region region on ifnull(b.edge_code,'0')=region.region_code and region.state=1
         WHERE
         1 = 1)
         ) big_table
         WHERE 1 = 1
-        <if test="warnLevel != -1"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
-        <if test="confMode != -1"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
-        <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        <if test="warnLevel != -1">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != -1">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''">and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and startTime != ''">
             <if test="endTime != null and endTime != ''">
                 and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}
@@ -633,264 +617,229 @@
     </select>
     <!--根据告警来源统计告警数据-->
     <select id="countByAlarmSource" resultType="java.util.Map">
-       SELECT
-            a.countNum as device,
-            b.countNum as robot,
-            d.countNum as camera,
-            (a.countNum+b.countNum+d.countNum) as total
-        FROM(
-            (select count(*) as countNum from t_warn_info ) a,
-            (select count(*) as countNum from t_robot_alarm ) b,
-            (select count(*) as countNum from t_camera_alarm) d
-        )
+        SELECT a.countNum                             as device,
+               b.countNum                             as robot,
+               d.countNum                             as camera,
+               (a.countNum + b.countNum + d.countNum) as total
+        FROM (
+                  (select count(*) as countNum from t_warn_info) a,
+                  (select count(*) as countNum from t_robot_alarm) b,
+                  (select count(*) as countNum from t_camera_alarm) d
+                 )
     </select>
     <!--根据设备类型统计告警个数-->
     <select id="countByDeviceType" resultType="com.yjh.platform.module.task.entity.TJContentInfoDetail">
-        select
-            dict_code as device_type,
-            dict_note as device_type_name,
-            (SELECT
-                COUNT(*)
-                FROM
-                t_warn_info a
-                LEFT JOIN t_std_device b ON a.device_id = b.device_id
+        select dict_code as device_type,
+               dict_note as device_type_name,
+               (SELECT COUNT(*)
+                FROM t_warn_info a
+                         LEFT JOIN t_std_device b ON a.device_id = b.device_id
                 WHERE b.device_type = dict_code
-                and a.warn_time BETWEEN #{startTime} and #{endTime}
-            ) as c_ount
+                  and a.warn_time BETWEEN #{startTime} and #{endTime}
+               )         as c_ount
         from t_dict_business
         where dict_code in
-            (
-                select dict_code
-                from t_dict_business
-                where col_name = 'device_type'
-            )
-         ORDER BY c_ount desc
+              (
+                  select dict_code
+                  from t_dict_business
+                  where col_name = 'device_type'
+              )
+        ORDER BY c_ount desc
     </select>
     <!--根据设备类型统计告警和缺陷个数-->
     <select id="countAlarmByDeviceType" resultType="com.yjh.platform.module.task.entity.TJContentInfoDetail">
-        select
-            dict_code as device_type,
-            dict_note as device_type_name,
-            (
-                (select COUNT(*)
-                from t_warn_info b
-                LEFT JOIN t_std_device a ON a.device_id = b.device_id
-                where a.device_type = dict_code
-                ) +
-                (select COUNT(*)
-                from t_defect_info b
-                LEFT JOIN t_std_device a ON a.device_id = b.device_id
-                where a.device_type = dict_code
-                )
-            ) as c_ount
+        select dict_code as device_type,
+               dict_note as device_type_name,
+               (
+                       (select COUNT(*)
+                        from t_warn_info b
+                                 LEFT JOIN t_std_device a ON a.device_id = b.device_id
+                        where a.device_type = dict_code
+                       ) +
+                       (select COUNT(*)
+                        from t_defect_info b
+                                 LEFT JOIN t_std_device a ON a.device_id = b.device_id
+                        where a.device_type = dict_code
+                       )
+                   )     as c_ount
         from t_dict_business
         where dict_code in
-            (
-                select dict_code
-                from t_dict_business
-                where col_name = 'device_type'
-            )
-         ORDER BY c_ount desc
+              (
+                  select dict_code
+                  from t_dict_business
+                  where col_name = 'device_type'
+              )
+        ORDER BY c_ount desc
     </select>
     <!--统计近一月的所有告警和缺陷个数-->
     <select id="countWarnAndDefectOnMonth1" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT
-        a.timeNode,
-        ifnull( b.count, 0 ) AS count
-        FROM
-        (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
-        FROM (
-                        SELECT @ai:=@ai+1 as ac from
-                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
-                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
-                        (SELECT @ai:=0) xc0
-        ) c )a
-        LEFT JOIN (
-        SELECT
-        DATE(warn_time) date,
-        warn_time,
-        count( 1 ) AS count
-        FROM
-        t_warn_info
-        WHERE
-        DATEDIFF( now( ), warn_time )  &lt;= 31
-        GROUP BY
-        date
+        SELECT a.timeNode,
+               ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 DAY), '%Y-%m-%d') as timeNode
+              FROM (
+                       SELECT @ai := @ai + 1 as ac
+                       from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                            (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                            (SELECT @ai := 0) xc0
+                   ) c) a
+                 LEFT JOIN (
+            SELECT DATE(warn_time) date,
+                   warn_time,
+                   count(1) AS     count
+            FROM t_warn_info
+            WHERE DATEDIFF(now(), warn_time) &lt;= 31
+            GROUP BY date
         ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
     <select id="countWarnAndDefectOnMonth2" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT
-        a.timeNode,
-        ifnull( b.count, 0 ) AS count
-        FROM
-        (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
-        FROM (
-                        SELECT @ai:=@ai+1 as ac from
-                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
-                        (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
-                        (SELECT @ai:=0) xc0
-        ) c )a
-        LEFT JOIN (
-        SELECT
-        DATE(defect_time) date,
-        defect_time,
-        count( 1 ) AS count
-        FROM
-        t_defect_info
-        WHERE
-        DATEDIFF( now( ), defect_time )  &lt;= 31
-        GROUP BY
-        date
+        SELECT a.timeNode,
+               ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 DAY), '%Y-%m-%d') as timeNode
+              FROM (
+                       SELECT @ai := @ai + 1 as ac
+                       from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                            (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                            (SELECT @ai := 0) xc0
+                   ) c) a
+                 LEFT JOIN (
+            SELECT DATE(defect_time) date,
+                   defect_time,
+                   count(1) AS       count
+            FROM t_defect_info
+            WHERE DATEDIFF(now(), defect_time) &lt;= 31
+            GROUP BY date
         ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
 
     <!--统计近一月内的告警数-->
     <select id="countAllWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT
-        a.timeNode,
-        ifnull( b.count, 0 ) AS count
-        FROM
-        (select date_add(curdate(), interval(cast(help_topic_id as signed ) - 30) day) timeNode
-        from mysql.help_topic
-        where help_topic_id  &lt; day(last_day(curdate()))
-        order by help_topic_id) a
-        LEFT JOIN (
-        SELECT
-        DATE(warn_time) date,
-        warn_time,
-        count( 1 ) AS count
-        FROM
-        t_warn_info
-        WHERE
-        DATEDIFF( now( ), warn_time )  &lt;= 31
-        GROUP BY
-        date
+        SELECT a.timeNode,
+               ifnull(b.count, 0) AS count
+        FROM (select date_add(curdate(), interval (cast(help_topic_id as signed) - 30) day) timeNode
+              from mysql.help_topic
+              where help_topic_id &lt; day(last_day(curdate()))
+              order by help_topic_id) a
+                 LEFT JOIN (
+            SELECT DATE(warn_time) date,
+                   warn_time,
+                   count(1) AS     count
+            FROM t_warn_info
+            WHERE DATEDIFF(now(), warn_time) &lt;= 31
+            GROUP BY date
         ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
 
     <!--统计近一月机器人本体告警-->
     <select id="countWarnOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT
-            a.timeNode,
-            ifnull( b.count, 0 ) AS count
-        FROM
-            (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac-1 DAY), '%Y-%m-%d') as timeNode
-            FROM (
-                SELECT @ai:=@ai+1 as ac from
-                (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
-                (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
-                (SELECT @ai:=0) xc0
-            ) c )a
-        LEFT JOIN (
-            SELECT
-                DATE(alarm_time) date,
-                alarm_time,
-                count( 1 ) AS count
-            FROM
-                t_robot_alarm
-            WHERE
-                DATEDIFF( now( ), alarm_time ) &lt;= 31
-                GROUP BY
-                date
-            ) b ON a.timeNode = b.date
+        SELECT a.timeNode,
+               ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 DAY), '%Y-%m-%d') as timeNode
+              FROM (
+                       SELECT @ai := @ai + 1 as ac
+                       from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                            (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
+                            (SELECT @ai := 0) xc0
+                   ) c) a
+                 LEFT JOIN (
+            SELECT DATE(alarm_time) date,
+                   alarm_time,
+                   count(1) AS      count
+            FROM t_robot_alarm
+            WHERE DATEDIFF(now(), alarm_time) &lt;= 31
+            GROUP BY date
+        ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
     <!--根据告警处理状态统计告警个数-->
     <select id="countWarnConfMode" resultType="java.util.Map">
-        SELECT
-            a.processed as '已核查',
-            e.untreated as '未核查'
-        FROM
-        (
-            (select count(conf_mode = 275 or null) as processed from t_warn_info
-                where warn_time between #{startTime} and #{endTime}) a,
-            (select count(conf_mode = 276 or null) as untreated from t_warn_info
-                where warn_time between #{startTime} and #{endTime}) e
-        )
+        SELECT a.processed as '已核查',
+               e.untreated as '未核查'
+        FROM (
+              (select count(conf_mode = 275 or null) as processed
+               from t_warn_info
+               where warn_time between #{startTime} and #{endTime}) a,
+              (select count(conf_mode = 276 or null) as untreated
+               from t_warn_info
+               where warn_time between #{startTime} and #{endTime}) e
+                 )
     </select>
     <!--根据告警和缺陷处理状态统计告警个数-->
     <select id="countWarnDefectConfMode" resultType="java.util.Map">
-        SELECT
-            a.processed + b.processed as '已核查',
-            d.untreated + e.untreated as '未核查'
-        FROM
-        (
-            (select count(conf_mode = 275 or null) as processed from t_warn_info
-                where warn_time between #{startTime} and #{endTime}) a,
-            (select count(conf_mode = 275 or null) as processed from t_defect_info
-                where defect_time between #{startTime} and #{endTime}) b,
-            (select count(conf_mode = 276 or null) as untreated from t_warn_info
-                where warn_time between #{startTime} and #{endTime}) d,
-            (select count(conf_mode = 276 or null) as untreated from t_defect_info
-                where defect_time between #{startTime} and #{endTime}) e
-        )
+        SELECT a.processed + b.processed as '已核查',
+               d.untreated + e.untreated as '未核查'
+        FROM (
+              (select count(conf_mode = 275 or null) as processed
+               from t_warn_info
+               where warn_time between #{startTime} and #{endTime}) a,
+              (select count(conf_mode = 275 or null) as processed
+               from t_defect_info
+               where defect_time between #{startTime} and #{endTime}) b,
+              (select count(conf_mode = 276 or null) as untreated
+               from t_warn_info
+               where warn_time between #{startTime} and #{endTime}) d,
+              (select count(conf_mode = 276 or null) as untreated
+               from t_defect_info
+               where defect_time between #{startTime} and #{endTime}) e
+                 )
     </select>
     <!--查看告警处理情况-->
     <select id="selectAlarmProcess" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT * FROM
         <include refid="TongYong"></include>
         where 1 = 1
-        <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnId != null ">and warn_id = #{warnId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="warnCountsNonIdentify" resultType="java.lang.Integer">
-              SELECT
-            (
-                a.countNum + b.countNum
-            ) AS total
-        FROM
-            (
-                (
-                    SELECT
-                        count(*) AS countNum
-                    FROM
-                        t_warn_info
-                    WHERE
-                        conf_mode = 276
-                ) a,
-                (
-                    SELECT
-                        count(*) AS countNum
-                    FROM
-                        t_defect_info
-                    WHERE
-                        conf_mode = 276
-                ) b
-            )
+        SELECT (
+                   a.countNum + b.countNum
+                   ) AS total
+        FROM (
+              (
+                  SELECT count(*) AS countNum
+                  FROM t_warn_info
+                  WHERE conf_mode = 276
+              ) a,
+              (
+                  SELECT count(*) AS countNum
+                  FROM t_defect_info
+                  WHERE conf_mode = 276
+              ) b
+                 )
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT
-            a.warn_id,
-            a.device_id,
-            b.device_name,
-            a.instance_id,
-            h.cruise_id as presetId,
-            k.camera_id,
-            a.warn_time as alarm_time,
-            a.std_mete_id,
-            d.mete_name,
-            a.warn_level as alarm_level,
-            e.dict_note as alarm_level_name,
-            a.warn_content,
-            b.real_code,
-            a.image_path,
-            a.alarm_source,
-            f.dict_note as alarm_source_name,
-            a.defect_model,
-            m.dict_note as defect_model_name,
-            d.custom_name,
-            a.device_code,
-            d.low_limit1,
-            d.low_limit2,
-            d.low_limit3,
-            d.low_limit4,
-            d.high_limit1,
-            d.high_limit2,
-            d.high_limit3,
-            d.high_limit4,
+        a.warn_id,
+        a.device_id,
+        b.device_name,
+        a.instance_id,
+        h.cruise_id as presetId,
+        k.camera_id,
+        a.warn_time as alarm_time,
+        a.std_mete_id,
+        d.mete_name,
+        a.warn_level as alarm_level,
+        e.dict_note as alarm_level_name,
+        a.warn_content,
+        b.real_code,
+        a.image_path,
+        a.alarm_source,
+        f.dict_note as alarm_source_name,
+        a.defect_model,
+        m.dict_note as defect_model_name,
+        d.custom_name,
+        a.device_code,
+        d.low_limit1,
+        d.low_limit2,
+        d.low_limit3,
+        d.low_limit4,
+        d.high_limit1,
+        d.high_limit2,
+        d.high_limit3,
+        d.high_limit4,
         b.up_region_name as region_name
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id
@@ -901,17 +850,17 @@
         LEFT JOIN t_camera_preset k on k.preset_id = h.cruise_id
         LEFT JOIN t_dict_business m on m.dict_code = a.defect_model and m.col_name = 'defect_model'
         where 1 = 1
-        <if test="warnId != null "> and warn_id = #{warnId, jdbcType=BIGINT}</if>
+        <if test="warnId != null ">and warn_id = #{warnId, jdbcType=BIGINT}</if>
 
     </select>
     <select id="selectDictNoteByCode" resultType="java.lang.String">
         SELECT
-            a.dict_note
+        a.dict_note
         FROM
-            t_dict_business a
+        t_dict_business a
         WHERE 1 = 1
-        <if test="dictCode != null "> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
-        <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictCode != null ">and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
+        <if test="colName != null ">and a.col_name = #{colName, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectDictCodeByNote" resultType="java.lang.String">
         SELECT
@@ -919,8 +868,8 @@
         FROM
         t_dict_business a
         WHERE 1 = 1
-        <if test="dictNote != null "> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
-        <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null ">and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="colName != null ">and a.col_name = #{colName, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectName" resultType="java.util.Map">
         SELECT
@@ -928,82 +877,85 @@
         b.device_name,
         b.real_code,
         a.custom_name
-    FROM
+        FROM
         t_std_devicemete a,
         t_std_device b
-    WHERE 1 = 1
-        <if test="stdMeteId != null "> and a.device_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
-    and a.device_id = b.device_id
+        WHERE 1 = 1
+        <if test="stdMeteId != null ">and a.device_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
+        and a.device_id = b.device_id
 
-    and a.device_id = d.device_id
+        and a.device_id = d.device_id
     </select>
     <select id="selectPresetId" resultType="java.lang.Long">
         SELECT
-            a.cruise_id as presetId
+        a.cruise_id as presetId
         FROM
-            t_cruise_point_instance a
+        t_cruise_point_instance a
         WHERE 1 = 1
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceId != null ">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
     <select id="selectCameraId" resultType="java.lang.Long">
-    SELECT
+        SELECT
         k.camera_id
-    FROM
+        FROM
         t_cruise_point_instance a
-    LEFT JOIN t_camera_preset k on k.preset_id = a.cruise_id
-    WHERE 1 = 1
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        LEFT JOIN t_camera_preset k on k.preset_id = a.cruise_id
+        WHERE 1 = 1
+        <if test="instanceId != null ">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="selectRegionNameByDeviceId" resultType="java.lang.String">
         SELECT a.up_region_name
         FROM
-            t_std_device a
+        t_std_device a
         WHERE 1 = 1
-        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceId != null ">and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="selectOperationWarn" resultType="java.util.HashMap">
         SELECT
-            a.warn_id AS warnId,
-            CASE
-            b.type
-            WHEN 456 THEN
-            '操作票操作'
-            WHEN 509 THEN
-            '紧急分合闸操作'
-            ELSE '单设备操作'
-            END AS taskName,
-            a.warn_content AS warnContent,
-            date_format( a.warn_time,'%Y-%c-%d %h:%i:%s') AS warnTime,
-            d.dict_note AS robotType,
-            f.region_name AS regionName
-            FROM
-            t_warn_info a
-            LEFT JOIN t_cruise_task b ON b.task_id = a.task_id
-            LEFT JOIN t_robot_info c ON c.robot_id = b.robot_id
-            LEFT JOIN t_dict_business d ON d.dict_code = c.robot_type
-            LEFT JOIN t_std_device e ON e.device_id = a.device_id
-            LEFT JOIN t_std_region f ON f.region_id = e.up_region_id
-            WHERE 1 = 1
-            and a.warn_type = '507'
-                <if test="startTime != null and startTime != ''">
-                    and a.warn_time <![CDATA[>=]]> #{startTime,jdbcType=TIMESTAMP}
-                </if>
-                <if test="endTime != null and endTime != ''">
-                    and  a.warn_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
-                </if>
-                <if test="deviceIdList != null and deviceIdList.size() > 0">
-                    and a.device_id IN
-                    <foreach collection="deviceIdList" item="deviceIds" separator="," open="(" close=")" index="index">
-                        #{deviceIds,jdbcType=BIGINT}
-                    </foreach>
-                </if>
-            ORDER BY a.warn_time DESC
+        a.warn_id AS warnId,
+        CASE
+        b.type
+        WHEN 456 THEN
+        '操作票操作'
+        WHEN 509 THEN
+        '紧急分合闸操作'
+        ELSE '单设备操作'
+        END AS taskName,
+        a.warn_content AS warnContent,
+        date_format( a.warn_time,'%Y-%c-%d %h:%i:%s') AS warnTime,
+        d.dict_note AS robotType,
+        f.region_name AS regionName
+        FROM
+        t_warn_info a
+        LEFT JOIN t_cruise_task b ON b.task_id = a.task_id
+        LEFT JOIN t_robot_info c ON c.robot_id = b.robot_id
+        LEFT JOIN t_dict_business d ON d.dict_code = c.robot_type
+        LEFT JOIN t_std_device e ON e.device_id = a.device_id
+        LEFT JOIN t_std_region f ON f.region_id = e.up_region_id
+        WHERE 1 = 1
+        and a.warn_type = '507'
+        <if test="startTime != null and startTime != ''">
+            and a.warn_time <![CDATA[>=]]> #{startTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and a.warn_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="deviceIdList != null and deviceIdList.size() > 0">
+            and a.device_id IN
+            <foreach collection="deviceIdList" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY a.warn_time DESC
     </select>
 
     <select id="countByInstanceIdAndTaskId" resultType="java.lang.Integer">
-        select count(*) from t_warn_info where task_id = #{taskId} and instance_id = #{instanceId}
+        select count(*)
+        from t_warn_info
+        where task_id = #{taskId}
+          and instance_id = #{instanceId}
     </select>
 
     <select id="selectStationNameByDeviceId" resultType="java.lang.String">
@@ -1013,7 +965,8 @@
             SELECT b.edge_code
             FROM t_std_device b
             WHERE b.device_id = #{deviceId,jdbcType=BIGINT}
-        ) and a.state = 1
+        )
+          and a.state = 1
     </select>
 
 </mapper>
