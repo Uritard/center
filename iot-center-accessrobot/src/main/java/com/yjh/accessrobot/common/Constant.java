@@ -1,9 +1,11 @@
 package com.yjh.accessrobot.common;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.apache.http.HttpEntity;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author YJH
  */
+@Slf4j
 public class Constant {
     /**
      * 本系统数据
@@ -177,6 +181,19 @@ public class Constant {
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
     }
+
+    public static void modelUpload(String type){
+        try {
+            Map<String, Object> param = new HashMap<>();
+            param.put("type", type);
+            Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+            log.info("modelUpload result: {}", JSON.toJSONString(re));
+        }catch (Exception e){
+            log.error("模型文件上传失败", e);
+        }
+    }
+
+    public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
     public static String robotCode="";
@@ -190,4 +207,22 @@ public class Constant {
     public static String REGION_REFRESH_URL = "http://iot-center-platform/tStdRegion/v1/refreshRegion";
 
     public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
+
+    /**
+     * 是否开启修改同步模型
+     */
+    private static Boolean updateSyncModel;
+
+    public static boolean updateSyncModel() {
+        if (updateSyncModel == null) {
+            try {
+                updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
+                log.warn("updateSyncModel is {}", updateSyncModel);
+            } catch (Exception e) {
+                updateSyncModel = false;
+            }
+        }
+        return updateSyncModel;
+    }
+
 }

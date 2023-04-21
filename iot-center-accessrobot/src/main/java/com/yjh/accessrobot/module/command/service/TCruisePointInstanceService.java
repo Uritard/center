@@ -290,6 +290,9 @@ public class TCruisePointInstanceService {
             });
             linkAutoMapper.batchInsertCruisePointInstance(tCruisePointInstanceList);
         }
+        if (Constant.updateSyncModel()) {
+            Constant.modelUpload("1");
+        }
     }
 
     public void importExcel(List<ExcelEntity> excelEntities, Long robotId) throws InterruptedException {
