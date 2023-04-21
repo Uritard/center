@@ -2,15 +2,11 @@ package com.yjh.accesstcp.module.device.controller;
 
 import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.common.utils.ZipUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
-import com.yjh.accesstcp.module.device.entity.SysLogs;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
-import com.yjh.accesstcp.module.device.service.SysLogsService;
-import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -173,7 +169,7 @@ public class SendToUpSystemController {
     }
 
     @ApiOperation(value = "更新TCP连接")
-    @RequestMapping(value = "/updateTcpContent", method = RequestMethod.POST)
+    @RequestMapping(value = "/updateTcpContent", method = RequestMethod.GET)
     public Result register() {
         Result result = new Result();
         try {
