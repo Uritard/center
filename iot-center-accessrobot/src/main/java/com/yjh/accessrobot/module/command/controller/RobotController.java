@@ -451,4 +451,17 @@ public class RobotController {
         return result;
     }
 
+    @ApiOperation(value = "更新Robot服务端口")
+    @RequestMapping(value = "/updateRobotServer", method = RequestMethod.GET)
+    public Result register() {
+        Result result = new Result();
+        try {
+            robotService.updateRobotServer();
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
 }

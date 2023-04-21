@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
@@ -19,10 +21,10 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,9 +166,96 @@ public class Constant {
         StaticContextAccessor.getBean(ServiceRestTemplate.class).delete(url, params);
     }
 
-    public static boolean apiPermissions;
-
     public static RedisTemplate redisTemplate;
+
+    public static Map<Integer, Map<ChannelFuture, ServerBootstrap>> futureServerBootstrapHashMap = new ConcurrentHashMap<>();
+
+    public static Boolean apiPermissions;
+
+    /**
+     * 接口鉴权是否打开
+     */
+    public static boolean apiPermissions() {
+        try {
+            apiPermissions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi"));
+            log.warn("apiPermissions is {}", apiPermissions);
+        } catch (Exception e) {
+            apiPermissions = false;
+        }
+        return apiPermissions;
+    }
+
+    /**
+     * 发送方唯一标识
+     */
+    public static String sendCode;
+
+    /**
+     * 获取发送方唯一标识
+     */
+    public static String sendCode() {
+        try {
+            sendCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content");
+            log.warn("sendCode is {}", sendCode);
+        } catch (Exception e) {
+            sendCode = "";
+        }
+        return sendCode;
+    }
+
+    /**
+     * 变电站名称
+     */
+    public static String stationCode;
+
+    /**
+     * 获取变电站名称
+     */
+    public static String stationCode() {
+        try {
+            stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+            log.warn("stationCode is {}", stationCode);
+        } catch (Exception e) {
+            stationCode = "";
+        }
+        return stationCode;
+    }
+
+    public static Boolean handlerNew;
+
+    /**
+     * handlerNew
+     */
+    public static boolean handlerNew() {
+        try {
+            handlerNew = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew"));
+            log.warn("handlerNew is {}", handlerNew);
+        } catch (Exception e) {
+            handlerNew = true;
+        }
+        return handlerNew;
+    }
+
+    /**
+     * robot服务监听端口
+     */
+    public static Integer port;
+
+    /**
+     * robot服务监听端口
+     */
+    public static Integer port() {
+        if (port == null){
+            try {
+                port = Integer.parseInt(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyServerPort")));
+                log.warn("port is {}", port);
+            } catch (Exception e) {
+                port = 10011;
+            }
+        }
+        return port;
+    }
+
 
     //请求webSocket发送方法
     public static String postUrl(String url, String json) throws IOException, URISyntaxException {
@@ -196,14 +285,6 @@ public class Constant {
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
-    public static String robotCode="";
-
-    public static String sendCode="";
-
-    public static String stationCode = "";
-
-    public static boolean handlerNew = true;
-
     public static String REGION_REFRESH_URL = "http://iot-center-platform/tStdRegion/v1/refreshRegion";
 
     public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
@@ -225,4 +306,29 @@ public class Constant {
         return updateSyncModel;
     }
 
+    public static String getLocalIp() throws SocketException {
+        String ip = "";
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                String name = intf.getName();
+                if (!name.contains("docker") && !name.contains("lo")) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()) {
+                            String ipaddress = inetAddress.getHostAddress();
+                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
+                                log.info(ipaddress);
+                                ip = ipaddress;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ip = "127.0.0.1";
+            log.error(ex.getMessage(), ex);
+        }
+        return ip;
+    }
 }

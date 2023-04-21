@@ -72,7 +72,7 @@ public class TCameraPresetService {
     private void presetModeSwitch(TCameraPreset tCameraPreset) throws InterruptedException {
         List<Map<String, Object>> item = getPresetItem(tCameraPreset);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-            .setSendCode(Constant.sendCode)
+            .setSendCode(Constant.sendCode())
             .setReceiveCode(tCameraPreset.getEdgeCode())
             .setCode("1111")
             .setTime(DateTimeUtil.format(new Date()))

@@ -36,13 +36,6 @@ import java.util.*;
 @Slf4j
 public class AccessTcpApplication implements CommandLineRunner {
 
-    @Value("${netty.server.port}")
-    private int port;
-    @Value("${netty.server.url}")
-    private String serverUrl;
-    @Value("${a.interface.flag}")
-    private String flag;
-
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -62,14 +55,11 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        Constant.handlerNew = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew")));
-        if("1".equals(flag)) {
-            InetSocketAddress address = new InetSocketAddress(serverUrl, port);
+        Constant.redisTemplate = redisTemplate;
+        if("1".equals(Constant.upSystemFlag())) {
+            InetSocketAddress address = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
             log.info("accesstcp is running, url is : " + url);
-            String cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
-            String server = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
-            Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise, registerManager);
+            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, registerManager);
         }
     }
     private static String getLocalIp() throws SocketException {

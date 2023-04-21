@@ -73,7 +73,7 @@ public class RobotTaskStatusToCruiseHandler implements MessageHandlerStrategy, I
          if (!"1".equals(systemLevel)) {
              String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
              XMLBaseModel upXmlBaseModel = new XMLBaseModel()
-                 .setSendCode(Constant.sendCode)
+                 .setSendCode(Constant.sendCode())
                  .setReceiveCode(recvCode)
                  .setType("411")
                  .setItems(Collections.singletonList(item));

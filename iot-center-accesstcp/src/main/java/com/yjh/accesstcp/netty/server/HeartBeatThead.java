@@ -26,6 +26,7 @@ public class HeartBeatThead implements Runnable{
                     isThreadStart = false;
                     log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
                     log.info("Thread stop success!");
+                    break;
                 }
                 tCPClientHandler.ProcSend();
                 log.info("--心跳信息已发送--");

@@ -17,7 +17,13 @@ import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
+import com.yjh.accesstcp.netty.server.NettyClient;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import com.yjh.accesstcp.thread.RegisterManager;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoop;
+import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -36,9 +42,11 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -50,8 +58,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SendToUpSystemServices {
 
-    @Value("${netty.server.port}")
-    private int port;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -66,7 +72,10 @@ public class SendToUpSystemServices {
     private TVoiceDeviceMapper tVoiceDeviceMapper;
     @Autowired
     private SendToUpSystemDao sendToUpSystemDao;
-
+    @Autowired
+    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
+    @Autowired
+    private RegisterManager registerManager;
     @Autowired
     private StatisticsDao statisticsDao;
 
@@ -91,12 +100,12 @@ public class SendToUpSystemServices {
 
         byte[] bytes = new byte[]{};
         long sendSessionId;
-        TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(port);
+        TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(Constant.upSystemPort());
         if (tcpClientHandler != null) {
             sendSessionId = Constant.sendSessionId.incrementAndGet();
         } else {
             // 刷新sendSessionId
-            log.error("服务未连接，请重试，port: {}", port);
+            log.error("服务未连接，请重试，port: {}", Constant.upSystemPort());
             Constant.sendSessionId.set(0L);
 
             // 把本级没有上报成功的巡视点结果暂存起来,重连服务后再上报上一级系统
@@ -1558,6 +1567,90 @@ public class SendToUpSystemServices {
                     upSystemFtpsUsername, upSystemFtpsPassword);
         } catch (Exception e) {
             log.error("将文件从上级系统ftp服务器下载错误：", e);
+        }
+    }
+
+    /**
+     * 更新TCP连接
+     */
+    public void updateTcpContent() {
+        try {
+            String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+            if (Objects.isNull(flag)){
+                log.error("上级系统连接开关为空");
+                return;
+            }
+            String ip = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
+            if (Objects.isNull(ip)){
+                log.error("上级系统IP为空");
+                return;
+            }
+            String port = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
+            if (Objects.isNull(port)){
+                log.error("上级系统端口为空");
+                return;
+            }
+            String one = "1";
+            if (!Constant.upSystemFlag().equals(flag)) {
+                //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
+                if (one.equals(flag)) {
+                    this.start(ip, port);
+                } else {
+                    this.stop();
+                }
+                Constant.upSystemFlag = flag;
+            }
+            boolean isChange = one.equals(flag) && !Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port);
+            if (isChange){
+                //ip 端口修改 变更连接
+                if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
+                    this.stop();
+                    this.start(ip, port);
+                } else {
+                    this.start(ip, port);
+                }
+                Constant.upSystemIp = ip;
+                Constant.upSystemPort = Integer.valueOf(port);
+            }
+        }catch (Exception e){
+            log.error("更新TCP连接失败");
+        }
+
+    }
+
+    /**
+     * 开启连接
+     * @param ip
+     * @param port
+     */
+    private void start(String ip, String port){
+        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))){
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+            Bootstrap bootstrap = Constant.bootstrapHashMap.get(1);
+            NettyClient.doConnect(inetSocketAddress, bootstrap);
+        }else {
+            NettyClient nettyClient = new NettyClient();
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+            nettyClient.start(inetSocketAddress, redisTemplate, this, analysisUnionTaskFileService, registerManager);
+        }
+    }
+
+    /**
+     * 关闭连接
+     */
+    private void stop() {
+        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
+            TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(Constant.upSystemPort());
+            try {
+                if (tcpClientHandler != null) {
+                    tcpClientHandler.setIsThreadStart(false);
+                    tcpClientHandler.getChannel().close().sync();
+                    tcpClientHandler.getChannel().flush();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

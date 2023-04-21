@@ -172,5 +172,17 @@ public class SendToUpSystemController {
         return result;
     }
 
+    @ApiOperation(value = "更新TCP连接")
+    @RequestMapping(value = "/updateTcpContent", method = RequestMethod.POST)
+    public Result register() {
+        Result result = new Result();
+        try {
+            sendToUpSystemService.updateTcpContent();
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
 
 }

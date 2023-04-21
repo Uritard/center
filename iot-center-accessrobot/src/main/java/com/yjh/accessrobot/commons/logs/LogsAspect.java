@@ -103,7 +103,7 @@ public class LogsAspect {
             params.set("requestOrigin", request.getRequestURL());
             params.set("requestPath", request.getRequestURI());
             params.set("requestMethod", request.getMethod());
-            if(Constant.apiPermissions){
+            if(Constant.apiPermissions()){
                 try {
                     if (!"".equals(annotation.authority())) {
                         String ans = annotation.authority();

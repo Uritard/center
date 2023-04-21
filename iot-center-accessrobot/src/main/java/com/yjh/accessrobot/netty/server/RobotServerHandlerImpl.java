@@ -310,7 +310,7 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
         xmlBaseModelEmpty.setTime(DateTimeUtil.getDateTimeString(false));
         xmlBaseModelEmpty.setType("251");
         xmlBaseModelEmpty.setCode(flag ? "200" : "500");
-        xmlBaseModelEmpty.setSendCode(Constant.sendCode);
+        xmlBaseModelEmpty.setSendCode(Constant.sendCode());
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
     }

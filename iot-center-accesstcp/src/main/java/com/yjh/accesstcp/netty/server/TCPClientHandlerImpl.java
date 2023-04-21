@@ -39,17 +39,13 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
     private RedisTemplate redisTemplate;
     private SendToUpSystemServices sendToUpSystemServices;
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
-    private String server;
-    private String cruise;
     private RegisterManager registerManager;
 
 
-    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise, RegisterManager registerManager) {
+    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
         this.analysisUnionTaskFileService = analysisUnionTaskFileService;
-        this.server = server;
-        this.cruise =cruise;
         this.registerManager =registerManager;
 
     }
@@ -668,13 +664,18 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
     }
 
     @Override
+    public void setIsThreadStart(Boolean status) {
+        isThreadStart = status;
+    }
+
+    @Override
     public String getCruise() {
-        return cruise;
+        return Constant.cruise();
     }
 
     @Override
     public String getServer() {
-        return server;
+        return Constant.server();
     }
 
     @Override

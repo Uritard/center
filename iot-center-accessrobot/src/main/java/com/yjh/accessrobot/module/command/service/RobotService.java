@@ -24,8 +24,11 @@ import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
+import com.yjh.accessrobot.netty.server.NettyServer;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -38,7 +41,6 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -220,7 +224,7 @@ public class RobotService {
             }
 
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode(Constant.sendCode)
+                    .setSendCode(Constant.sendCode())
                     .setReceiveCode(robotCode)
                     .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                     .setTime(DateTimeUtil.format(new Date()))
@@ -329,7 +333,7 @@ public class RobotService {
             return false;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(robotCode)
                 .setCode(Constant.stationCode)
                 .setTime(DateTimeUtil.format(new Date()))
@@ -353,7 +357,7 @@ public class RobotService {
         if (CollectionUtils.isNotEmpty(stdRegionList)) {
             String stationCode = stdRegionList.get(0).getStationId();
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode(Constant.sendCode)
+                    .setSendCode(Constant.sendCode())
                     .setReceiveCode(edgeCode)
                     .setCode(stationCode)
                     .setTime(DateTimeUtil.format(new Date()))
@@ -392,7 +396,7 @@ public class RobotService {
                 map.put("file_path", filePath);
                 mapList.add(map);
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                        .setSendCode(Constant.sendCode)
+                        .setSendCode(Constant.sendCode())
                         .setReceiveCode(edgeCode)
                         .setCode(stationCode)
                         .setTime(DateTimeUtil.format(new Date()))
@@ -1027,7 +1031,7 @@ public class RobotService {
         itemList.add(resMap);
         XMLBaseModel xmlBaseModel =
             new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(onlineCode)
                 .setCode(stationId)
                 .setType("81")
@@ -1241,7 +1245,7 @@ public class RobotService {
 
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setType(String.valueOf(resMap.get("type")))
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(uniqueFlag)
                 .setCode(code)
                 .setTime(DateTimeUtil.format(new Date()))
@@ -1306,7 +1310,7 @@ public class RobotService {
 
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
-                        .setSendCode(Constant.sendCode)
+                        .setSendCode(Constant.sendCode())
                         .setReceiveCode(robotCode)
                         .setCode(code)
                         .setCommand(commandValue)
@@ -1468,7 +1472,7 @@ public class RobotService {
             if (!cfmList.isEmpty()) {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("51")
-                        .setSendCode(Constant.sendCode)
+                        .setSendCode(Constant.sendCode())
                         .setReceiveCode(robotCode)
                         .setCode(taskId)
                         .setCommand("1")
@@ -1627,7 +1631,7 @@ public class RobotService {
         List<Map<String, Object>> items = new LinkedList<>();
         items.add(item);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(map.get("robotCode"))
                 .setCode(Constant.stationCode)
                 .setType("121")
@@ -1656,7 +1660,7 @@ public class RobotService {
             receiveCode = tRobotInfo.getRobotCode();
         }
 
-        xmlBaseModel.setSendCode(Constant.sendCode);
+        xmlBaseModel.setSendCode(Constant.sendCode());
         xmlBaseModel.setReceiveCode(receiveCode);
         log.info("xmlBaseModel {} ", xmlBaseModel);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
@@ -2166,7 +2170,7 @@ public class RobotService {
 
         TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(robotCode)
                 .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                 .setTime(DateTimeUtil.format(new Date()))
@@ -2414,7 +2418,7 @@ public class RobotService {
         Result result = new Result();
         try {
             String robotCode = map.get("robotCode");
-            log.info("sendCode:{},robotCode:{}====", Constant.sendCode, robotCode);
+            log.info("sendCode:{},robotCode:{}====", Constant.sendCode(), robotCode);
             if (StringUtils.isEmpty(robotCode)) {
                 log.error("当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
                 result.setMessage(200, "当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
@@ -2440,7 +2444,7 @@ public class RobotService {
                     }
                     Item.add(maps);
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                            .setSendCode(Constant.sendCode)
+                            .setSendCode(Constant.sendCode())
                             .setReceiveCode(robotCode)
                             .setType(type)
                             .setCode(deviceId)
@@ -2985,6 +2989,63 @@ public class RobotService {
 
     public String selectRealTaskId(String taskCode, Date date) {
         return tRobotInfoDao.selectRealTaskIdByTime(taskCode, date);
+    }
+
+    /**
+     * 更新Robot服务端口
+     */
+    public void updateRobotServer() {
+        try {
+            String port = (String) redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyServerPort");
+            if (Objects.isNull(port)) {
+                log.error("redis robot server port is null !");
+                return;
+            }
+            boolean isChange = !String.valueOf(Constant.port()).equals(port);
+            if (isChange) {
+                String url = Constant.getLocalIp();
+                InetSocketAddress address = new InetSocketAddress(url, Integer.parseInt(port));
+                Map<ChannelFuture, ServerBootstrap> map = Constant.futureServerBootstrapHashMap.get(1);
+                if (Objects.nonNull(map)) {
+                    for (ChannelFuture future : map.keySet()) {
+                        this.stop(future);
+                        this.start(future, address, map);
+                    }
+                }
+                Constant.port = Integer.valueOf(port);
+            }
+        } catch (Exception e) {
+            log.error("更新Robot服务端口失败", e);
+        }
+    }
+
+    /**
+     * 关闭旧的连接
+     * @param future
+     */
+    private void stop(ChannelFuture future) {
+        future.channel().close();
+        for (Map.Entry<String, String> vo : Constant.robotChannels.entrySet()) {
+            log.info("当前的robotChannels的key为" + vo.getKey());
+            String robotCode = vo.getKey();
+            RobotServerHandler.removeLink(robotCode);
+        }
+        Constant.futureServerBootstrapHashMap.remove(1);
+    }
+
+    /**
+     * 开启新连接
+     * @param future
+     * @param address
+     * @param map
+     * @throws InterruptedException
+     */
+    private void start(ChannelFuture future, InetSocketAddress address, Map<ChannelFuture, ServerBootstrap> map) throws InterruptedException {
+        ChannelFuture newFuture = map.get(future).bind(address).sync();
+        log.info("Server changed, start listen at " + address.getPort());
+        Map<ChannelFuture, ServerBootstrap> serverMap = new HashMap<>(1);
+        serverMap.put(newFuture, map.get(future));
+        Constant.futureServerBootstrapHashMap.put(1, serverMap);
     }
 }
 

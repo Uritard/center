@@ -95,7 +95,7 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
 
         itemsList.add(items);
         XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(robotCode)
                 .setType("251")
                 .setCode(code)

@@ -113,7 +113,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             upItem.put("description", downItem.get("description") == null ? null:downItem.get("description").toString());
 
             XMLBaseModel upXmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode)
+                .setSendCode(Constant.sendCode())
                 .setReceiveCode(recvCode)
                 .setType("411")
                 .setItems(Collections.singletonList(upItem));

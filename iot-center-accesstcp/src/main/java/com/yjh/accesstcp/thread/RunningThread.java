@@ -34,8 +34,9 @@ public class RunningThread implements Runnable{
 
                 if (!tcpClientHandler.getIsThreadStart()) {
                     isThreadStart = false;
-                    log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
-                    log.info("Thread stop success!");
+                    log.info("RunningThread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
+                    log.info("RunningThread stop success!");
+                    break;
                 }
 
                 String s = Constant.paramMap.get("patroldevice_run_interval");
@@ -97,7 +98,7 @@ public class RunningThread implements Runnable{
                             Map<String, Object> map11 = createMap(now, 11, mapForChargeCurrent);
                             list.add(map11);
                         }
-                        sendToUpSystemServices.sendResponse(0L, "2","",Constant.stationCode,list, true);
+                        sendToUpSystemServices.sendResponse(0L, "2","",Constant.stationCode(),list, true);
                     }
                 }
 
