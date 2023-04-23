@@ -7,10 +7,7 @@ import com.yjh.platform.module.task.entity.WarnStatistical;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tt
@@ -54,6 +51,8 @@ public interface TWarnInfoDao {
     List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
     List<TWarnInfoDetail> selectRobotAlarm(HashMap<String,Object> map);
     List<TWarnInfoDetail> WarnConfirm(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectCruiseInfoByInstanceId(@Param("list") Set<Long> list);
+    List<TWarnInfoDetail> selectEdgeNameByEdgeCode(@Param("list") Set<String> list);
     Map<String, Integer> countByAlarmSource();
     List<TJContentInfoDetail>  countByDeviceType(@Param(value = "startTime")String startTime,
                                                  @Param(value = "endTime")String endTime);

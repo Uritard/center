@@ -33,6 +33,8 @@ public class TWarnInfoDetail implements Serializable {
     private Integer alarmLevel;
     @ApiModelProperty(value = "告警级别-字典表")
     private String alarmLevelName;
+    @ApiModelProperty(value = "节点编码")
+    private String edgeCode;
 
     @ApiModelProperty(value = "处理状态")
     private Integer confMode;

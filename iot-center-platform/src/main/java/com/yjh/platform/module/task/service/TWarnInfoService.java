@@ -27,6 +27,8 @@ import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
 * @author tt
@@ -111,33 +113,50 @@ public class TWarnInfoService{
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
+        long time = System.currentTimeMillis();
+        log.info("_________________________________time1________________________________:{}\n",System.currentTimeMillis() -time);
         List<TWarnInfoDetail> list = tWarnInfoDao.WarnConfirm(map);
-        for (TWarnInfoDetail tWarnInfoDetail : list) {
-            String thresholdValue = "";
-            if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
-                thresholdValue = "预警阈值：" + tWarnInfoDetail.getLowLimit1() + "-" + tWarnInfoDetail.getHighLimit1();
-            }
-            if (Objects.nonNull(tWarnInfoDetail.getLowLimit2()) && Objects.nonNull(tWarnInfoDetail.getHighLimit2())){
-                thresholdValue = thresholdValue + " 一般阈值：" + tWarnInfoDetail.getLowLimit2() + "-" + tWarnInfoDetail.getHighLimit2();
-            }
-            if (Objects.nonNull(tWarnInfoDetail.getLowLimit3()) && Objects.nonNull(tWarnInfoDetail.getHighLimit3())){
-                thresholdValue = thresholdValue + " 严重阈值：" + tWarnInfoDetail.getLowLimit3() + "-" + tWarnInfoDetail.getHighLimit3();
-            }
-            if (Objects.nonNull(tWarnInfoDetail.getLowLimit4()) && Objects.nonNull(tWarnInfoDetail.getHighLimit4())){
-                thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
-            }
-            tWarnInfoDetail.setThresholdValue(thresholdValue);
-        }
-
+        log.info("_________________________________time2________________________________:{}\n",System.currentTimeMillis() -time);
         if (CollectionUtils.isNotEmpty(list)) {
-            list.forEach(tWarnInfoDetail -> {
+            Set<Long> instanceIds = list.stream().map(TWarnInfoDetail::getInstanceId).collect(Collectors.toSet());
+            Set<String> edgeCodes = list.stream().peek( o -> {if (StringUtils.isEmpty(o.getEdgeCode())) {o.setEdgeCode("0");}}).map(TWarnInfoDetail::getEdgeCode).collect(Collectors.toSet());
+            List<TWarnInfoDetail> presetInfoList = tWarnInfoDao.selectCruiseInfoByInstanceId(instanceIds);
+            List<TWarnInfoDetail> edgeInfoList = tWarnInfoDao.selectEdgeNameByEdgeCode(edgeCodes);
+            Map<Long,TWarnInfoDetail> tWarnInfoDetailMap = presetInfoList.stream().collect(Collectors.toMap(TWarnInfoDetail::getInstanceId, Function.identity()));
+            Map<String,TWarnInfoDetail> edgeMap = edgeInfoList.stream().collect(Collectors.toMap(TWarnInfoDetail::getEdgeCode, Function.identity()));
+            for (TWarnInfoDetail tWarnInfoDetail : list) {
+                TWarnInfoDetail presetInfo = tWarnInfoDetailMap.getOrDefault(tWarnInfoDetail.getInstanceId(),null);
+                TWarnInfoDetail edgeInfo = edgeMap.getOrDefault(tWarnInfoDetail.getEdgeCode(),null);
+                String thresholdValue = "";
+                if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
+                    thresholdValue = "预警阈值：" + tWarnInfoDetail.getLowLimit1() + "-" + tWarnInfoDetail.getHighLimit1();
+                }
+                if (Objects.nonNull(tWarnInfoDetail.getLowLimit2()) && Objects.nonNull(tWarnInfoDetail.getHighLimit2())){
+                    thresholdValue = thresholdValue + " 一般阈值：" + tWarnInfoDetail.getLowLimit2() + "-" + tWarnInfoDetail.getHighLimit2();
+                }
+                if (Objects.nonNull(tWarnInfoDetail.getLowLimit3()) && Objects.nonNull(tWarnInfoDetail.getHighLimit3())){
+                    thresholdValue = thresholdValue + " 严重阈值：" + tWarnInfoDetail.getLowLimit3() + "-" + tWarnInfoDetail.getHighLimit3();
+                }
+                if (Objects.nonNull(tWarnInfoDetail.getLowLimit4()) && Objects.nonNull(tWarnInfoDetail.getHighLimit4())){
+                    thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
+                }
+                tWarnInfoDetail.setThresholdValue(thresholdValue);
                 tWarnInfoDetail.setAlarmLevelName(DictBusinessCache.getDictNode("alarm_level",String.valueOf(tWarnInfoDetail.getAlarmLevel())));
                 tWarnInfoDetail.setAlarmSourceName(DictBusinessCache.getDictNode("alarm_source",String.valueOf(tWarnInfoDetail.getAlarmSource())));
                 tWarnInfoDetail.setConfModeName(DictBusinessCache.getDictNode("conf_mode",String.valueOf(tWarnInfoDetail.getConfMode())));
                 tWarnInfoDetail.setDefectModelName(DictBusinessCache.getDictNode("defect_model",String.valueOf(tWarnInfoDetail.getDefectModel())));
                 tWarnInfoDetail.setDealTypeName(DictBusinessCache.getDictNode("deal_type",String.valueOf(tWarnInfoDetail.getDealType())));
-            });
+                if (presetInfo != null) {
+                    tWarnInfoDetail.setCameraId(presetInfo.getCameraId());
+                    tWarnInfoDetail.setVideoCameraType(presetInfo.getVideoCameraType());
+                    tWarnInfoDetail.setPresetId(presetInfo.getPresetId());
+                }
+                if (edgeInfo != null) {
+                    tWarnInfoDetail.setStationName(edgeInfo.getStationName());
+                }
+            }
         }
+        log.info("_________________________________time3________________________________:{}\n",System.currentTimeMillis() -time);
         return list;
     }
     @Transactional(rollbackFor = Exception.class)
