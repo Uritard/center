@@ -67,6 +67,8 @@ public class TRobotInspection implements Serializable {
     @TableField(value = "device_info", updateStrategy = FieldStrategy.IGNORED)
     private String deviceInfo;
 
+    private Integer type;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

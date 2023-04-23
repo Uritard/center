@@ -112,6 +112,23 @@
         <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
     </select>
 
+    <select id="selectInspectionNameLike" parameterType="com.yjh.platform.module.device.entity.TRobotInspection"
+            resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
+        select a.robot_id, b.robot_name, b.robot_position, b.drone_position, a.inspection_id, a.inspection_name
+        from t_robot_info b inner join t_robot_inspection a on b.robot_id = a.robot_id
+        <if test="type == 1">
+            and b.robot_type is not null
+        </if>
+        <if test="type == 2">
+            and b.drone_type is not null
+        </if>
+        where 1 = 1
+        <if test="inspectionName != null and inspectionName != ''">
+            and a.inspection_name like CONCAT(CONCAT('%',#{inspectionName, jdbcType=VARCHAR}), '%')
+        </if>
+        <if test="robotId != null">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+    </select>
+
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
         select
         a.inspection_id,
@@ -522,5 +539,59 @@
                 LEFT JOIN t_robot_info c ON a.robot_id = c.robot_id
         WHERE
                 b.instance_id = #{instanceId})
+    </select>
+
+    <select id="getTRobotWithInspection" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select robot_id,
+               edge_code,
+               origin_id,
+               robot_code,
+               robot_num,
+               robot_name,
+               nest_name,
+               nest_code,
+               robot_status,
+               robot_type,
+               drone_type,
+               robot_ip,
+               robot_port,
+               light_ip,
+               light_port,
+               identity_manager,
+               identity_code,
+               lnferad_IP,
+               Inferad_Port,
+               Inferad_username,
+               Inferad_password,
+               phote_path,
+               create_by,
+               create_date,
+               update_by,
+               update_date,
+               robot_factory,
+               made_in,
+               made_date,
+               is_use,
+               commission_date,
+               up_region_id,
+               robot_position,
+               drone_position,
+               robot_source,
+               address,
+               building_user,
+               appearance_number,
+               defect_record,
+               repair_record,
+               exit_putInto_record,
+               remarks,
+               record_id,
+               channel_num_light,
+               channel_num_inferad,
+               last_online_time,
+               duration,
+               off_line_count,
+               image_size
+        from t_robot_info
+        where robot_id in (select distinct robot_id from t_robot_inspection)
     </select>
 </mapper>

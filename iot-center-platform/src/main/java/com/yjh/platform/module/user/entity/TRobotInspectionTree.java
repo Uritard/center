@@ -32,6 +32,9 @@ public class TRobotInspectionTree implements Serializable {
     @ApiModelProperty(value = "机器人类型")
     private String robotPosition;
 
+    @ApiModelProperty(value = "无人机类型")
+    private String dronePosition;
+
     @ApiModelProperty(value = "巡检点ID")
     private Long inspectionId;
 
