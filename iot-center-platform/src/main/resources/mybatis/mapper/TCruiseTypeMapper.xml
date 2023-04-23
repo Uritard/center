@@ -213,7 +213,7 @@
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
-				from t_algorithm_mete a
+        from t_std_devicemete a
         left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
@@ -221,9 +221,9 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where a.algorithm_id = (select algorithm_id from t_algorithm_info where analyse_type = 9)
-				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
-				 and b.device_mete_id is not null and h.inspection_type = 1
+        where a.mete_type =222
+        and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        and b.device_mete_id is not null and h.inspection_type = 1
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByMeterTypeByOil" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -283,7 +283,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where a.meter_type = 412
+        where a.meter_type in (412,413)
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
 				 and b.device_mete_id is not null and h.inspection_type = 1
         ORDER BY b.device_id, b.custom_id
@@ -368,7 +368,7 @@
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
-				from t_algorithm_mete a
+        from t_std_devicemete a
         left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
@@ -376,9 +376,9 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where a.algorithm_id in (select algorithm_id from t_algorithm_info where analyse_type in(8,7,6,5) )
-				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
-				 and b.device_mete_id is not null and h.inspection_type = 1
+        where a.mete_type =219
+        and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+        and b.device_mete_id is not null and h.inspection_type = 1
         ORDER BY b.device_id, b.custom_id
     </select>
     <update id="tagsDeleted" >

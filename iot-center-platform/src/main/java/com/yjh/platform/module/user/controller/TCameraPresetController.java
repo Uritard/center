@@ -79,6 +79,7 @@ public class TCameraPresetController {
                     params.put("cameraId",tCameraPreset.getCameraId());
                     params.put("presetId",tCameraPreset.getPresetId());
                     params.put("meteName",tCameraPreset.getPresetName());
+                    params.put("edgeCode",tCameraPreset.getEdgeCode());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
                     String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
