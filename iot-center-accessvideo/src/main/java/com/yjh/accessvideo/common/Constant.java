@@ -63,6 +63,19 @@ public class Constant {
 
     public static boolean apiPermissions;
 
+    /**
+     * 接口鉴权是否打开
+     */
+    public static boolean apiPermissions() {
+        try {
+            apiPermissions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi"));
+            log.warn("apiPermissions is {}", apiPermissions);
+        } catch (Exception e) {
+            apiPermissions = false;
+        }
+        return apiPermissions;
+    }
+
     public static RedisTemplate redisTemplate;
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {

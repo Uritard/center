@@ -112,4 +112,12 @@ public enum RecogniseStatusEnum {
         }
         return null;
     }
+    public static RecogniseStatusEnum getCodeByValue(String value) {
+        for (RecogniseStatusEnum statusEnum : RecogniseStatusEnum.values()) {
+            if (Objects.equals(statusEnum.getValue(), value)) {
+                return statusEnum;
+            }
+        }
+        return null;
+    }
 }

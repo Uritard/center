@@ -82,7 +82,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         Constant.redisTemplate = redisTemplate;
-        Constant.apiPermissions = Boolean.parseBoolean(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi")));
         log.info("videoAccess is running...");
         setSDKCom();
         if (!hCNetSDK.NET_DVR_Init()) {
