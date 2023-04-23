@@ -2,10 +2,7 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -137,15 +134,12 @@ public class InspectionResultThread implements Runnable{
         // 非模拟工具上来的结果
         if (Boolean.FALSE.equals(isSimulationTool)) {
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
-                tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
+                tCruiseTaskResultMap.put("resultNum", ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue()));
+                tCruiseTaskResultMap.put("resultDesc", robotPatrolTaskResult.getValue() + robotPatrolTaskResult.getUnit());
                 log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
             } else {
-                // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                tCruiseTaskResultMap.put("resultNum", "--");
-                if (!"3".equals(robotPatrolTaskResult.getFileType())) {
-                    isnormal = false;
-                    log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
-                }
+                tCruiseTaskResultMap.put("resultNum", "数据异常");
+                tCruiseTaskResultMap.put("resultDesc", "数据异常");
             }
         }
         String cruiseResult;

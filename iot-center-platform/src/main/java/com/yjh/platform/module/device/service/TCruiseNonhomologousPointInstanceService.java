@@ -91,23 +91,23 @@ public class TCruiseNonhomologousPointInstanceService {
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseNonhomologousWarnInfo> selectWarnByPage(TCruiseNonhomologousWarnInfo tCruiseNonhomologousWarnInfo) {
         List<TCruiseNonhomologousWarnInfo> list = tCruiseNonhomologousPointInstanceDao.selectWarnByPage(tCruiseNonhomologousWarnInfo);
-
-        for (TCruiseNonhomologousWarnInfo info: list) {
-            if(NonhomologousWarnEnum.SANXIANG.getCode().equals(info.getWarnType())) {
-                List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(info.getWarnId());
-                if (CollectionUtils.isNotEmpty(listMaps) && StringUtils.isEmpty(info.getOneCruiseDeviceName())) {
-                    String taskCode = listMaps.get(0).get("task_id").toString();
-                    Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
-                    String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
-                    StringJoiner meteNames = new StringJoiner("/");
-                    listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
-                    info.setDeviceName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_name").toString());
-                    info.setOneCruiseDeviceName(robotName);
-                    info.setDeviceTypeName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_type_name").toString());
-                    info.setDeviceMeteName(meteNames.toString());
-                }
-            }
-        }
+//
+//        for (TCruiseNonhomologousWarnInfo info: list) {
+//            if(NonhomologousWarnEnum.SANXIANG.getCode().equals(info.getWarnType())) {
+//                List<Map<String,Object>> listMaps = tCruiseNonhomologousPointInstanceDao.getSanxiangInfo(info.getWarnId());
+//                if (CollectionUtils.isNotEmpty(listMaps) && StringUtils.isEmpty(info.getOneCruiseDeviceName())) {
+//                    String taskCode = listMaps.get(0).get("task_id").toString();
+//                    Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
+//                    String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
+//                    StringJoiner meteNames = new StringJoiner("/");
+//                    listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
+//                    info.setDeviceName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_name").toString());
+//                    info.setOneCruiseDeviceName(robotName);
+//                    info.setDeviceTypeName(listMaps.get(0) == null ? null : listMaps.get(0).get("device_type_name").toString());
+//                    info.setDeviceMeteName(meteNames.toString());
+//                }
+//            }
+//        }
         return list;
     }
 
