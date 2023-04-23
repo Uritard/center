@@ -68,6 +68,10 @@ public interface CruiseConstant {
      * 异常原因，超时
      */
     int CRUISE_ABNORMAL_TIMEOUT = 251;
+    /**
+     * 异常原因，分析失败
+     */
+    int CRUISE_ABNORMAL_ANALYSEFAILED = 252;
 
     /**
      * 巡检数据状态，已执行

@@ -441,4 +441,12 @@ public class CommonUtils {
 
     }
 
+    /**
+     * 将StringBuilder最后一个字符删除
+     */
+    public static void clearLastChar(StringBuilder sb) {
+        if (sb != null && sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
 }

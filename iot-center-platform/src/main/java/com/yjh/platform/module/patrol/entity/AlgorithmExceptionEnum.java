@@ -1,5 +1,7 @@
 package com.yjh.platform.module.patrol.entity;
 
+import org.springframework.lang.NonNull;
+
 /**
  * @author 丫C
  * @date 2023/2/14
@@ -19,7 +21,9 @@ public enum AlgorithmExceptionEnum {
      */
     FAIL_DOWNLOAD_PICTURE("Faild to download image", "算法下载图片失败"),
 
-    FAIL_DOWNLOAD_PB_PICTURE("Faild to download PB images ", "算法下载判别基准图失败");
+    FAIL_DOWNLOAD_PB_PICTURE("Faild to download PB images ", "算法下载判别基准图失败"),
+
+    FAIL_ANALYSE("Faild to analyse ", "算法分析失败");;
 
 
 
@@ -48,13 +52,14 @@ public enum AlgorithmExceptionEnum {
         this.desc = desc;
     }
 
+    @NonNull
     public static AlgorithmExceptionEnum getInstance(String desc){
         for (AlgorithmExceptionEnum result : values()) {
             if (result.getDesc().equals(desc)) {
                 return result;
             }
         }
-        return null;
+        return FAIL_ANALYSE;
     }
 
     public static boolean isIncludeContent(String content){

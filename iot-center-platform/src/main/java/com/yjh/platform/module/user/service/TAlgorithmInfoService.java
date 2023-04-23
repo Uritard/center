@@ -4,8 +4,11 @@ import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -21,9 +24,13 @@ public class TAlgorithmInfoService{
     @Autowired
     private TAlgorithmInfoDao tAlgorithmInfoDao;
 
+    private final static Map<String, TAlgorithmInfo> ALGORITHM_INFO_MAP = new HashMap<>(64);
+
     @Transactional(rollbackFor = Exception.class)
     public int insert(TAlgorithmInfo tAlgorithmInfo) {
-        return this.tAlgorithmInfoDao.insert(tAlgorithmInfo);
+        int i = this.tAlgorithmInfoDao.insert(tAlgorithmInfo);
+        algorithmDefectInfoRefresh ();
+        return i;
     }
     public boolean judgeAnalyseType(String analyseType) {
         boolean flag = false;
@@ -55,7 +62,9 @@ public class TAlgorithmInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TAlgorithmInfo tAlgorithmInfo) {
-        return this.tAlgorithmInfoDao.update(tAlgorithmInfo);
+        int i = this.tAlgorithmInfoDao.update(tAlgorithmInfo);
+        algorithmDefectInfoRefresh ();
+        return i;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectAllAnalyseType() {
@@ -102,10 +111,36 @@ public class TAlgorithmInfoService{
                 return -1;
             }
         }
-        return this.tAlgorithmInfoDao.batchInsert(list);
+        int i = this.tAlgorithmInfoDao.batchInsert(list);
+        algorithmDefectInfoRefresh ();
+        return i;
     }
 
+    public void algorithmDefectInfoRefresh() {
+        List<TAlgorithmInfo> tAlgorithmInfoList = this.tAlgorithmInfoDao.select(null, null, null, null, null, "398", null, null);
+        if (tAlgorithmInfoList.size() > 0) {
+            ALGORITHM_INFO_MAP.put("abnormal", new TAlgorithmInfo().setAlgorithmName("图像有差异").setAliasName("abnormal").setDefectLevel(130));
+            tAlgorithmInfoList.forEach(info -> {
+                ALGORITHM_INFO_MAP.put(info.getAliasName(), info);
+            });
+        }
+    }
 
+    public String getDefectName(String aliasName) {
+        return getDefectName(aliasName, "不支持异常类型(" + aliasName +")");
+    }
 
+    public String getDefectName(String aliasName, String def) {
+        TAlgorithmInfo info = ALGORITHM_INFO_MAP.get(aliasName);
+        String name = def;
+        if (info != null && StringUtils.isNotEmpty(info.getAlgorithmName())) {
+            name = info.getAlgorithmName();
+        }
+        return name;
+    }
+
+    public TAlgorithmInfo getDefectInfo(String aliasName) {
+        return ALGORITHM_INFO_MAP.get(aliasName);
+    }
 }
 

@@ -10,8 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 /**
  * 巡视主机算法分析结果处理
@@ -78,7 +79,9 @@ public class NewDataDealThread implements Runnable {
             log.error(e.getMessage(), e);
         }
         log.info("resultList=={}", resultList);
-        patrolResultHandler.analysePatrolTaskResult(resultList);
+        Map<String, List<AnalysePatrolTaskResult>> groupResults = resultList.stream().collect(
+            Collectors.groupingBy( r -> r.getTaskId() + "_" + r.getInstanceId()));
+        patrolResultHandler.analysePatrolTaskResult(groupResults);
     }
 }
 
