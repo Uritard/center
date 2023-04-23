@@ -8,7 +8,8 @@ import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author hyh
@@ -34,7 +35,8 @@ public class AlgorithmAnalyseThread implements Runnable {
     public void run() {
         try {
             List<AnalysePatrolTaskResult> resultList = intelAnalysisService.sendAnalysePatrolTaskResult(response, flagId);
-            patrolResultHandler.analysePatrolTaskResult(resultList);
+            Map<String, List<AnalysePatrolTaskResult>> groupResults = resultList.stream().collect(Collectors.groupingBy( r -> r.getTaskId() + "_" + r.getInstanceId()));
+            patrolResultHandler.analysePatrolTaskResult(groupResults);
         } catch (Exception e) {
             log.error("算法返回结果解析", e);
         }

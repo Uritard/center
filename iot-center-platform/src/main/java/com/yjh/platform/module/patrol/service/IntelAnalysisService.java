@@ -658,10 +658,6 @@ public class IntelAnalysisService {
         List<String> falseDataCruiseList = new ArrayList<>();
         try {
             for (AnalyseResult analyseResult : response.getResultsList()) {
-                AnalysePatrolTaskResult taskResult = new AnalysePatrolTaskResult();
-                StringJoiner resultValue = new StringJoiner(",");
-                StringJoiner resultDesc = new StringJoiner(" ");
-                StringJoiner resultImg = new StringJoiner(" ");
 
                 String instanceId = analyseResult.getObjectId();
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
@@ -674,16 +670,23 @@ public class IntelAnalysisService {
                         && !generateMapFormat().isEmpty()
                         && generateMapFormat().containsKey(devicePointId);
                 if (Boolean.TRUE.equals(flag) && falseDataCruiseList.isEmpty()){
-                    falseDataCruiseList.add(instanceId);
-                    // json格式："123":"避雷器--正常"
-                    String jsonValue= String.valueOf(generateMapFormat().get(devicePointId));
-                    resultValue.add(jsonValue.split("--")[0]);
-                    taskResult.setResultValue(String.valueOf(resultValue));
+                    AnalysePatrolTaskResult taskResult = new AnalysePatrolTaskResult();
                     taskResult.setTaskId(taskId);
                     taskResult.setInstanceId(instanceId);
-                    taskResult.setResultDesc(jsonValue.split("--")[1]);
                     taskResult.setAnalyseType(algorithmType);
-                    taskResult.setConf("0.0");
+                    falseDataCruiseList.add(instanceId);
+                    // json格式："123":"1--正常--坐标--置信度"
+                    String jsonValue= String.valueOf(generateMapFormat().get(devicePointId));
+                    String[] vals = jsonValue.split("--");
+                    taskResult.setResultValue(vals[0]);
+                    taskResult.setTaskId(taskId);
+                    taskResult.setInstanceId(instanceId);
+                    taskResult.setResultDesc(vals[1]);
+                    taskResult.setAnalyseType(algorithmType);
+                    if (vals.length >= 4) {
+                        taskResult.setRectangle(vals[2]);
+                        taskResult.setConf(vals[3]);
+                    }
                     taskResult.setAnalyseResultImg(originPicPath);
                     // 拿图并复制
                     String falseDataPicPath = (String) redisTemplate.opsForHash().get("t_sys_param:falseDataPicPath", "content");
@@ -702,34 +705,24 @@ public class IntelAnalysisService {
                 }
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
-                // 遍历多个分析结果,同一个巡视点
-                taskResult.setTaskId(taskId);
-                taskResult.setInstanceId(instanceId);
-                taskResult.setAnalyseType(algorithmType);
-                taskResult.setRectangle(getRectangleByAnalyseResult(results.get(0)));
                 for (AnalyseResultItem result : results) {
+                    // 遍历多个分析结果,同一个巡视点
+                    AnalysePatrolTaskResult taskResult = new AnalysePatrolTaskResult();
+                    taskResult.setTaskId(taskId);
+                    taskResult.setInstanceId(instanceId);
+                    taskResult.setAnalyseType(algorithmType);
+                    taskResult.setRectangle(getRectangleByAnalyseResult(result));
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
                         // 2000:正确 2001:图像数据错误 2002:算法分析失败
                         if (StringUtils.equals("2001", result.getCode()) || StringUtils.equals("2002", result.getCode())){
                             boolean includeDesc = AlgorithmExceptionEnum.isIncludeDesc(result.getDesc());
-                            taskResult.setResultValue(includeDesc ?
-                                    AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc());
-                            taskResult.setResultDesc("异常");
+                            String desc = includeDesc ? AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc();
+                            taskResult.setResultValue("-1");
+                            taskResult.setResultDesc(desc);
                             taskResult.setAnalyseResultImg(originPicPath);
-                        }else {
-                            Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
-
-                            if (StringUtils.isBlank(map.get("resultValue"))) {
-                                taskResult.setAnalyseResultImg(originPicPath);
-                            }else {
-                                List<String> resultImgList = new ArrayList<>();
-                                Collections.addAll(resultImgList, StringUtils.split(map.get("resultImg"), " "));
-                                resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
-                                taskResult.setAnalyseResultImg(resultImgList.get(0));
-                            }
-                            taskResult.setResultDesc(map.getOrDefault("resultDesc", ""));
-                            taskResult.setResultValue(map.getOrDefault("resultValue", ""));
+                        } else {
+                            getResultMap(taskResult, originPicPath, result);
                         }
                     } catch (Exception e) {
                         log.error("算法分析结果解析点位失败：", e);
@@ -791,133 +784,99 @@ public class IntelAnalysisService {
         return analyseType;
     }
 
-    private Map<String, String> getResultMap(StringJoiner resultValue, StringJoiner resultDesc, StringJoiner resultImg, String originPicPath, AnalyseResultItem result) {
+    private void getResultMap(AnalysePatrolTaskResult taskResult, String originPicPath, AnalyseResultItem result) {
         String type = result.getType();
         String value = Optional.ofNullable(result.getValue()).orElse("");
         String desc = Optional.ofNullable(result.getDesc()).orElse("");
 
-        Map<String, String> map = new HashMap<>(5);
         if (Objects.equals("tx_pb",type)){
             // 判别
-            map = distinguishResultHandler(result, resultDesc, resultValue, resultImg, originPicPath, type, value, map);
+            distinguishResultHandler(result, taskResult, originPicPath, type, value);
         }else {
             // 缺陷和设备状态识别
-            map = defectOrRecognizeHandler(result, resultDesc, resultValue, resultImg, originPicPath, type, value, desc, map);
+            defectOrRecognizeHandler(result, taskResult, originPicPath, type, value, desc);
         }
-        return map;
     }
 
     /**
      * 判别结果处理
      */
-    private Map<String, String> distinguishResultHandler(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                                         String originPicPath, String type, String value,  Map<String, String> map) {
-        String targetPath;
+    private void distinguishResultHandler(AnalyseResultItem result, AnalysePatrolTaskResult taskResult, String originPicPath, String type,
+        String value) {
+        String targetPath = null;
         try {
             String resImageUrl = result.getResImageUrl();
             if (StringUtils.isNotEmpty(resImageUrl)) {
                 resImageUrl = resImageUrl.startsWith("/") ? resImageUrl.substring(1) : resImageUrl;
             }
-            if (StringUtils.equals("1", value)){
-                resultValue.add("abnormal");
-                targetPath = copyFileFromFtps(type, resImageUrl);
-                resultImg.add(targetPath);
-            }else {
-                resultValue.add("normal");
-                resultImg.add(originPicPath);
+            taskResult.setResultValue(value);
+            taskResult.setResultDesc("图像有差异");
+            targetPath = copyFileFromFtps(type, resImageUrl);
+            if (StringUtils.equals("1", value)) {
+                taskResult.setAnalyseResultImg(targetPath);
+            } else {
+                taskResult.setAnalyseResultImg(originPicPath);
+                taskResult.setResultDesc("未见异常");
             }
-            for (Area area : result.getPos()){
-                for (Point point : area.getAreas()){
-                    resultValue.add(point.getX() > 0 ? String.valueOf(point.getX()) : "0.0");
-                    resultValue.add(point.getY() > 0 ? String.valueOf(point.getY()) : "0.0");
-                }
-            }
-            map.put("resultDesc", String.valueOf(resultDesc.add("tx_pb")));
-            map.put("resultValue", String.valueOf(resultValue));
-            map.put("resultImg", String.valueOf(resultImg));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("组装判别结果异常：", e);
-            map.put("resultDesc", "");
-            map.put("resultValue", "结果解析失败");
-            map.put("resultImg", resultImg.length() > 0 ? String.valueOf(resultImg) : originPicPath);
+            taskResult.setResultValue("-1");
+            taskResult.setResultDesc("分析失败");
+            taskResult.setAnalyseResultImg(StringUtils.isNotEmpty(targetPath) ? targetPath : originPicPath);
         }
-        return map;
     }
 
     /**
      * 缺陷和识别结果处理
      */
-    private Map<String, String> defectOrRecognizeHandler(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                                         String originPicPath, String type, String value, String desc, Map<String, String> map) {
-        String targetPath;
+    private void defectOrRecognizeHandler(AnalyseResultItem result, AnalysePatrolTaskResult taskResult, String originPicPath, String type,
+        String value, String desc) {
+        String targetPath = null;
         try {
             String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
 
-            if (list.isEmpty()){
-                if (StringUtils.isEmpty(type) || StringUtils.equals("0", value)){
-                    // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
-                    map.put("resultDesc", "");
-                    map.put("resultValue", "");
-                    map.put("resultImg", originPicPath);
-                    return map;
-                }
-                if (StringUtils.equals("1", value)){
-                    resultValue.add(type);
-                    for (Area area : result.getPos()){
-                        for (Point point : area.getAreas()){
-                            resultValue.add(point.getX() > 0 ? String.valueOf(point.getX()) : "0.0");
-                            resultValue.add(point.getY() > 0 ? String.valueOf(point.getY()) : "0.0");
-                        }
-                    }
-                    resultValue.add(Optional.ofNullable(String.valueOf(result.getConf())).orElse("0.0"));
-                    resultDesc.add(desc);
-                    targetPath = copyFileFromFtps(type, resImageUrl);
-                    resultImg.add(targetPath);
-                }
-            }else {
+            if (StringUtils.isNotEmpty(resImageUrl)) {
                 targetPath = copyFileFromFtps(type, resImageUrl);
-                resultImg.add(targetPath);
-                if (StringUtils.equals("数据错误", value)){
-                    map.put("resultDesc", "数据错误");
-                    map.put("resultValue", "数据错误");
-                    map.put("resultImg", originPicPath);
-                    return map;
+                taskResult.setAnalyseResultImg(targetPath);
+            }
+
+            taskResult.setResultValue(value);
+            taskResult.setResultDesc(desc);
+
+            if (list.isEmpty()) {
+                taskResult.setResultValue(type);
+                if (StringUtils.isEmpty(type) || StringUtils.equals("0", value)) {
+                    // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
+                    taskResult.setResultValue("0");
+                    taskResult.setResultDesc("未见异常");
+                    taskResult.setAnalyseResultImg(originPicPath);
                 }
-                if (StringUtils.equals("未获得读数", value)){
-                    map.put("resultDesc", "未获得读数");
-                    map.put("resultValue", "未获得读数");
-                    map.put("resultImg", originPicPath);
-                    return map;
-                }
-                if (Objects.equals("meter", type) || Objects.equals("infrared", type) || Objects.equals("qrcode", type)){
-                    // 对于表计、红外、实物ID直接获取值
-                    resultValue.add(value);
-                }else {
+            } else {
+                // 非表计，数显，红外，二维码识别
+                if (!StringUtils.equalsAny(type, "meter", "infrared", "qrcode")) {
                     // 根据value获取对应的值
-                    if (ArrayUtils.contains(new String[]{"0","1","2","3","4","5","6"}, value)){
+                    if (ArrayUtils.contains(new String[] {"0", "1", "2", "3", "4", "5", "6"}, value)) {
                         int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                        String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
+                        String resultDescTemp =
+                            Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN)
+                                .getValue();
                         String descVal = result.getDesc();
                         if (StringUtils.containsAny(descVal, "储能", "红", "蓝")) {
                             resultDescTemp = descVal;
                         }
-                        resultValue.add(resultDescTemp);
-                    }else {
-                        resultValue.add("算法返回格式不正确");
+                        taskResult.setResultDesc(resultDescTemp);
+                    } else {
+                        taskResult.setResultDesc("算法返回格式不正确");
                     }
                 }
             }
-            map.put("resultDesc", String.valueOf(resultDesc));
-            map.put("resultValue", String.valueOf(resultValue));
-            map.put("resultImg", String.valueOf(resultImg));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("组装缺陷或识别结果异常：", e);
-            map.put("resultDesc", "");
-            map.put("resultValue", "结果解析失败");
-            map.put("resultImg", resultImg.length() > 0 ? String.valueOf(resultImg) : originPicPath);
+            taskResult.setResultValue("-1");
+            taskResult.setResultDesc("分析失败");
+            taskResult.setAnalyseResultImg(StringUtils.isNotEmpty(targetPath) ? targetPath : originPicPath);
         }
-        return map;
     }
 
     private void algorithmTestHandle(PicAnalyseResponse response){
@@ -1576,6 +1535,9 @@ public class IntelAnalysisService {
      * @return String
      */
     public String copyFileFromFtps(String type, String sourcePath){
+        if (StringUtils.isEmpty(sourcePath)) {
+            return "";
+        }
         try {
             String targetPath;
             if (Objects.isNull(type) || Objects.equals("tx_pb",type)){

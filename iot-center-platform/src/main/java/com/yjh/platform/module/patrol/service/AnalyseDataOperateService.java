@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
@@ -9,6 +10,8 @@ import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -34,6 +37,8 @@ public class AnalyseDataOperateService {
     private RedisTemplate redisTemplate;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private TAlgorithmInfoService algorithmInfo;
 
     private final Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
@@ -164,6 +169,12 @@ public class AnalyseDataOperateService {
         log.info("defectType:+======"+defectType);
         log.info("defectLevel:======"+defectLevel);
         return defectLevel.toString();
+    }
+
+    public TAlgorithmInfo getAlgorithmDefectInfo(String defectCode){
+        TAlgorithmInfo defect =algorithmInfo.getDefectInfo(defectCode);
+        log.info("defect:+======{}", JSON.toJSONString(defect));
+        return defect;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -624,227 +635,41 @@ public class AnalyseDataOperateService {
         return finalResult;
     }
 
+    public String resolveDefectResult(List<AnalysePatrolTaskResult> resultList) {
+        StringBuilder defectValue = new StringBuilder();
+        for (AnalysePatrolTaskResult result : resultList) {
+            String toDesc = resolveDefectResult(result.getResultValue(), result.getResultDesc());
+            defectValue.append(toDesc).append(" ");
+            result.setResultDesc(toDesc);
+        }
+        CommonUtils.clearLastChar(defectValue);
+
+        return defectValue.toString();
+    }
+
+    public String resolveDefectResult(String resultValueOrigin) {
+        return resolveDefectResult(resultValueOrigin, "算法返回结果解析失败(" + resultValueOrigin + ")");
+    }
+
     /**
      * -----缺陷识别结果解析（标签数据转化文字描述）------
      * @param resultValueOrigin 缺陷算法识别结果(逗号分隔)
      * @return
      */
-    @Transactional(rollbackFor = Exception.class)
-    public  String resolveDefectResult(String resultValueOrigin) {
-        String resultValue = resultValueOrigin.replaceAll(","," ");
-        log.info("----缺陷识别结果解析---resultValue:{}", resultValue);
-        String defectValue = "";
-        //算法设备识别专用
-        String defectRealValue = "1";
-        List<String> flags = new ArrayList<>();
-        String value = resultValue;
-        String finalValue = value.replaceAll("[0-9]", "")
-                .replaceAll("\\.", "")
-                .replace("-","");
+    public String resolveDefectResult(String resultValueOrigin, String desc) {
+        String resultValue = resultValueOrigin.replaceAll(",", " ");
+        log.info("----缺陷识别结果解析---resultValue:{}, desc: {}", resultValue, desc);
+
+        StringBuilder defectValue = new StringBuilder();
+        String finalValue = resultValue.replaceAll("[0-9]", "").replaceAll("\\.", "").replace("-", "");
         String[] str2 = finalValue.split("\\s+");
-        for (int i = 0; i < str2.length; i++) {
-            switch (str2[i]) {
-                case "wcaqm":
-                    defectValue = defectValue + "未穿安全帽" + " ";
-                    flags.add("1");
-                    break;
-                case "wcgz":
-                    defectValue = defectValue + "未穿工装" + " ";
-                    flags.add("1");
-                    break;
-                case "rydd":
-                    defectValue = defectValue + "人员倒地" + " ";
-                    flags.add("1");
-                    break;
-                case "xy":
-                    defectValue = defectValue + "吸烟" + " ";
-                    flags.add("1");
-                    break;
-                case "sly_dmyw":
-                    defectValue = defectValue + "地面油污" + " ";
-                    flags.add("1");
-                    break;
-                case "yw_nc":
-                    defectValue = defectValue + "异物-鸟巢" + " ";
-                    flags.add("1");
-                    break;
-                case "yw_gkxfw":
-                    defectValue = defectValue + "异物-挂空悬浮物" + " ";
-                    flags.add("1");
-                    break;
-                case "bmwh":
-                    defectValue = defectValue + "绝缘子表面污秽" + " ";
-                    flags.add("1");
-                    break;
-                case "jyz_pl":
-                    defectValue = defectValue + "绝缘子-破裂" + " ";
-                    flags.add("1");
-                    break;
-                case "jyz_lw":
-                    defectValue = defectValue + "绝缘子-裂纹" + " ";
-                    flags.add("1");
-                    break;
-                case "hxq_gjbs":
-                    defectValue = defectValue + "呼吸器-硅胶变色" + " ";
-                    flags.add("1");
-                    break;
-                case "hxq_gjtps":
-                    defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
-                    flags.add("1");
-                    break;
-                case "ywzt_yfyc":
-                    defectValue = defectValue + "油位状态-油封异常" + " ";
-                    flags.add("1");
-                    break;
-                case "bj_bpmh":
-                    defectValue = defectValue + "表计-表盘模糊" + " ";
-                    flags.add("1");
-                    break;
-                case "bj_bpps":
-                    defectValue = defectValue + "表计-表盘破损" + " ";
-                    flags.add("1");
-                    break;
-                case "bj_wkps":
-                    defectValue = defectValue + "表计-外壳破损" + " ";
-                    flags.add("1");
-                    break;
-                case "mcqdmsh":
-                    defectValue = defectValue + "门窗墙地面损坏" + " ";
-                    flags.add("1");
-                    break;
-                case "gbps":
-                    defectValue = defectValue + "盖板破损" + " ";
-                    flags.add("1");
-                    break;
-                case "gjptwss":
-                    defectValue = defectValue + "构架爬梯未上锁" + " ";
-                    flags.add("1");
-                    break;
-                case "xmbhyc":
-                    defectValue = defectValue + "箱门闭合异常" + " ";
-                    flags.add("1");
-                    break;
-                case "jsxs":
-                    defectValue = defectValue + "金属锈蚀" + " ";
-                    flags.add("1");
-                    break;
-                case"sly_bjbmyw":
-                    defectValue=defectValue+"部件表面油污"+ " ";
-                    flags.add("1");
-                    break;
-                case "gbqs":
-                    defectValue=defectValue+"盖板缺失"+ " ";
-                    flags.add("1");
-                    break;
-                case "yxcr":
-                    defectValue=defectValue+"越线闯入"+ " ";
-                    flags.add("1");
-                    break;
-                case "hzyw":
-                    defectValue=defectValue+"火灾烟雾"+ " ";
-                    flags.add("1");
-                    break;
-                case "xdwcr":
-                    defectValue=defectValue+"小动物闯入"+ " ";
-                    flags.add("1");
-                    break;
-                case "sndmjs":
-                    defectValue=defectValue+"室内地面积水"+ " ";
-                    flags.add("1");
-                    break;
-                case "kgg_ybf":
-                    defectValue=defectValue+"开关柜-压板分"+ " ";
-                    flags.add("1");
-                    break;
-                case "kgg_ybh":
-                    defectValue=defectValue+"开关柜-压板合"+ " ";
-                    flags.add("1");
-                    break;
-                case "bjdsyc":
-                    defectValue=defectValue+"表计读数异常"+" ";
-                    flags.add("1");
-                    break;
-                case "normal":
-                    defectValue="图像无差异";
-                    flags.add("1");
-                    break;
-                case "dmcj":
-                    defectValue = defectValue + "地面沉降" + " ";
-                    flags.add("1");
-                    break;
-                case "abnormal":
-                    defectValue="图像有差异";
-                    flags.add("1");
-                    break;
 
-
-                case "dthtps":
-                    defectValue="导体护套破损";
-                    flags.add("1");
-                    break;
-                case "yxdghsg":
-                    defectValue="引线断股或松股";
-                    flags.add("1");
-                    break;
-                case "wpdaqs":
-                    defectValue="未佩戴安全绳";
-                    flags.add("1");
-                    break;
-                case "qmls":
-                    defectValue="墙面漏水";
-                    flags.add("1");
-                    break;
-                case "wdls":
-                    defectValue="屋顶漏水";
-                    flags.add("1");
-                    break;
-                case "ywzt_ywzsjyc":
-                    defectValue="油位指示计异常";
-                    flags.add("1");
-                    break;
-                case "hxq_yfps":
-                    defectValue="呼吸器油封破损";
-                    flags.add("1");
-                    break;
-                case "dxdg":
-                    defectValue="导线断股";
-                    flags.add("1");
-                    break;
-                case "sly_jhbyw":
-                    defectValue = "套管胶合部油污";
-                    flags.add("1");
-                    break;
-                case "hkgnl":
-                    defectValue = "汇控柜凝露";
-                    flags.add("1");
-                    break;
-                case "pzqcd":
-                    defectValue = "膨胀器冲顶";
-                    flags.add("1");
-                    break;
-                case "drqgd":
-                    defectValue = "电容器鼓肚";
-                    flags.add("1");
-                    break;
-                case "":
-                    defectValue = defectValue+"";
-                    break;
-                default:
-                    defectRealValue=resultValue;
-                    flags.add("1");
-                    break;
-            }
+        for (String str : str2) {
+            defectValue.append(algorithmInfo.getDefectName(str, desc)).append(" ");
         }
+        CommonUtils.clearLastChar(defectValue);
 
-        if(flags.contains("1")){
-            if(!(defectRealValue.equals("1"))){
-                return defectRealValue+"device";
-            }
-            return defectValue;
-        }else {
-            return "null";
-        }
-
+        return defectValue.toString();
     }
 
 

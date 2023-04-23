@@ -32,6 +32,7 @@ public enum DictConvertUtil {
     private TDictBusinessService dictBusinessService;
 
     private final Map<String, String> dictMap = new HashMap<>(1024);
+    private final Map<String, String> dictReverseMap = new HashMap<>(1024);
 
     /**
      * 初始化字典表进内存
@@ -53,6 +54,7 @@ public enum DictConvertUtil {
             // 下划线转驼峰
             String colName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, dict.getColName());
             dictMap.put(colName + ":" + dict.getDictCode(), dict.getDictNote());
+            dictReverseMap.put(colName + ":" + dict.getDictNote(), dict.getDictCode());
         }
     }
 
@@ -78,6 +80,14 @@ public enum DictConvertUtil {
         }
         String key = colName + ":" + dictCode;
         return dictMap.getOrDefault(key, "");
+    }
+
+    public String getDictCode(String colName, String dictNote) {
+        if (StringUtils.isEmpty(dictNote) || StringUtils.isEmpty(colName)) {
+            return "";
+        }
+        String key = colName + ":" + dictNote;
+        return dictReverseMap.getOrDefault(key, "");
     }
 
     /**
