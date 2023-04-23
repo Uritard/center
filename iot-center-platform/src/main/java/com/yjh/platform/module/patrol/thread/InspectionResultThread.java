@@ -138,12 +138,12 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("resultDesc", robotPatrolTaskResult.getValue() + robotPatrolTaskResult.getUnit());
                 log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
             } else {
-                tCruiseTaskResultMap.put("resultNum", "数据异常");
+                tCruiseTaskResultMap.put("resultNum", "-1");
                 tCruiseTaskResultMap.put("resultDesc", "数据异常");
             }
         }
         String cruiseResult;
-        String cruiseAbnormal = "--";
+        String cruiseAbnormal = "";
 
         String valid = robotPatrolTaskResult.getValid();
         if (StringUtils.isNotEmpty(robotPatrolTaskResult.getAbnormalType())) {
@@ -155,8 +155,8 @@ public class InspectionResultThread implements Runnable{
                     isnormal = true;
                     break;
                 case "2":
-                    isnormal = false;
-                    cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM);
+                    // isnormal = false;
+                    // cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM);
                     break;
                 case "0":
                 default:
@@ -165,7 +165,7 @@ public class InspectionResultThread implements Runnable{
                     break;
             }
         } else {
-            cruiseAbnormal = isnormal ? String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL) : "--";
+            cruiseAbnormal = isnormal ? String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL) : "0";
         }
         cruiseResult = String.valueOf(isnormal ? CRUISE_RESULT_NORMAL : CRUISE_RESULT_ABNORMAL);
 
@@ -352,18 +352,18 @@ public class InspectionResultThread implements Runnable{
                         break;
                     default:
                         tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                        tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                        tCruiseTaskResultMap.put("cruiseAbnormal", "0");
                         break;
                 }
             }else {
                 tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                tCruiseTaskResultMap.put("cruiseAbnormal", "0");
             }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            tCruiseTaskResultMap.put("resultDesc", "--");
+            tCruiseTaskResultMap.put("resultDesc", StringUtils.isNotEmpty(value) ? "" : "已拍照");
             tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
-            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
+            // redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");
 

@@ -497,17 +497,12 @@ public class PatrolResultHandler {
             cruiseResultMap.put("resultNum", resultValue);
             String resultDesc = cruiseResultMap.get("resultDesc");
             boolean abnormal = StringUtils.contains(resultDesc, "格式不正确");
-            cruiseResultMap.put("resultDesc", resultDesc);
             StringBuilder retDesc = new StringBuilder();
             if (abnormal) {
-                cruiseResultMap.put("resultDesc", resultDesc);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
-            } else {
-                if (StringUtils.isNotEmpty(resultDesc)) {
-                    resultStrings =  resultDesc.split(",");
-                }
-                for (String val:resultStrings){
+            } else if (StringUtils.isEmpty(resultDesc)) {
+                for (String val : resultStrings) {
                     retDesc.append(val).append(tStdDevicemete.getUnit()).append(",");
                 }
                 CommonUtils.clearLastChar(retDesc);

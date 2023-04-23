@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
@@ -83,8 +84,11 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
 
     @Override
     protected Map<String, String> resultRecognition(Map<String, String> inspectionMap) {
-        // noting to do.
-        return null;
+        String resultValue = inspectionMap.get("resultNum");
+        if ("已拍照".equals(resultValue)) {
+            inspectionMap.put("resultDesc", resultValue);
+        }
+        return inspectionMap;
     }
 
     @Override

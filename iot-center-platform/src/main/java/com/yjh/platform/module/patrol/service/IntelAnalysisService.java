@@ -869,6 +869,8 @@ public class IntelAnalysisService {
                     } else {
                         taskResult.setResultDesc("算法返回格式不正确");
                     }
+                } else {
+                    taskResult.setResultDesc("");
                 }
             }
         } catch (Exception e) {
