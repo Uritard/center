@@ -88,7 +88,7 @@ public class PatrolTimeoutScheduled {
 
     private void taskTimeout(String taskId) {
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
+        log.info("机器人任务超时终止,robotCodeList:{}", robotCodeList);
         if (robotCodeList != null && robotCodeList.size() > 0) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
@@ -123,7 +123,8 @@ public class PatrolTimeoutScheduled {
                 return;
             }
 
-            m.put("resultNum", "超时");
+            m.put("resultNum", "-1");
+            m.put("resultDesc", "超时");
             // 异常原因，超时
             m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_TIMEOUT));
             // 巡视结果，异常
@@ -131,8 +132,8 @@ public class PatrolTimeoutScheduled {
             // 未审核
             m.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             m.put("picpath", "--");
-            // 巡检数据状态，执行失败
-            m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
+            // 巡检数据状态，执行遗漏
+            m.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));
             String dateTime = DateTimeUtil.getDateTimeString();
             // m.put("createtime", dateTime);
             m.put("endTime", dateTime);

@@ -158,7 +158,8 @@ public abstract class AbstractVideoCruise {
                 String resultNum = "已拍照";
 
                 if (picError) {
-                    inspectionMap.put("resultNum", "抓图失败");
+                    inspectionMap.put("resultNum", "-1");
+                    inspectionMap.put("resultDesc", "抓图失败");
                     inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
                     // 巡视结果，异常
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -288,15 +289,20 @@ public abstract class AbstractVideoCruise {
                 inspectionMap.put("cruiseResult", "");
                 return false;
             }
-            // 拍照结果处理
-            inspectionMap.put("resultNum", "算法分析失败");
-            // 巡视结果，正常
-            inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            // 巡检数据状态，已经执行
-            inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+
+        // 拍照结果处理
+        inspectionMap.put("resultNum", "-1");
+        // 巡视结果，异常
+        inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+        // 调用算法失败
+        inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_REQUESTFAILED));
+        //
+        inspectionMap.put("resultDesc", "调用算法失败");
+        // 巡检数据状态，已经执行
+        inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
         return true;
     }
 

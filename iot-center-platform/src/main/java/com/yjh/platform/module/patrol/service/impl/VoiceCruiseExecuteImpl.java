@@ -139,12 +139,14 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             voiceAnalyse(inspectionMap, voiceFilePath, voiceDevice);
         } else {
             // 录音结果处理
-            inspectionMap.put("resultNum", "录音失败");
-            // 巡视结果，正常
+            inspectionMap.put("resultNum", "-1");
+            inspectionMap.put("resultDesc", "录音失败");
+            inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
+            // 巡视结果，异常
             inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             inspectionMap.put("picpath", "--");
             inspectionMap.put("voicePath", "--");
-            // 巡检数据状态，已经执行
+            // 巡检数据状态，执行失败
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
         }
     }
@@ -171,9 +173,9 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
         int dbWarn = warning(dbList, voiceDevice.getDbValue(), cruiseResultMap, "分贝");
 
-        String retVal = "DB:" + dbWarn + " F:" + fWarn;
-        cruiseResultMap.put("resultNum", retVal);
-
+        String retVal = dbWarn + "Db," + fWarn + "Hz";
+        cruiseResultMap.put("resultNum", dbWarn+","+fWarn);
+        cruiseResultMap.put("resultDesc", retVal);
         return retVal;
     }
 

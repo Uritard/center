@@ -69,9 +69,17 @@ public interface CruiseConstant {
      */
     int CRUISE_ABNORMAL_TIMEOUT = 251;
     /**
+     * 异常原因，调用失败
+     */
+    int CRUISE_ABNORMAL_REQUESTFAILED = 350;
+    /**
      * 异常原因，分析失败
      */
-    int CRUISE_ABNORMAL_ANALYSEFAILED = 252;
+    int CRUISE_ABNORMAL_ANALYSEFAILED = 351;
+    /**
+     * 异常原因，系统异常
+     */
+    int CRUISE_ABNORMAL_SERVERERROR = 352;
 
     /**
      * 巡检数据状态，已执行
@@ -85,6 +93,18 @@ public interface CruiseConstant {
      * 巡检数据状态，执行失败
      */
     int CRUISE_STATE_FAILED = 254;
+    /**
+     * 巡检数据状态，执行忽略
+     */
+    int CRUISE_STATE_IGNORE = 340;
+    /**
+     * 巡检数据状态，执行遗漏
+     */
+    int CRUISE_STATE_OMIT = 341;
+    /**
+     * 巡检数据状态，算法分析中
+     */
+    int CRUISE_STATE_ANALYING = 342;
 
     /**
      * 审核状态，已审核

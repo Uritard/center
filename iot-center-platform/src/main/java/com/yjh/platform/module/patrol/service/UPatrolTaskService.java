@@ -1767,21 +1767,29 @@ public class UPatrolTaskService {
             boolean skipFlag = false;
             // 设备检修判断
             if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "instanceId")) >= 0) {
-                m.put("resultNum", "设备检修中");
+                m.put("resultNum", "-1");
+                m.put("resultDesc", "设备检修中");
                 // 异常原因，设备检修
                 m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                // 巡检数据状态，忽略
+                m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                 skipFlag = true;
             }
             // 机器人离线判断
-            if (!skipFlag && TypeEnum.ROBOT.getCode() == cruiseType) {
+            if (!skipFlag && TypeEnum.ROBOT.getCode() == cruiseType && TypeEnum.UAV.getCode() == cruiseType) {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
-                    m.put("resultNum", "机器人离线,未执行");
+                    m.put("resultNum", "-1");
+                    m.put("resultDesc", "机器人离线,未执行");
+                    // 巡检数据状态，忽略
+                    m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
                     if (robotOfflineMap.get(robotId) == 4) {
-                        m.put("resultNum", "机器人处于检修状态,未执行");
+                        m.put("resultDesc", "机器人处于检修状态,未执行");
                         m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                        // 巡检数据状态，忽略
+                        m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                     }
                     skipFlag = true;
                 }
@@ -1792,8 +1800,6 @@ public class UPatrolTaskService {
                 // 未审核
                 m.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
                 m.put("picpath", "--");
-                // 巡检数据状态，未执行
-                m.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
                 String dateTime = DateTimeUtil.getDateTimeString();
                 // m.put("createtime", dateTime);
                 m.put("endTime", dateTime);

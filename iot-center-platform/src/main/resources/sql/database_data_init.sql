@@ -336,10 +336,10 @@ INSERT INTO `t_dict_business` VALUES ('300130', '244', 'task_state', '任务超�
 INSERT INTO `t_dict_business` VALUES ('300131', '245', 'data_state', '数据异常', '0', '巡检数据状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300132', '246', 'cruise_result', '正常', '0', '巡视执行结果', '1');
 INSERT INTO `t_dict_business` VALUES ('300133', '247', 'cruise_result', '异常', '0', '巡视执行结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300134', '248', 'abnormal_type', '抓图失败', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business` VALUES ('300134', '248', 'abnormal_type', '采集失败', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300135', '249', 'abnormal_type', '数据异常', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300136', '250', 'abnormal_type', '异常告警', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300137', '251', 'abnormal_type', '算法超时', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business` VALUES ('300137', '251', 'abnormal_type', '执行超时', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300138', '252', 'cruise_data_state', '已执行', '0', '巡检数据状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300139', '253', 'cruise_data_state', '未执行', '0', '巡检数据状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300140', '254', 'cruise_data_state', '执行失败', '0', '巡检数据状态', '1');
@@ -722,6 +722,13 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ( '996', 'mete_type', '三相检测', 8, '巡视内容', 1);
 INSERT INTO `t_dict_business` VALUES ('300724', '997', 'alarm_source', '无人机', '0', '告警来源', '1');
 INSERT INTO `t_dict_business` VALUES ('300725', '998', 'alarm_source', '巡视任务', '0', '告警来源', '1');
+
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('340', 'cruise_data_state', '执行忽略', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('341', 'cruise_data_state', '执行遗漏', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('342', 'cruise_data_state', '算法分析中', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('350', 'abnormal_type', '调用失败', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('351', 'abnormal_type', '分析失败', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('352', 'abnormal_type', '系统异常', NULL, '巡视异常原因', 0);
 
 
 -- ----------------------------
