@@ -259,9 +259,55 @@ public class TCameraScreenService{
         }
 
         List<AreaInfoDetail> treeRootList = getTreeRoot(listTree);
-        Map<String,String> cameraStatusMap = getCameraStatusMap();
-        diGuiWithRobot(treeRootList, listTree,cameraStatusMap,1);
+        Map<Long, List<AreaInfoDetail>> upIdMap = getUpIdMap(listTree);
+        processAreaInfoTree(treeRootList, upIdMap);
         return treeRootList;
+    }
+
+    /**
+     * 将List转成map结构，key为上级节点id
+     *
+     * @param listTree listTree
+     * @return result
+     */
+    private Map<Long, List<AreaInfoDetail>> getUpIdMap(List<AreaInfoDetail> listTree) {
+        Map<Long, List<AreaInfoDetail>> map = new HashMap<>();
+        listTree.forEach(item -> {
+            if (item.getUpId() != null) {
+                if (map.containsKey(item.getUpId())) {
+                    map.get(item.getUpId()).add(item);
+                } else {
+                    List<AreaInfoDetail> list = new ArrayList<>();
+                    list.add(item);
+                    map.put(item.getUpId(), list);
+                }
+            }
+        });
+
+        return map;
+    }
+
+    /**
+     * 递归构建巡视点列表的树形结构
+     *
+     * @param treeRootList treeRootList
+     * @param upIdMap upIdMap
+     */
+    private void processAreaInfoTree(List<AreaInfoDetail> treeRootList, Map<Long, List<AreaInfoDetail>> upIdMap) {
+        if (CollectionUtils.isEmpty(treeRootList) || upIdMap == null || upIdMap.size() == 0) {
+            return;
+        }
+
+        List<AreaInfoDetail> childrenList = new ArrayList<>();
+        treeRootList.forEach(item -> {
+            if (upIdMap.containsKey(item.getId())) {
+                List<AreaInfoDetail> list = upIdMap.get(item.getId());
+                item.setChildren(list);
+                childrenList.addAll(list);
+            }
+        });
+
+        processAreaInfoTree(childrenList, upIdMap);
     }
 
     /**
