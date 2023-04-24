@@ -1536,7 +1536,7 @@ public class SendToUpSystemServices {
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystemFtps");
             String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
@@ -1558,7 +1558,7 @@ public class SendToUpSystemServices {
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("upSystemFtps");
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystemFtps");
             String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
