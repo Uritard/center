@@ -3,9 +3,7 @@ package com.yjh.platform.module.task.service;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
@@ -44,6 +42,10 @@ public class TCruisePlanService{
     private TCruisePlanAttrDao tCruisePlanAttrDao;
     @Autowired
     private TAlgorithmConfDao tAlgorithmConfDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
@@ -244,6 +246,13 @@ public class TCruisePlanService{
             }
         }
 //        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
+        return tCruisePlanDao.findInstanceTree(deviceIdList);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<InstanceTree> findInstanceByRegion(Long regionId) {
+        List<Long> regionList = tStdRegionDao.selectDownId(regionId);
+        List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionList);
         return tCruisePlanDao.findInstanceTree(deviceIdList);
     }
 

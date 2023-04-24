@@ -5,6 +5,8 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -12,6 +14,8 @@ import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +37,7 @@ public class TCameraScreenService{
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
 
     @Autowired
     private SysUserDao sysUserDao;
@@ -388,6 +393,244 @@ public class TCameraScreenService{
         diGuiWithRobot(areaInfoCountryList, listTree,map,flag);
         return areaInfoCountryList;
     }
+
+    public List<AreaInfoDetail> selectCameraTreeWithRobotNew(String cameraName, Integer flag, String robotFlag, Long userId,String level,Long id){
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        } else {
+            if (1234L == sysUser.getRoleId()) {
+                userId = null;
+            }
+            else if(1235L == sysUser.getRoleId()) {
+
+            } else {
+                throw  new BusinessException("当前用户角色不可查看");
+            }
+        }
+        List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
+        //获取相机的状态
+        Map<String,String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
+            map.putAll((Map<String,String>)re.getData());
+        }
+        switch (level){
+            case "5":
+                return areaTree(cameraName,flag,robotFlag,userId,map);
+            case "6":
+                return cameraTree(cameraName,flag,robotFlag,userId,id,map);
+            case "66":
+                return new ArrayList<>();
+            default:throw new BusinessException("参数错误！");
+        }
+    }
+    public List<AreaInfoDetail> assembleTrees(Collection<AreaInfoDetail> trees) {
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(trees)) {
+            return Collections.emptyList();
+        }
+
+        // 构建树主键/实例映射表，并初始化树的子节点集合
+        Map<?, AreaInfoDetail> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
+                .collect(Collectors.toMap(AreaInfoDetail::getId, t -> t, (o, n) -> n));
+
+        // 查找并关联树节点，返回所有没有父节点的树
+        return trees.stream().filter(tree -> {
+            AreaInfoDetail parent = ifNull(tree.getUpId(), mapping::get);
+            if (parent != null) {
+                parent.getChildren().add(tree);
+            }
+            return Objects.isNull(parent);
+        }).collect(Collectors.toList());
+    }
+    /**
+     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
+     *
+     * @param object   目标对象
+     * @param function 目标对象方法
+     * @param <T>      目标对象类型泛型
+     * @param <R>      返回对象类型泛型
+     * @return 返回对象
+     */
+    public static <T, R> R ifNull(T object, Function<T, R> function) {
+        return object == null || function == null ? null : function.apply(object);
+    }
+
+    private List<AreaInfoDetail> areaTree(String cameraName, Integer flag, String robotFlag, Long userId,Map<String,String> map){
+        List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
+        areaTree =  assembleTrees(areaTree);
+        areaTree =  areaAddDeviceTree(areaTree,cameraName,flag,robotFlag,userId,map);
+        return areaTree;
+    }
+
+    private List<AreaInfoDetail> areaAddDeviceTree(List<AreaInfoDetail> areaTree, String cameraName, Integer flag, String robotFlag, Long userId,Map<String,String> map){
+        if (areaTree == null){
+            return null;
+        }
+        areaTree.forEach(area ->{
+            if ("region".equals(area.getInfoType())){
+                if (area.getChildren() != null && area.getChildren().size() > 0){
+                    area.getChildren().addAll(cameraTree(cameraName,flag,robotFlag,userId,area.getId(),map));
+                    areaAddDeviceTree(area.getChildren(),cameraName,flag,robotFlag,userId,map);
+                }
+            }
+        });
+        return areaTree;
+    }
+
+    private List<AreaInfoDetail> cameraTree(String cameraName, Integer flag, String robotFlag, Long userId,Long upRegionId,Map<String,String> map){
+        List<AreaInfoDetail> childrenList = new ArrayList<>();
+        List<AreaInfoDetail> child = tCameraInfoDao.selectCameraTreeWithRobotNew(cameraName,robotFlag,userId,upRegionId);
+        child.forEach(childs ->{
+            if("camera".equals(childs.getInfoType())){
+                if(map.get(childs.getId().toString()) != null){
+                    childs.setState(Integer.valueOf(map.get(childs.getId().toString())));
+                }else {
+                    childs.setState(0);
+                }
+                if(flag != null){
+                    if(flag.equals(childs.getState())){
+                        childrenList.add(childs);
+                    } else if (flag == 2){
+                        childrenList.add(childs);
+                    }
+                }
+            }
+            if("robot".equals(childs.getInfoType())){
+                //机器人
+                TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(childs.getId());
+                List<AreaInfoDetail> robotCameraList = new ArrayList<>();
+                //可见光
+                AreaInfoDetail lightCamera = new AreaInfoDetail();
+                String light = String.valueOf(tRobotInfo.getRobotId()) + "9901";
+                lightCamera.setId(Long.parseLong(light));
+                lightCamera.setLabel("机器人可见光");
+                lightCamera.setInfoType("robotCamera");
+                lightCamera.setUpId(childs.getId());
+                lightCamera.setUpName(tRobotInfo.getRobotCode());
+                if("在线".equals(tRobotInfo.getRobotStatus())){
+                    childs.setState(1);
+                    lightCamera.setState(1);
+                }else {
+                    childs.setState(0);
+                    lightCamera.setState(0);
+                }
+
+                if(flag != null){
+                    if(flag == lightCamera.getState() && (flag == 1 || flag == 0)){
+                        robotCameraList.add(lightCamera);
+                    }else {
+                        robotCameraList.add(lightCamera);
+                    }
+                }
+                //红外
+                AreaInfoDetail redCamera = new AreaInfoDetail();
+                String infrared = String.valueOf(tRobotInfo.getRobotId()) + "9902";
+                redCamera.setId(Long.parseLong(infrared));
+                redCamera.setLabel("机器人红外");
+                redCamera.setInfoType("robotCamera");
+                redCamera.setUpId(childs.getId());
+                redCamera.setUpName(tRobotInfo.getRobotCode());
+                if("在线".equals(tRobotInfo.getRobotStatus())){
+                    childs.setState(1);
+                    redCamera.setState(1);
+                }else {
+                    childs.setState(0);
+                    redCamera.setState(0);
+                }
+
+                if(flag != null){
+                    if(flag == redCamera.getState()&& (flag == 1 || flag == 0)){
+                        robotCameraList.add(redCamera);
+                    }else {
+                        robotCameraList.add(redCamera);
+                    }
+                }
+                childs.setChildren(robotCameraList);
+                if(flag != null){
+                    if((flag == 1 || flag == 0)){
+                        if(flag == childs.getState()){
+                            childrenList.add(childs);
+                        }
+                    }else {
+                        childrenList.add(childs);
+                    }
+                }
+            }
+        });
+        return childrenList;
+    }
+
+    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag, Long userId){
+        if (StringUtils.isEmpty(cameraName)){
+            List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
+            return assembleTrees(areaTree);
+        }
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        } else {
+            if (1234L == sysUser.getRoleId()) {
+                userId = null;
+            }
+            else if(1235L == sysUser.getRoleId()) {
+
+            } else {
+                throw  new BusinessException("当前用户角色不可查看");
+            }
+        }
+        List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
+        //获取相机的状态
+        Map<String,String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
+            map.putAll((Map<String,String>)re.getData());
+        }
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId);
+        if (cameraList != null && cameraList.size() > 0){
+            List<Long> regionList = new ArrayList<>();
+            List<TCameraInfo> finalCameraList = new ArrayList<>();
+            cameraList.forEach(tCameraInfo -> {
+                if(flag != null){
+                    if(flag.equals(Integer.valueOf(map.get(tCameraInfo.getCameraId().toString())))){
+                        finalCameraList.add(tCameraInfo);
+                    } else if (flag == 2){
+                        finalCameraList.add(tCameraInfo);
+                    }
+                }
+                regionList.add(tCameraInfo.getUpRegionId());
+            });
+            regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+            if (regionList != null && regionList.size() > 0){
+                areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList,regionList);
+            }
+        }
+        areaInfoDetails.forEach(treeNode ->{
+            if("camera".equals(treeNode.getInfoType())){
+                if(map.get(treeNode.getId().toString()) != null){
+                    treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
+                }else {
+                    treeNode.setState(0);
+                }
+            }
+        });
+        return assembleTrees(areaInfoDetails);
+    }
+
     private void diGuiWithRobot(List<AreaInfoDetail> areaInfoList, List<AreaInfoDetail> listTree,Map<String,String> map,Integer flag) {
         for(AreaInfoDetail areaInfo : areaInfoList){
             List<AreaInfoDetail> childrenList = new ArrayList<>();

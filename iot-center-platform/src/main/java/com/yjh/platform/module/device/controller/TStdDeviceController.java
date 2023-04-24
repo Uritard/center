@@ -334,13 +334,56 @@ public class TStdDeviceController {
     @RequestMapping(value = "/selectDevTree", method = RequestMethod.GET)
     @Logs(title = "设备树查询",content = "设备树查询",logType = 1)
     public Result selectDevTree(@RequestParam(value = "level", required = true) String level,
-                                    @RequestParam(value = "deviceShow", required = true) String deviceShow,
+                                    @RequestParam(value = "deviceShow", required = false) String deviceShow,
                                 @RequestParam(value = "deviceType", required = false) String deviceType,
-                                @RequestParam(value = "analyseType", required = false) String analyseType) {
+                                @RequestParam(value = "analyseType", required = false) String analyseType,
+                                @RequestParam(value = "id", required = false) Long id,
+                                @RequestParam(value = "customId", required = false) String customId) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTree(level, deviceShow,deviceType,analyseType);
+//            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTree(level, deviceShow,deviceType,analyseType);
+            if ("-1".equals(deviceType)){
+                deviceType = null;
+            }
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeNew(level, deviceShow,deviceType,analyseType,id,customId);
             result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "设备树查询根绝名称模糊查询")
+    @RequestMapping(value = "/selectDevTreeByName", method = RequestMethod.GET)
+    @Logs(title = "设备树查询根绝名称模糊查询",content = "设备树查询根绝名称模糊查询",logType = 1)
+    public Result selectDevTreeByName(@RequestParam(value = "name", required = false) String name,
+                                @RequestParam(value = "type", required = false) String type,
+                                      @RequestParam(value = "deviceShow", required = false) String deviceShow) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeByName(name,type, deviceShow);
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "设备树查询根据巡视点查询")
+    @RequestMapping(value = "/selectDevTreeByInstanceId", method = RequestMethod.GET)
+    @Logs(title = "设备树查询根据巡视点查询",content = "设备树查询根据巡视点查询",logType = 1)
+    public Result selectDevTreeByInstanceId(@RequestParam(value = "idList", required = false) List<Long> idList,
+                                            @RequestParam(value = "type", required = false) String type) {
+        Result result = new Result();
+        try {
+            if ("dev".equals(type)){
+                result.setData(tStdDeviceService.selectDevTreeByDeviceId(idList));
+            } else if ("ins".equals(type)){
+                result.setData(tStdDeviceService.selectDevTreeByInstanceId(idList)); 
+            }
+
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

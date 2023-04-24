@@ -1,10 +1,8 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.user.entity.CameraInfo;
-import com.yjh.platform.module.user.entity.TCameraInfo;
-import com.yjh.platform.module.user.entity.TCameraInfoByDict;
-import com.yjh.platform.module.user.entity.TCamreaPresetTree;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.user.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -72,4 +70,18 @@ public interface TCameraInfoDao {
     HashMap<String,Object> selectByRobotIdByInferad(@Param(value = "robotId")Long robotId);
 
     int selectCount();
+
+    List<AreaInfoDetail> selectCameraTreeRegion();
+    List<AreaInfoDetail> selectCameraTreeWithRobotNew(@Param(value = "cameraName") String cameraName,
+                                                      @Param(value = "robotFlag") String robotFlag,
+                                                      @Param(value = "userId")Long userId,
+                                                      @Param(value = "upRegionId")Long upRegionId);
+    List<TCameraInfo> selectCameraByName(@Param(value = "cameraName") String cameraName,
+                                  @Param(value = "robotFlag") String robotFlag,
+                                  @Param(value = "userId")Long userId);
+
+    List<Long> selectRegionByCameraList(@Param(value = "list")List<TCameraInfo> list);
+
+    List<AreaInfoDetail> selectCameraTreeByName(@Param(value = "cameraList")List<TCameraInfo> cameraList,
+                                                @Param(value = "regionList")List<Long> regionList);
 }
