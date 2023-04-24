@@ -87,9 +87,6 @@ public class CameraConService {
     @Value("${spring.redis.host}")
     private String hostIp;
 
-    @Value("${realtime.video.definition}")
-    private String videoDefinition;
-
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
     private PlatFromFtpsConfig platFromFtpsConfig;
@@ -124,6 +121,7 @@ public class CameraConService {
             int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
             int cameraType = cameraConInfo.getCameraType();
             String nvrRtmpVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpVideo"));
+            String videoDefinition = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "realtimeVideoDefinition"));
             String transUrl = String.format(nvrRtmpVideo, userName, password, cameraIp, cameraPort, iChanNum,
                     videoDefinition, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
@@ -166,6 +164,7 @@ public class CameraConService {
         }
         log.info("list: {}， robotList: {}", JSON.toJSONString(list), JSON.toJSONString(robotList));
         String nvrRtmpVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpVideo"));
+        String videoDefinition = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "realtimeVideoDefinition"));
         list.forEach(cameraId -> {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
