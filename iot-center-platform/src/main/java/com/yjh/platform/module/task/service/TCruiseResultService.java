@@ -20,6 +20,7 @@ import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -401,7 +402,7 @@ public class TCruiseResultService{
     private void getTaskCountByCache(TaskSimpleInfo temTask) {
         //取出taskId对应下的所有instanceId
         log.info("doing taskId is==={}", temTask.getTaskId());
-        Set<String> instanceKey = redisTemplate.keys("patrol_task_result:"+ temTask.getTaskId() +":*");
+        Set<String> instanceKey = redisTemplate.keys(UPatrolTaskService.PATROL_TASK_PREFIX + temTask.getTaskId() +":*");
 //        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {
             Long instanceCount = (long)instanceKey.size();
