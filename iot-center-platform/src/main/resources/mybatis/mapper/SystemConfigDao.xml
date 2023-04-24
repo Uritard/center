@@ -4,7 +4,7 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.config.entity.SystemConfig">
-    <result column="id" property="id" />
+        <result column="id" property="id" />
         <result column="config_type" property="configType" />
         <result column="config_name" property="configName" />
         <result column="config_key" property="configKey" />
@@ -39,8 +39,8 @@
 
     <update id="update" parameterType="com.yjh.platform.module.config.entity.SystemConfig">
         update system_config <set>
-         config_value = #{configValue}
-        </set>
+        config_value = #{configValue}
+    </set>
         where id = #{id}
     </update>
 
