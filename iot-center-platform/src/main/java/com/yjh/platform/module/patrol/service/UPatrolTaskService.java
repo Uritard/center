@@ -661,6 +661,8 @@ public class UPatrolTaskService {
 
                 // 将定时任务句柄存储缓存队列，方便后续取消定时任务操作
                 ScheduledMapConfig.add(taskIdFinal, scheduledFuture);
+
+                Executors.newSingleThreadScheduledExecutor();
             }
 
             if (robotId != null){
@@ -933,9 +935,10 @@ public class UPatrolTaskService {
                 default:
                     break;
             }
-            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
-            result.put("resultNum", rname + "任务异常");
-            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
+            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));//执行遗漏
+            result.put("resultNum", "-1");
+            result.put("resultDesc", rname + "任务异常");
+            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));

@@ -9,6 +9,7 @@ import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.NonhomologousWarnEnum;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -149,7 +150,8 @@ public class TCruiseNonhomologousPointInstanceService {
         }
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
         for(Map<String,Object> m : warnDetailInfo){
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(
+                UPatrolTaskService.PATROL_TASK_PREFIX + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
                 if (tCruiseNonhomologousWarnDO.getWarnType() == 6){
                     redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
