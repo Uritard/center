@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_ANALYSE_DOING;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_FAILED;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -215,7 +216,7 @@ public class IntelAnalysisService {
         try {
             // 将任务置为算法识别中状态
             String key = String.format("patrol_task_result:%s:%s", analysisList.get(0).getTaskId(), analysisList.get(0).getInstanceId().toString());
-            redisTemplate.opsForHash().put(key, "cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
+            redisTemplate.opsForHash().put(key, "cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
         } catch (Exception e) {
             log.error("将任务置为算法识别中状态失败，err: ", e);
         }
