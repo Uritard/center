@@ -21,6 +21,10 @@ public class ConfigTreeNode {
 
     private String configName;
 
+    private String configKey;
+
+    private String configType;
+
     private String configValue;
 
     private String remark;

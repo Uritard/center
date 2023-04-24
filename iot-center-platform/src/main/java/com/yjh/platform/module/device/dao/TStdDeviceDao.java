@@ -123,4 +123,24 @@ public interface TStdDeviceDao {
 
     String defaultPart();
 
+    List<AreaInfo> selectDeviceByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> selectAllByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> selectCameraByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> selectRobotByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> selectCustomByRegionId(@Param(value = "deviceId")Long deviceId);
+    List<AreaInfo> selectDeviceMeteByDeviceAndCustom(@Param(value = "deviceId")Long deviceId,
+                                                     @Param(value = "deviceType")String deviceType,
+                                                     @Param(value = "analyseType")String analyseType);
+    List<AreaInfo> selectCruisePointByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
+    List<TCruisePointInstance> selectAllMeteCruiseTreeByName(@Param(value = "name")String name);
+    List<TCruisePointInstance> selectDevTreeDeviceByName(@Param(value = "name")String name);
+    List<TCruisePointInstance> selectCameraTreeDeviceByName(@Param(value = "name")String name);
+    List<Long> selectRegionByDeviceList(@Param(value = "list")List<TCruisePointInstance> list);
+    List<Long> selectUpIdByRegionList(@Param(value = "list")List<Long> list);
+    List<AreaInfo> selectAllMeteCruiseTreeByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
+                                                                 @Param(value = "regionList")List<Long> regionList);
+    List<AreaInfo> selectDevTreeDeviceByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
+                                                                 @Param(value = "regionList")List<Long> regionList);
+    TCruisePointInstanceDetail selectDevTreeDeviceByInstacneId(@Param(value = "instanceId")Long instanceId);
+
 }

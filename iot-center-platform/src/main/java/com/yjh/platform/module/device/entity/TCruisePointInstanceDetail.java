@@ -27,4 +27,6 @@ public class TCruisePointInstanceDetail extends TCruisePointInstance{
 
     private String meteName;
 
+    private Long upRegionId;
+
 }

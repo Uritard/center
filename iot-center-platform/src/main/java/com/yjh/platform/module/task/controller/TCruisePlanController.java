@@ -298,6 +298,24 @@ public class TCruisePlanController {
         return result;
     }
 
+
+    @ApiOperation(value = "查询标准区域下挂巡检点")
+    @RequestMapping(value = "/findInstancesByRegion", method = RequestMethod.GET)
+    @Logs(title = "查询预案",content = "查询标准区域下挂巡检点 ",logType = 1 ,authority = "1234,1235")
+    public Result findInstancesByRegion(@RequestParam(value = "regionId", required = false) Long regionId) {
+        Result result = new Result();
+        try {
+            Map<String, Object> resultMap = new HashMap<>();
+            List<InstanceTree> list = tCruisePlanService.findInstanceByRegion(regionId);
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询单设备操作测点接口")
     @RequestMapping(value = "/queryOperationInstances", method = RequestMethod.GET)
     @Logs(title = "查询操作测点",content = "查询单设备操作测点 ",logType = 1 ,authority = "1235")

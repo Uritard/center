@@ -183,12 +183,14 @@ public class TCameraScreenController {
     @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1235,1237")
     public Result cameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
                                   @RequestParam(value = "flag",required = false) Integer flag,
+                                  @RequestParam(value = "level",required = false) String level,
+                                  @RequestParam(value = "id",required = false) Long id,
                                   HttpServletRequest request) {
         Result result = new Result();
         try {
               Long userId=Long.valueOf(request.getHeader("userId"));
 //            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
-              result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, "1",userId));
+              result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName,flag, "1",userId,level,id));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -215,11 +217,34 @@ public class TCameraScreenController {
     @RequestMapping(value = "/selectCameraTreeWithRobot", method = RequestMethod.GET)
     @Logs(title = "查询摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1234,1235")
     public Result selectCameraTreeWithRobot(@RequestParam(value = "cameraName",required = false) String cameraName,
-                                  @RequestParam(value = "flag",required = false) Integer flag, HttpServletRequest request) {
+                                  @RequestParam(value = "flag",required = false) Integer flag,
+                                  @RequestParam(value = "level",required = false) String level,
+                                  @RequestParam(value = "id",required = false) Long id,
+                                            HttpServletRequest request) {
         Result result = new Result();
         try {
-            Long userId=Long.valueOf(request.getHeader("userId"));
-            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null,userId));
+//            Long userId=Long.valueOf(request.getHeader("userId"));
+            Long userId =10001L;
+//            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null,userId));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName,flag, null,userId,level,id));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "摄像机状态树")
+    @RequestMapping(value = "/selectCameraTreeWithRobotByName", method = RequestMethod.GET)
+    @Logs(title = "查询摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1234,1235")
+    public Result selectCameraTreeWithRobotByName(@RequestParam(value = "name",required = false) String name,
+                                  @RequestParam(value = "flag",required = false) Integer flag,
+                                            HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            //            Long userId=Long.valueOf(request.getHeader("userId"));
+            Long userId =10001L;
+            result.setData(tCameraScreenService.selectCameraTreeWithRobotByName(name,flag, null,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
