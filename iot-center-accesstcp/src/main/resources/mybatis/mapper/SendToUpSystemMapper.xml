@@ -102,7 +102,7 @@
         d.preset_num,
         d.preset_type,
         CONCAT('/', d.preset_id,'/' ,d.preset_id,'.jpg') AS preset_img,
-        REPLACE(d.preset_img, (SELECT content FROM t_sys_param WHERE param_code = 'presetRealImgPath') ,(SELECT content FROM t_sys_param WHERE param_code = 'presetImgPath')) AS local_path,
+        REPLACE(d.preset_img, #{presetRealImgPath} ,#{presetImgPath}) AS local_path,
         robot.robot_code,
         robot.robot_num,
         d.camera_id AS camera_id,

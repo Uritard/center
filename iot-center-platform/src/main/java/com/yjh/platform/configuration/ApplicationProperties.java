@@ -158,7 +158,7 @@ public class ApplicationProperties {
 
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystemFtps");
         ApplicationProperties.FtpsConfig managerSystemFtps = new ApplicationProperties.FtpsConfig();
-        intelAnalysisFtps.setIp(redisMap.get("managerSystemFtpsIp"))
+        managerSystemFtps.setIp(redisMap.get("managerSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("managerSystemFtpsPort"),10012))
                 .setUserName(redisMap.get("managerSystemFtpsUsername"))
                 .setPassword(redisMap.get("managerSystemFtpsPassword"));

@@ -13,6 +13,7 @@ import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.user.entity.TSysParam;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -31,6 +32,8 @@ public class TDeviceTypeImgService{
     private TDictBusinessDao tDictBusinessDao;
     @Autowired
     private TSysParamDao tSysParamDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //@Logs(title = "插入", code = "module")
     @Transactional(rollbackFor = Exception.class)
@@ -90,8 +93,8 @@ public class TDeviceTypeImgService{
         List<TDeviceTypeImg> inList = new ArrayList<>();
         colName.add("device_type");
         List<TDictBusiness> list = tDictBusinessDao.selectQuery(colName);
-        String realPath = tSysParamDao.selectByParamType("deviceTypeImgReaPath").getContent();
-        String absPath  = tSysParamDao.selectByParamType("deviceTypeImgAbsPath").getContent();
+        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:deviceTypeImgReaPath", "content"));
+        String absPath  =  String.valueOf(redisTemplate.opsForHash().get("t_sys_param:deviceTypeImgAbsPath", "content"));
 
         for(TDictBusiness tDictBusiness : list){
             TDeviceTypeImg tDeviceTypeImg = new TDeviceTypeImg();

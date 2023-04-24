@@ -241,8 +241,8 @@ public class TVoiceDeviceService{
                 areaInfoCountryList.add(areaInfoCountry);
             }
         }
-        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-        String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
+        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String absPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
@@ -411,8 +411,8 @@ public class TVoiceDeviceService{
 //            //此文件已经分析过了
 //        }
         Long voiceDeviceId = null;
-        String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
-        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+        String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
+        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
 
 
         String[] getId = voicePath.replaceAll(realPath,"").split("/");
@@ -532,8 +532,8 @@ public class TVoiceDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> frequencyAnalyse(String frequencyPath) throws Exception{
         Long voiceDeviceId = null;
-        String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
-        String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
+        String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
+        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
         String[] getId = frequencyPath.replaceAll(realPath,"").split("/");
         if(getId != null && getId.length>2){
             if("".equals(getId[0])){
