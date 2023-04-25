@@ -1,60 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.config.dao.SystemConfigDao">
-
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yjh.platform.module.config.entity.SystemConfig">
-        <result column="id" property="id" />
-        <result column="config_type" property="configType" />
-        <result column="config_name" property="configName" />
-        <result column="config_key" property="configKey" />
-        <result column="config_value" property="configValue" />
-        <result column="config_remark" property="configRemark" />
-        <result column="remark" property="remark" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id,
-        config_type, config_name, config_key, config_value, config_remark, remark
-    </sql>
-
-    <resultMap id="configTree" type="com.yjh.platform.module.config.entity.ConfigTreeNode">
-        <id column="config_type" property="id"/>
-        <result column="config_name" property="configName"/>
-        <collection property="child" ofType="com.yjh.platform.module.config.entity.ConfigTreeNode">
-            <id column="id" property="id"/>
-            <result column="config_remark" property="configName"/>
-            <result column="config_value" property="configValue"/>
-            <result column="config_key" property="configKey"/>
-            <result column="config_type" property="configType"/>
-            <result column="remark" property="remark"/>
-            <result column="config_type" property="upId"/>
-        </collection>
-    </resultMap>
-
-    <select id="selectConfigInfo" resultMap="configTree">
-        select * from system_config
-    </select>
-
-    <update id="update" parameterType="com.yjh.platform.module.config.entity.SystemConfig">
-        update system_config <set>
-        config_value = #{configValue}
-    </set>
-        where id = #{id}
-    </update>
-
-    <update id="batchUpdate">
-        <foreach collection="list" item="item" index="index" separator=";">
-            update system_config
-            <set>
-                config_value= #{item.configValue,jdbcType=VARCHAR}
-            </set>
-            where id = #{item.id}
-        </foreach>
-    </update>
-
-    <select id="selectAll" resultType="com.yjh.platform.module.config.entity.SystemConfig">
-        select * from system_config
-    </select>
-</mapper>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="com.yjh.platform.module.config.dao.SystemConfigDao">    <!-- 通用查询映射结果 -->    <resultMap id="BaseResultMap" type="com.yjh.platform.module.config.entity.SystemConfig">        <result column="id" property="id" />        <result column="config_type" property="configType" />        <result column="config_name" property="configName" />        <result column="config_key" property="configKey" />        <result column="config_value" property="configValue" />        <result column="config_remark" property="configRemark" />        <result column="remark" property="remark" />    </resultMap>    <!-- 通用查询结果列 -->    <sql id="Base_Column_List">        id,        config_type, config_name, config_key, config_value, config_remark, remark    </sql>    <resultMap id="configTree" type="com.yjh.platform.module.config.entity.ConfigTreeNode">        <id column="config_type" property="id"/>        <result column="config_name" property="configName"/>        <collection property="child" ofType="com.yjh.platform.module.config.entity.ConfigTreeNode">            <id column="id" property="id"/>            <result column="config_remark" property="configName"/>            <result column="config_value" property="configValue"/>            <result column="config_key" property="configKey"/>            <result column="config_type" property="configType"/>            <result column="remark" property="remark"/>            <result column="config_type" property="upId"/>        </collection>    </resultMap>    <select id="selectConfigInfo" resultMap="configTree">        select * from system_config    </select>    <update id="update" parameterType="com.yjh.platform.module.config.entity.SystemConfig">        update system_config <set>        config_value = #{configValue}    </set>        where id = #{id}    </update>    <update id="batchUpdate">        <foreach collection="list" item="item" index="index" separator=";">            update system_config            <set>                config_value= #{item.configValue,jdbcType=VARCHAR}            </set>            where id = #{item.id}        </foreach>    </update>    <select id="selectAll" resultType="com.yjh.platform.module.config.entity.SystemConfig">        select * from system_config    </select></mapper>
