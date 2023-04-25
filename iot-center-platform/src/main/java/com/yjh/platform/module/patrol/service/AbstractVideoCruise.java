@@ -261,6 +261,7 @@ public abstract class AbstractVideoCruise {
 
             // 调用算法中
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
+            inspectionMap.put("resultDesc", "算法分析中");
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
                 analysis.setAnalyseType(algorithm.getMeteAnalyse());

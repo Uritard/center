@@ -590,6 +590,7 @@ public class ProcessResultToUpSystem {
 
             Iterator it = defectList.iterator();
             Alarm alarmDetail = new Alarm();
+            List<Defect> defectTempList = new ArrayList<>();
             while (it.hasNext()) {
                 String key = it.next().toString();
                 Map<String, String> differentListMap = redisTemplate.opsForHash().entries(key);
@@ -598,7 +599,6 @@ public class ProcessResultToUpSystem {
                 log.info("缺陷结果：{}", resultinfo);
                 // 目前格式："wcaqm,1049.0,216.0,1211.0,389.0,0.8829"
                 String[] arr1 = resultinfo.split(",");
-                List<Defect> defectTempList = new ArrayList<>();
                 for (int i = 0; i < arr1.length; ) {
                     Defect defect = new Defect();
                     defect.setX1((int) NumberUtils.toDouble(arr1[i + 1]));
