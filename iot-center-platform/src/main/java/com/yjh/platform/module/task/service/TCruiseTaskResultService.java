@@ -249,7 +249,8 @@ public class TCruiseTaskResultService {
         if ("".equals(resultMap.get("resultNum")) || "null".equals(resultMap.get("resultNum"))) {
             inspectResult.setCruiseResultName("--");
         } else {
-            inspectResult.setCruiseResultName(resultMap.get("resultNum"));
+//            inspectResult.setCruiseResultName(resultMap.get("resultNum"));
+            inspectResult.setCruiseResultName(resultMap.get("resultDesc"));
         }
         if ("null".equals(resultMap.get("cruiseTime")) || "".equals(resultMap.get("cruiseTime"))) {
             inspectResult.setEndTime(null);
