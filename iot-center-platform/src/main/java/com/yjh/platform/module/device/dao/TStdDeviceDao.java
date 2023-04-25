@@ -132,7 +132,8 @@ public interface TStdDeviceDao {
                                                      @Param(value = "deviceType")String deviceType,
                                                      @Param(value = "analyseType")String analyseType);
     List<AreaInfo> selectCruisePointByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
-    List<TCruisePointInstance> selectAllMeteCruiseTreeByName(@Param(value = "name")String name);
+    List<TCruisePointInstance> selectAllMeteCruiseTreeByName(@Param(value = "name")String name,
+                                                             @Param(value = "analyseType")String analyseType);
     List<TCruisePointInstance> selectDevTreeDeviceByName(@Param(value = "name")String name);
     List<TCruisePointInstance> selectCameraTreeDeviceByName(@Param(value = "name")String name);
     List<Long> selectRegionByDeviceList(@Param(value = "list")List<TCruisePointInstance> list);
