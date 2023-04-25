@@ -339,6 +339,7 @@
         a.record_id,
         a.channel_num_light,
         a.channel_num_inferad,
+        a.image_size,
         g.record_name
         from t_robot_info a
         JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
@@ -470,6 +471,7 @@
         a.record_id,
         a.channel_num_light,
         a.channel_num_inferad,
+        a.image_size,
         g.record_name
         from t_robot_info a
         JOIN t_dict_business d ON a.drone_type=d.dict_code and d.col_name = 'drone_type'
