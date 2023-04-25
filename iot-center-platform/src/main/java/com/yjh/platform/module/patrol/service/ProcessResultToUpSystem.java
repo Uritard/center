@@ -344,6 +344,7 @@ public class ProcessResultToUpSystem {
         try {
             String materialId = analyseDataOperateService.selectMaterialId(NumberUtils.toLong(cruiseResultMap.get("deviceId")));
             String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+            String resultDesc = Optional.ofNullable(cruiseResultMap.get("resultDesc")).orElse("");
             String valueType = Optional.ofNullable(cruiseResultMap.get("valueType")).orElse("0");
 
             String cruiseType = Optional.ofNullable(cruiseResultMap.get("cruiseType")).orElse("");
@@ -371,8 +372,8 @@ public class ProcessResultToUpSystem {
 
             xmlItem.put("file_path", StringUtils.contains(picPath, ".") ? tagPath : "");
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
-            xmlItem.put("value", resultNum);
-            xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
+            xmlItem.put("value", resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), ""));
+            xmlItem.put("value_unit", resultDesc);
             xmlItem.put("value_type", valueType);
             String fileType = (String)xmlItem.get("file_type");
             String rectangle = "";
