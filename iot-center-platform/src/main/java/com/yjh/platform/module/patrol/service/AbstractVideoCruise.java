@@ -178,7 +178,8 @@ public abstract class AbstractVideoCruise {
                     }
 
                     // 拍照结果处理
-                    inspectionMap.put("resultNum", resultNum);
+                    inspectionMap.put("resultNum", "-1");
+                    inspectionMap.put("resultDesc", resultNum);
                     // 巡视结果，正常
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     // 未审核
@@ -299,7 +300,7 @@ public abstract class AbstractVideoCruise {
         inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
         // 调用算法失败
         inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_REQUESTFAILED));
-        //
+        // 异常值，调用算法失败
         inspectionMap.put("resultDesc", "调用算法失败");
         // 巡检数据状态，已经执行
         inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));

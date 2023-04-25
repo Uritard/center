@@ -1693,7 +1693,8 @@ public class UPatrolTaskService {
                             taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
                             taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
                             taskInfo.put("cruiseTime",simpleDateFormat.format(new Date()));
-                            taskInfo.put("resultNum", StringUtils.isNotEmpty(content) ? content : "任务终止");
+                            taskInfo.put("resultNum", "-1");
+                            taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : "任务终止");
                             skipPointList.add(taskInfo);
                         }
                         // todo 任务终止 上报站端
