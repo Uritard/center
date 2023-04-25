@@ -538,7 +538,7 @@
                 LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
                 LEFT JOIN t_robot_info c ON a.robot_id = c.robot_id
         WHERE
-                b.instance_id = #{instanceId})
+                b.instance_id = #{instanceId}
     </select>
 
     <select id="getTRobotWithInspection" resultType="com.yjh.platform.module.user.entity.TRobotInfo">

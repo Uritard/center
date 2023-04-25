@@ -636,8 +636,8 @@ public class TSequentialConfService{
             log.info("顺控执行完毕， {}-{}", JSONUtil.toJSONString(listSort), JSONUtil.toJSONString(map));
             if(listSort.get(listSort.size()-1).equals(map.get("cfgDeviceId")) ){
                 //这是最后一个步骤
-                TSysParam time = tSysParamDao.selectByParamType("cleanTime");
-                Thread.sleep(Integer.valueOf(time.getContent())*1000);
+                String time = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "content"));
+                Thread.sleep(Integer.valueOf(time)*1000);
                 Constant.sequentialState.put("state",-1);
                 Constant.sequentialState.put("cfgDeviceId","");
             }

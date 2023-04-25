@@ -16,7 +16,9 @@ import java.util.Map;
  */
 @Repository
 public interface SendToUpSystemDao {
-    List<Map<String,Object>> selectDeviceModel(@Param(value = "edgeCode") String edgeCode);
+    List<Map<String,Object>> selectDeviceModel(@Param(value = "edgeCode") String edgeCode,
+                                               @Param(value = "presetRealImgPath") String presetRealImgPath,
+                                               @Param(value = "presetImgPath") String presetImgPath);
     List<Map<String,Object>> selectRobotInfo();
     List<Map<String,Object>> selectDroneInfo();
     List<Map<String,Object>> selectVoiceInfo();
