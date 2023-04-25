@@ -1,9 +1,12 @@
 package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.module.patrol.entity.interlanalysis.AnalyseResultItem;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * @author tt
@@ -447,6 +451,19 @@ public class CommonUtils {
     public static void clearLastChar(StringBuilder sb) {
         if (sb != null && sb.length() > 0) {
             sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    public static String rectangleToPos(String rectangle) {
+        if (StringUtils.isEmpty(rectangle)) {
+            return "651.0,459.0,1203.0,986.0";
+        }
+
+        String[] recs = rectangle.split(";");
+        if (recs.length >= 4) {
+            return recs[0] + "," + recs[3];
+        } else {
+            return rectangle;
         }
     }
 }

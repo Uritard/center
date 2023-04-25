@@ -492,7 +492,7 @@ public class MessageThread {
         if (StringUtils.isNotEmpty(cycleWeek)){
             String[] split = cycleWeek.split(",");
             for (int i = 0; i < split.length; i++) {
-                split[i] = String.valueOf(Integer.parseInt(split[i]) + 1);
+                split[i] = String.valueOf((NumberUtils.toInt(split[i]) + 1) == 8 ? 1: (NumberUtils.toInt(split[i]) + 1));
                 str.add(split[i]);
             }
             tCruiseTaskAdd.setCycleWeek(str.toString());
