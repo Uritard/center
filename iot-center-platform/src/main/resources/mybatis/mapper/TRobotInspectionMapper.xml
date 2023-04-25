@@ -1,597 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.device.dao.TRobotInspectionDao">
-
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TRobotInspection">
-        <id column="inspection_id" jdbcType="BIGINT" property="inspectionId" />
-        <result column="inspection_code" jdbcType="VARCHAR" property="inspectionCode" />
-        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
-        <result column="inspection_name" jdbcType="VARCHAR" property="inspectionName" />
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        inspection_id,inspection_code, robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_position, collect_status, calibration_status, unit
-    </sql>
-
-
-    <insert id="insert" useGeneratedKeys="true" keyProperty="inspectionId" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
-        insert into t_robot_inspection(
-            inspection_id,
-            inspection_code,
-            robot_id,
-            inspection_name,
-            component_id,
-           meter_type,
-            appearance_type,
-            save_type_list,
-            recognition_type_list,
-            phase,
-            device_info
-        )values(
-                #{inspectionId, jdbcType=BIGINT},
-                #{inspectionCode, jdbcType=VARCHAR},
-                #{robotId, jdbcType=BIGINT},
-                #{inspectionName, jdbcType=VARCHAR},
-                #{componentId, jdbcType=VARCHAR},
-                #{meterType, jdbcType=INTEGER},
-                #{appearanceType, jdbcType=INTEGER},
-                #{saveTypeList, jdbcType=VARCHAR},
-                #{recognitionTypeList, jdbcType=VARCHAR},
-                #{phase, jdbcType=VARCHAR},
-                #{deviceInfo, jdbcType=VARCHAR}
-        )
-    </insert>
-
-    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_robot_inspection
-                where inspection_id = #{inspectionId, jdbcType=BIGINT}
-    </delete>
-
-    <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
-        update t_robot_inspection a <set>
-        <if test="inspectionCode != null "> a.inspection_code = #{inspectionCod},</if>
-        <if test="robotId != null ">a.robot_id = #{robotId},</if>
-        <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
-        <if test="componentId != null ">a.component_id = #{componentId},</if>
-        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
-        <if test="saveTypeList != null ">a.save_type_list = #{saveTypeList},</if>
-        <if test="recognitionTypeList != null">a.recognition_type_list = #{recognitionTypeList},</if>
-        <if test="phase != null ">a.phase = #{phase},</if>
-        <if test="deviceInfo != null ">a.device_info = #{deviceInfo},</if>
-    </set>
-        where a.inspection_id = #{inspectionId, jdbcType=BIGINT}
-    </update>
-
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
-        select
-        a.inspection_id,
-        a.inspection_code,
-        a.robot_id,
-        a.inspection_name,
-        a.component_id,
-        a.meter_type,
-        a.appearance_type,
-        a.save_type_list,
-        a.recognition_type_list,
-        a.phase,
-        a.device_info
-        from t_robot_inspection a
-        where 1 = 1
-            and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
-        limit 1
-    </select>
-
-    <select id="select" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
-        select
-        a.inspection_id,
-        a.inspection_code,
-        a.robot_id,
-        a.inspection_name,
-        a.component_id,
-        a.meter_type,
-        a.appearance_type,
-        a.save_type_list,
-        a.recognition_type_list,
-        a.phase,
-        a.device_info
-        from t_robot_inspection a
-        where 1 = 1
-        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
-        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
-        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
-        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
-        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
-        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
-        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
-        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
-    </select>
-
-    <select id="selectInspectionNameLike" parameterType="com.yjh.platform.module.device.entity.TRobotInspection"
-            resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
-        select a.robot_id, b.robot_name, b.robot_position, b.drone_position, a.inspection_id, a.inspection_name
-        from t_robot_info b inner join t_robot_inspection a on b.robot_id = a.robot_id
-        <if test="type == 1">
-            and b.robot_type is not null
-        </if>
-        <if test="type == 2">
-            and b.drone_type is not null
-        </if>
-        where 1 = 1
-        <if test="inspectionName != null and inspectionName != ''">
-            and a.inspection_name like CONCAT(CONCAT('%',#{inspectionName, jdbcType=VARCHAR}), '%')
-        </if>
-        <if test="robotId != null">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-    </select>
-
-    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">
-        select
-        a.inspection_id,
-        a.inspection_code,
-        a.robot_id,
-        a.inspection_name,
-        a.component_id,
-        a.meter_type,
-        a.appearance_type,
-        a.save_type_list,
-        a.recognition_type_list,
-        a.phase,
-        a.device_info
-        from t_robot_inspection a
-        where 1 = 1
-        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
-        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
-        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
-        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
-        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
-        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
-        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
-        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
-    </select>
-
-    <insert id="batchInsert">
-        insert into t_robot_inspection(
-        inspection_id,
-        inspection_code,
-        robot_id,
-        inspection_name,
-        component_id,
-        meter_type,
-        appearance_type,
-        save_type_list,
-        recognition_type_list,
-        phase,
-        device_info
-        )values
-        <foreach collection="list" item="TRobotInspection" separator=",">
-            (
-            #{TRobotInspection.inspectionId, jdbcType=BIGINT},
-            #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
-            #{TRobotInspection.robotId, jdbcType=BIGINT},
-            #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
-            #{TRobotInspection.componentId, jdbcType=VARCHAR},
-            #{TRobotInspection.meterType, jdbcType=INTEGER},
-            #{TRobotInspection.appearanceType, jdbcType=INTEGER},
-            #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},
-            #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},
-            #{TRobotInspection.phase, jdbcType=VARCHAR},
-            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR}
-            )
-        </foreach>
-    </insert>
-
-    <select id="selectForRobotTask" parameterType="java.lang.Long" resultType="java.lang.String">
-        SELECT DISTINCT
-        b.robot_code
-        FROM
-        t_robot_inspection a
-        left join t_robot_info b on a.robot_id = b.robot_id
-        WHERE
-        a.inspection_id IN
-        <foreach collection="list" open="(" close=")" separator="," item="inspectionId">
-            #{inspectionId,jdbcType=BIGINT}
-        </foreach>
-    </select>
-
-    <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.String">
-        SELECT
-            a.instance_id
-        FROM
-            t_cruise_point_instance a
-        LEFT JOIN t_robot_inspection b on a.cruise_id = b.inspection_id
-        LEFT JOIN t_robot_info d on b.robot_id = d.robot_id
-        where d.robot_code = #{robotCode,jdbcType=VARCHAR}
-        AND a.instance_id IN
-        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
-            #{instanceId,jdbcType=BIGINT}
-        </foreach>
-    </select>
-
-    <select id="selectRobotInspectionIds" resultType="com.yjh.platform.module.task.entity.ConfirmImmediately">
-        SELECT
-        a.inspection_id, a.robot_id, b.robot_name, b.robot_code
-        FROM
-        t_robot_inspection a
-        left join t_robot_info b ON a.robot_id = b.robot_id
-    </select>
-
-    <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">
-        SELECT
-        e.device_name as attrName,
-        (CASE
-        WHEN ISNULL(g.mete_name) AND ISNULL(a.inspection_name) THEN ''
-        WHEN ISNULL(g.mete_name)  THEN a.inspection_name
-        WHEN ISNULL(a.inspection_name)  THEN g.mete_name
-        ELSE CONCAT(g.mete_name,'/',a.inspection_name)
-        END) AS instance_name,
-        f.instance_id
-        FROM
-        t_cruise_point_instance f
-        left join (SELECT DISTINCT device_id,device_name from t_std_device) e on e.device_id = f.device_id
-        left join t_robot_inspection a on f.cruise_id = a.inspection_id
-        left join t_std_devicemete g on f.device_mete_id = g.device_mete_id
-        WHERE
-        f.instance_id in <foreach collection="list" open="(" close=")" separator="," item="instanceId">
-        #{instanceId,jdbcType=BIGINT}
-    </foreach>
-    </select>
-
-    <select id="selectRobotInfo" resultType="com.yjh.platform.module.device.entity.Robot">
-        SELECT
-            a.robot_id,
-            a.robot_code,
-            a.robot_name,
-            a.robot_status,
-            a.robot_type,
-            a.robot_ip,
-            b.dict_note AS robotTypeName,
-            a.robot_position,
-            c.dict_note AS robotPositionName,
-            a.phote_path,
-			d.region_name AS areaName,
-			d.region_id AS areaId
-        FROM
-            t_robot_info a
-            LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code
-            LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code
-			LEFT JOIN t_std_region d ON d.region_id = a.up_region_id
-        where 1=1
-        <if test="robotType != null">
-            and a.robot_type = #{robotType, jdbcType=VARCHAR}
-        </if>
-        AND a.drone_type IS NULL
-        <if test="userId != null">
-            AND a.robot_id IN (
-            SELECT
-            monitor_device_id
-            FROM
-            sys_user_device_permission sudp
-            WHERE
-            sudp.user_id = #{userId, jdbcType = BIGINT}
-            )
-        </if>
-    </select>
-
-    <select id="selectDroneInfo" resultType="com.yjh.platform.module.device.entity.Robot">
-        SELECT
-        a.robot_id,
-        a.robot_code,
-        a.robot_name,
-        a.nest_code,
-        a.nest_name,
-        a.robot_status,
-        a.drone_type,
-        a.robot_ip,
-        b.dict_note AS droneTypeName,
-        a.drone_position,
-        c.dict_note AS dronePositionName,
-        a.phote_path,
-        d.region_name AS areaName,
-        d.region_id AS areaId
-        FROM
-        t_robot_info a
-        LEFT JOIN t_dict_business b ON a.drone_type = b.dict_code
-        LEFT JOIN t_dict_business c ON a.drone_position = c.dict_code
-        LEFT JOIN t_std_region d ON d.region_id = a.up_region_id
-        where 1=1
-        <if test="droneType != null">
-            and a.drone_type = #{droneType, jdbcType=VARCHAR}
-        </if>
-        AND a.robot_type IS NULL
-        <if test="userId != null">
-            AND a.robot_id IN (
-            SELECT
-            monitor_device_id
-            FROM
-            sys_user_device_permission sudp
-            WHERE
-            sudp.user_id = #{userId, jdbcType = BIGINT}
-            )
-        </if>
-    </select>
-
-
-    <select id="selectRobotIsRunning" resultType="java.lang.String">
-        SELECT DISTINCT
-        e.robot_code
-        FROM
-        t_cruise_task a , t_cruise_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e
-        where 1=1
-        and a.task_id = b.task_id and b.instance_id = c.instance_id
-        and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
-        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
-    </select>
-
-    <select id="selectRobotCode" resultType="java.lang.String">
-        select robot_code
-        from t_robot_info
-        where robot_id = #{robotId,jdbcType=BIGINT}
-    </select>
-
-    <select id="selectRobotTaskOnStart" resultType="java.lang.String">
-        SELECT DISTINCT
-	        d.task_id
-        FROM
-	    t_robot_inspection a,
-	    t_cruise_point_instance b,
-	    t_cruise_task_attr c,
-	    t_cruise_result d
-        WHERE
-	    a.robot_id = #{robotId,jdbcType=BIGINT}
-        AND a.inspection_id = b.cruise_id
-        AND b.instance_id = c.instance_id
-        AND c.task_id = d.task_id
-        AND (
-	    d.c_state = 239
-	    OR d.c_state = 241
-        )
-        AND d.c_type != 508 AND d.c_type != 509 AND d.c_type != 456
-        ORDER BY d.create_time DESC
-        LIMIT 1
-    </select>
-
-    <select id="selectRobotOperationTaskOnStart" resultType="java.util.Map">
-        SELECT DISTINCT
-	    (CASE WHEN a.c_state = 239 THEN a.task_id ELSE "" END) AS taskId,
-	    (CASE WHEN a.c_state = 239 THEN "正在执行" ELSE "" END) AS taskState,
-	    (CASE WHEN a.c_state = 239 THEN a.task_name ELSE "" END) AS taskName
-        FROM
-	    t_cruise_result a
-        LEFT JOIN t_cruise_task_attr b ON b.task_id = a.task_id
-        LEFT JOIN t_cruise_point_instance c ON c.instance_id = b.instance_id
-        LEFT JOIN t_robot_inspection d ON d.inspection_id = c.cruise_id
-        WHERE
-	    d.robot_id = #{robotId,jdbcType=BIGINT}
-        AND (
-	    a.c_type = 508
-	    OR a.c_type = 509
-	    OR a.c_type = 456
-        )
-        ORDER BY
-	    a.create_time DESC
-        LIMIT 1;
-    </select>
-    <select id="selectRobot" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
-        SELECT
-            a.*
-        FROM
-            t_robot_info a
-            where a.robot_id = #{robotId}
-    </select>
-
-    <select id="selectTRobotInspectionTmp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">
-        select
-        a.inspection_id,
-        a.inspection_code,
-        a.robot_id,
-        a.inspection_name,
-        a.component_id,
-        a.meter_type,
-        a.appearance_type,
-        a.save_type_list,
-        a.recognition_type_list,
-        a.phase,
-        a.device_info
-        from t_robot_inspection a
-        where 1 = 1
-            and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
-        limit 1
-    </select>
-    <select id="selectTRobotInspectionByIds" parameterType="java.util.List" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">
-        select
-               distinct
-        inspection_id,
-        inspection_name
-        from t_robot_inspection
-        where inspection_id in
-            <foreach collection="list" separator="," open="(" close=")" item="inspectionId">
-                #{inspectionId, jdbcType=BIGINT}
-            </foreach>
-    </select>
-    <select id="selectInspection" resultType="java.util.Map">
-        SELECT
-        a.inspection_id,
-        a.inspection_name,
-        a.property_pic_path
-        FROM
-        t_robot_inspection a
-        WHERE 1 = 1
-        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
-    </select>
-
-    <select id="selectRealTaskId" resultType="java.lang.String">
-        SELECT
-            a.task_id
-        FROM
-        u_patrol_result a left join u_patrol_task b on a.task_id = b.task_id
-        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.task_state in (238,239,241)
-            <if test="executeTime != null">
-                and b.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
-            </if>
-        ORDER BY a.create_time desc
-            LIMIT 1
-    </select>
-
-    <select id="selectRealInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
-        SELECT
-            instance_id,
-            device_mete_id,
-            station_id,
-            station_name,
-            device_id,
-            custom_id,
-            data_format,
-            identify_type,
-            identify_son_type,
-            cruise_type,
-            cruise_id,
-            cruise_name,
-            cruise_content,
-            position_type,
-            unit,
-            if_sy,
-            sy_type,
-            if_videotape,
-            videotape_time,
-            text_desc,
-            sort
-        FROM
-            t_cruise_point_instance
-        WHERE origin_id = #{originId, jdbcType=VARCHAR}
-        and edge_code = #{edgeCode, jdbcType=VARCHAR}
-    </select>
-
-    <select id="selectRealInstanceByDevicePoint" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
-        SELECT
-            a.instance_id,
-            a.device_mete_id,
-            station_id,
-            station_name,
-            a.device_id,
-            b.custom_id,
-            data_format,
-            identify_type,
-            identify_son_type,
-            cruise_type,
-            cruise_id,
-            cruise_name,
-            cruise_content,
-            b.position_type
-
-        FROM
-            t_cruise_point_instance a left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
-        WHERE b.device_point_id = #{devicePointId, jdbcType=VARCHAR} limit 1;
-    </select>
-
-    <select id="selectRobotType" resultType="java.lang.Integer">
-        SELECT
-        CASE
-        WHEN robot_type IS NULL THEN
-        drone_type
-        ELSE
-        robot_type
-        END AS type
-        FROM
-        t_robot_info
-        WHERE
-        robot_code = #{robotCode} limit 1
-    </select>
-
-    <select id="selectRobotCount" resultType="java.lang.Integer">
-        SELECT count(robot_id) from t_robot_info where robot_code = #{robotCode}
-    </select>
-
-    <select id="selectRegion" resultType="java.lang.Integer">
-        SELECT count(region_id) from t_std_region where region_code = #{edgeCode}
-    </select>
-
-    <select id="selectRobotIdByRobotCode" resultType="java.lang.Long">
-        SELECT robot_id from t_robot_info where robot_code = #{robotCode}
-    </select>
-
-    <select id="selectRobotCodeByInstanceId" resultType="java.lang.String">
-        select robot_code as robotCode
-        FROM t_robot_info
-        WHERE
-                robot_id IN (
-                SELECT
-                    robot_id
-                FROM
-                    t_robot_inspection a LEFT JOIN t_cruise_point_instance b on a.inspection_id = b.cruise_id
-                WHERE
-                    b.instance_id = #{instanceId}
-            ) limit 1
-    </select>
-    <select id="selectTypeByInstanceId" resultType="java.lang.String">
-        SELECT
-            IF (c.robot_type = NULL,'无人机','机器人') AS type
-        FROM
-            t_robot_inspection a
-                LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
-                LEFT JOIN t_robot_info c ON a.robot_id = c.robot_id
-        WHERE
-                b.instance_id = #{instanceId}
-    </select>
-
-    <select id="getTRobotWithInspection" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
-        select robot_id,
-               edge_code,
-               origin_id,
-               robot_code,
-               robot_num,
-               robot_name,
-               nest_name,
-               nest_code,
-               robot_status,
-               robot_type,
-               drone_type,
-               robot_ip,
-               robot_port,
-               light_ip,
-               light_port,
-               identity_manager,
-               identity_code,
-               lnferad_IP,
-               Inferad_Port,
-               Inferad_username,
-               Inferad_password,
-               phote_path,
-               create_by,
-               create_date,
-               update_by,
-               update_date,
-               robot_factory,
-               made_in,
-               made_date,
-               is_use,
-               commission_date,
-               up_region_id,
-               robot_position,
-               drone_position,
-               robot_source,
-               address,
-               building_user,
-               appearance_number,
-               defect_record,
-               repair_record,
-               exit_putInto_record,
-               remarks,
-               record_id,
-               channel_num_light,
-               channel_num_inferad,
-               last_online_time,
-               duration,
-               off_line_count,
-               image_size
-        from t_robot_info
-        where robot_id in (select distinct robot_id from t_robot_inspection)
-    </select>
-</mapper>
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="com.yjh.platform.module.device.dao.TRobotInspectionDao">    <!-- 通用查询映射结果 -->    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TRobotInspection">        <id column="inspection_id" jdbcType="BIGINT" property="inspectionId" />        <result column="inspection_code" jdbcType="VARCHAR" property="inspectionCode" />        <result column="robot_id" jdbcType="BIGINT" property="robotId" />        <result column="inspection_name" jdbcType="VARCHAR" property="inspectionName" />    </resultMap>    <!-- 通用查询结果列 -->    <sql id="Base_Column_List">        inspection_id,inspection_code, robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_position, collect_status, calibration_status, unit    </sql>    <insert id="insert" useGeneratedKeys="true" keyProperty="inspectionId" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">        insert into t_robot_inspection(        inspection_id,        inspection_code,        robot_id,        inspection_name,        component_id,        meter_type,        appearance_type,        save_type_list,        recognition_type_list,        phase,        device_info        )values(        #{inspectionId, jdbcType=BIGINT},        #{inspectionCode, jdbcType=VARCHAR},        #{robotId, jdbcType=BIGINT},        #{inspectionName, jdbcType=VARCHAR},        #{componentId, jdbcType=VARCHAR},        #{meterType, jdbcType=INTEGER},        #{appearanceType, jdbcType=INTEGER},        #{saveTypeList, jdbcType=VARCHAR},        #{recognitionTypeList, jdbcType=VARCHAR},        #{phase, jdbcType=VARCHAR},        #{deviceInfo, jdbcType=VARCHAR}        )    </insert>    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">        delete from t_robot_inspection        where inspection_id = #{inspectionId, jdbcType=BIGINT}    </delete>    <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">        update t_robot_inspection a <set>        <if test="inspectionCode != null "> a.inspection_code = #{inspectionCod},</if>        <if test="robotId != null ">a.robot_id = #{robotId},</if>        <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>        <if test="componentId != null ">a.component_id = #{componentId},</if>        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>        <if test="saveTypeList != null ">a.save_type_list = #{saveTypeList},</if>        <if test="recognitionTypeList != null">a.recognition_type_list = #{recognitionTypeList},</if>        <if test="phase != null ">a.phase = #{phase},</if>        <if test="deviceInfo != null ">a.device_info = #{deviceInfo},</if>    </set>        where a.inspection_id = #{inspectionId, jdbcType=BIGINT}    </update>    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspection">        select        a.inspection_id,        a.inspection_code,        a.robot_id,        a.inspection_name,        a.component_id,        a.meter_type,        a.appearance_type,        a.save_type_list,        a.recognition_type_list,        a.phase,        a.device_info        from t_robot_inspection a        where 1 = 1        and a.inspection_id = #{inspectionId, jdbcType=BIGINT}        limit 1    </select>    <select id="select" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">        select        a.inspection_id,        a.inspection_code,        a.robot_id,        a.inspection_name,        a.component_id,        a.meter_type,        a.appearance_type,        a.save_type_list,        a.recognition_type_list,        a.phase,        a.device_info        from t_robot_inspection a        where 1 = 1        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>    </select>    <select id="selectInspectionNameLike" parameterType="com.yjh.platform.module.device.entity.TRobotInspection"            resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">        select a.robot_id, b.robot_name, b.robot_position, b.drone_position, a.inspection_id, a.inspection_name        from t_robot_info b inner join t_robot_inspection a on b.robot_id = a.robot_id        <if test="type == 1">            and b.robot_type is not null        </if>        <if test="type == 2">            and b.drone_type is not null        </if>        where 1 = 1        <if test="inspectionName != null and inspectionName != ''">            and a.inspection_name like CONCAT(CONCAT('%',#{inspectionName, jdbcType=VARCHAR}), '%')        </if>        <if test="robotId != null">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>    </select>    <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TRobotInspection" resultType="com.yjh.platform.module.device.entity.TRobotInspection">        select        a.inspection_id,        a.inspection_code,        a.robot_id,        a.inspection_name,        a.component_id,        a.meter_type,        a.appearance_type,        a.save_type_list,        a.recognition_type_list,        a.phase,        a.device_info        from t_robot_inspection a        where 1 = 1        <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>        <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>    </select>    <insert id="batchInsert">        insert into t_robot_inspection(        inspection_id,        inspection_code,        robot_id,        inspection_name,        component_id,        meter_type,        appearance_type,        save_type_list,        recognition_type_list,        phase,        device_info        )values        <foreach collection="list" item="TRobotInspection" separator=",">            (            #{TRobotInspection.inspectionId, jdbcType=BIGINT},            #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},            #{TRobotInspection.robotId, jdbcType=BIGINT},            #{TRobotInspection.inspectionName, jdbcType=VARCHAR},            #{TRobotInspection.componentId, jdbcType=VARCHAR},            #{TRobotInspection.meterType, jdbcType=INTEGER},            #{TRobotInspection.appearanceType, jdbcType=INTEGER},            #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},            #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},            #{TRobotInspection.phase, jdbcType=VARCHAR},            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR}            )        </foreach>    </insert>    <select id="selectForRobotTask" parameterType="java.lang.Long" resultType="java.lang.String">        SELECT DISTINCT        b.robot_code        FROM        t_robot_inspection a        left join t_robot_info b on a.robot_id = b.robot_id        WHERE        a.inspection_id IN        <foreach collection="list" open="(" close=")" separator="," item="inspectionId">            #{inspectionId,jdbcType=BIGINT}        </foreach>    </select>    <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.String">        SELECT        a.instance_id        FROM        t_cruise_point_instance a        LEFT JOIN t_robot_inspection b on a.cruise_id = b.inspection_id        LEFT JOIN t_robot_info d on b.robot_id = d.robot_id        where d.robot_code = #{robotCode,jdbcType=VARCHAR}        AND a.instance_id IN        <foreach collection="list" open="(" close=")" separator="," item="instanceId">            #{instanceId,jdbcType=BIGINT}        </foreach>    </select>    <select id="selectRobotInspectionIds" resultType="com.yjh.platform.module.task.entity.ConfirmImmediately">        SELECT        a.inspection_id, a.robot_id, b.robot_name, b.robot_code        FROM        t_robot_inspection a        left join t_robot_info b ON a.robot_id = b.robot_id    </select>    <select id="selectRobotTaskMessage" resultType="com.yjh.platform.module.device.entity.TCruisePointAttr">        SELECT        e.device_name as attrName,        (CASE        WHEN ISNULL(g.mete_name) AND ISNULL(a.inspection_name) THEN ''        WHEN ISNULL(g.mete_name)  THEN a.inspection_name        WHEN ISNULL(a.inspection_name)  THEN g.mete_name        ELSE CONCAT(g.mete_name,'/',a.inspection_name)        END) AS instance_name,        f.instance_id        FROM        t_cruise_point_instance f        left join (SELECT DISTINCT device_id,device_name from t_std_device) e on e.device_id = f.device_id        left join t_robot_inspection a on f.cruise_id = a.inspection_id        left join t_std_devicemete g on f.device_mete_id = g.device_mete_id        WHERE        f.instance_id in <foreach collection="list" open="(" close=")" separator="," item="instanceId">        #{instanceId,jdbcType=BIGINT}    </foreach>    </select>    <select id="selectRobotInfo" resultType="com.yjh.platform.module.device.entity.Robot">        SELECT        a.robot_id,        a.robot_code,        a.robot_name,        a.robot_status,        a.robot_type,        a.robot_ip,        b.dict_note AS robotTypeName,        a.robot_position,        c.dict_note AS robotPositionName,        a.phote_path,        d.region_name AS areaName,        d.region_id AS areaId        FROM        t_robot_info a        LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code        LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code        LEFT JOIN t_std_region d ON d.region_id = a.up_region_id        where 1=1        <if test="robotType != null">            and a.robot_type = #{robotType, jdbcType=VARCHAR}        </if>        AND a.drone_type IS NULL        <if test="userId != null">            AND a.robot_id IN (            SELECT            monitor_device_id            FROM            sys_user_device_permission sudp            WHERE            sudp.user_id = #{userId, jdbcType = BIGINT}            )        </if>    </select>    <select id="selectDroneInfo" resultType="com.yjh.platform.module.device.entity.Robot">        SELECT        a.robot_id,        a.robot_code,        a.robot_name,        a.nest_code,        a.nest_name,        a.robot_status,        a.drone_type,        a.robot_ip,        b.dict_note AS droneTypeName,        a.drone_position,        c.dict_note AS dronePositionName,        a.phote_path,        d.region_name AS areaName,        d.region_id AS areaId        FROM        t_robot_info a        LEFT JOIN t_dict_business b ON a.drone_type = b.dict_code        LEFT JOIN t_dict_business c ON a.drone_position = c.dict_code        LEFT JOIN t_std_region d ON d.region_id = a.up_region_id        where 1=1        <if test="droneType != null">            and a.drone_type = #{droneType, jdbcType=VARCHAR}        </if>        AND a.robot_type IS NULL        <if test="userId != null">            AND a.robot_id IN (            SELECT            monitor_device_id            FROM            sys_user_device_permission sudp            WHERE            sudp.user_id = #{userId, jdbcType = BIGINT}            )        </if>    </select>    <select id="selectRobotIsRunning" resultType="java.lang.String">        SELECT DISTINCT        e.robot_code        FROM        t_cruise_task a , t_cruise_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e        where 1=1        and a.task_id = b.task_id and b.instance_id = c.instance_id        and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>    </select>    <select id="selectRobotCode" resultType="java.lang.String">        select robot_code        from t_robot_info        where robot_id = #{robotId,jdbcType=BIGINT}    </select>    <select id="selectRobotTaskOnStart" resultType="java.lang.String">        SELECT DISTINCT        d.task_id        FROM        t_robot_inspection a,        t_cruise_point_instance b,        t_cruise_task_attr c,        t_cruise_result d        WHERE        a.robot_id = #{robotId,jdbcType=BIGINT}        AND a.inspection_id = b.cruise_id        AND b.instance_id = c.instance_id        AND c.task_id = d.task_id        AND (        d.c_state = 239        OR d.c_state = 241        )        AND d.c_type != 508 AND d.c_type != 509 AND d.c_type != 456        ORDER BY d.create_time DESC        LIMIT 1    </select>    <select id="selectRobotOperationTaskOnStart" resultType="java.util.Map">        SELECT DISTINCT        (CASE WHEN a.c_state = 239 THEN a.task_id ELSE "" END) AS taskId,        (CASE WHEN a.c_state = 239 THEN "正在执行" ELSE "" END) AS taskState,        (CASE WHEN a.c_state = 239 THEN a.task_name ELSE "" END) AS taskName        FROM        t_cruise_result a        LEFT JOIN t_cruise_task_attr b ON b.task_id = a.task_id        LEFT JOIN t_cruise_point_instance c ON c.instance_id = b.instance_id        LEFT JOIN t_robot_inspection d ON d.inspection_id = c.cruise_id        WHERE        d.robot_id = #{robotId,jdbcType=BIGINT}        AND (        a.c_type = 508        OR a.c_type = 509        OR a.c_type = 456        )        ORDER BY        a.create_time DESC        LIMIT 1;    </select>    <select id="selectRobot" resultType="com.yjh.platform.module.user.entity.TRobotInfo">        SELECT        a.*        FROM        t_robot_info a        where a.robot_id = #{robotId}    </select>    <select id="selectTRobotInspectionTmp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">        select        a.inspection_id,        a.inspection_code,        a.robot_id,        a.inspection_name,        a.component_id,        a.meter_type,        a.appearance_type,        a.save_type_list,        a.recognition_type_list,        a.phase,        a.device_info        from t_robot_inspection a        where 1 = 1        and a.inspection_id = #{inspectionId, jdbcType=BIGINT}        limit 1    </select>    <select id="selectTRobotInspectionByIds" parameterType="java.util.List" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">        select        distinct        inspection_id,        inspection_name        from t_robot_inspection        where inspection_id in        <foreach collection="list" separator="," open="(" close=")" item="inspectionId">            #{inspectionId, jdbcType=BIGINT}        </foreach>    </select>    <select id="selectInspection" resultType="java.util.Map">        SELECT        a.inspection_id,        a.inspection_name,        a.property_pic_path        FROM        t_robot_inspection a        WHERE 1 = 1        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>    </select>    <select id="selectRealTaskId" resultType="java.lang.String">        SELECT        a.task_id        FROM        u_patrol_result a left join u_patrol_task b on a.task_id = b.task_id        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.task_state in (238,239,241)        <if test="executeTime != null">            and b.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)        </if>        ORDER BY a.create_time desc        LIMIT 1    </select>    <select id="selectRealInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">        SELECT        instance_id,        device_mete_id,        station_id,        station_name,        device_id,        custom_id,        data_format,        identify_type,        identify_son_type,        cruise_type,        cruise_id,        cruise_name,        cruise_content,        position_type,        unit,        if_sy,        sy_type,        if_videotape,        videotape_time,        text_desc,        sort        FROM        t_cruise_point_instance        WHERE origin_id = #{originId, jdbcType=VARCHAR}        and edge_code = #{edgeCode, jdbcType=VARCHAR}    </select>    <select id="selectRealInstanceByDevicePoint" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">        SELECT        a.instance_id,        a.device_mete_id,        station_id,        station_name,        a.device_id,        b.custom_id,        data_format,        identify_type,        identify_son_type,        cruise_type,        cruise_id,        cruise_name,        cruise_content,        b.position_type        FROM        t_cruise_point_instance a left join t_std_devicemete b on a.device_mete_id = b.device_mete_id        WHERE b.device_point_id = #{devicePointId, jdbcType=VARCHAR} limit 1;    </select>    <select id="selectRobotType" resultType="java.lang.Integer">        SELECT        CASE        WHEN robot_type IS NULL THEN        drone_type        ELSE        robot_type        END AS type        FROM        t_robot_info        WHERE        robot_code = #{robotCode} limit 1    </select>    <select id="selectRobotCount" resultType="java.lang.Integer">        SELECT count(robot_id) from t_robot_info where robot_code = #{robotCode}    </select>    <select id="selectRegion" resultType="java.lang.Integer">        SELECT count(region_id) from t_std_region where region_code = #{edgeCode}    </select>    <select id="selectRobotIdByRobotCode" resultType="java.lang.Long">        SELECT robot_id from t_robot_info where robot_code = #{robotCode}    </select>    <select id="selectRobotCodeByInstanceId" resultType="java.lang.String">        select robot_code as robotCode        FROM t_robot_info        WHERE        robot_id IN (        SELECT        robot_id        FROM        t_robot_inspection a LEFT JOIN t_cruise_point_instance b on a.inspection_id = b.cruise_id        WHERE        b.instance_id = #{instanceId}        ) limit 1    </select>    <select id="selectTypeByInstanceId" resultType="java.lang.String">        SELECT        IF (c.robot_type = NULL,'无人机','机器人') AS type        FROM        t_robot_inspection a        LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id        LEFT JOIN t_robot_info c ON a.robot_id = c.robot_id        WHERE        b.instance_id = #{instanceId}    </select>    <select id="getTRobotWithInspection" resultType="com.yjh.platform.module.user.entity.TRobotInfo">        select robot_id,        edge_code,        origin_id,        robot_code,        robot_num,        robot_name,        nest_name,        nest_code,        robot_status,        robot_type,        drone_type,        robot_ip,        robot_port,        light_ip,        light_port,        identity_manager,        identity_code,        lnferad_IP,        Inferad_Port,        Inferad_username,        Inferad_password,        phote_path,        create_by,        create_date,        update_by,        update_date,        robot_factory,        made_in,        made_date,        is_use,        commission_date,        up_region_id,        robot_position,        drone_position,        robot_source,        address,        building_user,        appearance_number,        defect_record,        repair_record,        exit_putInto_record,        remarks,        record_id,        channel_num_light,        channel_num_inferad,        last_online_time,        duration,        off_line_count,        image_size        from t_robot_info        where robot_id in (select distinct robot_id from t_robot_inspection)    </select></mapper>

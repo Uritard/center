@@ -45,4 +45,7 @@ public class AreaInfo implements Serializable {
     @ApiModelProperty(value = "子类")
     private List<AreaInfo> children;
 
+    @ApiModelProperty(value = "测点关联相机Id")
+    private String cameraId;
+
 }

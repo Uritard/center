@@ -254,6 +254,7 @@ public class TCameraPresetService {
         AreaInfo camera = new AreaInfo();
         camera.setUpId(-1L);
         camera.setId(cameraId);
+        camera.setCameraId(cameraId.toString());
         camera.setLabel(tCameraInfo.getCameraName());
         camera.setInfoType("camera");
         List<AreaInfo> child = new LinkedList<>();
@@ -264,6 +265,7 @@ public class TCameraPresetService {
             preset.setLabel(item.getPresetName());
             preset.setInfoType("preset");
             preset.setUpName(tCameraInfo.getCameraName());
+            preset.setCameraId(cameraId.toString());
             child.add(preset);
         });
 
