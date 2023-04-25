@@ -46,6 +46,9 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     @ApiModelProperty(value = "巡视结果值")
     private String resultNum;
 
+    @ApiModelProperty(value = "巡视结果描述")
+    private String resultDesc;
+
     @ApiModelProperty(value = "人工审核值")
     private String personCheck;
 

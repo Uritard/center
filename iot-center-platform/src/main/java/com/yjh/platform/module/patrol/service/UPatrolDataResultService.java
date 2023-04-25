@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -122,12 +123,21 @@ public class UPatrolDataResultService {
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime, int pageNum, int pageSize) {
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType, meterType, endTime, startTime);
+        DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("identifyResult")
+            .add("cruiseResult").add("meteType").add("meterType").covertToDict(cruiseResultAnalyzeInfoList);
+
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
                 cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
             }
             if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())) {
                 cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            }
+            if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())) {
+                cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            }
+            if (CommonUtils.isEmptyOrNullstr(cruiseResultAnalInfo.getMeterTypeName())) {
+                cruiseResultAnalInfo.setMeterTypeName(cruiseResultAnalInfo.getMeteTypeName());
             }
         }
 
@@ -144,6 +154,9 @@ public class UPatrolDataResultService {
                                                  Integer meterType) {
 
         List<BrokenLineInfo> brokenLineInfos = uPatrolDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime, meteType, meterType);
+        DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("meteType").add("meterType")
+            .covertToDict(brokenLineInfos);
+
         for (BrokenLineInfo point : brokenLineInfos) {
             if (point.getResultNum().matches("^[a-zA-Z_\\u4e00-\\u9fa5_\\--]+$")) {
                 point.setResultNum("0");

@@ -513,36 +513,23 @@
         SELECT
         f.task_id,
         f.cruise_data_id,
-        a.device_mete_id,
+        f.device_mete_id,
         f.cruise_time,
         f.cruise_type,
-        h.dict_note as cruise_type_name,
         f.instance_name,
         g.task_type,
-        i.dict_note AS c_type_name,
         f.person_check,
         f.result_num,
+        f.result_desc,
         f.identify_result,
-        j.dict_note AS identify_result_name,
         f.cruise_result,
-        z.dict_note as cruise_result_name,
         f.picpath as picPath,
         a.mete_type,
-        m.dict_note as mete_type_name,
-        a.meter_type,
-        n.dict_note as meter_type_name
+        a.meter_type
         FROM u_patrol_data_result f
-        LEFT JOIN t_cruise_point_instance b ON b.instance_id = f.instance_id
-        LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_devicemete a on a.device_mete_id = f.device_mete_id
         LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
-        LEFT JOIN t_dict_business h ON f.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
-        LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
-        LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
-        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
-        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
-        WHERE
-        f.result_num IS NOT NULL
+        WHERE 1=1
         <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' and endTime != null and endTime !=''" >and f.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if>
         <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
@@ -598,26 +585,16 @@
         SELECT
         f.cruise_time as end_time,
         f.result_num,
-        b.cruise_type,
-        h.dict_note as cruise_type_name,
+        f.cruise_type,
         g.task_type,
         a.mete_name,
-        i.dict_note as c_type_name,
         a.mete_type,
-        m.dict_note as mete_type_name,
         a.meter_type,
-        n.dict_note as meter_type_name,
         a.device_mete_id
         FROM u_patrol_data_result f
-        LEFT JOIN t_cruise_point_instance b ON b.instance_id = f.instance_id
-        LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_std_devicemete a on a.device_mete_id = f.device_mete_id
         LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
-        LEFT JOIN t_dict_business h ON f.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
-        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
-        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
-        WHERE
-        f.result_num IS NOT NULL
+        WHERE 1=1
         <if test="deviceMeteId != null " > and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' and endTime != null and endTime !=''" >and f.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if>
         <if test="cruiseType != -1 " >and f.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>

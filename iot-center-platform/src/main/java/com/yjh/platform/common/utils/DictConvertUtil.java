@@ -247,6 +247,10 @@ public enum DictConvertUtil {
             list.add(new OptionalItem(colName, colName, colName + "Name"));
             return this;
         }
+
+        public boolean covertToDict(List<?> objList) {
+            return DICT.covertToDict(objList, this);
+        }
     }
 
     private static class OptionalItem {

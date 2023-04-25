@@ -716,7 +716,7 @@ public class IntelAnalysisService {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
                         // 2000:正确 2001:图像数据错误 2002:算法分析失败
-                        if (StringUtils.equals("2001", result.getCode()) || StringUtils.equals("2002", result.getCode())){
+                        if (!StringUtils.equals("2000", result.getCode())){
                             boolean includeDesc = AlgorithmExceptionEnum.isIncludeDesc(result.getDesc());
                             String desc = includeDesc ? AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc();
                             taskResult.setResultValue("-1");

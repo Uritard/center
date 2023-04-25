@@ -312,10 +312,10 @@ public class InspectionResultThread implements Runnable{
                 }
                 log.info("presetId====== {}",preset);
                 boolean result = abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
+                // 数据存入 redis
+                CruiseRedisStorage.offer(tCruiseTaskResultMap);
                 if (result) {
                     log.info("调用算法失败: {}", result);
-                    // 数据存入 redis
-                    CruiseRedisStorage.offer(tCruiseTaskResultMap);
                     uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
                 }
             } else {

@@ -259,6 +259,8 @@ public abstract class AbstractVideoCruise {
                 analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
             }
 
+            // 调用算法中
+            inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
                 analysis.setAnalyseType(algorithm.getMeteAnalyse());
