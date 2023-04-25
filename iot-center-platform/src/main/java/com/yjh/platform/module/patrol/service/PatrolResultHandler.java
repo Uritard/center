@@ -957,7 +957,6 @@ public class PatrolResultHandler {
         List<AnalysePatrolTaskResult> resultList) {
         StringBuilder defectNames = new StringBuilder();
         String redisKeyTemp = null;
-        StringBuilder retVal = new StringBuilder();
         for (AnalysePatrolTaskResult res : resultList) {
             String val = res.getResultValue();
             if (StringUtils.equalsAny(val, "-1", "0")) {
@@ -967,9 +966,10 @@ public class PatrolResultHandler {
             // 缺陷信息存redis
             redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
             Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
-            retVal.append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
+            StringBuilder retVal  = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
             log.info("value: {}, defectMap=={}", retVal, JSON.toJSONString(defectMap));
             redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
+            redisTemplate.opsForHash().putAll("defect:" + msgId + ":" + redisKeyTemp, defectMap);
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
             log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));
@@ -984,11 +984,6 @@ public class PatrolResultHandler {
             alarmPopUp(tStdDevicemete, infoMap);
 
             defectNames.append(res.getResultDesc()).append(" ");
-        }
-        if (StringUtils.isNotEmpty(defectNames.toString())) {
-            CommonUtils.clearLastChar(retVal);
-            // 为上报到算法管理平台暂存数据
-            redisTemplate.opsForHash().put("defect:" + msgId + ":" + redisKeyTemp, "value", retVal.toString());
         }
 
         // newAlarm
