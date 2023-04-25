@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -310,7 +311,13 @@ public class InspectionResultThread implements Runnable{
                     preset = details.getDevicePointId();
                 }
                 log.info("presetId====== {}",preset);
-                abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
+                boolean result = abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
+                if (result) {
+                    log.info("调用算法失败: {}", result);
+                    // 数据存入 redis
+                    CruiseRedisStorage.offer(tCruiseTaskResultMap);
+                    uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
+                }
             } else {
                 updatePointStatusNum(taskId, tCruiseTaskResultMap, details, value, fileFound);
             }
