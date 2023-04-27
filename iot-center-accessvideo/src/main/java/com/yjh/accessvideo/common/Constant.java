@@ -1,7 +1,7 @@
 package com.yjh.accessvideo.common;
 
 import com.alibaba.fastjson.JSON;
-import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
@@ -18,17 +18,44 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author YJH
+ */
 @Slf4j
 public class Constant {
 
     public static Map<String, Integer> maps = new ConcurrentHashMap<>();
+    /**
+     * 海康设备用户句柄集合
+     */
+    public static Map<String, Integer> hikDeviceUserIdMaps = new ConcurrentHashMap<>();
+    /**
+     * 海康设备语音对讲句柄集合
+     */
+    public static Map<Integer, Integer> hikDeviceVoiceComHandleMaps = new ConcurrentHashMap<>();
+    /**
+     * 海康设备语音转发句柄集合
+     */
+    public static Map<Integer, Integer> hikDeviceVoiceTransHandleMaps = new ConcurrentHashMap<>();
+
+    /**
+     * 音频解码句柄
+     */
+    public static Pointer pDecHandle = null;
+    public static FileOutputStream outputStream = null;
+    public static FileOutputStream outputStreamPcm = null;
+    public static Integer encodeFormat;
+
     public static Map<Integer, Long> DVRMaps = new ConcurrentHashMap<>();
 
     public static Map<Long, HCNetSDK.NET_DVR_DEVICEINFO_V40> deviceMaps = new ConcurrentHashMap<>();

@@ -535,6 +535,7 @@ public interface HCNetSDK extends Library {
 
     public static final int NET_DVR_COMPLETE_RESTORE_CTRL = 3420;    //设置完全恢复出厂值
 
+    public static final int NET_DVR_VIDEO_CALL_SIGNAL_PROCESS =  16032;  //可视对讲信令处理
     // 完整性检查
     public static final int NET_DVR_RECORD_CHECK = 6233; // 录像完整性检测
     public static final int NET_DVR_GET_RECORD_SEGMENT_CFG = 6242; // 获取录像段总大小
@@ -4394,8 +4395,16 @@ DVR实现巡航数据结构
 
     //语音对讲参数
     public static class NET_DVR_COMPRESSION_AUDIO extends StructureFieldOrder {
-        public byte byAudioEncType;   //音频编码类型 0-G722; 1-G711
-        public byte[] byres = new byte[7];//这里保留音频的压缩参数
+        // 音频编码类型 0- G722，1- G711_U，2- G711_A，7- AAC，8- PCM，9-G722
+        public byte byAudioEncType;
+        // 音频采样率：0- 默认，1- 16kHZ，2- 32kHZ，3- 48kHZ，4- 44.1kHZ，5- 8kHZ
+        public byte byAudioSamplingRate;
+        // 音频码率
+        public byte byAudioBitRate;
+        // 保留，置为0
+        public byte[] byres = new byte[4];
+        // Mp2l2前4个字节的含义表示后面内容音频数据长度
+        public byte bySupport;
     }
 
     public static class NET_DVR_AUDIODEC_INFO extends StructureFieldOrder {
@@ -4411,7 +4420,7 @@ DVR实现巡航数据结构
         public Pointer out_buf;                     /* 输出数据buf */
         public int in_data_size;                 /* 输入in_buf内数据byte数 */
         public int proc_data_size;               /* 输出解码库处理in_buf中数据大小bytes */
-        public int out_frame_size;               /* 解码一帧后数据BYTE数 */
+        public int out_frame_size;               /* 解码一帧后数据BYTE数 G711:320    G722:1280*/
         public NET_DVR_AUDIODEC_INFO dec_info = new NET_DVR_AUDIODEC_INFO();                     /* 输出解码信息 */
         public int g726dec_reset;                /* 重置开关 */
         public int g711_type;                    /* g711编码类型,0 - U law, 1- A law */
@@ -4419,15 +4428,17 @@ DVR实现巡航数据结构
     }
 
     public static class NET_DVR_AUDIOENC_INFO extends StructureFieldOrder {
-        public int in_frame_size;                /* 输入一帧数据大小(BYTES)，由GetInfoParam函数返回         */
-        public int[] reserved = new int[16];                 /* 保留 */
+        // 输入一帧音频数据的大小(BYTES)：如果是G711编码，输入数据的大小为320字节；如果是G722编码，输入数据的大小为1280字节
+        public int in_frame_size;
+        // 保留字节，置为0
+        public int[] reserved = new int[16];
     }
 
     //音频编码
     public static class NET_DVR_AUDIOENC_PROCESS_PARAM extends StructureFieldOrder {
         public Pointer in_buf;                      /* 输入buf */
         public Pointer out_buf;                     /* 输出buf */
-        public int out_frame_size;               /* 编码一帧后的BYTE数 */
+        public int out_frame_size;               /* 编码一帧后的BYTE数  G711:160    G722:80*/
         public int g726enc_reset;                /* 重置开关 */
         public int g711_type;                    /* g711编码类型,0 - U law, 1- A law */
         public int enc_mode;                     /* 音频编码模式，AMR编码配置 */
@@ -9493,7 +9504,6 @@ DVR实现巡航数据结构
     }
 
 
-
     boolean NET_DVR_Init();
 
     boolean NET_DVR_Cleanup();
@@ -9812,7 +9822,7 @@ DVR实现巡航数据结构
     void NET_DVR_ReleaseG722Decoder(Pointer pDecHandle);
 
     //G711: Win64、Linux32、Linux64
-    Pointer NET_DVR_InitG711Encoder(Pointer enc_info); //NET_DVR_AUDIOENC_INFO
+    Pointer NET_DVR_InitG711Encoder(NET_DVR_AUDIOENC_INFO enc_info); //NET_DVR_AUDIOENC_INFO
 
     boolean NET_DVR_EncodeG711Frame(Pointer handle, NET_DVR_AUDIOENC_PROCESS_PARAM p_enc_proc_param);
 
@@ -10561,6 +10571,34 @@ DVR实现巡航数据结构
             ENUM_VCA_EVENT_DURATION = 45;
     }
 
+    /*
+     * 可视对讲信令处理条件参数结构体
+     */
+    public static class NET_DVR_VIDEO_CALL_COND extends StructureFieldOrder {
+        // 结构体大小
+        public int      dwSize;
+        // 保留
+        public byte[]   byRes = new byte[128];
+    }
+
+    public static class NET_DVR_VIDEO_CALL_PARAM extends StructureFieldOrder{
+        // 结构体大小
+        public int dwSize;
+        // 信令类型：0- 请求呼叫，1- 取消本次呼叫，2- 接听本次呼叫，3- 拒绝本地来电呼叫，4- 被叫响铃超时，5- 结束本次通话，6- 设备正在通话中，7- 客户端正在通话中
+        public int dwCmdType;
+        // 期号，取值范围：[0,9]
+        public int wPeriod;
+        // 楼号
+        public int wBuildingNumber;
+        // 单元
+        public int wUnitNumber;
+        // 层号
+        public short wFloorNumber;
+        // 房间号
+        public int wRoomNumber;
+        // 保留，置为0
+        public byte[] byRes = new byte[118];
+    }
 }
 
 //windows gdi接口,gdi32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用
