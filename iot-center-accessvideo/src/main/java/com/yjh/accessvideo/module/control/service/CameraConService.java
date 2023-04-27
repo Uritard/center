@@ -761,7 +761,11 @@ public class CameraConService {
         }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         int iPreset = cameraConInfo.getPresetNum();
-        int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
+        Integer lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
+        if (Objects.isNull(lUserIDLong)) {
+            //摄像机id和预置位Id不正确
+            throw new BusinessException("此摄像机注册失败或未注册");
+        }
         boolean ret = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
 
         // 设置预置位名称 调用接口报参数错误，比对参数后未发现问题，取消设置预置位名称
