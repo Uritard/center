@@ -1,20 +1,17 @@
 package com.yjh.accessvideo;
 
 import com.alibaba.fastjson.JSON;
-import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.hik.handler.FLoginResultCallBackS;
 import com.yjh.accessvideo.hik.handler.FMSGCallBack;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
-import com.yjh.accessvideo.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,7 +21,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -173,6 +169,7 @@ public class AccessVideoApplication implements CommandLineRunner {
                 m_strLoginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
 
                 m_strLoginInfo.write();
+                m_strLoginInfo.cbLoginResult = new FLoginResultCallBackS();
                 lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
                 log.info("m_sDeviceIP: " + m_sDeviceIP + ", lUserID: " + lUserID);
                 if (lUserID == -1) {
