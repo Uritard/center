@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.enums.AlarmLevelEnum;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -14,6 +16,8 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
+import com.yjh.platform.module.task.dao.TWarnInfoDao;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
@@ -66,6 +70,8 @@ public class TCameraPresetService {
     private IntelAnalysisService intelAnalysisService;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private TWarnInfoDao tWarnInfoDao;
 
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;
@@ -632,6 +638,8 @@ public class TCameraPresetService {
 
                     // 检测结果及时同步到redis
                     setPresetCheckResultToRedis(item);
+                    // 生成预置位偏移告警信息
+                    cameraPresetCheckWarn(item);
                 } catch (Exception e) {
                     log.error("checkCameraPreset err: {}", e.getMessage());
                 }
@@ -639,6 +647,45 @@ public class TCameraPresetService {
         } finally {
             // 释放锁
             releaseLock(cameraId);
+        }
+    }
+
+    /**
+     * 生成预置位告警信息，并发送到前端
+     *
+     * @param checkResult checkResult
+     */
+    public void cameraPresetCheckWarn(CameraPresetCheckResult checkResult) {
+        log.info("判断是否需要生成预置位告警信息, 数据：" + JSONUtil.toJSONString(checkResult));
+        if (checkResult != null && checkResult.getPresetCheckResult().equals(-1)) {
+            log.info("需要生成预置位告警信息, 数据：" + JSONUtil.toJSONString(checkResult));
+
+            TWarnInfo warnInfo = new TWarnInfo();
+            warnInfo.setWarnTime(new Date());
+            warnInfo.setConfMode(275);
+            warnInfo.setDealType(286);
+            warnInfo.setDealInfo("程序正常，告警属实");
+            warnInfo.setWarnName("预置位检测告警");
+            warnInfo.setWarnLevel(Integer.parseInt(AlarmLevelEnum.ALARM_LEVEL_131.getDictCode()));
+            warnInfo.setWarnContent(String.format("预置位：%s 检测到偏移", checkResult.getPreset().getPresetName()));
+            warnInfo.setDealTime(new Date());
+            log.info("要插库的告警数据是==={}", warnInfo);
+            tWarnInfoDao.insert(warnInfo);
+            sendWebSocket(checkResult);
+        }
+    }
+
+    public void sendWebSocket(CameraPresetCheckResult checkResult) {
+        //给前端推webSocket
+        Map<String,String> jasonMap=new HashMap<>();
+        jasonMap.put("type","cameraPresetCheck");
+        jasonMap.put("content", String.format("预置位：%s 检测到偏移", checkResult.getPreset().getPresetName()));
+        String json= JSON.toJSONString(jasonMap);
+        log.info("发送预置位告警给前端的消息==={}", json);
+        try{
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+        } catch (Exception e) {
+            log.error("发送预置位告警websocket出错", e);
         }
     }
 
