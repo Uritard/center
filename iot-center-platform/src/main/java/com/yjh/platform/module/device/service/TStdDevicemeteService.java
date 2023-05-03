@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.enums.AlarmLevelEnum;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -196,93 +197,40 @@ public class TStdDevicemeteService{
     public Result selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> listForPage) {
         Result result = new Result();
 
-        List<TStdDeviceMeteDetail> list = new ArrayList<>();
         Integer pageNum = tStdDeviceMeteDetail.getPageNum();
         Integer pageSize = tStdDeviceMeteDetail.getPageSize();
 
-        //        if(listForPage.isEmpty()){
-        //            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
-        //            result.setData(dataResult);
-        //            return result;
-        //        }
-
-        //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
-        //            if (ids.size() != 0) {
-        //                tStdDeviceMeteDetail.setIds(ids);
-        //            } else {
-        //                ids.add(tStdDeviceMeteDetail.getUpRegionId());
-        //                tStdDeviceMeteDetail.setIds(ids);
-        //            }
-        //        }else {
-        //            //ids.clear();
-        //            ids = new LinkedList<>();
-        //            ids.add(tStdDeviceMeteDetail.getDeviceId());
-        //            tStdDeviceMeteDetail.setIds(ids);
-        //            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
-        //        }
         Integer isRedundant = tStdDeviceMeteDetail.getIsRedundant();
 
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        list = tStdDevicemeteDao
+        List<TStdDeviceMeteDetail> list = tStdDevicemeteDao
             .selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(), tStdDeviceMeteDetail.getRedundantType(),
                 isRedundant, listForPage);
 
         fillDeviceMeteInfo(list);
-
-        StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult();
-        dataResult.setCount(Long.valueOf(page.getTotal()).intValue());
-        dataResult.setCountPage(page.getPages());
-        dataResult.setPageNum(page.getPageNum());
-        dataResult.setPageSize(page.getPageSize());
-        dataResult.setList(list);
-        result.setData(dataResult);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("count", page.getTotal());
+        resultMap.put("list",list);
+        result.setData(resultMap);
         return result;
     }
 
     private void fillDeviceMeteInfo(List<TStdDeviceMeteDetail> list) {
         //填充字典值
-        List<String> colNames = new ArrayList<>();
-        colNames.add("alarm_level");
-        colNames.add("alarm_type");
-        colNames.add("mete_type");
-        colNames.add("mete_kind");
-        colNames.add("custom_type");
-        colNames.add("analyse_type");
-        List<TDictBusiness> tDictBusinesses = tDictBusinessDao.selectQuery(colNames);
 
-        Map<String, String> alarmLevelList = tDictBusinesses.stream().filter(t -> "alarm_level".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> alarmTypeList = tDictBusinesses.stream().filter(t -> "alarm_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> meteTypeList = tDictBusinesses.stream().filter(t -> "mete_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> meteKindList = tDictBusinesses.stream().filter(t -> "mete_kind".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> customTypeList = tDictBusinesses.stream().filter(t -> "custom_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
-        Map<String, String> analyseTypeList = tDictBusinesses.stream().filter(t -> "analyse_type".equals(t.getColName()))
-            .collect(Collectors.toMap(TDictBusiness::getDictCode, TDictBusiness::getDictNote));
+        DictConvertUtil.DictOptional optional = DictConvertUtil
+            .optional("alarmLevel")
+            .add("analyseType")
+            .add("alarmType")
+            .add("customType")
+            .add("meteType")
+            .add("meterType")
+            .add("meteKind")
+            .add("alarmLevel");
+        DictConvertUtil.DICT.covertToDict(list,optional);
+
 
         for (TStdDeviceMeteDetail detail : list) {
-            if (Objects.nonNull(detail.getAlarmLevel())) {
-                detail.setAlarmLevelName(alarmLevelList.get(String.valueOf(detail.getAlarmLevel())));
-            }
-            if (Objects.nonNull(detail.getCustomId())) {
-                detail.setCustomTypeName(customTypeList.get(String.valueOf(detail.getCustomId())));
-            }
-            if (Objects.nonNull(detail.getAlarmType())) {
-                detail.setAlarmTypeName(alarmTypeList.get(String.valueOf(detail.getAlarmType())));
-            }
-            if (Objects.nonNull(detail.getAnalyseType())) {
-                detail.setAnalyseTypeName(analyseTypeList.get(String.valueOf(detail.getAnalyseType())));
-            }
-            if (Objects.nonNull(detail.getMeteKind())) {
-                detail.setMeteKindName(alarmLevelList.get(String.valueOf(detail.getMeteKind())));
-            }
-            if (Objects.nonNull(detail.getMeteType())) {
-                detail.setMeteTypeName(alarmLevelList.get(String.valueOf(detail.getMeteType())));
-            }
-
             if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
                 String analyseName = "on".equals(detail.getIsAi()) ? "缺陷" : "on".equals(detail.getIsJudge()) ? "判别" : "无";
                 detail.setAnalyseTypeName(analyseName);
