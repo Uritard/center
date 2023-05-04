@@ -496,6 +496,7 @@ public class PatrolResultHandler {
             log.info("resultStringValue=={}, resultValue=={}", resultStringValue, resultValue);
 
             cruiseResultMap.put("resultNum", resultValue);
+            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             String resultDesc = cruiseResultMap.get("resultDesc");
             boolean abnormal = StringUtils.contains(resultDesc, "格式不正确");
             StringBuilder retDesc = new StringBuilder();
@@ -503,10 +504,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
             } else if (StringUtils.isEmpty(resultDesc)) {
-                for (String val : resultStrings) {
-                    retDesc.append(val).append(tStdDevicemete.getUnit()).append(",");
-                }
-                CommonUtils.clearLastChar(retDesc);
+                retDesc.append(CommonUtils.toResultDesc(resultValue, tStdDevicemete.getUnit()));
                 cruiseResultMap.put("resultDesc", retDesc.toString());
             }
 
