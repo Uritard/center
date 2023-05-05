@@ -498,8 +498,8 @@ public class SendToUpSystemServices {
         if ("1".equals(edgeLevel)){
             selectEdge = null;
         }
-        String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "presetRealImgPath"));
-        String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "presetImgPath"));
+        String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
+        String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(selectEdge,presetRealImgPath,presetImgPath);
         list.forEach(item->{
             item.put("station_code",stationCode);
