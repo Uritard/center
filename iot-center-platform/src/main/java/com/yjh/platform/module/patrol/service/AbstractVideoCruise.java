@@ -203,6 +203,7 @@ public abstract class AbstractVideoCruise {
                         isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, jsonForRe, algorithm);
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
+                        inspectionMap.put("resultNum", resultNum);
                         resultRecognition(inspectionMap);
                     }
                 }

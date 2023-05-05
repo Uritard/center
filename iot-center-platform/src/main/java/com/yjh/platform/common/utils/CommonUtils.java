@@ -466,4 +466,18 @@ public class CommonUtils {
             return rectangle;
         }
     }
+
+    public static String toResultDesc(String value, String unit) {
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
+        String unitLe = unit == null ? "" : unit;
+        String[] resultStrings = value.split(",");
+        StringBuilder retDesc = new StringBuilder();
+        for (String val : resultStrings) {
+            retDesc.append(val).append(unitLe).append(",");
+        }
+        CommonUtils.clearLastChar(retDesc);
+        return retDesc.toString();
+    }
 }

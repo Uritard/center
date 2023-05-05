@@ -87,6 +87,7 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
         String resultValue = inspectionMap.get("resultNum");
         if ("已拍照".equals(resultValue)) {
             inspectionMap.put("resultDesc", resultValue);
+            inspectionMap.put("resultNum", "1");
         }
         return inspectionMap;
     }

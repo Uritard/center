@@ -1867,6 +1867,9 @@ public class UPatrolTaskService {
                     // 机器人在线
                     robotOfflineMap.put(robotId, 0);
                 }
+            } else {
+                // 机器人信息不存在则置为离线
+                robotOfflineMap.put(robotId, 1);
             }
         }
         return robotOfflineMap.getOrDefault(robotId, 0) != 0;
@@ -2079,42 +2082,36 @@ public class UPatrolTaskService {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
             });
-            List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
             for (Map<String, String> redisInfoMap : taskInfoList) {
-                // Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                cruiseResultMapList.add(redisInfoMap);
-                boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
-                if (conditionRes) {
-                    UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
-                    uPatrolDataResult.setTaskId(taskId);
-                    uPatrolDataResult.setDeviceId(NumberUtils.toLong(redisInfoMap.get("deviceId")));
-                    uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
-                    uPatrolDataResult.setDeviceMeteId(NumberUtils.toLong(redisInfoMap.get("deviceMeteId")));
-                    uPatrolDataResult.setDeviceMeteName(redisInfoMap.get("deviceMeteName"));
-                    uPatrolDataResult.setCustomId(redisInfoMap.get("customId"));
-                    uPatrolDataResult.setCustomName(redisInfoMap.get("customName"));
-                    uPatrolDataResult.setDevicePointId(redisInfoMap.get("devicePointId"));
-                    uPatrolDataResult.setInstanceId(NumberUtils.toLong(redisInfoMap.get("instanceId")));
-                    uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
-                    uPatrolDataResult.setCruiseId(NumberUtils.toLong(redisInfoMap.get("cruiseId")));
-                    uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
-                    uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
-                    uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
-                    uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                    uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
-                    uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
-                    uPatrolDataResult.setCruiseType(NumberUtils.toInt(redisInfoMap.get("cruiseType")));
-                    uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
-                    uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
-                    uPatrolDataResult.setEvaluationState(MapUtils.getIntValue(redisInfoMap, "evaluationState", EVALUATION_STATE_UN));
-                    uPatrolDataResult.setCreatetime(new Date());
-                    uPatrolDataResult.setIsWarn(NumberUtils.toInt(redisInfoMap.get("isWarn")));
-                    uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
+                UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
+                uPatrolDataResult.setTaskId(taskId);
+                uPatrolDataResult.setDeviceId(NumberUtils.toLong(redisInfoMap.get("deviceId")));
+                uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
+                uPatrolDataResult.setDeviceMeteId(NumberUtils.toLong(redisInfoMap.get("deviceMeteId")));
+                uPatrolDataResult.setDeviceMeteName(redisInfoMap.get("deviceMeteName"));
+                uPatrolDataResult.setCustomId(redisInfoMap.get("customId"));
+                uPatrolDataResult.setCustomName(redisInfoMap.get("customName"));
+                uPatrolDataResult.setDevicePointId(redisInfoMap.get("devicePointId"));
+                uPatrolDataResult.setInstanceId(NumberUtils.toLong(redisInfoMap.get("instanceId")));
+                uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
+                uPatrolDataResult.setCruiseId(NumberUtils.toLong(redisInfoMap.get("cruiseId")));
+                uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
+                uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
+                uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
+                uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
+                uPatrolDataResult.setCruiseType(NumberUtils.toInt(redisInfoMap.get("cruiseType")));
+                uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
+                uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
+                uPatrolDataResult.setEvaluationState(MapUtils.getIntValue(redisInfoMap, "evaluationState", EVALUATION_STATE_UN));
+                uPatrolDataResult.setCreatetime(new Date());
+                uPatrolDataResult.setIsWarn(NumberUtils.toInt(redisInfoMap.get("isWarn")));
+                uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
 
-                    uPatrolDataResultList.add(uPatrolDataResult);
-                    if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()){
-                        abnormalCounts++;
-                    }
+                uPatrolDataResultList.add(uPatrolDataResult);
+                if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()) {
+                    abnormalCounts++;
                 }
             }
 
