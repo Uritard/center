@@ -17,6 +17,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 * @since 2020-07-27
 */
 @Service
+@Slf4j
 public class TStdDeviceService{
 
     @Autowired
@@ -205,26 +207,28 @@ public class TStdDeviceService{
 
         //根据模板ID查询测点模板
         try {
-            List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());
-            List<List<TStdMeteModelDetail>> partitionList = Lists.partition(tStdMeteModelDetailList, 2000);
+            List<TStdMeteModelDetail> tStdMeteModelDetilList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());
+            List<List<TStdMeteModelDetail>> partitionList = Lists.partition(tStdMeteModelDetilList, 2000);
             //parties = 主线程+子线程
             final CyclicBarrier barrier = new CyclicBarrier(partitionList.size() + 1);
             partitionList.forEach(partition -> {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tStdDevicemeteDao.batchAddTStdMeteModelDetail(partition,deivceIdUnique);
+                new Thread(() -> {
+                    try {
+                        tStdDevicemeteDao.batchAddTStdMeteModelDetail(partition, deivceIdUnique);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    } finally {
                         try {
                             barrier.await();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            log.error(e.getMessage(), e);
                         }
                     }
                 }).start();
             });
             barrier.await();
         } catch (BrokenBarrierException | InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();

@@ -94,7 +94,7 @@
             alarm_state,
             is_temdif,
             redundant_type,
-                                     alarm_level_string
+            alarm_level_string
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
@@ -184,13 +184,15 @@
         state_zero,
         state_one,
         is_temdif,
-        alarm_state
+        alarm_state,
+        redundant_type
+
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
             (
             #{TStdMeteModelDetail.deviceMeteId, jdbcType=BIGINT},
             #{deviceId, jdbcType=BIGINT},
-            #{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},
+           ifnull(#{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},"00"),
             #{TStdMeteModelDetail.customType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.customName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
@@ -228,7 +230,9 @@
             #{TStdMeteModelDetail.stateZero, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.stateOne, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.isTemdif, jdbcType=INTEGER},
-            #{TStdMeteModelDetail.alarmState, jdbcType=INTEGER}
+            ifnull(#{TStdMeteModelDetail.alarmState, jdbcType=INTEGER},"1"),
+            #{TStdMeteModelDetail.redundantType, jdbcType=VARCHAR}
+
             )
         </foreach>
     </insert>
