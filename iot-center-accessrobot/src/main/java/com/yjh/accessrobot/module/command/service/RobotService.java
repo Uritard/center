@@ -2225,7 +2225,7 @@ public class RobotService {
                     if ("".equals(localPath)) {
                         return;
                     }
-                    Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystemFtps");
+                    Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystem");
                     String ftpsLocalPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
                     String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
                     String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");

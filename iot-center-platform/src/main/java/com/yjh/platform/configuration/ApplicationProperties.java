@@ -140,7 +140,7 @@ public class ApplicationProperties {
 
     public void flush(){
 
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"upSystemFtps");
+        Map<String,String> redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"upSystem");
         ApplicationProperties.FtpsConfig upSystemFtps = new ApplicationProperties.FtpsConfig();
         upSystemFtps.setIp(redisMap.get("upSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("upSystemFtpsPort"),10012))
@@ -156,7 +156,7 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("algorithmSystemFtpsPassword"));
         this.intelAnalysisFtps = intelAnalysisFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystemFtps");
+        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystem");
         ApplicationProperties.FtpsConfig managerSystemFtps = new ApplicationProperties.FtpsConfig();
         managerSystemFtps.setIp(redisMap.get("managerSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("managerSystemFtpsPort"),10012))
@@ -164,7 +164,7 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("managerSystemFtpsPassword"));
         this.managerSystemFtps = managerSystemFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"algorithmMqttConfig");
+        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystem");
         ApplicationProperties.ManagerMqttConfig managerMqttConfig = new ApplicationProperties.ManagerMqttConfig();
         managerMqttConfig.setMqttHost(redisMap.get("mqttHost"))
                 .setMqttUser(redisMap.get("mqttUser"))
