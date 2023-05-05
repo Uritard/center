@@ -142,6 +142,7 @@
         a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},
         a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},
         a.modulus = #{modulus, jdbcType=INTEGER},
+        a.redundant_type = #{redundantType,jdbcType=VARCHAR}
     </set>
         where a.model_id = #{modelId, jdbcType=BIGINT}
         and a.mete_id=#{meteId,jdbcType=BIGINT}
@@ -179,7 +180,8 @@
         a.alarm_cnt,
         a.threshold_abs,
         a.threshold_per,
-        a.modulus
+        a.modulus,
+        a.redundant_type
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
@@ -291,7 +293,8 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        d.model_name
+        d.model_name,
+        a.redundant_type
         FROM
         ((
         (
@@ -443,7 +446,8 @@
         alarm_cnt,
         threshold_abs,
         threshold_per,
-        modulus
+        modulus,
+        redundant_type
         ) SELECT
         #{modelId},
         std_mete_id,
@@ -473,7 +477,8 @@
         alarm_cnt,
         threshold_abs,
         threshold_per,
-        modulus
+        modulus,
+        redundant_type
         FROM
         t_std_mete a
         WHERE FIND_IN_SET(a.std_mete_id, #{meteStrList})

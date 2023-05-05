@@ -177,21 +177,25 @@ public class TStdMetemodelService {
         //parties = 主线程+子线程
         final CyclicBarrier barrier = new CyclicBarrier(partitionList.size() + 1);
         partitionList.forEach(partition -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+            new Thread(() -> {
+                try {
                     String meteStrList = StringUtils.join(partition, ',');
                     tStdMetemodelDetailDao.batchAddModel(meteStrList, modelId);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                } finally {
                     try {
                         barrier.await();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error(e.getMessage(), e);
                     }
                 }
             }).start();
         });
         barrier.await();
     }
+
+
     @Transactional(rollbackFor = Exception.class)
     public ModelInfo selectModel(Long modelId){
         ModelInfo mInfo=new ModelInfo();

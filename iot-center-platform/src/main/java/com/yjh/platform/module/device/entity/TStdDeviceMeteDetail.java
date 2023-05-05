@@ -43,6 +43,8 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private Long upRegionId;
     private List<Long> ids;
 
+    private String meterTypeName;
+
     @Max(value=999999999)
     private Integer analyseType;
     private String analyseTypeName;
