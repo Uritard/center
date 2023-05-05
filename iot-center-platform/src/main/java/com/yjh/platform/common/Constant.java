@@ -306,6 +306,7 @@ public class Constant {
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
         standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+        updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
     }
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
