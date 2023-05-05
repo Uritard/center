@@ -335,6 +335,10 @@ public class TRobotInfoService{
                     if (map.containsKey("exitPutIntoRecord") && (!"".equals(map.get("exitPutIntoRecord")))) {
                         tRobotInfo.setExitPutIntoRecord(map.get("exitPutIntoRecord").toString());
                     }
+                    if (map.containsKey("imageSize") && (!"".equals(map.get("imageSize")))) {
+                        tRobotInfo.setImageSize(map.get("imageSize").toString());
+                    }
+
                     log.info("tRobotInfo信息是==="+tRobotInfo);
                     tRobotInfoDao.update(tRobotInfo);
                     return true;

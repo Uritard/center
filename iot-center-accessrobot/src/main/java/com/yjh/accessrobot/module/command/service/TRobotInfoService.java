@@ -144,6 +144,7 @@ public class TRobotInfoService {
             tRobotInfo.setChannelNumInferad(robotModel.getChannelNumInferad());
             tRobotInfo.setEdgeCode(edgeNode);
             tRobotInfo.setOriginId(robotModel.getRobotId().toString());
+            tRobotInfo.setImageSize(robotModel.getImageSize());
             return tRobotInfo;
         }).collect(Collectors.toList());
         List<TRobotInfo> oldRobotInfoList = tRobotInfoDao.selectByEdgeCodeAndType(edgeNode, type);
