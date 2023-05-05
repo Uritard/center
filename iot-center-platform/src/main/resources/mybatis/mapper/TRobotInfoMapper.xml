@@ -72,7 +72,7 @@
         defect_record,repair_record,exit_putInto_record,
         remarks,record_id,channel_num_light,
         channel_num_inferad,last_online_time,duration,
-        off_line_count,edge_code,origin_id
+        off_line_count,edge_code,origin_id,image_size
     </sql>
 
 
@@ -248,7 +248,8 @@
         a.remarks,
         a.record_id,
         a.channel_num_light,
-        a.channel_num_inferad
+        a.channel_num_inferad,
+        a.image_size
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -406,7 +407,8 @@
         a.remarks,
         a.record_id,
         a.channel_num_light,
-        a.channel_num_inferad
+        a.channel_num_inferad,
+        a.image_size
         from t_robot_info a
         where 1 = 1
         <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -515,7 +517,7 @@
         ,defect_record,repair_record,exit_putInto_record
         ,remarks,record_id,channel_num_light
         ,channel_num_inferad,last_online_time,duration
-        ,off_line_count,edge_code,origin_id
+        ,off_line_count,edge_code,origin_id,image_size
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
             values (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=VARCHAR}
@@ -533,7 +535,7 @@
             ,#{TRobotInfo.defectRecord,jdbcType=VARCHAR},#{TRobotInfo.repairRecord,jdbcType=VARCHAR},#{TRobotInfo.exitPutintoRecord,jdbcType=VARCHAR}
             ,#{TRobotInfo.remarks,jdbcType=VARCHAR},#{TRobotInfo.recordId,jdbcType=BIGINT},#{TRobotInfo.channelNumLight,jdbcType=INTEGER}
             ,#{TRobotInfo.channelNumInferad,jdbcType=INTEGER},#{TRobotInfo.lastOnlineTime,jdbcType=BIGINT},#{TRobotInfo.duration,jdbcType=BIGINT}
-            ,#{TRobotInfo.offLineCount,jdbcType=BIGINT},#{TRobotInfo.edgeCode,jdbcType=VARCHAR},#{TRobotInfo.originId,jdbcType=VARCHAR}
+            ,#{TRobotInfo.offLineCount,jdbcType=BIGINT},#{TRobotInfo.edgeCode,jdbcType=VARCHAR},#{TRobotInfo.originId,jdbcType=VARCHAR},#{TRobotInfo.imageSize,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

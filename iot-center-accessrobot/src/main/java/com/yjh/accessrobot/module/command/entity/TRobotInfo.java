@@ -201,4 +201,9 @@ public class TRobotInfo implements Serializable {
      * 原始id(下级同步的id)
      */
     private String originId;
+
+    /**
+     * 机器人地图图片尺寸
+     */
+    private String imageSize;
 }
