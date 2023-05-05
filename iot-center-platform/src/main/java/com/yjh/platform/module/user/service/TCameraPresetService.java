@@ -554,8 +554,14 @@ public class TCameraPresetService {
         silentConfMap.put(silentConf.getPresetType(),future);
     }
 
-    public List<SilentConf> selectSilentConfInfo(){
-        return tCameraPresetDao.selectPresetTypeInfo();
+    public List<SilentConf> selectSilentConfInfo() {
+        List<SilentConf> silentConfs = tCameraPresetDao.selectPresetTypeInfo();
+        for (SilentConf silentConf : silentConfs) {
+            if (-1 == silentConf.getChillTime()) {
+                silentConf.setChillTime(null);
+            }
+        }
+        return silentConfs;
     }
 
     public int updateSilentConf(SilentConf silentConf){
