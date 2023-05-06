@@ -224,7 +224,6 @@ public class TStdDevicemeteService{
             .add("alarmType")
             .add("customType")
             .add("meteType")
-            .add("meterType")
             .add("meteKind")
             .add("alarmLevel");
         DictConvertUtil.DICT.covertToDict(list,optional);
