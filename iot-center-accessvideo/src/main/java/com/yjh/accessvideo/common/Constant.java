@@ -20,7 +20,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -47,11 +51,11 @@ public class Constant {
      * 海康设备语音转发句柄集合
      */
     public static Map<Integer, Integer> hikDeviceVoiceTransHandleMaps = new ConcurrentHashMap<>();
-
     /**
      * 音频解码句柄
      */
     public static Pointer pDecHandle = null;
+
     public static FileOutputStream outputStream = null;
     public static FileOutputStream outputStreamPcm = null;
     public static Integer encodeFormat;
@@ -68,23 +72,10 @@ public class Constant {
      录像信息
      */
     public static Map<String, Integer> recordLongMap = new HashMap<>();
-
-//    public static int connectTimeCounts = 0;
-
-    //心跳报文
+    /**
+     * 心跳报文
+     */
     public static final byte TYPET3 = 0x03;
-
-//    public static String sdkPath;
-
-    public static String TASKID="";
-    public static String INSTANCEID="";
-//    public static  AtomicInteger FLAG;
-//    public static AtomicInteger ABNORMAL=new AtomicInteger(0);
-//    public static AtomicInteger NORMAL=new AtomicInteger(0);
-//    public static AtomicInteger NORMAL; //线程安全Integer
-//    public static Set<String> cruiseKeys=new HashSet<>();
-//    public static CopyOnWriteArraySet<String> cruiseKeys=new CopyOnWriteArraySet<>();//线程安全Set
-
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 
@@ -131,6 +122,34 @@ public class Constant {
         //return "666";
     }
 
+    public static InputStream websocketSendMsgBuffer(String url, byte[] bytes){
+        HttpURLConnection con = null;
+        InputStream inputStream = null;
+        //尝试发送请求
+        try {
+            URL u = new URL(url);
+            con = (HttpURLConnection) u.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            con.setDoInput(true);
+            con.setUseCaches(false);
+            con.setRequestProperty("Content-Type", "binary/octet-stream");
+            OutputStream outStream = con.getOutputStream();
+            outStream.write(bytes);
+            outStream.flush();
+            outStream.close();
+            //读取返回内容
+            inputStream = con.getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
+        }
+        return inputStream;
+    }
+
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
@@ -142,10 +161,7 @@ public class Constant {
     public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
 
     public static<T> Result otherServerList( List<T> list, String url) {
-        Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
+        Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
         return re;
     }
 
