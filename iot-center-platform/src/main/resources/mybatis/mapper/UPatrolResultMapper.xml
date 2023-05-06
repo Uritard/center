@@ -367,7 +367,8 @@
         a.check_date,
         a.modify_state,
         a.task_wait,a.create_time,
-        a.remark
+        a.remark,
+        a.weather
         FROM u_patrol_result a
         LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
         where 1 = 1

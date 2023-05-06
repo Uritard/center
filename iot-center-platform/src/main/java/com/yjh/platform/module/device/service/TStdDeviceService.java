@@ -609,7 +609,7 @@ public class TStdDeviceService{
     private List<AreaInfo> areaTree(String deviceShow){
         List<AreaInfo> areaTree = tStdDeviceDao.selectDevTreeRegion();
         areaTree =  assembleTrees(areaTree);
-        if ("all".equals(deviceShow)){
+        if (!StringUtils.isEmpty(deviceShow)){
             areaTree =  areaAddDeviceTree(areaTree,deviceShow);
         }
         return areaTree;
