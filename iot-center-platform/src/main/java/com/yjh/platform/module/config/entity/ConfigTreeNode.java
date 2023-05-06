@@ -29,6 +29,8 @@ public class ConfigTreeNode {
 
     private String remark;
 
+    private String rule;
+
 
     List<ConfigTreeNode> child;
 }

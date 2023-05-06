@@ -2482,3 +2482,16 @@ CREATE TABLE `t_cruise_triphase_rule` (
   `warn_level` int(11) DEFAULT '1' COMMENT '告警等级：1-预警，2-一般告警，3-严重告警，4-危急告警，',
   PRIMARY KEY (`triphase_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='三相告警配置实例表';
+
+DROP TABLE IF EXISTS `system_config`;
+CREATE TABLE `system_config` (
+  `id` bigint(68) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `config_type` varchar(50) default NULL  COMMENT '配置类型',
+  `config_name` varchar(50) default NULL  COMMENT '配置类型名称',
+  `config_key` varchar(50) default NULL  COMMENT '配置键',
+  `config_value` text default NULL  COMMENT '配置值',
+  `config_remark` varchar(500) default NULL  COMMENT '配置建说明',
+  `remark` varchar(500) default NULL  COMMENT '补充说明',
+  `rules` varchar(500) default NULL  COMMENT '规则校验',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统配置表';

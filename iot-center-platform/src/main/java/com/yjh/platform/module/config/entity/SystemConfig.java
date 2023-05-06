@@ -49,5 +49,8 @@ public class SystemConfig implements Serializable {
     @ApiModelProperty(value = "补充说明")
     private String remark;
 
+    @ApiModelProperty(value = "规则")
+    private String rules;
+
 
 }

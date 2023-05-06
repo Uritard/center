@@ -280,7 +280,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
             if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
                 return;
             }
-            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystemFtps");
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystem");
             String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
