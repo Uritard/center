@@ -1,5 +1,6 @@
-package com.yjh.accessvideo.hik.handler;
+package com.yjh.accessvideo.hik.transmit;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -9,9 +10,11 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
+ * WAV转PCM文件
  * @author 丫C
  * @date 2023/4/24
  */
+@Slf4j
 public class WavToPcm {
 
     /**
@@ -27,13 +30,13 @@ public class WavToPcm {
         try {
             fileInputStream = new FileInputStream(wavfilepath);
             fileOutputStream = new FileOutputStream(pcmfilepath);
-            byte[] wavbyte = InputStreamToByte(fileInputStream);
+            byte[] wavbyte = inputStreamToByte(fileInputStream);
             byte[] pcmbyte = Arrays.copyOfRange(wavbyte, 44, wavbyte.length);
             fileOutputStream.write(pcmbyte);
             IOUtils.closeQuietly(fileInputStream);
             IOUtils.closeQuietly(fileOutputStream);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage(), e);
         }
         return pcmfilepath;
     }
@@ -45,7 +48,7 @@ public class WavToPcm {
      * @return
      * @throws IOException
      */
-    private static byte[] InputStreamToByte(FileInputStream fis) throws IOException {
+    private static byte[] inputStreamToByte(FileInputStream fis) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         long size = fis.getChannel().size();
         byte[] buffer = null;
@@ -71,6 +74,6 @@ public class WavToPcm {
         String wavFilePath = "D:\\testFile\\cnhc-1-16000.wav";
         String pcmFilePath = "D:\\testFile\\cnhc-1-16000.pcm";
         convertAudioFiles(wavFilePath, pcmFilePath);
-        System.out.println("OK");
+        log.info("ok");
     }
 }

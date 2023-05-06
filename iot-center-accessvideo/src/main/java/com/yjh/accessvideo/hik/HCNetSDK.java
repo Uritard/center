@@ -9772,6 +9772,8 @@ DVR实现巡航数据结构
 
     boolean NET_DVR_VoiceComSendData(int lVoiceComHandle, byte[] pSendBuf, int dwBufSize);
 
+    boolean NET_DVR_SetVoiceDataCallBack(int lVoiceComHandle, boolean bNeedCBNoEncData, FVoiceDataCallBack_MR_V30 fVoiceDataCallBack, Pointer pUser);
+
     boolean NET_DVR_GetCurrentAudioCompress(int lUserID, NET_DVR_COMPRESSION_AUDIO lpCompressAudio);
 
     //语音广播

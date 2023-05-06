@@ -28,6 +28,7 @@ public class DateTimeUtil {
     private static final String DATETIMEMSFORMATTPL = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String TIMESIMPLEFORMATTPL = "HH:mm";
     private static final String TIMEFORMATTPL = "HH:mm:ss";
+    private static final String DATE_FORMAT_THREAD_LOCAL = "yyyyMMddHHmmss";
     private static ResourceBundle resource = null;
 
     private DateTimeUtil() {
@@ -88,6 +89,9 @@ public class DateTimeUtil {
         return DATETIMEFORMATTPL;
     }
 
+    public static String getDateFormatThreadLocal(){
+        return DATE_FORMAT_THREAD_LOCAL;
+    }
     /**
      * 获取当前时间字符串
      *
@@ -207,6 +211,21 @@ public class DateTimeUtil {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
         return sdf.format(date);
     }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串
+     */
+    public static String formatThreadLocal(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateFormatThreadLocal());
+        return sdf.format(date);
+    }
+
 
     /**
      * 字符串转换为日期时间.

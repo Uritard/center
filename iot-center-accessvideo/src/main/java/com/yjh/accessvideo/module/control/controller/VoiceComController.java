@@ -8,16 +8,17 @@ import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
-import com.yjh.accessvideo.hik.HikUtilsApp;
+import com.yjh.accessvideo.commons.utils.DateTimeUtil;
+import com.yjh.accessvideo.hik.transmit.HikUtilsApp;
 import com.yjh.accessvideo.module.control.service.VoiceComService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * <功能描述>
@@ -106,7 +107,6 @@ public class VoiceComController {
     public Result getAudioCompress(@RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
             Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
             HikUtilsApp hikUtilsApp = new HikUtilsApp();
             hikUtilsApp.getAudioCompress(lUserId);
@@ -122,11 +122,11 @@ public class VoiceComController {
     @ApiOperation(value = "开启语音转发测试")
     @GetMapping(value = "/startVoiceTransTest")
     public Result startVoiceTransTest(@RequestParam(value = "cameraId") Long cameraId,
-                                      @RequestParam(value = "dwVoiceChan") Integer dwVoiceChan,
-                                      @RequestParam(value = "timeItem") long timeItem) {
+                                      @RequestParam(value = "timeItem") long timeItem,
+                                      @RequestParam(value = "fileName") String fileName) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.startVoiceTransTest(cameraId, dwVoiceChan, timeItem));
+            result.setData(voiceComService.startVoiceTransTest(cameraId, timeItem, fileName));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -139,24 +139,40 @@ public class VoiceComController {
     @ApiOperation(value = "发送语音数据测试")
     @GetMapping(value = "/voiceComSendDataTest")
     public Result voiceComSendDataTest(@RequestParam(value = "fileName") String fileName,
-                                       @RequestParam(value = "cameraId") Long cameraId,
-                                       @RequestParam(value = "method") Integer method) {
+                                       @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
             Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
-            if (1 == method){
-                voiceComService.voiceComSendDataTest(lVoiceTranHandle, fileName);
-            }else {
-                voiceComService.voiceComSendDataTest2(lVoiceTranHandle, fileName);
-            }
+            String format = DateTimeUtil.formatThreadLocal(new Date());
+            voiceComService.voiceComSendDataTest(lVoiceTranHandle, fileName, format);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("发送语音数据测试失败描述:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "接收语音数据测试")
+    @PostMapping(value = "/receivedVoiceData")
+    public Result receivedVoiceData(@RequestParam(value = "cameraId") Long cameraId,
+                                    HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
+            Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
+            log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
+            Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
+            voiceComService.receivedVoiceData(request, lVoiceTranHandle);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收语音数据测试失败描述:", e);
         }
         return result;
     }
@@ -184,8 +200,7 @@ public class VoiceComController {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
             Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
             HikUtilsApp hikUtilsApp = new HikUtilsApp();
-            boolean deviceLogout = hikUtilsApp.deviceLogout(lUserId);
-            log.info("deviceLogout:{}", deviceLogout);
+            result.setData(hikUtilsApp.deviceLogout(lUserId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

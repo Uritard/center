@@ -1,4 +1,4 @@
-package com.yjh.accessvideo.hik.handler;
+package com.yjh.accessvideo.hik.transmit;
 
 import com.sun.jna.Pointer;
 import com.yjh.accessvideo.hik.HCNetSDK;
@@ -16,6 +16,5 @@ public class VoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_V30 {
     public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser) {
         log.info("lVoiceComHandle:{},pRecvDataBuffer:{},dwBufSize:{},byAudioFlag:{},pUser:{}",
                 lVoiceComHandle, pRecvDataBuffer, dwBufSize, byAudioFlag, pUser);
-        // todo 语音对讲回调处理
     }
 }

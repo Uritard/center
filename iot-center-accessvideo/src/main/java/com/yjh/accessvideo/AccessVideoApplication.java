@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.sun.jna.Pointer;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
-import com.yjh.accessvideo.hik.handler.FLoginResultCallBackS;
 import com.yjh.accessvideo.hik.handler.FMSGCallBack;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
@@ -169,7 +168,6 @@ public class AccessVideoApplication implements CommandLineRunner {
                 m_strLoginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
 
                 m_strLoginInfo.write();
-                m_strLoginInfo.cbLoginResult = new FLoginResultCallBackS();
                 lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
                 log.info("m_sDeviceIP: " + m_sDeviceIP + ", lUserID: " + lUserID);
                 if (lUserID == -1) {

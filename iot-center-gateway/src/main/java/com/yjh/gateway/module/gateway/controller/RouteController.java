@@ -1,6 +1,5 @@
 package com.yjh.gateway.module.gateway.controller;
 
-import com.netflix.zuul.ZuulFilter;
 import com.yjh.gateway.common.authFilter.zuulFilter;
 import com.yjh.gateway.common.websocket.WebSocketServer;
 import com.yjh.gateway.commons.result.BusinessException;
@@ -9,10 +8,15 @@ import com.yjh.gateway.commons.result.ResultCodeEnum;
 import com.yjh.gateway.module.gateway.service.RefreshRouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 
 /**
  * @Description
@@ -55,6 +59,26 @@ public class RouteController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("同步到websocket错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "通过websocket发送ByteBuffer")
+    @PostMapping(value = "/sendMsgBuffer")
+    public Result sendMsgBuffer(HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            InputStreamReader reader = new InputStreamReader(request.getInputStream());
+            byte[] bytes = IOUtils.toByteArray(reader);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+            WebSocketServer.sendMsgBuffer(byteBuffer);
+            result.setData("通过websocket发送ByteBuffer成功");
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("通过websocket发送ByteBuffer异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("通过websocket发送ByteBuffer错误:", e);
         }
         return result;
     }

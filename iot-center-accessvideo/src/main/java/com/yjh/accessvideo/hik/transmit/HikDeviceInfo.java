@@ -1,4 +1,4 @@
-package com.yjh.accessvideo.hik;
+package com.yjh.accessvideo.hik.transmit;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
