@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+
 /**
 * @author tt
 * @since 2020-08-06
@@ -25,6 +27,11 @@ public class TAlgorithmInfoService{
     private TAlgorithmInfoDao tAlgorithmInfoDao;
 
     private final static Map<String, TAlgorithmInfo> ALGORITHM_INFO_MAP = new HashMap<>(64);
+
+    @PostConstruct
+    public void init(){
+        algorithmDefectInfoRefresh ();
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TAlgorithmInfo tAlgorithmInfo) {

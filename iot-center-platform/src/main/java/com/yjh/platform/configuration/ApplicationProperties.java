@@ -207,11 +207,11 @@ public class ApplicationProperties {
 
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
-        otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("audioTcpByteOrderLittleEndianEnabled"),false))
-                .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("audioMqttUser"),false))
+        otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("springInterfaceApi"),false))
+                .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
                 .setTaskToRobot(redisMap.get("taskToRobot"))
                 .setStationCode(redisMap.get("stationCode"))
-                .setNonhomologousWarn(redisMap.get("audioMqttPwd"));
+                .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
 
         Constant.apiPermissions= this.getOtherConfig().getSpringInterfaceApi();

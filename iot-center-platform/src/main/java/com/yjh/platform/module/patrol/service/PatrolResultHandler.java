@@ -1099,7 +1099,7 @@ public class PatrolResultHandler {
     private Map<String, String> getDefectMap(String resultImage, String resultValueItem,
                                              Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
                                              String resultValue) {
-        log.info("resultImage:{},resultValue:{}", resultImage, resultValue);
+        log.info("resultImage:{},resultValue:{},resultValueItem:{}", resultImage, resultValue,resultValueItem);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
             TAlgorithmInfo defect = analyseDataOperateService.getAlgorithmDefectInfo(resultValueItem);
