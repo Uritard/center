@@ -32,6 +32,7 @@ import com.yjh.platform.module.task.entity.TCruiseTaskResult;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.scheduled.DeviceStaticsToUpSystem;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -96,6 +97,9 @@ public class HelloController {
     private TCameraPresetService tCameraPresetService;
     @Autowired
     private NonhomologousWarnDao nonhomologousWarnDao;
+
+    @Autowired
+    private TAlgorithmInfoService algorithmInfo;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -681,9 +685,11 @@ public class HelloController {
                        @RequestParam(value = "instanceId", required = false) String instanceId
                           ) throws Exception{
 //        warnToUpSystem(warnContent,warnType,taskId,instanceId);
-        List<String> originalImgList = new ArrayList<>();
-        originalImgList.add("C:\\robotData\\reportPath\\1.jpg");
-        FileUtil.zip(originalImgList, taskId + ".zip", taskId, "C:\\robotData\\reportPath");
+
+        algorithmInfo.getDefectInfo("yw_gkxfw");
+//        List<String> originalImgList = new ArrayList<>();
+//        originalImgList.add("C:\\robotData\\reportPath\\1.jpg");
+//        FileUtil.zip(originalImgList, taskId + ".zip", taskId, "C:\\robotData\\reportPath");
     }
 
     private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){
