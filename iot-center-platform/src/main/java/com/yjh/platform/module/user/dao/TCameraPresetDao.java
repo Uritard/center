@@ -90,6 +90,7 @@ public interface TCameraPresetDao {
   int selectCameraPresetInTask(@Param(value = "presetId") String presetId );
 
     List<SilentConf> selectSilentInfo(@Param(value = "presetType") Integer presetType );
+    SilentConf selectSilentInfoByPrimaryKey(@Param(value = "id") Long id );
 
     List<TCameraPreset> selectCameraByPresetType(@Param(value = "presetType") Integer presetType);
 

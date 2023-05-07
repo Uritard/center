@@ -489,12 +489,17 @@
         <if test="presetType != null and presetType != ''"> and preset_type = #{presetType}</if>
     </select>
 
+    <select id="selectSilentInfoByPrimaryKey" resultType="com.yjh.platform.module.user.entity.SilentConf">
+        select id, preset_type, preset_type_name, recognize_type, chill_time, editable from silent_conf
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
     <select id="selectCameraByPresetType" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
         *
         from t_camera_preset
         where preset_type = #{presetType}
-        and edge_code is null
+          and edge_code is null
     </select>
 
     <select id="selectIsDownSystemPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -513,15 +518,15 @@
     </select>
 
     <select id="selectPresetTypeInfo" resultType="com.yjh.platform.module.user.entity.SilentConf">
-        select * from silent_conf
+        select id, preset_type, preset_type_name, recognize_type, chill_time, editable
+        from silent_conf
     </select>
 
     <update id="updateSilentConf" parameterType="com.yjh.platform.module.user.entity.SilentConf">
         update silent_conf a <set>
-        <if test="presetType != null">a.preset_type = #{presetType},</if>
         <if test="presetTypeName != null and presetTypeName != ''">a.preset_type_name = #{presetTypeName},</if>
-        <if test="recognizeType != null and recognizeType != ''">a.recognize_type = #{recognizeType},</if>
-        <if test="chillTime != null ">a.chill_time = #{chillTime},</if>
+        a.recognize_type = #{recognizeType},
+        a.chill_time = #{chillTime}
     </set>
         where a.id = #{id}
     </update>
