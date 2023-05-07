@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
@@ -14,6 +15,7 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
+import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.collections4.CollectionUtils;
@@ -67,6 +69,8 @@ public class TCruisePointInstanceService{
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -510,6 +514,10 @@ public class TCruisePointInstanceService{
     }
     @Transactional(rollbackFor = Exception.class)
     public Map<Object,Object> selectCameraByDeviceMeteId(Long deviceMeteId){
+        TStdDeviceMete devicemete = tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
+        if (devicemete == null){
+            throw new BusinessException("测点已不存在！");
+        }
         List<Map<Object,Object>> cameraList = tCruisePointInstanceDao.selectCameraByDeviceMeteId(deviceMeteId);
         Map<Object,Object> reMap = new HashMap<>();
         reMap.put("cameraType",cameraList);
