@@ -150,6 +150,7 @@ public class TWarnInfoService{
                     tWarnInfoDetail.setCameraId(presetInfo.getCameraId());
                     tWarnInfoDetail.setVideoCameraType(presetInfo.getVideoCameraType());
                     tWarnInfoDetail.setPresetId(presetInfo.getPresetId());
+                    tWarnInfoDetail.setDeviceType(presetInfo.getDeviceType());
                 }
                 if (edgeInfo != null) {
                     tWarnInfoDetail.setStationName(edgeInfo.getStationName());

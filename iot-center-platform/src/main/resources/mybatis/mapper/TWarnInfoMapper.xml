@@ -506,7 +506,7 @@
     </select>
     <select id="selectCruiseInfoByInstanceId" parameterType="java.lang.Long"
             resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
-        select a.instance_id,a.cruise_id,b.robot_id as camera_id,(CASE
+        select a.instance_id,a.cruise_id as preset_id,b.robot_id as camera_id,(CASE
         WHEN (b.save_type_list='jpg') THEN
         1
         WHEN (b.save_type_list='fir') THEN
@@ -514,15 +514,15 @@
         ELSE
         ''
         END )
-        AS video_camera_type from t_cruise_point_instance a inner join t_robot_inspection b on a.cruise_id = b.inspection_id and
+        AS video_camera_type, 0 as device_type from t_cruise_point_instance a inner join t_robot_inspection b on a.cruise_id = b.inspection_id and
         a.instance_id in
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
         UNION
-        select a.instance_id,a.cruise_id,b.camera_id as camera_id,
+        select a.instance_id,a.cruise_id as preset_id,b.camera_id as camera_id,
         ''
-        AS video_camera_type from t_cruise_point_instance a inner join t_camera_preset b on a.cruise_id = b.preset_id and a.instance_id in
+        AS video_camera_type,1 as device_type from t_cruise_point_instance a inner join t_camera_preset b on a.cruise_id = b.preset_id and a.instance_id in
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
