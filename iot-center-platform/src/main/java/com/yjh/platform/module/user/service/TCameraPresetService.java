@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
@@ -565,6 +566,21 @@ public class TCameraPresetService {
     }
 
     public int updateSilentConf(SilentConf silentConf){
+        if (Objects.nonNull(silentConf.getId())) {
+            SilentConf silentConf1 = tCameraPresetDao.selectSilentInfoByPrimaryKey(silentConf.getId());
+            if (!silentConf1.getEditable()) {
+                throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(),"该预置位不可编辑！");
+            }
+
+            if (4 == silentConf1.getPresetType() || 5 == silentConf1.getPresetType()) {
+                if (StringUtils.isBlank(silentConf.getRecognizeType())) {
+                    throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(),"该预置位识别类型不正确！");
+                }
+                if (Objects.isNull(silentConf.getChillTime()) || silentConf.getChillTime() <= 0) {
+                    throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(),"时间为空或范围不正确！");
+                }
+            }
+        }
         this.creatSilentTask(silentConf);
         return tCameraPresetDao.updateSilentConf(silentConf);
     }

@@ -25,4 +25,6 @@ public class SilentConf {
 
     private Integer chillTime;
 
+    private Boolean editable;
+
 }
