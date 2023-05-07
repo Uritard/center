@@ -55,10 +55,12 @@
         <result column="cruise_type" jdbcType="BIGINT" property="cruiseType" />
         <result column="instance_name" jdbcType="BIGINT" property="instanceName" />
         <result column="result_num" jdbcType="BIGINT" property="resultNum" />
+        <result column="result_desc" jdbcType="BIGINT" property="resultDesc" />
         <result column="person_check" jdbcType="BIGINT" property="personCheck" />
         <result column="identify_result" jdbcType="BIGINT" property="identifyResult" />
         <result column="cruise_result" jdbcType="BIGINT" property="cruiseResult" />
         <result column="picpath" jdbcType="BIGINT" property="picPath" />
+        <result column="origpic" jdbcType="BIGINT" property="origpic" />
         <result column="device_name" jdbcType="BIGINT" property="deviceName" />
         <result column="evaluation_state" jdbcType="BIGINT" property="deviceName" />
         <result column="device_type" jdbcType="BIGINT" property="deviceType" />
@@ -539,7 +541,7 @@
         ORDER BY f.cruise_time DESC
     </select>
 
-    <select id="selectCruiseDataReport" resultMap="cruiseDataReport">
+    <select id="selectCruiseDataReport" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
         SELECT a.device_mete_id,
         a.mete_type,
         a.meter_type,
@@ -547,10 +549,12 @@
         e.cruise_type,
         e.instance_name,
         e.result_num,
+        e.result_desc,
         e.person_check,
         e.identify_result,
         e.cruise_result,
         e.picpath AS picPath,
+        e.origpic,
         e.device_name AS device_name,
         e.evaluation_state AS evaluation_state,
         e.task_id,
@@ -580,7 +584,49 @@
         </if>
         ORDER BY e.cruise_time DESC
     </select>
-
+    <select id="exportCruiseDataReport" resultType="java.util.Map">
+        SELECT a.device_mete_id as deviceMeteId,
+        a.mete_type as meteType,
+        a.meter_type as meterType,
+        e.cruise_time as cruiseTime,
+        e.cruise_type as cruiseType,
+        e.instance_name as instanceName,
+        e.result_num as resultNum,
+        e.result_desc as resultDesc,
+        e.person_check as personCheck,
+        e.identify_result as identifyResult,
+        e.cruise_result as cruiseResult,
+        e.picpath AS picPath,
+        e.origpic,
+        e.device_name AS deviceName,
+        e.evaluation_state AS evaluationState,
+        e.task_id as taskId,
+        e.instance_id as instanceId,
+        e.device_id as deviceId,
+        tsd.device_type      AS deviceType,
+        tsd.up_region_name   AS upRegionName,
+        tsd.up_region_id     AS regionId
+        FROM u_patrol_data_result e
+        LEFT JOIN t_std_devicemete a ON a.device_mete_id = e.device_mete_id
+        Left Join t_std_device tsd on e.device_id = tsd.device_id
+        WHERE 1 = 1
+        <if test="list != null and list.size() > 0">and e.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            <if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
+        <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+        <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
+        <if test="instanceName != null and instanceName != ''">
+            and e.instance_name like CONCAT('%',CONCAT(#{instanceName},'%'))
+        </if>
+        ORDER BY e.cruise_time DESC
+    </select>
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
         f.cruise_time as end_time,

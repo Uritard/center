@@ -10,6 +10,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,53 @@ public class UPatrolDataResultService {
             .add("deviceType")
             .add("alarmLevel");
         DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList,optional);
+
+        return cruiseResultAnalyzeInfoList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String, Object>> exportCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
+
+        List<Map<String, Object>> cruiseResultAnalyzeInfoList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(deviceIdList)) {
+
+            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
+
+            List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
+            Map<Long, TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId, Function.identity()));
+
+
+            cruiseResultAnalyzeInfoList.forEach(cruiseResultAnalyzeInfoMap -> {
+                if (Objects.isNull(cruiseResultAnalyzeInfoMap.get("identifyResult"))) {
+                    cruiseResultAnalyzeInfoMap.put("identifyResult", cruiseResultAnalyzeInfoMap.get("identifyResult"));
+                }
+                if (Objects.isNull(cruiseResultAnalyzeInfoMap.get("personCheck"))) {
+                    cruiseResultAnalyzeInfoMap.put("personCheck", cruiseResultAnalyzeInfoMap.get("personCheck"));
+                }
+
+                if (Objects.nonNull(cruiseResultAnalyzeInfoMap.get("regionId"))) {
+                    TStdRegion tStdRegion = regionMaps.get(MapUtils.getLongValue(cruiseResultAnalyzeInfoMap, "regionId"));
+                    Long upRegionId = tStdRegion.getUpRegionId();
+                    TStdRegion up = regionMaps.get(upRegionId);
+                    if (Objects.nonNull(up)) {
+                        cruiseResultAnalyzeInfoMap.put("regionName", up.getRegionName());
+                    } else {
+                        cruiseResultAnalyzeInfoMap.put("regionName", tStdRegion.getRegionName());
+                    }
+                }
+                cruiseResultAnalyzeInfoMap.put("evaluationState", "257".equals(MapUtils.getString(cruiseResultAnalyzeInfoMap, "evaluationState")) ? "未审核" : "已审核");
+            });
+        }
+        DictConvertUtil.DictOptional optional = DictConvertUtil
+                .optional("cruiseType")
+                .add("planType", "taskType", "cTypeName")
+                .add("identifyResult")
+                .add("cruiseResult")
+                .add("meteType")
+                .add("meterType")
+                .add("deviceType")
+                .add("alarmLevel");
+        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList, optional);
 
         return cruiseResultAnalyzeInfoList;
     }

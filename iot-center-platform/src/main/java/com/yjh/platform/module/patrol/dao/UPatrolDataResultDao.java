@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lqh
@@ -81,6 +82,14 @@ public interface UPatrolDataResultDao {
         @Param(value = "instanceName") String instanceName,
         @Param(value = "stationName") String stationName);
 
+    List<Map<String, Object>> exportCruiseDataReport(@Param(value = "cType") Integer cType,
+                                                     @Param(value = "meteType") String meteType,
+                                                     @Param(value = "meterType") Integer meterType,
+                                                     @Param(value = "endTime") String endTime,
+                                                     @Param(value = "startTime") String startTime,
+                                                     @Param(value = "list") List<Long> list,
+                                                     @Param(value = "instanceName") String instanceName,
+                                                     @Param(value = "stationName") String stationName);
     List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
         @Param(value = "cType") Integer cType,
         @Param(value = "deviceMeteId") Long deviceMeteId,
