@@ -559,7 +559,7 @@ public class PatrolResultHandler {
 
                     switch (meteKind){
                         case "1":
-                            int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultValue, stateZero, stateOne, alarmState);
+                            int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultDesc, stateZero, stateOne, alarmState);
                             if (warnRuleFlag != 1){
                                 log.info("Alarm value is not reached(遥信)");
                                 break;
