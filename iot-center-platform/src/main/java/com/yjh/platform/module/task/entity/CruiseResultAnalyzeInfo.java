@@ -67,6 +67,9 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     @ApiModelProperty(value = "巡检分析图片")
     private String picPath;
 
+    @ApiModelProperty(value = "巡检分析图片根目录")
+    private String origpic;
+
     @ApiModelProperty(value = "识别类型")
     private String meteType;
 
