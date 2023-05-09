@@ -320,7 +320,7 @@ public class SendToUpSystemServices {
                     // 区域模型
                     String regionModelTargetPath = String.format(stationCode + "/Model/region_model.xml");
                     uploadFileToUpFtps(createRegionModel(path), regionModelTargetPath);
-                    map.put("region_path", regionModelTargetPath);
+                    map.put("region_file_path", regionModelTargetPath);
                     list.add(map);
                     break;
                 case "1002":
