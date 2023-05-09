@@ -297,7 +297,8 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("picpath", picPath);
             }
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
-            boolean fileFound = new File(resultImagePath).exists();
+            File file = new File(resultImagePath);
+            boolean fileFound = !file.isDirectory() && file.exists();
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);

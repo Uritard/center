@@ -1780,7 +1780,7 @@ public class UPatrolTaskService {
                 skipFlag = true;
             }
             // 机器人离线判断
-            if (!skipFlag && TypeEnum.ROBOT.getCode() == cruiseType && TypeEnum.UAV.getCode() == cruiseType) {
+            if (!skipFlag && (TypeEnum.ROBOT.getCode() == cruiseType || TypeEnum.UAV.getCode() == cruiseType)) {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "-1");
