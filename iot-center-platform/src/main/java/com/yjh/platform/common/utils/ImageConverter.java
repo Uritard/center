@@ -41,7 +41,7 @@ public class ImageConverter implements Converter<String> {
                                        GlobalConfiguration globalConfiguration) throws IOException {
         File file = new File(value);
         String isPath = "/home/yjh_iot_center/";
-        if (file.exists()) {
+        if (!file.isDirectory() && file.exists()) {
             //文件存在
             return new CellData(FileUtils.readFileToByteArray(new File(picCompression(value))));
         } else if (value.contains(isPath)) {
