@@ -421,6 +421,7 @@ public class SendToUpSystemServices {
                         String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
                         uploadFileToUpFtps(mapAbsPath, mapModelTargetPath);
                         Map<String,Object> mapMap = new HashMap<>();
+                        mapMap.put("type", type);
                         mapMap.put("file_path", mapModelTargetPath);
                         list.add(mapMap);
                     }

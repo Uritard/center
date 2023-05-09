@@ -50,7 +50,7 @@ public class ModelUpdateHandler implements MessageHandlerStrategy, InitializingB
                 String type = String.valueOf(xmlBaseModel.getItems().get(0).get("type"));
                 if ("9".equals(type)) {
                     for(Map<String,Object> map:xmlBaseModel.getItems()) {
-                        String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
+                        String filePath = String.valueOf(map.get("file_path"));
                         robotService.syncModelUpdate(type, filePath, sendCode);
                     }
                 } else {
