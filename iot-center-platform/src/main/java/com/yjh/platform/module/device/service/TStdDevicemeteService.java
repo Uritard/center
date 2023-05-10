@@ -2,13 +2,13 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.yjh.platform.common.enums.AlarmLevelEnum;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -16,7 +16,9 @@ import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,6 +57,9 @@ public class TStdDevicemeteService{
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
     @Autowired
     private TCruiseTypeDao tCruiseTypeDao;
+
+    @Autowired
+    private LinkAutoMapper linkAutoMapper;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -370,7 +376,196 @@ public class TStdDevicemeteService{
         }
         return deleteCount;//批量删除标准测点
     }
+    /**
+     * 新建测点
+     *
+     * @param buildList 模型巡视点列表
+     */
+    public void importExcel(List<ExcelEntity> buildList)  {
+        log.info("开始执行导入:{}", new Date());
+        //取出当前根节点
+        Long rootId = linkAutoMapper.selectRoot();
 
+        //取出所有区域
+        Set<String> regionNameSet = buildList.stream().map(ExcelEntity::getAreaName).collect(Collectors.toSet());
+        //查询已存在区域
+        List<TStdRegion> tStdRegionList = linkAutoMapper.listTStdRegionByParentIdAndNameList(rootId, regionNameSet);
+        //处理不存在区域
+        if (CollectionUtils.isNotEmpty(tStdRegionList)) {
+            tStdRegionList.forEach(o -> regionNameSet.remove(o.getRegionName()));
+        }
+
+        if (CollectionUtils.isNotEmpty(regionNameSet)) {
+            List<TStdRegion> insertList = new ArrayList<>(regionNameSet.size());
+            regionNameSet.forEach(o -> {
+                TStdRegion tStdRegion = new TStdRegion();
+                tStdRegion.setUpRegionId(rootId);
+                tStdRegion.setRegionName(o);
+                tStdRegion.setState(1);
+                insertList.add(tStdRegion);
+            });
+            linkAutoMapper.batchInsertRegion(insertList);
+            //将新增区域放入list
+            tStdRegionList.addAll(insertList);
+        }
+
+        //替换区域Id
+        Map<String, TStdRegion> areaNameToId =
+            tStdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionName, Function.identity()));
+        buildList.forEach(o -> o.setAreaId(String.valueOf(areaNameToId.get(o.getAreaName()).getRegionId())));
+        Multimap<Long, ExcelEntity> areaToBayMap = HashMultimap.create();
+        buildList.forEach(o -> areaToBayMap.put(Long.valueOf(o.getAreaId()), o));
+
+        Set<Long> areaIdSet = areaToBayMap.keySet();
+        List<ExcelEntity> buildListAfterRegion = new LinkedList<>();
+        List<TStdRegion> totalRegion = new ArrayList<>();
+        for (Long areaId : areaIdSet) {
+            List<ExcelEntity> sameAreaList = new ArrayList<>(areaToBayMap.get(areaId));
+            Set<String> bayNameSet = sameAreaList.stream().map(ExcelEntity::getRegionName).collect(Collectors.toSet());
+            List<TStdRegion> existsBayList = linkAutoMapper.selectByRegionNameEqual(areaId, bayNameSet);
+
+            existsBayList.forEach(tStdRegion -> bayNameSet.remove(tStdRegion.getRegionName()));
+            List<TStdRegion> insertList = new ArrayList<>(bayNameSet.size());
+            if (CollectionUtils.isNotEmpty(bayNameSet)) {
+                bayNameSet.forEach(o -> {
+                    TStdRegion tStdRegion = new TStdRegion();
+                    tStdRegion.setUpRegionId(areaId);
+                    tStdRegion.setRegionName(o);
+                    tStdRegion.setState(1);
+                    insertList.add(tStdRegion);
+                });
+                linkAutoMapper.batchInsertRegion(insertList);
+                existsBayList.addAll(insertList);
+            }
+
+            Map<String, TStdRegion> bayNameToBayToId =
+                existsBayList.stream().collect(Collectors.toMap(TStdRegion::getRegionName, Function.identity()));
+
+            sameAreaList.forEach(ExcelEntity -> {
+                ExcelEntity.setRegionId(String.valueOf(bayNameToBayToId.get(ExcelEntity.getRegionName()).getRegionId()));
+            });
+
+            buildListAfterRegion.addAll(sameAreaList);
+            totalRegion.addAll(existsBayList);
+        }
+        Map<Long, TStdRegion> idToName = totalRegion.stream().collect(Collectors.toMap(TStdRegion::getRegionId, Function.identity()));
+
+        Multimap<Long, ExcelEntity> multimap = HashMultimap.create();
+        buildListAfterRegion.forEach(o -> multimap.put(Long.valueOf(o.getRegionId()), o));
+
+        Set<Long> set = multimap.keySet();
+
+        List<TStdDevice> totalStdDevices = new ArrayList<>();
+        List<TStdDevice> insertDevices = new ArrayList<>();
+
+        List<ExcelEntity> buildListAfterDevice = new LinkedList<>();
+        for (Long regionId : set) {
+            List<ExcelEntity> excelEntities = new ArrayList<>(multimap.get(regionId));
+            Set<String> deviceNames = new HashSet<>();
+            Map<String, String> map = excelEntities.stream().filter(o -> deviceNames.add(o.getMainDeviceName()))
+                .collect(Collectors.toMap(ExcelEntity::getMainDeviceName, ExcelEntity::getDeviceTypeId));
+            deviceNames.clear();
+            Map<String, String> nameToMainId = excelEntities.stream().filter(o -> deviceNames.add(o.getMainDeviceName()))
+                .collect(Collectors.toMap(ExcelEntity::getMainDeviceName, ExcelEntity::getMainDeviceId));
+            List<TStdDevice> tStdDevices = linkAutoMapper.selectByDeviceNameEqual(regionId, deviceNames);
+            if (CollectionUtils.isNotEmpty(tStdDevices)) {
+                tStdDevices.forEach(o -> o.setMainDeviceId(nameToMainId.get(o.getDeviceName())));
+                tStdDevices.forEach(tStdDevice -> deviceNames.remove(tStdDevice.getDeviceName()));
+                totalStdDevices.addAll(tStdDevices);
+            }
+            if (CollectionUtils.isNotEmpty(deviceNames)) {
+                deviceNames.forEach(deviceName -> {
+                    Integer deviceType = Integer.parseInt(map.get(deviceName));
+                    TStdDevice tStdDevice = new TStdDevice();
+                    tStdDevice.setUpRegionId(regionId);
+                    tStdDevice.setMainDeviceId(nameToMainId.get(deviceName));
+                    tStdDevice.setDeviceName(deviceName);
+                    tStdDevice.setDeviceType(deviceType);
+                    tStdDevice.setUpRegionName(idToName.get(regionId).getRegionName());
+                    insertDevices.add(tStdDevice);
+                    TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
+                    tStdDeviceAttr.setUsedTime(new Date());
+                    tStdDevice.setTStdDeviceAttr(tStdDeviceAttr);
+
+                });
+            }
+            excelEntities.forEach(o -> o.setMainDeviceId(String.valueOf(nameToMainId.get(o.getMainDeviceName()))));
+            buildListAfterDevice.addAll(excelEntities);
+        }
+        if (CollectionUtils.isNotEmpty(insertDevices)) {
+            linkAutoMapper.batchInsertDevice(insertDevices);
+            List<TStdDeviceAttr> tStdDeviceAttrs = insertDevices.stream().map(o -> {
+                o.getTStdDeviceAttr().setDeviceId(o.getDeviceId());
+                return o.getTStdDeviceAttr();
+            }).collect(Collectors.toList());
+            linkAutoMapper.batchInsertDeviceAttr(tStdDeviceAttrs);
+            totalStdDevices.addAll(insertDevices);
+
+        }
+
+        Set<String> strings = new HashSet<>();
+
+        Map<String, Long> stringLongMap = totalStdDevices.stream().filter(o -> strings.add(o.getMainDeviceId()))
+            .collect(Collectors.toMap(TStdDevice::getMainDeviceId, TStdDevice::getDeviceId));
+
+        buildListAfterDevice.forEach(o -> o.setDeviceId(stringLongMap.get(o.getMainDeviceId())));
+
+        Multimap<Long, ExcelEntity> multiMapForDevice = HashMultimap.create();
+        buildListAfterDevice.forEach(o -> multiMapForDevice.put(o.getDeviceId(), o));
+        List<TStdDeviceMete> totalMete = new ArrayList<>();
+        multiMapForDevice.keySet().forEach(deviceId -> {
+            List<ExcelEntity> entityList = new ArrayList<>(multiMapForDevice.get(deviceId));
+            Set<String> meteNames = entityList.stream().map(ExcelEntity::getMeteName).collect(Collectors.toSet());
+            List<TStdDeviceMete> tStdDeviceMetes = linkAutoMapper.selectByMeteNameEqual(deviceId, meteNames);
+            Map<String, TStdDeviceMete> tStdDeviceMeteMap =
+                tStdDeviceMetes.stream().collect(Collectors.toMap(TStdDeviceMete::getMeteName, Function.identity()));
+
+            entityList.forEach(excelEntity -> {
+                if (!tStdDeviceMeteMap.containsKey(excelEntity.getMeteName())) {
+                    TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
+                    tStdDeviceMete.setDeviceId(excelEntity.getDeviceId());
+                    tStdDeviceMete.setDevicePointId(String.valueOf(excelEntity.getMeteId()));
+                    tStdDeviceMete.setDeviceType(Integer.valueOf(excelEntity.getDeviceTypeId()));
+                    tStdDeviceMete.setCustomId(excelEntity.getCustomId());
+                    tStdDeviceMete.setCustomName(excelEntity.getCustomName());
+                    tStdDeviceMete.setMeterType(excelEntity.getMeterTypeId());
+                    tStdDeviceMete.setMeteType(excelEntity.getMeteTypeId());
+                    tStdDeviceMete.setMeteName(excelEntity.getMeteName());
+                    tStdDeviceMete.setMeteKind(excelEntity.getMeteKindId());
+                    //默认字段
+                    tStdDeviceMete.setPositionType(excelEntity.getPositionType());
+                    tStdDeviceMete.setIsAi(excelEntity.getIsAi());
+                    tStdDeviceMete.setIsJudge(excelEntity.getIsJudge());
+                    if (Objects.nonNull(excelEntity.getAlarmLevel())) {
+                        Integer alarmLevel = excelEntity.getAlarmLevel();
+                        tStdDeviceMete.setAlarmLevel(alarmLevel);
+                        StringJoiner stringJoiner   = new StringJoiner(",");
+                        for(int i = alarmLevel; i <= 133;i++) { 
+                            stringJoiner.add(String.valueOf(i));
+                        }
+                        tStdDeviceMete.setAlarmLevelString(stringJoiner.toString());
+                    }
+                    tStdDeviceMete.setHighLimit1(excelEntity.getHighLimit1() == null ? null : NumberUtils.toFloat(excelEntity.getHighLimit1()));
+                    tStdDeviceMete.setHighLimit2(excelEntity.getHighLimit2() == null ? null : NumberUtils.toFloat(excelEntity.getHighLimit2()));
+                    tStdDeviceMete.setHighLimit3(excelEntity.getHighLimit3() == null ? null : NumberUtils.toFloat(excelEntity.getHighLimit3()));
+                    tStdDeviceMete.setHighLimit4(excelEntity.getHighLimit4() == null ? null : NumberUtils.toFloat(excelEntity.getHighLimit4()));
+                    tStdDeviceMete.setLowLimit1(excelEntity.getLowLimit1() == null ? null : NumberUtils.toFloat(excelEntity.getLowLimit1()));
+                    tStdDeviceMete.setLowLimit2(excelEntity.getLowLimit2() == null ? null : NumberUtils.toFloat(excelEntity.getLowLimit2()));
+                    tStdDeviceMete.setLowLimit3(excelEntity.getLowLimit3() == null ? null : NumberUtils.toFloat(excelEntity.getLowLimit3()));
+                    tStdDeviceMete.setLowLimit4(excelEntity.getLowLimit4() == null ? null : NumberUtils.toFloat(excelEntity.getLowLimit4()));
+                    tStdDeviceMete.setUnit(excelEntity.getUnit());
+                    tStdDeviceMete.setAlarmNote(excelEntity.getAlarmNote());
+                    tStdDeviceMete.setAlarmState(0);
+                    tStdDeviceMete.setRedundantType(excelEntity.getRedundantType());
+                    tStdDeviceMete.setIsTemdif(0);
+                    totalMete.add(tStdDeviceMete);
+                }
+            });
+        });
+        if (CollectionUtils.isNotEmpty(totalMete)) {
+            linkAutoMapper.insertDeviceMete(totalMete);
+        }
+    }
 
 }
 

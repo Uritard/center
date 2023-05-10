@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.LinkAutoMapper">
+
+
+    <resultMap id="TRobotInspectionMap" type="com.yjh.platform.module.device.entity.TRobotInspection">
+        <id property="inspectionId" column="inspection_id" jdbcType="BIGINT"/>
+        <result property="robotId" column="robot_id" jdbcType="BIGINT"/>
+        <result property="inspectionCode" column="inspection_code" jdbcType="VARCHAR"/>
+        <result property="inspectionName" column="inspection_name" jdbcType="VARCHAR"/>
+        <result property="inspectionType" column="inspection_type" jdbcType="INTEGER"/>
+        <result property="componentId" column="component_id" jdbcType="VARCHAR"/>
+        <result property="meterType" column="meter_type" jdbcType="INTEGER"/>
+        <result property="appearanceType" column="appearance_type" jdbcType="INTEGER"/>
+        <result property="mainOperationType" column="main_operation_type" jdbcType="INTEGER"/>
+        <result property="operationType" column="operation_type" jdbcType="INTEGER"/>
+        <result property="saveTypeList" column="save_type_list" jdbcType="VARCHAR"/>
+        <result property="recognitionTypeList" column="recognition_type_list" jdbcType="VARCHAR"/>
+        <result property="phase" column="phase" jdbcType="VARCHAR"/>
+        <result property="deviceInfo" column="device_info" jdbcType="VARCHAR"/>
+        <result property="propertyPicPath" column="property_pic_path" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="TStdDeviceMeteMap" type="com.yjh.platform.module.device.entity.TStdDeviceMete">
+        <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="device_point_id" jdbcType="VARCHAR" property="devicePointId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="custom_name" jdbcType="VARCHAR" property="customName" />
+        <result column="mete_id" jdbcType="BIGINT" property="meteId" />
+        <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
+        <result column="meter_type" jdbcType="INTEGER" property="meterType" />
+        <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
+        <result column="appearance_type" jdbcType="INTEGER" property="appearanceType" />
+        <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+        <result column="inspection_type" jdbcType="VARCHAR" property="inspectionType" />
+        <result column="position_type" jdbcType="VARCHAR" property="positionType" />
+        <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
+        <result column="is_ai" jdbcType="VARCHAR" property="isAi" />
+        <result column="is_judge" jdbcType="VARCHAR" property="isJudge"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit" />
+        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote" />
+        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType" />
+        <result column="up_effect" jdbcType="REAL" property="upEffect" />
+        <result column="down_effect" jdbcType="REAL" property="downEffect" />
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel" />
+        <result column="high_limit1" jdbcType="REAL" property="highLimit1" />
+        <result column="low_limit1" jdbcType="REAL" property="lowLimit1" />
+        <result column="high_limit2" jdbcType="REAL" property="highLimit2" />
+        <result column="low_limit2" jdbcType="REAL" property="lowLimit2" />
+        <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay" />
+        <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt" />
+        <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs" />
+        <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer" />
+        <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
+        <result column="modulus" jdbcType="INTEGER" property="modulus" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="stateZero" jdbcType="VARCHAR" property="stateZero" />
+        <result column="stateOne" jdbcType="VARCHAR" property="stateOne" />
+        <result column="alarmState" jdbcType="INTEGER" property="alarmState" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="TStdRegionMap" type="com.yjh.platform.module.device.entity.TStdRegion">
+        <id property="regionId" column="region_id" jdbcType="BIGINT"/>
+        <result property="regionName" column="region_name" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
+        <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
+        <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
+        <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+        <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
+        <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+        <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+        <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+        <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="TStdDeviceMap" type="com.yjh.platform.module.device.entity.TStdDevice">
+        <id property="deviceId" column="device_id" jdbcType="BIGINT"/>
+        <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
+        <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
+        <result property="aliasName" column="alias_name" jdbcType="VARCHAR"/>
+        <result property="deviceType" column="device_type" jdbcType="INTEGER"/>
+        <result property="positionType" column="position_type" jdbcType="VARCHAR"/>
+        <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+        <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="upRegionName" column="up_region_name" jdbcType="VARCHAR"/>
+        <result property="customType" column="custom_type" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="presetId" column="preset_id" jdbcType="BIGINT"/>
+        <result property="cameraId" column="camera_id" jdbcType="BIGINT"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <result property="realCode" column="real_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="TStdDeviceSql">
+        device_id,device_code,device_name,
+        alias_name,device_type,position_type,
+        model_id,region_path,up_region_id,
+        up_region_name,custom_type,status,
+        update_time,create_time,preset_id,
+        camera_id,origin_id,edge_code,
+        real_code
+    </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="TStdRegionSql">
+        region_id,region_name,sort,
+        up_region_id,up_region_ids,region_code,
+        origin_region_id,station_id,station_name,
+        state,edge_status,region_path,
+        longitude,latitude,voltage_level,
+        remark,create_time
+    </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="TMeteSql">
+
+    </sql>
+    <sql id="TRobotInspectionSql">
+        inspection_id,robot_id,inspection_code,
+        inspection_name,inspection_type,component_id,
+        meter_type,appearance_type,main_operation_type,
+        operation_type,save_type_list,recognition_type_list,
+        phase,device_info,property_pic_path,
+        origin_id,edge_code
+    </sql>
+
+    <select id="selectRoot" resultType="java.lang.Long">
+        SELECT region_id
+        FROM t_std_region
+        where up_region_id = -1
+        limit 1
+    </select>
+
+    <select id="listTStdRegionByParentIdAndNameList" resultMap="TStdRegionMap">
+        select
+        <include refid="TStdRegionSql"/>
+        from t_std_region
+        where up_region_id = #{rootId}
+        and region_name in
+        <foreach collection="nameList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <insert id="batchInsertRegion" useGeneratedKeys="true" keyProperty="regionId"
+            parameterType="com.yjh.platform.module.device.entity.TStdRegion">
+        insert into t_std_region
+        ( region_name, sort
+        , up_region_id, up_region_ids, region_code
+        , origin_region_id, station_id, station_name
+        , state, edge_status, region_path
+        , longitude, latitude, voltage_level
+        , remark, create_time)
+        values
+        <foreach collection="list" separator="," item="item">
+            ( #{item.regionName,jdbcType=VARCHAR}, #{item.sort,jdbcType=INTEGER}
+            , #{item.upRegionId,jdbcType=BIGINT}, #{item.upRegionIds,jdbcType=VARCHAR}, #{item.regionCode,jdbcType=VARCHAR}
+            , #{item.originRegionId,jdbcType=VARCHAR}, #{item.stationId,jdbcType=VARCHAR}, #{item.stationName,jdbcType=VARCHAR}
+            , #{item.state,jdbcType=INTEGER}, #{item.edgeStatus,jdbcType=VARCHAR}, #{item.regionPath,jdbcType=VARCHAR}
+            , #{item.longitude,jdbcType=VARCHAR}, #{item.latitude,jdbcType=VARCHAR}, #{item.voltageLevel,jdbcType=VARCHAR}
+            , #{item.remark,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+
+    <select id="selectByDeviceNameEqual" resultMap="TStdDeviceMap">
+        select
+        <include refid="TStdDeviceSql"/>
+        from t_std_device
+        WHERE
+        up_region_id = #{upRegionId}
+        AND device_name in
+        <foreach collection="deviceNameList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        group by device_name
+    </select>
+
+    <select id="selectByRegionNameEqual" resultMap="TStdRegionMap">
+        select
+        <include refid="TStdRegionSql"/>
+        from t_std_region a
+        WHERE
+        up_region_id = #{upRegionId}
+        AND a.region_name in
+        <foreach collection="regionNameList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        group by region_name
+    </select>
+
+    <select id="selectByMeteNameEqual" resultMap="TStdDeviceMeteMap">
+        select
+        device_mete_id, device_id, device_point_id, custom_id, custom_name, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note,up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
+        mete_type, modulus, remark,state_zero,state_one,alarm_state
+        from t_std_devicemete a
+        WHERE
+        device_id = #{deviceId}
+        AND a.mete_name in
+        <foreach collection="meteNameList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        group by mete_name
+    </select>
+
+    <insert id="batchInsertDeviceAttr" keyColumn="device_id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_std_device_attr
+        ( device_id
+        ,device_model,pms_type,pms_id
+        ,device_vendor,production_date,used_time
+        ,disable_date,last_maintenance,maintenance_count
+        ,organization,department,responsible_person
+        ,latitude,longitude,ip
+        ,port,voltage_level,sequence_point
+        ,real_code,address)
+        values
+        <foreach collection="list" item="tStdDeviceAttr" separator=",">
+            (#{tStdDeviceAttr.deviceId,jdbcType=BIGINT}
+            ,#{tStdDeviceAttr.deviceModel,jdbcType=INTEGER},#{tStdDeviceAttr.pmsType,jdbcType=VARCHAR},#{tStdDeviceAttr.pmsId,jdbcType=VARCHAR}
+            ,#{tStdDeviceAttr.deviceVendor,jdbcType=VARCHAR},#{tStdDeviceAttr.productionDate,jdbcType=TIMESTAMP},#{tStdDeviceAttr.usedTime,jdbcType=TIMESTAMP}
+            ,#{tStdDeviceAttr.disableDate,jdbcType=TIMESTAMP},#{tStdDeviceAttr.lastMaintenance,jdbcType=TIMESTAMP},#{tStdDeviceAttr.maintenanceCount,jdbcType=VARCHAR}
+            ,#{tStdDeviceAttr.organization,jdbcType=VARCHAR},#{tStdDeviceAttr.department,jdbcType=VARCHAR},#{tStdDeviceAttr.responsiblePerson,jdbcType=VARCHAR}
+            ,#{tStdDeviceAttr.latitude,jdbcType=VARCHAR},#{tStdDeviceAttr.longitude,jdbcType=VARCHAR},#{tStdDeviceAttr.ip,jdbcType=VARCHAR}
+            ,#{tStdDeviceAttr.port,jdbcType=INTEGER},#{tStdDeviceAttr.voltageLevel,jdbcType=VARCHAR},#{tStdDeviceAttr.sequencePoint,jdbcType=VARCHAR}
+            ,#{tStdDeviceAttr.realCode,jdbcType=VARCHAR},#{tStdDeviceAttr.address,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertDevice" keyColumn="device_id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_std_device
+        (device_code
+        ,device_name,alias_name,device_type
+        ,position_type,model_id,region_path
+        ,up_region_id,up_region_name,custom_type
+        ,status,update_time
+        ,create_time,preset_id,camera_id,real_code
+        )
+        values
+        <foreach collection="list"  item="tStdDevice" separator=",">
+            (#{tStdDevice.deviceCode,jdbcType=VARCHAR}
+            ,#{tStdDevice.deviceName,jdbcType=VARCHAR},#{tStdDevice.aliasName,jdbcType=VARCHAR},#{tStdDevice.deviceType,jdbcType=INTEGER}
+            ,#{tStdDevice.positionType,jdbcType=VARCHAR},#{tStdDevice.modelId,jdbcType=BIGINT},#{tStdDevice.regionPath,jdbcType=VARCHAR}
+            ,#{tStdDevice.upRegionId,jdbcType=BIGINT},#{tStdDevice.upRegionName,jdbcType=VARCHAR},#{tStdDevice.customType,jdbcType=INTEGER}
+            ,#{tStdDevice.status,jdbcType=INTEGER},#{tStdDevice.updateTime,jdbcType=TIMESTAMP}
+            ,#{tStdDevice.createTime,jdbcType=TIMESTAMP},#{tStdDevice.presetId,jdbcType=BIGINT},#{tStdDevice.cameraId,jdbcType=BIGINT}
+            ,#{tStdDevice.realCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertDeviceMete" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" useGeneratedKeys="true">
+        insert into t_std_devicemete
+        ( device_mete_id,device_id,device_point_id
+        ,custom_id,custom_name,mete_id,mete_kind
+        ,mete_type,meter_type,device_type
+        ,inspection_type,mete_name,appearance_type
+        ,position_type,analyse_type,is_ai
+        ,is_judge,unit,alarm_note
+        ,alarm_type,up_effect,down_effect
+        ,state_zero,state_one,alarm_state
+        ,alarm_level,high_limit1,low_limit1
+        ,high_limit2,low_limit2,high_limit3
+        ,low_limit3,high_limit4,low_limit4
+        ,alarm_delay,alarm_cnt,threshold_abs
+        ,threshold_per,modulus,remark
+        ,redundant_type
+        )
+        values
+<foreach collection="list" separator="," item="item">
+    (#{item.deviceMeteId,jdbcType=BIGINT},#{item.deviceId,jdbcType=BIGINT},#{item.devicePointId,jdbcType=VARCHAR}
+    ,#{item.customId,jdbcType=VARCHAR},#{item.customName,jdbcType=VARCHAR},#{item.meteId,jdbcType=BIGINT},#{item.meteKind,jdbcType=VARCHAR}
+    ,#{item.meteType,jdbcType=VARCHAR},#{item.meterType,jdbcType=INTEGER},#{item.deviceType,jdbcType=INTEGER}
+    ,#{item.inspectionType,jdbcType=INTEGER},#{item.meteName,jdbcType=VARCHAR},#{item.appearanceType,jdbcType=INTEGER}
+    ,#{item.positionType,jdbcType=VARCHAR},#{item.analyseType,jdbcType=INTEGER},#{item.isAi,jdbcType=VARCHAR}
+    ,#{item.isJudge,jdbcType=VARCHAR},#{item.unit,jdbcType=VARCHAR},#{item.alarmNote,jdbcType=VARCHAR}
+    ,#{item.alarmType,jdbcType=VARCHAR},#{item.upEffect,jdbcType=FLOAT},#{item.downEffect,jdbcType=FLOAT}
+    ,#{item.stateZero,jdbcType=VARCHAR},#{item.stateOne,jdbcType=VARCHAR},#{item.alarmState,jdbcType=INTEGER}
+    ,#{item.alarmLevel,jdbcType=INTEGER},#{item.highLimit1,jdbcType=FLOAT},#{item.lowLimit1,jdbcType=FLOAT}
+    ,#{item.highLimit2,jdbcType=FLOAT},#{item.lowLimit2,jdbcType=FLOAT},#{item.highLimit3,jdbcType=FLOAT}
+    ,#{item.lowLimit3,jdbcType=FLOAT},#{item.highLimit4,jdbcType=FLOAT},#{item.lowLimit4,jdbcType=FLOAT}
+    ,#{item.alarmDelay,jdbcType=INTEGER},#{item.alarmCnt,jdbcType=INTEGER},#{item.thresholdAbs,jdbcType=DECIMAL}
+    ,#{item.thresholdPer,jdbcType=DECIMAL},#{item.modulus,jdbcType=INTEGER},#{item.remark,jdbcType=VARCHAR}
+    ,#{item.redundantType,jdbcType=VARCHAR})
+
+</foreach>
+    </insert>
+
+
+    <select id="selectTSRegionForStation" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        select
+            *
+        from
+            t_std_region a
+        where
+            a.up_region_id = -1
+limit 1
+    </select>
+
+</mapper>

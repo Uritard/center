@@ -936,6 +936,13 @@ public class TRobotInspectionService {
                 robot.setUpId(1L);
                 robot.setUpName("机器人树");
                 robot.setInfoType("robot");
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(robot.getImageSize())) {
+                    String[] strings = robot.getImageSize().split("x");
+                    if (strings.length == 2) {
+                        robot.setOriginalProportionX(Integer.valueOf(strings[0]));
+                        robot.setOriginalProportionY(Integer.valueOf(strings[1]));
+                    }
+                }
             }
             node.setChildren(robotList);
             reList.add(node);

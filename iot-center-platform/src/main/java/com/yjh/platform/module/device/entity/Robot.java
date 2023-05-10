@@ -88,8 +88,14 @@ public class Robot implements Serializable {
 
     @ApiModelProperty(value = "消息类型")
     private String infoType;
+    @ApiModelProperty(value = "图片大小")
+    private String imageSize;
 
     @ApiModelProperty(value = "子类")
     private List<Robot> children;
 
+    @ApiModelProperty(value = "宽")
+    private Integer originalProportionX;
+    @ApiModelProperty(value = "高")
+    private Integer originalProportionY;
 }
