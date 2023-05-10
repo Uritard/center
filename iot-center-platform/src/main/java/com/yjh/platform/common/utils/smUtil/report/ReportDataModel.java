@@ -1,8 +1,10 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.task.entity.*;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
@@ -227,7 +229,10 @@ public class ReportDataModel {
                     cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
                     cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
                     cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-                    cbsInspectionResultVo.getCruiseAbnormal() == 412
+                    cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
                 ){
                     cbsInspectionResultVo.setIdentifyResultName("待人工确认");
                     unReviewList.add(cbsInspectionResultVo);
@@ -244,10 +249,36 @@ public class ReportDataModel {
                         cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-                        cbsInspectionResultVo.getCruiseAbnormal() == 412
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
                 ){
                     cbsInspectionResultVo.setIdentifyResultName("待人工确认");
                     unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    normalList.add(cbsInspectionResultVo);
+                }
+            } else {
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
+                ) {
+                    if (cbsInspectionResultVo.getIsWarn() == 1) {
+                        abnormalList.add(cbsInspectionResultVo);
+                    } else {
+                        cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                        unReviewList.add(cbsInspectionResultVo);
+                    }
                 } else {
                     normalList.add(cbsInspectionResultVo);
                 }
@@ -354,9 +385,9 @@ public class ReportDataModel {
             elements.add(new TableCellElement(rowIndex, rowIndex, 9, 9, new String[]{Optional.ofNullable(detail.getIdentifyResultName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 巡视图像
-            String file = StringUtils.isEmpty(detail.getPicPath()) ? null : detail.getPicPath();
-            String oriFile = StringUtils.isEmpty(detail.getOriImg()) ? null : detail.getOriImg();
-            elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{file,oriFile},
+            String file = StringUtils.isEmpty(detail.getPicPath()) ? "" : detail.getPicPath();
+            String oriFile = StringUtils.isEmpty(detail.getOriImg()) ? "" : detail.getOriImg();
+            elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{FileUtil.picCompression(file), oriFile},
                     TableCellElement.TYPE_PICTURE));
 
             index = index -mergeCount;

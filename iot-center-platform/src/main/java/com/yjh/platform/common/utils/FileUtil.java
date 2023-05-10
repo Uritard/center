@@ -44,18 +44,20 @@ public class FileUtil {
      */
     public static String picCompression(String filePath) {
         try {
-            File file = new File(filePath);
             String thumbnailFilePath = "";
-            if (!file.isDirectory() && file.exists()) {
-                String path = StringUtils.substringBeforeLast(filePath, ".");
-                String suffixName = StringUtils.substringAfterLast(filePath, ".");
-                thumbnailFilePath = path + "-thumbnail" + "." + suffixName;
-                File suffixFile = new File(thumbnailFilePath);
-                if (!suffixFile.exists()) {
-                    Thumbnails.of(filePath)
-                            .size(960, 540)
-                            .outputQuality(0.25f)
-                            .asFiles(Rename.SUFFIX_HYPHEN_THUMBNAIL);
+            if (StringUtils.isNotEmpty(filePath)) {
+                File file = new File(filePath);
+                if (!file.isDirectory() && file.exists()) {
+                    String path = StringUtils.substringBeforeLast(filePath, ".");
+                    String suffixName = StringUtils.substringAfterLast(filePath, ".");
+                    thumbnailFilePath = path + "-thumbnail" + "." + suffixName;
+                    File suffixFile = new File(thumbnailFilePath);
+                    if (!suffixFile.exists()) {
+                        Thumbnails.of(filePath)
+                                .size(960, 540)
+                                .outputQuality(0.25f)
+                                .asFiles(Rename.SUFFIX_HYPHEN_THUMBNAIL);
+                    }
                 }
             }
             return thumbnailFilePath;
@@ -105,7 +107,7 @@ public class FileUtil {
             return;
         }
         File inputFile = null;
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(path+File.separator+zipFileName));;
+        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(path+File.separator+zipFileName));
         for (String str: fileList) {
             inputFile = new File(str);
             if (!inputFile.exists()){
@@ -117,7 +119,9 @@ public class FileUtil {
             if(!str.contains("/")){
                 flag = false;
             }
-            zip(out, inputFile, basePath+"/"+inputFile.getName(),flag);
+            if (!inputFile.isDirectory()){
+                zip(out, inputFile, basePath+"/"+inputFile.getName(),flag);
+            }
         }
         out.flush();
         out.close();

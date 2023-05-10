@@ -112,4 +112,6 @@ public class TCruiseDataResultDetail implements Serializable {
 
     private Long instanceId;
 
+    private  Integer isWarn;
+
 }

@@ -176,10 +176,10 @@ public class ReportManageController {
     @ApiOperation(value = "下载巡视报告")
     @GetMapping(value = "/downLoadCruiseReport")
     @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9,authority = "1235")
-    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
+    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId,@RequestParam(value = "remark")String remark) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.downLoadCruiseReport(taskId));
+            result = reportManageService.downLoadCruiseReport(taskId,remark);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
