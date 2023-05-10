@@ -1,6 +1,8 @@
 package com.yjh.platform.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.name.Rename;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
@@ -32,6 +34,34 @@ public class FileUtil {
         nameList.add("XLSM");
         nameList.add("XLST");
         nameList.add("XML");
+    }
+
+
+    /**
+     * 压缩图片 判断缩略图是否存在  不存在压缩 存在直接返回
+     * @param filePath 原图路径
+     * @return 缩略图路径
+     */
+    public static String picCompression(String filePath) {
+        try {
+            File file = new File(filePath);
+            String thumbnailFilePath = "";
+            if (!file.isDirectory() && file.exists()) {
+                String path = StringUtils.substringBeforeLast(filePath, ".");
+                String suffixName = StringUtils.substringAfterLast(filePath, ".");
+                thumbnailFilePath = path + "-thumbnail" + "." + suffixName;
+                File suffixFile = new File(thumbnailFilePath);
+                if (!suffixFile.exists()) {
+                    Thumbnails.of(filePath)
+                            .size(960, 540)
+                            .outputQuality(0.25f)
+                            .asFiles(Rename.SUFFIX_HYPHEN_THUMBNAIL);
+                }
+            }
+            return thumbnailFilePath;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static boolean checkFileName(String fileName){
