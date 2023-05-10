@@ -449,7 +449,6 @@
         b.identify_state,
         b.person_check,
         b.device_id,
-        q.device_point_id,
         b.instance_id,
         e.device_mete_id,
         q.state_zero,
