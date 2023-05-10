@@ -117,4 +117,8 @@ public class TStdDevice implements Serializable {
     private Long presetId;
 
     private Long cameraId;
+
+    private String mainDeviceId;
+
+    private TStdDeviceAttr tStdDeviceAttr;
 }

@@ -1,12 +1,17 @@
 package com.yjh.platform.module.device.controller;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.utils.ModelExcelListener;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.ExcelEntity;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +33,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -330,6 +336,28 @@ public class TStdDevicemeteController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("根据设备Id删除设备测点错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "excel导入测点")
+    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    @Logs(title = "excel导入测点",content = "excel导入测点",logType = 1)
+    public Result importExcel(MultipartFile file) {
+        Result result = new Result();
+        try {
+            InputStream inputStream = file.getInputStream();
+            ModelExcelListener modelExcelListener = new ModelExcelListener();
+            ReadSheet readSheet = new ReadSheet(0);
+            EasyExcelFactory.read(inputStream, ExcelEntity.class,modelExcelListener).headRowNumber(1).build().read(readSheet);
+            List<ExcelEntity> excelEntities = modelExcelListener.getExcelEntities();
+
+            if (CollectionUtils.isNotEmpty(excelEntities)) {
+                tStdDevicemeteService.importExcel(excelEntities);
+            }
+        }catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("发生异常:", e);
         }
         return result;
     }
