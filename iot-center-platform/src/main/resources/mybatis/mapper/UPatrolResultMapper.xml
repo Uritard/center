@@ -1003,10 +1003,10 @@
         d.weather as envInfo,
         d.check_date as reviewTime
         from
-        u_patrol_task a,u_patrol_result d, u_patrol_data_result c
+        u_patrol_task a
+        left join u_patrol_result d on a.task_id = d.task_id
+        left join u_patrol_data_result c on c.task_id = a.task_id
         where 1 = 1
-        and a.task_id = d.task_id
-        and c.task_id = a.task_id
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
@@ -1245,7 +1245,8 @@
         a.up_region_name as intervalName,
         m.region_name as regionName,
         f.cruise_status as cruiseState,
-        f.cruise_abnormal as cruiseAbnormal
+        f.cruise_abnormal as cruiseAbnormal,
+        f.is_warn
         from u_patrol_data_result f
         LEFT JOIN t_cruise_point_instance h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id

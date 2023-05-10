@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import cn.hutool.core.util.ZipUtil;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
@@ -9,6 +10,7 @@ import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
@@ -166,10 +168,13 @@ public class ReportManageService {
 
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+        UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        String remark = uPatrolResult.getRemark();
+
         //顺便处理非同源合并问题
         List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
         // 概况
-        TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList);
+        TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList,remark);
         recordData.setTaskVO(taskVO);
 
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
@@ -181,7 +186,11 @@ public class ReportManageService {
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
             detail.setPicPath(resultPath);
-            originalImgList.add(detail.getOriImg());
+            if (Objects.isNull(detail.getOriImg())) {
+                originalImgList.add(null);
+            } else {
+                originalImgList.add(detail.getOriImg());
+            }
         });
         recordData.setTCDRDList(tCruiseDataResultDetailList);
         recordData.setNonList(nonList);
@@ -243,7 +252,7 @@ public class ReportManageService {
         // 点位状态 未执行、执行失败、未知 放在待人工确认里面
         // 正常的挡在正常里面
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
-            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())) {
                 // i
                 if (cbsInspectionResultVo.getCruiseState() == 253 ||
                         cbsInspectionResultVo.getCruiseState() == 254 ||
@@ -253,15 +262,18 @@ public class ReportManageService {
                         cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-                        cbsInspectionResultVo.getCruiseAbnormal() == 412
-                ){
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
+                ) {
                     cbsInspectionResultVo.setIdentifyResultName("待人工确认");
                     unReviewList.add(cbsInspectionResultVo);
                 } else {
                     cbsInspectionResultVo.setIdentifyResultName("异常");
                     abnormalList.add(cbsInspectionResultVo);
                 }
-            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
+            } else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())) {
                 if (cbsInspectionResultVo.getCruiseState() == 253 ||
                         cbsInspectionResultVo.getCruiseState() == 254 ||
                         cbsInspectionResultVo.getCruiseState() == 255 ||
@@ -270,10 +282,35 @@ public class ReportManageService {
                         cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
                         cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-                        cbsInspectionResultVo.getCruiseAbnormal() == 412
-                ){
+                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
+                ) {
                     cbsInspectionResultVo.setIdentifyResultName("待人工确认");
                     unReviewList.add(cbsInspectionResultVo);
+                } else {
+                    normalList.add(cbsInspectionResultVo);
+                }
+            } else {
+                if (cbsInspectionResultVo.getCruiseState() == 253 ||
+                        cbsInspectionResultVo.getCruiseState() == 254 ||
+                        cbsInspectionResultVo.getCruiseState() == 255 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
+                        cbsInspectionResultVo.getCruiseAbnormal() == 352
+                ) {
+                    if (cbsInspectionResultVo.getIsWarn() == 1) {
+                        abnormalList.add(cbsInspectionResultVo);
+                    } else {
+                        cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                        unReviewList.add(cbsInspectionResultVo);
+                    }
                 } else {
                     normalList.add(cbsInspectionResultVo);
                 }
@@ -285,7 +322,7 @@ public class ReportManageService {
         taskVO.setUnReview(unReviewList.size());
     }
 
-    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
+    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
         delaCount(taskVO,tCruiseDataResultDetailList);
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
@@ -301,7 +338,12 @@ public class ReportManageService {
             CruiseStatistics = CruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
         }
         taskVO.setCruiseStatistics(CruiseStatistics);
-        taskVO.setCruiseConclusion("已审核");
+        if ("1".equals(remark)) {
+            taskVO.setCruiseConclusion("已审核");
+        } else {
+            taskVO.setCruiseConclusion("未审核");
+        }
+
         return taskVO;
     }
 
@@ -338,25 +380,28 @@ public class ReportManageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,String> downLoadCruiseReport(String taskId){
-//        String flag = reportManageDao.selectReviewTaskFlag(taskId);
-        String flag = uPatrolResultDao.selectReviewTaskFlag(taskId);
-        if ("0".equals(flag)) {
-            throw new BusinessException("该任务未被审核或任务下有巡视点未被审核");
+    public Result  downLoadCruiseReport(String taskId,String remark){
+        Result result = new Result();
+        if ("0".equals(remark)) {
+            //自动生成巡视报告
+            String reportFilePath = cruiseReportGenerate(taskId);
+            log.info("自动生成巡视报告的路径是==" + reportFilePath);
         }
+
         String reportName = taskId + ".xlsx";
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String fileRelativePath = map.get("content") + "/" + reportName;
-        log.info("excel文件相对路径是==="+fileRelativePath);
+        log.info("excel文件相对路径是===" + fileRelativePath);
 
-        String zipName = taskId+".zip";
+        String zipName = taskId + ".zip";
         String zipRelativePath = map.get("content") + "/" + zipName;
-        log.info("zip文件相对路径是==="+zipRelativePath);
+        log.info("zip文件相对路径是===" + zipRelativePath);
 
-        Map<String,String> fileMap = new HashMap<>(2);
-        fileMap.put("reportPath",fileRelativePath);
-        fileMap.put("zipPath",zipRelativePath);
-        return fileMap;
+        Map<String, String> fileMap = new HashMap<>(2);
+        fileMap.put("reportPath", fileRelativePath);
+        fileMap.put("zipPath", zipRelativePath);
+        result.setData(fileMap);
+        return result;
     }
 
 }
