@@ -43,7 +43,7 @@ public class ImageConverter implements Converter<String> {
         String isPath = "/home/yjh_iot_center/";
         if (!file.isDirectory() && file.exists()) {
             //文件存在
-            return new CellData(FileUtils.readFileToByteArray(new File(picCompression(value))));
+            return new CellData(FileUtils.readFileToByteArray(new File(FileUtil.picCompression(value))));
         } else if (value.contains(isPath)) {
             return new CellData(FileUtils.readFileToByteArray(new File(Objects.requireNonNull(this.getClass().getResource("/")).getPath()
                     + "nopic2.png")));
@@ -51,15 +51,4 @@ public class ImageConverter implements Converter<String> {
         return new CellData(value);
     }
 
-    public static String picCompression(String filePath) {
-        try {
-            Thumbnails.of(filePath)
-                    .size(960, 540).asFiles(Rename.PREFIX_HYPHEN_THUMBNAIL);
-            String path = StringUtils.substringBeforeLast(filePath, "/");
-            String filename = StringUtils.substringAfterLast(filePath, "/");
-            return path + "/thumbnail-" + filename;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
