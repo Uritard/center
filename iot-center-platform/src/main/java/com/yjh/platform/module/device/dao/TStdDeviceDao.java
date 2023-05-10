@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -81,7 +82,8 @@ public interface TStdDeviceDao {
                                            @Param(value = "upRegionIds") List<Long> upRegionIds,
                                            @Param(value = "list") List<Long> list,
                                            @Param(value = "pageSize") Integer pageSize);
-    List<Long>selectForPage(TStdDeviceDetail tStdDeviceDetail);
+    List<Long> selectForPage(TStdDeviceDetail tStdDeviceDetail);
+    List<Long> findPresetByCameraIdAndMeteId(@Param("cameraId")String cameraId,@Param("meteId")Long Id);
 
     TStdRegion selectRegionById(@Param(value = "deviceId") Long deviceId);
     List<AreaInfo> selectDevTreeCustom();
@@ -143,5 +145,7 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectDevTreeDeviceByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
                                                                  @Param(value = "regionList")List<Long> regionList);
     TCruisePointInstanceDetail selectDevTreeDeviceByInstacneId(@Param(value = "instanceId")Long instanceId);
+
+    List<Map<String,Long>> selectFirstPresetIdByCameraIdList(@Param("list")List<String> cameraIdList);
 
 }

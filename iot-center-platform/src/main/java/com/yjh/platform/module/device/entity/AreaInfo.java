@@ -48,4 +48,7 @@ public class AreaInfo implements Serializable {
     @ApiModelProperty(value = "测点关联相机Id")
     private String cameraId;
 
+    @ApiModelProperty(value = "绑定预置位列表")
+    private List<Long> presetId;
+
 }

@@ -762,9 +762,11 @@ public class RobotService {
         //        log.info("机器人现有的deviceList是：" + nowList);
 
         List<TRobotInspection> newInspectionList = new ArrayList<>();
+        List<TRobotInspection> updateInspections = new ArrayList<>();
         for (TRobotInspection tRobotInspection : tRobotInspectionsInfoModelFile) {
             if (nowInspectionList.contains(tRobotInspection.getInspectionCode())) {
                 nowInspectionList.remove(tRobotInspection.getInspectionCode());
+                updateInspections.add(tRobotInspection);
             } else {
                 newInspectionList.add(tRobotInspection);
             }
@@ -791,7 +793,9 @@ public class RobotService {
                 deleteCountTCPA = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);
                 //查询出清理后的无绑定关系的测点
                 List<Long> deviceMeteIdsDeleted = tRobotInspectionDao.selectDeviceMeteIdByDeviceMeteId(deviceMeteIds);
-                deleteCountTDM = tRobotInspectionDao.batchDeleteTDeviceMete(deviceMeteIdsDeleted);
+                if (CollectionUtils.isNotEmpty(deviceMeteIdsDeleted)) {
+                    deleteCountTDM = tRobotInspectionDao.batchDeleteTDeviceMete(deviceMeteIdsDeleted);
+                }
             }
             log.info("TRI删除条数=={},TCPI删除条数=={},TCPA删除条数=={},TDM删除条数=={}", deleteCountTRI, deleteCountTCPI, deleteCountTCPA,deleteCountTDM);
         }
@@ -800,10 +804,6 @@ public class RobotService {
             int res = tRobotInspectionDao.batchInsertTRobotInspection(newInspectionList);
             log.info("TRI插入条数=={}", res);
         }
-        List<TRobotInspection> updateInspections = tRobotInspectionsInfoModelFile
-            .stream()
-            .filter(o->newInspectionList.contains(o))
-            .collect(Collectors.toList());;
 
         log.info("准备更新的deviceList是=={}", updateInspections.size());
         for (TRobotInspection item : updateInspections) {

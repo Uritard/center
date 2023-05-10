@@ -669,7 +669,8 @@ public class TStdDeviceService{
     }
 
     public List<AreaInfo> deviceMeteTree(Long deviceId,String deviceType, String analyseType){
-        return tStdDeviceDao.selectDeviceMeteByDeviceAndCustom(deviceId,deviceType,analyseType);
+        List<AreaInfo> areaInfos = tStdDeviceDao.selectDeviceMeteByDeviceAndCustom(deviceId,deviceType,analyseType);
+        return areaInfos;
     }
 
     public List<AreaInfo> cruisePoint(Long deviceMeteId){
