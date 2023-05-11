@@ -66,8 +66,10 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         analyseTypeMap.put("1", Collections.singletonList("meter"));
         analyseTypeMap.put("2", Collections.singletonList("meter"));
         analyseTypeMap.put("3", Collections.singletonList("meter"));
+        analyseTypeMap.put("4", Collections.singletonList("meter"));
         analyseTypeMap.put("5", Collections.singletonList("switch"));
         analyseTypeMap.put("6", Collections.singletonList("isolator"));
+        analyseTypeMap.put("7", Collections.singletonList("meter"));
         analyseTypeMap.put("8", Collections.singletonList("qrcode"));
         analyseTypeMap.put("9", Collections.singletonList("infrared"));
         analyseTypeMap.put("10", Collections.singletonList("switch"));

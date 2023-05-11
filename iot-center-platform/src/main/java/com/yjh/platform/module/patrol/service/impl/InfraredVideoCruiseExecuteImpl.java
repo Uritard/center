@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.ResultConvertUtil;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
@@ -16,7 +17,6 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -88,7 +88,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     @Override
     protected Map<String, String> resultRecognition(Map<String, String> inspectionMap) {
         String resultValue = inspectionMap.get("resultNum");
-        String resultDesc = CommonUtils.toResultDesc(resultValue, inspectionMap.getOrDefault("unit", ""));
+        String resultDesc = ResultConvertUtil.convertDesc(resultValue, inspectionMap.getOrDefault("unit", ""));
         inspectionMap.put("resultDesc", resultDesc);
         return patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
     }

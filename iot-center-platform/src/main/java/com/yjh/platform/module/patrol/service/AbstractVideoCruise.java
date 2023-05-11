@@ -429,7 +429,11 @@ public abstract class AbstractVideoCruise {
     protected abstract Map<String, String> resultRecognition(Map<String, String> inspectionMap);
 
     public static class AnalyticsFactory {
-        private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new HashMap<>(8);
+        private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new EnumMap<>(CruiseConstant.AnalyticsEnum.class);
+
+        private AnalyticsFactory(){
+            // nothing
+        }
 
         public static AnalyticsService getAnalytics(CruiseConstant.AnalyticsEnum anayEnum) {
 
@@ -442,6 +446,10 @@ public abstract class AbstractVideoCruise {
     }
 
     public static class Factory {
+        private Factory(){
+            // nothing
+        }
+
         public static AbstractVideoCruise getVideoCruise(CruiseConstant.TypeEnum cruiseType) {
             AbstractVideoCruise videoCruise;
             switch (cruiseType){
