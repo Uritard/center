@@ -47,4 +47,78 @@ public class ResultConvertUtil {
             return result;
         }
     }
+
+    /**
+     * 审核结果转换为数值
+     *
+     * @param checkResult 结果
+     * @return resultNum 目标值
+     */
+    public static String convertResult(String checkResult,String type) {
+        switch (type){
+            case "表计":
+                return convertBJResult(checkResult);
+            case "缺陷":
+                return convertQXResult(checkResult);
+            case "判别":
+                return convertPBResult(checkResult);
+            default:break;
+        }
+        return "0";
+    }
+
+    /**
+     * 缺陷结果转换为数值
+     *
+     * @param result 结果
+     * @return resultNum 目标值
+     */
+    public static String convertQXResult(String result) {
+        if (StringUtils.isNotEmpty(result)){
+            result = result.replace(","," ")
+                    .replace("，"," ");
+            return String.valueOf(result.split(" ").length);
+        }
+        return "0";
+    }
+
+    /**
+     * 表计结果转换为数值
+     *
+     * @param result 结果
+     * @return resultNum 目标值
+     */
+    public static String convertBJResult(String result) {
+        if (StringUtils.isNotEmpty(result)){
+            if (!result.matches("\\.*\\d+.*")){
+                //汉字
+                return convertResult(result);
+            } else {
+                return result;
+            }
+        }
+        return "0";
+    }
+
+    /**
+     * 判别结果转换为数值
+     *
+     * @param result 结果
+     * @return resultNum 目标值
+     */
+    public static String convertPBResult(String result) {
+        if (StringUtils.isNotEmpty(result)){
+            if (!result.matches("\\.*\\d+.*")){
+                //汉字 有差异 无差异
+                if (result.contains("有")) {
+                    return "1";
+                } else {
+                    return "0";
+                }
+            } else {
+                return result;
+            }
+        }
+        return "0";
+    }
 }

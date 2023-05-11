@@ -811,6 +811,7 @@
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         update u_patrol_data_result set
         <if test="personCheck != null ">person_check = #{personCheck},</if>
+        <if test="modifyNum != null ">modify_num = #{modifyNum},</if>
         <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         evaluation_state = 256,
         <if test="checkUser != null ">check_user = #{checkUser},</if>
@@ -821,7 +822,7 @@
 
     <update id="manualReviewByTask" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         UPDATE u_patrol_data_result
-        SET person_check = result_num,
+        SET person_check = result_desc,
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="checkUser != null ">check_user = #{checkUser},</if>
         evaluation_state = 256,

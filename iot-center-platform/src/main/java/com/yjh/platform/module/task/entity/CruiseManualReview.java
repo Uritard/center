@@ -61,4 +61,6 @@ public class CruiseManualReview {
     private String executeTime;
     @ApiModelProperty(value = "下级同步时需要，下级唯一标识")
     private String sendCode;
+    @ApiModelProperty(value = "审核结果数值")
+    private String modifyNum;
 }
