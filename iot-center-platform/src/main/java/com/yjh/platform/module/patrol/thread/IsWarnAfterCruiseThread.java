@@ -85,7 +85,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             }
 
             Map<String, String> initInfo = new HashMap<>(16);
-            initInfo.put("valueTemp", threadMap.get("value"));
+            initInfo.put("value", threadMap.get("value"));
 
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
             boolean isTemDif = StringUtils.equals("2", sysLevel)
@@ -176,7 +176,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", isTemDif ? initInfo.get("valueTemp") : "");
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", isTemDif ? initInfo.get("valueTemp") : initInfo.get("value"));
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "isWarn", "1");
 
 
