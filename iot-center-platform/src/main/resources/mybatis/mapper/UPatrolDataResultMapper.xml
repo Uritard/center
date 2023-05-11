@@ -62,7 +62,7 @@
         <result column="picpath" jdbcType="BIGINT" property="picPath" />
         <result column="origpic" jdbcType="BIGINT" property="origpic" />
         <result column="device_name" jdbcType="BIGINT" property="deviceName" />
-        <result column="evaluation_state" jdbcType="BIGINT" property="deviceName" />
+        <result column="evaluation_state" jdbcType="BIGINT" property="evaluationState" />
         <result column="device_type" jdbcType="BIGINT" property="deviceType" />
         <result column="up_region_name" jdbcType="BIGINT" property="upRegionName" />
         <association property="alarmLevel" select="selectWarnByTaskAndInstance" column="{taskId=task_id,instanceId=instance_id}" />
@@ -630,7 +630,7 @@
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
         f.cruise_time as end_time,
-        f.result_num,
+        if(f.modify_num is null,f.result_num,f.modify_num) resultNum,
         f.cruise_type,
         g.task_type,
         a.mete_name,

@@ -14,6 +14,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.common.utils.ResultConvertUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -179,11 +180,11 @@ public class UPatrolResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
-
+        String thisPointType = "表计";
+        Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
+        String ai = String.valueOf(result.get("ai"));
+        String judge = String.valueOf(result.get("judge"));
         if (IdentifyStateEnum.FAULT.getCode().equals(cruiseManualReview.getIdentifyState())) {
-            Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
-            String ai = String.valueOf(result.get("ai"));
-            String judge = String.valueOf(result.get("judge"));
             String KEY_PREFIX = "";
             if ("on".equals(ai)) {
                 //缺陷
@@ -198,10 +199,17 @@ public class UPatrolResultService {
             }
         }
 
+        if ("on".equals(ai)){
+            thisPointType = "缺陷";
+        } else if ("on".equals(judge)){
+            thisPointType = "判别";
+        }
+
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         Date date = new Date();
         cruiseManualReview.setCheckUser(userName);
         cruiseManualReview.setCheckDate(date);
+        cruiseManualReview.setModifyNum(ResultConvertUtil.convertResult(cruiseManualReview.getPersonCheck(),thisPointType));
         //manualReview
         int result1 = uPatrolResultDao.manualReview(cruiseManualReview);
 

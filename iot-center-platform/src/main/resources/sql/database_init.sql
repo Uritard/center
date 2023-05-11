@@ -967,7 +967,7 @@ CREATE TABLE `t_cruise_data_result` (
   `cruise_type` int(11) DEFAULT '1' COMMENT '巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
   `result_desc` varchar(512) DEFAULT '' COMMENT '巡检结果文字描述',
   `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
-  `modify_num` varchar(100) DEFAULT '' COMMENT '机器人巡检图片分析值',
+  `modify_num` varchar(100) DEFAULT '' COMMENT '审核结果数值',
   `picpath` varchar(256) DEFAULT '' COMMENT '巡检分析图片',
   `confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,相对',
   `pic_path_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,相对',
