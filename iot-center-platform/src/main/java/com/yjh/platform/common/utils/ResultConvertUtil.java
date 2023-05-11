@@ -40,12 +40,36 @@ public class ResultConvertUtil {
             String code = String.valueOf(statusEnum.getCode());
             return StringUtils.substring(code, code.length() - 1, code.length());
         } else if (StringUtils.containsAny(result, ARR)) {
-            return String.valueOf(result.split("_").length);
-        } else if (StringUtils.startsWith(result, StringUtils.SPACE) && StringUtils.endsWith(result, StringUtils.SPACE)) {
-            return String.valueOf(result.split(" {2}").length);
+            return String.valueOf(StringUtils.split(result,"_").length);
+        } else if (StringUtils.contains(result, "正常")) {
+            return "0";
+        } else if (CommonUtils.containsChinese(result)) {
+            return String.valueOf(StringUtils.split(result).length);
         } else {
             return result;
         }
+    }
+
+    /**
+     * 结果转换为带单位数值
+     * @param value 结果
+     * @param unit 单位
+     */
+    public static String convertDesc(String value, String unit) {
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
+        if (CommonUtils.containsChinese(value)) {
+            return value;
+        }
+        String unitLe = unit == null ? "" : unit;
+        String[] resultStrings = StringUtils.split(value,",");
+        StringBuilder retDesc = new StringBuilder();
+        for (String val : resultStrings) {
+            retDesc.append(val).append(unitLe).append(",");
+        }
+        CommonUtils.clearLastChar(retDesc);
+        return retDesc.toString();
     }
 
     /**

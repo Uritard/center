@@ -504,7 +504,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
             } else if (StringUtils.isEmpty(resultDesc)) {
-                retDesc.append(CommonUtils.toResultDesc(resultValue, tStdDevicemete.getUnit()));
+                retDesc.append(ResultConvertUtil.convertDesc(resultValue, tStdDevicemete.getUnit()));
                 cruiseResultMap.put("resultDesc", retDesc.toString());
             }
 

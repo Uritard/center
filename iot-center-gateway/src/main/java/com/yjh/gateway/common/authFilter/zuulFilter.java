@@ -53,6 +53,7 @@ public class zuulFilter extends ZuulFilter {
     // 国密规范测试用户ID
     private static final String UKEY_USERID ="1234567812345678";
 
+    private static final byte[] LOCK = new byte[0];
     private static volatile Map<String, String[]> SECURE_SIGNS;
 
     @Value("${spring.logout.path}")
@@ -430,14 +431,14 @@ public class zuulFilter extends ZuulFilter {
 
     private static void loadSecureSigns() {
         if (SECURE_SIGNS == null) {
-            synchronized (UKEY_USERID) {
+            synchronized (LOCK) {
                 if (SECURE_SIGNS == null) {
                     String secureSigns = (String)redisTemplate.opsForHash().get("t_sys_param:secureSigns", "content");
                     log.info("安全标识配置: {}", secureSigns);
                     if (StringUtils.isEmpty(secureSigns)) {
                         return;
                     }
-                    SECURE_SIGNS = new HashMap<>(16);
+                    Map<String, String[]> secureSignMap = new HashMap<>(16);
                     // user1:path1,path2;user2:path3,path4
                     String[] userSigns = secureSigns.split(";");
                     for (String sign : userSigns) {
@@ -445,8 +446,9 @@ public class zuulFilter extends ZuulFilter {
                             continue;
                         }
                         String[] userSign = sign.split(":", 2);
-                        SECURE_SIGNS.put(userSign[0], StringUtils.split(userSign[1], ","));
+                        secureSignMap.put(userSign[0], StringUtils.split(userSign[1], ","));
                     }
+                    SECURE_SIGNS = secureSignMap;
                 }
             }
         }

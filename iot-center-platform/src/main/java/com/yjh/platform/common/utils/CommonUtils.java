@@ -1,12 +1,9 @@
 package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.module.patrol.entity.interlanalysis.AnalyseResultItem;
-import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author tt
@@ -36,6 +34,8 @@ public class CommonUtils {
      * @Fields logger : 日志
      */
     private static Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+
+    public static final Pattern PATTERN_CHINESE = Pattern.compile("[\u4e00-\u9fa5]");
 
     /**
      * 获取payLoad 数据
@@ -454,6 +454,9 @@ public class CommonUtils {
         }
     }
 
+    /**
+     * 将四个点的矩形框区域变成对角两个点的矩形框
+     */
     public static String rectangleToPos(String rectangle) {
         if (StringUtils.isEmpty(rectangle)) {
             return "651.0,459.0,1203.0,986.0";
@@ -467,17 +470,11 @@ public class CommonUtils {
         }
     }
 
-    public static String toResultDesc(String value, String unit) {
-        if (StringUtils.isEmpty(value)) {
-            return "";
-        }
-        String unitLe = unit == null ? "" : unit;
-        String[] resultStrings = value.split(",");
-        StringBuilder retDesc = new StringBuilder();
-        for (String val : resultStrings) {
-            retDesc.append(val).append(unitLe).append(",");
-        }
-        CommonUtils.clearLastChar(retDesc);
-        return retDesc.toString();
+    /**
+     * 判断字符串是否含有中文
+     */
+    public static boolean containsChinese(String str) {
+        Matcher matcher = PATTERN_CHINESE.matcher(str);
+        return matcher.find();
     }
 }

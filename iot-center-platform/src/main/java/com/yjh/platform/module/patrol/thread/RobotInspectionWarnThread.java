@@ -113,8 +113,8 @@ public class RobotInspectionWarnThread implements Runnable{
             }
 
             Map<String, String> cruiseMap = new HashMap<>();
-            cruiseMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            cruiseMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
+            // cruiseMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            // cruiseMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
             // 为了避免存入告警时初始化的值不正确，再次传入一下 instanceId避免问题
             cruiseMap.put("instanceId", String.valueOf(instanceId));
             cruiseMap.put("isWarn", "1");

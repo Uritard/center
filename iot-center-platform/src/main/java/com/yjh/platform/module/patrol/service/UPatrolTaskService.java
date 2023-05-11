@@ -661,8 +661,6 @@ public class UPatrolTaskService {
 
                 // 将定时任务句柄存储缓存队列，方便后续取消定时任务操作
                 ScheduledMapConfig.add(taskIdFinal, scheduledFuture);
-
-                Executors.newSingleThreadScheduledExecutor();
             }
 
             if (robotId != null){
@@ -866,9 +864,9 @@ public class UPatrolTaskService {
      * @param robotCode robotCode
      * @param robotId robotId
      * @param cruiseResultKey cruiseResultKey
-     * @return result
+     * @return result 0:正常 1:未执行 2:调用算法超时
      */
-    private boolean checkProcessTime(Map<String, String> result, String robotCode, Long robotId, String cruiseResultKey) {
+    private int checkProcessTime(Map<String, String> result, String robotCode, Long robotId, String cruiseResultKey) {
         int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
         String instanceId = result.get("instanceId");
         boolean inNode; // 判断当前节点是否在任务结束节点范围内，包括机器人/无人机/下级节点
@@ -881,7 +879,7 @@ public class UPatrolTaskService {
         }
 
         if (inNode && CRUISE_STATE_UN == cruiseState) {
-            return false;
+            return 1;
         }
 
         if (inNode && CRUISE_STATE_ANALYSE_DOING == cruiseState) {
@@ -895,11 +893,11 @@ public class UPatrolTaskService {
             // 将重试次数写回redis
             redisTemplate.opsForHash().put(instanceKey, "attempts", (++attempts).toString());
             if (attempts > 8) {
-                return false;
+                return 2;
             }
         }
 
-        return true;
+        return 0;
     }
 
     /**
@@ -915,7 +913,8 @@ public class UPatrolTaskService {
         //判断是不是机器人的点以及还是否完成
         int cruiseType = MapUtils.getIntValue(result, "cruiseType");
         String instanceId = result.get("instanceId");
-        if (!checkProcessTime(result, robotCode, robotId, cruiseResultKey)) {
+        int check = checkProcessTime(result, robotCode, robotId, cruiseResultKey);
+        if (1 == check) {
             //这个点 没有做
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
             String rname = "";
@@ -939,6 +938,19 @@ public class UPatrolTaskService {
             result.put("resultNum", "-1");
             result.put("resultDesc", rname + "任务异常");
             result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
+            result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
+            result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
+            result.put("cruiseTime",DateTimeUtil.format(new Date()));
+
+            String instanceKey = cruiseResultKey + instanceId;
+            redisTemplate.opsForHash().putAll(instanceKey, result);
+
+            patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+        } else if (2 == check) {
+            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//执行遗漏
+            result.put("resultNum", "-1");
+            result.put("resultDesc", "算法分析超时");
+            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_TIMEOUT));//超时
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));
@@ -1504,8 +1516,7 @@ public class UPatrolTaskService {
                 robotTaskStates(robotTaskStatesMap);
             }
         } catch (Exception e) {
-            log.error("任务启动异常: " + e);
-            e.printStackTrace();
+            log.error("任务启动异常: ", e);
         }
         return taskPatrolledId;
     }

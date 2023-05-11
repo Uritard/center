@@ -336,7 +336,7 @@ public class ProcessResultToUpSystem {
      * @return Map<String, String>
      */
     private Map<String, String> packageCruiseResultInfo(String taskId, String instanceId, Map<String, String> cruiseResultMap, Map<String, Object> xmlItem, String tagPath) {
-        Map<String, String> resultPathMap = new HashMap<>(5);
+        Map<String, String> resultPathMap = new HashMap<>(8);
         String picPath = String.valueOf(redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "picpath"));
         log.info("picPath=={}", picPath);
         picPath = replaceResultImgPath(picPath, false);
@@ -378,7 +378,7 @@ public class ProcessResultToUpSystem {
             String fileType = (String)xmlItem.get("file_type");
             String rectangle = "";
             if (StringUtils.containsAny(fileType, "1", "2", "5")) {
-                CommonUtils.mathRandom(10);
+                // 坐标随机
                 int x1 = RandomUtils.nextInt(200, 500);
                 int y1 = RandomUtils.nextInt(160, 340);
                 int x2 = RandomUtils.nextInt(x1 + 139, x1 + 541);
@@ -390,11 +390,9 @@ public class ProcessResultToUpSystem {
             xmlItem.put("data_type", cruiseType);
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
-                if(MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_ABNORMALALARM){
-                    valid = "2";
-                } else {
-                    valid = "0";
-                }
+                valid = "0";
+            } else if("1".equals(MapUtils.getString(cruiseResultMap,"isWarn"))){
+                valid = "2";
             }
             xmlItem.put("valid", valid);
             xmlItem.put("abnormal_type", cruiseResultMap.get("cruiseAbnormal"));
@@ -598,24 +596,26 @@ public class ProcessResultToUpSystem {
                 // 获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
                 String resultinfo = differentListMap.get("value");
                 log.info("缺陷结果：{}", resultinfo);
+
                 // 目前格式："wcaqm,1049.0,216.0,1211.0,389.0,0.8829"
                 String[] arr1 = resultinfo.split(",");
-                for (int i = 0; i < arr1.length; ) {
-                    Defect defect = new Defect();
-                    defect.setX1((int) NumberUtils.toDouble(arr1[i + 1]));
-                    defect.setY1((int) NumberUtils.toDouble(arr1[i + 2]));
-                    defect.setX2((int) NumberUtils.toDouble(arr1[i + 3]));
-                    defect.setY2((int) NumberUtils.toDouble(arr1[i + 4]));
-                    defect.setType(arr1[i]);
-                    int confidence = (int) (NumberUtils.toDouble(arr1[i + 5]) * 100);
+                Defect defect = new Defect();
+                if (arr1.length >= 6) {
+                    defect.setX1((int)NumberUtils.toDouble(arr1[1]));
+                    defect.setY1((int)NumberUtils.toDouble(arr1[2]));
+                    defect.setX2((int)NumberUtils.toDouble(arr1[3]));
+                    defect.setY2((int)NumberUtils.toDouble(arr1[4]));
+
+                    int confidence = (int)(NumberUtils.toDouble(arr1[5]) * 100);
                     defect.setConfidence(confidence);
-                    defect.setDesc(differentListMap.get("defectContent") +
-                            "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + "," + defect.getY2() + ";" +
-                            "置信度 " + confidence + "%)"
-                    );
-                    defectTempList.add(defect);
-                    i = i + 6;
+                    // i = i + 6;
                 }
+                defect.setType(arr1[0]);
+                defect.setDesc(
+                    differentListMap.get("defectContent") + "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + ","
+                        + defect.getY2() + ";" + "置信度 " + defect.getConfidence() + "%)");
+                defectTempList.add(defect);
+
                 alarmDetail.setDefect(defectTempList);
                 alarmDetail.setBay_name(nameMap.get("upRegionName"));
                 alarmDetail.setDevice_name(deviceName);
