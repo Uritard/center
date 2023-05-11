@@ -54,14 +54,14 @@ public class UPatrolDataResultService {
     private Logger log = LoggerFactory.getLogger(UPatrolDataResultService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes, Long customId) {
+    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes, Long customId,String meteName) {
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()) {
             //cruiseRes:-1全部,1正常,0异常
             if (cruiseRes == 1) {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId);
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId, meteName);
             } else {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId);
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId, meteName);
             }
             for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList) {
                 if (item.getFinalState() == 246 || item.getFinalState() == 261) {

@@ -77,9 +77,9 @@ public class TCruiseDataResultService {
         if (deviceIdList != null && !deviceIdList.isEmpty()) {
             //cruiseRes:-1全部,1正常,0异常
             if (cruiseRes == 1) {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+//                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
             } else {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+//                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
             }
             for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList) {
                 if (item.getFinalState() == 246 || item.getFinalState() == 261) {
