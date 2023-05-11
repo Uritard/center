@@ -83,6 +83,7 @@ public class UPatrolDataResultController {
                                             @RequestParam(value = "meteType", required = false) String meteType,
                                             @RequestParam(value = "meterType", required = false) Integer meterType,
                                             @RequestParam(value = "cruiseRes", required = false) Integer cruiseRes,
+                                            @RequestParam(value = "meteName", required = false) String meteName,
                                             @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                             @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
         Result result = new Result();
@@ -101,7 +102,7 @@ public class UPatrolDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = uPatrolDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,customId);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = uPatrolDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,customId, meteName);
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
