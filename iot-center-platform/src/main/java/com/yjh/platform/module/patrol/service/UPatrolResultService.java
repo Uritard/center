@@ -160,6 +160,8 @@ public class UPatrolResultService {
         cruiseResultDetailList.forEach(cruiseResultDetail -> {
             if (StringUtils.isNotBlank(cruiseResultDetail.getRemark())) {
                 cruiseResultDetail.setAbnormalType(cruiseResultDetail.getAbnormalType1() + "," + cruiseResultDetail.getAbnormalType2());
+            } else {
+                cruiseResultDetail.setAbnormalType(cruiseResultDetail.getAbnormalType1());
             }
         });
         return cruiseResultDetailList;
