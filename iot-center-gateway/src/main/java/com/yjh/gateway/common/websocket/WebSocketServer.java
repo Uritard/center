@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,6 +29,7 @@ public class WebSocketServer {
     @Resource
     private RedisTemplate redisTemplate;
 
+    private BufferedOutputStream bos = null;
     /**静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。*/
     private static int onlineCount = 0;
     /**concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。*/
@@ -73,6 +74,8 @@ public class WebSocketServer {
         } catch (IOException e) {
             log.error("用户: {},网络异常!!!!!!", userId);
         }
+        // 初始化文件流
+        initFileStream();
     }
 
     /**
@@ -89,13 +92,29 @@ public class WebSocketServer {
         log.info("用户退出: {},当前在线人数为: {}", userId, getOnlineCount());
     }
 
+    private void initFileStream() {
+        String filePathTemp = System.getProperty("user.dir");
+        String filePathName = filePathTemp + "/AudioFile/ReceiveData/cnm.pcm";
+        FileOutputStream fos = null;
+        File file = new File(filePathName);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try {
+            fos = new FileOutputStream(file, true);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
+        bos = new BufferedOutputStream(fos);
+    }
+
     /**
      * 收到客户端消息后调用的方法
      *
      * @param message 客户端发送过来的消息*/
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("用户消息:"+userId+",报文:"+message);
+        log.info("用户消息:{},报文:{}", userId, message);
         //可以群发消息
         //消息保存到数据库、redis
         if(StringUtils.isNotBlank(message)){
@@ -119,6 +138,23 @@ public class WebSocketServer {
             }catch (Exception e){
                 log.error(e.getMessage(), e);
             }
+        }
+    }
+
+    /**
+     * 收到客户端消息后调用的方法
+     *
+     * @param message 客户端发送过来的音频数据
+     */
+    @OnMessage(maxMessageSize = 40960)
+    public void onMessage(byte[] message, @PathParam("token") String token) {
+        log.info("token:{},输入音频数据报文:{}", token, message);
+        try {
+            bos.write(message);
+
+//            Constant.sendAudioDataToVideo(message);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

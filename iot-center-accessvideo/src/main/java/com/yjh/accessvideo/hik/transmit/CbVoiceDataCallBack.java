@@ -2,11 +2,14 @@ package com.yjh.accessvideo.hik.transmit;
 
 import com.sun.jna.Pointer;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * 语音转发回调函数,接收设备传来的音频数据
@@ -17,11 +20,11 @@ import java.nio.ByteBuffer;
 public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
     private static final HCNetSDK HC_NET_SDK = HCNetSDK.INSTANCE;
-    private final RedisTemplate redisTemplate;
-    static int AUDIO_HEADER_LENGTH = 44;
+    private final String webSocketUrl;
+    private static final int AUDIO_HEADER_LENGTH = 44;
 
-    public CbVoiceDataCallBack(RedisTemplate redisTemplate){
-        this.redisTemplate = redisTemplate;
+    public CbVoiceDataCallBack(String webSocketUrl){
+        this.webSocketUrl = webSocketUrl;
     }
 
     @Override
@@ -32,17 +35,20 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
             return;
         }
 
-        log.info("进来了！！！数据大小:{}", dwBufSize);
+        log.info("Come in！！！Data size is :{},now time:{}", dwBufSize, DateTimeUtil.getDateTimeString(new Date(), true));
+
         try {
             // 将设备发送的原始音频数据写入文件
             ByteBuffer buffers = pRecvDataBuffer.getByteBuffer(0, dwBufSize);
             byte[] originBytes = new byte[dwBufSize];
             buffers.rewind();
             buffers.get(originBytes);
-            Constant.outputStream.write(originBytes);
+            if (Objects.nonNull(Constant.outputStream)){
+                Constant.outputStream.write(originBytes);
+            }
 
             // 若编码格式为G711时,需要解码
-            if (2 == Constant.encodeFormat){
+            if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat){
                 // 初始化音频解码
                 if (Constant.pDecHandle == null) {
                     Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
@@ -62,7 +68,9 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 // G711音频解码调用sdk
                 if (!HC_NET_SDK.NET_DVR_DecodeG711Frame(Constant.pDecHandle, strutAudioParam)) {
                     log.error("NET_DVR_DecodeG711Frame failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
-                    return;
+                    if (0 != HC_NET_SDK.NET_DVR_GetLastError()){
+                        return;
+                    }
                 }
                 strutAudioParam.read();
 
@@ -79,57 +87,46 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 for (int i = 0; i < bytes.length; i++) {
                     bytes[i] = bufferPcm.get();
                 }
-                StringBuilder str = new StringBuilder();
-                for (byte byteItem : bytes) {
-                    str.append(String.format("%02x ", byteItem));
-                }
-                log.info("收到设备端的音源数据: {}", str);
+                printByte(bytes);
 
                 // 将设备发送的pcm音频数据写入文件
                 Constant.outputStreamPcm.write(bytesPcm);
 
-                // 组装wav发送ws到其他服务
-                // 方式一
-                WaveHeader header = new WaveHeader();
-                header.fileLength = bytesPcm.length + (44 - 8);
-                header.fmtHdrLength = 16;
-                header.formatTag = 0x0001;
-                header.channels = 1;
-                header.samplesPerSec = 8000;
-                header.bitsPerSample = 16;
-                header.blockAlign = (short) (header.channels * header.bitsPerSample / 8);
-                header.avgBytesPerSec = header.blockAlign * header.samplesPerSec;
-                header.dataHdrLength = bytesPcm.length;
-                byte[] headerBytes = header.getHeader();
-
-                assert headerBytes.length == 44;
-                byte[] byteResult = new byte[headerBytes.length + bytesPcm.length];
-                System.arraycopy(headerBytes, 0, byteResult, 0, headerBytes.length);
-                System.arraycopy(bytesPcm, 0, byteResult, headerBytes.length, bytesPcm.length);
-                StringBuilder str1 = new StringBuilder();
-                for (byte byteItem : byteResult) {
-                    str1.append(String.format("%02x ", byteItem));
-                }
-                log.info("加头的音源数据1: {}", str1);
-
-                // 方式二
-                byte[] byteResult2 = new byte[headerBytes.length + bytesPcm.length];
-                byte[] waveFileHeader = getWaveFileHeader(bytesPcm.length, 8000, 1, 16);
-                System.arraycopy(waveFileHeader, 0, byteResult2, 0, waveFileHeader.length);
-                System.arraycopy(bytesPcm, 0, byteResult2, waveFileHeader.length, bytesPcm.length);
-                StringBuilder str2 = new StringBuilder();
-                for (byte byteItem : byteResult2) {
-                    str2.append(String.format("%02x ", byteItem));
-                }
-                log.info("加头的音源数据: {}", str2);
-
-                // 调用其他服务发送ws
-                String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:sendMsgBufferUrl","content"));
-                Constant.websocketSendMsgBuffer(webSocketUrl, byteResult2);
+                originBytes = bytesPcm;
             }
+
+            // 组装wave并调用其他服务发送ws
+            byte[] bytesResult = createWaveFile(originBytes, Constant.encodeFormat);
+            printByte(bytesResult);
+
+            Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 生成wav音频数据
+     * @param originBytes 原始音频数据
+     * @param encodeFormat 编码格式
+     * @return byte[]
+     */
+    private byte[] createWaveFile(byte[] originBytes, Integer encodeFormat){
+        // 总长 = wav头 + 原始音频长度
+        byte[] byteResult = new byte[44 + originBytes.length];
+
+        byte[] headerBytes = new byte[0];
+        try {
+            int totalAudioLen = originBytes.length;
+            int sampleRate = 2 == encodeFormat ? 8000 : 16000;
+            headerBytes = getWaveFileHeader(totalAudioLen, sampleRate, 1, 16);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+
+        System.arraycopy(headerBytes, 0, byteResult, 0, headerBytes.length);
+        System.arraycopy(originBytes, 0, byteResult, headerBytes.length, originBytes.length);
+        return byteResult;
     }
 
     /**
@@ -138,7 +135,29 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
      * @param sampleRate 采样率,也就是录制时使用的频率、音频采样级别 8000 = 8KHz
      * @param channels audioRecord的声道数1/2
      * @param audioFormat  采样精度; 譬如 16bit
-     * @return
+     * @return byte[]
+     */
+    private byte[] getWaveFileHeader2(int totalAudioLen, int sampleRate, short channels, short audioFormat) throws IOException {
+        WaveHeader header = new WaveHeader();
+        header.fileLength = totalAudioLen + (44 - 8);
+        header.fmtHdrLength = 16;
+        header.formatTag = 0x0001;
+        header.channels = channels;
+        header.samplesPerSec = sampleRate;
+        header.bitsPerSample = audioFormat;
+        header.blockAlign = (short) (header.channels * header.bitsPerSample / 8);
+        header.avgBytesPerSec = header.blockAlign * header.samplesPerSec;
+        header.dataHdrLength = totalAudioLen;
+        return header.getHeader();
+    }
+
+    /**
+     * 生成音频文件头部消息
+     * @param totalAudioLen 不包括header的音频数据总长度
+     * @param sampleRate 采样率,也就是录制时使用的频率、音频采样级别 8000 = 8KHz
+     * @param channels audioRecord的声道数1/2
+     * @param audioFormat  采样精度; 譬如 16bit
+     * @return byte[]
      */
     public static byte[] getWaveFileHeader(long totalAudioLen, long sampleRate, int channels, long audioFormat) {
         long totalDataLen = totalAudioLen + 36;
@@ -200,5 +219,13 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
         header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
         header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
         return header;
+    }
+
+    private void printByte(byte[] bytes) {
+        StringBuilder str = new StringBuilder();
+        for (byte byteItem : bytes) {
+            str.append(String.format("%02x ", byteItem));
+        }
+        log.info("音源数据: {}", str);
     }
 }

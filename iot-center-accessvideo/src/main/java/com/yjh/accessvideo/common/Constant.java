@@ -152,7 +152,7 @@ public class Constant {
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";

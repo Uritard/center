@@ -1,8 +1,14 @@
 package com.yjh.gateway.common;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author YJH
+ */
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -15,14 +21,20 @@ public class Constant {
 
     public static final String kafka_COUNT = "statistics:oc_data_kafka_offset";
 
-    //设备在redis中的键名-hash  deviceId,deviceName,
+    /**
+     * 设备在redis中的键名-hash  deviceId,deviceName,
+     */
     public static final String REDIS_DEVICE = "dmp_device_base:ACCESSCODE_DEVICECODE";
-    //网关设备在redis中的键名 -hash
+    /**
+     * 网关设备在redis中的键名 -hash
+     */
     public static final String REDIS_GW_DEVICE = "dmp_device_gw:CODE";
 
     public static final String REDIS_GW_HISTORY = "dmp_history_gw:CODE";
 
-    // 自定义属性
+    /**
+     * 自定义属性
+     */
     public static final String DYNAMIC = "dynamic";
 
     //自定义遥脉，遥测，遥信，遥调,遥控
@@ -78,5 +90,33 @@ public class Constant {
             put("10004", "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0");
         }
     };
+
+    /**
+     * video服务接收语音数据接口
+     */
+    public static String VIDEO_RECEIVE_DATA = "";
+
+    public static void sendAudioDataToVideo(byte[] bytes) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(Constant.VIDEO_RECEIVE_DATA);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setRequestProperty("Content-Type", "binary/octet-stream");
+            OutputStream outStream = connection.getOutputStream();
+            outStream.write(bytes);
+            outStream.flush();
+            outStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
 
 }

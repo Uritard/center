@@ -1,7 +1,10 @@
 package com.yjh.gateway;
 
+import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.commons.restTemplate.ServiceRestTemplate;
 import org.apache.catalina.connector.Connector;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
@@ -15,6 +18,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,12 +33,19 @@ import org.springframework.web.client.RestTemplate;
 @EnableFeignClients
 @EnableZuulProxy
 @EnableCircuitBreaker
-public class GatewayApplication {
+public class GatewayApplication implements CommandLineRunner {
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
+    @Override
+    public void run(String... strings) {
+        Constant.VIDEO_RECEIVE_DATA = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:receivedVoiceData","content"));
+    }
     @Bean
     public static ConfigureRedisAction configureRedisAction() {
         return ConfigureRedisAction.NO_OP;

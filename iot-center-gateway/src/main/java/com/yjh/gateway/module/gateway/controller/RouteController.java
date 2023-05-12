@@ -8,14 +8,13 @@ import com.yjh.gateway.commons.result.ResultCodeEnum;
 import com.yjh.gateway.module.gateway.service.RefreshRouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -68,9 +67,17 @@ public class RouteController {
     public Result sendMsgBuffer(HttpServletRequest request) {
         Result result = new Result();
         try {
-            InputStreamReader reader = new InputStreamReader(request.getInputStream());
-            byte[] bytes = IOUtils.toByteArray(reader);
-            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+            InputStream reader = request.getInputStream();
+            // G711编码:364 PCM编码:1964
+            byte[] bytes = new byte[1964];
+            int n = reader.read(bytes);
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, 0, n);
+
+            StringBuilder str = new StringBuilder();
+            for (byte byteItem : byteBuffer.array()) {
+                str.append(String.format("%02x ", byteItem));
+            }
+            log.info("Audio source data sent to the page: {}", str);
             WebSocketServer.sendMsgBuffer(byteBuffer);
             result.setData("通过websocket发送ByteBuffer成功");
         } catch (BusinessException e) {
