@@ -234,18 +234,18 @@ public class TWarnInfoController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             if(pageSize==0){
-//                logsRecord.LogsSend(request,"9","导出","告警确认导出");
+                logsRecord.LogsSend(request,"9","导出","告警确认导出");
             }else{
-//                logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
+                logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfoDetail> list = tWarnInfoService.WarnConfirm(warnLevel, confMode,startTime,endTime,deviceName,defectType,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-//        }catch (BusinessException e) {
-//            result.setMessage(10008, "用户无权限");
-            //log.error("日志统计失败：" + e);
+        }catch (BusinessException e) {
+            result.setMessage(10008, "用户无权限");
+            log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有告警失败描述：", e);
