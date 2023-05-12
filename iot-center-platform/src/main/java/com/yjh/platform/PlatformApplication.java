@@ -85,7 +85,7 @@ public class PlatformApplication  implements CommandLineRunner {
         redisTemplate.delete("AllRobotCode");
         sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis(true);
-        DictBusinessCache.init(false);
+        DictBusinessCache.init(true);
         tCameraInfoService.intoRedis();
         DictConvertUtil.DICT.loadDict(dictBusinessService);
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
