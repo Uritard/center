@@ -148,7 +148,7 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("upSystemFtpsPassword"));
         this.upSystemFtps = upSystemFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"algorithmSystemFtps");
+        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"algorithmSystem");
         ApplicationProperties.FtpsConfig intelAnalysisFtps = new ApplicationProperties.FtpsConfig();
         intelAnalysisFtps.setIp(redisMap.get("algorithmSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("algorithmSystemFtpsPort"),10012))
