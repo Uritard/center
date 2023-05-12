@@ -756,6 +756,12 @@ public class PatrolResultHandler {
                 voiceMap.put(rets[0], NumberUtils.toInt(rets[1]));
             }
         }
+        String resultDesc = cruiseResultMap.get("resultDesc");
+        StringBuilder retDesc = new StringBuilder();
+        if (StringUtils.isEmpty(resultDesc)) {
+            retDesc.append(CommonUtils.toResultDesc(resultValue, cruiseResultMap.get("unit")));
+            cruiseResultMap.put("resultDesc", retDesc.toString());
+        }
 
         int warnDbVal = NumberUtils.toInt(voiceDevice.getDbValue());
         int maxDbVal = voiceMap.getOrDefault("DB", 0);
