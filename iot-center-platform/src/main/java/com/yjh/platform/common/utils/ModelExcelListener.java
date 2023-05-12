@@ -84,6 +84,13 @@ public class ModelExcelListener implements ReadListener<ExcelEntity> {
         if (StringUtils.isNotBlank(excelEntity.getAlarmLevelName())) {
             excelEntity.setAlarmLevel(alarmLevelMap.get(excelEntity.getAlarmLevelName()) == null ? null : Integer.valueOf(alarmLevelMap.get(excelEntity.getAlarmLevelName())));
         }
+
+        if (StringUtils.equalsAny("操作类",excelEntity.getInspectionType())) {
+            excelEntity.setInspectionType("2");
+        }
+        else {
+            excelEntity.setInspectionType("1");
+        }
         excelEntities.add(excelEntity);
     }
 

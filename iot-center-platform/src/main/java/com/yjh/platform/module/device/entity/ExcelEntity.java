@@ -76,6 +76,8 @@ public class ExcelEntity implements Serializable {
     private String unit;
     @ExcelProperty(value = "告警级别")
     private String alarmLevelName;
+    @ExcelProperty(value = "测点类型")
+    private String inspectionType;
     private Integer alarmLevel;
     private Integer meteKindId;
     private String deviceTypeId;
