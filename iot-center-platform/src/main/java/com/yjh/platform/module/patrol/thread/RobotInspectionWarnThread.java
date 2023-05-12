@@ -151,7 +151,7 @@ public class RobotInspectionWarnThread implements Runnable{
             String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
             int alarmSource = 998;
             if (StringUtils.isNotEmpty(type)){
-                alarmSource = analyseDataOperateService.selectDictCodeByUpDict("alarm_source", type);
+                alarmSource = NumberUtils.toInt(analyseDataOperateService.selectDictCode("alarm_source", type),998);
             }
             tDefectInfo.setAlarmSource(alarmSource);
             tDefectInfo.setValue(taskAlarm.getValue());
@@ -182,7 +182,7 @@ public class RobotInspectionWarnThread implements Runnable{
             String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
             int alarmSource = 998;
             if (StringUtils.isNotEmpty(type)) {
-                alarmSource = analyseDataOperateService.selectDictCodeByUpDict("alarm_source", type);
+                alarmSource = NumberUtils.toInt(analyseDataOperateService.selectDictCode("alarm_source", type),998);
             }
             warnInfo.setAlarmSource(alarmSource);
             warnInfo.setValue(taskAlarm.getValue());
