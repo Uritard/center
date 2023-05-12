@@ -822,7 +822,12 @@
 
     <update id="manualReviewByTask" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
         UPDATE u_patrol_data_result
-        SET person_check = result_desc,
+        SET person_check =
+        IF (
+        evaluation_state = 256,
+        person_check,
+        result_desc
+        ),
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="checkUser != null ">check_user = #{checkUser},</if>
         evaluation_state = 256,
@@ -832,7 +837,6 @@
         IF (cruise_result = 246, 258, 259)
         WHERE
         task_id = #{taskId,jdbcType=VARCHAR}
-        AND evaluation_state = 257;
     </update>
 
     <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">

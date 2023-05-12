@@ -493,15 +493,15 @@ public class SendToUpSystemServices {
     }
 
     public String createDeviceModel(String path, String stationCode) throws Exception {
-        Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
-        String selectEdge = selectEdgeMap.get("content");
+//        Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
+//        String selectEdge = selectEdgeMap.get("content");
         String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
-        if ("1".equals(edgeLevel)){
-            selectEdge = null;
-        }
+//        if ("1".equals(edgeLevel)){
+//            selectEdge = null;
+//        }
         String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
-        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(selectEdge,presetRealImgPath,presetImgPath);
+        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(null, presetRealImgPath,presetImgPath);
         list.forEach(item->{
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
