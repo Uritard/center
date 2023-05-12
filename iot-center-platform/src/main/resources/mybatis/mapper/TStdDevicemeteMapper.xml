@@ -142,7 +142,7 @@
         )
     </insert>
 
-    <insert id="batchAddTStdMeteModelDetail">
+     <insert id="batchAddTStdMeteModelDetail">
         insert into t_std_devicemete(
         device_mete_id,
         device_id,
@@ -202,7 +202,7 @@
             #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.appearanceType, jdbcType=INTEGER},
             #{TStdMeteModelDetail.deviceType, jdbcType=INTEGER},
-            #{TStdMeteModelDetail.inspectionType, jdbcType=INTEGER},
+            ifnull(#{TStdMeteModelDetail.inspectionType, jdbcType=INTEGER},1),
             #{TStdMeteModelDetail.positionType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.analyseType, jdbcType=INTEGER},
             #{TStdMeteModelDetail.isAi, jdbcType=VARCHAR},
