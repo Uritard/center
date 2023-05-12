@@ -534,7 +534,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setMeteType(excelEntity.getMeteTypeId());
                     tStdDeviceMete.setMeteName(excelEntity.getMeteName());
                     tStdDeviceMete.setMeteKind(excelEntity.getMeteKindId());
-                    tStdDeviceMete.setMeteKind(excelEntity.getMeteKindId());
+                    tStdDeviceMete.setInspectionType(excelEntity.getInspectionType());
                     //默认字段
                     tStdDeviceMete.setPositionType(excelEntity.getPositionType());
                     tStdDeviceMete.setIsAi(excelEntity.getIsAi());
