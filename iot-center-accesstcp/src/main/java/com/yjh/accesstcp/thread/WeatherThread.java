@@ -75,10 +75,21 @@ public class WeatherThread implements Runnable{
                         if ("robot".equals(device.get("type"))) {
                             //氧气含量
                             Map<String, Object> mapForOxygen = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":7");
+                            if (mapForOxygen.isEmpty()){
+                                mapForOxygen.put("unit","ppm");
+                                mapForOxygen.put("value","0");
+                                mapForOxygen.put("valueUnit","0ppm");
+                            }
+
                             Map<String, Object> map7 = createMap(now, 7, mapForOxygen, device);
                             list.add(map7);
                             //SF6含量
                             Map<String, Object> mapForSf6 = redisTemplate.opsForHash().entries("RobotWeather:" + device.get("robot_code") + ":8");
+                            if (mapForSf6.isEmpty()){
+                                mapForSf6.put("unit","ppm");
+                                mapForSf6.put("value","0");
+                                mapForSf6.put("valueUnit","0ppm");
+                            }
                             Map<String, Object> map8 = createMap(now, 8, mapForSf6, device);
                             list.add(map8);
                         }
