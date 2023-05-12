@@ -759,7 +759,7 @@ public class PatrolResultHandler {
         String resultDesc = cruiseResultMap.get("resultDesc");
         StringBuilder retDesc = new StringBuilder();
         if (StringUtils.isEmpty(resultDesc)) {
-            retDesc.append(CommonUtils.toResultDesc(resultValue, cruiseResultMap.get("unit")));
+            retDesc.append(ResultConvertUtil.convertDesc(resultValue, cruiseResultMap.get("unit")));
             cruiseResultMap.put("resultDesc", retDesc.toString());
         }
 
