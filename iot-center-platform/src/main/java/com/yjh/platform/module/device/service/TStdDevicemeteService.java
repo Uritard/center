@@ -400,6 +400,7 @@ public class TStdDevicemeteService{
             regionNameSet.forEach(o -> {
                 TStdRegion tStdRegion = new TStdRegion();
                 tStdRegion.setUpRegionId(rootId);
+                tStdRegion.setRegionCode(StringUtils.EMPTY);
                 tStdRegion.setRegionName(o);
                 tStdRegion.setState(1);
                 insertList.add(tStdRegion);
@@ -431,6 +432,7 @@ public class TStdDevicemeteService{
                     TStdRegion tStdRegion = new TStdRegion();
                     tStdRegion.setUpRegionId(areaId);
                     tStdRegion.setRegionName(o);
+                    tStdRegion.setRegionCode(StringUtils.EMPTY);
                     tStdRegion.setState(1);
                     insertList.add(tStdRegion);
                 });

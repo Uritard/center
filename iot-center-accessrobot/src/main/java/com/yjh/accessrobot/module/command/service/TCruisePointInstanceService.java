@@ -78,6 +78,7 @@ public class TCruisePointInstanceService {
             regionNameSet.forEach(o -> {
                 TStdRegion tStdRegion = new TStdRegion();
                 tStdRegion.setUpRegionId(rootId);
+                tStdRegion.setRegionCode(StringUtils.EMPTY);
                 tStdRegion.setRegionName(o);
                 tStdRegion.setState(1);
                 insertList.add(tStdRegion);
@@ -108,6 +109,7 @@ public class TCruisePointInstanceService {
                 bayNameSet.forEach(o -> {
                     TStdRegion tStdRegion = new TStdRegion();
                     tStdRegion.setUpRegionId(areaId);
+                    tStdRegion.setRegionCode(StringUtils.EMPTY);
                     tStdRegion.setRegionName(o);
                     tStdRegion.setState(1);
                     insertList.add(tStdRegion);
