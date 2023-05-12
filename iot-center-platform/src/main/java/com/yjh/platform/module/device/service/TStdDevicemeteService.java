@@ -443,8 +443,8 @@ public class TStdDevicemeteService{
             Map<String, TStdRegion> bayNameToBayToId =
                 existsBayList.stream().collect(Collectors.toMap(TStdRegion::getRegionName, Function.identity()));
 
-            sameAreaList.forEach(ExcelEntity -> {
-                ExcelEntity.setRegionId(String.valueOf(bayNameToBayToId.get(ExcelEntity.getRegionName()).getRegionId()));
+            sameAreaList.forEach(excelEntity -> {
+                excelEntity.setRegionId(String.valueOf(bayNameToBayToId.get(excelEntity.getRegionName()).getRegionId()));
             });
 
             buildListAfterRegion.addAll(sameAreaList);
