@@ -467,15 +467,16 @@ public class TStdDeviceService{
                 break;
             case "9":
                 if(StringUtils.isNotEmpty(deviceType)){
-                    Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
-                    String selectEdge = selectEdgeMap.get("content");
-                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
-                    if ("1".equals(edgeLevel)){
-                        selectEdge = null;
-                    }
+                    //送检查询筛选用
+//                    Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
+//                    String selectEdge = selectEdgeMap.get("content");
+//                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+//                    if ("1".equals(edgeLevel)){
+//                        selectEdge = null;
+//                    }
                     if (Objects.equals(deviceShow, "camera")) { listTree = this.tStdDeviceDao.selectCameraMeteCruiseTree(deviceType,analyseType); }
                     else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotMeteCruiseTree(deviceType,analyseType); }
-                    else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteCruiseTree(deviceType,analyseType,selectEdge); }
+                    else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteCruiseTree(deviceType,analyseType,null); }
                     else { throw new BusinessException("设备树展示内容输入有误！"); }
                 }else{
                     throw new BusinessException("设备树展示内容传参有误！");
