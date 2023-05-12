@@ -43,7 +43,7 @@ public class HikUtilsApp {
             return;
         }
         HC_NET_SDK.NET_DVR_SetLogToFile(logLevel, sdkLogPath, false);
-        log.info("==================================NET_DVR_Init success==================================");
+        log.info("===================NET_DVR_Init success===================");
     }
 
     /**
@@ -77,7 +77,7 @@ public class HikUtilsApp {
             log.error("Device login fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
             return false;
         } else {
-            log.info("==================================NET_DVR_Login_V40 success==================================");
+            log.info("===================NET_DVR_Login_V40 success===================");
             Constant.hikDeviceUserIdMaps.put(String.valueOf(hikDeviceInfo.getHikDeviceId()), lUserId);
             return true;
         }
@@ -94,7 +94,7 @@ public class HikUtilsApp {
         compressionAudio.write();
 
         if (HC_NET_SDK.NET_DVR_GetCurrentAudioCompress(lUserId, compressionAudio)){
-            log.info("==================================NET_DVR_GetCurrentAudioCompress success==================================");
+            log.info("===================NET_DVR_GetCurrentAudioCompress success===================");
 
             compressionAudioTemp.setByAudioEncType(compressionAudio.byAudioEncType);
             compressionAudioTemp.setByAudioSamplingRate(compressionAudio.byAudioSamplingRate);
@@ -124,7 +124,7 @@ public class HikUtilsApp {
         if (lVoiceComHandle == -1) {
             log.error("Start voice com fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
         }else {
-            log.info("==================================NET_DVR_StartVoiceCom_V30 success==================================");
+            log.info("===================NET_DVR_StartVoiceCom_V30 success===================");
             Constant.hikDeviceVoiceComHandleMaps.put(lUserId, lVoiceComHandle);
         }
         return lVoiceComHandle;
@@ -135,7 +135,7 @@ public class HikUtilsApp {
      */
     public boolean stopVoiceCom(int lVoiceComHandle) {
         if (HC_NET_SDK.NET_DVR_StopVoiceCom(lVoiceComHandle)){
-            log.info("==================================NET_DVR_StopVoiceCom success==================================");
+            log.info("===================NET_DVR_StopVoiceCom success===================");
             return true;
         }
         log.error("Stop voice com fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
@@ -152,7 +152,7 @@ public class HikUtilsApp {
         if (lVoiceTranHandle == -1){
             log.error("Start voice trans fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
         }else {
-            log.info("==================================NET_DVR_StartVoiceCom_MR_V30 success==================================");
+            log.info("===================NET_DVR_StartVoiceCom_MR_V30 success===================");
             Constant.hikDeviceVoiceTransHandleMaps.put(lUserId, lVoiceTranHandle);
         }
         return lVoiceTranHandle;
@@ -163,7 +163,7 @@ public class HikUtilsApp {
      */
     public boolean stopVoiceTrans(int lVoiceTranHandle){
         if (HC_NET_SDK.NET_DVR_StopVoiceCom(lVoiceTranHandle)){
-            log.info("==================================NET_DVR_StopVoiceCom success==================================");
+            log.info("===================NET_DVR_StopVoiceCom success===================");
             return true;
         }
         log.error("Client audio start fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
@@ -175,7 +175,7 @@ public class HikUtilsApp {
      */
     public boolean deviceLogout(int lUserId){
         if (HC_NET_SDK.NET_DVR_Logout(lUserId)) {
-            log.info("==================================NET_DVR_Logout success==================================");
+            log.info("===================NET_DVR_Logout success===================");
             return true;
         }
         log.error("Logout fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());

@@ -58,10 +58,10 @@ public class VoiceComController {
 
     @ApiOperation(value = "设备登录")
     @GetMapping(value = "/deviceLogin")
-    public Result deviceLogin(@RequestParam(value = "cameraId") Long cameraId) {
+    public Result deviceLogin(@RequestParam(value = "deviceId") Long deviceId) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.deviceLogin(cameraId));
+            result.setData(voiceComService.deviceLogin(deviceId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -72,12 +72,11 @@ public class VoiceComController {
     }
 
     @ApiOperation(value = "开启语音对讲")
-    @GetMapping(value = "/startVoiceCom")
-    public Result startVoiceCom(@RequestParam(value = "cameraId") Long cameraId,
-                                @RequestParam(value = "dwVoiceChan") Integer dwVoiceChan) {
+    @GetMapping(value = "/startVoiceTrans")
+    public Result startVoiceTrans(@RequestParam(value = "deviceId") Long deviceId) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.startVoiceCom(cameraId, dwVoiceChan));
+            result = voiceComService.startVoiceTrans(deviceId, result);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -88,11 +87,11 @@ public class VoiceComController {
     }
 
     @ApiOperation(value = "关闭语音对讲")
-    @GetMapping(value = "/stopVoiceCom")
-    public Result stopVoiceCom(@RequestParam(value = "cameraId") Long cameraId) {
+    @GetMapping(value = "/stopVoiceTrans")
+    public Result stopVoiceTrans(@RequestParam(value = "deviceId") Long deviceId) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.stopVoiceCom(cameraId));
+            result = voiceComService.stopVoiceTrans(deviceId, result);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -123,10 +122,12 @@ public class VoiceComController {
     @GetMapping(value = "/startVoiceTransTest")
     public Result startVoiceTransTest(@RequestParam(value = "cameraId") Long cameraId,
                                       @RequestParam(value = "timeItem") long timeItem,
-                                      @RequestParam(value = "fileName") String fileName) {
+                                      @RequestParam(value = "fileName", required = false) String fileName,
+                                      @RequestParam(value = "armFramework") Integer armFramework,
+                                      @RequestParam(value = "timeStamp") Integer timeStamp) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.startVoiceTransTest(cameraId, timeItem, fileName));
+            result.setData(voiceComService.startVoiceTransTest(cameraId, timeItem, fileName, armFramework, timeStamp));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -137,9 +138,11 @@ public class VoiceComController {
     }
 
     @ApiOperation(value = "发送语音数据测试")
-    @GetMapping(value = "/voiceComSendDataTest")
-    public Result voiceComSendDataTest(@RequestParam(value = "fileName") String fileName,
-                                       @RequestParam(value = "cameraId") Long cameraId) {
+    @PostMapping(value = "/sendVoiceDataTest")
+    public Result sendVoiceDataTest(@RequestParam(value = "fileName") String fileName,
+                                    @RequestParam(value = "cameraId") Long cameraId,
+                                    @RequestParam(value = "armFramework") Integer armFramework,
+                                    @RequestParam(value = "timeStamp") Integer timeStamp) {
         Result result = new Result();
         try {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
@@ -147,7 +150,7 @@ public class VoiceComController {
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
             String format = DateTimeUtil.formatThreadLocal(new Date());
-            voiceComService.voiceComSendDataTest(lVoiceTranHandle, fileName, format);
+            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework, timeStamp);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -157,37 +160,17 @@ public class VoiceComController {
         return result;
     }
 
-    @ApiOperation(value = "接收语音数据测试")
-    @PostMapping(value = "/receivedVoiceData")
-    public Result receivedVoiceData(@RequestParam(value = "cameraId") Long cameraId,
-                                    HttpServletRequest request) {
+    @ApiOperation(value = "接收并发送语音数据")
+    @PostMapping(value = "/receiveAndSendVoiceData")
+    public Result receiveAndSendVoiceData(HttpServletRequest request) {
         Result result = new Result();
         try {
-            log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
-            Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
-            log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
-            Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
-            voiceComService.receivedVoiceData(request, lVoiceTranHandle);
+            voiceComService.receiveAndSendVoiceData(request, 40029L);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("接收语音数据测试失败描述:", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "关闭语音转发测试")
-    @GetMapping(value = "/stopVoiceTransTest")
-    public Result stopVoiceTransTest(@RequestParam(value = "cameraId") Long cameraId) {
-        Result result = new Result();
-        try {
-            result.setData(voiceComService.stopVoiceTransTest(cameraId));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("关闭语音转发测试失败描述:", e);
+            log.error("接收语音数据并发送失败描述:", e);
         }
         return result;
     }
