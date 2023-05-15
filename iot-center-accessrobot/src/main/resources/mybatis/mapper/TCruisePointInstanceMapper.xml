@@ -66,11 +66,11 @@
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")">#{originId}</foreach>
     </delete>
     <delete id="deleteInstanceIdList">
-        delete from t_cruise_plan_attr where
+        delete from u_patrol_plan_attr where
         instance_id in
         <foreach collection="deleteInstanceIdList" item="instanceId" open="(" separator="," close=")">#{instanceId}</foreach>
     </delete>
-    <select id="selectByEdgeCodeAndOriginIds" resultMap="BaseResultMap">
+    <select id="selectByEdgeCodeAndOriginIds" resultType="java.lang.Long">
         select
         instance_id
         from t_cruise_point_instance
