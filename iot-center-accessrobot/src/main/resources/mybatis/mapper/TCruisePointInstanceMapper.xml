@@ -5,29 +5,29 @@
 <mapper namespace="com.yjh.accessrobot.module.command.dao.TCruisePointInstanceMapper">
 
     <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TCruisePointInstance">
-            <id property="instanceId" column="instance_id" jdbcType="BIGINT"/>
-            <result property="deviceMeteId" column="device_mete_id" jdbcType="BIGINT"/>
-            <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
-            <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
-            <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
-            <result property="customId" column="custom_id" jdbcType="VARCHAR"/>
-            <result property="dataFormat" column="data_format" jdbcType="VARCHAR"/>
-            <result property="identifyType" column="identify_type" jdbcType="INTEGER"/>
-            <result property="identifySonType" column="identify_son_type" jdbcType="INTEGER"/>
-            <result property="cruiseType" column="cruise_type" jdbcType="INTEGER"/>
-            <result property="cruiseId" column="cruise_id" jdbcType="BIGINT"/>
-            <result property="cruiseName" column="cruise_name" jdbcType="VARCHAR"/>
-            <result property="cruiseContent" column="cruise_content" jdbcType="VARCHAR"/>
-            <result property="positionType" column="position_type" jdbcType="VARCHAR"/>
-            <result property="unit" column="unit" jdbcType="VARCHAR"/>
-            <result property="ifSy" column="if_sy" jdbcType="INTEGER"/>
-            <result property="syType" column="sy_type" jdbcType="INTEGER"/>
-            <result property="ifVideotape" column="if_videotape" jdbcType="INTEGER"/>
-            <result property="videotapeTime" column="videotape_time" jdbcType="VARCHAR"/>
-            <result property="textDesc" column="text_desc" jdbcType="VARCHAR"/>
-            <result property="sort" column="sort" jdbcType="VARCHAR"/>
-            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
-            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <id property="instanceId" column="instance_id" jdbcType="BIGINT"/>
+        <result property="deviceMeteId" column="device_mete_id" jdbcType="BIGINT"/>
+        <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+        <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+        <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+        <result property="customId" column="custom_id" jdbcType="VARCHAR"/>
+        <result property="dataFormat" column="data_format" jdbcType="VARCHAR"/>
+        <result property="identifyType" column="identify_type" jdbcType="INTEGER"/>
+        <result property="identifySonType" column="identify_son_type" jdbcType="INTEGER"/>
+        <result property="cruiseType" column="cruise_type" jdbcType="INTEGER"/>
+        <result property="cruiseId" column="cruise_id" jdbcType="BIGINT"/>
+        <result property="cruiseName" column="cruise_name" jdbcType="VARCHAR"/>
+        <result property="cruiseContent" column="cruise_content" jdbcType="VARCHAR"/>
+        <result property="positionType" column="position_type" jdbcType="VARCHAR"/>
+        <result property="unit" column="unit" jdbcType="VARCHAR"/>
+        <result property="ifSy" column="if_sy" jdbcType="INTEGER"/>
+        <result property="syType" column="sy_type" jdbcType="INTEGER"/>
+        <result property="ifVideotape" column="if_videotape" jdbcType="INTEGER"/>
+        <result property="videotapeTime" column="videotape_time" jdbcType="VARCHAR"/>
+        <result property="textDesc" column="text_desc" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -43,100 +43,117 @@
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from t_cruise_point_instance
-        where  instance_id = #{instanceId,jdbcType=BIGINT} 
+        where instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
     <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from t_cruise_point_instance
-        where  edge_code = #{edgeCode}
+        where edge_code = #{edgeCode}
     </select>
 
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from t_cruise_point_instance
-        where  instance_id = #{instanceId,jdbcType=BIGINT} 
+        delete
+        from t_cruise_point_instance
+        where instance_id = #{instanceId,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
-        delete from t_cruise_point_instance  where edge_code=#{edgeCode}
+        delete from t_cruise_point_instance where edge_code=#{edgeCode}
         and origin_id in
-        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">#{originId}</foreach>
     </delete>
+    <delete id="deleteInstanceIdList">
+        delete from t_cruise_plan_attr where
+        instance_id in
+        <foreach collection="deleteInstanceIdList" item="instanceId" open="(" separator="," close=")">#{instanceId}</foreach>
+    </delete>
+    <select id="selectByEdgeCodeAndOriginIds" resultMap="BaseResultMap">
+        select
+        instance_id
+        from t_cruise_point_instance
+        where edge_code = #{edgeCode} and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">#{originId}</foreach>
+    </select>
     <delete id="deleteByEdgeCode">
-        delete from t_cruise_point_instance  where edge_code=#{edgeCode}
+        delete
+        from t_cruise_point_instance
+        where edge_code = #{edgeCode}
     </delete>
-    <insert id="insert" keyColumn="instance_id" keyProperty="instanceId" parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance" useGeneratedKeys="true">
+    <insert id="insert" keyColumn="instance_id" keyProperty="instanceId"
+            parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance" useGeneratedKeys="true">
         insert into t_cruise_point_instance
-        ( instance_id,device_mete_id,station_id
-        ,station_name,device_id,custom_id
-        ,data_format,identify_type,identify_son_type
-        ,cruise_type,cruise_id,cruise_name
-        ,cruise_content,position_type,unit
-        ,if_sy,sy_type,if_videotape
-        ,videotape_time,text_desc,sort
-        ,origin_id,edge_code)
-        values (#{instanceId,jdbcType=BIGINT},#{deviceMeteId,jdbcType=BIGINT},#{stationId,jdbcType=VARCHAR}
-        ,#{stationName,jdbcType=VARCHAR},#{deviceId,jdbcType=BIGINT},#{customId,jdbcType=VARCHAR}
-        ,#{dataFormat,jdbcType=VARCHAR},#{identifyType,jdbcType=INTEGER},#{identifySonType,jdbcType=INTEGER}
-        ,#{cruiseType,jdbcType=INTEGER},#{cruiseId,jdbcType=BIGINT},#{cruiseName,jdbcType=VARCHAR}
-        ,#{cruiseContent,jdbcType=VARCHAR},#{positionType,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
-        ,#{ifSy,jdbcType=INTEGER},#{syType,jdbcType=INTEGER},#{ifVideotape,jdbcType=INTEGER}
-        ,#{videotapeTime,jdbcType=VARCHAR},#{textDesc,jdbcType=VARCHAR},#{sort,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR})
+        ( instance_id, device_mete_id, station_id
+        , station_name, device_id, custom_id
+        , data_format, identify_type, identify_son_type
+        , cruise_type, cruise_id, cruise_name
+        , cruise_content, position_type, unit
+        , if_sy, sy_type, if_videotape
+        , videotape_time, text_desc, sort
+        , origin_id, edge_code)
+        values ( #{instanceId,jdbcType=BIGINT}, #{deviceMeteId,jdbcType=BIGINT}, #{stationId,jdbcType=VARCHAR}
+               , #{stationName,jdbcType=VARCHAR}, #{deviceId,jdbcType=BIGINT}, #{customId,jdbcType=VARCHAR}
+               , #{dataFormat,jdbcType=VARCHAR}, #{identifyType,jdbcType=INTEGER}, #{identifySonType,jdbcType=INTEGER}
+               , #{cruiseType,jdbcType=INTEGER}, #{cruiseId,jdbcType=BIGINT}, #{cruiseName,jdbcType=VARCHAR}
+               , #{cruiseContent,jdbcType=VARCHAR}, #{positionType,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}
+               , #{ifSy,jdbcType=INTEGER}, #{syType,jdbcType=INTEGER}, #{ifVideotape,jdbcType=INTEGER}
+               , #{videotapeTime,jdbcType=VARCHAR}, #{textDesc,jdbcType=VARCHAR}, #{sort,jdbcType=VARCHAR}
+               , #{originId,jdbcType=VARCHAR}, #{edgeCode,jdbcType=VARCHAR})
     </insert>
-    <insert id="insertSelective" keyColumn="instance_id" keyProperty="instanceId" parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance" useGeneratedKeys="true">
+    <insert id="insertSelective" keyColumn="instance_id" keyProperty="instanceId"
+            parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance" useGeneratedKeys="true">
         insert into t_cruise_point_instance
         <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="instanceId != null">instance_id,</if>
-                <if test="deviceMeteId != null">device_mete_id,</if>
-                <if test="stationId != null">station_id,</if>
-                <if test="stationName != null">station_name,</if>
-                <if test="deviceId != null">device_id,</if>
-                <if test="customId != null">custom_id,</if>
-                <if test="dataFormat != null">data_format,</if>
-                <if test="identifyType != null">identify_type,</if>
-                <if test="identifySonType != null">identify_son_type,</if>
-                <if test="cruiseType != null">cruise_type,</if>
-                <if test="cruiseId != null">cruise_id,</if>
-                <if test="cruiseName != null">cruise_name,</if>
-                <if test="cruiseContent != null">cruise_content,</if>
-                <if test="positionType != null">position_type,</if>
-                <if test="unit != null">unit,</if>
-                <if test="ifSy != null">if_sy,</if>
-                <if test="syType != null">sy_type,</if>
-                <if test="ifVideotape != null">if_videotape,</if>
-                <if test="videotapeTime != null">videotape_time,</if>
-                <if test="textDesc != null">text_desc,</if>
-                <if test="sort != null">sort,</if>
-                <if test="originId != null">origin_id,</if>
-                <if test="edgeCode != null">edge_code,</if>
+            <if test="instanceId != null">instance_id,</if>
+            <if test="deviceMeteId != null">device_mete_id,</if>
+            <if test="stationId != null">station_id,</if>
+            <if test="stationName != null">station_name,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="customId != null">custom_id,</if>
+            <if test="dataFormat != null">data_format,</if>
+            <if test="identifyType != null">identify_type,</if>
+            <if test="identifySonType != null">identify_son_type,</if>
+            <if test="cruiseType != null">cruise_type,</if>
+            <if test="cruiseId != null">cruise_id,</if>
+            <if test="cruiseName != null">cruise_name,</if>
+            <if test="cruiseContent != null">cruise_content,</if>
+            <if test="positionType != null">position_type,</if>
+            <if test="unit != null">unit,</if>
+            <if test="ifSy != null">if_sy,</if>
+            <if test="syType != null">sy_type,</if>
+            <if test="ifVideotape != null">if_videotape,</if>
+            <if test="videotapeTime != null">videotape_time,</if>
+            <if test="textDesc != null">text_desc,</if>
+            <if test="sort != null">sort,</if>
+            <if test="originId != null">origin_id,</if>
+            <if test="edgeCode != null">edge_code,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="instanceId != null">#{instanceId,jdbcType=BIGINT},</if>
-                <if test="deviceMeteId != null">#{deviceMeteId,jdbcType=BIGINT},</if>
-                <if test="stationId != null">#{stationId,jdbcType=VARCHAR},</if>
-                <if test="stationName != null">#{stationName,jdbcType=VARCHAR},</if>
-                <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
-                <if test="customId != null">#{customId,jdbcType=VARCHAR},</if>
-                <if test="dataFormat != null">#{dataFormat,jdbcType=VARCHAR},</if>
-                <if test="identifyType != null">#{identifyType,jdbcType=INTEGER},</if>
-                <if test="identifySonType != null">#{identifySonType,jdbcType=INTEGER},</if>
-                <if test="cruiseType != null">#{cruiseType,jdbcType=INTEGER},</if>
-                <if test="cruiseId != null">#{cruiseId,jdbcType=BIGINT},</if>
-                <if test="cruiseName != null">#{cruiseName,jdbcType=VARCHAR},</if>
-                <if test="cruiseContent != null">#{cruiseContent,jdbcType=VARCHAR},</if>
-                <if test="positionType != null">#{positionType,jdbcType=VARCHAR},</if>
-                <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
-                <if test="ifSy != null">#{ifSy,jdbcType=INTEGER},</if>
-                <if test="syType != null">#{syType,jdbcType=INTEGER},</if>
-                <if test="ifVideotape != null">#{ifVideotape,jdbcType=INTEGER},</if>
-                <if test="videotapeTime != null">#{videotapeTime,jdbcType=VARCHAR},</if>
-                <if test="textDesc != null">#{textDesc,jdbcType=VARCHAR},</if>
-                <if test="sort != null">#{sort,jdbcType=VARCHAR},</if>
-                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
-                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+            <if test="instanceId != null">#{instanceId,jdbcType=BIGINT},</if>
+            <if test="deviceMeteId != null">#{deviceMeteId,jdbcType=BIGINT},</if>
+            <if test="stationId != null">#{stationId,jdbcType=VARCHAR},</if>
+            <if test="stationName != null">#{stationName,jdbcType=VARCHAR},</if>
+            <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
+            <if test="customId != null">#{customId,jdbcType=VARCHAR},</if>
+            <if test="dataFormat != null">#{dataFormat,jdbcType=VARCHAR},</if>
+            <if test="identifyType != null">#{identifyType,jdbcType=INTEGER},</if>
+            <if test="identifySonType != null">#{identifySonType,jdbcType=INTEGER},</if>
+            <if test="cruiseType != null">#{cruiseType,jdbcType=INTEGER},</if>
+            <if test="cruiseId != null">#{cruiseId,jdbcType=BIGINT},</if>
+            <if test="cruiseName != null">#{cruiseName,jdbcType=VARCHAR},</if>
+            <if test="cruiseContent != null">#{cruiseContent,jdbcType=VARCHAR},</if>
+            <if test="positionType != null">#{positionType,jdbcType=VARCHAR},</if>
+            <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
+            <if test="ifSy != null">#{ifSy,jdbcType=INTEGER},</if>
+            <if test="syType != null">#{syType,jdbcType=INTEGER},</if>
+            <if test="ifVideotape != null">#{ifVideotape,jdbcType=INTEGER},</if>
+            <if test="videotapeTime != null">#{videotapeTime,jdbcType=VARCHAR},</if>
+            <if test="textDesc != null">#{textDesc,jdbcType=VARCHAR},</if>
+            <if test="sort != null">#{sort,jdbcType=VARCHAR},</if>
+            <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+            <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <insert id="batchInsert">
@@ -150,7 +167,7 @@
         ,videotape_time,text_desc,sort
         ,origin_id,edge_code)
         values
-        <foreach collection="list"  item="tCruisePointInstance" separator=",">
+        <foreach collection="list" item="tCruisePointInstance" separator=",">
             (#{tCruisePointInstance.deviceMeteId,jdbcType=BIGINT},#{tCruisePointInstance.stationId,jdbcType=VARCHAR}
             ,#{tCruisePointInstance.stationName,jdbcType=VARCHAR},#{tCruisePointInstance.deviceId,jdbcType=BIGINT},#{tCruisePointInstance.customId,jdbcType=VARCHAR}
             ,#{tCruisePointInstance.dataFormat,jdbcType=VARCHAR},#{tCruisePointInstance.identifyType,jdbcType=INTEGER},#{tCruisePointInstance.identifySonType,jdbcType=INTEGER}
@@ -165,112 +182,111 @@
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance">
         update t_cruise_point_instance
         <set>
-                <if test="deviceMeteId != null">
-                    device_mete_id = #{deviceMeteId,jdbcType=BIGINT},
-                </if>
-                <if test="stationId != null">
-                    station_id = #{stationId,jdbcType=VARCHAR},
-                </if>
-                <if test="stationName != null">
-                    station_name = #{stationName,jdbcType=VARCHAR},
-                </if>
-                <if test="deviceId != null">
-                    device_id = #{deviceId,jdbcType=BIGINT},
-                </if>
-                <if test="customId != null">
-                    custom_id = #{customId,jdbcType=VARCHAR},
-                </if>
-                <if test="dataFormat != null">
-                    data_format = #{dataFormat,jdbcType=VARCHAR},
-                </if>
-                <if test="identifyType != null">
-                    identify_type = #{identifyType,jdbcType=INTEGER},
-                </if>
-                <if test="identifySonType != null">
-                    identify_son_type = #{identifySonType,jdbcType=INTEGER},
-                </if>
-                <if test="cruiseType != null">
-                    cruise_type = #{cruiseType,jdbcType=INTEGER},
-                </if>
-                <if test="cruiseId != null">
-                    cruise_id = #{cruiseId,jdbcType=BIGINT},
-                </if>
-                <if test="cruiseName != null">
-                    cruise_name = #{cruiseName,jdbcType=VARCHAR},
-                </if>
-                <if test="cruiseContent != null">
-                    cruise_content = #{cruiseContent,jdbcType=VARCHAR},
-                </if>
-                <if test="positionType != null">
-                    position_type = #{positionType,jdbcType=VARCHAR},
-                </if>
-                <if test="unit != null">
-                    unit = #{unit,jdbcType=VARCHAR},
-                </if>
-                <if test="ifSy != null">
-                    if_sy = #{ifSy,jdbcType=INTEGER},
-                </if>
-                <if test="syType != null">
-                    sy_type = #{syType,jdbcType=INTEGER},
-                </if>
-                <if test="ifVideotape != null">
-                    if_videotape = #{ifVideotape,jdbcType=INTEGER},
-                </if>
-                <if test="videotapeTime != null">
-                    videotape_time = #{videotapeTime,jdbcType=VARCHAR},
-                </if>
-                <if test="textDesc != null">
-                    text_desc = #{textDesc,jdbcType=VARCHAR},
-                </if>
-                <if test="sort != null">
-                    sort = #{sort,jdbcType=VARCHAR},
-                </if>
-                <if test="originId != null">
-                    origin_id = #{originId,jdbcType=VARCHAR},
-                </if>
-                <if test="edgeCode != null">
-                    edge_code = #{edgeCode,jdbcType=VARCHAR},
-                </if>
+            <if test="deviceMeteId != null">
+                device_mete_id = #{deviceMeteId,jdbcType=BIGINT},
+            </if>
+            <if test="stationId != null">
+                station_id = #{stationId,jdbcType=VARCHAR},
+            </if>
+            <if test="stationName != null">
+                station_name = #{stationName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceId != null">
+                device_id = #{deviceId,jdbcType=BIGINT},
+            </if>
+            <if test="customId != null">
+                custom_id = #{customId,jdbcType=VARCHAR},
+            </if>
+            <if test="dataFormat != null">
+                data_format = #{dataFormat,jdbcType=VARCHAR},
+            </if>
+            <if test="identifyType != null">
+                identify_type = #{identifyType,jdbcType=INTEGER},
+            </if>
+            <if test="identifySonType != null">
+                identify_son_type = #{identifySonType,jdbcType=INTEGER},
+            </if>
+            <if test="cruiseType != null">
+                cruise_type = #{cruiseType,jdbcType=INTEGER},
+            </if>
+            <if test="cruiseId != null">
+                cruise_id = #{cruiseId,jdbcType=BIGINT},
+            </if>
+            <if test="cruiseName != null">
+                cruise_name = #{cruiseName,jdbcType=VARCHAR},
+            </if>
+            <if test="cruiseContent != null">
+                cruise_content = #{cruiseContent,jdbcType=VARCHAR},
+            </if>
+            <if test="positionType != null">
+                position_type = #{positionType,jdbcType=VARCHAR},
+            </if>
+            <if test="unit != null">
+                unit = #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="ifSy != null">
+                if_sy = #{ifSy,jdbcType=INTEGER},
+            </if>
+            <if test="syType != null">
+                sy_type = #{syType,jdbcType=INTEGER},
+            </if>
+            <if test="ifVideotape != null">
+                if_videotape = #{ifVideotape,jdbcType=INTEGER},
+            </if>
+            <if test="videotapeTime != null">
+                videotape_time = #{videotapeTime,jdbcType=VARCHAR},
+            </if>
+            <if test="textDesc != null">
+                text_desc = #{textDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=VARCHAR},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
+            <if test="edgeCode != null">
+                edge_code = #{edgeCode,jdbcType=VARCHAR},
+            </if>
         </set>
-        where   instance_id = #{instanceId,jdbcType=BIGINT} 
+        where instance_id = #{instanceId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance">
         update t_cruise_point_instance
-        set 
-            device_mete_id =  #{deviceMeteId,jdbcType=BIGINT},
-            station_id =  #{stationId,jdbcType=VARCHAR},
-            station_name =  #{stationName,jdbcType=VARCHAR},
-            device_id =  #{deviceId,jdbcType=BIGINT},
-            custom_id =  #{customId,jdbcType=VARCHAR},
-            data_format =  #{dataFormat,jdbcType=VARCHAR},
-            identify_type =  #{identifyType,jdbcType=INTEGER},
-            identify_son_type =  #{identifySonType,jdbcType=INTEGER},
-            cruise_type =  #{cruiseType,jdbcType=INTEGER},
-            cruise_id =  #{cruiseId,jdbcType=BIGINT},
-            cruise_name =  #{cruiseName,jdbcType=VARCHAR},
-            cruise_content =  #{cruiseContent,jdbcType=VARCHAR},
-            position_type =  #{positionType,jdbcType=VARCHAR},
-            unit =  #{unit,jdbcType=VARCHAR},
-            if_sy =  #{ifSy,jdbcType=INTEGER},
-            sy_type =  #{syType,jdbcType=INTEGER},
-            if_videotape =  #{ifVideotape,jdbcType=INTEGER},
-            videotape_time =  #{videotapeTime,jdbcType=VARCHAR},
-            text_desc =  #{textDesc,jdbcType=VARCHAR},
-            sort =  #{sort,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=VARCHAR},
-            edge_code =  #{edgeCode,jdbcType=VARCHAR}
-        where   instance_id = #{instanceId,jdbcType=BIGINT} 
+        set device_mete_id    = #{deviceMeteId,jdbcType=BIGINT},
+            station_id        = #{stationId,jdbcType=VARCHAR},
+            station_name      = #{stationName,jdbcType=VARCHAR},
+            device_id         = #{deviceId,jdbcType=BIGINT},
+            custom_id         = #{customId,jdbcType=VARCHAR},
+            data_format       = #{dataFormat,jdbcType=VARCHAR},
+            identify_type     = #{identifyType,jdbcType=INTEGER},
+            identify_son_type = #{identifySonType,jdbcType=INTEGER},
+            cruise_type       = #{cruiseType,jdbcType=INTEGER},
+            cruise_id         = #{cruiseId,jdbcType=BIGINT},
+            cruise_name       = #{cruiseName,jdbcType=VARCHAR},
+            cruise_content    = #{cruiseContent,jdbcType=VARCHAR},
+            position_type     = #{positionType,jdbcType=VARCHAR},
+            unit              = #{unit,jdbcType=VARCHAR},
+            if_sy             = #{ifSy,jdbcType=INTEGER},
+            sy_type           = #{syType,jdbcType=INTEGER},
+            if_videotape      = #{ifVideotape,jdbcType=INTEGER},
+            videotape_time    = #{videotapeTime,jdbcType=VARCHAR},
+            text_desc         = #{textDesc,jdbcType=VARCHAR},
+            sort              = #{sort,jdbcType=VARCHAR},
+            origin_id         = #{originId,jdbcType=VARCHAR},
+            edge_code         = #{edgeCode,jdbcType=VARCHAR}
+        where instance_id = #{instanceId,jdbcType=BIGINT}
     </update>
-    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap"   >
+    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from t_cruise_point_instance
-        where  edge_code = #{edgeCode} and origin_id=#{originId}
+        where edge_code = #{edgeCode} and origin_id=#{originId}
     </select>
-    <select id="selectByEdgeCodeAndCruiseId"  resultMap="BaseResultMap">
+    <select id="selectByEdgeCodeAndCruiseId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from t_cruise_point_instance
-        where  edge_code = #{edgeCode} and cruise_id=#{cruiseId}
+        where edge_code = #{edgeCode} and cruise_id=#{cruiseId}
     </select>
 </mapper>
