@@ -38,7 +38,6 @@ import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 

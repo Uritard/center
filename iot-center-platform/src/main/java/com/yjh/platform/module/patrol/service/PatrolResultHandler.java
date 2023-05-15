@@ -498,7 +498,7 @@ public class PatrolResultHandler {
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             String resultDesc = cruiseResultMap.get("resultDesc");
-            boolean abnormal = StringUtils.contains(resultDesc, "格式不正确");
+            boolean abnormal = "-1".equals(resultValue) || StringUtils.contains(resultDesc, "格式不正确");
             StringBuilder retDesc = new StringBuilder();
             if (abnormal) {
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -814,8 +814,8 @@ public class PatrolResultHandler {
 
             // 巡视结果告警处理
             cruiseResultMap.put("isWarn", "1");
-            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
+            // cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            // cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
 
             // 告警入库
             TWarnInfo tWarnInfo = getWarnInfo(warnMap);
