@@ -129,4 +129,19 @@ public class RobotConInfo implements Serializable {
     @ApiModelProperty(value = "录像机ID")
     private Long recordId;
 
+    @TableField("nest_name")
+    @ApiModelProperty(value = "机巢名称")
+    private String nestName;
+
+    @TableField("nest_code")
+    @ApiModelProperty(value = "机巢编码")
+    private String nestCode;
+
+    @TableField("drone_type")
+    @ApiModelProperty(value = "无人机型号")
+    private String droneType;
+
+    @TableField("drone_position")
+    @ApiModelProperty(value = "无人机类型")
+    private String dronePosition;
 }
