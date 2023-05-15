@@ -98,6 +98,8 @@ public class TCameraPreset implements Serializable {
 
     @ApiModelProperty(value = "守望位类型")
     private String presetTypeName;
+    @ApiModelProperty(value = "相机名称")
+    private String cameraName;
 
     private Integer pageNum = 1;
 

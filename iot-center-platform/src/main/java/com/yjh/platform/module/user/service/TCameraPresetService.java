@@ -225,17 +225,10 @@ public class TCameraPresetService {
             return null;
         }
 
-        Map<Long, List<TCameraPreset>> groupBy = presetList.stream().collect(Collectors.groupingBy(TCameraPreset::getCameraId));
-        if (groupBy == null || groupBy.size() == 0) {
-            return null;
-        }
-
         List<AreaInfo> tree = new LinkedList<>();
-        groupBy.entrySet().stream().forEach((Map.Entry<Long, List<TCameraPreset>> entry) -> {
-            AreaInfo areaInfo = getCameraAreaInfoTree(entry.getValue(), entry.getKey());
-            if (areaInfo != null) {
-                tree.add(areaInfo);
-            }
+        presetList.forEach(entry -> {
+            AreaInfo areaInfo = getCameraAreaInfoTree(entry);
+            tree.add(areaInfo);
         });
 
         return tree;
@@ -244,40 +237,19 @@ public class TCameraPresetService {
     /**
      * 将某个相机下的预置位转成树结构
      *
-     * @param presetList presetList
-     * @param cameraId cameraId
+     * @param preset preset
      * @return result
      */
-    private AreaInfo getCameraAreaInfoTree(List<TCameraPreset> presetList, Long cameraId) {
-        if (CollectionUtils.isEmpty(presetList)) {
-            return null;
-        }
+    private AreaInfo getCameraAreaInfoTree(TCameraPreset preset) {
+        AreaInfo areaInfo = new AreaInfo();
+        areaInfo.setUpId(preset.getCameraId());
+        areaInfo.setId(preset.getPresetId());
+        areaInfo.setLabel(preset.getPresetName());
+        areaInfo.setInfoType("preset");
+        areaInfo.setUpName(preset.getCameraName());
+        areaInfo.setCameraId(String.valueOf(preset.getCameraId()));
 
-        TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(cameraId);
-        if(tCameraInfo == null){
-            return null;
-        }
-
-        AreaInfo camera = new AreaInfo();
-        camera.setUpId(-1L);
-        camera.setId(cameraId);
-        camera.setCameraId(cameraId.toString());
-        camera.setLabel(tCameraInfo.getCameraName());
-        camera.setInfoType("camera");
-        List<AreaInfo> child = new LinkedList<>();
-        presetList.forEach(item -> {
-            AreaInfo preset = new AreaInfo();
-            preset.setUpId(cameraId);
-            preset.setId(item.getPresetId());
-            preset.setLabel(item.getPresetName());
-            preset.setInfoType("preset");
-            preset.setUpName(tCameraInfo.getCameraName());
-            preset.setCameraId(cameraId.toString());
-            child.add(preset);
-        });
-
-        camera.setChildren(child);
-        return camera;
+        return areaInfo;
     }
 
     public boolean judgePresentNum(Long cameraId,Integer presentNum) {

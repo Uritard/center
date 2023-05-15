@@ -20,6 +20,8 @@ public interface TCruisePointInstanceMapper {
     int deleteByPrimaryKey(Long id);
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
+    int deleteInstanceIdList( @Param("deleteInstanceIdList") Collection<Long> deleteInstanceIdList );
+    List<Long> selectByEdgeCodeAndOriginIds(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
     int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
 

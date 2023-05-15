@@ -532,7 +532,13 @@ public class TStdDeviceModelService {
         //删除的数据
         SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldMap.keySet(), newMap.keySet());
         if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+            List<Long> tCruisePointInstanceList =tCruisePointInstanceMapper.selectByEdgeCodeAndOriginIds(edgeCode,deleteIdSet);
             tCruisePointInstanceMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
+
+            if (CollectionUtils.isNotEmpty(tCruisePointInstanceList)) {
+                //删除已取消的巡视点
+                tCruisePointInstanceMapper.deleteInstanceIdList(tCruisePointInstanceList);
+            }
         }
         //新增的数据
         SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
