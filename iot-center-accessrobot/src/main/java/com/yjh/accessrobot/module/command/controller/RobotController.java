@@ -4,6 +4,8 @@ package com.yjh.accessrobot.module.command.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.smUtil.Demo;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.result.BusinessException;
@@ -15,9 +17,14 @@ import com.yjh.accessrobot.module.command.entity.TCameraPreset;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.command.service.TCameraPresetService;
+import com.yjh.accessrobot.netty.handler.*;
+import com.yjh.accessrobot.netty.server.RobotServerHandlerImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -462,6 +469,64 @@ public class RobotController {
             log.error("失败查询描述：", e);
         }
         return result;
+    }
+
+
+    @ApiOperation(value = "测试收到消息")
+    @RequestMapping(value = "/testRecMsg", method = RequestMethod.GET)
+    public Result testRecMsg(@RequestParam(value = "xml") String xml) {
+        Result result = new Result();
+        try {
+            Document document = null;
+            try {
+                document = DocumentHelper.parseText(xml);
+            } catch (DocumentException e) {
+                e.getMessage();
+            }
+            XMLBaseModel xmlBaseModel = PlatformXMLUtil.readStringXmlOut(document);
+            String handlerType;
+            String resultType = "251";
+            String type = xmlBaseModel.getType();
+            if (Objects.equals(resultType, type)) {
+                handlerType = type + xmlBaseModel.getCommand();
+            } else {
+                handlerType = type;
+            }
+            MessageHandlerStrategy messageHandlerStrategy;
+            // 63,64命令类型 私有协议与220kv规约冲突
+            if ("63".equals(type) || "64".equals(type)) {
+                boolean isSubSystem = robotService.isSubSystem(xmlBaseModel.getSendCode());
+                messageHandlerStrategy = buildMessageHandlerStrategy(type,isSubSystem);
+            } else {
+                messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            }
+            if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
+                messageHandlerStrategy.handler(null, new RobotServerHandlerImpl(), xmlBaseModel, 0, 0);
+            }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+    private MessageHandlerStrategy buildMessageHandlerStrategy(String type, boolean isSubSystem) {
+        MessageHandlerStrategy messageHandlerStrategy;
+        //下级系统
+        if (isSubSystem) {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandlerUpSystem.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandler.class);
+            }
+            // 机器人
+        } else {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(RobotCruiseReportHandler.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(OperationResultHandler.class);
+            }
+        }
+        return messageHandlerStrategy;
     }
 
 }
