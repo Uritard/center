@@ -29,10 +29,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -174,9 +175,9 @@ public class IsWarnAfterCruiseThread implements Runnable {
             log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", initInfo.get("valueTemp"));
+            // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
+            // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", initInfo.get("valueTemp"));
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "isWarn", "1");
 
 
