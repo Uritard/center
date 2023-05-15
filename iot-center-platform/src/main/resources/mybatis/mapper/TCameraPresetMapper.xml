@@ -182,9 +182,10 @@
 
     <!--根据摄像机id查询所有预置位信息-->
     <select id="selectPresetByCruiseId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
-        SELECT a.preset_id, a.camera_id, a.preset_num, a.preset_name, a.preset_type, a.creator_user, a.creator_time,
+        SELECT a.preset_id, a.camera_id, a.preset_num, a.preset_name, a.preset_type, a.creator_user, a.creator_time,b.camera_name,
         a.is_use, a.preset_img, a.inspection_postion, a.collect_status, a.calibration_status, a.preset_ptz
         from t_camera_preset a
+            left join t_camera_info b on a.camera_id = b.camera_id
         LEFT JOIN t_cruise_point_instance h ON a.preset_id = h.cruise_id
         WHERE 1 = 1
         <if test="cruiseId != null and cruiseId != ''"> and h.device_mete_id = #{cruiseId, jdbcType=BIGINT}</if>
