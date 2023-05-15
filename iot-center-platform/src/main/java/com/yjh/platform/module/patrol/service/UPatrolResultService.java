@@ -184,28 +184,31 @@ public class UPatrolResultService {
     public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
         String thisPointType = "表计";
         Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
-        String ai = String.valueOf(result.get("ai"));
-        String judge = String.valueOf(result.get("judge"));
-        if (IdentifyStateEnum.FAULT.getCode().equals(cruiseManualReview.getIdentifyState())) {
-            String KEY_PREFIX = "";
-            if ("on".equals(ai)) {
-                //缺陷
-                KEY_PREFIX ="DEFECT:" + cruiseManualReview.getInstanceId();
-                //将redisData存入redis
-            } else if ("on".equals(judge)){
-                KEY_PREFIX ="JUDGE:" + cruiseManualReview.getInstanceId();
+        if (Objects.nonNull(result)){
+            String ai = String.valueOf(result.get("ai"));
+            String judge = String.valueOf(result.get("judge"));
+            if (IdentifyStateEnum.FAULT.getCode().equals(cruiseManualReview.getIdentifyState())) {
+                String KEY_PREFIX = "";
+                if ("on".equals(ai)) {
+                    //缺陷
+                    KEY_PREFIX ="DEFECT:" + cruiseManualReview.getInstanceId();
+                    //将redisData存入redis
+                } else if ("on".equals(judge)){
+                    KEY_PREFIX ="JUDGE:" + cruiseManualReview.getInstanceId();
+                }
+                //塞
+                if (!KEY_PREFIX.equals("")) {
+                    redisTemplateForThree.opsForValue().set(KEY_PREFIX,cruiseManualReview.getPersonCheck());
+                }
             }
-            //塞
-            if (!KEY_PREFIX.equals("")) {
-                redisTemplateForThree.opsForValue().set(KEY_PREFIX,cruiseManualReview.getPersonCheck());
+
+            if ("on".equals(ai)){
+                thisPointType = "缺陷";
+            } else if ("on".equals(judge)){
+                thisPointType = "判别";
             }
         }
 
-        if ("on".equals(ai)){
-            thisPointType = "缺陷";
-        } else if ("on".equals(judge)){
-            thisPointType = "判别";
-        }
 
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         Date date = new Date();

@@ -1,14 +1,18 @@
 package com.yjh.platform.module.config.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.config.dao.SystemConfigDao;
 import com.yjh.platform.module.config.entity.ConfigTreeNode;
 import com.yjh.platform.module.config.entity.SystemConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,9 +79,25 @@ public class SystemConfigService {
         return systemConfigDao.update(systemConfig);
     }
     public int batchUpdate(List<SystemConfig> systemConfig) {
+//        checkParams(systemConfig);
         systemConfigInfoToRedis(systemConfig);
         flushCatch();
         return systemConfigDao.batchUpdate(systemConfig);
+    }
+
+    private void checkParams(List<SystemConfig> systemConfigList){
+        systemConfigList.forEach(systemConfig -> {
+            String jsonRule = systemConfig.getRules();
+            if (StringUtils.isNotEmpty(jsonRule)){
+                JSONObject jsonObject = JSON.parseObject(jsonRule);
+                String rule = jsonObject.getString("rule");
+                String msg = jsonObject.getString("msg");
+                if (systemConfig.getConfigValue().matches(rule)){
+                    throw new BusinessException(msg);
+                }
+            }
+        });
+
     }
 
     private void systemConfigInfoToRedis(List<SystemConfig> configList){
