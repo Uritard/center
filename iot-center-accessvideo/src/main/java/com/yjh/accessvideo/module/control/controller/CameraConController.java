@@ -9,6 +9,7 @@ import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
+import com.yjh.accessvideo.module.control.service.DroneCameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,9 @@ public class CameraConController {
 
     @Autowired
     private CameraConService cameraConService;
+
+    @Autowired
+    private DroneCameraConService droneCameraConService;
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
@@ -809,6 +813,22 @@ public class CameraConController {
         param.put("ftpsPath","video"+ftpsPath);
         param.put("localPath",localPath);
         Constant.otherServerMap(param,Constant.COPY_FILE_URL);
+    }
+
+    @ApiOperation(value = "无人机相机播放")
+    @RequestMapping(value = "/droneStartRealPlay", method = RequestMethod.GET)
+    public Result droneStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(droneCameraConService.droneStartRealPlay(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("无人机相机播放失败:", e);
+        }
+
+        return result;
     }
 
 }
