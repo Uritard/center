@@ -2161,9 +2161,10 @@ public class UPatrolTaskService {
                     log.info("准备传其他服务的taskId==={}", taskId);
                     uPatrolDataResultService.updateCruiseAnalyze(taskId);
 
-                    for (UPatrolDataResult up : uPatrolDataResultList) {
-                        updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
-                    }
+                    // 理论上不需要这一步处理，影响效率，先去掉 Chenfei 20230515
+                    // for (UPatrolDataResult up : uPatrolDataResultList) {
+                    //     updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
+                    // }
                 }
             }
             if (!Constant.fastTurbo()) {
