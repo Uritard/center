@@ -99,6 +99,8 @@ public class UPatrolTaskService {
     public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
     public static final String TASK_PRIORITY_REDIS_KEY = "task_priority_config:";
     public static final String TASK_LOWER_REDIS_KEY = "lowPatrolTask:";
+    public static final String TASK_RETRY_SUFFIX = "_遗漏点位重试任务";
+    public static final String TASK_RETRY_PREFIX = "taskRetry:";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
 
     @Autowired
@@ -2093,6 +2095,9 @@ public class UPatrolTaskService {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
             });
+            List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
+            List<Long> missInstanceMapList = new ArrayList<>();
+
             for (Map<String, String> redisInfoMap : taskInfoList) {
                 UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                 uPatrolDataResult.setTaskId(taskId);
@@ -2124,6 +2129,14 @@ public class UPatrolTaskService {
                 if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()) {
                     abnormalCounts++;
                 }
+                if (String.valueOf(CRUISE_STATE_OMIT).equals(redisInfoMap.get("cruiseStatus"))) {
+                    missInstanceMapList.add(NumberUtils.toLong(redisInfoMap.get("instanceId")));
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(missInstanceMapList)) {
+                UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+                omitInstanceRetry(missInstanceMapList,uPatrolTask);
             }
 
             // 更新upr
@@ -3001,5 +3014,93 @@ public class UPatrolTaskService {
      */
     public String selectTaskName(String taskId) {
         return uPatrolTaskDao.selectTaskName(taskId);
+    }
+
+    /**
+     * 遗漏点位重试任务
+     * @param instanceIdList
+     * @param uPatrolTaskParam
+     * @return
+     */
+    public UPatrolTask omitInstanceRetry(List<Long> instanceIdList,UPatrolTask uPatrolTaskParam) {
+        Object retry = redisTemplate.opsForValue().get(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId());
+        if (Objects.nonNull(retry)) {
+            log.info("当前任务 \"{}\"为重试任务不再重试！",uPatrolTaskParam.getTaskName());
+            return null;
+        }
+        redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId(),"done",3,TimeUnit.DAYS);
+
+        TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+        tCruiseTaskAdd.setIfRun(173);
+        tCruiseTaskAdd.setTaskName(uPatrolTaskParam.getTaskName() + TASK_RETRY_SUFFIX);
+        tCruiseTaskAdd.setPlanId(uPatrolTaskParam.getPlanId());
+        UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
+
+        // 设置任务优先级
+        setLevel(uPatrolTask, tCruiseTaskAdd);
+        uPatrolTask.setCreateTime(new Date());
+        if (Objects.isNull(uPatrolTask.getTaskId())) {
+            uPatrolTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
+        }
+        if (Objects.isNull(uPatrolTask.getTaskCode())) {
+            uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
+        }
+
+        List<Long> instanceList = insertTaskAttrForRetry(uPatrolTask, tCruiseTaskAdd,instanceIdList);
+
+        List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
+            // 找出下级设备或下级节点的点让其做任务
+            String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
+            if (StringUtils.isNotEmpty(res)) {
+                throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
+            }
+
+        return uPatrolTask;
+    }
+
+    private List<Long> insertTaskAttrForRetry(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd,List<Long> instanceIdList) {
+        List<Long> instanceList = new ArrayList<>();
+        List<UPatrolTaskAttr> uPatrolTaskAttrs = new ArrayList<>();
+        List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
+        for (UPatrolPlanAttr uPatrolPlanAttr : uPatrolPlanAttrList) {
+            if (!instanceIdList.contains(uPatrolPlanAttr.getInstanceId())) {
+                continue;
+            }
+            UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
+            uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
+            uPatrolTaskAttr.setInstanceId(uPatrolPlanAttr.getInstanceId());
+            uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
+            uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
+            uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
+            uPatrolTaskAttr.setPointTaskId(uPatrolPlanAttr.getPointTaskId());
+            uPatrolTaskAttr.setPointType(uPatrolPlanAttr.getPointType());
+            uPatrolTaskAttr.setDeviceType(uPatrolPlanAttr.getDeviceType());
+            uPatrolTaskAttr.setMeteType(uPatrolPlanAttr.getMeteType());
+            uPatrolTaskAttr.setRegionId(uPatrolPlanAttr.getUpRegionId());
+
+            instanceList.add(uPatrolPlanAttr.getInstanceId());
+            uPatrolTaskAttrs.add(uPatrolTaskAttr);
+            if (uPatrolTaskAttrs.size() % 2000 == 0) {
+                this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
+                uPatrolTaskAttrs = new ArrayList<>();
+            }
+        }
+
+        TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+        tCruiseTaskAdd.setType(plan.getType());
+        uPatrolTask.setTaskType(tCruiseTaskAdd.getType());
+
+        if (uPatrolTaskAttrs.size() > 0) {
+            uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
+        }
+        uPatrolTask.setCreateTime(new Date());
+        uPatrolTaskDao.add(uPatrolTask);
+        log.info("instanceList {}", instanceList);
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        if (!"2".equals(edgeLevel)) {
+            Constant.modelUpload("7");
+        }
+        return instanceList;
+
     }
 }
