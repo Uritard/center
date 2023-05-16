@@ -46,12 +46,6 @@ public class DroneCameraConService {
     @Value("${spring.redis.host}")
     private String hostIp;
 
-    @Value("${drone.station.userName}")
-    private String droneUserName;
-
-    @Value("${drone.station.password}")
-    private String dronePassword;
-
     /**
      * 获取无人机的三路视频流（无人机、机巢内、机巢外）
      *
@@ -112,7 +106,7 @@ public class DroneCameraConService {
     private String initToken(RobotConInfo robotConInfo) {
         String loginStr = "http://$s:%s/prod-api/auth/login";
         String loginUrl = String.format(loginStr, robotConInfo.getRobotIp(), robotConInfo.getRobotPort());
-        String token = getDroneToken(loginUrl);
+        String token = getDroneToken(loginUrl, robotConInfo);
 
         redisTemplate.opsForHash().put("t_sys_param:droneStation", "token", token);
 
@@ -125,7 +119,7 @@ public class DroneCameraConService {
      * @param url url
      * @return result
      */
-    private String getDroneToken(String url) {
+    private String getDroneToken(String url, RobotConInfo robotConInfo) {
         //设置请求头参数
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type","application/json");
@@ -134,8 +128,8 @@ public class DroneCameraConService {
 
         //设置body参数，并转成json字符串
         DroneLoginBodyEntity bodyEntity = new DroneLoginBodyEntity();
-        bodyEntity.setUserName(droneUserName);
-        bodyEntity.setPassWord(dronePassword);
+        bodyEntity.setUserName(robotConInfo.getInferadUsername());
+        bodyEntity.setPassWord(robotConInfo.getInferadPassword());
         bodyEntity.setUuid(getUUID());
         bodyEntity.setCode("666666");
 
