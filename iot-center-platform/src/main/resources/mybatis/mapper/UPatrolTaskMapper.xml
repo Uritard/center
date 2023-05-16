@@ -593,9 +593,7 @@
 
     <update id="updateIsWarnByCruiseDataId" parameterType="java.lang.String">
         UPDATE u_patrol_data_result a <set>
-        a.is_warn = 1,
-        a.cruise_result  = 247,
-        a.cruise_abnormal = 250
+        a.is_warn = 1
     </set>
         WHERE
         a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
