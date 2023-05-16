@@ -256,5 +256,10 @@ public class TRobotInfo implements Serializable {
      */
     private String originId;
 
+    /**
+     * 机器人地图图片尺寸
+     */
+    private String imageSize;
+
     private static final long serialVersionUID = 1L;
 }

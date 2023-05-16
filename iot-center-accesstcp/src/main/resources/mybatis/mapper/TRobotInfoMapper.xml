@@ -53,6 +53,7 @@
         <result property="offLineCount" column="off_line_count" jdbcType="BIGINT"/>
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="imageSize" column="image_size" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -444,6 +445,7 @@
         else ''
         end) as video_mode,
         a.address as place,
+        a.image_size,
         (CASE WHEN a.robot_position = 155 THEN '2' WHEN a.robot_position = 156 THEN '1' WHEN a.robot_position = 399 THEN '3' end) as type,
         a.remarks as patroldevice_info,
         '' as robots_code,

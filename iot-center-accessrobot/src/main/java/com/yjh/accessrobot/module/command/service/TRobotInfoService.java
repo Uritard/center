@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.service;
 
+import com.yjh.accessrobot.commons.utils.JSONUtil;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TCameraRecorderDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -161,6 +162,7 @@ public class TRobotInfoService {
                 tRobotInfoList.stream().filter(tRobotInfo -> updateIdSet.contains(tRobotInfo.getOriginId())).forEach(tRobotInfo -> {
                     TRobotInfo oldTRobotInfo = oldTRobotInfoMap.get(tRobotInfo.getOriginId());
                     tRobotInfo.setRobotId(oldTRobotInfo.getRobotId());
+                    log.info("模型同步需要更新的tRobotInfo：{}", JSONUtil.toJSONString(tRobotInfo));
                     tRobotInfoDao.updateByPrimaryKey(tRobotInfo);
                 });
             }
@@ -173,6 +175,7 @@ public class TRobotInfoService {
             SetUtils.SetView<String> insertIdSet = SetUtils.difference(newTRobotInfoMap.keySet(), oldTRobotInfoMap.keySet());
             if (CollectionUtils.isNotEmpty(insertIdSet)) {
                 List<TRobotInfo> insertTRobotInfoList = tRobotInfoList.stream().filter(tRobotInfo -> insertIdSet.contains(tRobotInfo.getOriginId())).collect(Collectors.toList());
+                log.info("模型同步需要新增的insertTRobotInfoList：{}", JSONUtil.toJSONString(insertTRobotInfoList));
                 tRobotInfoDao.batchInsert(insertTRobotInfoList);
                 dealDevicePermission(insertTRobotInfoList.stream().map(TRobotInfo::getRobotId).collect(Collectors.toList()));
             }

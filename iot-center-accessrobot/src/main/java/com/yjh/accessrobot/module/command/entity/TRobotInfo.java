@@ -205,5 +205,6 @@ public class TRobotInfo implements Serializable {
     /**
      * 机器人地图图片尺寸
      */
+    @TableField(value = "image_size",updateStrategy = FieldStrategy.IGNORED)
     private String imageSize;
 }
