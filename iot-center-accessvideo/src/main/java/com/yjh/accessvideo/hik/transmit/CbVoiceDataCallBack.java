@@ -47,7 +47,7 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 Constant.outputStream.write(originBytes);
             }
 
-            // 若编码格式为G711时,需要解码
+            // 若编码格式为G711时,需要解码   G711 -> PCM
             if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat){
                 // 初始化音频解码
                 if (Constant.pDecHandle == null) {
@@ -81,13 +81,13 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 bufferPcm.get(bytesPcm);
 
                 // 打印收到设备端的音源数据
-                bufferPcm.flip();
-                int len = bufferPcm.limit() - bufferPcm.position();
-                byte[] bytes = new byte[len];
-                for (int i = 0; i < bytes.length; i++) {
-                    bytes[i] = bufferPcm.get();
-                }
-                printByte(bytes);
+//                bufferPcm.flip();
+//                int len = bufferPcm.limit() - bufferPcm.position();
+//                byte[] bytes = new byte[len];
+//                for (int i = 0; i < bytes.length; i++) {
+//                    bytes[i] = bufferPcm.get();
+//                }
+//                printByte(bytes);
 
                 // 将设备发送的pcm音频数据写入文件
                 Constant.outputStreamPcm.write(bytesPcm);
@@ -95,9 +95,13 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 originBytes = bytesPcm;
             }
 
+            if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.encodeFormat) {
+                // Todo something
+            }
+
             // 组装wave并调用其他服务发送ws
             byte[] bytesResult = createWaveFile(originBytes, Constant.encodeFormat);
-            printByte(bytesResult);
+//            printByte(bytesResult);
 
             Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
         }catch (Exception e){

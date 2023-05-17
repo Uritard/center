@@ -1,5 +1,7 @@
 package com.yjh.gateway.common;
 
+import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -96,20 +98,27 @@ public class Constant {
      */
     public static String VIDEO_RECEIVE_DATA = "";
 
-    public static void sendAudioDataToVideo(byte[] bytes) {
+    public static InputStream sendAudioDataToVideo(byte[] bytes) {
         HttpURLConnection connection = null;
+        InputStream inputStream = null;
         try {
             URL url = new URL(Constant.VIDEO_RECEIVE_DATA);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            // 允许写出
             connection.setDoOutput(true);
+            // 允许读入
             connection.setDoInput(true);
+            // 不使用缓存
             connection.setUseCaches(false);
             connection.setRequestProperty("Content-Type", "binary/octet-stream");
             OutputStream outStream = connection.getOutputStream();
             outStream.write(bytes);
             outStream.flush();
             outStream.close();
+
+            //读取返回内容
+            inputStream = connection.getInputStream();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -117,6 +126,7 @@ public class Constant {
                 connection.disconnect();
             }
         }
+        return inputStream;
     }
 
 }

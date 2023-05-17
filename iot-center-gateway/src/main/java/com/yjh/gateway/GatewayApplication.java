@@ -4,6 +4,7 @@ import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.commons.restTemplate.ServiceRestTemplate;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,8 +36,8 @@ import org.springframework.web.client.RestTemplate;
 @EnableCircuitBreaker
 public class GatewayApplication implements CommandLineRunner {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Value("${voice.data.receive.url}")
+    private String voiceDataReceiveUrl;
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
@@ -44,7 +45,7 @@ public class GatewayApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) {
-        Constant.VIDEO_RECEIVE_DATA = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:receivedVoiceData","content"));
+        Constant.VIDEO_RECEIVE_DATA = voiceDataReceiveUrl;
     }
     @Bean
     public static ConfigureRedisAction configureRedisAction() {

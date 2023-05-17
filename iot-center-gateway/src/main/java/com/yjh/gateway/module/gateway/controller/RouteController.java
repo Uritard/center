@@ -46,7 +46,7 @@ public class RouteController {
     }
 
     @ApiOperation(value = "同步到websocket")
-    @RequestMapping(value = "/syncWebsocket", method = RequestMethod.POST)
+    @PostMapping(value = "/syncWebsocket")
     public Result syncWebsocketInfo(@RequestParam(value = "json") String json) {
         Result result = new Result();
         try {
@@ -68,16 +68,10 @@ public class RouteController {
         Result result = new Result();
         try {
             InputStream reader = request.getInputStream();
-            // G711编码:364 PCM编码:1964
+            // G711编码:320 + 44 = 364 PCM编码:1920 + 44 = 1964
             byte[] bytes = new byte[1964];
             int n = reader.read(bytes);
             ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, 0, n);
-
-            StringBuilder str = new StringBuilder();
-            for (byte byteItem : byteBuffer.array()) {
-                str.append(String.format("%02x ", byteItem));
-            }
-            log.info("Audio source data sent to the page: {}", str);
             WebSocketServer.sendMsgBuffer(byteBuffer);
             result.setData("通过websocket发送ByteBuffer成功");
         } catch (BusinessException e) {
@@ -91,7 +85,7 @@ public class RouteController {
     }
 
     @ApiOperation(value = "刷新安全标记")
-    @RequestMapping(value = "/reloadSecureSigns", method = RequestMethod.GET)
+    @GetMapping(value = "/reloadSecureSigns")
     public Result reloadSecureSigns() {
         Result result = new Result();
         try {

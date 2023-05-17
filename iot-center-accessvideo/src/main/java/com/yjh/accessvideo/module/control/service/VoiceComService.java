@@ -9,14 +9,17 @@ import com.yjh.accessvideo.hik.transmit.*;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.RobotConInfo;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
@@ -26,6 +29,9 @@ import java.util.Objects;
  */
 @Service
 public class VoiceComService {
+
+    @Value("${spring.websocket.send.url}")
+    private String webSocketUrl;
 
     private final Logger log = LoggerFactory.getLogger(VoiceComService.class);
     private static final String USE_DIR = System.getProperty("user.dir");
@@ -39,6 +45,7 @@ public class VoiceComService {
 
     private final CameraConDao cameraConDao;
     private final RedisTemplate redisTemplate;
+    private VoiceDataSendToDevice voiceDataSendToDevice = null;
 
     public VoiceComService(CameraConDao cameraConDao, RedisTemplate redisTemplate) {
         this.cameraConDao = cameraConDao;
@@ -48,19 +55,20 @@ public class VoiceComService {
     public boolean deviceLogin(Long deviceId) {
         HikDeviceInfo hikDeviceInfo = new HikDeviceInfo();
 
+        String port = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cameraServicePort", "content"));
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(deviceId, null);
         if (Objects.nonNull(cameraConInfo)) {
             hikDeviceInfo.setDeviceIp(cameraConInfo.getCameraIp());
-            hikDeviceInfo.setDevicePort(cameraConInfo.getPort());
-            hikDeviceInfo.setPassword(cameraConInfo.getCameraCode());
+            hikDeviceInfo.setDevicePort(Integer.valueOf(port));
             hikDeviceInfo.setUserName(cameraConInfo.getCameraManager());
+            hikDeviceInfo.setPassword(cameraConInfo.getCameraCode());
             hikDeviceInfo.setHikDeviceId(cameraConInfo.getCameraId());
         } else {
             RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(deviceId);
-            hikDeviceInfo.setDeviceIp(robotConInfo.getLnferadIp());
-            hikDeviceInfo.setDevicePort(robotConInfo.getInferadPort());
-            hikDeviceInfo.setPassword(robotConInfo.getIdentityCode());
+            hikDeviceInfo.setDeviceIp(robotConInfo.getLightIp());
+            hikDeviceInfo.setDevicePort(Integer.valueOf(port));
             hikDeviceInfo.setUserName(robotConInfo.getIdentityManager());
+            hikDeviceInfo.setPassword(robotConInfo.getIdentityCode());
             hikDeviceInfo.setHikDeviceId(robotConInfo.getRobotId());
         }
 
@@ -87,7 +95,6 @@ public class VoiceComService {
         CompressionAudio audioCompress = hikUtilsApp.getAudioCompress(lUserId);
         Constant.encodeFormat = (int) audioCompress.getByAudioEncType();
 
-        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:sendMsgBufferUrl", "content"));
         if (cbVoiceDataCallBack == null) {
             cbVoiceDataCallBack = new CbVoiceDataCallBack(webSocketUrl);
         }
@@ -114,6 +121,7 @@ public class VoiceComService {
         if (Constant.outputStream != null) {
             try {
                 Constant.outputStream.close();
+                Constant.outputStream = null;
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
@@ -121,6 +129,7 @@ public class VoiceComService {
         if (Constant.outputStreamPcm != null) {
             try {
                 Constant.outputStreamPcm.close();
+                Constant.outputStreamPcm = null;
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
@@ -152,7 +161,16 @@ public class VoiceComService {
         return result;
     }
 
-    public int startVoiceTransTest(Long cameraId, long timeItem, String fileName, Integer armFramework, Integer timeStamp) {
+    /**
+     * 语音对讲测试:开启 + 发送数据 + 处理回调
+     *
+     * @param cameraId     相机id
+     * @param timeItem     等待时间间隔，主要为了测试设备端只发数据
+     * @param fileName     文件名称
+     * @param armFramework 是否为arm架构
+     * @return int
+     */
+    public int startVoiceTransTest(Long cameraId, long timeItem, String fileName, Integer armFramework) {
         // 未登录
         if (Constant.hikDeviceUserIdMaps.isEmpty() || !Constant.hikDeviceUserIdMaps.containsKey(String.valueOf(cameraId))) {
             return -1;
@@ -164,7 +182,7 @@ public class VoiceComService {
 
         String format = DateTimeUtil.formatThreadLocal(new Date());
 
-        // 保存回调函数的原始音频数据
+        // 保存回调函数中的音频数据
         String filePathName = USE_DIR + "/AudioFile/ReceiveData/originAudio-" + format + ".g7";
         if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.encodeFormat) {
             filePathName = filePathName.replace("g7", "aac");
@@ -187,7 +205,7 @@ public class VoiceComService {
         }
 
         if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat) {
-            // 保存回调函数的解码后的音频数据  G711
+            // 保存回调函数的G711解码后的音频数据
             File filePcm = new File(USE_DIR + "/AudioFile/ReceiveData/decodeData-" + format + ".pcm");
             if (!filePcm.exists()) {
                 try {
@@ -203,7 +221,6 @@ public class VoiceComService {
             }
         }
 
-        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:sendMsgBufferUrl", "content"));
         if (cbVoiceDataCallBack == null) {
             cbVoiceDataCallBack = new CbVoiceDataCallBack(webSocketUrl);
         }
@@ -220,12 +237,20 @@ public class VoiceComService {
             return startVoiceTrans;
         }
 
-        voiceSendData(startVoiceTrans, fileName, format, armFramework, timeStamp);
+        voiceSendData(startVoiceTrans, fileName, format, armFramework);
 
         return startVoiceTrans;
     }
 
-    public void voiceSendData(int lVoiceTranHandle, String fileName, String format, Integer armFramework, Integer timeStamp) {
+    /**
+     * 发送数据
+     *
+     * @param lVoiceTranHandle 语音对讲句柄
+     * @param fileName         文件名称
+     * @param format           格式化时间
+     * @param armFramework     是否为arm架构  1:是 0:否
+     */
+    public void voiceSendData(int lVoiceTranHandle, String fileName, String format, Integer armFramework) {
         String filePathNameTemp = USE_DIR + "/AudioFile/SendData/";
         FileInputStream voiceFile = null;
         try {
@@ -241,7 +266,7 @@ public class VoiceComService {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        if (dataLength < 0){
+        if (dataLength < 0) {
             log.error("input file dataSize < 0");
             return;
         }
@@ -255,13 +280,22 @@ public class VoiceComService {
         ptrVoiceByte.write();
 
         if (1 == armFramework) {
-            voiceSendByArm(lVoiceTranHandle, dataLength, ptrVoiceByte, timeStamp);
+            voiceSendByArm(lVoiceTranHandle, dataLength, ptrVoiceByte);
             return;
         }
 
         voiceSendNotArm(lVoiceTranHandle, filePathNameTemp, format, dataLength, ptrVoiceByte);
     }
 
+    /**
+     * 非arm架构发送的是编码后的G711数据
+     *
+     * @param lVoiceTranHandle 语音转发句柄
+     * @param filePathNameTemp 文件路径
+     * @param format           格式化时间
+     * @param dataLength       数据长度
+     * @param ptrVoiceByte     发送的数据
+     */
     public void voiceSendNotArm(int lVoiceTranHandle, String filePathNameTemp, String format, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
         int iEncodeSize = 0;
         // 音频编码信息结构体
@@ -350,7 +384,33 @@ public class VoiceComService {
         HC_NET_SDK.NET_DVR_ReleaseG711Encoder(encoder);
     }
 
-    public void voiceSendByArm(int lVoiceTranHandle, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte, Integer timeStamp) {
+    /**
+     * arm架构发送的是原始pcm数据
+     * 优化发送数据逻辑
+     *
+     * @param lVoiceTranHandle 语音对讲句柄
+     * @param dataLength       数据长度
+     * @param ptrVoiceByte     发送的数据
+     */
+    public void voiceSendByArmOptimize(int lVoiceTranHandle, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
+        log.info("------------------------voiceSendByArm's dataLength:{}------------------------", dataLength);
+
+        byte[] receiveByte = ptrVoiceByte.byValue;
+        if (voiceDataSendToDevice == null) {
+            voiceDataSendToDevice = new VoiceDataSendToDevice();
+        }
+        voiceDataSendToDevice.voiceSendByArm(lVoiceTranHandle, receiveByte, dataLength);
+
+    }
+
+    /**
+     * arm架构发送的是原始pcm数据
+     *
+     * @param lVoiceTranHandle 语音对讲句柄
+     * @param dataLength       数据长度
+     * @param ptrVoiceByte     发送的数据
+     */
+    public void voiceSendByArm(int lVoiceTranHandle, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
         int iEncodeSize = 0;
         log.info("------------------------voiceSendByArm's dataLength:{}------------------------", dataLength);
 
@@ -361,64 +421,65 @@ public class VoiceComService {
             ptrPcmData.write();
 
             iEncodeSize += PCM_DATA_SIZE;
-            // 转发语音pcm数据,每次发送固定大小的字节
+            // 每次发送固定大小1920字节数据
             if (!HC_NET_SDK.NET_DVR_VoiceComSendData(lVoiceTranHandle, ptrPcmData.byValue, PCM_DATA_SIZE)) {
                 log.error("NET_DVR_VoiceComSendData failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
                 return;
             }
 
-            // 间隔一段时间再发送数据
+            // 1920 / (16000 * 1 * 16 / 8 * 1 / 1000) = 60
             try {
-                Thread.sleep(timeStamp);
+                Thread.sleep(60);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
             }
         }
     }
 
-    public void receiveAndSendVoiceData(HttpServletRequest request, Long deviceId) {
-        // 未登录
-        if (Constant.hikDeviceUserIdMaps.isEmpty() || !Constant.hikDeviceUserIdMaps.containsKey(String.valueOf(deviceId))) {
-            log.error("hikDeviceUserIdMaps is ERROR");
-            return;
-        }
-
-        // 未开启
-        Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(deviceId));
-        if (Constant.hikDeviceVoiceTransHandleMaps.isEmpty() || !Constant.hikDeviceVoiceTransHandleMaps.containsKey(lUserId)) {
-            log.error("hikDeviceVoiceTransHandleMaps is ERROR");
-            return;
-        }
-
-        Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
-        InputStream inputStream = null;
-
+    /**
+     * 接收音频数据并发送给设备
+     *
+     * @param request  请求
+     */
+    public void receiveAndSendVoiceData(HttpServletRequest request) {
         try {
-            inputStream = request.getInputStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            InputStream inputStream = request.getInputStream();
+            byte[] allDataBytes = IOUtils.toByteArray(inputStream);
+            // 设备id长度
+            byte[] lengthByte = new byte[1];
+            System.arraycopy(allDataBytes, 0, lengthByte, 0, 1);
+            String length = new String(lengthByte, StandardCharsets.UTF_8);
+            int i = Integer.parseInt(length);
+            // 设备id
+            byte[] deviceIdByte = new byte[i];
+            System.arraycopy(allDataBytes, 1, deviceIdByte, 0, i);
+            String deviceId = new String(deviceIdByte, StandardCharsets.UTF_8);
+            // 音频数据
+            byte[] dataByte = new byte[allDataBytes.length - 1 - i];
+            System.arraycopy(allDataBytes, i + 1, dataByte, 0, allDataBytes.length - 1 - i);
 
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-        int dataLength = 0;
-        try {
-            dataLength = bufferedInputStream.available();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (dataLength < 0) {
-            log.error("input file dataSize < 0");
-            return;
-        }
+            // 未登录
+            if (Constant.hikDeviceUserIdMaps.isEmpty() || !Constant.hikDeviceUserIdMaps.containsKey(deviceId)) {
+                log.error("hikDeviceUserIdMaps is ERROR");
+                return;
+            }
 
-        HCNetSDK.BYTE_ARRAY ptrVoiceByte = new HCNetSDK.BYTE_ARRAY(dataLength);
-        try {
-            bufferedInputStream.read(ptrVoiceByte.byValue);
+            // 未开启
+            Integer lUserId = Constant.hikDeviceUserIdMaps.get(deviceId);
+            if (Constant.hikDeviceVoiceTransHandleMaps.isEmpty() || !Constant.hikDeviceVoiceTransHandleMaps.containsKey(lUserId)) {
+                log.error("hikDeviceVoiceTransHandleMaps is ERROR");
+                return;
+            }
+
+            Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
+            int dataLength = dataByte.length;
+            HCNetSDK.BYTE_ARRAY ptrVoiceByte = new HCNetSDK.BYTE_ARRAY(dataLength);
+            ptrVoiceByte.byValue = dataByte;
+            ptrVoiceByte.write();
+
+            voiceSendByArmOptimize(lVoiceTranHandle, dataLength, ptrVoiceByte);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        ptrVoiceByte.write();
-
-        voiceSendByArm(lVoiceTranHandle, dataLength, ptrVoiceByte, 100);
     }
 }
