@@ -19,6 +19,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -33,6 +34,7 @@ import java.util.UUID;
  * @Description 普宙无人机视频接入
  * @Date create in 2023/5/15 10:12
  */
+@Service
 public class DroneCameraConService {
 
     private final Logger log = LoggerFactory.getLogger(DroneCameraConService.class);
