@@ -332,7 +332,7 @@ public class TStdDevicemeteService{
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String list) {
         int deleteCount=0;
-        List<String> list1= Arrays.asList(list.split(","));
+        String[] list1= list.split(",");
         for (String item:list1) {
             tAlgorithmConfBakDao.deleteByPrimaryId(Long.valueOf(item));
             List<Long> haveList = tStdDevicemeteDao.selectHave(Long.valueOf(item));
@@ -340,38 +340,12 @@ public class TStdDevicemeteService{
             //删除关联的表
             if(haveList != null && haveList.size()>0){
                 tCruisePlanAttrDao.deleteByInstanceId(haveList);
-                //tCruiseTaskAttrDao.deleteByInstanceId(haveList);
                 tCruiseTypeDao.deleteForInstanceId(haveList);
             }
 
             TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));
             log.info("deviceMete---------------------"+tStdDeviceMete);
-            Long deviceId=tStdDeviceMete.getDeviceId();
-            String customId=tStdDeviceMete.getCustomId();
-//            TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(Long.valueOf(item));//根据devicemeteId查测点
-//            Long deviceId=tStdDeviceMete.getDeviceId();
-//            String customId=tStdDeviceMete.getCustomId();
             deleteCount=tStdDevicemeteDao.deleteByPrimaryId(Long.valueOf(item))+deleteCount;
-
-            if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
-//
-                if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
-                    List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
-                    tStdDeviceDao.deleteByUnionKeys(deviceId);
-//                    if(tStdDevices.size()==1){
-//                        tStdDevices.get(0).setCustomId("700");
-//                        tStdDevices.get(0).setCustomName("本体");
-//                        tStdDeviceDao.add(tStdDevices.get(0));
-//                    }
-                }else {                                               //若存在则删除与当前测点关联的设备信息
-                    tStdDeviceDao.deleteByUnionKeys(deviceId);
-                }
-//
-            }
-
-//            if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){
-//                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-//            }
 
         }
         return deleteCount;//批量删除标准测点
