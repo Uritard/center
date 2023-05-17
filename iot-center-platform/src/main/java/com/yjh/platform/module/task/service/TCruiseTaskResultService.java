@@ -15,6 +15,7 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -458,8 +459,8 @@ public class TCruiseTaskResultService {
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
         rateAndTaskInfo.put("rate", rate);
         TaskSimpleInfo taskSimpleInfo = uPatrolResultDao.selectTaskStateByTaskId(taskId);
-        rateAndTaskInfo.put("taskState", taskSimpleInfo.getTaskState());
-        rateAndTaskInfo.put("taskStateName", taskSimpleInfo.getTaskStateName());
+        rateAndTaskInfo.put("taskState", Optional.ofNullable(taskSimpleInfo).map(TaskSimpleInfo::getTaskState).orElse(CruiseConstant.TASK_STATE_EXECUTING));
+        rateAndTaskInfo.put("taskStateName", Optional.ofNullable(taskSimpleInfo).map(TaskSimpleInfo::getTaskStateName).orElse("正在执行"));
         return rateAndTaskInfo;
     }
 
