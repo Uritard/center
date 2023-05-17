@@ -543,7 +543,7 @@ public class SendToUpSystemServices {
             item.put("video_pos",jsonArray.toJSONString());
             if ("1".equals(edgeLevel) && Objects.nonNull(item.get("preset_img")) && Objects.nonNull(item.get("local_path"))){
                 item.put("preset_img", "/" + stationCode + item.get("preset_img"));
-                String localPath = String.valueOf(item.get("local_path"));
+                String localPath = String.valueOf(item.get("local_path")).replace(presetRealImgPath,presetImgPath);
                 String targetPath = String.valueOf(item.get("preset_img"));
                 uploadFileToUpFtps(localPath, targetPath);
             }
