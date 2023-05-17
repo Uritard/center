@@ -123,11 +123,10 @@ public class VoiceComController {
     public Result startVoiceTransTest(@RequestParam(value = "cameraId") Long cameraId,
                                       @RequestParam(value = "timeItem") long timeItem,
                                       @RequestParam(value = "fileName", required = false) String fileName,
-                                      @RequestParam(value = "armFramework") Integer armFramework,
-                                      @RequestParam(value = "timeStamp") Integer timeStamp) {
+                                      @RequestParam(value = "armFramework") Integer armFramework) {
         Result result = new Result();
         try {
-            result.setData(voiceComService.startVoiceTransTest(cameraId, timeItem, fileName, armFramework, timeStamp));
+            result.setData(voiceComService.startVoiceTransTest(cameraId, timeItem, fileName, armFramework));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -141,8 +140,7 @@ public class VoiceComController {
     @PostMapping(value = "/sendVoiceDataTest")
     public Result sendVoiceDataTest(@RequestParam(value = "fileName") String fileName,
                                     @RequestParam(value = "cameraId") Long cameraId,
-                                    @RequestParam(value = "armFramework") Integer armFramework,
-                                    @RequestParam(value = "timeStamp") Integer timeStamp) {
+                                    @RequestParam(value = "armFramework") Integer armFramework) {
         Result result = new Result();
         try {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
@@ -150,7 +148,7 @@ public class VoiceComController {
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
             String format = DateTimeUtil.formatThreadLocal(new Date());
-            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework, timeStamp);
+            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -165,7 +163,8 @@ public class VoiceComController {
     public Result receiveAndSendVoiceData(HttpServletRequest request) {
         Result result = new Result();
         try {
-            voiceComService.receiveAndSendVoiceData(request, 40029L);
+            log.info("Data is coming...");
+            voiceComService.receiveAndSendVoiceData(request);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

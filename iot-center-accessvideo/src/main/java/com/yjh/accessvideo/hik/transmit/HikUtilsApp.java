@@ -71,7 +71,7 @@ public class HikUtilsApp {
         strLoginInfo.wPort = devicePort.shortValue();
         strLoginInfo.bUseAsynLogin = false;
         strLoginInfo.write();
-        log.info("ip地址:{},端口号:{},登录账号:{},登录密码:{}", deviceIp, devicePort, userName, password);
+        log.info("deviceIp:{},devicePort:{},userName:{},password:{}", deviceIp, devicePort, userName, password);
         int lUserId = HC_NET_SDK.NET_DVR_Login_V40(strLoginInfo, strDeviceInfo);
         if (lUserId <= -1) {
             log.error("Device login fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());

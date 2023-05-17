@@ -2,6 +2,7 @@ package com.yjh.gateway.common.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.gateway.common.Constant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +15,14 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author tt
  */
-@ServerEndpoint("/ws/{userId}/{token}")
+@ServerEndpoint("/ws/{userId}/{token}/{deviceId}")
 @Component
 public class WebSocketServer {
 
@@ -30,6 +32,7 @@ public class WebSocketServer {
     private RedisTemplate redisTemplate;
 
     private BufferedOutputStream bos = null;
+    private BufferedOutputStream bos2 = null;
     /**静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。*/
     private static int onlineCount = 0;
     /**concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。*/
@@ -95,17 +98,25 @@ public class WebSocketServer {
     private void initFileStream() {
         String filePathTemp = System.getProperty("user.dir");
         String filePathName = filePathTemp + "/AudioFile/ReceiveData/cnm.pcm";
+        String filePathName2 = filePathTemp + "/AudioFile/ReceiveData/cnm2.pcm";
         FileOutputStream fos = null;
+        FileOutputStream fos2 = null;
         File file = new File(filePathName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
+        File file2 = new File(filePathName2);
+        if (!file2.getParentFile().exists()) {
+            file2.getParentFile().mkdirs();
+        }
         try {
             fos = new FileOutputStream(file, true);
+            fos2 = new FileOutputStream(file2, true);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
         }
         bos = new BufferedOutputStream(fos);
+        bos2 = new BufferedOutputStream(fos2);
     }
 
     /**
@@ -147,12 +158,32 @@ public class WebSocketServer {
      * @param message 客户端发送过来的音频数据
      */
     @OnMessage(maxMessageSize = 40960)
-    public void onMessage(byte[] message, @PathParam("token") String token) {
-        log.info("token:{},输入音频数据报文:{}", token, message);
+    public void onMessage(byte[] message, @PathParam("deviceId") String deviceId) {
+        log.info("token:{},data length:{}", token, message.length);
         try {
             bos.write(message);
+            // 前端发送的数据前面一段为0,去除无效数据
+            int i;
+            for (i = 0; i < message.length; i++) {
+                if (message[i] != 0) {
+                    break;
+                }
+            }
+            byte[] messageTemp = new byte[message.length - i];
+            System.arraycopy(message, i, messageTemp, 0, message.length - i);
+            bos2.write(messageTemp);
 
-//            Constant.sendAudioDataToVideo(message);
+//            String deviceId = "40004";
+            byte[] deviceIdLengthByte = String.valueOf(deviceId.length()).getBytes();
+            byte[] deviceIdByte = deviceId.getBytes();
+            byte[] allDataByte = new byte[messageTemp.length + deviceIdLengthByte.length + deviceIdByte.length];
+
+            System.arraycopy(deviceIdLengthByte, 0, allDataByte, 0, deviceIdLengthByte.length);
+            System.arraycopy(deviceIdByte, 0, allDataByte, deviceIdLengthByte.length, deviceIdByte.length);
+            System.arraycopy(messageTemp, 0, allDataByte, deviceIdByte.length + deviceIdLengthByte.length, messageTemp.length);
+
+            log.info("Sending data to access video service...");
+            Constant.sendAudioDataToVideo(allDataByte);
         } catch (Exception e) {
             e.printStackTrace();
         }
