@@ -1322,11 +1322,12 @@ INSERT INTO `t_version` VALUES ('4', '1', '2.0.1.220506_RC', '巡视主机新特
 INSERT INTO `t_version` VALUES ('5', '2', '1.1.1.220422_beta', '增加用户定制需求，性能优化。', '1.修复个别BUG\n2.增加用户定制需求\n3.性能优化，提高检测精度', '2022-04-22 14:09:11');
 INSERT INTO `t_version` VALUES ('6', '2', '1.1.1.220610_beta', '特高压检测版本，添加新特高压检测要求，增加检测类型。', '1.修复若干BUG\n2.检测接口优化修改\n3.图片传输方式修改\n4.性能优化，增加检测类型，提高检测精度\n5.配置逻辑优化', '2022-06-10 16:22:53');
 
-INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (1, '普通预置位','', -1);
-INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (2, '守望位','', -1);
-INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (3, '秒级静默任务','', -1);
-INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600);
-INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120);
+INSERT INTO `intelligenceelec`.`silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (1, 1, '普通预置位', '', -1, 0);
+INSERT INTO `intelligenceelec`.`silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (2, 2, '守望位', '', -1, 0);
+INSERT INTO `intelligenceelec`.`silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (3, 3, '秒级静默任务', '', -1, 0);
+INSERT INTO `intelligenceelec`.`silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (4, 4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600, 1);
+INSERT INTO `intelligenceelec`.`silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (5, 5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120, 1);
+
 
 INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('901', '1', NULL);
 INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('902', '2', NULL);
