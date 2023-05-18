@@ -103,9 +103,8 @@ public class DeviceStaticsToUpSystem {
 
 
     private void packageInfoBack(String key, Map<String, String> device, List<Map<String, Object>> infoMaps, String reportDate) {
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         Map<String, Object> deviceStaticsInfo;
-        if ("3".equals(sysLevel)) {
+        if (Constant.isUpSystem()) {
             // 是上级系统上报，直接查询数据库
             deviceStaticsInfo = uPatrolDeviceStaticsDao.selectByDeviceCode(device.get("patrolDeviceCode"));
         } else {

@@ -328,8 +328,7 @@ public class UPatrolTaskService {
         String level4 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
         Integer ifRun = uPatrolTask.getExecuteType();
         if (tCruiseTaskAdd.getTaskLevel() == null) {
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-            if("3".equals(sysLevel)) {
+            if(Constant.isUpSystem()) {
                 // 上级系统
                 uPatrolTask.setTaskLevel(NumberUtils.toInt(level2, 2));
                 return;
@@ -426,8 +425,7 @@ public class UPatrolTaskService {
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         log.info("instanceList {}", instanceList);
-        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-        if (!"2".equals(edgeLevel)) {
+        if (!Constant.isHost()) {
             Constant.modelUpload("7");
         }
         return instanceList;
@@ -527,8 +525,7 @@ public class UPatrolTaskService {
             redisTemplate.opsForHash().putAll(str, map);
         }
         initializeThisTaskInfo(task, instanceList, nodeSet);
-        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-        if (!"2".equals(edgeLevel)) {
+        if (!Constant.isHost()) {
             sendTaskStateToUp(task, 5);
         }
         return detailList;
@@ -2791,11 +2788,10 @@ public class UPatrolTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {
-
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String sysLevel = Constant.getLevelEdge();
         Map<String, Object> reMap = new HashMap<>();
         Map<String,String> taskMap = uPatrolTaskDao.selectRobotTaskOnStartV2(robotId);
-        if ("3".equals(sysLevel)) {
+        if (Constant.LEVEL_UP_SYSTEM.equals(sysLevel)) {
             if (MapUtils.isEmpty(taskMap)) {
                 taskMap = Maps.newHashMap();
             }
@@ -3097,8 +3093,7 @@ public class UPatrolTaskService {
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         log.info("instanceList {}", instanceList);
-        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-        if (!"2".equals(edgeLevel)) {
+        if (!Constant.isHost()) {
             Constant.modelUpload("7");
         }
         return instanceList;

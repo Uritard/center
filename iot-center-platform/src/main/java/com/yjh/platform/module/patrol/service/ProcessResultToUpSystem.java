@@ -182,8 +182,7 @@ public class ProcessResultToUpSystem {
                 alarmAndResultToUpSystem(cruiseResultNewList, alarmLevel, tWarnInfo);
             }
             xmlBaseModel.setItems(xmlItems);
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-            if (StringUtils.equals("1", sysLevel)) {
+            if (Constant.isEdge()) {
                 xmlBaseModel.setCommand("1");
             }
             if (StringUtils.isBlank(xmlBaseModel.getType())){

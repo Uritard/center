@@ -61,10 +61,6 @@ public interface CruiseConstant {
      */
     int CRUISE_ABNORMAL_DATAABNORMAL = 249;
     /**
-     * 异常原因，异常告警
-     */
-    int CRUISE_ABNORMAL_ABNORMALALARM = 250;
-    /**
      * 异常原因，超时
      */
     int CRUISE_ABNORMAL_TIMEOUT = 251;
@@ -80,10 +76,6 @@ public interface CruiseConstant {
      * 异常原因，系统异常
      */
     int CRUISE_ABNORMAL_SERVERERROR = 352;
-    /**
-     * 异常原因，缺陷异常
-     */
-    int CRUISE_ABNORMAL_DEFECT = 409;
     /**
      * 异常原因，检修
      */

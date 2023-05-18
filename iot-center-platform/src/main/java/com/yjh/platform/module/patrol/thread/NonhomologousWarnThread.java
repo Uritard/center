@@ -647,7 +647,7 @@ public class NonhomologousWarnThread implements Runnable{
 
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            String sysLevel = Constant.getLevelEdge();
             if (StringUtils.equals("1", sysLevel)) {
                 xmlBaseModel.setCommand("1");
             }

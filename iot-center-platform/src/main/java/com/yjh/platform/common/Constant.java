@@ -7,6 +7,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.user.entity.Channel;
 import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -39,7 +40,14 @@ public class Constant {
 
     public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}&meteName={meteName}&edgeCode={edgeCode}";
     public static final String T_SYS_PARAM = "t_sys_param:";
+    /**
+     * 边缘节点
+     */
     public static final String LEVEL_EDGE = "1";
+    /**
+     * 巡视主机
+     */
+    public static final String LEVEL_HOST = "2";
     /*
     *  上级系统层级
     */
@@ -166,6 +174,8 @@ public class Constant {
     private static Boolean fastTurbo;
 
     private static Boolean standardPoints;
+
+    private static String systemLevel;
     /**
      * 是否开启修改同步模型
      */
@@ -309,6 +319,41 @@ public class Constant {
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
     }
 
+    /**
+     * 获取系统级别
+     */
+    public static String getLevelEdge() {
+        if (StringUtils.isEmpty(systemLevel)) {
+            try {
+                systemLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
+            } catch (Exception e) {
+                systemLevel = LEVEL_HOST;
+            }
+        }
+        return systemLevel;
+    }
+
+    /**
+     * 是否边缘节点
+     */
+    public static boolean isEdge() {
+        return LEVEL_EDGE.equals(getLevelEdge());
+    }
+
+    /**
+     * 是否巡视主机
+     */
+    public static boolean isHost() {
+        return LEVEL_HOST.equals(getLevelEdge());
+    }
+
+    /**
+     * 是否上级系统
+     */
+    public static boolean isUpSystem() {
+        return LEVEL_UP_SYSTEM.equals(getLevelEdge());
+    }
+
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
 
     /**
@@ -321,24 +366,7 @@ public class Constant {
             put("1236", "审计员");
         }
     };
-    /**
-     * ukey序列号
-     */
-    public static final Map<String, String> UKEY_XLH = new HashMap<String, String>() {
-        {
-            put("10001", "A99B4B794F101786");
-            put("10004", "2735428C3E687671");
-        }
-    };
-    /**
-     * ukey公钥
-     */
-    public static final Map<String, String> UKEY_GY = new HashMap<String, String>() {
-        {
-            put("10001", "04deeafe50247551be7bbf7658402db06b9fb5490471a3dca87b2e6c68b54bcc61a9529d8ba5877da05cff226433799b4ad65953db2d00af7262bcaaa3442544a2");
-            put("10004", "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0");
-        }
-    };
+
     public static Boolean apiPermissions=false;
 
 

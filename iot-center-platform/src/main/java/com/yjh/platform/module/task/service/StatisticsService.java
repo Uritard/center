@@ -6,13 +6,11 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
-import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +18,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -142,9 +138,8 @@ public class StatisticsService {
     }
 
     public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type) {
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         List<Map<String, Object>> list = null;
-        if ("3".equals(sysLevel)) {
+        if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(robotId,ROBOT.equals(type) ? "0":"1");
         } else {
@@ -254,9 +249,8 @@ public class StatisticsService {
      * @return
      */
     public List<Map<String, Object>> countCamera(Long id) {
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         List<Map<String, Object>> list = null;
-        if ("3".equals(sysLevel)) {
+        if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(id,"2");
         } else {
@@ -343,7 +337,7 @@ public class StatisticsService {
 
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             return cruiseStatistics(robotCode,year,month,type,Constant.TASK_CHECK,startTime,endTime);
@@ -381,7 +375,7 @@ public class StatisticsService {
         Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             return cruiseStatistics(regionCode,year,month,type,Constant.INSTANCE_LOSS,startTime,endTime);
@@ -466,7 +460,7 @@ public class StatisticsService {
         Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             return cruiseStatistics(regionCode,year,month,type,Constant.WARN_CHECK,startTime,endTime);
@@ -504,7 +498,7 @@ public class StatisticsService {
         Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             return cruiseStatistics(regionCode,year,month,type,Constant.WARN_ACCURACY,startTime,endTime);
@@ -542,7 +536,7 @@ public class StatisticsService {
         Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             return cruiseStatistics(regionCode,year,month,type,Constant.RESULT_CHECK,startTime,endTime);

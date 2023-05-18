@@ -85,8 +85,7 @@ public class SilentTaskJob implements Runnable {
         log.info("静默任务定时任务==静默监视类型：{}", presetType);
         // 分析主机开关
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis", "content"));
-        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-        if (StringUtils.equals(FLAG, flag) && "2".equals(edgeLevel)) {
+        if (StringUtils.equals(FLAG, flag) && Constant.isHost()) {
             log.info("巡视主机分析主机开关：isIntelDefectAnalysis 没开");
             return;
         }
@@ -141,7 +140,7 @@ public class SilentTaskJob implements Runnable {
                 log.info("抓图失败 result:{}", result);
                 return;
             }
-            String edgeLevel = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeLevel", "content");
+            String edgeLevel = Constant.getLevelEdge();
             log.info("edgeLevel:{}",edgeLevel);
             //如果是边缘节点 上传巡视主机
             if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
