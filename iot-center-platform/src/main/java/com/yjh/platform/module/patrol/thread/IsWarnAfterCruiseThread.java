@@ -177,7 +177,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", initInfo.get("valueTemp"));
+            //redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", initInfo.get("valueTemp"));
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "isWarn", "1");
 
 
