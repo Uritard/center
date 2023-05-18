@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.enums.AlarmLevelEnum;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -965,6 +966,52 @@ public class TCameraPresetService {
         }
 
         sendMsg(tCameraPreset);
+    }
+
+    public Result add(TCameraPreset tCameraPreset) {
+        int resultNum = 0;
+        Result result = new Result();
+        //判断该预置位是否已被设置
+        if(judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+            return result;
+        }else {
+            int isMicro = microCamera(tCameraPreset);
+            if (isMicro > 0) {
+                result.setMessage(ResultCodeEnum.CODE10009.getCode(), "微型相机只可以设置一个预置位");
+                return result;
+            }
+            //操作数据库
+            resultNum = insert(tCameraPreset);
+
+            if (resultNum != 0) {
+                //操作预置位
+                //                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
+
+                HashMap<String, Object> params = new HashMap<>();
+                params.put("cameraId",tCameraPreset.getCameraId());
+                params.put("presetId",tCameraPreset.getPresetId());
+                params.put("meteName",tCameraPreset.getPresetName());
+                params.put("edgeCode",tCameraPreset.getEdgeCode());
+
+                Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
+                String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
+                if (!org.springframework.util.StringUtils.isEmpty(resData) || isMicro == 0) {
+                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                    JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
+                    tCameraPreset.setPresetImg((String) json.get("urlPath"));
+                    tCameraPreset.setPresetPtz(resData);
+                    update(tCameraPreset);//存图
+                    result.setData(resultNum);
+                } else {
+                    tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+                    resultNum = 0;
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                    result.setData(resultNum);
+                }
+            }
+        }
+        return result;
     }
 
     /**
