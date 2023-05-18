@@ -173,7 +173,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
         int dbWarn = warning(dbList, voiceDevice.getDbValue(), cruiseResultMap, "分贝");
 
-        String retVal = dbWarn + "Db," + fWarn + "Hz";
+        String retVal = dbWarn + "dB," + fWarn + "Hz";
         cruiseResultMap.put("resultNum", dbWarn+","+fWarn);
         cruiseResultMap.put("resultDesc", retVal);
         return retVal;
