@@ -737,8 +737,7 @@ public class HelloController {
             StaticContextAccessor.getBean(AnalyseDataOperateService.class).uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-            if (org.apache.commons.lang3.StringUtils.equals("1", sysLevel)) {
+            if (Constant.isEdge()) {
                 xmlBaseModel.setCommand("1");
             }
             List<com.yjh.platform.module.patrol.entity.XMLBaseModel> list = new ArrayList<>();

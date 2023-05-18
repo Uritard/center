@@ -1,7 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -115,7 +114,7 @@ public class PatrolResultHandler {
             return;
         }
 
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String sysLevel = Constant.getLevelEdge();
         log.info("robotPatrolTaskResult resultList=={}", resultList);
 
         //上级系统处理逻辑，因缺少attr表数据，需将任务信息放入redis
@@ -592,7 +591,7 @@ public class PatrolResultHandler {
                             Map<String, String> initInfo = new HashMap<>(16);
                             initInfo.put("valueTemp", String.valueOf(resultValueMeter));
 
-                            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+                            String sysLevel = Constant.getLevelEdge();
                             boolean isTemDif = StringUtils.equals("2", sysLevel)
                                     && 1 == tStdDevicemete.getIsTemdif()
                                     && Objects.equals("222", tStdDevicemete.getMeteType());
@@ -1056,8 +1055,7 @@ public class PatrolResultHandler {
                 jasonMaps.put("defectModel", infoMap.get("defectModel"));
                 log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
                 currentWarnInfo.put("isPop","true");
-                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
-                if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                if (!Constant.isUpSystem()){
                     Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                 }
             }

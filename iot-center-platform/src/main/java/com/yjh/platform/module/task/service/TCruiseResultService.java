@@ -374,9 +374,8 @@ public class TCruiseResultService{
 //        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
         List<TaskSimpleInfo> novelTaskList=uPatrolResultDao.selectTaskIsRunning();
         for(TaskSimpleInfo temTask:novelTaskList){
-            Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
             String systemLevel = "3";
-//            String systemLevel = systemLevelMap.getOrDefault("content","2");
+//            String systemLevel = Constant.getLevelEdge();
             log.info("systemLevel:{}",systemLevel);
             if ("3".equals(systemLevel)) {
                 getTaskCountByCache(temTask);

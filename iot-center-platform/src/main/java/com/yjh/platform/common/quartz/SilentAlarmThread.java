@@ -14,7 +14,6 @@ import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.service.TCameraPresetService;
-import com.yjh.platform.module.video.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -475,8 +474,7 @@ public class SilentAlarmThread implements Runnable {
             jasonMaps.put("defectModel", "450");
             String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
             log.info("发送给前端的消息: {}", json);
-            String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
-            if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+            if (!Constant.isUpSystem()){
 //                restTemplatePost(syncWebsocketUrl, json);
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
             }

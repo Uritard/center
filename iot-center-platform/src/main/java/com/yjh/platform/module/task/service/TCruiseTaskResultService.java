@@ -560,7 +560,7 @@ public class TCruiseTaskResultService {
     public CruiseResultCounter selectCruiseStatusCountNew(String taskId) throws ParseException {
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
         //处理上级系统逻辑
-        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String systemLevel  = Constant.getLevelEdge();
         log.info("systemLevel:{}",systemLevel);
         if ("3".equals(systemLevel)) {
             //处理巡视点数量信息

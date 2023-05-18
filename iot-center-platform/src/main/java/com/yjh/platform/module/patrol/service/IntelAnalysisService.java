@@ -58,13 +58,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_ANALYSE_DOING;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_FAILED;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -1383,8 +1381,7 @@ public class IntelAnalysisService {
                 jasonMaps.put("warnType", "1");
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
-                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
-                if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                if (!Constant.isUpSystem()){
                     postUrl(Constant.WEBSOCKET_URL, json);
                 }
             }

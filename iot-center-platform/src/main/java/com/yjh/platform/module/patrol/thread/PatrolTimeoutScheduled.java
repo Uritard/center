@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.patrol.thread;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -62,6 +63,11 @@ public class PatrolTimeoutScheduled {
 
         String tasksAreTime = hashOperations.get("t_sys_param:tasksAreTime", "content");
         int timeOut = NumberUtils.toInt(tasksAreTime);
+
+        if (!Constant.isHost()) {
+            // 边缘节点和上级系统超时时间加长30分钟，避免和巡视主机一致
+            timeOut += 30;
+        }
 
         List<TaskSimpleInfo> runningList = uPatrolResultDao.selectTaskIsRunning();
 
