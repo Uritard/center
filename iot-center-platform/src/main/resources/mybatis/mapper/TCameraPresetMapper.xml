@@ -531,4 +531,34 @@
     </set>
         where a.id = #{id}
     </update>
+
+    <select id="queryPresetByCameraAndMete" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        SELECT preset_id,
+               edge_code,
+               origin_id,
+               camera_id,
+               preset_num,
+               preset_name,
+               preset_type,
+               creator_user,
+               creator_time,
+               is_use,
+               preset_img,
+               inspection_postion,
+               collect_status,
+               preset_ptz,
+               calibration_status,
+               remark
+        FROM t_camera_preset
+        WHERE camera_id = #{cameraId,jdbcType=BIGINT}
+          AND preset_id IN (
+            SELECT cruise_id
+            FROM t_cruise_point_instance
+            WHERE device_mete_id = #{meteId,jdbcType=BIGINT})
+    </select>
+    <select id="queryMaxPresetNum" resultType="java.lang.Integer">
+        SELECT MAX(preset_num)
+        FROM t_camera_preset
+        WHERE camera_id = #{cameraId,jdbcType=BIGINT}
+    </select>
 </mapper>
