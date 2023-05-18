@@ -578,6 +578,8 @@
         WHERE
         1 = 1
         AND a.warn_type != '507' OR a.warn_type IS NULL
+        <if test="deviceName != null and deviceName != ''">and b.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and k.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         )
         UNION ALL
         (SELECT
@@ -616,8 +618,11 @@
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
-        1 = 1)
-        ) big_table
+        1 = 1
+        <if test="deviceName != null and deviceName != ''">and b.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and k.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        )
+            ) big_table
         WHERE 1 = 1
         <if test="warnLevel != -1">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != -1">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
