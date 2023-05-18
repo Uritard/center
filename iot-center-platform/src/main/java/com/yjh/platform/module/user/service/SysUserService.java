@@ -318,9 +318,8 @@ public class SysUserService {
                             mapResult.put("roleMenuList", sysRoleMenuList);
                             mapResult.put("sysUserLogin", sysUserSelect);
                             Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-                            Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
                             mapResult.put("systemName",systemNameMap.get("content"));
-                            mapResult.put("systemLevel", ValueUtil.getOrDefault(systemLevelMap.get("content"),"2"));
+                            mapResult.put("systemLevel", Constant.getLevelEdge());
                             String userId = String.valueOf(sysUserLogin.getUserId());
                             Map<String, Object> mapAccount = new HashMap<>();
                             Map<String, Object> mapAppKey = new HashMap<>();
@@ -372,9 +371,8 @@ public class SysUserService {
                         mapResult.put("roleMenuList", sysRoleMenuList);
                         mapResult.put("sysUserLogin", sysUserSelect);
                         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-                        Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
                         mapResult.put("systemName",systemNameMap.get("content"));
-                        mapResult.put("systemLevel", ValueUtil.getOrDefault(systemLevelMap.get("content"),"2"));
+                        mapResult.put("systemLevel", Constant.getLevelEdge());
                         String userId = String.valueOf(sysUserLogin.getUserId());
                         Map<String, Object> mapAccount = new HashMap<>();
                         Map<String, Object> mapAppKey = new HashMap<>();

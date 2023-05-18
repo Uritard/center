@@ -362,7 +362,7 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String sequentialRec(String meteId) throws Exception{
         {
-            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+            String edgeLevel = Constant.getLevelEdge();
             List<Map<String,Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
             if (list.isEmpty()){
                 log.info("meteId {} sequentialRec config is empty!", meteId);

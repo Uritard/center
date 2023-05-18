@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
@@ -193,8 +194,7 @@ public abstract class AbstractVideoCruise {
                 }
 
                 // 判断当前节点级别,如果是边缘节点,直接处理拍照的结果
-                String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-                if (!picError && !StringUtils.equals("1", sysLevel)) {
+                if (!picError && !Constant.isEdge()) {
                     // 判断是否有配置算法
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
                     if (algorithm != null) {

@@ -490,7 +490,7 @@ public class DataDealThread implements Runnable {
                                                         jasonMaps2.put("defectModel", tWarnInfo.getDefectModel());
                                                         String json = JSON.toJSONString(jasonMaps2);
                                                         log.info("发送给前端的消息：" + json);
-                                                        String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                        String edgeLevel = Constant.getLevelEdge();
                                                         if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
                                                             postUrl(syncWebsocketUrl,json);
                                                         }
@@ -714,7 +714,7 @@ public class DataDealThread implements Runnable {
                                                 jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                 String json = JSON.toJSONString(jasonMaps2);
                                                 log.info("发送给前端的消息：" + json);
-                                                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                String edgeLevel = Constant.getLevelEdge();
                                                 if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
                                                     postUrl(syncWebsocketUrl,json);
                                                 }
@@ -790,7 +790,7 @@ public class DataDealThread implements Runnable {
                                                     jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                     String json = JSON.toJSONString(jasonMaps2);
                                                     log.info("发送给前端的消息：" + json);
-                                                    String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                    String edgeLevel = Constant.getLevelEdge();
                                                     if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
                                                         postUrl(syncWebsocketUrl,json);
                                                     }

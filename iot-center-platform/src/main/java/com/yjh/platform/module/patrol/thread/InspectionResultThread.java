@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -80,7 +81,6 @@ public class InspectionResultThread implements Runnable{
             }
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
@@ -98,6 +98,11 @@ public class InspectionResultThread implements Runnable{
             }
             // 结果值处理
             setCruiseResult(tCruiseTaskResultMap, instanceId);
+            int cruiseStatus = CRUISE_STATE_DONE;
+            if (StringUtils.equals(tCruiseTaskResultMap.get("cruiseAbnormal"), String.valueOf(CRUISE_ABNORMAL_TIMEOUT))) {
+                cruiseStatus = CRUISE_STATE_OMIT;
+            }
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
 
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
@@ -226,7 +231,7 @@ public class InspectionResultThread implements Runnable{
      */
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType) {
         try {
-            String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+            String sysLevel = Constant.getLevelEdge();
             // 下级主动上报异常的点不调用算法，如超时，任务终止，异常的情况
             boolean isInterrupt = "0".equals(robotPatrolTaskResult.getValid());
 
@@ -307,7 +312,7 @@ public class InspectionResultThread implements Runnable{
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
-            String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+            String sysLevel = Constant.getLevelEdge();
 
             if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel)) {
                 JSONObject jsonForRe = new JSONObject();

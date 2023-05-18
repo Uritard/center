@@ -563,10 +563,6 @@
         LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
         LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
         WHERE 1 = 1
-          and
-        b.cruise_abnormal != '250'
-          and
-        b.cruise_abnormal != '409'
         <if test="taskResultId != null and taskResultId != ''">and b.cruise_data_id = #{taskResultId,jdbcType=VARCHAR}
         </if>
 

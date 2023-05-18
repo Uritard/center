@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
@@ -79,8 +80,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
     }
 
     private void voiceRecord(Map<String, String> inspectionMap) {
-        String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
-        isEdge = "1".equals(sysLevel);
+        isEdge = Constant.isEdge();
 
         String dateT = DateTimeUtil.getDateTimeString();
         inspectionMap.put("cruiseTime", dateT);

@@ -298,7 +298,7 @@ public class UPatrolResultService {
         Map<String, String> initInfo = new HashMap<>(16);
         initInfo.put("valueTemp", personCheck);
 
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        String sysLevel = Constant.getLevelEdge();
         boolean isTemDif = StringUtils.equals("2", sysLevel)
                 && 1 == tStdDevicemete.getIsTemdif()
                 && Objects.equals("222", tStdDevicemete.getMeteType());
