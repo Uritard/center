@@ -28,7 +28,7 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
     }
 
     @Override
-    public void invoke(int lVoiceComHandle, Pointer pRecvDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser) {
+    public void invoke(int lVoiceComHandle, Pointer receiveDataBuffer, int dwBufSize, byte byAudioFlag, Pointer pUser) {
         // byAudioFlag 语音标志：0- 本地采集的数据，1- 设备发送过来的语音数据
         if (0 == byAudioFlag){
             log.info("This is client sends audio data...");
@@ -39,7 +39,7 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
         try {
             // 将设备发送的原始音频数据写入文件
-            ByteBuffer buffers = pRecvDataBuffer.getByteBuffer(0, dwBufSize);
+            ByteBuffer buffers = receiveDataBuffer.getByteBuffer(0, dwBufSize);
             byte[] originBytes = new byte[dwBufSize];
             buffers.rewind();
             buffers.get(originBytes);
@@ -49,13 +49,13 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
             // 若编码格式为G711时,需要解码   G711 -> PCM
             if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat){
-                // 初始化音频解码
+                /*// 初始化音频解码
                 if (Constant.pDecHandle == null) {
                     Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
                 }
                 // G711音频解码
                 HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM strutAudioParam = new HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM();
-                strutAudioParam.in_buf = pRecvDataBuffer;
+                strutAudioParam.in_buf = receiveDataBuffer;
                 strutAudioParam.in_data_size = dwBufSize;
                 HCNetSDK.BYTE_ARRAY ptrVoiceData = new HCNetSDK.BYTE_ARRAY(320);
                 ptrVoiceData.write();
@@ -93,15 +93,22 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 Constant.outputStreamPcm.write(bytesPcm);
 
                 originBytes = bytesPcm;
+
+             */
+
+                byte[] bytes = AudioFormatUtil.decode(originBytes);
+                originBytes = bytes;
+                if (Objects.nonNull(Constant.outputStreamPcm)) {
+                    Constant.outputStreamPcm.write(bytes);
+                }
             }
 
             if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.encodeFormat) {
-                // Todo something
+                log.info("Todo something by Aac");
             }
 
             // 组装wave并调用其他服务发送ws
             byte[] bytesResult = createWaveFile(originBytes, Constant.encodeFormat);
-//            printByte(bytesResult);
 
             Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
         }catch (Exception e){

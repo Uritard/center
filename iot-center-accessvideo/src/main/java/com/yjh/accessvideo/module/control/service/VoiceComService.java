@@ -221,6 +221,7 @@ public class VoiceComService {
             }
         }
 
+        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:sendMsgBufferUrl", "content"));
         if (cbVoiceDataCallBack == null) {
             cbVoiceDataCallBack = new CbVoiceDataCallBack(webSocketUrl);
         }
@@ -280,23 +281,28 @@ public class VoiceComService {
         ptrVoiceByte.write();
 
         if (1 == armFramework) {
-            voiceSendByArm(lVoiceTranHandle, dataLength, ptrVoiceByte);
+            if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat) {
+                voiceSendG711ByArm(lVoiceTranHandle, ptrVoiceByte);
+            } else if (VoiceTransConstant.AudioEncType.PCM.getCode() == Constant.encodeFormat) {
+                voiceSendPcmByArm(lVoiceTranHandle, ptrVoiceByte);
+            }
             return;
         }
 
-        voiceSendNotArm(lVoiceTranHandle, filePathNameTemp, format, dataLength, ptrVoiceByte);
+        voiceSendG711NotArm(lVoiceTranHandle, filePathNameTemp, format, dataLength, ptrVoiceByte);
     }
 
     /**
-     * 非arm架构发送的是编码后的G711数据
+     * 非arm架构--发送的是编码后的G711数据
      *
-     * @param lVoiceTranHandle 语音转发句柄
+     * @param lVoiceTranHandle 语音对讲句柄
      * @param filePathNameTemp 文件路径
      * @param format           格式化时间
      * @param dataLength       数据长度
      * @param ptrVoiceByte     发送的数据
      */
-    public void voiceSendNotArm(int lVoiceTranHandle, String filePathNameTemp, String format, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
+    public void voiceSendG711NotArm(int lVoiceTranHandle, String filePathNameTemp, String format,
+                                int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
         int iEncodeSize = 0;
         // 音频编码信息结构体
         HCNetSDK.NET_DVR_AUDIOENC_INFO encodeInfo = new HCNetSDK.NET_DVR_AUDIOENC_INFO();
@@ -373,11 +379,7 @@ public class VoiceComService {
                 }
 
                 // 发送间隔时间20ms
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    log.error(e.getMessage(), e);
-                }
+                sendDataInterval(20);
             }
         }
         // 数据发送结束,关闭编码库资源
@@ -385,7 +387,38 @@ public class VoiceComService {
     }
 
     /**
-     * arm架构发送的是原始pcm数据
+     * arm架构--发送的是编码后的G711数据
+     *
+     * @param lVoiceTranHandle 语音对讲句柄
+     * @param ptrVoiceByte     发送的数据
+     */
+    public void voiceSendG711ByArm(int lVoiceTranHandle, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
+        int iEncodeSize = 0;
+
+        byte[] g711AllData = AudioFormatUtil.encode(ptrVoiceByte.byValue);
+        int dataLength = g711AllData.length;
+
+        while ((dataLength - iEncodeSize) > G711_ENCODE_DATA_SIZE || ((dataLength - iEncodeSize) > 0 && (dataLength - iEncodeSize) <= G711_ENCODE_DATA_SIZE)) {
+            HCNetSDK.BYTE_ARRAY ptrG711Data = new HCNetSDK.BYTE_ARRAY(G711_ENCODE_DATA_SIZE);
+            int length = Math.min((dataLength - iEncodeSize), G711_ENCODE_DATA_SIZE);
+            System.arraycopy(g711AllData, iEncodeSize, ptrG711Data.byValue, 0, length);
+            ptrG711Data.write();
+
+            iEncodeSize += G711_ENCODE_DATA_SIZE;
+
+            // 转发语音G711数据,每次发送160字节
+            if (!HC_NET_SDK.NET_DVR_VoiceComSendData(lVoiceTranHandle, ptrG711Data.byValue, G711_ENCODE_DATA_SIZE)) {
+                log.error("NET_DVR_VoiceComSendData failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
+                return;
+            }
+
+            // 发送间隔时间20ms
+            sendDataInterval(20);
+        }
+    }
+
+    /**
+     * arm架构--发送的是原始pcm数据
      * 优化发送数据逻辑
      *
      * @param lVoiceTranHandle 语音对讲句柄
@@ -399,20 +432,32 @@ public class VoiceComService {
         if (voiceDataSendToDevice == null) {
             voiceDataSendToDevice = new VoiceDataSendToDevice();
         }
-        voiceDataSendToDevice.voiceSendByArm(lVoiceTranHandle, receiveByte, dataLength);
 
+        // 默认为PCM编码
+        int dataSize = PCM_DATA_SIZE;
+        long timeInterval = 60;
+        if (VoiceTransConstant.AudioEncType.PCM.getCode() == Constant.encodeFormat) {
+            dataSize = G711_ENCODE_DATA_SIZE;
+            timeInterval = 20;
+            receiveByte = AudioFormatUtil.encode(receiveByte);
+        }
+
+        try {
+            voiceDataSendToDevice.voiceSendByArm(lVoiceTranHandle, receiveByte, dataLength, dataSize, timeInterval);
+        } catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**
-     * arm架构发送的是原始pcm数据
+     * arm架构--发送的是原始pcm数据
      *
      * @param lVoiceTranHandle 语音对讲句柄
-     * @param dataLength       数据长度
      * @param ptrVoiceByte     发送的数据
      */
-    public void voiceSendByArm(int lVoiceTranHandle, int dataLength, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
+    public void voiceSendPcmByArm(int lVoiceTranHandle, HCNetSDK.BYTE_ARRAY ptrVoiceByte) {
         int iEncodeSize = 0;
-        log.info("------------------------voiceSendByArm's dataLength:{}------------------------", dataLength);
+        int dataLength = ptrVoiceByte.byValue.length;
 
         while ((dataLength - iEncodeSize) > PCM_DATA_SIZE || ((dataLength - iEncodeSize) > 0 && (dataLength - iEncodeSize) <= PCM_DATA_SIZE)) {
             HCNetSDK.BYTE_ARRAY ptrPcmData = new HCNetSDK.BYTE_ARRAY(PCM_DATA_SIZE);
@@ -421,18 +466,27 @@ public class VoiceComService {
             ptrPcmData.write();
 
             iEncodeSize += PCM_DATA_SIZE;
-            // 每次发送固定大小1920字节数据
+            // 转发语音PCM数据,每次发送1920字节
             if (!HC_NET_SDK.NET_DVR_VoiceComSendData(lVoiceTranHandle, ptrPcmData.byValue, PCM_DATA_SIZE)) {
                 log.error("NET_DVR_VoiceComSendData failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
                 return;
             }
 
             // 1920 / (16000 * 1 * 16 / 8 * 1 / 1000) = 60
-            try {
-                Thread.sleep(60);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-            }
+            sendDataInterval(60);
+        }
+    }
+
+    /**
+     * 发送数据时间间隔
+     *
+     * @param timeInterval 时间间隔
+     */
+    private void sendDataInterval(long timeInterval) {
+        try {
+            Thread.sleep(timeInterval);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
         }
     }
 

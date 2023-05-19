@@ -592,7 +592,8 @@
         a.robot_position,
         b.dict_note as robotFactoryName,
         c.dict_note as typeName,
-        d.dict_note as positionName
+        d.dict_note as positionName,
+        a.robot_name
         from t_robot_info a
         left join t_dict_business b on a.robot_factory = b.dict_code
         left join t_dict_business c on a.robot_type = c.dict_code
