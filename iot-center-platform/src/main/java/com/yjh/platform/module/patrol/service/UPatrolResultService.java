@@ -293,7 +293,7 @@ public class UPatrolResultService {
         if (Objects.isNull(tStdDevicemete)){
             return;
         }
-        String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0];
+        String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0].replaceAll(afterManualReviewInfo.getUnit(), "");
 
         Map<String, String> initInfo = new HashMap<>(16);
         initInfo.put("valueTemp", personCheck);
