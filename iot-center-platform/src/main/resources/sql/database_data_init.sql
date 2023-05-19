@@ -448,7 +448,7 @@ INSERT INTO `t_dict_business` VALUES ('300318', '394', 'defect_model', '构架�
 INSERT INTO `t_dict_business` VALUES ('300319', '395', 'defect_model', '箱门闭合异常', '0', '缺陷类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300320', '396', 'defect_model', '金属锈蚀', '0', '缺陷类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300322', '398', 'defect_type', '缺陷识别', '0', '算法识别', '1');
-INSERT INTO `t_dict_business` VALUES ('300323', '399', 'robot_position', '轨道', '3', '机器人类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300323', '399', 'robot_position', '室内轨道', '3', '机器人类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300324', '400', 'param_type', '系统服务配置', '0', '参数类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300325', '401', 'param_type', '文件路径配置', '0', '参数类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300326', '402', 'param_type', '安全参数配置', '0', '参数类型', '1');
@@ -1312,6 +1312,7 @@ INSERT INTO `t_sys_param` VALUES ('100132', '404', 'standardPoints', '是否使�
 INSERT INTO `t_sys_param` VALUES ('100133', '404', 'fastTurbo', '是否启用极速模式', 'false', '极速模式，减少日志和不必要消息上报，开启后会影响问题定位，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100134', '404', 'selectEdge', '要查询的edgeCode', 'Edge01', '要查询的edgeCode', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false', '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100141', '404', 'cameraServicePort', '海康相机服务端口', '8000', '海康相机服务端口(用作语音对讲)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

@@ -351,6 +351,7 @@ public class InspectionResultThread implements Runnable{
         log.info("====This is the result of no algorithm===");
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             CruiseConstant.AbnormalResDescEnum abnormalEnum = AbnormalResDescEnum.getEnum(value);
             if (!Objects.isNull(abnormalEnum)) {
                 switch (abnormalEnum) {
@@ -360,10 +361,12 @@ public class InspectionResultThread implements Runnable{
                         break;
                     case ROBOT_OFFLINE:
                         tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
+                        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                         break;
                     case ROBOT_OVERHAUL:
                     case EQUIPMENT_MAINTENANCE:
                         tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                         break;
                     case TERMINATION_OF_TASK:
                         tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
@@ -377,7 +380,7 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 tCruiseTaskResultMap.put("cruiseAbnormal", "0");
             }
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+
             tCruiseTaskResultMap.put("resultDesc", StringUtils.isNotEmpty(value) ? "" : "已拍照");
             tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();

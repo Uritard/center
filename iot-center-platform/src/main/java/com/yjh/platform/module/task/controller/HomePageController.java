@@ -119,7 +119,7 @@ public class HomePageController {
 
 
     @ApiOperation(value = "机器人数据")
-    @RequestMapping(value = "/robotInfoForHomePage", method = RequestMethod.GET)
+    @GetMapping(value = "/robotInfoForHomePage")
     public Result robotInfoForHomePage(@RequestParam(value = "robotPosition", required = false) String robotPosition) {
         Result result = new Result();
         try {
