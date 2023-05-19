@@ -79,6 +79,9 @@ public class UPatrolDataResult implements Serializable {
     @ApiModelProperty(value = "巡检结果数值")
     private String resultNum;
 
+    @ApiModelProperty(value = "单位")
+    private String unit;
+
     @ApiModelProperty(value = "机器人巡检图片分析值（暂时没用）")
     private String modifyNum;
 
