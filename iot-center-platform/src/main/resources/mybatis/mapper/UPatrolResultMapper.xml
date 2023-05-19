@@ -342,7 +342,8 @@
 	a.task_id,
 	a.identify_result,
 	a.person_check,
-	a.picpath
+	a.picpath,
+    a.unit
         FROM
             u_patrol_data_result a
         WHERE
