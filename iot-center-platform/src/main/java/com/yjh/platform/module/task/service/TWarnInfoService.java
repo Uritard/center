@@ -6,6 +6,10 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -41,6 +45,10 @@ public class TWarnInfoService{
     @Autowired
     private TDefectInfoDao tDefectInfoDao;
     @Autowired
+    private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
     private TCameraAlarmDao tCameraAlarmDao;
     @Autowired
     private TRobotAlarmDao tRobotAlarmDao;
@@ -56,6 +64,18 @@ public class TWarnInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TWarnInfo tWarnInfo) {
+        if (Objects.nonNull(tWarnInfo.getDeviceId())) {
+            TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tWarnInfo.getDeviceId());
+            if (Objects.nonNull(tStdDevice)) {
+                tWarnInfo.setDeviceName(tStdDevice.getDeviceName());
+            }
+        }
+        if (Objects.nonNull(tWarnInfo.getStdMeteId())) {
+            TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tWarnInfo.getStdMeteId());
+            if (Objects.nonNull(tStdDevicemete)) {
+                tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+            }
+        }
         return this.tWarnInfoDao.insert(tWarnInfo);
     }
 
@@ -88,6 +108,20 @@ public class TWarnInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TWarnInfo> list) {
+        list.forEach(tWarnInfo -> {
+            if (Objects.nonNull(tWarnInfo.getDeviceId())) {
+                TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tWarnInfo.getDeviceId());
+                if (Objects.nonNull(tStdDevice)) {
+                    tWarnInfo.setDeviceName(tStdDevice.getDeviceName());
+                }
+            }
+            if (Objects.nonNull(tWarnInfo.getStdMeteId())) {
+                TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tWarnInfo.getStdMeteId());
+                if (Objects.nonNull(tStdDevicemete)) {
+                    tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+                }
+            }
+        });
         return this.tWarnInfoDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)

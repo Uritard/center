@@ -58,6 +58,8 @@ public class TCruiseResultService{
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
+    private TWarnInfoService tWarnInfoService;
+    @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
@@ -219,7 +221,7 @@ public class TCruiseResultService{
                     warnInfo.setDealTime(date);
                     warnInfo.setDealPersonId(userId);
                     log.info("要插库的告警数据是==="+warnInfo);
-                    tWarnInfoDao.insert(warnInfo);
+                    tWarnInfoService.insert(warnInfo);
                     sendWebSocket(warnInfo.getWarnId());
                     tCruiseResultDao.updateIsWarn(cruiseManualReview.getCruiseDataId());
                 }

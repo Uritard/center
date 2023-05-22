@@ -49,6 +49,10 @@ public class TWarnInfo implements Serializable {
      * 设备Id
      */
     private Long deviceId;
+    /**
+     * 设备Id
+     */
+    private String deviceName;
 
     /**
      * 部位ID
@@ -64,6 +68,10 @@ public class TWarnInfo implements Serializable {
      * 标准测点ID
      */
     private Long stdMeteId;
+    /**
+     * 标准测点ID
+     */
+    private String deviceMeteName;
 
     /**
      * 处理状态1.已核查2.未核查

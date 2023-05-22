@@ -199,6 +199,8 @@
             warn_name,
             warn_content,
             device_id,
+            device_name,
+            device_mete_name,
             cunstom_id,
             instance_id,
             std_mete_id,
@@ -225,6 +227,8 @@
                 #{warnName, jdbcType=VARCHAR},
                 #{warnContent, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
+                #{deviceName, jdbcType=VARCHAR},
+                #{deviceMeteName, jdbcType=VARCHAR},
                 #{cunstomId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=BIGINT},
                 #{stdMeteId, jdbcType=BIGINT},
@@ -245,68 +249,6 @@
                 #{taskId, jdbcType=VARCHAR}
         )
     </insert>
-
-
-    <insert id="batchInsertWarnInfo">
-        insert into t_warn_info(
-        warn_id,
-        warn_level,
-        warn_time,
-        warn_type,
-        warn_name,
-        warn_content,
-        device_id,
-        cunstom_id,
-        instance_id,
-        std_mete_id,
-        conf_mode,
-        is_warn,
-        deal_type,
-        deal_info,
-        deal_person_id,
-        deal_time,
-        if_warn_disable,
-        alarm_source,
-        warn_subtype,
-        device_code,
-        image_path,
-        video_path,
-        value,
-        out_range,
-        task_id
-        )values
-        <foreach collection="list" item="TWarnInfo" separator=",">
-            (
-            #{TWarnInfo.warnId, jdbcType=BIGINT},
-            #{TWarnInfo.warnLevel, jdbcType=INTEGER},
-            #{TWarnInfo.warnTime, jdbcType=TIMESTAMP},
-            #{TWarnInfo.warnType, jdbcType=INTEGER},
-            #{TWarnInfo.warnName, jdbcType=VARCHAR},
-            #{TWarnInfo.warnContent, jdbcType=VARCHAR},
-            #{TWarnInfo.deviceId, jdbcType=BIGINT},
-            #{TWarnInfo.cunstomId, jdbcType=VARCHAR},
-            #{TWarnInfo.instanceId, jdbcType=BIGINT},
-            #{TWarnInfo.stdMeteId, jdbcType=BIGINT},
-            #{TWarnInfo.confMode, jdbcType=INTEGER},
-            #{TWarnInfo.isWarn, jdbcType=INTEGER},
-            #{TWarnInfo.dealType, jdbcType=INTEGER},
-            #{TWarnInfo.dealInfo, jdbcType=VARCHAR},
-            #{TWarnInfo.dealPersonId, jdbcType=VARCHAR},
-            #{TWarnInfo.dealTime, jdbcType=TIMESTAMP},
-            #{TWarnInfo.ifWarnDisable, jdbcType=INTEGER},
-            #{TWarnInfo.alarmSource, jdbcType=INTEGER},
-            #{TWarnInfo.warnSubtype, jdbcType=INTEGER},
-            #{TWarnInfo.deviceCode, jdbcType=VARCHAR},
-            #{TWarnInfo.imagePath, jdbcType=VARCHAR},
-            #{TWarnInfo.videoPath, jdbcType=VARCHAR},
-            #{TWarnInfo.value, jdbcType=VARCHAR},
-            #{TWarnInfo.outRange, jdbcType=VARCHAR},
-            #{TWarnInfo.taskId, jdbcType=VARCHAR}
-            )
-        </foreach>
-    </insert>
-
-
 
     <insert id="insertVideoAnalyseResult" useGeneratedKeys="true" keyProperty="algorithmResultId" parameterType="com.yjh.platform.module.patrol.entity.TVideoAnalyseResult">
         insert into t_video_analyse_result(
@@ -792,6 +734,8 @@
             defect_name,
             defect_content,
             device_id,
+            device_name,
+            device_mete_name,
             cunstom_id,
             instance_id,
             std_mete_id,
@@ -818,6 +762,8 @@
                 #{defectName, jdbcType=VARCHAR},
                 #{defectContent, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
+                #{deviceName, jdbcType=VARCHAR},
+                #{deviceMeteName, jdbcType=VARCHAR},
                 #{cunstomId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=BIGINT},
                 #{stdMeteId, jdbcType=BIGINT},
@@ -848,6 +794,8 @@
         defect_name,
         defect_content,
         device_id,
+        device_name,
+        device_mete_name,
         cunstom_id,
         instance_id,
         std_mete_id,
@@ -876,6 +824,8 @@
             #{TDefectInfo.defectName, jdbcType=VARCHAR},
             #{TDefectInfo.defectContent, jdbcType=VARCHAR},
             #{TDefectInfo.deviceId, jdbcType=BIGINT},
+            #{deviceName, jdbcType=VARCHAR},
+            #{deviceMeteName, jdbcType=VARCHAR},
             #{TDefectInfo.cunstomId, jdbcType=VARCHAR},
             #{TDefectInfo.instanceId, jdbcType=BIGINT},
             #{TDefectInfo.stdMeteId, jdbcType=BIGINT},

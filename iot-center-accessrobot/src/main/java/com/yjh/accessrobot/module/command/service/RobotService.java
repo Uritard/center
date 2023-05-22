@@ -2084,16 +2084,6 @@ public class RobotService {
     }
 
     /**
-     * 机器人巡检点告警及分析机器人巡检点结果后的告警
-     *
-     * @param warnInfo 告警信息
-     * @return int
-     */
-    public int insertWarn(TWarnInfo warnInfo) {
-        return tRobotInfoDao.insertWarn(warnInfo);
-    }
-
-    /**
      * 根据任务id和巡检点id查询告警id
      *
      * @param taskId     任务id
