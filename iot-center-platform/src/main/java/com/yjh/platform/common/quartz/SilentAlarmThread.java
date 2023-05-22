@@ -13,6 +13,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +68,7 @@ public class SilentAlarmThread implements Runnable {
     private TCameraPresetService tCameraPresetService;
     private ApplicationProperties applicationProperties;
 
-    private TWarnInfoDao tWarnInfoDao;
+    private TWarnInfoService tWarnInfoDao;
 
     public String getPresetId() {
         return presetId;
@@ -81,7 +82,7 @@ public class SilentAlarmThread implements Runnable {
     }
 
     public SilentAlarmThread(String ip, String port, String presetId, String cameraId, RedisTemplate redisTemplate,
-                             TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties, String syncWebsocketUrl,TWarnInfoDao tWarnInfoDao) {
+                             TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties, String syncWebsocketUrl,TWarnInfoService tWarnInfoDao) {
         this.ip = ip;
         this.port = port;
         this.presetId = presetId;

@@ -62,6 +62,8 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
 
+    private String deviceName;
+
     @Length(max = 32, message = "cunstomId长度必须小于等于32")
     @ApiModelProperty(value = "部位ID")
     @TableField(value = "cunstom_id", updateStrategy = FieldStrategy.IGNORED)
@@ -74,6 +76,7 @@ public class TDefectInfo implements Serializable {
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "标准测点ID")
     private Long stdMeteId;
+    private String deviceMeteName;
 
     @Max(value = 999999999)
     @ApiModelProperty(value = "缺陷状态：1未处理 2已处理 3已确认 4已忽略")

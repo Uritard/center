@@ -97,6 +97,10 @@ public class TDefectInfo implements Serializable {
 
     private String outRange;
 
+    private String deviceName;
+
+    private String deviceMeteName;
+
     @ApiModelProperty(value = "联动信息")
     private String linkMessage;
 

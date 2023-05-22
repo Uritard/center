@@ -11,10 +11,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.module.command.dao.TCameraPresetMapper;
-import com.yjh.accessrobot.module.command.dao.TCruisePointInstanceMapper;
-import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
-import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
+import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -56,6 +53,8 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     private TCameraPresetMapper tCameraPresetMapper;
     @Autowired
     private TStdDeviceMapper tStdDeviceMapper;
+    @Autowired
+    private TStdDevicemeteMapper tStdDevicemeteMapper;
     @Autowired
     private TWarnInfoMapper tWarnInfoMapper;
     @Resource
@@ -177,6 +176,19 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
                 .setDefectModel(450)
                 .setAlarmSource(800)
                 .setImagePath(defectResultRealImg);
+
+        if (Objects.nonNull(tWarnInfo.getDeviceId())) {
+            TStdDevice tStdDevice = tStdDeviceMapper.selectByPrimaryKey(tWarnInfo.getDeviceId());
+            if (Objects.nonNull(tStdDevice)) {
+                tWarnInfo.setDeviceName(tStdDevice.getDeviceName());
+            }
+        }
+        if (Objects.nonNull(tWarnInfo.getStdMeteId())) {
+            TStdDeviceMete tStdDevicemete = tStdDevicemeteMapper.selectByPrimaryKey(tWarnInfo.getStdMeteId());
+            if (Objects.nonNull(tStdDevicemete)) {
+                tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+            }
+        }
         tWarnInfoMapper.insert(tWarnInfo);
         // webSocket通知前端调用查询告警弹框的接口
         sendWebsocket( tWarnInfo);

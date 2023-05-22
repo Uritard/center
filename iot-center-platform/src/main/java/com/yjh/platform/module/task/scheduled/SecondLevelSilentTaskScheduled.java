@@ -5,6 +5,7 @@ import com.yjh.platform.common.quartz.SilentAlarmThread;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,7 @@ public class SecondLevelSilentTaskScheduled {
     @Value("${spring.websocket.send.url}")
     private String syncWebsocketUrl;
     @Autowired
-    private TWarnInfoDao tWarnInfoDao;
+    private TWarnInfoService tWarnInfoDao;
 
     @Async
     @Scheduled(cron = "${seconds.silent.task.cron}")

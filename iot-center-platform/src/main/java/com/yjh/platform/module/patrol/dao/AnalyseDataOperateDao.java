@@ -14,8 +14,6 @@ public interface AnalyseDataOperateDao {
 
     int insertWarnInfo(TWarnInfo tWarnInfo);
 
-    int batchInsertWarnInfo(List<TWarnInfo> list);
-
     int insertVideoAnalyseResult(TVideoAnalyseResult tVideoAnalyseResult);
 
     int batchInsertVideoAnalyseResult(List<TVideoAnalyseResult> list);

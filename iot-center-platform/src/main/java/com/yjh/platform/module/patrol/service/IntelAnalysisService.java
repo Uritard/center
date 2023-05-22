@@ -14,6 +14,10 @@ import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
@@ -98,6 +102,12 @@ public class IntelAnalysisService {
     @Lazy
     @Autowired
     private TSequentialConfService tSequentialConfService;
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
+    @Autowired
+    private TStdDevicemeteService tStdDevicemeteService;
+
+
 
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
@@ -1367,6 +1377,19 @@ public class IntelAnalysisService {
                         .setDefectModel(450)
                         .setAlarmSource(689)
                         .setImagePath(resultImgList.get(0));
+
+                if (Objects.nonNull(tWarnInfo.getDeviceId())) {
+                    TStdDevice tStdDevice = tStdDeviceService.selectByUnionKeys(tWarnInfo.getDeviceId());
+                    if (Objects.nonNull(tStdDevice)) {
+                        tWarnInfo.setDeviceName(tStdDevice.getDeviceName());
+                    }
+                }
+                if (Objects.nonNull(tWarnInfo.getStdMeteId())) {
+                    TStdDeviceMete tStdDevicemete = tStdDevicemeteService.selectByPrimaryId(tWarnInfo.getStdMeteId());
+                    if (Objects.nonNull(tStdDevicemete)) {
+                        tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+                    }
+                }
                 analyseDataOperateDao.insertWarnInfo(tWarnInfo);
 
                 list.add(tWarnInfo);

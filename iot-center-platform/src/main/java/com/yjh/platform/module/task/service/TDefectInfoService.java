@@ -2,6 +2,10 @@ package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +23,28 @@ public class TDefectInfoService {
 
     @Autowired
     private TDefectInfoDao tDefectInfoDao;
+
+    @Autowired
+    private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
     private DateTimeUtil dateTimeUtil;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TDefectInfo tDefectInfo) {
+
+        if (Objects.nonNull(tDefectInfo.getDeviceId())) {
+            TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tDefectInfo.getDeviceId());
+            if (Objects.nonNull(tStdDevice)) {
+                tDefectInfo.setDeviceName(tStdDevice.getDeviceName());
+            }
+        }
+        if (Objects.nonNull(tDefectInfo.getStdMeteId())) {
+            TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tDefectInfo.getStdMeteId());
+            if (Objects.nonNull(tStdDevicemete)) {
+                tDefectInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+            }
+        }
         return this.tDefectInfoDao.insert(tDefectInfo);
     }
 

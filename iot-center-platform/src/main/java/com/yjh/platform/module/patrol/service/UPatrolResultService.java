@@ -27,6 +27,7 @@ import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -62,6 +63,8 @@ public class UPatrolResultService {
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private TWarnInfoService tWarnInfoService;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
@@ -399,7 +402,7 @@ public class UPatrolResultService {
                 warnInfo.setDealTime(date);
                 warnInfo.setDealPersonId(userId);
                 log.info("要插库的告警数据是===" + warnInfo);
-                tWarnInfoDao.insert(warnInfo);
+                tWarnInfoService.insert(warnInfo);
                 sendWebSocket(warnInfo.getWarnId());
                 uPatrolResultDao.updateIsWarn(taskId, instanceId);
             }

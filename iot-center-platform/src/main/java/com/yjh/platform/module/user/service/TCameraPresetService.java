@@ -19,6 +19,7 @@ import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
@@ -72,7 +73,7 @@ public class TCameraPresetService {
     @Autowired
     private ApplicationProperties applicationProperties;
     @Autowired
-    private TWarnInfoDao tWarnInfoDao;
+    private TWarnInfoService tWarnInfoDao;
 
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;

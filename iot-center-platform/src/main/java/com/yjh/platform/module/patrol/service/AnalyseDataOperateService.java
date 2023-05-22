@@ -6,6 +6,9 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
@@ -34,22 +37,34 @@ public class AnalyseDataOperateService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
     @Autowired
+    private TStdDeviceDao tStdDeviceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private ApplicationProperties applicationProperties;
     @Autowired
     private TAlgorithmInfoService algorithmInfo;
 
+
     private final Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int insertWarnInfo(TWarnInfo tWarnInfo) {
+        if (Objects.nonNull(tWarnInfo.getDeviceId())) {
+            TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tWarnInfo.getDeviceId());
+            if (Objects.nonNull(tStdDevice)) {
+                tWarnInfo.setDeviceName(tStdDevice.getDeviceName());
+            }
+        }
+        if (Objects.nonNull(tWarnInfo.getStdMeteId())) {
+            com.yjh.platform.module.device.entity.TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tWarnInfo.getStdMeteId());
+            if (Objects.nonNull(tStdDevicemete)) {
+                tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+            }
+        }
         return this.analyseDataOperateDao.insertWarnInfo(tWarnInfo);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int batchInsertWarnInfo(List<TWarnInfo> list) {
-        return this.analyseDataOperateDao.batchInsertWarnInfo(list);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -155,11 +170,38 @@ public class AnalyseDataOperateService {
 
     @Transactional(rollbackFor = Exception.class)
     public int insertDefectInfo(TDefectInfo tDefectInfo) {
+
+        if (Objects.nonNull(tDefectInfo.getDeviceId())) {
+            TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tDefectInfo.getDeviceId());
+            if (Objects.nonNull(tStdDevice)) {
+                tDefectInfo.setDeviceName(tStdDevice.getDeviceName());
+            }
+        }
+        if (Objects.nonNull(tDefectInfo.getStdMeteId())) {
+            com.yjh.platform.module.device.entity.TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tDefectInfo.getStdMeteId());
+            if (Objects.nonNull(tStdDevicemete)) {
+                tDefectInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+            }
+        }
         return this.analyseDataOperateDao.insertDefectInfo(tDefectInfo);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertDefectInfo(List<TDefectInfo> list) {
+        list.forEach(tDefectInfo -> {
+            if (Objects.nonNull(tDefectInfo.getDeviceId())) {
+                TStdDevice tStdDevice = tStdDeviceDao.selectByUnionKeys(tDefectInfo.getDeviceId());
+                if (Objects.nonNull(tStdDevice)) {
+                    tDefectInfo.setDeviceName(tStdDevice.getDeviceName());
+                }
+            }
+            if (Objects.nonNull(tDefectInfo.getStdMeteId())) {
+                com.yjh.platform.module.device.entity.TStdDeviceMete tStdDevicemete = tStdDevicemeteDao.selectByPrimaryId(tDefectInfo.getStdMeteId());
+                if (Objects.nonNull(tStdDevicemete)) {
+                    tDefectInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+                }
+            }
+        });
         return this.analyseDataOperateDao.batchInsertDefectInfo(list);
     }
 

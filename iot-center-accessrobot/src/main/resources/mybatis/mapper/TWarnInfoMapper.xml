@@ -59,8 +59,8 @@
         insert into t_warn_info
         ( warn_level,warn_time
         ,warn_type,warn_name,warn_content
-        ,device_id,cunstom_id,instance_id
-        ,std_mete_id,conf_mode,is_warn
+        ,device_id,device_name,cunstom_id,instance_id
+        ,std_mete_id,device_mete_name,conf_mode,is_warn
         ,deal_type,deal_info,deal_person_id
         ,deal_time,defect_model,alarm_source
         ,warn_subtype,device_code,image_path
@@ -68,8 +68,8 @@
         ,task_id)
         values (#{warnLevel,jdbcType=INTEGER},#{warnTime,jdbcType=TIMESTAMP}
         ,#{warnType,jdbcType=INTEGER},#{warnName,jdbcType=VARCHAR},#{warnContent,jdbcType=VARCHAR}
-        ,#{deviceId,jdbcType=BIGINT},#{cunstomId,jdbcType=VARCHAR},#{instanceId,jdbcType=BIGINT}
-        ,#{stdMeteId,jdbcType=BIGINT},#{confMode,jdbcType=INTEGER},#{isWarn,jdbcType=INTEGER}
+        ,#{deviceId,jdbcType=BIGINT},#{deviceName,jdbcType=VARCHAR},#{cunstomId,jdbcType=VARCHAR},#{instanceId,jdbcType=BIGINT}
+        ,#{stdMeteId,jdbcType=BIGINT},#{deviceMeteName,jdbcType=VARCHAR},#{confMode,jdbcType=INTEGER},#{isWarn,jdbcType=INTEGER}
         ,#{dealType,jdbcType=INTEGER},#{dealInfo,jdbcType=VARCHAR},#{dealPersonId,jdbcType=VARCHAR}
         ,#{dealTime,jdbcType=TIMESTAMP},#{defectModel,jdbcType=INTEGER},#{alarmSource,jdbcType=INTEGER}
         ,#{warnSubtype,jdbcType=INTEGER},#{deviceCode,jdbcType=VARCHAR},#{imagePath,jdbcType=VARCHAR}
@@ -86,6 +86,8 @@
                 <if test="warnName != null">warn_name,</if>
                 <if test="warnContent != null">warn_content,</if>
                 <if test="deviceId != null">device_id,</if>
+                <if test="deviceName != null">device_name,</if>
+                <if test="deviceMeteName != null">device_mete_name,</if>
                 <if test="cunstomId != null">cunstom_id,</if>
                 <if test="instanceId != null">instance_id,</if>
                 <if test="stdMeteId != null">std_mete_id,</if>
@@ -113,6 +115,8 @@
                 <if test="warnName != null">#{warnName,jdbcType=VARCHAR},</if>
                 <if test="warnContent != null">#{warnContent,jdbcType=VARCHAR},</if>
                 <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
+                <if test="deviceName != null">#{deviceName,jdbcType=VARCHAR},</if>
+                <if test="deviceMeteName != null">#{deviceMeteName,jdbcType=VARCHAR},</if>
                 <if test="cunstomId != null">#{cunstomId,jdbcType=VARCHAR},</if>
                 <if test="instanceId != null">#{instanceId,jdbcType=BIGINT},</if>
                 <if test="stdMeteId != null">#{stdMeteId,jdbcType=BIGINT},</if>
