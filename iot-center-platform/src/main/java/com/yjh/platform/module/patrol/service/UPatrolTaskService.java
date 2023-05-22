@@ -1703,14 +1703,15 @@ public class UPatrolTaskService {
     public void taskShutDown(String taskId, String content) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
         if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
+            log.warn("任务已经结束，不可重复终止！");
             return;
         }
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
 
-        // 机器人任务终止
+        // 下级任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
         robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-        log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
+        log.info("下级任务终止,robotCodeList:{}", robotCodeList);
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
@@ -1749,13 +1750,12 @@ public class UPatrolTaskService {
                                 //任务终止
                                 taskInfo.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                                 taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
-                                taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+                                taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                                 taskInfo.put("cruiseTime", simpleDateFormat.format(new Date()));
                                 taskInfo.put("resultNum", "-1");
                                 taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : "任务终止");
                                 skipPointList.add(taskInfo);
                             }
-                            // todo 任务终止 上报站端
                         }
                     }
                     log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
@@ -2145,7 +2145,7 @@ public class UPatrolTaskService {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
             });
-            List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
+
             List<Long> missInstanceMapList = new ArrayList<>();
 
             for (Map<String, String> redisInfoMap : taskInfoList) {

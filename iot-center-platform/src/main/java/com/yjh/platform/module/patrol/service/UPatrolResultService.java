@@ -296,7 +296,7 @@ public class UPatrolResultService {
         if (Objects.isNull(tStdDevicemete)){
             return;
         }
-        String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0].replaceAll(afterManualReviewInfo.getUnit(), "");
+        String personCheck = afterManualReviewInfo.getModifyNum().split(",")[0];
 
         Map<String, String> initInfo = new HashMap<>(16);
         initInfo.put("valueTemp", personCheck);
@@ -357,12 +357,13 @@ public class UPatrolResultService {
         warnInfo.setConfMode(275);
         warnInfo.setDealType(286);
         warnInfo.setDealInfo("程序正常，告警属实");
-        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
+        Integer warnFlag = NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("defectModel", "其他"), 450);
         warnInfo.setDefectModel(warnFlag);
-        String type = tRobotInspectionDao.selectTypeByInstanceId(afterManualReviewInfo.getInstanceId());
+        // String type = tRobotInspectionDao.selectTypeByInstanceId(afterManualReviewInfo.getInstanceId());
         int alarmSource= 998;
+        String type = DictConvertUtil.DICT.covertToDict("cruiseType", afterManualReviewInfo.getCruiseType());
         if (StringUtils.isNotEmpty(type)){
-            alarmSource = Integer.parseInt(tWarnInfoDao.selectDictCodeByNote(type, "alarm_source"));
+            alarmSource = NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("alarmSource", type), alarmSource);
         }
         warnInfo.setAlarmSource(alarmSource);
         warnInfo.setImagePath(afterManualReviewInfo.getPicPath());

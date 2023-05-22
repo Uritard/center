@@ -489,4 +489,11 @@ public class CommonUtils {
             return null;
         }
     }
+
+    public static String getNumberStr(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return "";
+        }
+        return str.replaceAll("[^0-9\\.-]", "");
+    }
 }
