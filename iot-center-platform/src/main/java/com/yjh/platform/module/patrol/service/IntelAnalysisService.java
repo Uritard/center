@@ -28,6 +28,7 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -106,6 +107,8 @@ public class IntelAnalysisService {
     private TStdDeviceService tStdDeviceService;
     @Autowired
     private TStdDevicemeteService tStdDevicemeteService;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
 
 
 
@@ -443,6 +446,8 @@ public class IntelAnalysisService {
                 String presetIdStr = arr[1];
                 String key = String.format("CAMERA_PRESET_CHECK_RESULT:%d", cameraId);
                 redisTemplate.opsForHash().put(key, presetIdStr, "-1");
+
+                tCameraPresetService.cameraPresetCheckWarn(Long.parseLong(presetIdStr));
             }
         } catch (Exception e) {
             log.error("presetCheckHandle fail, flagId: {}, err: {}", flagId, e.getMessage());
