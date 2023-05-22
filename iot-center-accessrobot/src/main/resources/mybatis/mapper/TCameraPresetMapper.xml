@@ -16,6 +16,7 @@
             <result property="presetImg" column="preset_img" jdbcType="VARCHAR"/>
             <result property="inspectionPostion" column="inspection_postion" jdbcType="INTEGER"/>
             <result property="collectStatus" column="collect_status" jdbcType="INTEGER"/>
+            <result property="presetPtz" column="preset_ptz" jdbcType="VARCHAR"/>
             <result property="calibrationStatus" column="calibration_status" jdbcType="INTEGER"/>
             <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
@@ -28,7 +29,7 @@
         preset_name,preset_type,
         creator_user,creator_time,is_use,
         preset_img,inspection_postion,collect_status,
-        calibration_status,remark,preset_ptz,origin_id,
+        preset_ptz,calibration_status,remark,preset_ptz,origin_id,
         edge_code
     </sql>
 
@@ -115,7 +116,7 @@
         ,preset_name,preset_type
         ,creator_user,creator_time,is_use
         ,preset_img,inspection_postion,collect_status
-        ,calibration_status,remark,origin_id
+        ,preset_ptz,calibration_status,remark,origin_id
         ,edge_code)
         values
         <foreach collection="list"  item="tCameraPreset" separator=",">
@@ -123,7 +124,7 @@
             ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.presetType,jdbcType=INTEGER}
             ,#{tCameraPreset.creatorUser,jdbcType=VARCHAR},#{tCameraPreset.creatorTime,jdbcType=TIMESTAMP},#{tCameraPreset.isUse,jdbcType=INTEGER}
             ,#{tCameraPreset.presetImg,jdbcType=VARCHAR},#{tCameraPreset.inspectionPostion,jdbcType=INTEGER},#{tCameraPreset.collectStatus,jdbcType=INTEGER}
-            ,#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
+            ,#{presetPtz,jdbcType=VARCHAR},#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
             ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR})
         </foreach>
     </insert>
@@ -150,6 +151,7 @@
             preset_img =  #{presetImg,jdbcType=VARCHAR},
             inspection_postion =  #{inspectionPostion,jdbcType=INTEGER},
             collect_status =  #{collectStatus,jdbcType=INTEGER},
+            preset_ptz =  #{presetPtz,jdbcType=VARCHAR},
             calibration_status =  #{calibrationStatus,jdbcType=INTEGER},
             remark =  #{remark,jdbcType=VARCHAR},
             origin_id =  #{originId,jdbcType=VARCHAR},

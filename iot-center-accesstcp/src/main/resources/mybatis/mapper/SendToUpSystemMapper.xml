@@ -103,6 +103,7 @@
         d.preset_type,
         CONCAT('/', d.preset_id,'/' ,d.preset_id,'.jpg') AS preset_img,
         d.preset_img AS local_path,
+        d.preset_ptz,
         robot.robot_code,
         robot.robot_num,
         d.camera_id AS camera_id,
