@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.common.utils.DictBusinessCache;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
@@ -85,7 +84,6 @@ public class PlatformApplication  implements CommandLineRunner {
         redisTemplate.delete("AllRobotCode");
         sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis(true);
-        DictBusinessCache.init(true);
         tCameraInfoService.intoRedis();
         DictConvertUtil.DICT.loadDict(dictBusinessService);
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务

@@ -49,6 +49,10 @@ public class ThreadPoolConfig {
      * 线程队列大小
      */
     private static int patrolQueueSize = 16;
+    /**
+     * 定时任务线程数
+     */
+    private static int scheduledPoolSize = 8;
 
     public static int getCorePoolSizeDefault() {
         return corePoolSizeDefault;
@@ -105,4 +109,13 @@ public class ThreadPoolConfig {
     public void setPatrolQueueSizeDefault(int patrolQueueSize) {
         ThreadPoolConfig.patrolQueueSize = patrolQueueSize;
     }
+
+    public static int getScheduledPoolSize() {
+        return scheduledPoolSize;
+    }
+
+    public void setScheduledPoolSize(int scheduledPoolSize) {
+        ThreadPoolConfig.scheduledPoolSize = scheduledPoolSize;
+    }
+
 }

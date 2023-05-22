@@ -251,6 +251,10 @@ public enum DictConvertUtil {
         public boolean covertToDict(List<?> objList) {
             return DICT.covertToDict(objList, this);
         }
+
+        public boolean covertToDict(Object obj) {
+            return DICT.covertToDict(obj, this);
+        }
     }
 
     private static class OptionalItem {
