@@ -8,6 +8,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+import java.util.Objects;
 
 /**
  * @Description
@@ -19,13 +20,15 @@ public class FeignConfiguration implements RequestInterceptor {
     @Override
     public void apply(RequestTemplate template) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        Enumeration headerNames = request.getHeaderNames();
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                String name = (String) headerNames.nextElement();
-                String values = request.getHeader(name);
-                template.header(name, values);
+        if (Objects.nonNull(attributes)) {
+            HttpServletRequest request = attributes.getRequest();
+            Enumeration headerNames = request.getHeaderNames();
+            if (headerNames != null) {
+                while (headerNames.hasMoreElements()) {
+                    String name = (String) headerNames.nextElement();
+                    String values = request.getHeader(name);
+                    template.header(name, values);
+                }
             }
         }
     }

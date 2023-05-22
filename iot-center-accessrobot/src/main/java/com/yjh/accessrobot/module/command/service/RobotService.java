@@ -23,8 +23,8 @@ import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.command.proxy.PlatformProxy;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
-import com.yjh.accessrobot.netty.server.NettyServer;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.bootstrap.ServerBootstrap;
@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -94,7 +93,6 @@ public class RobotService {
     private TCruisePointInstanceService tCruisePointInstanceService;
     @Resource
     private SysUserDao sysUserDao;
-
     @Resource
     LogsRecord logsRecord;
 
@@ -118,6 +116,9 @@ public class RobotService {
 
     @Autowired
     private  TVoiceDeviceService tVoiceDeviceService;
+
+    @Autowired
+    private PlatformProxy platformProxy;
 
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
@@ -2187,6 +2188,38 @@ public class RobotService {
     }
 
     /**
+     * 删除任务
+     *
+     * @param edgeCode 机器人唯一标识
+     * @param taskId     值
+     * @return String
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String deleteTransfer(List<String> edgeCode, String taskId,String startTime,String source) {
+        if (StringUtils.isNotBlank(taskId)) {
+            if (CollectionUtils.isNotEmpty(edgeCode)) {
+                edgeCode.forEach(code -> {
+                    if (StringUtils.isNotBlank(code)) {
+                        List<Map<String, Object>> item = new LinkedList<>();
+                        Map<String, Object> map = new HashMap<>(5);
+                        map.put("taskId", taskId);
+                        map.put("startTime",startTime);
+                        map.put("source",source);
+                        item.add(map);
+
+                        XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode(Constant.sendCode()).setReceiveCode(code)
+                            .setTime(DateTimeUtil.format(new Date())).setType("101").setCommand("102").setItems(item);
+                        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                        log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
+                        RobotServerHandler.send(generateByteOrder(xmlString, code), code);
+                    }
+                });
+            }
+        }
+        return "200";
+    }
+
+    /**
      * 判断任务是否属于机器人本体任务
      *
      * @param taskId 任务id
@@ -3046,6 +3079,10 @@ public class RobotService {
         Map<ChannelFuture, ServerBootstrap> serverMap = new HashMap<>(1);
         serverMap.put(newFuture, map.get(future));
         Constant.futureServerBootstrapHashMap.put(1, serverMap);
+    }
+
+    public void deleteTask(String taskId,String startTime,String source) {
+        platformProxy.delete(taskId,startTime,source);
     }
 }
 

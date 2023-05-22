@@ -29,6 +29,7 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
@@ -140,6 +141,9 @@ public class UPatrolTaskService {
     private JobManager jobManager;
     @Autowired
     private ApplicationProperties applicationProperties;
+
+    @Autowired
+    private RobotProxy robotProxy;
 
     @Autowired
     private LogsRecord logsRecord;
@@ -1382,13 +1386,14 @@ public class UPatrolTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String taskId, String startTime,HttpServletRequest request) {
+    public int deleteByPrimaryId(String taskId, String startTime,String source,HttpServletRequest request) {
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
-        if (Optional.ofNullable(request).isPresent()) {
+        Long planId = task.getPlanId();
+        if (Optional.ofNullable(request).isPresent() && Objects.nonNull(request.getHeader("userId"))) {
             logsRecord.LogsSend(request, "4", "删除任务", "删除任务-" + task.getTaskName());
         }
         if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
-            if (!startTime.equals("-1")) {
+            if (!"-1".equals(startTime)) {
                 TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
                 tCruiseTaskDel.setTaskId(taskId);
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
@@ -1423,7 +1428,53 @@ public class UPatrolTaskService {
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条
         uPatrolTaskDao.deleteInitByPrimaryId(taskId);
-        return this.uPatrolTaskDao.deleteByPrimaryId(taskId);
+        int result = this.uPatrolTaskDao.deleteByPrimaryId(taskId);
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        //边缘节点无需上报或下发
+        if (!"1".equals(edgeLevel)) {
+            //巡视系统需要下发，来源为上级系统的删除需要在上级系统下发
+            if ("2".equals(edgeLevel) ||("3".equals(source) && "3".equals(edgeLevel))) {
+                List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(planId);
+                List<Long> instanceIdList = uPatrolPlanAttrList.stream().map(UPatrolPlanAttr::getInstanceId).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(instanceIdList)) {
+                    List<TCruisePointInstanceNameDetail> tCruisePointInstanceNameDetails =
+                        tCruisePointInstanceDao.selectForTask(instanceIdList);
+                    Set<String> edgeCode = tCruisePointInstanceNameDetails.stream().map(TCruisePointInstanceNameDetail::getEdgeCode)
+                        .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
+                    if (CollectionUtils.isNotEmpty(edgeCode)) {
+                        //删除下级系统任务信息
+                        robotProxy.deleteTransfer(new ArrayList<>(edgeCode), taskId, startTime,source);
+                    }
+                }
+            }
+            //只有来源为巡视系统的删除命令需要上报上级系统
+            if ("2".equals(edgeLevel) && "2".equals(source)) {
+                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                List<Map<String, Object>> xmlItems = new ArrayList<>();
+                Map<String, Object> xmlItem = new HashMap<>(16);
+
+                xmlBaseModel.setType("41");
+                xmlBaseModel.setCommand("102");
+                xmlItem.put("taskId", taskId);
+                xmlItem.put("startTime", startTime);
+                xmlItems.add(xmlItem);
+                xmlBaseModel.setItems(xmlItems);
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> deleteMap = new HashMap<>(3);
+                deleteMap.put("list", list);
+                log.info("删除任务上报: {}", JSON.toJSONString(deleteMap));
+                try {
+                    Constant.otherServer(deleteMap, Constant.TCP_URL);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+
+        return result;
     }
 
     public int taskPauseWithoutRobot(String taskId) {
