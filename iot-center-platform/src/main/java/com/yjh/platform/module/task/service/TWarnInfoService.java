@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.DictBusinessCache;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -25,7 +25,6 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -103,8 +102,8 @@ public class TWarnInfoService{
         map.put("meteName", meteName);
         return tWarnInfoDao.selectRobotAlarm(map);
     }
-    @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfoDetail> WarnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName) {
+
+    public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
         map.put("confMode", confMode);
@@ -141,11 +140,9 @@ public class TWarnInfoService{
                     thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
                 }
                 tWarnInfoDetail.setThresholdValue(thresholdValue);
-                tWarnInfoDetail.setAlarmLevelName(DictBusinessCache.getDictNode("alarm_level",String.valueOf(tWarnInfoDetail.getAlarmLevel())));
-                tWarnInfoDetail.setAlarmSourceName(DictBusinessCache.getDictNode("alarm_source",String.valueOf(tWarnInfoDetail.getAlarmSource())));
-                tWarnInfoDetail.setConfModeName(DictBusinessCache.getDictNode("conf_mode",String.valueOf(tWarnInfoDetail.getConfMode())));
-                tWarnInfoDetail.setDefectModelName(DictBusinessCache.getDictNode("defect_model",String.valueOf(tWarnInfoDetail.getDefectModel())));
-                tWarnInfoDetail.setDealTypeName(DictBusinessCache.getDictNode("deal_type",String.valueOf(tWarnInfoDetail.getDealType())));
+                // 转换字典数据
+                DictConvertUtil.optional("alarmLevel").add("alarmSource").add("confMode").add("defectModel").add("dealType").covertToDict(tWarnInfoDetail);
+
                 if (presetInfo != null) {
                     tWarnInfoDetail.setCameraId(presetInfo.getCameraId());
                     tWarnInfoDetail.setVideoCameraType(presetInfo.getVideoCameraType());
