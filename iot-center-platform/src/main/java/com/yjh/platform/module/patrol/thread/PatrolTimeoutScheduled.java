@@ -10,8 +10,10 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TaskSimpleInfo;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,15 +46,15 @@ public class PatrolTimeoutScheduled {
 
     private final RedisTemplate redisTemplate;
     private final UPatrolResultDao uPatrolResultDao;
-    private final TRobotInspectionDao tRobotInspectionDao;
+    private final UPatrolTaskDao uPatrolTaskDao;
     private final UPatrolTaskService uPatrolTaskService;
     HashOperations<String, String, String> hashOperations;
 
-    public PatrolTimeoutScheduled(RedisTemplate redisTemplate, UPatrolResultDao uPatrolResultDao, TRobotInspectionDao tRobotInspectionDao,
+    public PatrolTimeoutScheduled(RedisTemplate redisTemplate, UPatrolResultDao uPatrolResultDao, UPatrolTaskDao uPatrolTaskDao,
         UPatrolTaskService uPatrolTaskService) {
         this.redisTemplate = redisTemplate;
         this.uPatrolResultDao = uPatrolResultDao;
-        this.tRobotInspectionDao = tRobotInspectionDao;
+        this.uPatrolTaskDao = uPatrolTaskDao;
         this.uPatrolTaskService = uPatrolTaskService;
         this.hashOperations = redisTemplate.opsForHash();
     }
@@ -93,20 +95,6 @@ public class PatrolTimeoutScheduled {
     }
 
     private void taskTimeout(String taskId) {
-        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务超时终止,robotCodeList:{}", robotCodeList);
-        if (robotCodeList != null && robotCodeList.size() > 0) {
-            Map<String, Object> robotTaskStatesMap = new HashMap<>();
-            robotTaskStatesMap.put("taskId", taskId);
-            robotTaskStatesMap.put("commandValue", 4);
-            robotTaskStatesMap.put("robotCodeList", robotCodeList);
-            uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
 
         Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
         if (CollectionUtils.isEmpty(tasKeys)) {
@@ -153,6 +141,19 @@ public class PatrolTimeoutScheduled {
         // 更新 PATROL_SUMMARY_PREFIX 并存储
         uPatrolTaskService.patrolTaskResultHandler(outPointList);
         uPatrolTaskService.forceCompletionTask(taskId);
+
+        // 16秒后终止下级任务，延后终止避免与本级超时状态冲突，终止后下级上报任务状态是终止，本级是超时
+        ScheduledMapConfig.schedule(16, t -> {
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+            log.info("下级任务超时终止,robotCodeList:{}", robotCodeList);
+            if (robotCodeList != null && !robotCodeList.isEmpty()) {
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", taskId);
+                robotTaskStatesMap.put("commandValue", 4);
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
+            }
+        });
     }
 
 }

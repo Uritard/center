@@ -98,11 +98,6 @@ public class InspectionResultThread implements Runnable{
             }
             // 结果值处理
             setCruiseResult(tCruiseTaskResultMap, instanceId);
-            int cruiseStatus = CRUISE_STATE_DONE;
-            if (StringUtils.equals(tCruiseTaskResultMap.get("cruiseAbnormal"), String.valueOf(CRUISE_ABNORMAL_TIMEOUT))) {
-                cruiseStatus = CRUISE_STATE_OMIT;
-            }
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
 
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
@@ -182,6 +177,17 @@ public class InspectionResultThread implements Runnable{
         }
         computeEmpty(tCruiseTaskResultMap, "cruiseResult", cruiseResult);
         computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", cruiseAbnormal);
+
+        // 重新获取一下异常状态，可能异常状态已经设置过了，譬如超时，终止
+        cruiseAbnormal = tCruiseTaskResultMap.get("cruiseAbnormal");
+        // 更改点位执行状态
+        int cruiseStatus = CRUISE_STATE_DONE;
+        if (StringUtils.equals(cruiseAbnormal, String.valueOf(CRUISE_ABNORMAL_TIMEOUT))) {
+            cruiseStatus = CRUISE_STATE_OMIT;
+        } else if (StringUtils.equals(cruiseAbnormal, String.valueOf(CRUISE_ABNORMAL_INTERRUPT))) {
+            cruiseStatus = CRUISE_STATE_IGNORE;
+        }
+        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
     }
 
     private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
