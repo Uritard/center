@@ -670,6 +670,14 @@ public class TCameraPresetService {
         }
     }
 
+    public void cameraPresetCheckWarn(Long presetId) {
+        CameraPresetCheckResult checkResult = new CameraPresetCheckResult();
+        TCameraPreset preset = tCameraPresetDao.selectByPrimaryId(presetId);
+        checkResult.setPreset(preset);
+        checkResult.setPresetCheckResult(-1);
+        cameraPresetCheckWarn(checkResult);
+    }
+
     public void sendWebSocket(CameraPresetCheckResult checkResult) {
         //给前端推webSocket
         Map<String,String> jasonMap=new HashMap<>();
