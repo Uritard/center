@@ -359,6 +359,9 @@ public class TRobotInfoService{
             Multimap<Long,Map<String,Object>> multimap = HashMultimap.create();
             List<Map<String,Object>> robotList = new LinkedList<>();
                 Set<Long> set = new HashSet<>();
+                if (CollectionUtils.isEmpty(tRobotInspectionTreeList)) {
+                    return robotList;
+                }
             tRobotInspectionTreeList.forEach(o ->{
                 if (set.add(o.getRobotId())) {
                     Map<String,Object> robot = new HashMap<>();
