@@ -597,7 +597,7 @@
         e.instance_name as instanceName,
         e.result_num as resultNum,
         e.result_desc as resultDesc,
-        e.person_check as personCheck,
+        IFNULL(e.person_check,'') as personCheck,
         e.identify_result as identifyResult,
         e.cruise_result as cruiseResult,
         e.picpath AS picPath,
@@ -609,7 +609,8 @@
         e.device_id as deviceId,
         tsd.device_type      AS deviceType,
         tsd.up_region_name   AS upRegionName,
-        tsd.up_region_id     AS regionId
+        tsd.up_region_id     AS regionId,
+        (select warn_level from t_warn_info where task_id = e.task_id and instance_id = e.instance_id limit 1) AS alarmLevel
         FROM u_patrol_data_result e
         LEFT JOIN t_std_devicemete a ON a.device_mete_id = e.device_mete_id
         Left Join t_std_device tsd on e.device_id = tsd.device_id
