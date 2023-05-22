@@ -14,11 +14,13 @@ import com.yjh.accesstcp.module.device.entity.RobotTaskInstanceInfo;
 import com.yjh.accesstcp.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.proxy.UPatrolTaskProxy;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.TCameraPresetService;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -111,17 +113,17 @@ public class MessageThread {
                     redisTemplate.opsForHash().putAll("upSystemParameter", Constant.paramMap);
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(clientHandler, true);
-                    //天气线程发天气
-                    WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
-                    //运行数据
-                    RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
-                    // 无人机机巢数据线程
-                    NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
-                    TaskExecutePool.getInstance().execute(nestRunThread);
-                    TaskExecutePool.getInstance().execute(runningThread);
+//                    //天气线程发天气
+//                    WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
+//                    //运行数据
+//                    RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+//                    // 无人机机巢数据线程
+////                    NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+////                    TaskExecutePool.getInstance().execute(nestRunThread);
+//                    TaskExecutePool.getInstance().execute(runningThread);
                     TaskExecutePool.getInstance().execute(heartBeatThead);
-                    //江苏要求
-                    TaskExecutePool.getInstance().execute(weatherThread);
+//                    //江苏要求
+//                    TaskExecutePool.getInstance().execute(weatherThread);
 
                     Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
                     List<XMLBaseModel> list = new ArrayList<>();
@@ -293,6 +295,17 @@ public class MessageThread {
                     log.info("--响应任务下发--" + re);
                 }
 
+            }
+            else if ("102".equals(xmlBaseModel.getCommand())) {
+                List<Map<String, Object>> list = xmlBaseModel.getItems();
+                if(CollectionUtils.isNotEmpty(list)) {
+                    Map<String,Object> map = list.get(0);
+                    String taskId = map.getOrDefault("taskId","").toString();
+                    String startTime = map.getOrDefault("startTime","").toString();
+                    String source = map.getOrDefault("source","").toString();
+                    UPatrolTaskProxy uPatrolTaskProxy = StaticContextAccessor.getBean(UPatrolTaskProxy.class);
+                    uPatrolTaskProxy.delete(taskId,startTime,source);
+                }
             }
         }
 

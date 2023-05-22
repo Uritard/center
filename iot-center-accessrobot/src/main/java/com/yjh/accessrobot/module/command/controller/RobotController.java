@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
@@ -529,4 +530,17 @@ public class RobotController {
         return messageHandlerStrategy;
     }
 
+    @PostMapping(value = "/deleteTransfer")
+    public Result deleteTransfer(@RequestParam(value = "edgeCode") List<String> edgeCode, @RequestParam(value = "taskId") String taskId
+        , @RequestParam(value = "startTime") String startTime, @RequestParam(value = "source") String source) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.deleteTransfer(edgeCode, taskId,startTime,source));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+
+        return result;
+    }
 }

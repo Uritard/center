@@ -18,6 +18,7 @@ import com.yjh.accessrobot.netty.thread.StandTaskDealThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,18 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("本级系统给下级{}响应了", robotCode);
+
+        if ("102".equals(xmlBaseModel.getCommand())) {
+            List<Map<String, Object>> list = xmlBaseModel.getItems();
+            if(CollectionUtils.isNotEmpty(list)) {
+                Map<String, Object> map = list.get(0);
+                String taskId = map.getOrDefault("taskId", "").toString();
+                String startTime = map.getOrDefault("startTime", "").toString();
+                String source = map.getOrDefault("source", "").toString();
+                robotService.deleteTask(taskId, startTime, source);
+                return;
+            }
+        }
 
         // 处理数据
         List<RobotPatrolTaskStatus> statusList = new ArrayList<>();

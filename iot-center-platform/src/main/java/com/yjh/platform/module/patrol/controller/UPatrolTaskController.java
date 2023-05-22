@@ -11,6 +11,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.SilentHandler;
@@ -54,6 +55,8 @@ public class UPatrolTaskController {
     private TPeriodModelDao tPeriodModelDao;
     @Autowired
     private LogsRecord logsRecord;
+    @Autowired
+    private RobotProxy robotProxy;
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
@@ -169,10 +172,11 @@ public class UPatrolTaskController {
     @Logs(title = "删除任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
     public Result delete(HttpServletRequest request,
                          @RequestParam(value = "taskId", required = true) String taskId,
-                         @RequestParam(value = "startTime", required = false) String startTime) {
+        @RequestParam(value = "startTime", required = false) String startTime,
+        @RequestParam(value = "source", required = false) String source) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime,request));
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime,source,request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);
@@ -434,4 +438,19 @@ public class UPatrolTaskController {
         }
         return result;
     }
+
+    @ApiOperation(value = "下级系统的静默监视数据")
+    @PostMapping(value = "/test")
+    public void test() {
+        Result result = new Result();
+        try {
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理静默监视巡视结果错误:", e);
+        }
+    }
+
+
 }

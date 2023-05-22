@@ -73,8 +73,8 @@ public interface TCPClientHandler {
         //构造注册消息
         //todo sendcode 要从配置文件里读取
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-            .setSendCode(getCruise())
-            .setReceiveCode(getServer())
+            .setSendCode("Edge01")
+            .setReceiveCode("Region01")
             .setType("251")
             .setCommand("1");
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
