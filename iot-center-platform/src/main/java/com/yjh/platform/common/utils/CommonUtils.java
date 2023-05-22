@@ -2,6 +2,7 @@ package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -476,5 +477,16 @@ public class CommonUtils {
     public static boolean containsChinese(String str) {
         Matcher matcher = PATTERN_CHINESE.matcher(str);
         return matcher.find();
+    }
+
+    public static Integer toInteger(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(str);
+        } catch (final NumberFormatException nfe) {
+            return null;
+        }
     }
 }

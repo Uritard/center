@@ -4,6 +4,7 @@
 
 package com.yjh.platform.common.utils;
 
+import com.yjh.commons.NamedThreadFactory;
 import com.yjh.platform.configuration.ThreadPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public enum ThreadPoolUtil {
         }
 
         threadPools = new ThreadPoolExecutor(coreSize, maxSize, ThreadPoolConfig.getKeepAliveTime(), TimeUnit.SECONDS, queue,
-            new CommonThreadFactory(namePre), rejectedExec);
+            new NamedThreadFactory(namePre), rejectedExec);
     }
 
     /**
@@ -110,31 +111,6 @@ public enum ThreadPoolUtil {
         message.append("当前工作线程数:").append(getActiveCount()).append(',').append("已添加线程数:").append(getTaskCount()).append(',')
             .append("已完成线程数:").append(getCompletedTaskCount()).append(',').append("阻塞队列缓存线程数:").append(getQueueSize()).append(',');
         return message.toString();
-    }
-
-    /**
-     * 给线程池线程默认的线程名
-     */
-    private class CommonThreadFactory implements ThreadFactory {
-        private final AtomicInteger count = new AtomicInteger();
-
-        private String namePrefix;
-
-        public CommonThreadFactory() {
-            this.namePrefix = "Common-pool-Thread";
-        }
-
-        public CommonThreadFactory(String namePrefix) {
-            this.namePrefix = namePrefix;
-        }
-
-        @Override
-        public Thread newThread(@NonNull Runnable r) {
-            int c = count.incrementAndGet();
-            Thread t = new Thread(r);
-            t.setName(namePrefix + "-" + c);
-            return t;
-        }
     }
 
     private class DelayRunsPolicy implements RejectedExecutionHandler {

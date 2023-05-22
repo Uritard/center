@@ -4,7 +4,6 @@ package com.yjh.platform.module.task.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 //import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -239,7 +238,7 @@ public class TWarnInfoController {
                 logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TWarnInfoDetail> list = tWarnInfoService.WarnConfirm(warnLevel, confMode,startTime,endTime,deviceName,defectType,meteName);
+            List<TWarnInfoDetail> list = tWarnInfoService.warnConfirm(warnLevel, confMode,startTime,endTime,deviceName,defectType,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
