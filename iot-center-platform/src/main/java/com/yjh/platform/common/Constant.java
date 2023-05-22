@@ -180,6 +180,11 @@ public class Constant {
      * 是否开启修改同步模型
      */
     private static Boolean updateSyncModel;
+    /**
+     * 下级上报结束等待次数
+     */
+    private static int endWaitTimes;
+
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
@@ -311,12 +316,25 @@ public class Constant {
         return standardPoints;
     }
 
+    public static int endWaitTimes() {
+        if (endWaitTimes == 0) {
+            try {
+                endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
+                log.warn("taskFinishWaitTimes is {}", endWaitTimes);
+            } catch (Exception e) {
+                endWaitTimes = 8;
+            }
+        }
+        return endWaitTimes;
+    }
+
     public static void refreshPacketLog() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
         standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
+        endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
     }
 
     /**

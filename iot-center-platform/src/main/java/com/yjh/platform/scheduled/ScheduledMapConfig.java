@@ -1,12 +1,15 @@
 package com.yjh.platform.scheduled;
 
-import org.apache.commons.lang3.StringUtils;
+import com.yjh.commons.NamedThreadFactory;
+import com.yjh.platform.configuration.ThreadPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
+import java.util.function.Predicate;
 
 /**
  * @Author jinyujiang
@@ -14,65 +17,77 @@ import java.util.concurrent.ScheduledFuture;
  * @Date create in 2023/4/19 16:41
  */
 public class ScheduledMapConfig {
-    private static Map<String, ScheduledFuture> scheduledFutureMap = new ConcurrentHashMap<>();
-    private static Map<String, Integer> scheduledRunTimesMap = new ConcurrentHashMap<>();
-    private static final Integer MAX_RUN_TIMES = 8;
-    private static Logger log = LoggerFactory.getLogger(ScheduledMapConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledMapConfig.class);
 
-    public static void add(String key, ScheduledFuture scheduledFuture) {
-        log.info("创建定时任务，key: {}", key);
-        if (StringUtils.isNotEmpty(key) && scheduledFuture != null) {
-            scheduledFutureMap.put(key, scheduledFuture);
-        }
-    }
+    private static final ScheduledThreadPoolExecutor
+        SCHEDULED_THREAD_POOLS = new ScheduledThreadPoolExecutor(ThreadPoolConfig.getScheduledPoolSize(), new NamedThreadFactory("plartform-scheduled"));
 
-    public static ScheduledFuture get(String key) {
-        if (StringUtils.isNotEmpty(key)) {
-            return scheduledFutureMap.get(key);
-        }
-
-        return null;
-    }
-
-    public static void remove(String key) {
-        log.info("移除定时任务，key: {}", key);
-        if (StringUtils.isEmpty(key)) {
-            return;
-        }
-
-        if (scheduledFutureMap.containsKey(key)) {
-            ScheduledFuture scheduledFuture = get(key);
-            boolean result = scheduledFuture.cancel(false);
-            if (result) {
-                scheduledFutureMap.remove(key);
-
-                if (scheduledRunTimesMap.containsKey(key)) {
-                    scheduledRunTimesMap.remove(key);
-                }
-            }
-        }
+    private ScheduledMapConfig(){
+        // nothing to do
     }
 
     /**
-     * 记录定时任务已执行次数，并判断是否需要移除
-     *
-     * @param key key
+     * 指定多长时间执行一次，一共执行多少次，若执行方法返回true或者达到执行次数，则不再执行
+     * @param seconds 多长时间执行一次
+     * @param numRetries 执行次数
+     * @param taskFunction 执行内容
      */
-    public static void countAndClean(String key) {
-        log.info("计算定时任务执行次数，并判断是否需要移除，key: {}", key);
-        Integer scheduledRunTimes = scheduledRunTimesMap.get(key);
-        if (scheduledRunTimes == null) {
-            scheduledRunTimes = 1;
-        } else {
-            scheduledRunTimes++;
-        }
+    public static void schedule(int seconds, int numRetries, BooleanSupplier taskFunction) {
+        int nextRetries = numRetries - 1;
+        SCHEDULED_THREAD_POOLS.schedule(() -> {
+            boolean succ = false;
+            try {
+                succ = taskFunction.getAsBoolean();
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            if (!succ && nextRetries > 0) {
+                schedule(seconds, nextRetries, taskFunction);
+            } else if (!succ) {
+                LOGGER.error("schedule task return false");
+            }
 
-        if (scheduledRunTimes > MAX_RUN_TIMES) {
-            log.info("定时任务超过最大执行次数，需要移除，key: {}", key);
-            remove(key);
-        } else {
-            scheduledRunTimesMap.put(key, scheduledRunTimes);
-            log.info("定时任务未超过最大执行次数，key: {}， 已执行次数:{}", key, scheduledRunTimes);
-        }
+        }, seconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 指定多长时间执行一次，一共执行多少次，若执行方法返回true或者达到执行次数，则不再执行
+     * 会向执行方法传入一个参数表示已经执行了多少次
+     * @param seconds 多长时间执行一次
+     * @param numRetries 执行次数
+     * @param taskFunction 执行内容
+     */
+    public static void schedule(int seconds, int numRetries, Predicate<Integer> taskFunction) {
+        schedule(seconds, numRetries, 0, taskFunction);
+    }
+
+    /**
+     * 内部实现，指定多长时间执行一次，一共执行多少次，若执行方法返回true或者达到执行次数，则不再执行
+     * 会向执行方法传入一个参数表示已经执行了多少次
+     * @param seconds 多长时间执行一次
+     * @param numRetries 执行次数
+     * @param times 已经执行次数
+     * @param taskFunction 执行内容
+     */
+    private static void schedule(int seconds, int numRetries, int times, Predicate<Integer> taskFunction) {
+        SCHEDULED_THREAD_POOLS.schedule(() -> {
+            int currTimes = times + 1;
+            boolean succ = taskFunction.test(currTimes);
+            if (!succ && numRetries - currTimes > 0) {
+                schedule(seconds, numRetries, currTimes, taskFunction);
+            } else if (!succ) {
+                LOGGER.error("schedule task return false");
+            }
+
+        }, seconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 指定时间段后执行一次
+     * @param seconds 多长时间后执行
+     * @param taskFunction 执行内容
+     */
+    public static void schedule(int seconds, IntConsumer taskFunction) {
+        SCHEDULED_THREAD_POOLS.schedule(() -> taskFunction.accept(1), seconds, TimeUnit.SECONDS);
     }
 }

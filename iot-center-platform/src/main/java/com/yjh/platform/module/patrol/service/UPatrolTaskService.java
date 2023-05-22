@@ -140,8 +140,6 @@ public class UPatrolTaskService {
     private JobManager jobManager;
     @Autowired
     private ApplicationProperties applicationProperties;
-    @Autowired
-    private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     @Autowired
     private LogsRecord logsRecord;
@@ -649,17 +647,7 @@ public class UPatrolTaskService {
 
             if (robotEnd) {
                 String taskIdFinal = taskId;
-                // 机器人/下级系统任务终止
-                ScheduledFuture scheduledFuture = threadPoolTaskScheduler.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        dealRobotTaskShutDown(taskIdFinal, robotCode, robotId);
-                        ScheduledMapConfig.countAndClean(taskIdFinal);
-                    }
-                }, new CronTrigger("0/15 * * * * ?"));
-
-                // 将定时任务句柄存储缓存队列，方便后续取消定时任务操作
-                ScheduledMapConfig.add(taskIdFinal, scheduledFuture);
+                ScheduledMapConfig.schedule(15, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, t));
             }
 
             if (robotId != null){
@@ -833,14 +821,14 @@ public class UPatrolTaskService {
      * @param robotCode robotCode
      * @param robotId robotId
      */
-    public void dealRobotTaskShutDown(String taskId, String robotCode, Long robotId) {
+    public boolean dealRobotTaskShutDown(String taskId, String robotCode, Long robotId, int times) {
         log.info("处理机器人上报任务结束,参数：taskId:{}, robotCode:{}, robotId:{},", taskId, robotCode, robotId);
 
         String key = PATROL_SUMMARY_PREFIX + taskId;
         String taskSource = (String)redisTemplate.opsForHash().get(key, "taskSource");
         if ("1".equals(taskSource)) {
             forceCompletionTask(taskId);
-            return;
+            return true;
         }
 
         String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
@@ -851,9 +839,18 @@ public class UPatrolTaskService {
             return null;
         });
 
-        resultMap.forEach(result -> {
-            dealOneRobotTask(result, taskId, robotCode, robotId, cruiseResultKey);
-        });
+        int ret = 1;
+        for (Map<String, String> result : resultMap) {
+            int check = dealOneRobotTask(result, taskId, robotCode, robotId, cruiseResultKey, times);
+            // check 0:正常 1:未执行 2:调用算法超时 -1:算法调用未结束 10:非当前节点数据
+            // 如果check=10，表示有非当前节点数据，则机器人上报结束就不用重复调用
+            if (check == -1 && ret != 0) {
+                ret = -1;
+            } else if (check == 10) {
+                ret = 0;
+            }
+        }
+        return ret != -1;
     }
 
     /**
@@ -862,12 +859,11 @@ public class UPatrolTaskService {
      * @param result result
      * @param robotCode robotCode
      * @param robotId robotId
-     * @param cruiseResultKey cruiseResultKey
-     * @return result 0:正常 1:未执行 2:调用算法超时
+     * @param times 当前处理已经执行次数
+     * @return result 0:正常,已完成 1:未执行 2:调用算法超时 -1:算法调用未结束 10:非当前节点数据
      */
-    private int checkProcessTime(Map<String, String> result, String robotCode, Long robotId, String cruiseResultKey) {
+    private int checkProcessTime(Map<String, String> result, String robotCode, Long robotId, int times) {
         int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
-        String instanceId = result.get("instanceId");
         boolean inNode; // 判断当前节点是否在任务结束节点范围内，包括机器人/无人机/下级节点
         if (robotId == null) {
             // 是下级节点
@@ -877,23 +873,23 @@ public class UPatrolTaskService {
             inNode = robotId == MapUtils.getLongValue(result, "robotId");
         }
 
-        if (inNode && CRUISE_STATE_UN == cruiseState) {
+        if (!inNode) {
+            return 10;
+        }
+
+        if ((CRUISE_STATE_UN == cruiseState || CRUISE_STATE_ANALYSE_DOING == cruiseState) && times < Constant.endWaitTimes()) {
+            // 如果点位状态未执行，或算法分析中，多等待几轮
+            return -1;
+        }
+
+        if (CRUISE_STATE_UN == cruiseState) {
+            // 未执行
             return 1;
         }
 
-        if (inNode && CRUISE_STATE_ANALYSE_DOING == cruiseState) {
-            String instanceKey = cruiseResultKey + instanceId;
-            Integer attempts = 1;
-            String attemptStr = result.get("attempts");
-            if (attemptStr != null) {
-                attempts = Integer.valueOf(attemptStr);
-            }
-
-            // 将重试次数写回redis
-            redisTemplate.opsForHash().put(instanceKey, "attempts", (++attempts).toString());
-            if (attempts > 8) {
-                return 2;
-            }
+        if (CRUISE_STATE_ANALYSE_DOING == cruiseState) {
+            // 算法分析中
+            return 2;
         }
 
         return 0;
@@ -908,11 +904,11 @@ public class UPatrolTaskService {
      * @param robotId robotId
      * @param cruiseResultKey cruiseResultKey
      */
-    private void dealOneRobotTask(Map<String, String> result, String taskId, String robotCode, Long robotId, String cruiseResultKey) {
+    private int dealOneRobotTask(Map<String, String> result, String taskId, String robotCode, Long robotId, String cruiseResultKey, int times) {
         //判断是不是机器人的点以及还是否完成
         int cruiseType = MapUtils.getIntValue(result, "cruiseType");
         String instanceId = result.get("instanceId");
-        int check = checkProcessTime(result, robotCode, robotId, cruiseResultKey);
+        int check = checkProcessTime(result, robotCode, robotId, times);
         if (1 == check) {
             //这个点 没有做
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
@@ -959,6 +955,8 @@ public class UPatrolTaskService {
 
             patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
         }
+
+        return check;
     }
 
     /**
@@ -1682,48 +1680,49 @@ public class UPatrolTaskService {
             log.info("tasKeys size: {}", tasKeys.size());
 
             // 暂停15秒等待未接收数据完成接收
-            Thread.sleep(15000);
+            ScheduledMapConfig.schedule(15, t -> {
+                List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
+                    tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                    return null;
+                });
 
-            List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
-                tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
-                return null;
-            });
+                log.info("taskInfoList size: {}", taskInfoList.size());
 
-            log.info("taskInfoList size: {}", taskInfoList.size());
-
-            if(taskInfoList.size() != 0) {
-                SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                List<Map<String, String>> skipPointList = new ArrayList<>();
-                for (Map<String, String> taskInfo : taskInfoList) {
-                    if (MapUtils.isNotEmpty(taskInfo)) {
-                        //count = count+1;
-                        if (CommonUtils.isEmptyOrNullstr(taskInfo.get("cruiseResult"))) {
-                            //任务终止
-                            taskInfo.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                            taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
-                            taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
-                            taskInfo.put("cruiseTime",simpleDateFormat.format(new Date()));
-                            taskInfo.put("resultNum", "-1");
-                            taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : "任务终止");
-                            skipPointList.add(taskInfo);
+                if (taskInfoList.size() != 0) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    List<Map<String, String>> skipPointList = new ArrayList<>();
+                    for (Map<String, String> taskInfo : taskInfoList) {
+                        if (MapUtils.isNotEmpty(taskInfo)) {
+                            //count = count+1;
+                            if (CommonUtils.isEmptyOrNullstr(taskInfo.get("cruiseResult"))) {
+                                //任务终止
+                                taskInfo.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                                taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
+                                taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+                                taskInfo.put("cruiseTime", simpleDateFormat.format(new Date()));
+                                taskInfo.put("resultNum", "-1");
+                                taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : "任务终止");
+                                skipPointList.add(taskInfo);
+                            }
+                            // todo 任务终止 上报站端
                         }
-                        // todo 任务终止 上报站端
                     }
+                    log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
+                    ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, taskId));
                 }
-                log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
-                ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, taskId));
-            }
 
-            log.info("任务终止成功=={}", taskId);
+                log.info("任务终止成功=={}", taskId);
+
+                //任务状态上报站端
+                // sendTaskStateToUp(task, 4);
+                uPatrolResultDao.update(uPatrolResult);
+
+                lowTaskGoOn(taskId);
+            });
         } catch (Exception e) {
             log.info("任务终止失败", e);
         }
 
-        //任务状态上报站端
-        // sendTaskStateToUp(task, 4);
-        uPatrolResultDao.update(uPatrolResult);
-
-        lowTaskGoOn(taskId);
     }
 
     /**
@@ -2055,9 +2054,12 @@ public class UPatrolTaskService {
      * @param taskId 任务id
      */
     private void completionOfTask(String taskId) {
-        try {
-            Thread.sleep(15000);
+        // 延迟15秒执行
+        ScheduledMapConfig.schedule(15, t -> completionOfTaskDone(taskId));
+    }
 
+    private void completionOfTaskDone(String taskId) {
+        try {
             int taskStatus;
             int all;
             boolean ended;
@@ -2856,7 +2858,7 @@ public class UPatrolTaskService {
     }
 
     private String taskStatusToString(String state) {
-        if (!org.springframework.util.StringUtils.isEmpty(state)) {
+        if (!StringUtils.isEmpty(state)) {
             //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
             if ("1".equals(state)) {
                 state = "已执行";
