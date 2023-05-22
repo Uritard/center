@@ -2,10 +2,12 @@ package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
 import com.yjh.platform.module.task.entity.TCruiseTriphaseRule;
 import com.yjh.platform.module.task.dao.TCruiseTriphaseRuleDao;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,10 @@ public class TCruiseTriphaseRuleService {
         if(checkExist>0){
             throw new BusinessException("该非同源告警规则关联的巡视点已绑定其他非同源告警规则！");
         }else {
+            String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
+            if (!NumberUtils.isParsable(warnThreshold)) {
+                throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+            }
             tCruiseTriphaseRule.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceOneId()));
             tCruiseTriphaseRule.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTwoId()));
             tCruiseTriphaseRule.setTriCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTriId()));
@@ -48,6 +54,10 @@ public class TCruiseTriphaseRuleService {
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseTriphaseRule tCruiseTriphaseRule) {
+        String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
+        if (!NumberUtils.isParsable(warnThreshold)) {
+            throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+        }
         tCruiseTriphaseRule.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceOneId()));
         tCruiseTriphaseRule.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTwoId()));
         tCruiseTriphaseRule.setTriCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTriId()));
