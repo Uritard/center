@@ -545,7 +545,7 @@
         ORDER BY f.cruise_time DESC
     </select>
 
-    <select id="selectCruiseDataReport" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
+    <select id="selectCruiseDataReport" resultMap="cruiseDataReport">
         SELECT a.device_mete_id,
         a.mete_type,
         a.meter_type,
