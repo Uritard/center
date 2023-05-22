@@ -172,7 +172,8 @@ public class UPatrolDataResultController {
                                          @RequestParam(value = "endTime", required = false) String endTime,
                                          @RequestParam(value = "startTime", required = false) String startTime,
                                          @RequestParam(value = "stationName", required = false) String stationName,
-                                         @RequestParam(value = "typeString") String typeString) {
+                                         @RequestParam(value = "typeString") String typeString,
+                                         HttpServletRequest request) {
 
         Result result = new Result();
         try {
@@ -198,7 +199,7 @@ public class UPatrolDataResultController {
             }
 
             List<Map<String, Object>> cruiseResultAnalyzeInfoList = uPatrolDataResultService.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
-
+            String userId = request.getHeader("userId") + "_" + request.getHeader("token");
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
@@ -219,7 +220,7 @@ public class UPatrolDataResultController {
                     List<List<String>> contents = Lists.newArrayList();
                     cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
                         List<String> content = Lists.newArrayList();
-                        strings.forEach(s -> content.add(String.valueOf(cruiseResult.get(ExportUtil.map.get(s)))));
+                        strings.forEach(s -> content.add(String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""))));
                         contents.add(content);
                     });
                     ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
@@ -239,7 +240,7 @@ public class UPatrolDataResultController {
                     jasonMap.put("type", "cruiseDataReport");
                     jasonMap.put("url", fileRelativePath);
                     try {
-                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

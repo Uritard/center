@@ -8,6 +8,7 @@ import com.yjh.gateway.commons.result.ResultCodeEnum;
 import com.yjh.gateway.module.gateway.service.RefreshRouteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +48,15 @@ public class RouteController {
 
     @ApiOperation(value = "同步到websocket")
     @PostMapping(value = "/syncWebsocket")
-    public Result syncWebsocketInfo(@RequestParam(value = "json") String json) {
+    public Result syncWebsocketInfo(@RequestParam(value = "json") String json,
+                                    @RequestParam(value = "userId", required = false) String userId) {
         Result result = new Result();
         try {
-            WebSocketServer.sendMsg(json);
+            if (StringUtils.isNotEmpty(userId)) {
+                WebSocketServer.sendToOther(json, userId);
+            } else {
+                WebSocketServer.sendMsg(json);
+            }
             result.setData("同步到websocket");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

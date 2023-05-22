@@ -7,6 +7,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.user.entity.Channel;
 import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
@@ -22,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,32 +188,37 @@ public class Constant {
     private static int endWaitTimes;
 
 
-    public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
-        //将websocket信息写入redis
-        String json= JSON.toJSONString(map);
-        //WebSocketServer.sendMsg(json);
-        // String.valueOf(map);
-        if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
-                || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
-            redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);
+    public static String websocketSendMsg(String url, Map<String, String> map) throws IOException {
+        return websocketSendMsg(url, map, null);
+    }
+
+    public static String websocketSendMsg(String url, Map<String, String> map, String userId) throws IOException {
+        // 将WebSocket信息写入Redis
+        String json = JSON.toJSONString(map);
+        String type = "type";
+        if (ArrayUtils.contains(new String[]{"logError", "newTask", "newLinkage", "newAlarm", "alarmPopUp", "linkagePopUp"}, map.get(type))) {
+            redisTemplate.opsForValue().set(map.get("type"), String.valueOf(map), 5, TimeUnit.MINUTES);
         }
 
         CloseableHttpClient client = HttpClients.createDefault();
         String result = "";
         try {
-            URI uri = new URIBuilder(url).setParameter("json", json).build();
-            HttpPost httpGet = new HttpPost(uri);
-            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
-            httpGet.setHeader("Accept", "application/json");
-            httpGet.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
-            CloseableHttpResponse response = client.execute(httpGet);
+            URIBuilder uriBuilder = new URIBuilder(url).setParameter("json", json);
+            if (userId != null) {
+                uriBuilder.addParameter("userId", userId);
+            }
+            URI uri = uriBuilder.build();
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+            CloseableHttpResponse response = client.execute(httpPost);
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return result;
-        //return "666";
     }
 
     public static boolean isPacketLog() {

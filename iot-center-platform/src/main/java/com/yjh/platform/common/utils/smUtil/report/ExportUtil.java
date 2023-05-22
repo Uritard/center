@@ -53,7 +53,7 @@ public class ExportUtil {
         put("巡视图片", "origpic");
         put("审核值", "personCheck");
         put("审核结果", "identifyResultName");
-        put("采集信息", "resultDesc");
+        put("巡视值", "resultDesc");
         put("表计类型", "meterTypeName");
         put("间隔名称", "upRegionName");
         put("设备名称", "deviceName");

@@ -213,6 +213,14 @@ public class WebSocketServer {
         });
     }
 
+    public static void sendToOther(String message, String userId){
+        webSocketMap.forEach((k,v) ->{
+            if (k.contains(userId)){
+                v.session.getAsyncRemote().sendText(message);
+            }
+        });
+    }
+
     public static void sendMsgBuffer(ByteBuffer bytesAtTime){
         webSocketMap.forEach((k,v) ->{
             v.session.getAsyncRemote().sendBinary(bytesAtTime);
