@@ -102,6 +102,7 @@
         a.algorithm_code,
         a.analyse_type,
         a.is_ai,
+        a.defect_level,
         a.defect_type
         from t_algorithm_info a
         where 1 = 1

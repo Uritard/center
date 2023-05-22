@@ -2,6 +2,7 @@ package com.yjh.platform.common.utils;
 
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -114,11 +115,11 @@ public class ResultConvertUtil {
      */
     public static String convertBJResult(String result) {
         if (StringUtils.isNotEmpty(result)){
-            if (!result.matches("\\.*\\d+.*")){
+            if (CommonUtils.containsChinese(result)){
                 //汉字
                 return convertResult(result);
             } else {
-                return result;
+                return CommonUtils.getNumberStr(result);
             }
         }
         return "0";
