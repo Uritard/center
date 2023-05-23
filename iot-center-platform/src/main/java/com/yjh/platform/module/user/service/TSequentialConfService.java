@@ -1,12 +1,14 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.druid.sql.ast.statement.SQLForeignKeyImpl;
+import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
@@ -710,12 +712,12 @@ public class TSequentialConfService{
     }
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
+        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
 
         try{
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+
             String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
@@ -737,7 +739,7 @@ public class TSequentialConfService{
                     new OutputStreamWriter(
                             new FileOutputStream(txt), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
 
-            bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
+            bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+ DateTimeUtil.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::控制状态信息>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\t联动指令\r\n");
             bw.write("#1\t"+1+"\t"+cfgDeviceId+"\t"+tCfgDevice.getDeviceName()+"\t"+"遥控"+"\t"+order+"\r\n");
@@ -760,9 +762,9 @@ public class TSequentialConfService{
                 Constant.otherServer(mapForSend, Constant.UDP_SEND);
             }
         } catch (IOException e) {
-            log.error("生成顺控确认文件失败" + e);
+            log.error("生成顺控确认文件失败:", e);
         } catch (Exception e) {
-            log.error("发送顺控确认文件失败" + e);
+            log.error("发送顺控确认文件失败:", e);
         }
 
         return "ok";

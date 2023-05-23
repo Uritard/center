@@ -223,8 +223,7 @@ public class TCameraScreenController {
                                             HttpServletRequest request) {
         Result result = new Result();
         try {
-//            Long userId=Long.valueOf(request.getHeader("userId"));
-            Long userId =10001L;
+            Long userId=Long.valueOf(request.getHeader("userId"));
 //            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null,userId));
             result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName,flag, null,userId,level,id));
         } catch (Exception e) {

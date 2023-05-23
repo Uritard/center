@@ -36,9 +36,8 @@ public class StatisticsController {
   @ApiOperation(value = "机器人/无人机可靠性")
   @GetMapping(value = "/robot")
   @Logs(title = "机器人/无人机可靠性",content = "根据用户传递的参数查询机器人/无人机可靠性",logType = 1, authority = "1234")
-  public Result robot(
-      @RequestParam(value = "id", required = false) Long id,
-      @RequestParam(value = "type") String type) {
+  public Result robot(@RequestParam(value = "id", required = false) Long id,
+                      @RequestParam(value = "type") String type) {
     Result result = new Result();
     try {
       result.setData(statisticsService.selectStatisticsRobot(id, type));
