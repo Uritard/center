@@ -741,26 +741,24 @@ public class PatrolResultHandler {
     }
 
     public Map<String, String> voiceAlarmHandler(String resultValue, Map<String, String> cruiseResultMap) {
-        if (!StringUtils.containsAny(resultValue, "DB:", "F:")) {
+        /*if (!StringUtils.containsAny(resultValue, "Db", "Hz")) {
             log.warn("voice is not analyse, resultValue: {}, cruiseResultMap: {}", resultValue, JSON.toJSONString(cruiseResultMap));
-        }
-        Long cruiseId = org.apache.commons.collections4.MapUtils.getLongValue(cruiseResultMap, "cruiseId");
+        }*/
+        Long cruiseId = MapUtils.getLongValue(cruiseResultMap, "cruiseId");
         VoiceDeviceAllInfoDetail voiceDevice = tVoiceDeviceService.selectByPrimaryId(cruiseId);
 
-        String[] restVals = resultValue.split(" ");
+        String[] restVals = resultValue.split(",");
         Map<String, Integer> voiceMap = new HashMap<>(8);
-        for (String ret : restVals) {
-            String[] rets = StringUtils.split(ret,":");
-            if (rets.length >= 2) {
-                voiceMap.put(rets[0], NumberUtils.toInt(rets[1]));
-            }
+        String resultDesc;
+        if (restVals.length >= 2) {
+            voiceMap.put("DB", NumberUtils.toInt(restVals[0]));
+            voiceMap.put("F", NumberUtils.toInt(restVals[1]));
+            resultDesc = restVals[0] + "Db," + restVals[1] + "Hz";
+        } else {
+            voiceMap.put("DB", NumberUtils.toInt(restVals[0]));
+            resultDesc = ResultConvertUtil.convertDesc(resultValue, cruiseResultMap.get("unit"));
         }
-        String resultDesc = cruiseResultMap.get("resultDesc");
-        StringBuilder retDesc = new StringBuilder();
-        if (StringUtils.isEmpty(resultDesc)) {
-            retDesc.append(ResultConvertUtil.convertDesc(resultValue, cruiseResultMap.get("unit")));
-            cruiseResultMap.put("resultDesc", retDesc.toString());
-        }
+        cruiseResultMap.put("resultDesc", resultDesc);
 
         int warnDbVal = NumberUtils.toInt(voiceDevice.getDbValue());
         int maxDbVal = voiceMap.getOrDefault("DB", 0);
@@ -797,14 +795,14 @@ public class PatrolResultHandler {
             warnMap.put("imagePath", cruiseResultMap.get("picpath"));
             warnMap.put("voicePath", cruiseResultMap.get("voicePath"));
             warnMap.put("confMode", "276");
-            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "巡视任务"));
-            warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
+            warnMap.put("alarmSource", DictConvertUtil.DICT.getDictCode("alarmSource", "声纹"));
+            warnMap.put("defectModel", DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
 
             log.info("Alarm value is reached(遥测)");
             warnMap.put("warnName", meteName + alarmPrefix + "数据异常");
             warnMap.put("warnTime", DateTimeUtil.format(new Date()));
 
-            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
+            warnMap.put("warnLevel", DictConvertUtil.DICT.getDictCode("alarmLevel", "一般告警"));
             warnMap.put("warnContent", meteName + alarmPrefix + ":" + resultValue + "--" + "一般告警");
             warnMap.put("outRange", String.valueOf(outRang));
 
@@ -820,7 +818,7 @@ public class PatrolResultHandler {
             TWarnInfo tWarnInfo = getWarnInfo(warnMap);
             analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
-            Map<String, String> infoMap = new HashMap<>(5);
+            Map<String, String> infoMap = new HashMap<>(8);
             infoMap.put("alarmLevel", String.valueOf(tWarnInfo.getWarnLevel()));
             infoMap.put("flag", "warn");
             infoMap.put("defectModel", String.valueOf(tWarnInfo.getDefectModel()));

@@ -647,7 +647,8 @@ public class UPatrolTaskService {
 
             if (robotEnd) {
                 String taskIdFinal = taskId;
-                ScheduledMapConfig.schedule(15, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, t));
+                int fanalTaskState = taskState;
+                ScheduledMapConfig.schedule(15, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
             }
 
             if (robotId != null){
@@ -737,6 +738,11 @@ public class UPatrolTaskService {
             redisTemplate.opsForHash().put(key, "taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             return;
         }*/
+        int oldState = MapUtils.getIntValue(countMap, "taskState", TASK_STATE_NOT_START);
+        if (oldState == TASK_STATE_FINISHED || oldState == TASK_STATE_INTERRUPT || oldState == TASK_STATE_ABNORMAL || oldState == TASK_STATE_TIMEOUT) {
+            log.warn("任务已经结束，不可更改状态， taskId: {}, taskState: {}, newState: {}", taskId, oldState, taskState);
+            return;
+        }
 
         // 是否下级主动创建任务
         boolean subCreateTask = "1".equals(countMap.get("taskSource"));
@@ -821,7 +827,7 @@ public class UPatrolTaskService {
      * @param robotCode robotCode
      * @param robotId robotId
      */
-    public boolean dealRobotTaskShutDown(String taskId, String robotCode, Long robotId, int times) {
+    public boolean dealRobotTaskShutDown(String taskId, String robotCode, Long robotId, int taskState, int times) {
         log.info("处理机器人上报任务结束,参数：taskId:{}, robotCode:{}, robotId:{},", taskId, robotCode, robotId);
 
         String key = PATROL_SUMMARY_PREFIX + taskId;
@@ -841,7 +847,7 @@ public class UPatrolTaskService {
 
         int ret = 1;
         for (Map<String, String> result : resultMap) {
-            int check = dealOneRobotTask(result, taskId, robotCode, robotId, cruiseResultKey, times);
+            int check = dealOneRobotTask(result, taskId, robotCode, robotId, cruiseResultKey, taskState, times);
             // check 0:正常 1:未执行 2:调用算法超时 -1:算法调用未结束 10:非当前节点数据
             // 如果check=10，表示有非当前节点数据，则机器人上报结束就不用重复调用
             if (check == -1 && ret != 0) {
@@ -904,7 +910,7 @@ public class UPatrolTaskService {
      * @param robotId robotId
      * @param cruiseResultKey cruiseResultKey
      */
-    private int dealOneRobotTask(Map<String, String> result, String taskId, String robotCode, Long robotId, String cruiseResultKey, int times) {
+    private int dealOneRobotTask(Map<String, String> result, String taskId, String robotCode, Long robotId, String cruiseResultKey, int taskState, int times) {
         //判断是不是机器人的点以及还是否完成
         int cruiseType = MapUtils.getIntValue(result, "cruiseType");
         String instanceId = result.get("instanceId");
@@ -931,8 +937,9 @@ public class UPatrolTaskService {
             }
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));//执行遗漏
             result.put("resultNum", "-1");
-            result.put("resultDesc", rname + "任务异常");
-            result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
+            String desc = taskState == CruiseConstant.TASK_STATE_TIMEOUT ? "超期" : rname + "任务异常";
+            result.put("resultDesc", desc);
+            result.put("cruiseAbnormal", String.valueOf(taskState == CruiseConstant.TASK_STATE_TIMEOUT ? CruiseConstant.CRUISE_ABNORMAL_TIMEOUT : CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));
@@ -3023,11 +3030,16 @@ public class UPatrolTaskService {
      * @return
      */
     public UPatrolTask omitInstanceRetry(List<Long> instanceIdList,UPatrolTask uPatrolTaskParam) {
+        if (!Constant.isHost()) {
+            log.info("当前任务 \"{}\" 非巡视主机，不执行重试！",uPatrolTaskParam.getTaskName());
+            return null;
+        }
         Object retry = redisTemplate.opsForValue().get(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId());
         if (Objects.nonNull(retry)) {
             log.info("当前任务 \"{}\"为重试任务不再重试！",uPatrolTaskParam.getTaskName());
             return null;
         }
+
         redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId(),"done",3,TimeUnit.DAYS);
 
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();

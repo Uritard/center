@@ -31,9 +31,9 @@ public class RestTemplateConfig {
     public HttpClientConnectionManager poolingConnectionManager() {
         PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
         // 连接池最大连接数
-        poolingConnectionManager.setMaxTotal(10);
+        poolingConnectionManager.setMaxTotal(50);
         // 每个主机的并发
-        poolingConnectionManager.setDefaultMaxPerRoute(5);
+        poolingConnectionManager.setDefaultMaxPerRoute(30);
         return poolingConnectionManager;
     }
 
@@ -49,7 +49,7 @@ public class RestTemplateConfig {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setHttpClient(httpClientBuilder().build());
         factory.setReadTimeout(20000);
-        factory.setConnectTimeout(20000);
+        factory.setConnectTimeout(60000);
         factory.setConnectionRequestTimeout(20000);
         return factory;
     }

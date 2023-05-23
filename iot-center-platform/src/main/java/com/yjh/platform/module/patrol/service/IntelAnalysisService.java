@@ -336,6 +336,7 @@ public class IntelAnalysisService {
         analysis.setInstanceId(-1L);
         analysis.setPicPath(picTargetPath);
         analysis.setPicModelPath(picModelPath);
+        analysis.setTargetParent("presetCheck");
         analysis.setIsAi(1);
 
         return Arrays.asList(analysis);
@@ -370,8 +371,9 @@ public class IntelAnalysisService {
         analyseObject.setObjectId(instanceId);
 
         String picPath = analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(), redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString());
-        String targetNamePath = upLoadFileByHttpPath(picPath);
-        String modelNamePath = upLoadFileByHttpPath(analysis.getPicModelPath());
+        String targetParent = StringUtils.isEmpty(analysis.getTargetParent()) ? "" : analysis.getTargetParent() + "/";
+        String targetNamePath = upLoadFileByHttpPath(picPath, targetParent);
+        String modelNamePath = upLoadFileByHttpPath(analysis.getPicModelPath(), targetParent);
         List<String> imageUrlList = new ArrayList<>();
         imageUrlList.add(targetNamePath);
         analyseObject.setImageUrlList(imageUrlList);
@@ -386,10 +388,10 @@ public class IntelAnalysisService {
      * @param httpPath httpPath
      * @return result
      */
-    private String upLoadFileByHttpPath(String httpPath) {
+    private String upLoadFileByHttpPath(String httpPath, String targetParent) {
         try {
             String[] split = httpPath.split("/");
-            String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
+            String targetNamePath = targetParent + split[split.length - 2] + "/" + split[split.length - 1];
             uploadFileToFtps(httpPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             return targetNamePath;
         } catch (Exception e) {
@@ -548,7 +550,8 @@ public class IntelAnalysisService {
             analyseObject.setObjectId(instanceId);
 
             String[] split = analysis.getPicPath().split("/");
-            String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
+            String targetParent = StringUtils.isEmpty(analysis.getTargetParent()) ? "" : analysis.getTargetParent() + "/";
+            String targetNamePath =  targetParent + split[split.length - 2] + "/" + split[split.length - 1];
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);

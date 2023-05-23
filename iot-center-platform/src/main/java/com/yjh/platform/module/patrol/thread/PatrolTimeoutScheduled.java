@@ -67,8 +67,8 @@ public class PatrolTimeoutScheduled {
         int timeOut = NumberUtils.toInt(tasksAreTime);
 
         if (!Constant.isHost()) {
-            // 边缘节点和上级系统超时时间加长30分钟，避免和巡视主机一致
-            timeOut += 30;
+            // 边缘节点和上级系统超时时间加长13分钟，避免和巡视主机一致
+            timeOut += 13;
         }
 
         List<TaskSimpleInfo> runningList = uPatrolResultDao.selectTaskIsRunning();

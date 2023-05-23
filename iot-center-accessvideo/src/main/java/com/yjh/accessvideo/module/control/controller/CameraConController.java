@@ -262,7 +262,8 @@ public class CameraConController {
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
 //    @Logs(title = "相机抓图",content = "根据用户传递的参数控制相机抓图",logType = 5, authority = "1234,1235")
     public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId,
-                                 @RequestParam(value = "meteName", required = false) String meteName) {
+                                 @RequestParam(value = "meteName", required = false) String meteName,
+                                 @RequestParam(value = "parentPath", required = false) String parentPath) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -270,13 +271,14 @@ public class CameraConController {
             int max=9999,min=1;
             int ran = (int) (Math.random()*(max-min)+min);
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
+            String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
+            String filePathTem = "/" + parent + formatter.format(new Date())+ ran + ".jpg";
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
             String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId, meteName);
-            String urlPath = capturePath+filePathTem;
+            String urlPath = capturePath + filePathTem;
             resultMap.put("urlPath", urlPath);
             resultMap.put("absPath", filePath);
             String url = "chmod 777 "+ filePath;
@@ -454,7 +456,7 @@ public class CameraConController {
             resultMap.put("cameraPtz", ptzStr);
 
             // 抓图
-            Result resultPic = capturePicture(cameraId, presetName);
+            Result resultPic = capturePicture(cameraId, presetName, "presetCheckImg");
             if (result != null && resultPic.getData() != null) {
                 Map<String, Object> picMap = (Map<String, Object>) resultPic.getData();
                 resultMap.putAll(picMap);
