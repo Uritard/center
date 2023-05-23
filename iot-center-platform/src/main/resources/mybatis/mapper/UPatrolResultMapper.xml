@@ -338,18 +338,19 @@
             resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
         SELECT
             ( SELECT count(*) FROM t_warn_info warn WHERE warn.task_id = #{taskId} AND instance_id = #{instanceId} LIMIT 1 ) AS is_warn,
-	a.instance_id,
-	a.task_id,
-	a.identify_result,
-	a.person_check,
-	a.picpath,
-    a.unit
+            a.instance_id,
+            a.task_id,
+            a.identify_result,
+            a.person_check,
+            a.picpath,
+            a.modify_num,
+            a.cruise_type,
+            a.unit
         FROM
             u_patrol_data_result a
-        WHERE
-            1 = 1
-          AND a.instance_id = #{instanceId}
-          AND a.task_id = #{taskId}
+            WHERE
+                a.instance_id = #{instanceId}
+                AND a.task_id = #{taskId}
     </select>
 
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"

@@ -33,6 +33,10 @@ public class AfterManualReviewInfo implements Serializable {
     private Long instanceId;
     @ApiModelProperty(value = "人工审核值")
     private Integer identifyResult;
+    @ApiModelProperty(value = "审核后的值")
+    private String modifyNum;
+    @ApiModelProperty(value = "巡视类型")
+    private Integer cruiseType;
     @ApiModelProperty(value = "单位")
     private String unit;
 }

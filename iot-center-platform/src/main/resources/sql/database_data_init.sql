@@ -172,25 +172,25 @@ INSERT INTO `sys_role_menu` VALUES ('210152', '0600', null, 'halfChecked', '1234
 -- ----------------------------
 -- Records of t_algorithm_info
 -- ----------------------------
-INSERT INTO `t_algorithm_info` VALUES ('1000002', '表计识别-指针', 'meter', '333', '001', '1', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000002', '表计识别-指针', 'meter', '', '001', '1', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000003', '表计识别-计数', 'meter', '', '002', '2', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000004', '表计识别-数显', 'meter', '', '003', '3', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000005', '表计识别-油位', '油位识别', '', '004', '4', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000005', '表计识别-油位', 'meter', '', '004', '4', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000011', '表计识别-指示灯', 'light', '', '005', '5', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000007', '表计识别-刀闸', 'isolator', '', '006', '6', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000008', '表计识别-吸湿', '吸湿识别', '', '007', '7', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000008', '表计识别-吸湿', 'meter', '', '007', '7', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000009', '表计识别-物体', 'qrcode', '', '008', '8', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000010', '表计识别-红外', 'infrared', '', '009', '9', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000006', '表计识别-开关', 'switch', '', '010', '10', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000012', '声音', 'sound', '013', '', '13', '1', '450', '1');
+INSERT INTO `t_algorithm_info` VALUES ('1000012', '声音', 'sound', '', '013', '13', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000013', '缺陷识别', '缺陷识别', '', '011', '398', '0', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000016', '未穿工装', 'wcgz', '', '', '398', '0', '376', '131');
 INSERT INTO `t_algorithm_info` VALUES ('1000017', '未穿安全帽', 'wcaqm', '', '', '398', '0', '377', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000018', '人员倒地', 'rydd', '', '', '398', '0', '378', '133');
 INSERT INTO `t_algorithm_info` VALUES ('1000019', '吸烟', 'xy', '', '', '398', '0', '379', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000020', '地面油污', 'sly_dmyw', '', '', '398', '0', '380', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000021', '鸟窝', 'yw_nc', '', '', '398', '0', '381', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000022', '挂空悬浮物', 'yw_gkxfw', '', '', '398', '0', '382', '132');
+INSERT INTO `t_algorithm_info` VALUES ('1000021', '异物-鸟巢', 'yw_nc', '', '', '398', '0', '381', '132');
+INSERT INTO `t_algorithm_info` VALUES ('1000022', '异物-挂空悬浮物', 'yw_gkxfw', '', '', '398', '0', '382', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000023', '表面污秽', 'bmwh', '', '', '398', '0', '383', '131');
 INSERT INTO `t_algorithm_info` VALUES ('1000024', '绝缘子-破裂', 'jyz_pl', '', '', '398', '0', '384', '133');
 INSERT INTO `t_algorithm_info` VALUES ('1000025', '绝缘子-裂纹', 'jyz_pl', '', '', '398', '0', '385', '133');
