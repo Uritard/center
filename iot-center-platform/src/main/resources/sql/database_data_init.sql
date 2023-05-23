@@ -317,7 +317,7 @@ INSERT INTO `t_dict_business` VALUES ('300111', '225', 'unit', 'A', '0', '单位
 INSERT INTO `t_dict_business` VALUES ('300112', '226', 'unit', '℃', '0', '单位名称', '1');
 INSERT INTO `t_dict_business` VALUES ('300113', '227', 'unit', '%H', '0', '单位名称', '1');
 INSERT INTO `t_dict_business` VALUES ('300114', '228', 'cruise_type', '机器人', '0', '巡检方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '视频', '0', '巡检方式', '1');
+INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '可见光', '0', '巡检方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300116', '230', 'cruise_type', '红外', '0', '巡检方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300117', '231', 'cruise_type', '在线监控', '0', '巡检方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300118', '232', 'cruise_type', '声纹', '0', '巡检方式', '1');
@@ -338,7 +338,6 @@ INSERT INTO `t_dict_business` VALUES ('300132', '246', 'cruise_result', '正常'
 INSERT INTO `t_dict_business` VALUES ('300133', '247', 'cruise_result', '异常', '0', '巡视执行结果', '1');
 INSERT INTO `t_dict_business` VALUES ('300134', '248', 'abnormal_type', '采集失败', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300135', '249', 'abnormal_type', '数据异常', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300136', '250', 'abnormal_type', '异常告警', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300137', '251', 'abnormal_type', '执行超时', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300138', '252', 'cruise_data_state', '已执行', '0', '巡检数据状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300139', '253', 'cruise_data_state', '未执行', '0', '巡检数据状态', '1');
@@ -458,7 +457,6 @@ INSERT INTO `t_dict_business` VALUES ('300329', '405', 'defect_model', '表计�
 INSERT INTO `t_dict_business` VALUES ('300330', '406', 'effective_state', '已生效', '0', '生效状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300331', '407', 'effective_state', '已失效', '0', '生效状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300332', '408', 'effective_state', '未生效', '0', '生效状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300333', '409', 'abnormal_type', '缺陷异常', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300334', '410', 'abnormal_type', '设备检修', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300335', '411', 'abnormal_type', '设备离线', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300336', '412', 'abnormal_type', '任务终止', '0', '巡视异常原因', '1');
@@ -720,6 +718,7 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('816', 'mete_type', '氧气浓度检测', '1', '巡视内容', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('817', 'mete_type', 'SF6浓度检测', '1', '巡视内容', '1');
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ( '996', 'mete_type', '三相检测', 8, '巡视内容', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('995', 'alarm_source', '声纹', '0', '告警来源', '1');
 INSERT INTO `t_dict_business` VALUES ('300724', '997', 'alarm_source', '无人机', '0', '告警来源', '1');
 INSERT INTO `t_dict_business` VALUES ('300725', '998', 'alarm_source', '巡视任务', '0', '告警来源', '1');
 
