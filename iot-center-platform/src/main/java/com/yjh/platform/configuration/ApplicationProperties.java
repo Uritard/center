@@ -194,7 +194,7 @@ public class ApplicationProperties {
                 .setSequentialReturnLinkage(redisMap.get("sequentialReturnLinkage"))
                 .setSequentialFileCharset(redisMap.get("sequentialFileCharset"))
                 .setSequentialResultFlag(redisMap.get("sequentialResultFlag"));
-        this.algorithmServerConfig = algorithmServerConfig;
+        this.sequentialConfig = sequentialConfig;
 
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"audioConfig");
         ApplicationProperties.AudioConfig audioConfig = new ApplicationProperties.AudioConfig();
