@@ -547,6 +547,14 @@
         SELECT warn_id,instance_id, device_id, device_name, mete_name, warn_content, alarm_level, alarm_source, alarm_time, conf_mode,
         deal_person_id,
         deal_person_name, deal_time, std_mete_id, real_code, image_path, deal_info, deal_type, defect_model, regionName,
+        high_limit1,
+        high_limit2,
+        high_limit3,
+        high_limit4,
+        low_limit1,
+        low_limit2,
+        low_limit3,
+        low_limit4,
         custom_name,edge_code FROM (
         ( SELECT
         a.warn_id,
