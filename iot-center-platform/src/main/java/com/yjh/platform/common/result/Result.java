@@ -68,6 +68,10 @@ public class Result {
         this.data = data;
     }
 
+    public boolean isSuccess() {
+        return code == 200;
+    }
+
     @Override
     public String toString() {
         return "Result{" +

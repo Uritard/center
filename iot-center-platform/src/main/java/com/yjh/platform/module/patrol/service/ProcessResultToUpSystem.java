@@ -368,9 +368,13 @@ public class ProcessResultToUpSystem {
                     break;
             }
 
+            String resultValue = resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), "");
+            if (StringUtils.containsAny(resultDesc, "Db", "Hz")) {
+                resultValue = resultValue.replaceAll("[DbBFHz:]", "");
+            }
             xmlItem.put("file_path", StringUtils.contains(picPath, ".") ? tagPath : "");
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
-            xmlItem.put("value", resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), ""));
+            xmlItem.put("value", resultValue);
             xmlItem.put("value_unit", resultDesc);
             xmlItem.put("value_type", valueType);
             String fileType = (String)xmlItem.get("file_type");

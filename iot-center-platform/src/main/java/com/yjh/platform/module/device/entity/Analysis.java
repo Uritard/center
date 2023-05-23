@@ -47,4 +47,7 @@ public class Analysis implements Serializable {
 
     private String referenceImage;
 
+    @ApiModelProperty(value = "上传ftps的父目录")
+    private String targetParent;
+
 }
