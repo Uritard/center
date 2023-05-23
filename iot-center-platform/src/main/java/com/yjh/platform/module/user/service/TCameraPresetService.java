@@ -654,18 +654,6 @@ public class TCameraPresetService {
         log.info("判断是否需要生成预置位告警信息, 数据：" + JSONUtil.toJSONString(checkResult));
         if (checkResult != null && checkResult.getPresetCheckResult().equals(-1)) {
             log.info("需要生成预置位告警信息, 数据：" + JSONUtil.toJSONString(checkResult));
-
-            TWarnInfo warnInfo = new TWarnInfo();
-            warnInfo.setWarnTime(new Date());
-            warnInfo.setConfMode(275);
-            warnInfo.setDealType(286);
-            warnInfo.setDealInfo("程序正常，告警属实");
-            warnInfo.setWarnName("预置位检测告警");
-            warnInfo.setWarnLevel(Integer.parseInt(AlarmLevelEnum.ALARM_LEVEL_131.getDictCode()));
-            warnInfo.setWarnContent(String.format("预置位：%s 检测到偏移", checkResult.getPreset().getPresetName()));
-            warnInfo.setDealTime(new Date());
-            log.info("要插库的告警数据是==={}", warnInfo);
-            tWarnInfoDao.insert(warnInfo);
             sendWebSocket(checkResult);
         }
     }
