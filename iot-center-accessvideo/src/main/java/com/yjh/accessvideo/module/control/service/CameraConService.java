@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.module.control.service;
 
+import cn.hutool.core.io.file.PathUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import com.sun.jna.NativeLong;
@@ -54,6 +55,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -559,6 +561,8 @@ public class CameraConService {
         if("813".equals(cameraConInfo.getRecorderType())){
             iChanNum = cameraConInfo.getChannelNum();
         }
+        // 创建父文件夹
+        PathUtil.mkParentDirs(Paths.get(filePath));
 
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
         lpJpegPara.wPicSize = 0xff;
