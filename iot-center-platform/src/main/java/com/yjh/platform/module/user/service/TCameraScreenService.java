@@ -5,24 +5,23 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
-import com.yjh.platform.module.user.dao.TCameraScreenDao;
+import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import com.yjh.platform.module.user.entity.enums.UserStateEnum;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 /**
 * @author lqh
@@ -41,6 +40,8 @@ public class TCameraScreenService{
 
     @Autowired
     private SysUserDao sysUserDao;
+
+    private Logger log = LoggerFactory.getLogger(TCameraScreenService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraScreen tCameraScreen) {
@@ -634,8 +635,8 @@ public class TCameraScreenService{
             }
         }
         List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
-        //获取相机的状态
-        Map<String,String> map = new HashMap<>();
+        //获取相机的状态:  map包含在离线的  不包含未知状态的
+        Map<String,String> map = new HashMap<>(8);
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
@@ -646,22 +647,25 @@ public class TCameraScreenService{
             }
             map.putAll((Map<String,String>)re.getData());
         }
+
         List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId);
-        if (cameraList != null && cameraList.size() > 0){
-            List<Long> regionList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(cameraList)){
+            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+
             List<TCameraInfo> finalCameraList = new ArrayList<>();
-            cameraList.forEach(tCameraInfo -> {
-                if(flag != null){
-                    if(flag.equals(Integer.valueOf(map.get(tCameraInfo.getCameraId().toString())))){
-                        finalCameraList.add(tCameraInfo);
-                    } else if (flag == 2){
-                        finalCameraList.add(tCameraInfo);
-                    }
-                }
-                regionList.add(tCameraInfo.getUpRegionId());
-            });
-            regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
-            if (regionList != null && regionList.size() > 0){
+            // flag:1-在线 0-离线 2-全部
+            if (flag == 2){
+                finalCameraList = cameraList;
+            } else if (flag == 1) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            } else if (flag == 0) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            }
+
+            if (!CollectionUtils.isEmpty(finalCameraList)) {
+                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+            }
+            if (!CollectionUtils.isEmpty(regionList)){
                 areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList,regionList);
             }
         }
