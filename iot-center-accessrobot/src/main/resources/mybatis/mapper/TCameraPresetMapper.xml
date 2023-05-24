@@ -124,7 +124,7 @@
             ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.presetType,jdbcType=INTEGER}
             ,#{tCameraPreset.creatorUser,jdbcType=VARCHAR},#{tCameraPreset.creatorTime,jdbcType=TIMESTAMP},#{tCameraPreset.isUse,jdbcType=INTEGER}
             ,#{tCameraPreset.presetImg,jdbcType=VARCHAR},#{tCameraPreset.inspectionPostion,jdbcType=INTEGER},#{tCameraPreset.collectStatus,jdbcType=INTEGER}
-            ,#{presetPtz,jdbcType=VARCHAR},#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
+            ,#{tCameraPreset.presetPtz,jdbcType=VARCHAR},#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
             ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR})
         </foreach>
     </insert>
