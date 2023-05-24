@@ -1061,7 +1061,7 @@ public class DateTimeUtil {
      * @CreateTime 2020/8/27 18:15
      */
     public static List<Date> cornTransTime(String cronExpression, Date dayBefore,Date dayAfter) {
-        List<Date> validTimeList = new ArrayList<Date>();
+        List<Date> validTimeList = new ArrayList<>();
         if (cronExpression == null || cronExpression.length() < 1) {
             return validTimeList;
         } else {
@@ -1078,8 +1078,10 @@ public class DateTimeUtil {
             if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) >= 0){
                 dd = exp.getNextValidTimeAfter(date);
             } else if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) < 0) {
-//                dd = exp.getNextValidTimeAfter(dayBefore);
-                dd = dayBefore;
+                // 将时间提前 500ms，避免第一个时间出不来
+                Date preSecendDate = new Date(dayBefore.getTime() - 500);
+                dd = exp.getNextValidTimeAfter(preSecendDate);
+//                 dd = dayBefore;
             } else {
                 return validTimeList;
             }
@@ -1091,13 +1093,13 @@ public class DateTimeUtil {
                 dd = exp.getNextValidTimeAfter(dd);
             }
         }
-
+/*
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<String> validTimeList2 = new ArrayList<String>();
+        List<String> validTimeList2 = new ArrayList<>();
         for (Date aValidTimeList:validTimeList) {
             validTimeList2.add(sdf.format(aValidTimeList));
         }
-        logger.info("validTimeList2: "+validTimeList2);
+        logger.info("validTimeList2: "+validTimeList2);*/
         return validTimeList;
     }
 
