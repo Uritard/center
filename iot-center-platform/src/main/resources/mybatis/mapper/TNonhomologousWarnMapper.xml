@@ -50,6 +50,7 @@
     <select id="getNonhomologousInspections" parameterType="java.util.Map" resultType="java.util.Map">
         select
         a.instance_id as instanceId,
+        a.device_mete_id as deviceMeteId,
         a.instance_id_one as instanceIdOne,
         a.instance_id_two as instanceIdTwo,
         b.cruise_name as oneCruiseName,
