@@ -131,7 +131,7 @@ public class NonhomologousWarnThread implements Runnable{
                 String robotInstanceId = String.valueOf(map.get("instanceIdOne"));
                 String videoInstanceId = String.valueOf(map.get("instanceIdTwo"));
                 String instanceId = String.valueOf(map.get("instanceId"));
-                Long deviceMeteId = Long.valueOf(String.valueOf(map.get("deviceMeteId")));
+                Long deviceMeteId = ValueUtil.toLong(String.valueOf(map.get("deviceMeteId")));
                 String oneCruiseName = String.valueOf(map.get("oneCruiseName"));
                 String twoCruiseName = String.valueOf(map.get("twoCruiseName"));
 
@@ -153,6 +153,7 @@ public class NonhomologousWarnThread implements Runnable{
                             videoInsResult = StringUtils.substringBefore(videoInsResult, ",");
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
                                 float dval = Math.abs(NumberUtils.toFloat(robotInsResult) - NumberUtils.toFloat(videoInsResult));
+                                log.info("红外非同源差值---{}，{}，{}", dval, robotInsResult, videoInsResult);
                                 if(dval - threshold > 1e-5){
                                     String dvalStr = CommonUtils.percentFormat(dval, "#.##");
                                     String warnContent = "红外测温非同源结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold;
