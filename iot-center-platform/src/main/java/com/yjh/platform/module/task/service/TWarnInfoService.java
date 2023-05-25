@@ -515,8 +515,12 @@ public class TWarnInfoService{
             tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(Long.valueOf(warnId));
             tWarnInfoDetail.setDeviceType(1);
         }
-
+        //这个sql只能查到下级区域的
         String stationName = tWarnInfoDao.selectStationNameByDeviceId(tWarnInfoDetail.getDeviceId());
+        //本急区域取upRegionId为-1的region
+        if (StringUtils.isEmpty(stationName)){
+            stationName = tWarnInfoDao.selectStationNameByThis();
+        }
         tWarnInfoDetail.setStationName(stationName);
         return tWarnInfoDetail;
     }

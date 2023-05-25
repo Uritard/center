@@ -1006,4 +1006,10 @@
           and a.state = 1
     </select>
 
+    <select id="selectStationNameByThis" resultType="java.lang.String">
+        SELECT a.region_name
+        FROM t_std_region a
+        where a.up_region_id = -1
+    </select>
+
 </mapper>
