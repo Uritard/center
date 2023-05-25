@@ -4,6 +4,7 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.NettyClient;
+import com.yjh.accesstcp.thread.ReContentManager;
 import com.yjh.accesstcp.thread.RegisterManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
     @Autowired
     private RegisterManager registerManager;
+    @Autowired
+    private ReContentManager reContentManager;
 
     private NettyClient nettyClient = new NettyClient();
 
@@ -59,7 +62,7 @@ public class AccessTcpApplication implements CommandLineRunner {
         if("1".equals(Constant.upSystemFlag())) {
             InetSocketAddress address = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
             log.info("accesstcp is running, url is : " + url);
-            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, registerManager);
+            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, registerManager, reContentManager);
         }
     }
     private static String getLocalIp() throws SocketException {
