@@ -88,8 +88,13 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     @Override
     protected Map<String, String> resultRecognition(Map<String, String> inspectionMap) {
         String resultValue = inspectionMap.get("resultNum");
-        String resultDesc = ResultConvertUtil.convertDesc(resultValue, inspectionMap.getOrDefault("unit", ""));
-        inspectionMap.put("resultDesc", resultDesc);
+        if ("已拍照".equals(resultValue)) {
+            inspectionMap.put("resultDesc", resultValue);
+            inspectionMap.put("resultNum", "-1");
+        } else {
+            String resultDesc = ResultConvertUtil.convertDesc(resultValue, inspectionMap.getOrDefault("unit", ""));
+            inspectionMap.put("resultDesc", resultDesc);
+        }
         return patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
     }
 

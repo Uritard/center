@@ -204,7 +204,8 @@ public class PatrolResultHandler {
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
-                    taskAlarm.setValue(robotPatrolTaskResult.getValue());
+                    taskAlarm.setValue(ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue()));
+                    taskAlarm.setValueUnit(robotPatrolTaskResult.getValue());
                     taskAlarm.setDeviceId(instanceId);
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
@@ -461,8 +462,8 @@ public class PatrolResultHandler {
             }
             cruiseResultMap.put("resultDesc", resultDesc);
 
-            if (StringUtils.equals("-1", resultValue)) {
-                cruiseResultMap.put("resultNum", "-1");
+            if (StringUtils.equals("-1", resultValue) || StringUtils.contains(resultDesc, "格式不正确")) {
+                cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
             } else {
@@ -493,21 +494,15 @@ public class PatrolResultHandler {
             String[] resultStrings = resultValue.split(",");
             String resultStringValue = resultStrings[0];
             log.info("resultStringValue=={}, resultValue=={}", resultStringValue, resultValue);
-
-            cruiseResultMap.put("resultNum", resultValue);
-            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             String resultDesc = cruiseResultMap.get("resultDesc");
-            boolean abnormal = "-1".equals(resultValue) || StringUtils.contains(resultDesc, "格式不正确");
-            StringBuilder retDesc = new StringBuilder();
-            if (abnormal) {
-                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
-            } else if (StringUtils.isEmpty(resultDesc)) {
+            StringBuilder retDesc = new StringBuilder(resultDesc);
+            if (CommonUtils.isEmptyOrNullstr(resultDesc)) {
                 retDesc.append(ResultConvertUtil.convertDesc(resultValue, tStdDevicemete.getUnit()));
                 cruiseResultMap.put("resultDesc", retDesc.toString());
             }
 
-            if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
+            int cruiseResult = MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL);
+            if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+") && cruiseResult == CRUISE_RESULT_NORMAL) {
                 // 判断是否为红外识别且获取FIR文件 放入缓存中
                 if(StringUtils.isNotEmpty(firDocPath)) {
                     firDocPath = firDocPath.replaceAll(
@@ -724,6 +719,7 @@ public class PatrolResultHandler {
                     RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
                     robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
                     robotPatrolTaskAlarm.setValue(resultStringValue);
+                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
                     robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
@@ -1154,7 +1150,9 @@ public class PatrolResultHandler {
                 String msgName = "msg:" + msgId + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                 redisTemplate.opsForHash().put(msgName, "value", resultDesc + "," + CommonUtils.rectangleToPos(rectangle) + "," + conf);
             }
-            normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, null);
+            if (!abnormal) {
+                normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, null);
+            }
         }catch (Exception e){
             log.error("判别结果处理异常：", e);
         }
