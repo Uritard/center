@@ -50,7 +50,7 @@ public class SystemConfig implements Serializable {
     private String remark;
 
     @ApiModelProperty(value = "规则")
-    private String rules;
+    private String rule;
 
-
+    private String configTypeName;
 }

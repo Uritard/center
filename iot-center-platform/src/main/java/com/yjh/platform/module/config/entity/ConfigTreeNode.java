@@ -31,6 +31,8 @@ public class ConfigTreeNode {
 
     private String rule;
 
+    private String upName;
+
 
     List<ConfigTreeNode> child;
 }

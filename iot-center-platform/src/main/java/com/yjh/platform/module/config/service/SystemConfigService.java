@@ -79,7 +79,7 @@ public class SystemConfigService {
         return systemConfigDao.update(systemConfig);
     }
     public int batchUpdate(List<SystemConfig> systemConfig) {
-//        checkParams(systemConfig);
+        checkParams(systemConfig);
         systemConfigInfoToRedis(systemConfig);
         flushCatch();
         return systemConfigDao.batchUpdate(systemConfig);
@@ -87,15 +87,12 @@ public class SystemConfigService {
 
     private void checkParams(List<SystemConfig> systemConfigList){
         systemConfigList.forEach(systemConfig -> {
-            String jsonRule = systemConfig.getRules();
-            if (StringUtils.isNotEmpty(jsonRule)){
-                JSONObject jsonObject = JSON.parseObject(jsonRule);
-                String rule = jsonObject.getString("rule");
-                String msg = jsonObject.getString("msg");
-                if (systemConfig.getConfigValue().matches(rule)){
-                    throw new BusinessException(msg);
+                String jsonRule = systemConfig.getRule();
+                if (StringUtils.isNotEmpty(jsonRule)) {
+                    if (!systemConfig.getConfigValue().matches(jsonRule)) {
+                        throw new BusinessException("参数：" +systemConfig.getConfigTypeName()+" "+ systemConfig.getConfigName() + " 不符合规则，请输入正确的参数");
+                    }
                 }
-            }
         });
 
     }
