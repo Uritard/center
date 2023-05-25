@@ -522,8 +522,10 @@ public class TCameraPresetService {
             future.cancel(true);
             executor.setRemoveOnCancelPolicy(true);
         }
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+
         SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
-                silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode());
+                silentConf.getPresetType(),applicationProperties,stationCode);
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }

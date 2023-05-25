@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -23,6 +24,22 @@ import java.util.Map;
 @Accessors(chain = true)
 @Configuration
 public class ApplicationProperties {
+
+    /**
+     * 27大类数据配置文件
+     */
+    @Value("${spring.inspection.conf}")
+    private String inspectionConf;
+    /**
+     * 任务是否下发到机器人
+     */
+    @Value("${spring.task.to.robot}")
+    private String taskToRobot;
+    /**
+     * 顺控是否自定义结果 0-否 1-是
+     */
+    @Value("${spring.sequential.result.flag}")
+    private String sequentialResultFlag;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -185,7 +202,7 @@ public class ApplicationProperties {
         ApplicationProperties.AlgorithmServerConfig algorithmServerConfig = new ApplicationProperties.AlgorithmServerConfig();
         algorithmServerConfig.setNettyRecognizePort(ValueUtil.toInteger(redisMap.get("nettyRecognizePort"),13668))
                 .setNettyAiPort(ValueUtil.toInteger(redisMap.get("nettyAiPort"),13669))
-                .setConfFileName(redisMap.get("confFileName"));
+                .setConfFileName(inspectionConf);
         this.algorithmServerConfig = algorithmServerConfig;
 
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"sequentialConfig");
@@ -193,7 +210,7 @@ public class ApplicationProperties {
         sequentialConfig.setSequentialVideocfmResult(redisMap.get("sequentialVideocfmResult"))
                 .setSequentialReturnLinkage(redisMap.get("sequentialReturnLinkage"))
                 .setSequentialFileCharset(redisMap.get("sequentialFileCharset"))
-                .setSequentialResultFlag(redisMap.get("sequentialResultFlag"));
+                .setSequentialResultFlag(sequentialResultFlag);
         this.sequentialConfig = sequentialConfig;
 
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"audioConfig");
@@ -204,13 +221,12 @@ public class ApplicationProperties {
                 .setAudioMqttUser(redisMap.get("audioMqttUser"))
                 .setAudioMqttPwd(redisMap.get("audioMqttPwd"));
         this.audioConfig = audioConfig;
-
         redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
         otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("springInterfaceApi"),false))
                 .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
-                .setTaskToRobot(redisMap.get("taskToRobot"))
-                .setStationCode(redisMap.get("stationCode"))
+                .setTaskToRobot(taskToRobot)
+                .setStationCode((String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
 
