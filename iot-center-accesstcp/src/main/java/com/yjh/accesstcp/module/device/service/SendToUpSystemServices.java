@@ -19,6 +19,7 @@ import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.NettyClient;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import com.yjh.accesstcp.thread.ReContentManager;
 import com.yjh.accesstcp.thread.RegisterManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -76,6 +77,8 @@ public class SendToUpSystemServices {
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
     @Autowired
     private RegisterManager registerManager;
+    @Autowired
+    private ReContentManager reContentManager;
     @Autowired
     private StatisticsDao statisticsDao;
 
@@ -1630,11 +1633,11 @@ public class SendToUpSystemServices {
         if (Objects.nonNull(Constant.bootstrapHashMap.get(1))){
             InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
             Bootstrap bootstrap = Constant.bootstrapHashMap.get(1);
-            NettyClient.doConnect(inetSocketAddress, bootstrap);
+            reContentManager.reContent(inetSocketAddress, bootstrap);
         }else {
             NettyClient nettyClient = new NettyClient();
             InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
-            nettyClient.start(inetSocketAddress, redisTemplate, this, analysisUnionTaskFileService, registerManager);
+            nettyClient.start(inetSocketAddress, redisTemplate, this, analysisUnionTaskFileService, registerManager, reContentManager);
         }
     }
 
@@ -1650,6 +1653,8 @@ public class SendToUpSystemServices {
                     tcpClientHandler.getChannel().close().sync();
                     tcpClientHandler.getChannel().flush();
                 }
+                registerManager.terminate();
+                reContentManager.terminate();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

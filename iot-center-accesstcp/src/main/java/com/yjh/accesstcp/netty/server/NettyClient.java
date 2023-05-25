@@ -3,6 +3,7 @@ package com.yjh.accesstcp.netty.server;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.thread.ReContentManager;
 import com.yjh.accesstcp.thread.RegisterManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -22,7 +23,8 @@ import java.util.concurrent.TimeUnit;
 @lombok.extern.slf4j.Slf4j
 public class NettyClient {
 
-    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager) {
+    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,
+                      AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager, ReContentManager reContentManager) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -41,32 +43,12 @@ public class NettyClient {
                 if (!futureListener.isSuccess()) {
                     log.info("和服务端1：" + address + "连接失败!");
                     //10秒后重连
-                    eventLoop.schedule(() -> doConnect(address, bootstrap), 10, TimeUnit.SECONDS);
+                    eventLoop.schedule(() -> reContentManager.reContent(address, bootstrap), 10, TimeUnit.SECONDS);
                 } else {
                     log.info("和服务端1：" + address + "连接成功!");
                 }
             });
         }catch (Exception e) {e.getMessage();}
-    }
-
-    /**
-     *
-     * 重新连接tcp服务端
-     */
-    public static void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
-        try {
-            if (bootstrap != null) {
-                bootstrap.remoteAddress(remoteAddress);
-                ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
-                    final EventLoop eventLoop = futureListener.channel().eventLoop();
-                    if (!futureListener.isSuccess()) {
-                        //重连
-                        log.info("与服务端"+remoteAddress + "连接失败!准备尝试重连!");
-                        eventLoop.schedule(() -> doConnect(remoteAddress, bootstrap), 60, TimeUnit.SECONDS);
-                    }
-                });
-            }
-        } catch (Exception e) { log.info("------连接服务端连接失败------" + e.getMessage()); }
     }
 
 }
