@@ -329,7 +329,7 @@ public class ReportHelper {
             if (maxChars[i] == -1)
                 continue;
 
-            sheet.setColumnWidth(i, calculateCellWidth(ChineseChars[i], EnglishChars[i], isBold[i]));
+                sheet.setColumnWidth(i, calculateCellWidth(ChineseChars[i], EnglishChars[i], isBold[i]));
         }
         logger.info("Set Column Size done. AutoSize ? " + useAutoSize);
 
