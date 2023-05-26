@@ -553,7 +553,7 @@ public class PatrolResultHandler {
 
                     switch (meteKind){
                         case "1":
-                            int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultDesc, stateZero, stateOne, alarmState);
+                            int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultStringValue, stateZero, stateOne, alarmState);
                             if (warnRuleFlag != 1){
                                 log.info("Alarm value is not reached(遥信)");
                                 break;
@@ -563,11 +563,7 @@ public class PatrolResultHandler {
                             warnMap.put("warnName", meteName + "状态异常");
                             warnMap.put("warnTime", DateTimeUtil.format(new Date()));
                             warnMap.put("outRange", "--");
-                            if (alarmState == 0) {
-                                warnMap.put("warnContent", meteName + ":" + stateZero + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
-                            } else {
-                                warnMap.put("warnContent", meteName + ":" + stateOne + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemete.getAlarmLevel()), "alarm_level"));
-                            }
+                            warnMap.put("warnContent", meteName + ":" + resultDesc + "--" + DictConvertUtil.DICT.covertToDict("alarmLevel", String.valueOf(tStdDevicemete.getAlarmLevel())));
                             log.info("warnMap=={}", warnMap);
                             redisTemplate.opsForHash().putAll(warnName, warnMap);
 
@@ -625,7 +621,7 @@ public class PatrolResultHandler {
 
                             switch (warnRuleMeter) {
                                 case 1:
-                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "预警");
+                                    warnLevel = DictConvertUtil.DICT.getDictCode("alarmLevel", "预警");
                                     warnContent = isTemDif ?
                                             initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "预警";
                                     outRange = isTemDif ?
@@ -633,7 +629,7 @@ public class PatrolResultHandler {
                                             String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter);
                                     break;
                                 case 2:
-                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "一般告警");
+                                    warnLevel = DictConvertUtil.DICT.getDictCode("alarmLevel", "一般告警");
                                     warnContent = isTemDif ?
                                             initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "一般告警";
                                     outRange = isTemDif ?
@@ -641,7 +637,7 @@ public class PatrolResultHandler {
                                             String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter);
                                     break;
                                 case 3:
-                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "严重告警");
+                                    warnLevel = DictConvertUtil.DICT.getDictCode("alarmLevel", "严重告警");
                                     warnContent = isTemDif ?
                                             initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "严重告警";
                                     outRange = isTemDif ?
@@ -649,7 +645,7 @@ public class PatrolResultHandler {
                                             String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter);
                                     break;
                                 case 4:
-                                    warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "危急告警");
+                                    warnLevel = DictConvertUtil.DICT.getDictCode("alarmLevel", "危急告警");
                                     warnContent = isTemDif ?
                                             initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "危急告警";
                                     outRange = isTemDif ?
