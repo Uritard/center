@@ -368,7 +368,7 @@ public class TStdDevicemeteController {
     public Result queryPresetByCameraAndMete(@RequestParam("cameraId")Long cameraId,@RequestParam("meteId")Long meteId) {
         Result result = new Result();
         try {
-            tStdDevicemeteService.queryPresetByCameraAndMete(cameraId,meteId);
+            result.setData(tStdDevicemeteService.queryPresetByCameraAndMete(cameraId,meteId));
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("发生异常:", e);
@@ -376,7 +376,7 @@ public class TStdDevicemeteController {
         return result;
     }
        @ApiOperation(value = "测点预置位自锁定")
-    @RequestMapping(value = "/linkOrEditPreset", method = RequestMethod.GET)
+    @RequestMapping(value = "/linkOrEditPreset", method = RequestMethod.POST)
     @Logs(title = "excel导入测点",content = "excel导入测点",logType = 1)
     public Result linkOrEditPreset(@RequestBody LockPresetCommand lockPresetCommand) {
         Result result = new Result();
