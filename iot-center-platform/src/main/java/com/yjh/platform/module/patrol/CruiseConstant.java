@@ -53,7 +53,7 @@ public interface CruiseConstant {
      */
     int CRUISE_RESULT_ABNORMAL = 247;
     /**
-     * 异常原因，抓图失败
+     * 异常原因，采集失败
      */
     int CRUISE_ABNORMAL_NOPIC = 248;
     /**
@@ -249,7 +249,15 @@ public interface CruiseConstant {
         /**
          * 任务终止
          */
-        TERMINATION_OF_TASK("任务终止");
+        TERMINATION_OF_TASK("任务终止"),
+        /**
+         * 录音失败
+         */
+        RECORDING_FAILURE("录音失败"),
+        /**
+         * 任务超时
+         */
+        TASK_TIMEOUT("超时");
 
         public String getDesc() {
             return desc;

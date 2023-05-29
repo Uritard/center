@@ -3,7 +3,6 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -26,10 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
-import static com.yjh.platform.module.patrol.CruiseConstant.AbnormalResDescEnum.CAPTURE_FAILURE;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -49,8 +46,6 @@ public class InspectionResultThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final AnalyseDataOperateDao analyseDataOperateDao;
     private final PatrolResultHandler resultHandler;
-
-    private static ReentrantLock lock = new ReentrantLock();
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
@@ -96,7 +91,7 @@ public class InspectionResultThread implements Runnable{
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getUnit())){
                 tCruiseTaskResultMap.put("unit", robotPatrolTaskResult.getUnit());
             }
-            // 结果值处理
+            // 巡视结果、异常原因、执行状态处理
             setCruiseResult(tCruiseTaskResultMap, instanceId);
 
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
@@ -181,11 +176,24 @@ public class InspectionResultThread implements Runnable{
         // 重新获取一下异常状态，可能异常状态已经设置过了，譬如超时，终止
         cruiseAbnormal = tCruiseTaskResultMap.get("cruiseAbnormal");
         // 更改点位执行状态
-        int cruiseStatus = CRUISE_STATE_DONE;
-        if (StringUtils.equals(cruiseAbnormal, String.valueOf(CRUISE_ABNORMAL_TIMEOUT))) {
-            cruiseStatus = CRUISE_STATE_OMIT;
-        } else if (StringUtils.equals(cruiseAbnormal, String.valueOf(CRUISE_ABNORMAL_INTERRUPT))) {
-            cruiseStatus = CRUISE_STATE_IGNORE;
+        int cruiseStatus;
+        int cruiseAbnormalTemp = NumberUtils.toInt(cruiseAbnormal);
+        switch (cruiseAbnormalTemp) {
+            // 超时-执行遗漏、任务终止和检修-执行忽略、采集失败和离线-执行失败
+            case CRUISE_ABNORMAL_TIMEOUT:
+                cruiseStatus = CRUISE_STATE_OMIT;
+                break;
+            case CRUISE_ABNORMAL_INTERRUPT:
+            case CRUISE_ABNORMAL_OVERHAUL:
+                cruiseStatus = CRUISE_STATE_IGNORE;
+                break;
+            case CRUISE_ABNORMAL_NOPIC:
+            case CRUISE_ABNORMAL_OFFLINE:
+                cruiseStatus = CRUISE_STATE_FAILED;
+                break;
+            default:
+                cruiseStatus = CRUISE_STATE_DONE;
+                break;
         }
         tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
     }
@@ -229,7 +237,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 判断任务是否为本级系统下发给下级系统的任务
+     * 判断任务结果来源
      * @param taskId 任务id
      * @param instanceId 巡视点id
      * @param sendCode 下级唯一标识
@@ -238,8 +246,6 @@ public class InspectionResultThread implements Runnable{
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType) {
         try {
             String sysLevel = Constant.getLevelEdge();
-            // 下级主动上报异常的点不调用算法，如超时，任务终止，异常的情况
-            boolean isInterrupt = "0".equals(robotPatrolTaskResult.getValid());
 
             CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
             Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
@@ -253,8 +259,8 @@ public class InspectionResultThread implements Runnable{
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
             boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
-            isSimulationTool = (isSimulationTool || needAnalysis) && !isInterrupt;
-            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}, isInterrupt: {}", isSimulationTool, taskId, type, sysLevel, cruiseType, isInterrupt);
+            isSimulationTool = isSimulationTool || needAnalysis;
+            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
@@ -320,7 +326,10 @@ public class InspectionResultThread implements Runnable{
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
             String sysLevel = Constant.getLevelEdge();
 
-            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel)) {
+            // 下级上报异常的点不调用算法，如超时，任务终止，异常的情况
+            boolean isInterrupt = "0".equals(robotPatrolTaskResult.getValid());
+            log.info("isInterrupt:{}", isInterrupt);
+            if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel) && !isInterrupt) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
                 String preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
@@ -329,10 +338,10 @@ public class InspectionResultThread implements Runnable{
                 }
                 log.info("presetId====== {}",preset);
                 boolean result = abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
+                log.info("调用算法结果: {}", result);
                 // 数据存入 redis
                 CruiseRedisStorage.offer(tCruiseTaskResultMap);
                 if (result) {
-                    log.info("调用算法失败: {}", result);
                     uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
                 }
             } else {
@@ -354,43 +363,11 @@ public class InspectionResultThread implements Runnable{
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details,
                                       String value, boolean fileFound) {
-        log.info("====This is the result of no algorithm===");
+        log.info("====This is the result of no algorithm==={}", value);
         try {
-            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            CruiseConstant.AbnormalResDescEnum abnormalEnum = AbnormalResDescEnum.getEnum(value);
-            if (!Objects.isNull(abnormalEnum)) {
-                switch (abnormalEnum) {
-                    // 目前异常情况会出现的结果 后续再更新
-                    case CAPTURE_FAILURE:
-                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
-                        break;
-                    case ROBOT_OFFLINE:
-                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
-                        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
-                        break;
-                    case ROBOT_OVERHAUL:
-                    case EQUIPMENT_MAINTENANCE:
-                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
-                        tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
-                        break;
-                    case TERMINATION_OF_TASK:
-                        tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
-                        break;
-                    default:
-                        tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                        tCruiseTaskResultMap.put("cruiseAbnormal", "0");
-                        break;
-                }
-            }else {
-                tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                tCruiseTaskResultMap.put("cruiseAbnormal", "0");
-            }
-
             tCruiseTaskResultMap.put("resultDesc", StringUtils.isNotEmpty(value) ? "" : "已拍照");
             tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
-            // redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");
 

@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.service;
 
-import cn.hutool.core.util.ZipUtil;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author YC
@@ -38,7 +36,7 @@ import java.util.stream.Collectors;
 @Service
 public class ReportManageService {
 
-    private Logger log = LoggerFactory.getLogger(ReportManageService.class);
+    private final Logger log = LoggerFactory.getLogger(ReportManageService.class);
     @Autowired
     private ReportManageDao reportManageDao;
     @Autowired
@@ -55,10 +53,8 @@ public class ReportManageService {
 
         // 明细
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectDetail(list,startTime,endTime);
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
-        String absPath = map.get("content");
-        Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
-        String relPath = entries.get("content");
+        String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+        String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
         // 相对路径替换绝对路径
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
@@ -67,15 +63,16 @@ public class ReportManageService {
         recordData.setTCDRDList(tCruiseDataResultDetailList);
 
         // 概况
-        TaskVO taskVO = getTaskVODefined(tCruiseDataResultDetailList);
+        TaskVO taskVO = getTaskVoDefined(tCruiseDataResultDetailList);
         recordData.setTaskVO(taskVO);
 
-        // 巡视报告名称
-        String fileName = "Report-" + DateTimeUtil.format3(new Date()) + ".xlsx";
+        // 报表名称:站所名称+报告名称+当前时间
+        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String fileNameTemp = stationName + "-" + reportName;
+        String fileName = fileNameTemp + "-" + DateTimeUtil.format3(new Date()) + ".xlsx";
 
-        //从缓存中获取系统参数
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
-        String reportPath = redisMap.get("content")+"/"+fileName;
+        String reportPathTemp = (String) redisTemplate.opsForHash().get("t_sys_param:reportReflect", "content");
+        String reportPath = reportPathTemp + "/" + fileName;
         log.info("reportPath:{}", reportPath);
         File file = new File(reportPath);
 
@@ -94,16 +91,14 @@ public class ReportManageService {
     @Transactional(rollbackFor = Exception.class)
     public String reportDownload(String reportId) {
         String fileName = reportManageDao.selectReportEnvId(reportId);
-        //从缓存中获取系统参数
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportRelative");
-        String reportPath = map.get("content");
-        String filePath = reportPath+"/"+fileName;
-        log.info("filePath:"+filePath);
+        String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:reportRelative", "content");
+        String filePath = reportPath + "/"+ fileName;
+        log.info("filePath:{}", filePath);
         return filePath;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TReportInfo> reportSelect(String reportName,String startTime,String endTime){
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>(4);
         map.put("reportName", reportName);
         map.put("startTime", startTime);
         map.put("endTime", endTime);
@@ -111,10 +106,8 @@ public class ReportManageService {
     }
     @Transactional(rollbackFor = Exception.class)
     public int reportDelete(String reportId) {
-        //从缓存中获取系统参数
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
-        String reportPath = map.get("content");
-        log.info("reportPath:"+reportPath);
+        String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:reportReflect", "content");
+        log.info("reportPath:{}", reportPath);
 
         String url = "ls "+reportPath+" | wc -w";
         long count = 0;
@@ -128,10 +121,10 @@ public class ReportManageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.info("删除前文件的个数："+count);
+        log.info("删除前文件的个数：{}", count);
         String fileName = reportManageDao.selectReportEnvId(reportId);
-        String filePath = reportPath+"/"+fileName;
-        log.info("filePath:"+filePath);
+        String filePath = reportPath + "/" + fileName;
+        log.info("filePath:{}", filePath);
         if(StringUtils.contains(filePath, "|")){
             log.error("路径错误，含非法字符串！{}", fileName);
             throw new BusinessException("路径错误，含非法字符串！");
@@ -155,7 +148,7 @@ public class ReportManageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.info("删除后文件的个数："+count2);
+        log.info("删除后文件的个数：{}", count2);
         int res = 0;
         if (count - 1 == count2){
             res = reportManageDao.reportDelete(reportId);
@@ -177,10 +170,8 @@ public class ReportManageService {
         TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList,remark);
         recordData.setTaskVO(taskVO);
 
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
-        String absPath = map.get("content");
-        Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
-        String relPath = entries.get("content");
+        String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+        String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
         List<String>  originalImgList = new ArrayList<>();
         // 相对路径替换绝对路径
         tCruiseDataResultDetailList.forEach(detail->{
@@ -195,19 +186,18 @@ public class ReportManageService {
         recordData.setTCDRDList(tCruiseDataResultDetailList);
         recordData.setNonList(nonList);
 
-        // 巡视报告名称
-        String reportName =  taskId +".xlsx";
+        // 报告名称:站所名称+任务名称+巡视时间
+        String fileNameTemp = taskVO.getStationName() + "-" + taskVO.getTaskName();
+        String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
 
-        // 从缓存中获取系统参数
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String reportPath = redisMap.get("content");
+        String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
         log.info("reportPath:{}", reportPath);
 
         File temporaryFile = new File(reportPath);
         String newReportPath = null;
         if (!temporaryFile.exists() && !temporaryFile.isDirectory()) {
             temporaryFile.mkdir();
-            newReportPath = reportPath+"/"+reportName;
+            newReportPath = reportPath + "/" + reportName;
             log.info("不存在，创建的文件绝对路径是==={}", newReportPath);
             File file = new File(reportPath);
             ContentData contentData = ReportDataModel.getData(recordData);
@@ -215,7 +205,7 @@ public class ReportManageService {
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file,taskId);
         }else {
-            newReportPath = reportPath+"/"+reportName;
+            newReportPath = reportPath + "/" + reportName;
             log.info("存在，该文件绝对路径是==={}", newReportPath);
             File file = new File(newReportPath);
             ContentData contentData = ReportDataModel.getData(recordData);
@@ -232,7 +222,7 @@ public class ReportManageService {
         return newReportPath;
     }
 
-    private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> tCDRDList){
+    private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> detailList){
         List<TCruiseDataResultDetail> abnormalList = new ArrayList<>();
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
@@ -251,7 +241,7 @@ public class ReportManageService {
         //根据要求 识别出来是异常 放在异常里
         // 点位状态 未执行、执行失败、未知 放在待人工确认里面
         // 正常的挡在正常里面
-        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+        for (TCruiseDataResultDetail cbsInspectionResultVo : detailList) {
             if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())) {
                 // i
                 if (cbsInspectionResultVo.getCruiseState() == 253 ||
@@ -325,19 +315,19 @@ public class ReportManageService {
     public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
         delaCount(taskVO,tCruiseDataResultDetailList);
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setStationName(stationName);
         taskVO.setVoltageClasses(voltageClasses);
         taskVO.setStationType(stationType);
 
-        String CruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
+        String cruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
                 + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
         if (Objects.nonNull(taskVO.getUnReview())){
-            CruiseStatistics = CruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
+            cruiseStatistics = cruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
         }
-        taskVO.setCruiseStatistics(CruiseStatistics);
+        taskVO.setCruiseStatistics(cruiseStatistics);
         if ("1".equals(remark)) {
             taskVO.setCruiseConclusion("已审核");
         } else {
@@ -347,9 +337,9 @@ public class ReportManageService {
         return taskVO;
     }
 
-    public TaskVO getTaskVODefined(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
+    public TaskVO getTaskVoDefined(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
         TaskVO taskVO = new TaskVO();
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setStationName(stationName);
@@ -364,15 +354,15 @@ public class ReportManageService {
                 !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultNum())).count();
         long waitCount= allCount - alreadyCount;
 
-        String CruiseStatistics = "总点位" + allCount + "个" +
+        String cruiseStatistics = "总点位" + allCount + "个" +
                 ",已检点位" + alreadyCount + "个" +
                 ",未检点位" + waitCount + "个" +
                 ",正常点位" + normalCount + "个" +
                 ",异常点位" + abnormalCount +  "个";
         if (0 != unReviewCount){
-            CruiseStatistics = CruiseStatistics +  ",待人工确认点位" + unReviewCount + "个。";
+            cruiseStatistics = cruiseStatistics +  ",待人工确认点位" + unReviewCount + "个。";
         }
-        taskVO.setCruiseStatistics(CruiseStatistics);
+        taskVO.setCruiseStatistics(cruiseStatistics);
         // 当前站内环境信息
         String stationWeather = uPatrolTaskService.getStationWeather();
         taskVO.setEnvInfo(stationWeather);
@@ -385,17 +375,22 @@ public class ReportManageService {
         if ("0".equals(remark)) {
             //自动生成巡视报告
             String reportFilePath = cruiseReportGenerate(taskId);
-            log.info("自动生成巡视报告的路径是==" + reportFilePath);
+            log.info("自动生成巡视报告的路径是=={}", reportFilePath);
         }
 
-        String reportName = taskId + ".xlsx";
-        Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String fileRelativePath = map.get("content") + "/" + reportName;
-        log.info("excel文件相对路径是===" + fileRelativePath);
+        // 报告名称:站所名称+任务名称+巡视时间
+        TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
+        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String fileNameTemp = stationName + "-" + taskVO.getTaskName();
+        String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
+
+        String fileRelativePathTemp = (String) redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content");
+        String fileRelativePath = fileRelativePathTemp + "/" + reportName;
+        log.info("excel文件相对路径是==={}", fileRelativePath);
 
         String zipName = taskId + ".zip";
-        String zipRelativePath = map.get("content") + "/" + zipName;
-        log.info("zip文件相对路径是===" + zipRelativePath);
+        String zipRelativePath = fileRelativePathTemp + "/" + zipName;
+        log.info("zip文件相对路径是==={}", zipRelativePath);
 
         Map<String, String> fileMap = new HashMap<>(2);
         fileMap.put("reportPath", fileRelativePath);

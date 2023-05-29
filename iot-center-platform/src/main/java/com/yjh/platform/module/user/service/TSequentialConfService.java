@@ -718,7 +718,8 @@ public class TSequentialConfService{
         try{
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
 
-            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+            Map<String, String> map = redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode());
+            String stationId = map.get("stationId");
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}",simpleDateFormat2.format(new Date()));
@@ -762,9 +763,9 @@ public class TSequentialConfService{
                 Constant.otherServer(mapForSend, Constant.UDP_SEND);
             }
         } catch (IOException e) {
-            log.error("生成顺控确认文件失败:", e);
+            log.error(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("发送顺控确认文件失败:", e);
+            log.error(e.getMessage(), e);
         }
 
         return "ok";

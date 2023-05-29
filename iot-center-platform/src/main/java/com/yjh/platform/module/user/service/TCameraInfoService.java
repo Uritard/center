@@ -164,7 +164,7 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraInfo tCameraInfo) {
-        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
+        /*TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
         try {
             log.info("channelId----------:"+tCameraInfo.getMonitorId());
             Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);  //获取已存在的监测点信息
@@ -199,7 +199,7 @@ public class TCameraInfoService {
                 channel.setPort(recorder.getHttpPort().toString());
                 channel.setUserName(recorder.getIdentityManager());
                 channel.setUserPwd(recorder.getIdentityCode());
-                Integer realChannelNum = tCameraInfo.getChannelNum() /*+ 32*/;
+                Integer realChannelNum = tCameraInfo.getChannelNum() *//*+ 32*//*;
                 channel.setChanIndex(realChannelNum.toString());
 
 
@@ -212,10 +212,10 @@ public class TCameraInfoService {
         }catch (Exception e){
             log.error("监测点修改失败：", e);
             return 0;
-        }finally {
+        }finally {*/
             ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
             return this.tCameraInfoDao.update(tCameraInfo);
-        }
+//        }
 
     }
 
