@@ -89,7 +89,8 @@ public interface UPatrolResultDao {
                                                 @Param(value = "startTime") String startTime,
                                                 @Param(value = "endTime") String endTime,
                                                 @Param(value = "list") List<Long> list,
-                                                @Param(value = "customId") String customId);
+                                                @Param(value = "customId") String customId,
+                                                @Param(value = "isWarn") Integer isWarn);
 
     List<CruiseResultDetail> selectAbnormalResult(@Param(value = "taskResultId") String taskResultId,
                                                   @Param(value = "cruiseType") Integer cruiseType,
