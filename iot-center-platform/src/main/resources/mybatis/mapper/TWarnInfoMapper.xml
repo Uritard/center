@@ -594,8 +594,8 @@
         WHERE
         1 = 1
         AND a.warn_type != '507' OR a.warn_type IS NULL
-        <if test="deviceName != null and deviceName != ''">and b.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
-        <if test="meteName != null and meteName != ''">and k.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        <if test="deviceName != null and deviceName != ''">and a.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and a.device_mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         )
         UNION ALL
         (SELECT
@@ -635,15 +635,13 @@
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
-        <if test="deviceName != null and deviceName != ''">and b.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
-        <if test="meteName != null and meteName != ''">and k.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        <if test="deviceName != null and deviceName != ''">and a.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''">and a.device_mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         )
             ) big_table
         WHERE 1 = 1
         <if test="warnLevel != -1">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <if test="confMode != -1">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''">and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
-        <if test="meteName != null and meteName != ''">and mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and startTime != ''">
             <if test="endTime != null and endTime != ''">
                 and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}
