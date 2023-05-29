@@ -71,8 +71,10 @@ public class ModelDecodeUtil {
                 if (StringUtils.isNotEmpty(fget) && fget.length() > 32) {
                     // 参数解密
                     String decompiled = demo.decryptIdentifierNoExp(fget, identifier);
-                    if (decompiled.length() > 32) {
-                        throw new BusinessException("密码长度需小于等于32位");
+                    if (decompiled.length() > 64 && decompiled.equals(fget)) {
+                        throw new BusinessException("密码解析失败，请重试！");
+                    } else if (decompiled.length() > 32) {
+                        throw new BusinessException("密码长度需小于等于32位！");
                     }
                     // 使用 set 方法将密码替换对象值
                     Method setMethod = methodSet(cls, f);
