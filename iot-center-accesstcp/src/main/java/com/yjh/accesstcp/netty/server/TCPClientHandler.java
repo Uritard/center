@@ -52,7 +52,7 @@ public interface TCPClientHandler {
     //重新连接tcp服务端
     default void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
         try {
-            if (bootstrap != null && this.getIsThreadStart()) {
+            if (bootstrap != null) {
                 bootstrap.remoteAddress(remoteAddress);
                 ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
                     final EventLoop eventLoop = futureListener.channel().eventLoop();
