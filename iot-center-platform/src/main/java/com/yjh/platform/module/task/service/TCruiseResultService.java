@@ -103,7 +103,7 @@ public class TCruiseResultService{
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
 //            cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
-            cruiseResultDetailList = uPatrolResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
+//            cruiseResultDetailList = uPatrolResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
         }
         return cruiseResultDetailList;
     }

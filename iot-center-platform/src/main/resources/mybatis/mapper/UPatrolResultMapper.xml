@@ -492,6 +492,7 @@
         <if test="taskId != null and taskId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
 
         <if test="deviceType != null and deviceType != -1">and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="isWarn != null and isWarn != -1">and b.is_warn = #{isWarn, jdbcType=INTEGER}</if>
 
         <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 

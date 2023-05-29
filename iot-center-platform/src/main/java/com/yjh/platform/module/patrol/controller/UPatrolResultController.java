@@ -142,6 +142,7 @@ public class UPatrolResultController {
                                      @RequestParam(value = "endTime",required = false) String endTime,
                                      @RequestParam(value = "regionId",required = false) Long regionId,
                                      @RequestParam(value = "customId",required = false) String customId,
+                                     @RequestParam(value = "isWarn",required = false) Integer isWarn,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
@@ -181,7 +182,7 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
+            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId,isWarn);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
