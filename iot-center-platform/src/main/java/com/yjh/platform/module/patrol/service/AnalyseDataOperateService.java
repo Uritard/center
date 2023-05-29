@@ -688,6 +688,13 @@ public class AnalyseDataOperateService {
 
         return defectValue.toString();
     }
+    public String resolveDefectResultValue(List<AnalysePatrolTaskResult> resultList,String resultValue) {
+        if (resultList.size() > 1){
+            return String.valueOf(resultList.size());
+        } else {
+            return resultValue;
+        }
+    }
 
     public String resolveDefectResult(String resultValueOrigin) {
         return resolveDefectResult(resultValueOrigin, "算法返回结果解析失败(" + resultValueOrigin + ")");

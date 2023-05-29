@@ -454,12 +454,14 @@ public class PatrolResultHandler {
             String analyseResultImg = resultList.get(0).getAnalyseResultImg();
             String firDocPath = resultList.get(0).getFirDocPath();
             String resultValue = resultList.get(0).getResultValue();
-            String resultDesc = resultList.get(0).getResultDesc();
+//            String resultDesc = resultList.get(0).getResultDesc();
 
             if(StringUtils.contains(analyseResultImg, METER)){
                 resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
                 cruiseResultMap.put("picpath", resultImage);
             }
+            String resultDesc = analyseDataOperateService.resolveDefectResult(resultList);
+            resultValue = analyseDataOperateService.resolveDefectResultValue(resultList,resultValue);
             cruiseResultMap.put("resultDesc", resultDesc);
 
             if (StringUtils.equals("-1", resultValue) || StringUtils.contains(resultDesc, "格式不正确")) {
@@ -467,6 +469,9 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
             } else {
+                cruiseResultMap.put("resultNum", resultValue);
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                cruiseResultMap.put("cruiseAbnormal", "0");
                 normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
             }
         } catch (Exception e) {
