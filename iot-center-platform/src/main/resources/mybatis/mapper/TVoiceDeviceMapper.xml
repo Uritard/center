@@ -231,8 +231,8 @@
             a.up_region_id AS upId,
             b.region_name as upName,
             "device" AS infoType,
-        c.db_value as dbValue,
-        c.f_value as fvalue
+        concat(c.db_value, 'dB') as dbValue,
+        concat(c.f_value, 'Hz')as fvalue
         FROM
         t_voice_device a
         left join t_voice_config c on a.config_id = c.config_id

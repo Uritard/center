@@ -12,7 +12,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +29,9 @@ import java.util.Map;
 @Api(value = "/reportManage")
 public class ReportManageController {
 
-    private Logger log = LoggerFactory.getLogger(ReportManageController.class);
+    private final Logger log = LoggerFactory.getLogger(ReportManageController.class);
 
-    @Autowired
-    private ReportManageService reportManageService;
+    private final ReportManageService reportManageService;
 
     public ReportManageController(ReportManageService reportManageService) {
         this.reportManageService = reportManageService;
@@ -75,37 +73,7 @@ public class ReportManageController {
         }
         return result;
     }
-    //    @ApiOperation(value = "查询报表生成记录")
-//    @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
-//    public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
-//                               @RequestParam(value = "startTime", required = false)String startTime,
-//                               @RequestParam(value = "endTime", required = false)String endTime,
-//                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-//                               @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-//        Result result = new Result();
-//        Map<String,Object> resultMap = new HashMap<>();
-//        try {
-//            String url = "ls "+reportAbsolutePath+" | wc -w";
-//            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
-//            String lineForId = null;
-//            while ((lineForId = readerForId.readLine()) != null) {
-//                long count = Long.parseLong(lineForId);
-//                resultMap.put("count", count);
-//            }
-//            Page page = PageHelper.startPage(pageNum, pageSize);
-//            List<TReportInfo> list = reportManageService.reportSelect(reportName,startTime,endTime,reportAbsolutePath);
-//            resultMap.put("count", page.getTotal());
-//            resultMap.put("list", list);
-//            result.setData(resultMap);
-//        } catch (BusinessException b) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-//            log.error("查询报表记录错误:", e);
-//        }
-//        return result;
-//    }
+
     @ApiOperation(value = "查询报表生成记录")
     @GetMapping(value = "/reportSelect")
     @Logs(title = "查询报表生成记录",content = "根据用户传递的参数查询报表生成记录",logType = 1,authority = "1235")
@@ -115,7 +83,7 @@ public class ReportManageController {
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>(4);
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TReportInfo> list = reportManageService.reportSelect(reportName,startTime,endTime);
@@ -143,20 +111,7 @@ public class ReportManageController {
         }
         return result;
     }
-    //    @ApiOperation(value = "批量删除报表")
-//    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.POST)
-//    public Result reportBatchDelete(@RequestBody List<TReportInfo> fileNameList) {
-//        Result result = new Result();
-//        try {
-////            result.setData(reportManageService.reportBatchDelete(reportAbsolutePath,fileNameList));
-//        } catch (BusinessException b) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-//            log.error("批量删除报表错误:", e);
-//        }
-//        return result;
-//    }
+
     @ApiOperation(value = "审核完成后根据任务生成巡检记录报告")
     @GetMapping(value = "/reportByTask")
     @Logs(title = "审核报表",content = "审核完成后根据任务生成巡检记录报告",logType = 5)
@@ -188,19 +143,4 @@ public class ReportManageController {
         }
         return result;
     }
-
-   /* @ApiOperation(value = "巡视结果分析报表生成")
-    @GetMapping(value = "/cruiseResultAnalyseReporter")
-    @Logs(title = "巡视结果分析报表生成",content = "巡视结果分析报表生成",logType = 5)
-    public Result cruiseResultAnalyseReporter(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
-        Result result=new Result();
-        try {
-            result.setData(reportManageService.cruiseResultAnalyseReporter(deviceMeteId));
-
-        }catch (Exception e){
-            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-            log.error("报表生成失败：",e);
-        }
-        return result;
-    }*/
 }

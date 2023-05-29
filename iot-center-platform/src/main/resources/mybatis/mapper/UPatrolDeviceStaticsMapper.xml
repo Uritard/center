@@ -112,6 +112,7 @@
                           LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id
                  WHERE tc.camera_id = #{cameraId,jdbcType=BIGINT}
                    AND updr.cruise_time IS NOT NULL
+                   and updr.cruise_time <![CDATA[>]]> tc.commission_date
              ) result
     </select>
 
