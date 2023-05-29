@@ -52,7 +52,7 @@ public interface TCPClientHandler {
     //重新连接tcp服务端
     default void doConnect(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
         try {
-            if (bootstrap != null /*&& this.getIsThreadStart()*/) {
+            if (bootstrap != null) {
                 bootstrap.remoteAddress(remoteAddress);
                 ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
                     final EventLoop eventLoop = futureListener.channel().eventLoop();
@@ -73,8 +73,8 @@ public interface TCPClientHandler {
         //构造注册消息
         //todo sendcode 要从配置文件里读取
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-            .setSendCode("Edge01")
-            .setReceiveCode("Region01")
+            .setSendCode(getCruise())
+            .setReceiveCode(getServer())
             .setType("251")
             .setCommand("1");
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
