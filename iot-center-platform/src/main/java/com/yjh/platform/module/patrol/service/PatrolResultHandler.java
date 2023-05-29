@@ -729,10 +729,10 @@ public class PatrolResultHandler {
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
-            } else {
-                cruiseResultMap.put("resultNum", resultValue);
-                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
+            // } else {
+            //     cruiseResultMap.put("resultNum", resultValue);
+            //     cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            //     cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED));
             }
         }catch (Exception e){
             log.error("正常识别结果处理异常：", e);
@@ -742,7 +742,7 @@ public class PatrolResultHandler {
     }
 
     public Map<String, String> voiceAlarmHandler(String resultValue, Map<String, String> cruiseResultMap) {
-        /*if (!StringUtils.containsAny(resultValue, "Db", "Hz")) {
+        /*if (!StringUtils.containsAny(resultValue, "dB", "Hz")) {
             log.warn("voice is not analyse, resultValue: {}, cruiseResultMap: {}", resultValue, JSON.toJSONString(cruiseResultMap));
         }*/
         Long cruiseId = MapUtils.getLongValue(cruiseResultMap, "cruiseId");
@@ -754,7 +754,7 @@ public class PatrolResultHandler {
         if (restVals.length >= 2) {
             voiceMap.put("DB", NumberUtils.toInt(restVals[0]));
             voiceMap.put("F", NumberUtils.toInt(restVals[1]));
-            resultDesc = restVals[0] + "Db," + restVals[1] + "Hz";
+            resultDesc = restVals[0] + "dB," + restVals[1] + "Hz";
         } else {
             voiceMap.put("DB", NumberUtils.toInt(restVals[0]));
             resultDesc = ResultConvertUtil.convertDesc(resultValue, cruiseResultMap.get("unit"));

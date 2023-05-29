@@ -369,8 +369,8 @@ public class ProcessResultToUpSystem {
             }
 
             String resultValue = resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), "");
-            if (StringUtils.containsAny(resultDesc, "Db", "Hz")) {
-                resultValue = resultValue.replaceAll("[DbBFHz:]", "");
+            if (StringUtils.containsAny(resultDesc, "dB", "Hz")) {
+                resultValue = resultValue.replaceAll("[dBDbFHz:]", "");
             }
             xmlItem.put("file_path", StringUtils.contains(picPath, ".") ? tagPath : "");
             xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
