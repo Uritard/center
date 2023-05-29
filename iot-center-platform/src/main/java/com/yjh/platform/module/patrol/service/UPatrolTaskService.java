@@ -58,8 +58,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -78,7 +76,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -955,7 +952,7 @@ public class UPatrolTaskService {
         } else if (2 == check) {
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//执行遗漏
             result.put("resultNum", "-1");
-            result.put("resultDesc", "算法分析超时");
+            result.put("resultDesc", AbnormalResDescEnum.ANALYSE_TIMEOUT.getDesc());
             result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_TIMEOUT));//超时
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
@@ -1760,7 +1757,7 @@ public class UPatrolTaskService {
                                 taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                                 taskInfo.put("cruiseTime", simpleDateFormat.format(new Date()));
                                 taskInfo.put("resultNum", "-1");
-                                taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : "任务终止");
+                                taskInfo.put("resultDesc", StringUtils.isNotEmpty(content) ? content : AbnormalResDescEnum.TERMINATION_OF_TASK.getDesc());
                                 skipPointList.add(taskInfo);
                             }
                         }
@@ -1839,7 +1836,7 @@ public class UPatrolTaskService {
             // 设备检修判断
             if (CollectionUtils.isNotEmpty(finalOverhaul) && Collections.binarySearch(finalOverhaul, MapUtils.getString(m, "instanceId")) >= 0) {
                 m.put("resultNum", "-1");
-                m.put("resultDesc", "设备检修中");
+                m.put("resultDesc", AbnormalResDescEnum.EQUIPMENT_MAINTENANCE.getDesc());
                 // 异常原因，设备检修
                 m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
                 // 巡检数据状态，忽略
@@ -1851,13 +1848,13 @@ public class UPatrolTaskService {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "-1");
-                    m.put("resultDesc", "机器人离线,未执行");
+                    m.put("resultDesc", AbnormalResDescEnum.ROBOT_OFFLINE.getDesc());
                     // 巡检数据状态，忽略
                     m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
                     if (robotOfflineMap.get(robotId) == 4) {
-                        m.put("resultDesc", "机器人处于检修状态,未执行");
+                        m.put("resultDesc", AbnormalResDescEnum.ROBOT_OVERHAUL.getDesc());
                         m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
                         // 巡检数据状态，忽略
                         m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));

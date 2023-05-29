@@ -200,7 +200,7 @@ public class UPatrolResultService {
                     KEY_PREFIX ="JUDGE:" + cruiseManualReview.getInstanceId();
                 }
                 //塞
-                if (!KEY_PREFIX.equals("")) {
+                if (StringUtils.isNotEmpty(KEY_PREFIX)) {
                     redisTemplateForThree.opsForValue().set(KEY_PREFIX,cruiseManualReview.getPersonCheck());
                 }
             }

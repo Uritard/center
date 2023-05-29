@@ -84,4 +84,14 @@ public enum AlgorithmExceptionEnum {
         return include;
     }
 
+    public static boolean isIncludeAny(String str){
+        boolean include = false;
+        for (AlgorithmExceptionEnum e : AlgorithmExceptionEnum.values()){
+            if(e.getDesc().equals(str) || e.getContent().equals(str)){
+                include = true;
+                break;
+            }
+        }
+        return include;
+    }
 }

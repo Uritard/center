@@ -2,7 +2,6 @@ package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +36,7 @@ public class CommonUtils {
     private static Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
     public static final Pattern PATTERN_CHINESE = Pattern.compile("[\u4e00-\u9fa5]");
+    public static final Pattern PATTERN_NUMBER = Pattern.compile("\\d+(\\.\\d+)?");
 
     /**
      * 获取payLoad 数据
@@ -479,6 +479,14 @@ public class CommonUtils {
         return matcher.find();
     }
 
+    /**
+     * 是否含有数字
+     */
+    public static boolean containsNumber(String str) {
+        Matcher matcher = PATTERN_NUMBER.matcher(str);
+        return matcher.find();
+    }
+
     public static Integer toInteger(String str) {
         if (StringUtils.isEmpty(str)) {
             return null;
@@ -492,8 +500,9 @@ public class CommonUtils {
 
     public static String getNumberStr(String str) {
         if (StringUtils.isEmpty(str)) {
-            return "";
+            return "0";
         }
-        return str.replaceAll("[^0-9\\.-]", "");
+        String num = str.replaceAll("[^0-9\\.-\\\\,]", "");
+        return StringUtils.isEmpty(num) ? "0" : num;
     }
 }

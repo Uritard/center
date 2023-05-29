@@ -1,11 +1,11 @@
 package com.yjh.platform.common.utils;
 
+import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * <功能描述>
@@ -47,7 +47,7 @@ public class ResultConvertUtil {
         } else if (CommonUtils.containsChinese(result)) {
             return String.valueOf(StringUtils.split(result).length);
         } else {
-            return result;
+            return CommonUtils.getNumberStr(result);
         }
     }
 
@@ -80,6 +80,10 @@ public class ResultConvertUtil {
      * @return resultNum 目标值
      */
     public static String convertResult(String checkResult,String type) {
+        if (AlgorithmExceptionEnum.isIncludeAny(checkResult) || CruiseConstant.AbnormalResDescEnum.contains(checkResult)) {
+            return "-1";
+        }
+
         switch (type){
             case "表计":
                 return convertBJResult(checkResult);
@@ -115,11 +119,11 @@ public class ResultConvertUtil {
      */
     public static String convertBJResult(String result) {
         if (StringUtils.isNotEmpty(result)){
-            if (CommonUtils.containsChinese(result)){
+            if (CommonUtils.containsNumber(result)){
+                return CommonUtils.getNumberStr(result);
+            } else {
                 //汉字
                 return convertResult(result);
-            } else {
-                return CommonUtils.getNumberStr(result);
             }
         }
         return "0";
