@@ -129,11 +129,13 @@ public class PatrolResultHandler {
 
         // 将重复的deviceId挑出来
         List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
-                .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
+            .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
 
         HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
+                log.info("任务处理结果，robotPatrolTaskResult: {}", JSONUtil.toJSONString(robotPatrolTaskResult));
+
                 Map<String, String> infoMap = new HashMap<>(8);
 
                 // 通过上报的任务id查询本级系统上的任务id
@@ -160,7 +162,10 @@ public class PatrolResultHandler {
                 //device_id转换
                 String robotCode = robotPatrolTaskResult.getSendCode();
                 String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotPatrolTaskResult.getDeviceId();
+                log.info("Robot_SPAndIN_Info: 获取 redisKey： {}", redisKey);
                 Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+                log.info("Robot_SPAndIN_Info: 获取 redisvalue： {}", JSONUtil.toJSONString(robotInfoKeyMap));
+
                 String instanceId = robotInfoKeyMap.get("instanceId");
                 // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
                 TCruisePointInstance instance;
@@ -177,11 +182,12 @@ public class PatrolResultHandler {
                 } else {
                     instance = tCruisePointInstanceDao.selectByPrimaryId(NumberUtils.toLong(instanceId));
                 }
-                log.info("taskId===={}, instanceId: {}", taskId, instanceId);
+                log.info("taskId===={}, instanceId: {}， instance: {}", taskId, instanceId, JSONUtil.toJSONString(instance));
 
                 instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
+                log.info("文件处理 isAlarmMap: {}", JSONUtil.toJSONString(isAlarmMap));
 
                 // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
                 if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
@@ -221,6 +227,8 @@ public class PatrolResultHandler {
 
                 // 巡视结果处理
                 TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
+                log.info("巡视结果处理 stdDeviceMete: {}", JSONUtil.toJSONString(stdDeviceMete));
+
                 if (ArrayUtils.contains(new String[]{"690", "691", "692"}, stdDeviceMete.getMeteType()) && isJFRepeat) {
                     List<RobotPatrolTaskResult> list = multipleValuesResultMap.computeIfAbsent(robotPatrolTaskResult.getDeviceId(), v -> new ArrayList<>());
                     list.add(robotPatrolTaskResult);

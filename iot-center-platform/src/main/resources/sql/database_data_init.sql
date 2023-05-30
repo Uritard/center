@@ -1312,6 +1312,7 @@ INSERT INTO `t_sys_param` VALUES ('100133', '404', 'fastTurbo', '是否启用极
 INSERT INTO `t_sys_param` VALUES ('100134', '404', 'selectEdge', '要查询的edgeCode', 'Edge01', '要查询的edgeCode', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false', '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100141', '404', 'cameraServicePort', '海康相机服务端口', '8000', '海康相机服务端口(用作语音对讲)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param` VALUES ('100142', '404', 'droneOpen', '无人机任务启动报文开关', 'true', '针对普宙无人机不支持周期任务，需要额外发送启动命令，开启后会额外发送一条任务启动报文，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
