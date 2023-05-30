@@ -1457,4 +1457,9 @@
             image_size           = #{imageSize,jdbcType=VARCHAR}
         where robot_id = #{robotId,jdbcType=BIGINT}
     </update>
+    <select id="checkDroneByRobotCode" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_robot_info a
+        WHERE a.robot_code = #{robotCode} and drone_type is not null
+    </select>
 </mapper>

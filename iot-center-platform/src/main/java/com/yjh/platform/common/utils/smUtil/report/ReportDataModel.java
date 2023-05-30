@@ -379,7 +379,7 @@ public class ReportDataModel {
                         TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             }
             // 巡视结果
-            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 8, new String[]{Optional.ofNullable(detail.getResultNum()).orElse("")},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 8, new String[]{Optional.ofNullable(detail.getResultDesc()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 点位状态
             elements.add(new TableCellElement(rowIndex, rowIndex, 9, 9, new String[]{Optional.ofNullable(detail.getIdentifyResultName()).orElse("")},

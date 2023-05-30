@@ -35,6 +35,10 @@ public class TCruiseDataResultDetail implements Serializable {
      */
     private String resultNum;
     /**
+     * 巡视值带
+     */
+    private String resultDesc;
+    /**
      * 图片
      */
     private String picPath;

@@ -193,7 +193,7 @@ public class UPatrolTaskController {
     public Result taskStart(HttpServletRequest request, @RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskStart(taskId, request));
+            result.setData(uPatrolTaskService.taskStart(taskId, request, false));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务启动异常:", e);
