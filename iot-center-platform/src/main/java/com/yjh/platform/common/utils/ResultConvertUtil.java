@@ -23,10 +23,11 @@ public class ResultConvertUtil {
         String b = " 挂空悬浮物  鸟巢  鸟巢 ";
         String c = "分";
         String d = "分_合_合_合_合_合_合";
-        System.out.println(convertResult(a));
-        System.out.println(convertResult(b));
-        System.out.println(convertResult(c));
-        System.out.println(convertResult(d));
+//        System.out.println(convertResult(a));
+//        System.out.println(convertResult(b));
+//        System.out.println(convertResult(c));
+//        System.out.println(convertResult(d));
+        System.out.println(convertBJResult("100,20.34"));
     }
 
     /**

@@ -381,8 +381,8 @@ public class UPatrolResultService {
                 //触发告警
                 if (Boolean.TRUE.equals(isWarN) || 279 == alarmSource || 997 == alarmSource) {
                     // 修改告警信息表
-                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")),
-                        Integer.valueOf(map.get("warnLevel").toString()), isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")),
+                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : MapUtils.getString(map,"warnName"),
+                        Integer.valueOf(map.get("warnLevel").toString()), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map ,"warnContent"),
                             "程序正常，告警属实",286, isTemDif ? initInfo.get("outRange") : outRange, userId,
                         date);
                     sendWebSocket(warnId);
