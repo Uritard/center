@@ -101,6 +101,8 @@ public class TCameraPreset implements Serializable {
     @ApiModelProperty(value = "相机名称")
     private String cameraName;
 
+    private String cruiseType;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

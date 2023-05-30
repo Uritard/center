@@ -21,9 +21,11 @@ import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -75,6 +77,8 @@ public class TStdDevicemeteService{
 
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
+    @Autowired
+    private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TCameraPresetService tCameraPresetService  ;
     @Autowired
@@ -536,7 +540,7 @@ public class TStdDevicemeteService{
                         Integer alarmLevel = excelEntity.getAlarmLevel();
                         tStdDeviceMete.setAlarmLevel(alarmLevel);
                         StringJoiner stringJoiner   = new StringJoiner(",");
-                        for(int i = alarmLevel; i <= 133;i++) { 
+                        for(int i = alarmLevel; i <= 134;i++) {
                             stringJoiner.add(String.valueOf(i));
                         }
                         tStdDeviceMete.setAlarmLevelString(stringJoiner.toString());
@@ -554,6 +558,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setAlarmState(0);
                     tStdDeviceMete.setRedundantType(excelEntity.getRedundantType());
                     tStdDeviceMete.setIsTemdif(0);
+                    tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     totalMete.add(tStdDeviceMete);
                 }
             });
@@ -582,16 +587,22 @@ public class TStdDevicemeteService{
             tCameraPreset.setPresetName(lockPresetCommand.getPresetName());
             tCameraPreset.setCameraName(lockPresetCommand.getCameraName());
             result = tCameraPresetService.add(tCameraPreset);
+            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
             if (HttpStatus.HTTP_OK == result.getCode()) {
                 TCruisePointInstanceDetail tCruisePointInstanceDetail = new TCruisePointInstanceDetail();
-                tCruisePointInstanceDetail.setCruiseType(lockPresetCommand.getCruiseType());
-                tCruisePointInstanceDetail.setDeviceId(lockPresetCommand.getDeviceId());
+                if (tCameraInfo.getCameraType() == 205) {
+                    tCruisePointInstanceDetail.setCruiseType(229);
+                } else if (tCameraInfo.getCameraType() == 206) {
+                    tCruisePointInstanceDetail.setCruiseType(230);
+                }
                 tCruisePointInstanceDetail.setDeviceMeteId(lockPresetCommand.getDeviceMeteId());
+                tCruisePointInstanceDetail.setDeviceId(lockPresetCommand.getDeviceId());
                 tCruisePointInstanceDetail.setCustomId(lockPresetCommand.getCustomId());
                 tCruisePointInstanceDetail.setIds(Collections.singletonList(tCameraPreset.getPresetId()));
                 tCruisePointInstanceDetail.setMeteName(lockPresetCommand.getMeteName());
                 int i = tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail);
                 if (i == -3) {
+                    tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
                     result.setMessage("巡视点已经绑定了预案,操作无法生效！");
                     result.setCode(10102);
                 } else {
@@ -604,7 +615,7 @@ public class TStdDevicemeteService{
             }
         } else {
             try {
-                TCameraPreset cameraPreset = tCameraPresetService.selectByPrimaryId(tCameraPreset.getPresetId());
+                TCameraPreset cameraPreset = tCameraPresetService.selectByPrimaryId(lockPresetCommand.getPresetId());
                 if (cameraPreset == null) {
                     result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), "预置位信息有误，请检查预置位信息或联系管理员");
                     result.setData(0);
