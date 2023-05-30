@@ -432,6 +432,8 @@ public class UPatrolTaskService {
 
 
     public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task)  {
+        List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
+
         UPatrolResult uPatrolResult = new UPatrolResult();
         Date now = new Date();
         uPatrolResult.setTaskId(task.getTaskId())
@@ -443,12 +445,11 @@ public class UPatrolTaskService {
                 .setTaskLevel(task.getTaskLevel())
                 .setTaskState(238)
                 .setCreateTime(task.getCreateTime())
-                .setTaskCount(instanceList.size())
-                .setTaskWait(instanceList.size())
+                .setTaskCount(detailList.size())
+                .setTaskWait(detailList.size())
                 .setRemark("0");
         uPatrolResultDao.add(uPatrolResult);
 
-        List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
         if (!Constant.fastTurbo()) {
             log.info("instancesList==={}", detailList);
         }
@@ -523,7 +524,7 @@ public class UPatrolTaskService {
             }
             redisTemplate.opsForHash().putAll(str, map);
         }
-        initializeThisTaskInfo(task, instanceList, nodeSet);
+        initializeThisTaskInfo(task, detailList.size(), nodeSet);
         if (!Constant.isHost()) {
             sendTaskStateToUp(task, 5);
         }
@@ -564,10 +565,10 @@ public class UPatrolTaskService {
         return initializeTaskInfo(instanceList, ctask);
     }
 
-    public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList, Set<String> nodeSet) {
+    public void initializeThisTaskInfo(UPatrolTask task, int allSize, Set<String> nodeSet) {
 
         Map<String, String> mapForAbnormal = new HashMap<>();
-        mapForAbnormal.put("all", String.valueOf(instanceList.size()));
+        mapForAbnormal.put("all", String.valueOf(allSize));
         mapForAbnormal.put("abnormal", "0");
         mapForAbnormal.put("normal", "0");
         mapForAbnormal.put("taskStart", DateTimeUtil.format(task.getStartTime()));
@@ -793,11 +794,8 @@ public class UPatrolTaskService {
             // 若节点是子节点创建，或仅包含一个节点，或所有节点状态相等，则更新当前节点状态
             if (robotId == null && (subCreateTask || stateChange || stateNodeAll)) {
                 //任务暂停继续处理
-                if (TASK_STATE_PAUSE == taskState) {
-                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_PAUSE);
-                    uPatrolResultDao.update(result);
-                } else if (TASK_STATE_EXECUTING == taskState) {
-                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(TASK_STATE_EXECUTING);
+                if (ArrayUtils.contains(new int[]{TASK_STATE_PAUSE, TASK_STATE_EXECUTING}, taskState)) {
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(taskState);
                     uPatrolResultDao.update(result);
                 }
                 countChangeMap.put("taskState", String.valueOf(taskState));
@@ -857,8 +855,24 @@ public class UPatrolTaskService {
                 ret = 0;
             }
         }
+
+        if (ret != -1) {
+            checkCompletionTask(taskId);
+        }
+
         return ret != -1;
     }
+
+    /**
+     * 判断任务如果是状态 完成、终止、超期、异常终止，那么强制结束任务
+     */
+    public void checkCompletionTask(String taskId) {
+        String taskState = (String)redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "taskState");
+        if (ArrayUtils.contains(new int[]{TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, NumberUtils.toInt(taskState))) {
+            forceCompletionTask(taskId);
+        }
+    }
+
 
     /**
      * 判断任务等待时间是否超时（调用算法），任务是否异常
@@ -938,7 +952,7 @@ public class UPatrolTaskService {
             }
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));//执行遗漏
             result.put("resultNum", "-1");
-            String desc = taskState == CruiseConstant.TASK_STATE_TIMEOUT ? "超期" : rname + "任务异常";
+            String desc = taskState == CruiseConstant.TASK_STATE_TIMEOUT ? AbnormalResDescEnum.TASK_TIMEOUT.getDesc(): rname + "任务异常";
             result.put("resultDesc", desc);
             result.put("cruiseAbnormal", String.valueOf(taskState == CruiseConstant.TASK_STATE_TIMEOUT ? CruiseConstant.CRUISE_ABNORMAL_TIMEOUT : CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
@@ -1759,6 +1773,8 @@ public class UPatrolTaskService {
             Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
             if (CollectionUtils.isEmpty(tasKeys)) {
                 log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
+                log.error("直接更新任务状态，不执行入库操作， {}", taskId);
+                uPatrolResultDao.update(uPatrolResult);
                 throw new BusinessException("任务未正确初始化");
             }
 
@@ -1878,7 +1894,7 @@ public class UPatrolTaskService {
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "-1");
                     m.put("resultDesc", AbnormalResDescEnum.ROBOT_OFFLINE.getDesc());
-                    // 巡检数据状态，忽略
+                    // 巡检数据状态，执行失败
                     m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));

@@ -59,7 +59,7 @@ public class SystemConfigController {
         try {
             result.setData(systemConfigService.batchUpdate(systemConfig));
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             log.info("修改系统配置出错：",e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
