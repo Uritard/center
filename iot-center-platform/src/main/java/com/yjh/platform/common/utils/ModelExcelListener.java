@@ -22,10 +22,11 @@ import java.util.Map;
 @Slf4j
 public class ModelExcelListener implements ReadListener<ExcelEntity> {
     List<ExcelEntity> excelEntities = new ArrayList<>();
+    List<ExcelEntity> errorExcelEntities = new ArrayList<>();
 
     @Override
     public void onException(Exception e, AnalysisContext analysisContext) throws Exception {
-        log.error("模型文件读取失败！，错误：{}",e.getMessage());
+        log.error("模型文件读取失败！，错误：{}", e.getMessage());
     }
 
     @Override
@@ -34,9 +35,10 @@ public class ModelExcelListener implements ReadListener<ExcelEntity> {
 
     @Override
     public void invoke(ExcelEntity excelEntity, AnalysisContext analysisContext) {
-        log.info("{}",excelEntity);
+        log.info("{}", excelEntity);
         if (StringUtils.isNotBlank(excelEntity.getAnalyseTypeName())) {
-            excelEntity.setAnalyseTypeId(NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("analyseType", excelEntity.getAnalyseTypeName())));
+            excelEntity
+                .setAnalyseTypeId(NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("analyseType", excelEntity.getAnalyseTypeName())));
         }
 
         if (StringUtils.isNotBlank(excelEntity.getDeviceTypeName())) {
@@ -57,19 +59,31 @@ public class ModelExcelListener implements ReadListener<ExcelEntity> {
             excelEntity.setMeteKindId(CommonUtils.toInteger(DictConvertUtil.DICT.getDictCode("meteKind", excelEntity.getMeteKindName())));
         }
         if (StringUtils.isNotBlank(excelEntity.getAlarmLevelName())) {
-            excelEntity.setAlarmLevel(CommonUtils.toInteger(DictConvertUtil.DICT.getDictCode("alarmLevel", excelEntity.getAlarmLevelName())));
+            excelEntity
+                .setAlarmLevel(CommonUtils.toInteger(DictConvertUtil.DICT.getDictCode("alarmLevel", excelEntity.getAlarmLevelName())));
         }
 
-        if (StringUtils.equalsAny("操作类",excelEntity.getInspectionType())) {
+        if (StringUtils.equalsAny("操作类", excelEntity.getInspectionType())) {
             excelEntity.setInspectionType("2");
-        }
-        else {
+        } else {
             excelEntity.setInspectionType("1");
+        }
+
+        switch (excelEntity.getRedundantType()) {
+            case "I类":
+                excelEntity.setRedundantType("1");
+                break;
+            case "II类":
+                excelEntity.setRedundantType("2");
+                break;
+            case "III类":
+                excelEntity.setRedundantType("3");
+                break;
+            default:
+                break;
         }
         excelEntities.add(excelEntity);
     }
-
-
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext analysisContext) {
