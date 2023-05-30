@@ -140,7 +140,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
         } else {
             // 录音结果处理
             inspectionMap.put("resultNum", "-1");
-            inspectionMap.put("resultDesc", "录音失败");
+            inspectionMap.put("resultDesc", AbnormalResDescEnum.RECORDING_FAILURE.getDesc());
             inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
             // 巡视结果，异常
             inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));

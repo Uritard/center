@@ -160,7 +160,7 @@ public abstract class AbstractVideoCruise {
 
                 if (picError) {
                     inspectionMap.put("resultNum", "-1");
-                    inspectionMap.put("resultDesc", "抓图失败");
+                    inspectionMap.put("resultDesc", AbnormalResDescEnum.CAPTURE_FAILURE.getDesc());
                     inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
                     // 巡视结果，异常
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -262,7 +262,7 @@ public abstract class AbstractVideoCruise {
 
             // 调用算法中
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
-            inspectionMap.put("resultDesc", "算法分析中");
+            inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
                 analysis.setAnalyseType(algorithm.getMeteAnalyse());
@@ -305,7 +305,7 @@ public abstract class AbstractVideoCruise {
         // 调用算法失败
         inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_REQUESTFAILED));
         // 异常值，调用算法失败
-        inspectionMap.put("resultDesc", "调用算法失败");
+        inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSE_REQFAILED.getDesc());
         // 巡检数据状态，已经执行
         inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
         return true;

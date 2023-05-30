@@ -137,7 +137,7 @@ public class InspectionResultThread implements Runnable{
             log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
         } else if (!isSimulationTool) {
             tCruiseTaskResultMap.put("resultNum", "-1");
-            tCruiseTaskResultMap.put("resultDesc", "数据异常");
+            tCruiseTaskResultMap.put("resultDesc", AbnormalResDescEnum.DATA_ERROR.getDesc());
             tCruiseTaskResultMap.put("cruiseResult", "" + CRUISE_RESULT_ABNORMAL);
             tCruiseTaskResultMap.put("cruiseAbnormal", "" + CRUISE_ABNORMAL_DATAABNORMAL);
             robotPatrolTaskResult.setValid("0");

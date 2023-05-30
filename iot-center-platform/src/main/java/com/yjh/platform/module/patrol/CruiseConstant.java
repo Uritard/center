@@ -235,6 +235,10 @@ public interface CruiseConstant {
          */
         CAPTURE_FAILURE("抓图失败"),
         /**
+         * 录音失败
+         */
+        RECORDING_FAILURE("录音失败"),
+        /**
          * 机器人离线,未执行
          */
         ROBOT_OFFLINE("机器人离线,未执行"),
@@ -247,19 +251,36 @@ public interface CruiseConstant {
          */
         EQUIPMENT_MAINTENANCE("设备检修中"),
         /**
-         * 任务终止
+         * 算法分析中
          */
-        TERMINATION_OF_TASK("任务终止"),
+        ANALYSISING("算法分析中"),
         /**
-         * 录音失败
+         * 调用算法失败
          */
-        RECORDING_FAILURE("录音失败"),
+        ANALYSE_REQFAILED("调用算法失败"),
+        /**
+         * 算法分析超时
+         */
+        ANALYSE_TIMEOUT("算法分析超时"),
         /**
          * 任务超时
          */
-        TASK_TIMEOUT("超时");
+        TASK_TIMEOUT("任务超时"),
+        /**
+         * 数据异常
+         */
+        DATA_ERROR("数据异常"),
+        /**
+         * 任务终止
+         */
+        TERMINATION_OF_TASK("任务终止");
 
         public String getDesc() {
+            return desc;
+        }
+
+        @Override
+        public String toString(){
             return desc;
         }
 
@@ -279,6 +300,10 @@ public interface CruiseConstant {
 
         public static AbnormalResDescEnum getEnum(String desc) {
             return ABNORMAL_ENUM_MAP.get(desc);
+        }
+
+        public static boolean contains(String desc) {
+            return ABNORMAL_ENUM_MAP.containsKey(desc);
         }
     }
 

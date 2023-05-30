@@ -8,7 +8,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -118,7 +117,7 @@ public class PatrolTimeoutScheduled {
             }
 
             m.put("resultNum", "-1");
-            m.put("resultDesc", "超时");
+            m.put("resultDesc", AbnormalResDescEnum.TASK_TIMEOUT.getDesc());
             // 异常原因，超时
             m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_TIMEOUT));
             // 巡视结果，异常
