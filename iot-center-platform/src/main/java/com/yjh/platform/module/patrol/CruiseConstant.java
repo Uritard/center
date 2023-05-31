@@ -263,9 +263,9 @@ public interface CruiseConstant {
          */
         ANALYSE_TIMEOUT("算法分析超时"),
         /**
-         * 任务超时
+         * 任务超期
          */
-        TASK_TIMEOUT("任务超时"),
+        TASK_TIMEOUT("任务超期"),
         /**
          * 数据异常
          */

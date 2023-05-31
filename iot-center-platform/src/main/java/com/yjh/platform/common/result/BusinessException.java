@@ -13,7 +13,7 @@ public class BusinessException extends RuntimeException {
      * @Fields serialVersionUID :
      */
     private static final long serialVersionUID = 1L;
-    private Integer code;
+    private Integer code = ResultCodeEnum.SYSTEMERROR.getCode();
     private String message;
 
     public BusinessException(String message) {
@@ -35,6 +35,7 @@ public class BusinessException extends RuntimeException {
         this.code = code;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

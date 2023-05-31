@@ -536,7 +536,7 @@ public class MessageThread {
             }
         }
 
-        priority = StringUtils.isEmpty(priority) || "2".equals(edgeLevel) ? level : priority;
+        priority = !StringUtils.equalsAny(priority, "1", "2", "3", "4")  || "2".equals(edgeLevel) ? level : priority;
         tCruiseTaskAdd.setTaskLevel(NumberUtils.toInt(priority));
 
         return tCruiseTaskAdd;

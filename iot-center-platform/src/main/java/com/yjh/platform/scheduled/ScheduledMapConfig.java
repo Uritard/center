@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
@@ -43,8 +44,8 @@ public class ScheduledMapConfig {
             }
             if (!succ && nextRetries > 0) {
                 schedule(seconds, nextRetries, taskFunction);
-            } else if (!succ) {
-                LOGGER.error("schedule task return false");
+            }  else {
+                LOGGER.error("schedule ended, leave retries: {}, return: {}", nextRetries, succ);
             }
 
         }, seconds, TimeUnit.SECONDS);
@@ -74,9 +75,10 @@ public class ScheduledMapConfig {
             int currTimes = times + 1;
             boolean succ = taskFunction.test(currTimes);
             if (!succ && numRetries - currTimes > 0) {
+                LOGGER.error("schedule running times {}", currTimes);
                 schedule(seconds, numRetries, currTimes, taskFunction);
-            } else if (!succ) {
-                LOGGER.error("schedule task return false");
+            } else {
+                LOGGER.error("schedule ended, times: {}, return: {}", times, succ);
             }
 
         }, seconds, TimeUnit.SECONDS);
@@ -87,7 +89,7 @@ public class ScheduledMapConfig {
      * @param seconds 多长时间后执行
      * @param taskFunction 执行内容
      */
-    public static void schedule(int seconds, IntConsumer taskFunction) {
-        SCHEDULED_THREAD_POOLS.schedule(() -> taskFunction.accept(1), seconds, TimeUnit.SECONDS);
+    public static <T> void schedule(int seconds, T param, Consumer<T> taskFunction) {
+        SCHEDULED_THREAD_POOLS.schedule(() -> taskFunction.accept(param), seconds, TimeUnit.SECONDS);
     }
 }

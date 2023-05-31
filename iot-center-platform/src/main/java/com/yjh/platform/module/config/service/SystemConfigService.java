@@ -2,18 +2,16 @@ package com.yjh.platform.module.config.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.config.dao.SystemConfigDao;
 import com.yjh.platform.module.config.entity.ConfigTreeNode;
 import com.yjh.platform.module.config.entity.SystemConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -89,8 +87,13 @@ public class SystemConfigService {
         systemConfigList.forEach(systemConfig -> {
                 String jsonRule = systemConfig.getRule();
                 if (StringUtils.isNotEmpty(jsonRule)) {
-                    if (!systemConfig.getConfigValue().matches(jsonRule)) {
-                        throw new BusinessException("参数：" +systemConfig.getConfigTypeName()+" "+ systemConfig.getConfigName() + " 不符合规则，请输入正确的参数");
+                    JSONObject ruleObj = JSON.parseObject(jsonRule);
+                    String prule = ruleObj.getString("rule");
+                    String pmsg = ruleObj.getString("msg");
+
+                    if (!StringUtils.isAnyEmpty(prule, pmsg) && !systemConfig.getConfigValue().matches(prule)) {
+                        throw new BusinessException(
+                            ResultCodeEnum.CODE20017.getCode(), "参数：" +systemConfig.getConfigTypeName()+" "+ systemConfig.getConfigName() + " 不符合规则，" + pmsg);
                     }
                 }
         });

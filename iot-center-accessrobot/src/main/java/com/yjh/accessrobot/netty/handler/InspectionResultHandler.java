@@ -83,7 +83,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         try {
             StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_RESULT_PROCESS, resultList, Result.class);
         }catch (Exception e){
-            log.error("调用platform出错：{}", e.getMessage());
+            log.error("调用platform出错：{}", e.getMessage(), e);
         }
     }
 

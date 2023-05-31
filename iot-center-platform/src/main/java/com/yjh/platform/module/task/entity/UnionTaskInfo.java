@@ -33,6 +33,8 @@ public class UnionTaskInfo implements Serializable {
 
     private String resultNum;
 
+    private String resultDesc;
+
     private String origpic;
 
     private String personCheck;

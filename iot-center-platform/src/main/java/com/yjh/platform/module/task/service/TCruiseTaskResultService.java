@@ -637,11 +637,8 @@ public class TCruiseTaskResultService {
             cruiseResultCounter.setAlarmCount(abnormal);
             cruiseResultCounter.setCruisedCount(normal+abnormal);
             cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
-            //将两个时间字符串转为日期类型
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date d1 = simpleDateFormat.parse(startTime);
-            String d2String = simpleDateFormat.format(new Date());
-            Date d2 = simpleDateFormat.parse(d2String);
+            Date d1 = DateTimeUtil.parse(startTime, new Date());
+            Date d2 = new Date();
             cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
         } else {
             UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
