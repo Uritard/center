@@ -354,7 +354,7 @@ public class MessageThread {
                             sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                         } else if (200 == re.getCode()) {
                             String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
-                            item.put("task_patrolled_id", taskPatrolledId);
+                            xmlItem.put("task_patrolled_id", taskPatrolledId);
                             xmlItem.put("error_code", "0");
                             xmlItems.add(xmlItem);
                             sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
