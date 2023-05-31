@@ -7,6 +7,7 @@ import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.service.*;
 import com.yjh.platform.netty.client.NettyClient;
@@ -67,6 +68,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TRobotInfoService tRobotInfoService;
     @Autowired
     private TDictBusinessService dictBusinessService;
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
 
 
     private NettyClient nettyClient = new NettyClient();
@@ -93,6 +96,8 @@ public class PlatformApplication  implements CommandLineRunner {
         //区域信息加载到缓存
         tStdRegionService.loadRegionIntoRedis();
         tRobotInfoService.initAllRobotCode(); // RobotCode初始化
+        // 初始化任务优先级
+        uPatrolTaskService.taskPriorityConfigToRedis();
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
