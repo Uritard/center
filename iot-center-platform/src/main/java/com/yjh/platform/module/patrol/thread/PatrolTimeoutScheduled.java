@@ -75,19 +75,22 @@ public class PatrolTimeoutScheduled {
         Date currentDate = new Date();
 
         for (TaskSimpleInfo task : runningList) {
-            String taskId = task.getTaskId();
-            String key = PATROL_SUMMARY_PREFIX + taskId;
-            Map<String, String> taskMap = hashOperations.entries(key);
-            String lastDate = taskMap.get("lastCruiseTime");
-            String taskStart = taskMap.get("taskStart");
-            int taskState = NumberUtils.toInt(taskMap.get("taskState"), TASK_STATE_EXECUTING);
-            Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
-            if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !ArrayUtils.contains(
-                new int[] {TASK_STATE_FINISHED, TASK_STATE_PAUSE, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, taskState)) {
-                // 设置任务状态超时
-                uPatrolTaskService.updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_TIMEOUT));
+            try {
+                String taskId = task.getTaskId();
+                String key = PATROL_SUMMARY_PREFIX + taskId;
+                Map<String, String> taskMap = hashOperations.entries(key);
+                String lastDate = taskMap.get("lastCruiseTime");
+                String taskStart = taskMap.get("taskStart");
+                int taskState = NumberUtils.toInt(taskMap.get("taskState"), TASK_STATE_EXECUTING);
+                Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
+                if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !uPatrolTaskService.taskIsEnded(taskState) && TASK_STATE_PAUSE != taskState) {
+                    // 设置任务状态超时
+                    uPatrolTaskService.updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_TIMEOUT));
 
-                taskTimeout(taskId);
+                    taskTimeout(taskId);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         }
 
@@ -142,12 +145,12 @@ public class PatrolTimeoutScheduled {
         uPatrolTaskService.forceCompletionTask(taskId);
 
         // 16秒后终止下级任务，延后终止避免与本级超时状态冲突，终止后下级上报任务状态是终止，本级是超时
-        ScheduledMapConfig.schedule(16, t -> {
-            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+        ScheduledMapConfig.schedule(16, taskId, tid -> {
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(tid);
             log.info("下级任务超时终止,robotCodeList:{}", robotCodeList);
             if (robotCodeList != null && !robotCodeList.isEmpty()) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", taskId);
+                robotTaskStatesMap.put("taskId", tid);
                 robotTaskStatesMap.put("commandValue", 4);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 uPatrolTaskService.robotTaskStates(robotTaskStatesMap);

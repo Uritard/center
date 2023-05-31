@@ -326,7 +326,7 @@ public class UPatrolTaskService {
         String level3 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "903", "level");
         String level4 = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
         Integer ifRun = uPatrolTask.getExecuteType();
-        if (tCruiseTaskAdd.getTaskLevel() == null) {
+        if (tCruiseTaskAdd.getTaskLevel() == null || tCruiseTaskAdd.getTaskLevel() == 0) {
             if(Constant.isUpSystem()) {
                 // 上级系统
                 uPatrolTask.setTaskLevel(NumberUtils.toInt(level2, 2));
@@ -741,7 +741,7 @@ public class UPatrolTaskService {
             return;
         }*/
         int oldState = MapUtils.getIntValue(countMap, "taskState", TASK_STATE_NOT_START);
-        if (oldState == TASK_STATE_FINISHED || oldState == TASK_STATE_INTERRUPT || oldState == TASK_STATE_ABNORMAL || oldState == TASK_STATE_TIMEOUT) {
+        if (taskIsEnded(oldState)) {
             log.warn("任务已经结束，不可更改状态， taskId: {}, taskState: {}, newState: {}", taskId, oldState, taskState);
             return;
         }
@@ -856,6 +856,7 @@ public class UPatrolTaskService {
             }
         }
 
+        // ret != -1 表示等待结束，不需要再次等待，定时任务结束
         if (ret != -1) {
             checkCompletionTask(taskId);
         }
@@ -868,7 +869,7 @@ public class UPatrolTaskService {
      */
     public void checkCompletionTask(String taskId) {
         String taskState = (String)redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "taskState");
-        if (ArrayUtils.contains(new int[]{TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, NumberUtils.toInt(taskState))) {
+        if (taskIsEnded(NumberUtils.toInt(taskState))) {
             forceCompletionTask(taskId);
         }
     }
@@ -1522,6 +1523,10 @@ public class UPatrolTaskService {
     public int taskPauseWithoutRobot(String taskId) {
         //任务暂停 不用给机器人发
         UPatrolResult taskResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        if (taskIsEnded(taskResult.getTaskState())) {
+            log.info("当前任务已经结束，不可暂停:{}, state: {}", taskId, taskResult.getTaskState());
+            return 1;
+        }
         taskResult.setTaskState(TASK_STATE_PAUSE);
 
         // 更新Redis任务状态
@@ -1633,11 +1638,17 @@ public class UPatrolTaskService {
         if (Optional.ofNullable(request).isPresent()) {
             logsRecord.LogsSend(request, "11", "任务暂停", "任务暂停-" + uPatrolResult.getTaskName());
         }
+        if (taskIsEnded(uPatrolResult.getTaskState())) {
+            log.info("当前任务已经结束，不可暂停:{}, state: {}", taskId, uPatrolResult.getTaskState());
+            return 1;
+        }
         uPatrolResult.setTaskState(TASK_STATE_PAUSE);
         try {
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
 
             //Thread.sleep(10000);
+            updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
+
             // 机器人任务暂停，包括机器人和下级系统
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
@@ -1649,7 +1660,7 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-            updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
+
             Map<String, String> jasonMapOnFinished = new HashMap<>();
             jasonMapOnFinished.put("type", "taskChange");
             jasonMapOnFinished.put("taskId", taskId);
@@ -1665,6 +1676,10 @@ public class UPatrolTaskService {
         sendTaskStateToUp(uPatrolTask, 3);
 
         return uPatrolResultDao.update(uPatrolResult);
+    }
+
+    public boolean taskIsEnded(int state) {
+        return ArrayUtils.contains(new int[] {TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, state);
     }
 
     public void updateTaskStateForRedis(String taskId, String state) {
@@ -1685,7 +1700,7 @@ public class UPatrolTaskService {
         if (Optional.ofNullable(request).isPresent()) {
             logsRecord.LogsSend(request, "12", "任务恢复", "任务恢复-" + uPatrolResult.getTaskName());
         }
-        if (ArrayUtils.contains(new int[] {TASK_STATE_FINISHED, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL, TASK_STATE_TIMEOUT}, uPatrolResult.getTaskState())) {
+        if (taskIsEnded(uPatrolResult.getTaskState())) {
             log.info("当前任务已经结束:{}, state: {}", taskId, uPatrolResult.getTaskState());
             return 1;
         }
@@ -1749,8 +1764,8 @@ public class UPatrolTaskService {
     @Async
     public void taskShutDown(String taskId, String content) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
-            log.warn("任务已经结束，不可重复终止！");
+        if (taskIsEnded(uPatrolResult.getTaskState())) {
+            log.warn("任务已经结束，不可重复终止！taskState: {}", uPatrolResult.getTaskState());
             return;
         }
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
@@ -1781,7 +1796,7 @@ public class UPatrolTaskService {
             log.info("tasKeys size: {}", tasKeys.size());
 
             // 暂停15秒等待未接收数据完成接收
-            ScheduledMapConfig.schedule(15, t -> {
+            ScheduledMapConfig.schedule(15, taskId, tid -> {
                 List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
                     tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                     return null;
@@ -1789,7 +1804,7 @@ public class UPatrolTaskService {
 
                 log.info("taskInfoList size: {}", taskInfoList.size());
 
-                if (taskInfoList.size() != 0) {
+                if (!taskInfoList.isEmpty()) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     List<Map<String, String>> skipPointList = new ArrayList<>();
                     for (Map<String, String> taskInfo : taskInfoList) {
@@ -1807,17 +1822,17 @@ public class UPatrolTaskService {
                             }
                         }
                     }
-                    log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
-                    ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, taskId));
+                    log.info("task [{}] shut down, skipPointList: {}", tid, skipPointList.size());
+                    ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, tid));
                 }
 
-                log.info("任务终止成功=={}", taskId);
+                log.info("任务终止成功=={}", tid);
 
                 //任务状态上报站端
                 // sendTaskStateToUp(task, 4);
                 uPatrolResultDao.update(uPatrolResult);
 
-                lowTaskGoOn(taskId);
+                lowTaskGoOn(tid);
             });
         } catch (Exception e) {
             log.info("任务终止失败", e);
@@ -2155,7 +2170,7 @@ public class UPatrolTaskService {
      */
     private void completionOfTask(String taskId) {
         // 延迟15秒执行
-        ScheduledMapConfig.schedule(15, t -> completionOfTaskDone(taskId));
+        ScheduledMapConfig.schedule(15, taskId, this::completionOfTaskDone);
     }
 
     private void completionOfTaskDone(String taskId) {
@@ -2178,6 +2193,9 @@ public class UPatrolTaskService {
             }
             if (ended) {
                 log.warn("taskId is:{} , already ended； {}", taskId, ended);
+                // 表明已经入库过一次，不再重复入库，但需要更改任务状态，避免一直显示正在执行
+                UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId).setTaskState(taskStatus);
+                uPatrolResultDao.update(uPatrolResult);
                 return;
             }
 

@@ -147,7 +147,7 @@ public class TaskJob extends QuartzJobBean {
         // String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(taskId);
         log.info("TaskResult update, taskId: {}, result: {}", taskId, JSON.toJSONString(result));
-        if (ArrayUtils.contains(new int[]{CruiseConstant.TASK_STATE_FINISHED, CruiseConstant.TASK_STATE_INTERRUPT, CruiseConstant.TASK_STATE_ABNORMAL, CruiseConstant.TASK_STATE_TIMEOUT}, result.getTaskState())) {
+        if (uPatrolTaskService.taskIsEnded(result.getTaskState())) {
             log.error("任务已经结束，不可再次执行，task: {}，taskState: {}", taskId, result.getTaskState());
             return;
         }
