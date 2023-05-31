@@ -11,6 +11,7 @@ import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -480,7 +481,7 @@ public class TCameraScreenService{
         }
     }
     public List<AreaInfoDetail> assembleTrees(Collection<AreaInfoDetail> trees) {
-        if (org.apache.commons.collections4.CollectionUtils.isEmpty(trees)) {
+        if (CollectionUtils.isEmpty(trees)) {
             return Collections.emptyList();
         }
 
@@ -620,8 +621,8 @@ public class TCameraScreenService{
             List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
             return assembleTrees(areaTree);
         }
-        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
 
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
             throw new BusinessException("用户不存在或已删除");
         } else {
@@ -634,6 +635,7 @@ public class TCameraScreenService{
                 throw  new BusinessException("当前用户角色不可查看");
             }
         }
+
         List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
         //获取相机的状态:  map包含在离线的  不包含未知状态的
         Map<String,String> map = new HashMap<>(8);

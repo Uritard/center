@@ -106,7 +106,7 @@ public class VoiceComController {
     public Result getAudioCompress(@RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
+            Integer lUserId = Constant.hikDeviceUserIdMaps.get(cameraId);
             HikUtilsApp hikUtilsApp = new HikUtilsApp();
             hikUtilsApp.getAudioCompress(lUserId);
         } catch (BusinessException b) {
@@ -144,11 +144,11 @@ public class VoiceComController {
         Result result = new Result();
         try {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
-            Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
+            Integer lUserId = Constant.hikDeviceUserIdMaps.get(cameraId);
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
             String format = DateTimeUtil.formatThreadLocal(new Date());
-            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework);
+            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework, cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -180,7 +180,7 @@ public class VoiceComController {
         Result result = new Result();
         try {
             log.info("hikDeviceUserIdMaps:{}", Constant.hikDeviceUserIdMaps);
-            Integer lUserId = Constant.hikDeviceUserIdMaps.get(String.valueOf(cameraId));
+            Integer lUserId = Constant.hikDeviceUserIdMaps.get(cameraId);
             HikUtilsApp hikUtilsApp = new HikUtilsApp();
             result.setData(hikUtilsApp.deviceLogout(lUserId));
         } catch (BusinessException b) {

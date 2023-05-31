@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * <功能描述>
@@ -23,13 +24,16 @@ public class AudioFormatUtil {
         String pcmFilePath = "D:\\testFile\\cnhc-1-16000.pcm";
 //        convertAudioFiles(wavFilePath, pcmFilePath);
 
-        String srcFilePath = "D:\\testFile\\g7\\encodeData-20230518204132.g7";
-        String destFilePath = "D:\\testFile\\pcm\\encodeData-20230518204132.pcm";
+        String srcFilePath = "D:\\testFile\\g7\\originAudio-20230519164938.g7";
+        String destFilePath = "D:\\testFile\\pcm\\originAudio-20230519164938.pcm";
         decodeTest(srcFilePath, destFilePath);
 
         String srcFilePath2 = "D:\\testFile\\pcm\\audio-1-16-8000.pcm";
         String destFilePath2 = "D:\\testFile\\g7\\audio-1-16-8000.g7";
 //        encodeTest(srcFilePath2, destFilePath2);
+
+        HashMap<Long, Integer> hashMap = new HashMap<>();
+        hashMap.remove(123);
     }
 
     private static void encodeTest(String srcFilePath, String destFilePath) {

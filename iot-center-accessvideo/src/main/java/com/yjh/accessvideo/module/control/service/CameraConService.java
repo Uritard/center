@@ -1592,7 +1592,7 @@ public class CameraConService {
                     Date endDate = format.parse(lastTime);
                     if (System.currentTimeMillis() - endDate.getTime() > 10 * 60 * 1000) {
                         //最后一次操控时间距离现在大于10分钟
-                        camreaStatusMap.put("state", 0);
+                        camreaStatusMap.put("state", "0");
                         redisTemplate.opsForHash().putAll("camera_info", camreaStatusMap);
                         return;
                     }

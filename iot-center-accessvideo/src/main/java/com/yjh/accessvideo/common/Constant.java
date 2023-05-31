@@ -42,7 +42,7 @@ public class Constant {
     /**
      * 海康设备用户句柄集合
      */
-    public static Map<String, Integer> hikDeviceUserIdMaps = new ConcurrentHashMap<>();
+    public static Map<Long, Integer> hikDeviceUserIdMaps = new ConcurrentHashMap<>();
     /**
      * 海康设备语音对讲句柄集合
      */
@@ -52,13 +52,17 @@ public class Constant {
      */
     public static Map<Integer, Integer> hikDeviceVoiceTransHandleMaps = new ConcurrentHashMap<>();
     /**
+     * 海康设备音频编码集合
+     */
+    public static Map<Long, Integer> hikDeviceEncodeFormatMaps = new ConcurrentHashMap<>();
+    /**
      * 音频解码句柄
      */
     public static Pointer pDecHandle = null;
 
     public static FileOutputStream outputStream = null;
     public static FileOutputStream outputStreamPcm = null;
-    public static Integer encodeFormat;
+
 
     public static Map<Integer, Long> DVRMaps = new ConcurrentHashMap<>();
 

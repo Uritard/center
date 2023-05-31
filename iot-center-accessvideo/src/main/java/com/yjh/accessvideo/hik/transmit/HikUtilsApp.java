@@ -78,7 +78,7 @@ public class HikUtilsApp {
             return false;
         } else {
             log.info("===================NET_DVR_Login_V40 success===================");
-            Constant.hikDeviceUserIdMaps.put(String.valueOf(hikDeviceInfo.getHikDeviceId()), lUserId);
+            Constant.hikDeviceUserIdMaps.put(hikDeviceInfo.getHikDeviceId(), lUserId);
             return true;
         }
     }

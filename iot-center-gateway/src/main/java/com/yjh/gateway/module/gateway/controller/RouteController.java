@@ -75,7 +75,7 @@ public class RouteController {
         try {
             InputStream reader = request.getInputStream();
             // G711编码:320 + 44 = 364 PCM编码:1920 + 44 = 1964
-            byte[] bytes = new byte[1964];
+            byte[] bytes = new byte[364];
             int n = reader.read(bytes);
             ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, 0, n);
             WebSocketServer.sendMsgBuffer(byteBuffer);

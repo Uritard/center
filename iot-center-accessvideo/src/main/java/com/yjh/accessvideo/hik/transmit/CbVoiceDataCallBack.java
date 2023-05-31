@@ -21,10 +21,12 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
     private static final HCNetSDK HC_NET_SDK = HCNetSDK.INSTANCE;
     private final String webSocketUrl;
+    private final Long deviceId;
     private static final int AUDIO_HEADER_LENGTH = 44;
 
-    public CbVoiceDataCallBack(String webSocketUrl){
+    public CbVoiceDataCallBack(String webSocketUrl, Long deviceId){
         this.webSocketUrl = webSocketUrl;
+        this.deviceId = deviceId;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
             }
 
             // 若编码格式为G711时,需要解码   G711 -> PCM
-            if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.encodeFormat){
+            if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)){
                 /*// 初始化音频解码
                 if (Constant.pDecHandle == null) {
                     Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
@@ -101,15 +103,16 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
                 if (Objects.nonNull(Constant.outputStreamPcm)) {
                     Constant.outputStreamPcm.write(bytes);
                 }
+                log.info("pcm data size is {}", bytes.length);
             }
 
-            if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.encodeFormat) {
+            if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)) {
                 log.info("Todo something by Aac");
             }
 
             // 组装wave并调用其他服务发送ws
-            byte[] bytesResult = createWaveFile(originBytes, Constant.encodeFormat);
-
+            byte[] bytesResult = createWaveFile(originBytes, Constant.hikDeviceEncodeFormatMaps.get(deviceId));
+            log.info("bytesResult data size is {}", bytesResult.length);
             Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
         }catch (Exception e){
             log.error(e.getMessage(), e);
