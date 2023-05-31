@@ -5,6 +5,9 @@
     <insert id="insertNonhomologousWarnInfo"  parameterType="java.util.Map">
         insert into t_cruise_nonhomologous_warn(
             warn_id,
+            device_name,
+            device_type_name,
+            device_mete_name,
             instance_id,
             device_mete_id,
             warn_content,
@@ -15,6 +18,9 @@
             three_cruise_device_name
         )values(
                    #{warnId, jdbcType=VARCHAR},
+                   #{deviceName, jdbcType=VARCHAR},
+                   #{deviceTypeName, jdbcType=VARCHAR},
+                   #{deviceMeteName, jdbcType=VARCHAR},
                    #{instanceId, jdbcType=VARCHAR},
                    #{deviceMeteId, jdbcType=BIGINT},
                    #{warnContent, jdbcType=VARCHAR},
@@ -58,10 +64,16 @@
         a.warn_threshold as warnThreshold,
         a.interval_type as intervalType,
         a.cruise_type as warnType,
+        e.deviceName,
+        k.dict_note AS deviceTypeName,
+        d.mete_name AS deviceMeteName,
         if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
         from t_cruise_nonhomologous_point_instance a
         left join t_cruise_point_instance b on b.instance_id = a.instance_id_one
         left join t_cruise_point_instance c on c.instance_id = a.instance_id_two
+        LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
+        LEFT JOIN t_std_device e ON e.device_id = d.device_id
+        LEFT JOIN t_dict_business k ON k.dict_code = e.device_type
         where a.instance_id_one = #{deviceId} or a.instance_id_two = #{deviceId}
     </select>
 

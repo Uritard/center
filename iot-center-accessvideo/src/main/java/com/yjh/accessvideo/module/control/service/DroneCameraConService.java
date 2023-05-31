@@ -220,8 +220,8 @@ public class DroneCameraConService {
         log.info("进入getPlayStreamUrl方法，入参： data：{},  cameraType: {}", JSONUtil.toJSONString(data), cameraType);
 
         String rtmpStr = "rtmp://%s:%s/live/%s";
-        String httpStr = "rtmp://%s:%s/live/%s.flv";
-        String wsStr = "rtmp://%s:%s/live/%s.flv";
+        String httpStr = "http://%s:%s/live/%s.flv";
+        String wsStr = "ws://%s:%s/live/%s.flv";
 
         Map<String, Object> map = new HashMap<>();
         map.put("rtmpUrlInferad", String.format(rtmpStr, data.getDrone_ip(), data.getRtmp_port(), data.getSteam()));
