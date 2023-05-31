@@ -61,6 +61,9 @@ public class LinkageMonitorData {
     @ApiModelProperty(value = "巡检点结果")
     private String resultNum;
 
+    @ApiModelProperty(value = "巡视值")
+    private String resultDesc;
+
     @ApiModelProperty(value = "开始时间")
     private String startTime;
 

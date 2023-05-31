@@ -649,8 +649,11 @@ public class TSequentialConfService{
     }
 
     private void upToMonitorSystem(Map<String, String> recBack, Map<String, Object> map, String param) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        log.info("recBack:{},map:{},param:{}", recBack, map, param);
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+        String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
+        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+        String path = ftpsFilePath + "/" + stationId + "/linkage/";
 
         try {
             String value = "";
@@ -661,10 +664,8 @@ public class TSequentialConfService{
                 case "4": value = "合不到位"; break;
                 default: value = "无效状态"; break;
             }
-            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
-            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-            String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
+            log.info("applicationProperties:{}", applicationProperties);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialVideocfmResult().replace("{{date}}", simpleDateFormat2.format(new Date()));
 
             File txt=new File(devicePath);
@@ -678,10 +679,10 @@ public class TSequentialConfService{
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(txt,true), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
-            bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
+            bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+DateTimeUtil.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::设备状态>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-            bw.write("#1\t"+1+"\t"+ meteId +"\t"+ map.get("deviceName")+"\t"+ value +"\t"+simpleDateFormat.format(new Date())+"\r\n");
+            bw.write("#1\t"+1+"\t"+ meteId +"\t"+ map.get("deviceName")+"\t"+ value +"\t"+DateTimeUtil.format(new Date())+"\r\n");
             bw.write("</DeviceInfo::设备状态>\r\n");
             bw.flush();
             bw.close();
@@ -691,6 +692,7 @@ public class TSequentialConfService{
                 mapForSend.put("edgeCode", map.get("edgeCode"));
                 mapForSend.put("command", "2");
                 mapForSend.put("filePath", devicePath.replace(ftpsFilePath, ""));
+                log.info("Sending file to edge...");
                 Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
             } else {
                 //将生成的顺控确认文件发送给主辅监控系统
@@ -698,6 +700,7 @@ public class TSequentialConfService{
                 List<String> list = new ArrayList<>();
                 list.add(devicePath);
                 mapForSend.put("list", list);
+                log.info("Sending file to udp...");
                 Constant.otherServer(mapForSend, Constant.UDP_SEND);
             }
         }catch (Exception e){
@@ -707,13 +710,16 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
-        //todo 写入识别结果
+
+
+
         return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+        log.info("applicationProperties:{}", applicationProperties);
 
         try{
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
@@ -754,12 +760,14 @@ public class TSequentialConfService{
                 mapForSend.put("edgeCode", tCfgDevice.getEdgeCode());
                 mapForSend.put("command", "3");
                 mapForSend.put("filePath", devicePath.replace(ftpsFilePath,""));
+                log.info("Sending file to edge...");
                 Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
             } else {
                 Map<String, List<String>> mapForSend = new HashMap<>();
                 List<String> list = new ArrayList<>();
                 list.add(devicePath);
                 mapForSend.put("list", list);
+                log.info("Sending file to udp...");
                 Constant.otherServer(mapForSend, Constant.UDP_SEND);
             }
         } catch (IOException e) {

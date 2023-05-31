@@ -6,6 +6,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
@@ -13,6 +14,7 @@ import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -137,13 +139,13 @@ public class StatisticsService {
         return result;
     }
 
-    public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type) {
+    public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type, int pageNum, int pageSize) {
         List<Map<String, Object>> list = null;
         if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(robotId,ROBOT.equals(type) ? "0":"1");
         } else {
-            list = packageInfo(type,robotId);
+            list = packageInfo(type,robotId, pageNum, pageSize);
         }
 /*        Long duration = null;
         String robotStatus = null;
@@ -248,13 +250,13 @@ public class StatisticsService {
      *
      * @return
      */
-    public List<Map<String, Object>> countCamera(Long id) {
+    public List<Map<String, Object>> countCamera(Long id, int pageNum, int pageSize) {
         List<Map<String, Object>> list = null;
         if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(id,"2");
         } else {
-            list = packageInfo(CAMERA,id);
+            list = packageInfo(CAMERA, id, pageNum, pageSize);
         }
 
         return list;
@@ -598,10 +600,12 @@ public class StatisticsService {
         return numberFormat.format((float) num1 / (float) num2 * 100) + "%";
     }
 
+    private List<Map<String, Object>> packageInfo(String key, Long id, int pageNum, int pageSize) {
+        int startIndex = pageSize * (pageNum - 1);
+        int endIndex = pageSize;
 
-    private List<Map<String, Object>> packageInfo(String key, Long id) {
         List<Map<String, Object>> list = new ArrayList<>();
-        //机器人无人机处理
+        // 机器人无人机处理
         if (ROBOT.equals(key) || DRONE.equals(key)) {
             List<Long> idList;
             if (id != null) {
@@ -612,6 +616,22 @@ public class StatisticsService {
             }
 
             if (!CollectionUtils.isEmpty(idList)) {
+                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex);
+                for (Map<String, Object> deviceStaticsInfo : deviceStaticsInfoList){
+                    String robotId = String.valueOf(deviceStaticsInfo.get("robotId"));
+
+                    // 正常巡检天数 & 巡检出勤率
+                    Map<String, Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(NumberUtils.toLong(robotId));
+                    deviceStaticsInfo.put("cruiseDay", result.getOrDefault("cruise_day", 0));
+                    deviceStaticsInfo.put("cruisePercent", result.get("cruise_rate") == null ? 0 : result.get("cruise_rate") + "%");
+
+                    deviceStaticsInfo.replaceAll((k, v) -> String.valueOf(v));
+                    redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + robotId, deviceStaticsInfo);
+                }
+                list.addAll(deviceStaticsInfoList);
+            }
+
+            /*if (!CollectionUtils.isEmpty(idList)) {
                 idList.forEach(robotId -> {
                     Map<String, Object> deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(robotId);
                     Integer normalDays = uPatrolDeviceStaticsDao.selectNormalDays(deviceStaticsInfo.get("deviceCode").toString());
@@ -630,73 +650,75 @@ public class StatisticsService {
                     redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + robotId, cacheMap);
                     list.add(deviceStaticsInfo);
                 });
+            }*/
+            return list;
+        }
+        // 摄像机处理
+        List<Map<String, Object>> mapList = statisticsDao.countCamera(id, startIndex, endIndex);
+
+        Set<Long> set = new HashSet();
+        for (Map<String, Object> map : mapList) {
+            // 巡检出勤率
+            double cruiseDay = NumberUtils.toDouble(map.get("cruiseDay").toString());
+            double commissionDay = NumberUtils.toDouble(map.get("commissionDay").toString());
+            if (commissionDay != 0) {
+                String cruisePercent = String.format("%.3f", cruiseDay * 100 / commissionDay);
+                map.put("cruisePercent", cruisePercent + "%");
+            }
+
+            // 漏检率
+            double totalNum = NumberUtils.toDouble(map.get("totalNum").toString());
+            double lossNum = NumberUtils.toDouble(map.get("lossNum").toString());
+            if (totalNum != 0) {
+                String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
+                map.put("lossPercent", lossPercent + "%");
+            }
+
+            Long recordId = NumberUtils.toLong(map.get("recordId").toString());
+            map.put("recordId", recordId);
+            if (0 == recordId) {
+                log.error("存在无对应的录像机");
+                continue;
+            }
+            set.add(recordId);
+        }
+        // 下面的太ex了后面再优化
+        Map<Integer, String> percentMap = new HashMap<>(8);
+        for (Long recordId : set) {
+            Result re = getNVRInfo(recordId);
+            if (re == null || re.getData() == null) {
+                continue;
+            }
+            Map<String, Object> mapData = (Map<String, Object>) re.getData();
+
+            List<Map<String, Object>> chanInfo = new ArrayList<>();
+            if (mapData.get("channel") != null) {
+                chanInfo = (List<Map<String, Object>>) mapData.get("channel");
+                for (Map<String, Object> mapChannel : chanInfo) {
+                    int intactTime = (int) mapChannel.get("intactTime");
+                    int ipChanNum = (int) mapChannel.get("ipChanNum");
+                    if (intactTime != 0) {
+                        String intactPercent = String.format("%.3f", intactTime / 100d);
+                        percentMap.put(ipChanNum, intactPercent + "%");
+                    }
+                }
             }
         }
-        else if (CAMERA.equals(key)) {
-            List<Map<String, Object>> mapList = statisticsDao.countCamera(id);
-            Set<Long> set = new HashSet();
+        if (percentMap.size() > 0) {
             for (Map<String, Object> map : mapList) {
-                // 正常巡检天数 & 巡检出勤率
-                Map<String, Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(map.get("cameraId").toString()));
-
-                map.put("cruiseDay",result.get("cruise_day"));
-                map.put("cruisePercent",result.get("cruise_rate") + "%");
-                double totalNum = Double.parseDouble(map.get("totalNum").toString());
-                double lossNum = Double.parseDouble(map.get("lossNum").toString());
-                if (totalNum != 0) {
-                    String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
-                    map.put("lossPercent", lossPercent + "%");
-                }
-
-
-                // 根据cameraId查询recordId，查询摄像机完整率
-                Long cameraId = (Long) map.get("cameraId");
-                Long recordId = statisticsDao.selectRecordByCamera(cameraId);
-                map.put("recordId", recordId);
-                if (recordId == null) {
-                    log.error("相机cameraId={}无对应的录像机", cameraId);
-                    continue;
-                }
-                set.add(recordId);
+                int ipChanNum = (int) map.get("channelNum");
+                map.put("intactPercent", percentMap.get(ipChanNum));
             }
-            Map<Integer, String> percentMap = new HashMap<>(8);
-            for (Long recordId : set) {
-                Result re = getNVRInfo(recordId);
-                if (re == null || re.getData() == null) {
-                    continue;
-                }
-                Map<String, Object> mapData = (Map<String, Object>) re.getData();
-
-                List<Map<String, Object>> chanInfo = new ArrayList<>();
-                if (mapData.get("channel") != null) {
-                    chanInfo = (List<Map<String, Object>>) mapData.get("channel");
-                    for (Map<String, Object> mapChannel : chanInfo) {
-                        int intactTime = (int) mapChannel.get("intactTime");
-                        int ipChanNum = (int) mapChannel.get("ipChanNum");
-                        if (intactTime != 0) {
-                            String intactPercent = String.format("%.3f", intactTime / 100d);
-                            percentMap.put(ipChanNum, intactPercent + "%");
-                        }
-                    }
-                }
-            }
-            if (percentMap.size() > 0) {
-                for (Map<String, Object> map : mapList) {
-                    int ipChanNum = (int) map.get("channelNum");
-                    map.put("intactPercent", percentMap.get(ipChanNum));
-                }
-            }
-            mapList.forEach(map -> {
-                        Map<String, String> tempMap = Maps.newHashMap();
-                        for (Map.Entry<String, Object> entry : map.entrySet()) {
-                            tempMap.put(entry.getKey(), String.valueOf(entry.getValue()));
-                        }
-                        redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), tempMap);
-                    }
-            );
-            return mapList;
         }
-        return list;
+        mapList.forEach(map -> {
+                    Map<String, String> tempMap = Maps.newHashMap();
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        tempMap.put(entry.getKey(), String.valueOf(entry.getValue()));
+                    }
+                    redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), tempMap);
+                }
+        );
+        return mapList;
     }
 
 

@@ -47,7 +47,9 @@ public interface StatisticsDao {
    *
    * @return map列表
    */
-  List<Map<String, Object>> countCamera(@Param(value = "cameraId") Long cameraId);
+  List<Map<String, Object>> countCamera(@Param(value = "cameraId") Long cameraId,
+                                        @Param("startIndex")int startIndex,
+                                        @Param("endIndex")int endIndex);
 
   /**
    * 根据相机id查询录像机id

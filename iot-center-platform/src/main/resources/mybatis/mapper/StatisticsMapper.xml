@@ -19,7 +19,8 @@
     </select>
     <select id="countCamera" resultType="java.util.HashMap">
         SELECT
-        tcp.`camera_id` cameraId,
+        tci.record_id as recordId,
+        tci.`camera_id` cameraId,
         tci.camera_name cameraName,
         channel_num channelNum,
         TO_DAYS(NOW()) - TO_DAYS(tci.commission_date) + 1 commissionDay,
@@ -27,29 +28,27 @@
         SELECT
         COUNT(
         DISTINCT DATE_FORMAT(
-        tcdr.`createtime`,
+        updr.`createtime`,
         '%Y-%m-%d'
         )
         )
         ) cruiseDay,
-        SUM(
-        IF (tcdr.cruise_result = 247, 1, 0)
-        ) AS lossNum,
-        COUNT(result.task_result_id) totalNum
+        SUM(IF (updr.cruise_result = 247, 1, 0)) AS lossNum,
+        COUNT(updr.cruise_data_id) totalNum
         FROM
-        t_camera_preset tcp
+        t_camera_info tci
+        LEFT JOIN `t_camera_preset` tcp ON tci.`camera_id` = tcp.`camera_id`
         LEFT JOIN `t_cruise_point_instance` tcpi ON tcp.`preset_id` = tcpi.`cruise_id`
-        LEFT JOIN `t_camera_info` tci ON tci.`camera_id` = tcp.`camera_id`
-        LEFT JOIN `u_patrol_data_result` tcdr ON tcdr.`cruise_id` = tcpi.`instance_id`
-        and tci.commission_date  <![CDATA[<]]> tcdr.`createtime`
-        LEFT JOIN t_cruise_task_result result ON result.task_id = tcdr.task_id
-        LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        AND tcdr.cruise_id = detail.instance_id
-        WHERE
-        tci.`commission_date` IS TRUE
+        LEFT JOIN `u_patrol_data_result` updr ON updr.`instance_id` = tcpi.`instance_id`
+        AND updr.cruise_time IS NOT NULL
+        AND updr.cruise_time > tci.commission_date
+        WHERE 1 == 1
         and tci.`commission_date`  <![CDATA[<=]]> now()
         <if test="cameraId != null and cameraId != ''">and tcp.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         GROUP BY cameraId
+        <if test="startIndex != 0 and endIndex != 0">
+            LIMIT #{startIndex},#{endIndex}
+        </if>
     </select>
     <select id="selectStatisticsRobot" resultType="java.util.Map">
         SELECT

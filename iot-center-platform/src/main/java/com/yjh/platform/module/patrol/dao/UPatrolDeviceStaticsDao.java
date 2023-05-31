@@ -32,4 +32,6 @@ public interface UPatrolDeviceStaticsDao {
 
     Integer batchInsert(@Param("list") List<DeviceStaticsInfo> deviceStaticsInfos);
     Integer batchDelete(@Param("list") Set<String> idList);
+
+    List<Map<String, Object>> selectRobotStaticsInfo(@Param("startIndex")int startIndex, @Param("endIndex")int endIndex);
 }

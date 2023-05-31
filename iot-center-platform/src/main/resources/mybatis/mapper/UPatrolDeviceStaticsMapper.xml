@@ -172,4 +172,37 @@
             #{item,jdbcType=VARCHAR}
         </foreach>
     </delete>
+
+    <select id="selectRobotStaticsInfo" resultType="java.util.Map">
+        SELECT
+            a.robot_id robotId,
+            a.robot_name AS robotName,
+            a.robot_num AS deviceCode,
+            a.last_online_time AS lastOnlineTime,
+            IFNULL(
+                    CONCAT(
+                            CONVERT (
+                                        a.duration / 60 / 1000,
+                                        DECIMAL (10, 0)
+                                ),
+                            '分钟'
+                        ),
+                    0
+                ) AS duration,
+            a.off_line_count AS offLineCount,
+            a.commission_date,
+            CASE b.device_run
+                WHEN 0 THEN
+                    b.commission_days + TO_DAYS(NOW()) - TO_DAYS(b.device_resume_date)
+                ELSE
+                    b.commission_days
+                END AS normal_day
+        FROM
+            t_robot_info a
+                LEFT JOIN device_statics_info_result b ON a.robot_num = b.device_code
+        <if test="startIndex != 0 and endIndex != 0">
+            LIMIT #{startIndex},#{endIndex}
+        </if>
+    </select>
+
 </mapper>
