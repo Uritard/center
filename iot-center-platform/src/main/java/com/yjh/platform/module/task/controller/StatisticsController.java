@@ -6,8 +6,6 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.task.service.StatisticsService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +20,11 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/statistics/v1")
-@Api(value = "/statistics", description = "统计信息接口")
+@Api(value = "/statistics", tags = "统计信息接口")
 public class StatisticsController {
 
-  @Autowired private final StatisticsService statisticsService;
+  @Autowired
+  private final StatisticsService statisticsService;
 
   private final Logger log = LoggerFactory.getLogger(StatisticsController.class);
 
@@ -37,10 +36,12 @@ public class StatisticsController {
   @GetMapping(value = "/robot")
   @Logs(title = "机器人/无人机可靠性",content = "根据用户传递的参数查询机器人/无人机可靠性",logType = 1, authority = "1234")
   public Result robot(@RequestParam(value = "id", required = false) Long id,
-                      @RequestParam(value = "type") String type) {
+                      @RequestParam(value = "type") String type,
+                      @RequestParam(defaultValue = "1") int pageNum,
+                      @RequestParam( defaultValue = "8") int pageSize) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.selectStatisticsRobot(id, type));
+      result.setData(statisticsService.selectStatisticsRobot(id, type, pageNum, pageSize));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("查询失败：", e);
@@ -51,11 +52,12 @@ public class StatisticsController {
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
   @Logs(title = "摄像机可靠性",content = "根据用户传递的参数查询摄像机可靠性",logType = 1, authority = "1234")
-  public Result camera(@RequestParam(value = "id", required = false) Long id) {
+  public Result camera(@RequestParam(value = "id", required = false) Long id,
+                       @RequestParam(defaultValue = "1") int pageNum,
+                       @RequestParam( defaultValue = "8") int pageSize) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countCamera(id));
-
+      result.setData(statisticsService.countCamera(id, pageNum, pageSize));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("查询失败：", e);
@@ -64,7 +66,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "巡视点位漏检率")
-  @RequestMapping(value = "/instance", method = RequestMethod.GET)
+  @GetMapping(value = "/instance")
   @Logs(title = "巡视点位漏检率",content = "根据用户传递的参数查询巡视点位漏检率",logType = 1, authority = "1234")
   public Result instance(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -82,7 +84,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "告警审核完成率")
-  @RequestMapping(value = "/warnCheck", method = RequestMethod.GET)
+  @GetMapping(value = "/warnCheck")
   @Logs(title = "告警审核完成率",content = "根据用户传递的参数查询告警审核完成率",logType = 1, authority = "1234")
   public Result countWarnCheck(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -102,7 +104,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "巡视告警准确率")
-  @RequestMapping(value = "/warnAccuracy", method = RequestMethod.GET)
+  @GetMapping(value = "/warnAccuracy")
   @Logs(title = "巡视告警准确率",content = "根据用户传递的参数查询巡视告警准确率",logType = 1, authority = "1234")
   public Result countWarnAccuracy(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -121,7 +123,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "巡视结果人工审核完成率")
-  @RequestMapping(value = "/resultCheck", method = RequestMethod.GET)
+  @GetMapping(value = "/resultCheck")
   @Logs(title = "巡视结果人工审核完成率",content = "根据用户传递的参数查询巡视结果人工审核完成率",logType = 1, authority = "1234")
   public Result countResultCheck(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -140,7 +142,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "巡视任务闭环率")
-  @RequestMapping(value = "/taskCheck", method = RequestMethod.GET)
+  @GetMapping(value = "/taskCheck")
   @Logs(title = "巡视任务闭环率",content = "根据用户传递的参数查询巡视任务闭环率",logType = 1, authority = "1234")
   public Result taskCheck(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -159,7 +161,7 @@ public class StatisticsController {
 
 
   @ApiOperation(value = "执行巡视任务次数")
-  @RequestMapping(value = "/taskFrequency", method = RequestMethod.GET)
+  @GetMapping(value = "/taskFrequency")
   @Logs(title = "巡视任务执行次数", content = "按日月周统计任务执行次数", logType = 1, authority = "1234")
   public Result taskFrequency(
           @RequestParam(value = "code",required = false)String regionCode,
@@ -179,7 +181,7 @@ public class StatisticsController {
 
 
   @ApiOperation(value = "统计巡视任务时长")
-  @RequestMapping(value = "/taskExecutedPeriod", method = RequestMethod.GET)
+  @GetMapping(value = "/taskExecutedPeriod")
   @Logs(title = "统计巡视任务执行时长", content = "按日月周统计任务执行总时长", logType = 1, authority = "1234")
   public Result taskExecutedPeriod(
           @RequestParam(value = "type") Integer type,
@@ -197,7 +199,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "统计任务执行发现的缺陷")
-  @RequestMapping(value = "/taskFoundDefects", method = RequestMethod.GET)
+  @GetMapping(value = "/taskFoundDefects")
   @Logs(title = "巡视任务执行次数", content = "按日月周统计任务执行次数", logType = 1, authority = "1234")
   public Result taskFoundDefects(
           @RequestParam(value = "type") Integer type,
@@ -215,7 +217,7 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "导出任务执行可靠性报表")
-  @RequestMapping(value = "exportTaskExecutedReliableTable",method = RequestMethod.GET)
+  @GetMapping(value = "exportTaskExecutedReliableTable")
   @Logs(title = "导出任务执行可靠性报表",content = "按日月周导出任务执行次数、时长、发现缺陷的重量与数量", logType = 1, authority = "1234")
   public Result exportTaskExecutedReliableTable(
           @RequestParam(value = "type") Integer type,

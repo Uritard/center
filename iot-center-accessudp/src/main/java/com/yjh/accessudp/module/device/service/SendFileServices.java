@@ -36,6 +36,7 @@ public class SendFileServices {
         //读取联动设备的信息
         //TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
         //String devicePath = "D:/code/qhTest/deviceInfo666.txt";
+
         log.info("文件路径：  "+devicePath);
         BufferedReader br = null;
         InputStreamReader in = null;
