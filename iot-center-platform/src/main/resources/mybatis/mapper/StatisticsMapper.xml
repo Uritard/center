@@ -42,7 +42,7 @@
         LEFT JOIN `u_patrol_data_result` updr ON updr.`instance_id` = tcpi.`instance_id`
         AND updr.cruise_time IS NOT NULL
         AND updr.cruise_time > tci.commission_date
-        WHERE 1 == 1
+        WHERE 1 = 1
         and tci.`commission_date`  <![CDATA[<=]]> now()
         <if test="cameraId != null and cameraId != ''">and tcp.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         GROUP BY cameraId

@@ -42,7 +42,7 @@ public class VoiceDevice {
 
     private String filePath;
 
-    private Integer dbValue;
+    private String dbValue;
 
-    private Integer fValue;
+    private String fValue;
 }
