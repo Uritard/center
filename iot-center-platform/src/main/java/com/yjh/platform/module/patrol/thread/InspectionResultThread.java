@@ -310,7 +310,6 @@ public class InspectionResultThread implements Runnable{
             int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
             tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             if (TypeEnum.VOICE.getCode() != cruiseType) {
                 tCruiseTaskResultMap.put("origpic", resultImagePath);
@@ -365,10 +364,6 @@ public class InspectionResultThread implements Runnable{
                                       String value, boolean fileFound) {
         log.info("====This is the result of no algorithm==={}", value);
         try {
-            tCruiseTaskResultMap.put("resultDesc", StringUtils.isNotEmpty(value) ? "" : "已拍照");
-            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : "已拍照");
-            String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
-
             String resultValue = tCruiseTaskResultMap.get("resultNum");
 
             int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
@@ -380,6 +375,7 @@ public class InspectionResultThread implements Runnable{
                     resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
                 }
             }
+            String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         } catch (Exception e) {

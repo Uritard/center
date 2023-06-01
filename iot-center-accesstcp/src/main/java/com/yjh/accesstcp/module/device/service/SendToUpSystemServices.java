@@ -1189,7 +1189,7 @@ public class SendToUpSystemServices {
             downloadFile(localFilePath, filePath);
             Map<String, List<String>> mapForSend = new HashMap<>(1);
             List<String> list = new ArrayList<>();
-            list.add(filePath);
+            list.add(localFilePath);
             mapForSend.put("list", list);
             Constant.otherServer(mapForSend, Constant.UDP_SEND);
         } catch (Exception e) {
