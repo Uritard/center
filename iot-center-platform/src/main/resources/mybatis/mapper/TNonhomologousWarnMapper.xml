@@ -64,7 +64,7 @@
         a.warn_threshold as warnThreshold,
         a.interval_type as intervalType,
         a.cruise_type as warnType,
-        e.deviceName,
+        e.device_mame AS deviceName,
         k.dict_note AS deviceTypeName,
         d.mete_name AS deviceMeteName,
         if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
