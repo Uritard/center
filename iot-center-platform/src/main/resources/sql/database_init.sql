@@ -1037,6 +1037,8 @@ CREATE TABLE `t_cruise_nonhomologous_warn` (
   `device_name` varchar(256) DEFAULT NULL COMMENT '设备名称',
   `device_type_name` varchar(256) DEFAULT NULL COMMENT '设备类型',
   `device_mete_name` varchar(256) DEFAULT NULL COMMENT '测点名称',
+  `region_name` varchar(256) DEFAULT NULL COMMENT '区域名称',
+  `custom_name` varchar(256) DEFAULT NULL COMMENT '部件名称',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='非同源告警表';
 

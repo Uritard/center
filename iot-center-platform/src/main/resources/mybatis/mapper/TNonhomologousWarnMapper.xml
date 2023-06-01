@@ -15,7 +15,9 @@
             warn_type,
             one_cruise_device_name,
             two_cruise_device_name,
-            three_cruise_device_name
+            three_cruise_device_name,
+            region_name,
+            custom_name
         )values(
                    #{warnId, jdbcType=VARCHAR},
                    #{deviceName, jdbcType=VARCHAR},
@@ -28,7 +30,9 @@
                    #{warnType, jdbcType=INTEGER},
                    #{oneCruiseDeviceName, jdbcType=VARCHAR},
                    #{twoCruiseDeviceName, jdbcType=VARCHAR},
-                   #{threeCruiseDeviceName, jdbcType=VARCHAR}
+                   #{threeCruiseDeviceName, jdbcType=VARCHAR},
+                   #{regionName, jdbcType=VARCHAR},
+                   #{customName, jdbcType=VARCHAR}
                )
     </insert>
 
@@ -65,15 +69,18 @@
         a.warn_threshold as warnThreshold,
         a.interval_type as intervalType,
         a.cruise_type as warnType,
-        e.device_name,
-        k.dict_note AS device_type_name,
-        d.mete_name AS device_mete_name,
+        e.device_name as deviceName,
+        k.dict_note as deviceTypeName,
+        d.mete_name as deviceMeteName,
+        d.custom_name as customName,
+        f.region_name as regionName,
         if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
         from t_cruise_nonhomologous_point_instance a
         LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
         LEFT JOIN t_std_device e ON e.device_id = d.device_id
         LEFT JOIN t_dict_business k ON k.dict_code = e.device_type
         LEFT JOIN t_cruise_triphase_rule n ON n.triphase_id = a.instance_id
+        left join t_std_region f on e.up_region_id = f.region_id
         where a.instance_id_one = #{deviceId} or a.instance_id_two = #{deviceId}
     </select>
 
