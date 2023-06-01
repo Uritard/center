@@ -517,11 +517,6 @@ public class UPatrolTaskService {
                     break;
             }
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
-            if (!Constant.fastTurbo()) {
-                log.info("str {}", str);
-                log.info("map {}", map);
-                log.info("task {}", task);
-            }
             redisTemplate.opsForHash().putAll(str, map);
         }
         initializeThisTaskInfo(task, detailList.size(), nodeSet);

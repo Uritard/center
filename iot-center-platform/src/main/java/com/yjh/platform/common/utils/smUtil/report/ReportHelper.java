@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -153,7 +154,7 @@ public class ReportHelper {
     }
     public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest,String taskId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook(rowNum);
-        final Sheet sheet = wb.createSheet("巡检报告");
+        final SXSSFSheet sheet = wb.createSheet("巡检报告");
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         Row row;
         Cell cell;
@@ -231,7 +232,7 @@ public class ReportHelper {
                     }
 
                     int textLength = longestLine.length();
-                    int ENCharLength = longestLine.replaceAll("[^A-Za-z0-9.:-]+", "").length();
+                    int ENCharLength = longestLine.replaceAll("[^A-Za-z0-9,.:-]+", "").length();
                     int CHCharLength = textLength - ENCharLength;
                     int length = ENCharLength + (int) (CH2EN * CHCharLength);
                     if (length > maxChars[colStart]) {
@@ -305,33 +306,29 @@ public class ReportHelper {
                 mergeCell(sheet, rowIndex, element.getRowEnd(), colStart, element.getColumnEnd());
             }
 
-//            final int cellHeight = element.getCellHeight();
-//            if (cellHeight > 0) {
-//                row.setHeightInPoints(cellHeight);
-//            }
+            final int cellHeight = element.getCellHeight();
+            if (cellHeight > 0) {
+                row.setHeightInPoints(cellHeight);
+            }
         }
-
-        boolean useAutoSize = true;//rowNum <= 1000;
 
         for (int i = 0; i < columnNum; ++i) {
-            if (imageColumnMap.containsKey(i))
+            if (imageColumnMap.containsKey(i)) {
                 continue;
-
-            if (useAutoSize) {
-                try {
-                    sheet.autoSizeColumn(i,true);
-                    continue;
-                } catch (Exception e) {
-                    logger.info("Failed to autoSize for column " + i);
-                }
+            }
+            try {
+                sheet.trackColumnForAutoSizing(i);
+                sheet.autoSizeColumn(i, true);
+                continue;
+            } catch (Exception e) {
+                logger.error("Failed to autoSize for column", e);
             }
 
-            if (maxChars[i] == -1)
+            if (maxChars[i] == -1) {
                 continue;
-
+            }
             sheet.setColumnWidth(i, calculateCellWidth(ChineseChars[i], EnglishChars[i], isBold[i]));
         }
-        logger.info("Set Column Size done. AutoSize ? " + useAutoSize);
 
         FileOutputStream fileOut = null;
         try {
