@@ -297,6 +297,7 @@ public class UPatrolResultService {
             return;
         }
         String personCheck = afterManualReviewInfo.getModifyNum().split(",")[0];
+        String checkDesc = afterManualReviewInfo.getPersonCheck();
 
         Map<String, String> initInfo = new HashMap<>(16);
         initInfo.put("valueTemp", personCheck);
@@ -313,12 +314,13 @@ public class UPatrolResultService {
                 initInfo.put("valueTemp", String.valueOf(abs));
                 initInfo.put("temperature", temperature);
                 initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
-                initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + personCheck + "--温差" + abs);
+                initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + checkDesc + "--温差" + abs);
                 initInfo.put("outRange", String.valueOf(abs));
             }
         }
         Map<String, Object> params = new HashMap<>();
         params.put("value", personCheck);
+        params.put("valueDesc", checkDesc);
         params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
         params.put("meteKind", tStdDevicemete.getMeteKind());
         params.put("alarmState", tStdDevicemete.getAlarmState());

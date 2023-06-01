@@ -111,6 +111,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             Map<String, Object> params = new HashMap<>(16);
             params.put("value", initInfo.get("valueTemp"));
+            params.put("valueDesc", initInfo.get("valueDesc"));
             params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
             params.put("meteKind", tStdDevicemete.getMeteKind());
             params.put("alarmState", tStdDevicemete.getAlarmState());

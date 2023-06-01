@@ -418,7 +418,7 @@ public class AnalyseDataOperateService {
      * @param lowLimit4 遥测 下4 阈值
      * @return  是否产生告警  0/1
      */
-   public Map<String,Object> alarmJudge(String value, String stdDeviceMeteName,
+   public Map<String,Object> alarmJudge(String value, String valueDesc, String stdDeviceMeteName,
                                         String meteKind,
                                         Integer alarmState, String stateZero,
                                         String stateOne, Integer alarmLevel,
@@ -441,7 +441,7 @@ public class AnalyseDataOperateService {
                return resultMap;
            }
            // 告警信息拼装并返回
-           warnInfoSetting(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
+           warnInfoSetting(value, valueDesc, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
                    highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap);
        }catch (Exception e){
            log.error(e.getMessage(), e);
@@ -450,7 +450,7 @@ public class AnalyseDataOperateService {
        return resultMap;
    }
 
-    private Map<String,Object> warnInfoSetting(String value, String stdDeviceMeteName, String meteKind,
+    private Map<String,Object> warnInfoSetting(String value, String valDesc, String stdDeviceMeteName, String meteKind,
                                                Integer alarmState, String stateZero, String stateOne,
                                                Integer alarmLevel, Float highLimit1, Float lowLimit1,
                                                Float highLimit2, Float lowLimit2, Float highLimit3,
@@ -463,21 +463,14 @@ public class AnalyseDataOperateService {
         //超越浮动值
         String outRange = null;
         Date warnTime = null;
+        String valueDesc = StringUtils.defaultIfBlank(valDesc, value);
         switch (meteKind) {
             case "1":
                 warnLevel = alarmLevel;
                 if (warnJudgementTelesignaling(value, stateZero, stateOne, alarmState) == 1) {
                     isWarn = true;
                     warnName = stdDeviceMeteName;
-                    switch (alarmState) {
-                        case 0:
-                            warnContent = stdDeviceMeteName + ":" + stateZero + "--" + "状态" + selectDictNote(warnLevel.toString(), "alarm_level");
-                            break;
-                        case 1:
-                            warnContent = stdDeviceMeteName + ":" + stateOne + "--" + "状态" + selectDictNote(warnLevel.toString(), "alarm_level");
-                        default:
-                            break;
-                    }
+                    warnContent = stdDeviceMeteName + ":" + valueDesc + "--" + "状态" + selectDictNote(warnLevel.toString(), "alarm_level");
                     warnTime = new Date();
                 }
                 break;
@@ -495,7 +488,7 @@ public class AnalyseDataOperateService {
                         switch (level) {
                             case 1:
                                 warnLevel = Integer.valueOf(selectDictCode("alarm_level", "预警"));
-                                warnContent = stdDeviceMeteName + ":" + value + "--" + "预警";
+                                warnContent = stdDeviceMeteName + ":" + valueDesc + "--" + "预警";
                                 if (resultValueMeter >= highLimit1) {
                                     outRange = String.valueOf(resultValueMeter - highLimit1);
                                 } else {
@@ -504,7 +497,7 @@ public class AnalyseDataOperateService {
                                 break;
                             case 2:
                                 warnLevel = Integer.valueOf(selectDictCode("alarm_level", "一般告警"));
-                                warnContent = stdDeviceMeteName + ":" + value + "--" + "一般告警";
+                                warnContent = stdDeviceMeteName + ":" + valueDesc + "--" + "一般告警";
                                 if (resultValueMeter >= highLimit2) {
                                     outRange = String.valueOf(resultValueMeter - highLimit2);
                                 } else {
@@ -513,7 +506,7 @@ public class AnalyseDataOperateService {
                                 break;
                             case 3:
                                 warnLevel = Integer.valueOf(selectDictCode("alarm_level", "严重告警"));
-                                warnContent = stdDeviceMeteName + ":" + value + "-" + "严重告警";
+                                warnContent = stdDeviceMeteName + ":" + valueDesc + "-" + "严重告警";
                                 if (resultValueMeter >= highLimit3) {
                                     outRange = String.valueOf(resultValueMeter - highLimit3);
                                 } else {
@@ -522,7 +515,7 @@ public class AnalyseDataOperateService {
                                 break;
                             case 4:
                                 warnLevel = Integer.valueOf(selectDictCode("alarm_level", "危急告警"));
-                                warnContent = stdDeviceMeteName + ":" + value + "-" + "危急告警";
+                                warnContent = stdDeviceMeteName + ":" + valueDesc + "-" + "危急告警";
                                 if (resultValueMeter >= highLimit4) {
                                     outRange = String.valueOf(resultValueMeter - highLimit4);
                                 } else {

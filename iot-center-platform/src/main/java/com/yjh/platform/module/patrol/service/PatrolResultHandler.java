@@ -286,7 +286,9 @@ public class PatrolResultHandler {
             isAlarmMap.put("robotCode", robotPatrolTaskResult.getSendCode());
             isAlarmMap.put("taskCode", taskId);
             isAlarmMap.put("instanceId", instanceId);
-            isAlarmMap.put("value", robotPatrolTaskResult.getValue());
+            String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
+            isAlarmMap.put("value", value);
+            isAlarmMap.put("valueDesc", robotPatrolTaskResult.getValueUnit());
             isAlarmMap.put("deviceName", robotPatrolTaskResult.getDeviceName());
             isAlarmMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             isAlarmMap.put("fileType", robotPatrolTaskResult.getFileType());
