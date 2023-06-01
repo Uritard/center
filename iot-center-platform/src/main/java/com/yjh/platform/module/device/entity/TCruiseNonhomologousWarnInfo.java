@@ -103,8 +103,16 @@ public class TCruiseNonhomologousWarnInfo implements Serializable {
 //    @TableField(value = "camera_name",updateStrategy = FieldStrategy.IGNORED)
 //    private String cameraName;
 
+    @ApiModelProperty(value = "巡视点1巡视设备")
+    @TableField(value = "",updateStrategy = FieldStrategy.IGNORED)
     private String oneCruiseDeviceName;
+
+    @ApiModelProperty(value = "巡视点2巡视设备")
+    @TableField(value = "two_cruise_device_name",updateStrategy = FieldStrategy.IGNORED)
     private String twoCruiseDeviceName;
+
+    @ApiModelProperty(value = "巡视点3巡视设备名称")
+    @TableField(value = "three_cruise_device_name",updateStrategy = FieldStrategy.IGNORED)
     private String threeCruiseDeviceName;
 
     @Max(value=999999999)

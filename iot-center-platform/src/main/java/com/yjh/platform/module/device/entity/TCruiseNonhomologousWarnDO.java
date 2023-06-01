@@ -56,9 +56,27 @@ public class TCruiseNonhomologousWarnDO  implements Serializable {
     @TableField(value = "warn_time",updateStrategy = FieldStrategy.IGNORED)
     private String warnTime;
 
-
+    @ApiModelProperty(value = "巡视点1巡视设备")
+    @TableField(value = "",updateStrategy = FieldStrategy.IGNORED)
     private String oneCruiseDeviceName;
+
+    @ApiModelProperty(value = "巡视点2巡视设备")
+    @TableField(value = "two_cruise_device_name",updateStrategy = FieldStrategy.IGNORED)
     private String twoCruiseDeviceName;
+
+    @ApiModelProperty(value = "巡视点3巡视设备名称")
+    @TableField(value = "three_cruise_device_name",updateStrategy = FieldStrategy.IGNORED)
     private String threeCruiseDeviceName;
 
+    @ApiModelProperty(value = "设备名称")
+    @TableField(value = "device_name",updateStrategy = FieldStrategy.IGNORED)
+    private String deviceName;
+
+    @ApiModelProperty(value = "设备类型")
+    @TableField(value = "device_type_name",updateStrategy = FieldStrategy.IGNORED)
+    private String deviceTypeName;
+
+    @ApiModelProperty(value = "测点名称")
+    @TableField(value = "device_mete_name",updateStrategy = FieldStrategy.IGNORED)
+    private String deviceMeteName;
 }
