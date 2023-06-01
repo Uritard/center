@@ -56,24 +56,24 @@
     <select id="getNonhomologousInspections" parameterType="java.util.Map" resultType="java.util.Map">
         select
         a.instance_id as instanceId,
+        n.one_cruise_device_name as oneCruiseName,
+        n.two_cruise_device_name as twoCruiseName,
+        n.tri_cruise_device_name AS threeCruiseDeviceName,
         a.device_mete_id as deviceMeteId,
         a.instance_id_one as instanceIdOne,
         a.instance_id_two as instanceIdTwo,
-        b.cruise_name as oneCruiseName,
-        c.cruise_name as twoCruiseName,
         a.warn_threshold as warnThreshold,
         a.interval_type as intervalType,
         a.cruise_type as warnType,
-        e.device_mame AS deviceName,
-        k.dict_note AS deviceTypeName,
-        d.mete_name AS deviceMeteName,
+        e.device_name,
+        k.dict_note AS device_type_name,
+        d.mete_name AS device_mete_name,
         if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
         from t_cruise_nonhomologous_point_instance a
-        left join t_cruise_point_instance b on b.instance_id = a.instance_id_one
-        left join t_cruise_point_instance c on c.instance_id = a.instance_id_two
         LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
         LEFT JOIN t_std_device e ON e.device_id = d.device_id
         LEFT JOIN t_dict_business k ON k.dict_code = e.device_type
+        LEFT JOIN t_cruise_triphase_rule n ON n.triphase_id = a.instance_id
         where a.instance_id_one = #{deviceId} or a.instance_id_two = #{deviceId}
     </select>
 
