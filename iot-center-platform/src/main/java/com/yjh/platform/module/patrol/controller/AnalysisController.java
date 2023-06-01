@@ -195,7 +195,7 @@ public class AnalysisController {
 
     @ApiOperation(value = "告警判断处理接口")
     @GetMapping(value = "/warnInfo")
-    public Result alarmJudge(@RequestParam String value, @RequestParam String stdDeviceMeteName,
+    public Result alarmJudge(@RequestParam String value, @RequestParam(value = "valueDesc", required = false) String valueDesc, @RequestParam String stdDeviceMeteName,
                            @RequestParam String meteKind, @RequestParam Integer alarmState,
                            @RequestParam String stateZero, @RequestParam String stateOne,
                            @RequestParam Integer alarmLevel,
@@ -205,7 +205,7 @@ public class AnalysisController {
                            @RequestParam Float highLimit4, @RequestParam Float lowLimit4) {
         Result result = new Result();
         try {
-            result.setData(analyseDataOperateService.alarmJudge(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
+            result.setData(analyseDataOperateService.alarmJudge(value, valueDesc, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
                     highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
