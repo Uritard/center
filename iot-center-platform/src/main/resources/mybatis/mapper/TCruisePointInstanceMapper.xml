@@ -669,7 +669,7 @@
         c.preset_id as presetId,
         d.channel_num as channelNum
         FROM
-        t_cruise_point_instance b,
+        t_cruise_point_instance b
         left join t_camera_preset c on b.cruise_id = c.preset_id
        left join t_camera_info d on c.camera_id = d.camera_id
         where b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
