@@ -597,6 +597,9 @@ public class TStdDeviceModelService {
                 t.setDeviceId(old.getDeviceId());
                 //告警由巡视主机去配置,同步之后不能覆盖
                 if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)){
+                    t.setIsAi(old.getIsAi());
+                    t.setIsJudge(old.getIsJudge());
+                    t.setAnalyseType(old.getAnalyseType());
                     t.setMeteKind(old.getMeteKind());
                     t.setUnit(old.getUnit());
                     t.setAlarmNote(old.getAlarmNote());
