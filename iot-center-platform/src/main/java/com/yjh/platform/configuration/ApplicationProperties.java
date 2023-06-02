@@ -31,11 +31,6 @@ public class ApplicationProperties {
     @Value("${spring.inspection.conf}")
     private String inspectionConf;
     /**
-     * 任务是否下发到机器人
-     */
-    @Value("${spring.task.to.robot}")
-    private String taskToRobot;
-    /**
      * 顺控是否自定义结果 0-否 1-是
      */
     @Value("${spring.sequential.result.flag}")
@@ -149,8 +144,6 @@ public class ApplicationProperties {
         private Boolean cameraPresetSecondCheck;
         //非同源趋势对比支持汉字
         private String nonhomologousWarn;
-        //任务是否下发到机器人
-        private String taskToRobot;
         //stationCode
         private String stationCode;
     }
@@ -225,7 +218,6 @@ public class ApplicationProperties {
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
         otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("springInterfaceApi"),false))
                 .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
-                .setTaskToRobot(taskToRobot)
                 .setStationCode((String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
