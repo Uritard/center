@@ -128,8 +128,8 @@ public class TCruiseNonhomologousPointInstanceService {
                 tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",robotName);
                 tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
                 tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
-                tCruiseNonhomologousWarnInfo.put("delayName", listMaps.get(0) == null ? null : listMaps.get(0).get("region_name"));
-                tCruiseNonhomologousWarnInfo.put("customName", listMaps.get(0) == null ? null : listMaps.get(0).get("custom_name"));
+                tCruiseNonhomologousWarnInfo.put("delayName", tCruiseNonhomologousWarnDO.getRegionName());
+                tCruiseNonhomologousWarnInfo.put("customName", tCruiseNonhomologousWarnDO.getCustomName());
                 tCruiseNonhomologousWarnInfo.put("warnContent", tCruiseNonhomologousWarnDO.getWarnContent());
             } else {
                 tCruiseNonhomologousWarnInfo.put("deviceName",tCruiseNonhomologousWarnDO.getDeviceName());
@@ -140,8 +140,8 @@ public class TCruiseNonhomologousPointInstanceService {
                 listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
                 tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
                 tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
-                tCruiseNonhomologousWarnInfo.put("delayName", listMaps.get(0) == null ? null : listMaps.get(0).get("region_name"));
-                tCruiseNonhomologousWarnInfo.put("customName", listMaps.get(0) == null ? null : listMaps.get(0).get("custom_name"));
+                tCruiseNonhomologousWarnInfo.put("delayName", tCruiseNonhomologousWarnDO.getRegionName());
+                tCruiseNonhomologousWarnInfo.put("customName", tCruiseNonhomologousWarnDO.getCustomName());
                 tCruiseNonhomologousWarnInfo.put("warnContent", tCruiseNonhomologousWarnDO.getWarnContent());
             }
         }

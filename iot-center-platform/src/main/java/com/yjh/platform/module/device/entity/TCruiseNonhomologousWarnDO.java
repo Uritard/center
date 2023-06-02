@@ -79,4 +79,12 @@ public class TCruiseNonhomologousWarnDO  implements Serializable {
     @ApiModelProperty(value = "测点名称")
     @TableField(value = "device_mete_name",updateStrategy = FieldStrategy.IGNORED)
     private String deviceMeteName;
+
+    @ApiModelProperty(value = "区域名称")
+    @TableField(value = "region_name",updateStrategy = FieldStrategy.IGNORED)
+    private String regionName;
+
+    @ApiModelProperty(value = "部件名称")
+    @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
+    private String customName;
 }
