@@ -1462,4 +1462,10 @@
         FROM t_robot_info a
         WHERE a.robot_code = #{robotCode} and drone_type is not null
     </select>
+
+    <select id="selectAlarmShield" resultType="com.yjh.platform.module.user.entity.AlarmShield">
+        select * from alarm_shield
+        where warn_count like concat('%',#{warnCount},'%')
+        and shield_id = #{robotId}
+    </select>
 </mapper>

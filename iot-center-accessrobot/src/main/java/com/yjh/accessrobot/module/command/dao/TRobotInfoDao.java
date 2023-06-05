@@ -421,4 +421,7 @@ public interface TRobotInfoDao {
 
     int checkDroneByRobotCode(@Param(value = "robotCode") String robotCode);
 
+    List<AlarmShield> selectAlarmShield(@Param(value = "robotId") Long robotId,
+                                        @Param(value = "warnCount") String warnCount);
+
 }

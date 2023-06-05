@@ -317,7 +317,6 @@ public class IntelAnalysisService {
         for (Analysis analysis: analysisList) {
             // 如果是静默监视识别 只要求识别越线闯入、未穿工装和未带安全帽
             if (Objects.equals("12", analysis.getAnalyseType())) {
-                //静默的  判断他是本系统的还是下级
                 String recognizeType = "";
                 recognizeType = tCameraPresetDao.selectRecognizeTypeByPresetId(analysis.getInstanceId());
                 AnalyseObject analyseObject = new AnalyseObject();
@@ -1106,8 +1105,6 @@ public class IntelAnalysisService {
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
             log.info("analyseDataOperateDao.selectInstanceInfo入参及结果，ObjectId：{}， map: {}", analyseResult.getObjectId(), JSONUtil.toJSONString(map));
 
-            Boolean isHave = false;
-
             log.info("人工干预静默监视识别结果开始，干预前的结果：{}", JSONUtil.toJSONString(analyseResult));
             // 人工干预静默监视识别结果
             processSilentMonitorResult(analyseResult);
@@ -1138,9 +1135,6 @@ public class IntelAnalysisService {
                 String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
                 resultImg.add(defectResultRealImg);
-                if ("1".equals(value)){
-                    isHave = true;
-                }
             }
 
             List<String> resultImgList = new ArrayList<>();

@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.entity.AlarmShield;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
+import com.yjh.accessrobot.module.command.service.RobotService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 可靠性统计工具类
@@ -43,6 +46,9 @@ public class StatisticsUtil {
 
   @Resource
   private ServiceRestTemplate serviceRestTemplate;
+
+  @Resource
+  private RobotService robotService;
 
   /**
    * 刷新机器人/无人机状态的同时，刷新缓存，统计在线时长及离线次数 <br>
@@ -147,10 +153,27 @@ public class StatisticsUtil {
                   .setAlarmTime(now)
                   .setAlarmState(0);
           log.info("tRobotAlarm的内容==={}", tRobotAlarm);
-          int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
-          log.info("插告警表的结果=" + res);
+          //告警屏蔽处理
+          AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
+          List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getRobotId(), tRobotAlarm.getAlarmInfo());
+          if (alarmShieldList.size() > 0){
+            alarmShieldList.forEach(alarmShield -> {
+              Date endTime = alarmShield.getEndTime();
+              if (now.before(endTime)){
+                log.info("告警屏蔽：{}",alarmShield);
+                isWarn.set(false);
+              }
+            });
+          }
+          if (isWarn.get()){
+            int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
+            log.info("插告警表的结果=" + res);
 
-          sendWebsocket(tRobotAlarm);
+            sendWebsocket(tRobotAlarm);
+          } else {
+            log.info("此告警被屏蔽了，不入库，不弹窗");
+          }
+
         }
       }
     } catch (Exception e) {
