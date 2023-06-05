@@ -22,6 +22,7 @@ import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -1584,12 +1585,12 @@ public class CameraConService {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
         log.info("camreaStatusMap: {}, camreaStatusMapState: {}", camreaStatusMap, camreaStatusMap.get("state"));
         if (Objects.nonNull(camreaStatusMap.get("state"))) {
-            Integer state = Integer.parseInt(String.valueOf(camreaStatusMap.get("state")));
-            if (Objects.equals(state, 1)) {
+            int state = MapUtils.getIntValue(camreaStatusMap, "state");
+            if (1 == state) {
                 try {
                     //判断时间问题
-                    String lastTime = String.valueOf(camreaStatusMap.get("lastTime"));
-                    Date endDate = format.parse(lastTime);
+                    String lastTime = MapUtils.getString(camreaStatusMap, "lastTime");
+                    Date endDate = DateTimeUtil.parse(lastTime);
                     if (System.currentTimeMillis() - endDate.getTime() > 10 * 60 * 1000) {
                         //最后一次操控时间距离现在大于10分钟
                         camreaStatusMap.put("state", "0");
@@ -3189,6 +3190,7 @@ public class CameraConService {
             } else {
                 map = new HashMap<>();
                 map.put("cameraId", String.valueOf(cameraId));
+                map.put("lastTime", format.format(new Date()));
             }
             redisTemplate.opsForHash().putAll(str, map);
         } catch (Exception e) {

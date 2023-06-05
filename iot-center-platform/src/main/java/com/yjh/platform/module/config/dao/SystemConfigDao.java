@@ -3,10 +3,12 @@ package com.yjh.platform.module.config.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yjh.platform.module.config.entity.ConfigTreeNode;
 import com.yjh.platform.module.config.entity.SystemConfig;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -26,4 +28,6 @@ public interface SystemConfigDao {
 
     List<SystemConfig> selectAll();
 
+    @MapKey("id")
+    Map<String, SystemConfig> selectByConfigList(List<SystemConfig> list);
 }

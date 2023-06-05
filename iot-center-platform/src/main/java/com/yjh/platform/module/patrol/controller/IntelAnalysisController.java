@@ -35,11 +35,6 @@ public class IntelAnalysisController {
         this.intelAnalysisService = intelAnalysisService;
     }
 
-    @PostMapping("/picAnalyse")
-    public Response picAnalyse(@Valid @RequestBody PicAnalyseRequest picAnalyseRequest) {
-        return intelAnalysisService.picAnalyse(picAnalyseRequest);
-    }
-
     @PostMapping(value = "/picAnalyseNoDetection")
     public List<Response> picAnalyseNoDetection(@Valid @RequestBody List<Analysis> analysisList) {
         return intelAnalysisService.picAnalyseNoDetection(analysisList);
