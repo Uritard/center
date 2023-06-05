@@ -3115,5 +3115,9 @@ public class RobotService {
     public void deleteTask(String taskId,String startTime,String source) {
         platformProxy.delete(taskId,startTime,source);
     }
+
+    public List<AlarmShield> selectAlarmShield(Long robotId,String warnCount){
+        return tRobotInfoDao.selectAlarmShield(robotId,warnCount);
+    }
 }
 

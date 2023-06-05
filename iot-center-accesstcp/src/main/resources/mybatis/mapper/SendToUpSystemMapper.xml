@@ -88,7 +88,7 @@
         b.redundant_type,
         b.is_temdif,
         ""               as save_type_list,
-        k.dict_note      as recognition_type_list,
+        k.up_dict      as recognition_type_list,
         ""               as phase,
         ""               as device_info,
         ""               as data_type,
@@ -119,7 +119,7 @@
         left join t_std_region re on f.up_region_id = re.region_id
         left join t_std_region region on re.up_region_id = region.region_id
         left join t_dict_business j on f.device_type = j.dict_code
-        left join t_dict_business k on a.cruise_type = k.dict_code
+        left join t_dict_business k on b.mete_type = k.dict_code
         LEFT JOIN t_dict_business m ON b.custom_id = m.dict_code
         LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
         where 1=1

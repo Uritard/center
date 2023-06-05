@@ -12,8 +12,11 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.module.user.dao.AlarmShieldDao;
+import com.yjh.platform.module.user.entity.AlarmShield;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
@@ -47,6 +50,10 @@ public class TWarnInfoController {
     private TStdRegionService tStdRegionService;
     @Autowired
     private TStdDeviceService tStdDeviceService;
+    @Autowired
+    private TRobotAlarmDao tRobotAlarmDao;
+    @Autowired
+    private AlarmShieldDao alarmShieldDao;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoController.class);
 
@@ -549,6 +556,50 @@ public class TWarnInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人本体告警弹框内容失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "告警屏蔽设置")
+    @PostMapping(value = "/warnShield")
+    @Logs(title = "告警屏蔽设置",content = "告警屏蔽设置",logType = 1,authority = "1235")
+    public Result warnShield(@RequestBody AlarmShield alarmShield) {
+        Result result = new Result();
+        try {
+            //查看是否已设置过
+            AlarmShield alarmShieldOld = alarmShieldDao.selectByWarnCount(alarmShield.getWarnContent(),alarmShield.getShieldType());
+            if (alarmShieldOld == null){
+                //新增的 直接插入
+                alarmShieldDao.add(alarmShield);
+            } else {
+                //不是新增的 更新
+                alarmShieldOld.setEndTime(alarmShield.getEndTime());
+                alarmShieldDao.update(alarmShieldOld);
+            }
+            if (alarmShield.getShieldType() == 1){
+                TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getShieldId(),alarmShield.getWarnContent());
+                tRobotAlarm.setEndTime(alarmShield.getEndTime());
+                tRobotAlarmDao.update(tRobotAlarm);
+            }
+            result.setData(1);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("告警屏蔽设置失败：", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "告警屏蔽查询")
+    @PostMapping(value = "/warnShieldInfo")
+    @Logs(title = "告警屏蔽查询",content = "告警屏蔽查询",logType = 1,authority = "1235")
+    public Result warnShieldInfo() {
+        Result result = new Result();
+        try {
+            result.setData(alarmShieldDao.select());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("告警屏蔽设置失败：", e);
         }
         return result;
     }

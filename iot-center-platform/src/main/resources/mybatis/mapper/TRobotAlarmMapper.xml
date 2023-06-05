@@ -210,6 +210,16 @@
         <if test="endTime != null and endTime != ''"> and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
     </select>
 
+    <select id="selectByRobotIdAndContent" resultType="com.yjh.platform.module.task.entity.TRobotAlarm">
+        select
+        a.*
+        from t_robot_alarm a
+        where robot_id = #{robotId}
+        and a.content like concat("%",#{content},"%")
+        order by warn_time  desc
+        limit 1
+    </select>
+
     <insert id="batchInsert">
         insert into t_robot_alarm(
             robot_alarm_id,
