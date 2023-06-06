@@ -359,11 +359,11 @@ public class TStdDeviceController {
     @Logs(title = "设备树查询根绝名称模糊查询",content = "设备树查询根绝名称模糊查询",logType = 1)
     public Result selectDevTreeByName(@RequestParam(value = "name", required = false) String name,
                                 @RequestParam(value = "type", required = false) String type,
-                                @RequestParam(value = "analyseType", required = false) String analyseType,
+                                @RequestParam(value = "deviceType", required = false) String deviceType,
                                       @RequestParam(value = "deviceShow", required = false) String deviceShow) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeByName(name,type, deviceShow,analyseType);
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeByName(name,type, deviceShow,deviceType);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
