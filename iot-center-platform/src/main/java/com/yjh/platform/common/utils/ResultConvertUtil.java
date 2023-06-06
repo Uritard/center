@@ -3,6 +3,7 @@ package com.yjh.platform.common.utils;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
+import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusExEnum;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -126,7 +127,21 @@ public class ResultConvertUtil {
                 return CommonUtils.getNumberStr(result);
             } else {
                 //汉字
-                return convertResult(result);
+                RecogniseStatusEnum statusEnum = RecogniseStatusEnum.getCodeByValue(result);
+                RecogniseStatusExEnum statusExEnum = RecogniseStatusExEnum.getCodeByValue(result);
+                if (Objects.nonNull(statusEnum)) {
+                    String code = String.valueOf(statusEnum.getCode());
+                    return StringUtils.substring(code, code.length() - 1, code.length());
+                } else if (Objects.nonNull(statusExEnum)) {
+                    String code = String.valueOf(statusExEnum.getCode());
+                    return StringUtils.substring(code, code.length() - 1, code.length());
+                } else if (StringUtils.contains(result, "正常")) {
+                    return "0";
+                } else if (StringUtils.contains(result, "异常")) {
+                    return "-1";
+                }else {
+                    return "0";
+                }
             }
         }
         return "0";
