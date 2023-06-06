@@ -287,6 +287,9 @@ public class PatrolResultHandler {
             isAlarmMap.put("taskCode", taskId);
             isAlarmMap.put("instanceId", instanceId);
             String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
+            if ("0".equals(robotPatrolTaskResult.getValid())){
+                value = "-1";
+            }
             isAlarmMap.put("value", value);
             isAlarmMap.put("valueDesc", robotPatrolTaskResult.getValueUnit());
             isAlarmMap.put("deviceName", robotPatrolTaskResult.getDeviceName());
