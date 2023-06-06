@@ -374,7 +374,7 @@ public class UPatrolResultService {
         log.info("warnInfo==" + warnInfo);
 
         //判断该点是否已在告警表
-        if (afterManualReviewInfo.getIsWarn() == 1) {
+        if (afterManualReviewInfo.getIsWarn() >= 1) {
             List<Long> warnIdList =
                 uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
             for (Long warnId : warnIdList) {
