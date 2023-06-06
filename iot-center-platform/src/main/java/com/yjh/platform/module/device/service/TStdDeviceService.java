@@ -543,7 +543,7 @@ public class TStdDeviceService{
         return reMap;
     }
 
-    public List<AreaInfo> selectDevTreeByName(String name, String type,String deviceShow,String analyseType){
+    public List<AreaInfo> selectDevTreeByName(String name, String type,String deviceShow,String deviceType){
         if (StringUtils.isEmpty(name)){
             return selectDevTreeNew("5",null,null,null,null,null);
         }
@@ -574,7 +574,7 @@ public class TStdDeviceService{
                 break;
             case "ins":
                 //查巡视点
-                List<TCruisePointInstance> insList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name,analyseType);
+                List<TCruisePointInstance> insList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name,deviceType);
                 if (insList != null && insList.size()>0){
                     List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
                     regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));

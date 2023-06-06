@@ -93,10 +93,6 @@ public class TCruiseTaskService {
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
-    @PostConstruct
-    public void toRedis(){
-        redisTemplate.opsForValue().set("RobotTask.taskToRobot", applicationProperties.getOtherConfig().getTaskToRobot());
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public String insert(TCruiseTask tCruiseTask,TCruiseTaskAdd tCruiseTaskAdd) {
