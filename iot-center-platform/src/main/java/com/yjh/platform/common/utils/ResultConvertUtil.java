@@ -19,15 +19,15 @@ public class ResultConvertUtil {
     private static final String[] ARR = {"_", "分", "合"};
 
     public static void main(String[] args) {
-        String a = " 表计表盘模糊 ";
-        String b = " 挂空悬浮物  鸟巢  鸟巢 ";
-        String c = "分";
-        String d = "分_合_合_合_合_合_合";
+//        String a = " 表计表盘模糊 ";
+//        String b = " 挂空悬浮物  鸟巢  鸟巢 ";
+//        String c = "分";
+//        String d = "分_合_合_合_合_合_合";
 //        System.out.println(convertResult(a));
 //        System.out.println(convertResult(b));
 //        System.out.println(convertResult(c));
 //        System.out.println(convertResult(d));
-        System.out.println(convertBJResult("100,20.34"));
+        System.out.println(convertResult("机器人任务异常"));
     }
 
     /**
@@ -45,7 +45,9 @@ public class ResultConvertUtil {
             return String.valueOf(StringUtils.split(result,"_").length);
         } else if (StringUtils.contains(result, "正常")) {
             return "0";
-        } else if (CommonUtils.containsChinese(result)) {
+        } else if (StringUtils.contains(result, "异常")) {
+            return "-1";
+        }else if (CommonUtils.containsChinese(result)) {
             return String.valueOf(StringUtils.split(result).length);
         } else {
             return CommonUtils.getNumberStr(result);
