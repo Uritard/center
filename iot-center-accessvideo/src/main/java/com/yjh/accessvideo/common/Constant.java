@@ -59,6 +59,10 @@ public class Constant {
      * 音频解码句柄
      */
     public static Pointer pDecHandle = null;
+    /**
+     * 系统架构
+     */
+    public static String SYSTEM_ARCH = null;
 
     public static FileOutputStream outputStream = null;
     public static FileOutputStream outputStreamPcm = null;

@@ -5,6 +5,7 @@ import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -51,59 +52,55 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
             // 若编码格式为G711时,需要解码   G711 -> PCM
             if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)){
-                /*// 初始化音频解码
-                if (Constant.pDecHandle == null) {
-                    Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
-                }
-                // G711音频解码
-                HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM strutAudioParam = new HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM();
-                strutAudioParam.in_buf = receiveDataBuffer;
-                strutAudioParam.in_data_size = dwBufSize;
-                HCNetSDK.BYTE_ARRAY ptrVoiceData = new HCNetSDK.BYTE_ARRAY(320);
-                ptrVoiceData.write();
-
-                strutAudioParam.out_buf = ptrVoiceData.getPointer();
-                strutAudioParam.out_frame_size = 320;
-                strutAudioParam.g711_type = 1;
-                strutAudioParam.write();
-
-                // G711音频解码调用sdk
-                if (!HC_NET_SDK.NET_DVR_DecodeG711Frame(Constant.pDecHandle, strutAudioParam)) {
-                    log.error("NET_DVR_DecodeG711Frame failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
-                    if (0 != HC_NET_SDK.NET_DVR_GetLastError()){
-                        return;
+                // X86:amd64    Arm:aarch64
+                if (StringUtils.equals("amd64", Constant.SYSTEM_ARCH)) {
+                    // 初始化音频解码
+                    if (Constant.pDecHandle == null) {
+                        Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
                     }
+                    // G711音频解码
+                    HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM strutAudioParam = new HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM();
+                    strutAudioParam.in_buf = receiveDataBuffer;
+                    strutAudioParam.in_data_size = dwBufSize;
+                    HCNetSDK.BYTE_ARRAY ptrVoiceData = new HCNetSDK.BYTE_ARRAY(320);
+                    ptrVoiceData.write();
+
+                    strutAudioParam.out_buf = ptrVoiceData.getPointer();
+                    strutAudioParam.out_frame_size = 320;
+                    strutAudioParam.g711_type = 1;
+                    strutAudioParam.write();
+
+                    // G711音频解码调用sdk
+                    if (!HC_NET_SDK.NET_DVR_DecodeG711Frame(Constant.pDecHandle, strutAudioParam)) {
+                        log.error("NET_DVR_DecodeG711Frame failed, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
+                        if (0 != HC_NET_SDK.NET_DVR_GetLastError()){
+                            return;
+                        }
+                    }
+                    strutAudioParam.read();
+
+                    // 读取解码之后PCM音频数据
+                    ByteBuffer bufferPcm = strutAudioParam.out_buf.getByteBuffer(0, strutAudioParam.out_frame_size);
+                    byte[] bytesPcm = new byte[strutAudioParam.out_frame_size];
+                    bufferPcm.rewind();
+                    bufferPcm.get(bytesPcm);
+
+//                    printRecData(bufferPcm);
+
+                    if (Objects.nonNull(Constant.outputStreamPcm)) {
+                        // 将设备发送的pcm音频数据写入文件
+                        Constant.outputStreamPcm.write(bytesPcm);
+                    }
+                    originBytes = bytesPcm;
+                    log.info("pcm data size is {}", bytesPcm.length);
+                } else {
+                    byte[] bytes = AudioFormatUtil.decode(originBytes);
+                    originBytes = bytes;
+                    if (Objects.nonNull(Constant.outputStreamPcm)) {
+                        Constant.outputStreamPcm.write(bytes);
+                    }
+                    log.info("pcm data size is {}", bytes.length);
                 }
-                strutAudioParam.read();
-
-                // 读取解码之后PCM音频数据
-                ByteBuffer bufferPcm = strutAudioParam.out_buf.getByteBuffer(0, strutAudioParam.out_frame_size);
-                byte[] bytesPcm = new byte[strutAudioParam.out_frame_size];
-                bufferPcm.rewind();
-                bufferPcm.get(bytesPcm);
-
-                // 打印收到设备端的音源数据
-//                bufferPcm.flip();
-//                int len = bufferPcm.limit() - bufferPcm.position();
-//                byte[] bytes = new byte[len];
-//                for (int i = 0; i < bytes.length; i++) {
-//                    bytes[i] = bufferPcm.get();
-//                }
-//                printByte(bytes);
-
-                // 将设备发送的pcm音频数据写入文件
-                Constant.outputStreamPcm.write(bytesPcm);
-
-                originBytes = bytesPcm;
-
-             */
-
-                byte[] bytes = AudioFormatUtil.decode(originBytes);
-                originBytes = bytes;
-                if (Objects.nonNull(Constant.outputStreamPcm)) {
-                    Constant.outputStreamPcm.write(bytes);
-                }
-                log.info("pcm data size is {}", bytes.length);
             }
 
             if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)) {
@@ -233,6 +230,16 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
         header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
         header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
         return header;
+    }
+
+    private void printRecData(ByteBuffer bufferPcm) {
+        bufferPcm.flip();
+        int len = bufferPcm.limit() - bufferPcm.position();
+        byte[] bytes = new byte[len];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = bufferPcm.get();
+        }
+        printByte(bytes);
     }
 
     private void printByte(byte[] bytes) {

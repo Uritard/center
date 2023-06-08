@@ -63,7 +63,7 @@ public class LinkageSignalHandler implements MessageHandlerStrategy, Initializin
                     Constant.restTemplateGet(Constant.SEQUENCE_URL, params);
                 } else if ("1".equals(meteKind) && "变位".equals(value)) {
                     //不调用拍照  等边缘节点上报巡检结果（视频文件） 再做分析
-                    log.info("收到一键顺控变位信号 {}，", meteKind);
+                    log.info("收到一键顺控变位信号,meteKind:{}，", meteKind);
                 }
             } catch (Exception e) {
                 log.error("联动信号处理失败！", e);

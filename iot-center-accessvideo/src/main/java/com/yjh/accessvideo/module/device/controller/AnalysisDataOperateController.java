@@ -9,10 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -24,15 +21,15 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/AnalysisDataOperate/v1")
-@Api(value = "/AnalysisDataOperate", description = "算法结果处理操作接口")
+@Api(value = "/AnalysisDataOperate", tags = "算法结果处理操作接口")
 public class AnalysisDataOperateController {
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
 
-    private Logger log= LoggerFactory.getLogger(AnalysisDataOperateController.class);
+    private final Logger log= LoggerFactory.getLogger(AnalysisDataOperateController.class);
 
     @ApiOperation(value = "告警判断处理接口")
-    @RequestMapping(value = "/warnInfo",method = RequestMethod.GET)
+    @GetMapping(value = "/warnInfo")
     public Result warnInfo(@RequestParam String value,
                            @RequestParam String stdDeviceMeteName,
                            @RequestParam String meteKind,
@@ -52,19 +49,14 @@ public class AnalysisDataOperateController {
 
         Result result=new Result();
         try{
-            //是否告警
-            Boolean isWarn=false;
-            //告警级别
-            Integer warnLevel=0;
-            //告警名称
-            String warnName=null;
-            //告警内容
-            String warnContent=null;
-            //超越浮动值
-            String outRange=null;
-            //告警时间
-            Date warnTime=null;
-            int flag=analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
+            Boolean isWarn = false;
+            Integer warnLevel = null;
+            String warnName = null;
+            String warnContent = null;
+            String outRange = null;
+            Date warnTime = null;
+            // 判断是否配置了告警规则
+            int flag = analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
             if(flag==1){
                 switch (meteKind){
                     case "1":

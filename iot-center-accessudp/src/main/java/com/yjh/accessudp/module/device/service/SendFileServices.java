@@ -81,10 +81,9 @@ public class SendFileServices {
             log.info("ok了");
             udpForDevice(info,socket);
             log.info("结束发送");
-            log.info("InetAddress.getByName(springUnionSendToIp): "+ InetAddress.getByName(springUnionSendToIp));
             socket.close();
         } catch (Exception e) {
-            log.error("发送错误" + e);
+            log.error("发送错误:", e);
         }
         return 1;
     }

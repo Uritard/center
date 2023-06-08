@@ -413,6 +413,14 @@ public class UPatrolResultService {
 
     }
 
+    public static void main(String[] args) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("123",null);
+        System.out.println(map.get("123"));
+        System.out.println(Integer.valueOf(MapUtils.getString(map, "123")));
+
+    }
+
     public int manualReviewTask(String taskId, String userId, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");

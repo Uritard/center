@@ -250,8 +250,8 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             String instanceId = String.valueOf(analysis.getInstanceId());
             analyseObject.setObjectId(instanceId);
 
-            String[] split = analysis.getPicPath().split("/");
-            String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
+            String prefixAbsolutePath = hashOperations.get("t_sys_param:prefixAbsolutePath", "content");
+            String targetNamePath = StringUtils.substringAfter(analysis.getPicPath(), prefixAbsolutePath);
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);

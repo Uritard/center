@@ -134,8 +134,7 @@ public class PatrolResultHandler {
         HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
-                log.info("任务处理结果，robotPatrolTaskResult: {}", JSONUtil.toJSONString(robotPatrolTaskResult));
-
+                log.info("robotPatrolTaskResult: {}", JSONUtil.toJSONString(robotPatrolTaskResult));
                 Map<String, String> infoMap = new HashMap<>(8);
 
                 // 通过上报的任务id查询本级系统上的任务id

@@ -147,8 +147,7 @@ public class VoiceComController {
             Integer lUserId = Constant.hikDeviceUserIdMaps.get(cameraId);
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
-            String format = DateTimeUtil.formatThreadLocal(new Date());
-            voiceComService.voiceSendData(lVoiceTranHandle, fileName, format, armFramework, cameraId);
+            voiceComService.voiceSendData(lVoiceTranHandle, fileName, armFramework, cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

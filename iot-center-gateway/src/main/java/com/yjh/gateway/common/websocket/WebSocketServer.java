@@ -77,8 +77,7 @@ public class WebSocketServer {
         } catch (IOException e) {
             log.error("用户: {},网络异常!!!!!!", userId);
         }
-        // 初始化文件流
-        initFileStream();
+//        initFileStream();
     }
 
     /**
@@ -95,6 +94,7 @@ public class WebSocketServer {
         log.info("用户退出: {},当前在线人数为: {}", userId, getOnlineCount());
     }
 
+    // 初始化文件流
     private void initFileStream() {
         String filePathTemp = System.getProperty("user.dir");
         String filePathName = filePathTemp + "/AudioFile/ReceiveData/cnm.pcm";
@@ -161,7 +161,6 @@ public class WebSocketServer {
     public void onMessage(byte[] message, @PathParam("deviceId") String deviceId) {
         log.info("token:{},data length:{}", token, message.length);
         try {
-            bos.write(message);
             // 前端发送的数据前面一段为0,去除无效数据
             int i;
             for (i = 0; i < message.length; i++) {
@@ -171,9 +170,9 @@ public class WebSocketServer {
             }
             byte[] messageTemp = new byte[message.length - i];
             System.arraycopy(message, i, messageTemp, 0, message.length - i);
-            bos2.write(messageTemp);
+//            bos.write(message);
+//            bos2.write(messageTemp);
 
-//            String deviceId = "40004";
             byte[] deviceIdLengthByte = String.valueOf(deviceId.length()).getBytes();
             byte[] deviceIdByte = deviceId.getBytes();
             byte[] allDataByte = new byte[messageTemp.length + deviceIdLengthByte.length + deviceIdByte.length];

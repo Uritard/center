@@ -412,20 +412,11 @@ public class AnalyseDataOperateService {
      * @param lowLimit4 遥测 下4 阈值
      * @return  是否产生告警  0/1
      */
-    //@Logs(title = "告警配置判断")
-    @Transactional(rollbackFor = Exception.class)
-    public int warnSettings(String meteKind,
-                            String stateZero,
-                            Integer alarmState,
-                            Float highLimit1,
-                            Float lowLimit1,
-                            Float highLimit2,
-                            Float lowLimit2,
-                            Float highLimit3,
-                            Float lowLimit3,
-                            Float highLimit4,
-                            Float lowLimit4) {
-        int warnFlag=0;
+    public int warnSettings(String meteKind, String stateZero, Integer alarmState,
+                            Float highLimit1, Float lowLimit1,
+                            Float highLimit2, Float lowLimit2,
+                            Float highLimit3, Float lowLimit3,
+                            Float highLimit4, Float lowLimit4) {
         Set<Float> alarmMeter = new HashSet<>();
         alarmMeter.add(highLimit1);
         alarmMeter.add(lowLimit1);
@@ -436,24 +427,28 @@ public class AnalyseDataOperateService {
         alarmMeter.add(highLimit4);
         alarmMeter.add(lowLimit4);
         alarmMeter.remove(null);
-        log.info("alarmMeter:"+alarmMeter);
-        if(Objects.nonNull(meteKind)){
-            switch (meteKind){
-                case "1":
-                    if(Objects.nonNull(stateZero) && Objects.nonNull(alarmState)){
-                        warnFlag=1;
-                    }
-                    break;
-                case "2":
-                    if(alarmMeter.size() > 0){
-                        warnFlag=1;
-                    }
-                    break;
-            }
+        log.info("alarmMeter:{}", alarmMeter);
+
+        int warnFlag = 0;
+        if (Objects.isNull(meteKind)){
+            return warnFlag;
         }
 
+        switch (meteKind){
+            case "1":
+                if(Objects.nonNull(stateZero) && Objects.nonNull(alarmState)){
+                    warnFlag=1;
+                }
+                break;
+            case "2":
+                if(alarmMeter.size() > 0){
+                    warnFlag=1;
+                }
+                break;
+            default:
+                break;
+        }
         return warnFlag;
-
     }
 
 

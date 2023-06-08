@@ -95,8 +95,6 @@ public class IntelAnalysisService {
     @Autowired
     private FtpsService ftpsService;
     @Autowired
-    private PatrolResultHandler patrolResultHandler;
-    @Autowired
     private AlarmService alarmService;
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
@@ -109,8 +107,6 @@ public class IntelAnalysisService {
     private TStdDevicemeteService tStdDevicemeteService;
     @Autowired
     private TCameraPresetService tCameraPresetService;
-
-
 
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
@@ -563,9 +559,10 @@ public class IntelAnalysisService {
             String instanceId = String.valueOf(analysis.getInstanceId());
             analyseObject.setObjectId(instanceId);
 
-            String[] split = analysis.getPicPath().split("/");
+            String prefixAbsolutePath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+            String targetNamePathTemp = StringUtils.substringAfter(analysis.getPicPath(), prefixAbsolutePath);
             String targetParent = StringUtils.isEmpty(analysis.getTargetParent()) ? "" : analysis.getTargetParent() + "/";
-            String targetNamePath =  targetParent + split[split.length - 2] + "/" + split[split.length - 1];
+            String targetNamePath =  targetParent + targetNamePathTemp;
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);
@@ -620,6 +617,7 @@ public class IntelAnalysisService {
     public void picAnalyseRetNotify(PicAnalyseResponse response){
         log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
         String flagId = response.getRequestId().split("#")[1];
+        // 正常的巡视多了接口会阻塞，所以放在线程池
         if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || flagId.contains( "presetCheck")){
             picResAnalyse(response);
         }else {
@@ -658,9 +656,6 @@ public class IntelAnalysisService {
             presetCheckHandle(response, flagId);
             return;
         }
-        // 普通图像分析
-//        List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
-//        patrolResultHandler.analysePatrolTaskResult(resultList);
     }
 
     /**

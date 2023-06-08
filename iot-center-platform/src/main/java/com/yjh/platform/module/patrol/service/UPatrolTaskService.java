@@ -2072,7 +2072,7 @@ public class UPatrolTaskService {
                 }
                 sendTaskStateToUp(taskId, state);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
