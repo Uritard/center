@@ -42,8 +42,6 @@ public class SystemConfigService {
 
     private final RedisTemplate redisTemplate;
 
-    private final String systemConfigKey="systemConfigKey:";
-
     private MqttUtilsServer algorithmMqtt;
 
     private MqttUtilsServer voiceMqtt;
@@ -83,19 +81,32 @@ public class SystemConfigService {
         return systemConfigDao.batchUpdate(systemConfig);
     }
 
-    private void checkParams(List<SystemConfig> systemConfigList){
+    private void checkParams(List<SystemConfig> systemConfigList) {
+        Map<String, SystemConfig> configMap = systemConfigDao.selectByConfigList(systemConfigList);
+
         systemConfigList.forEach(systemConfig -> {
-                String jsonRule = systemConfig.getRule();
-                if (StringUtils.isNotEmpty(jsonRule)) {
+            String configKey = systemConfig.getConfigType() + "_" + systemConfig.getConfigKey();
+            SystemConfig ruleConfig = configMap.get(configKey);
+            String jsonRule = ruleConfig.getRule();
+            if (StringUtils.isNotEmpty(jsonRule) && StringUtils.isNotEmpty(systemConfig.getConfigValue())) {
+                boolean mismatch = false;
+                String pmsg = "";
+                try {
                     JSONObject ruleObj = JSON.parseObject(jsonRule);
                     String prule = ruleObj.getString("rule");
-                    String pmsg = ruleObj.getString("msg");
+                    pmsg = ruleObj.getString("msg");
 
                     if (!StringUtils.isAnyEmpty(prule, pmsg) && !systemConfig.getConfigValue().matches(prule)) {
-                        throw new BusinessException(
-                            ResultCodeEnum.CODE20017.getCode(), "参数：" +systemConfig.getConfigTypeName()+" "+ systemConfig.getConfigName() + " 不符合规则，" + pmsg);
+                        mismatch = true;
                     }
+                } catch (Exception e) {
+                    log.error("规则解析失败： {}", jsonRule, e);
                 }
+                if (mismatch) {
+                    throw new BusinessException(ResultCodeEnum.CODE20017.getCode(),
+                        "参数：【" + systemConfig.getConfigTypeName() + " > " + systemConfig.getConfigName() + "】不符合规则，" + pmsg);
+                }
+            }
         });
 
     }
@@ -104,7 +115,7 @@ public class SystemConfigService {
         configList.forEach(systemConfig ->{
             Map<String,String> map = new HashMap<>();
             map.put(systemConfig.getConfigKey(),systemConfig.getConfigValue());
-            redisTemplate.opsForHash().putAll(systemConfigKey+systemConfig.getConfigType(),map);
+            redisTemplate.opsForHash().putAll(ApplicationProperties.SYSTEM_CONFIG_KEY +systemConfig.getConfigType(),map);
             updateToOtherServer(systemConfig);
             updateVoiceMqttConfig(systemConfig);
             updateAlgorithmMqttConfig(systemConfig);

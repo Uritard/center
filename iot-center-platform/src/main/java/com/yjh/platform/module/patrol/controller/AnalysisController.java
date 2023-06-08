@@ -14,11 +14,9 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
-import com.yjh.platform.module.patrol.service.AnalysisService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +37,6 @@ import java.util.*;
 public class AnalysisController {
 
     @Autowired
-    private final AnalysisService analysisService;
-    @Autowired
     private final IntelAnalysisService intelAnalysisService;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -56,8 +52,7 @@ public class AnalysisController {
 
     private final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
-    public AnalysisController(AnalysisService analysisService, IntelAnalysisService intelAnalysisService, AbstractVideoCruise abstractVideoCruise) {
-        this.analysisService = analysisService;
+    public AnalysisController(IntelAnalysisService intelAnalysisService, AbstractVideoCruise abstractVideoCruise) {
         this.intelAnalysisService = intelAnalysisService;
         this.abstractVideoCruise = abstractVideoCruise;
     }
@@ -77,23 +72,7 @@ public class AnalysisController {
             log.info("---------发送算法信息中");
             log.info("算法数据列表：{}", analysisList);
             log.info("端口号：{}", applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort());
-            if (analysisList.get(0).getInstanceId() == -1) {
-                result.setData(analysisService.feignAlgorithm(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort()));
-            }else {
-                // 开关
-                String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
-                if (StringUtils.equals(FLAG, flag)){
-                    // 原来的socket协议
-                    result.setData(analysisService.feignAlgorithm(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyRecognizePort()));
-                }else {
-                    // 调用智能分析主机接口进行分析
-                    try {
-                        intelAnalysisService.picAnalyseNoDetection(analysisList);
-                    }catch (Exception e){
-                        log.error("调用智能分析主机进行缺陷分析异常：", e);
-                    }
-                }
-            }
+            abstractVideoCruise.analysis(analysisList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -117,18 +96,7 @@ public class AnalysisController {
             log.info("缺陷接口数据列表：{}", analysisList);
             log.info("端口号：{}", applicationProperties.getAlgorithmServerConfig().getNettyAiPort());
             // 开关
-            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
-            if (StringUtils.equals(FLAG, flag)){
-                // 原来的socket协议
-                result.setData(analysisService.feignDefect(analysisList, applicationProperties.getAlgorithmServerConfig().getNettyAiPort()));
-            }else {
-                // 调用智能分析主机接口进行分析
-                try {
-                    intelAnalysisService.picAnalyseNoDetection(analysisList);
-                }catch (Exception e){
-                    log.error("调用智能分析主机进行缺陷分析异常：", e);
-                }
-            }
+            abstractVideoCruise.defect(analysisList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -159,7 +127,7 @@ public class AnalysisController {
         analysis.setPicPath(picPath);
         if (Objects.equals("-1", type) && Objects.nonNull(instanceId)){
             // 设备状态识别
-            String analyseType = analysisService.selectAnalyseType(instanceId);
+            String analyseType = analyseDataOperateService.selectAnalyseType(instanceId);
             analysis.setAnalyseType(analyseType);
         }else {
             // 缺陷和判别

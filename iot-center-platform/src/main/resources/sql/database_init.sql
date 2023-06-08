@@ -230,12 +230,12 @@ CREATE TABLE `qrtz_triggers` (
 DROP TABLE IF EXISTS `sys_info_backup`;
 CREATE TABLE `sys_info_backup` (
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
-  `user_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8_bin DEFAULT '' COMMENT '用户名',
+  `user_name` varchar(20) DEFAULT '' COMMENT '用户名',
   `password` varchar(256) DEFAULT '' COMMENT '密码',
   `true_name` varchar(20) DEFAULT '' COMMENT '真实姓名',
   `user_type` int(1) DEFAULT '1' COMMENT '账号性质',
   `sex` int(1) DEFAULT '1' COMMENT '性别0女，1 男，2未知',
-  `e_mail` varchar(20) DEFAULT '' COMMENT 'email',
+  `e_mail` varchar(128) DEFAULT '' COMMENT 'email',
   `work_no` varchar(30) DEFAULT '' COMMENT '工号',
   `face_id` varchar(32) DEFAULT '' COMMENT '人脸ID',
   `finger_id` varchar(50) DEFAULT '' COMMENT '指纹ID',
@@ -444,12 +444,12 @@ CREATE TABLE `sys_unique_user` (
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `user_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户id',
-  `user_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8_bin DEFAULT '' COMMENT '用户名',
+  `user_name` varchar(20) DEFAULT '' COMMENT '用户名',
   `password` varchar(256) DEFAULT '' COMMENT '密码',
   `true_name` varchar(20) DEFAULT '' COMMENT '真实姓名',
   `user_type` int(1) DEFAULT '1' COMMENT '账号1-在线，0-离线',
   `sex` int(1) DEFAULT '2' COMMENT '性别0女，1 男，2未知',
-  `e_mail` varchar(20) DEFAULT '' COMMENT 'email',
+  `e_mail` varchar(128) DEFAULT '' COMMENT 'email',
   `work_no` varchar(30) DEFAULT '' COMMENT '工号',
   `face_id` varchar(32) DEFAULT '' COMMENT '人脸ID',
   `finger_id` varchar(50) DEFAULT '' COMMENT '指纹ID',
@@ -1287,9 +1287,11 @@ CREATE TABLE `t_defect_info` (
   `defect_name` varchar(125) DEFAULT '' COMMENT '缺陷名称',
   `defect_content` varchar(512) DEFAULT '' COMMENT '缺陷内容',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备Id',
+  `device_name` varchar(255) NULL COMMENT '设备名称',
   `cunstom_id` varchar(32) DEFAULT '' COMMENT '部位ID',
   `instance_id` bigint(48) DEFAULT '0' COMMENT '巡检点ID',
   `std_mete_id` bigint(48) DEFAULT '0' COMMENT '标准测点ID',
+  `device_mete_name` varchar(255) NULL COMMENT '测点名称',
   `conf_mode` int(11) DEFAULT '0' COMMENT '缺陷状态：1未处理 2已处理 3已确认 4已忽略',
   `is_defect` int(11) DEFAULT '0' COMMENT '是否缺陷',
   `deal_type` int(1) DEFAULT '0' COMMENT '处理方式：0自动，1手动',
@@ -1436,7 +1438,7 @@ CREATE TABLE `t_dict_business` (
   PRIMARY KEY (`dict_id`) USING BTREE,
   UNIQUE KEY `idx_dictcode` (`dict_code`,`col_name`) USING BTREE,
   KEY `colName` (`col_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=300696 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='业务字典表';
+) ENGINE=InnoDB AUTO_INCREMENT=300707 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='业务字典表';
 
 -- ----------------------------
 -- Table structure for t_env_warning
@@ -1896,6 +1898,7 @@ CREATE TABLE `t_std_mete` (
   `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `remark` varchar(125) DEFAULT '' COMMENT '备注',
+  `redundant_type` varchar(50) NOT NULL DEFAULT "1" COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
   PRIMARY KEY (`std_mete_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000020000 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
 
@@ -1945,6 +1948,7 @@ CREATE TABLE `t_std_metemodel_detail` (
   `threshold_abs` decimal(10,4) DEFAULT '0.0000' COMMENT '绝对阀值',
   `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
+  `redundant_type` varchar(50) NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
   PRIMARY KEY (`mete_id`,`model_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统测点模版详细表';
 
@@ -2236,9 +2240,11 @@ CREATE TABLE `t_warn_info` (
   `warn_name` varchar(125) DEFAULT '' COMMENT '告警名称',
   `warn_content` varchar(512) DEFAULT '' COMMENT '告警内容',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备Id',
+  `device_name` varchar(255) NULL COMMENT '设备名称',
   `cunstom_id` varchar(32) DEFAULT '' COMMENT '部位ID',
   `instance_id` bigint(48) DEFAULT '1' COMMENT '巡检点ID',
   `std_mete_id` bigint(48) DEFAULT '1' COMMENT '标准测点ID',
+  `device_mete_name` varchar(255) NULL COMMENT '测点名称',
   `conf_mode` int(11) DEFAULT '1' COMMENT '处理状态1.已核查2.未核查',
   `is_warn` int(11) DEFAULT '1' COMMENT '是否告警',
   `deal_type` int(1) DEFAULT '1' COMMENT '是否属实1.属实2.不属实',
@@ -2274,7 +2280,7 @@ CREATE TABLE `u_patrol_task_attr` (
   `mete_type` int DEFAULT '1' COMMENT '识别类型',
   `region_id` bigint DEFAULT NULL COMMENT '设备所属区域',
   PRIMARY KEY (`task_id`,`instance_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
 
 
 -- ----------------------------
@@ -2301,6 +2307,7 @@ CREATE TABLE `u_patrol_data_result` (
   `result_desc` varchar(512) DEFAULT '' COMMENT '巡检结果文字描述（暂时没用）',
   `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
   `modify_num` varchar(100) DEFAULT '' COMMENT '审核结果数值',
+  `unit` varchar(64) NULL DEFAULT '' COMMENT '单位',
   `picpath` varchar(256) DEFAULT '' COMMENT '巡检分析图片，相对路径',
   `confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,相对',
   `pic_path_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,相对（暂时没用）',
@@ -2315,15 +2322,16 @@ CREATE TABLE `u_patrol_data_result` (
   `createtime` datetime DEFAULT CURRENT_TIMESTAMP,
   `remark` varchar(256) DEFAULT '' COMMENT '备用字段3',
   `check_user` varchar(32) DEFAULT '' COMMENT '审核人',
-  `check_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '审核时间',
+  `check_date` datetime NULL COMMENT '审核时间',
   `is_warn` int(11) DEFAULT '1' COMMENT '是否产生告警1.是0.否',
   `cruise_result` int(11) DEFAULT '1' COMMENT '巡视执行结果-正常、异常',
   `fir_name` varchar(60) DEFAULT '' COMMENT '红外FIR文件名称',
-  `fir_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '红外FIR文件生成时间',
+  `fir_date` datetime NULL COMMENT '红外FIR文件生成时间',
   `result_pic` varchar(255) DEFAULT '' COMMENT 'FIR文件存储路径',
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
   `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
-  PRIMARY KEY (`cruise_data_id`) USING BTREE
+  PRIMARY KEY (`cruise_data_id`) USING BTREE,
+  KEY `task_id_index` (`task_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='巡检点数据表';
 
 
@@ -2461,6 +2469,7 @@ CREATE TABLE `silent_conf` (
   `preset_type_name` varchar(255) DEFAULT NULL COMMENT '预置位类型名称',
   `recognize_type` varchar(255) DEFAULT NULL COMMENT '要识别的类型，以逗号隔开 如:wcanm,wcgz',
   `chill_time` int(64) DEFAULT -1 COMMENT '此类型识别的时间间隔，单位：秒',
+  `editable` tinyint(1) NOT NULL COMMENT '是否可编辑',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='静默监视配置表';
 

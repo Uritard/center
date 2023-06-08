@@ -769,5 +769,9 @@ public class AnalyseDataOperateService {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
     }
+
+    public String selectAnalyseType(long instanceId) {
+        return analyseDataOperateDao.selectAnalyseType(instanceId);
+    }
 }
 

@@ -13,7 +13,6 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.interlanalysis.AnalyseObject;
@@ -21,14 +20,18 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.PicAnalyseRequest;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyticsService;
+import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <功能描述>
@@ -42,39 +45,35 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ApplicationProperties applicationProperties;
-    private final IntelligentAlgorithmConfig algorithmConfig;
+    private final ApplicationProperties.IntelligentAlgorithmConfig algorithmConfig;
+    private final TAlgorithmInfoDao tAlgorithmInfoDao;
 
     private HashOperations<String, String, String> hashOperations;
-    private Map<String, List<String>> analyseTypeMap = new HashMap<>(16);
+    private Map<String, List<String>> analyseTypeMap = new HashMap<>(32);
 
     public HttpAnalyticsServiceImpl(RedisTemplate<String, Object> redisTemplate, ApplicationProperties applicationProperties,
-        IntelligentAlgorithmConfig algorithmConfig) {
+        TAlgorithmInfoDao tAlgorithmInfoDao) {
         this.redisTemplate = redisTemplate;
         this.applicationProperties = applicationProperties;
-        this.algorithmConfig = algorithmConfig;
+        this.tAlgorithmInfoDao = tAlgorithmInfoDao;
+        this.algorithmConfig = applicationProperties.getIntelAlgorithmConfig();
         this.hashOperations = redisTemplate.opsForHash();
-        reloadAnalyseType();
     }
 
     /**
      * 初始化分析类型对应分析主机分析关系
      */
+    @PostConstruct
     public void reloadAnalyseType() {
-
+        log.info("分析主机配置信息： {}", JSON.toJSONString(algorithmConfig));
         analyseTypeMap.put("11", Arrays.asList(algorithmConfig.getDistinguishType().split(",")));
         analyseTypeMap.put("398", Arrays.asList(algorithmConfig.getDefectType().split(",")));
-        analyseTypeMap.put("1", Collections.singletonList("meter"));
-        analyseTypeMap.put("2", Collections.singletonList("meter"));
-        analyseTypeMap.put("3", Collections.singletonList("meter"));
-        analyseTypeMap.put("4", Collections.singletonList("meter"));
-        analyseTypeMap.put("5", Collections.singletonList("switch"));
-        analyseTypeMap.put("6", Collections.singletonList("isolator"));
-        analyseTypeMap.put("7", Collections.singletonList("meter"));
-        analyseTypeMap.put("8", Collections.singletonList("qrcode"));
-        analyseTypeMap.put("9", Collections.singletonList("infrared"));
-        analyseTypeMap.put("10", Collections.singletonList("switch"));
-        analyseTypeMap.put("13", Collections.singletonList("sound"));
-        analyseTypeMap.put("12", Arrays.asList(algorithmConfig.getSilentMonitorType().split(",")));
+        analyseTypeMap.put("14", Arrays.asList(algorithmConfig.getPresetCheck().split(",")));
+
+        List<TAlgorithmInfo> tAlgorithmInfoList = this.tAlgorithmInfoDao.select(null, null, null, null, null, null, 1, null);
+        if (CollectionUtils.isNotEmpty(tAlgorithmInfoList)) {
+            tAlgorithmInfoList.forEach(info -> analyseTypeMap.put(info.getAnalyseType(), Arrays.asList(StringUtils.split(info.getAliasName(), ","))));
+        }
     }
 
     /**
@@ -100,24 +99,43 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         return result;
     }
 
-    private List<PicAnalyseRequest> formatTransition(List<Analysis> analysisList) {
+    public List<PicAnalyseRequest> formatTransition(List<Analysis> analysisList) {
         List<PicAnalyseRequest> list = new ArrayList<>();
         for (Analysis analysis : analysisList) {
-            // 如果是静默监视识别 只要求识别越线闯入、未穿工装和未带安全帽
+            // 如果是静默监视识别 根据数据库配置获取识别类型
             if (Objects.equals("12", analysis.getAnalyseType())) {
+                //静默的  判断他是本系统的还是下级
+                String recognizeType = tAlgorithmInfoDao.selectRecognizeTypeByPresetId(analysis.getInstanceId());
                 AnalyseObject analyseObject = new AnalyseObject();
-                analyseObject.setTypeList(Collections.singletonList("yxcr"));
+                analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
 
-                AnalyseObject analyseObject2 = new AnalyseObject();
-                analyseObject2.setTypeList(Arrays.asList("wcaqm", "wcgz"));
-                list.add(packagePicAnalyseRequest(analysis, analyseObject2));
+                saveSilentMonitorImageUrlToRedis(analyseObject);
             } else {
                 AnalyseObject analyseObject = setAnalyseObject(analysis);
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
             }
         }
         return list;
+    }
+
+    /**
+     * 静默识别文件保存，用以人工干预识别结果
+     */
+    private void saveSilentMonitorImageUrlToRedis(AnalyseObject analysis) {
+        boolean needManMade = Boolean.parseBoolean(
+            (String)redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade"));
+
+        if (!needManMade) {
+            log.info("t_sys_param.silentMonitorAnalyseResult.needManMade is {}", needManMade);
+            return;
+        }
+
+        String imageUrl = analysis.getImageUrlList().get(0);
+        String objectId = analysis.getObjectId();
+
+        redisTemplate.opsForHash().put("silentMonitorImageUrl", objectId, imageUrl);
+        redisTemplate.expire("silentMonitorImageUrl", 3, TimeUnit.DAYS);
     }
 
     /**
@@ -158,20 +176,23 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
         String analyseType = analysis.getAnalyseType();
         try {
-            if ("11".equals(analyseType)) {
+            // 14 表示预置位偏移检测
+            boolean presetCheck = "14".equals(analyseType);
+            String targetParent = StringUtils.isEmpty(analysis.getTargetParent()) ? "" : analysis.getTargetParent() + "/";
+            if ("11".equals(analyseType) || presetCheck) {
 
                 String imageNormalUrlPath = "";
                 // 为了能够让算法返回200 且返回分析结果 所以是null
                 String targetNamePath = "null";
                 // 判别基准图
                 String flag = hashOperations.get("t_sys_param:isEPRI", "content");
-                if (StringUtils.equals("false", flag)) {
+                if (StringUtils.equals("false", flag) || presetCheck) {
                     // 拿提前拍好的预置位作为判别基准图
                     imageNormalUrlPath = analysis.getReferenceImage();
                     log.info("拿提前拍好的预置位作为判别基准图:{}", imageNormalUrlPath);
                     if (StringUtils.isNotEmpty(imageNormalUrlPath)) {
                         String[] split = imageNormalUrlPath.split("/");
-                        targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                        targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
                     analyseObject.setImageNormalUrlPath(targetNamePath);
                 } else {
@@ -192,7 +213,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                     log.info("拿电科院给的图:{}", imageNormalUrlPath);
                     if (StringUtils.isNotEmpty(imageNormalUrlPath)){
                         String[] split = imageNormalUrlPath.split("/");
-                        targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                        targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
                     analyseObject.setImageNormalUrlPath(targetNamePath);
                 }
@@ -250,8 +271,9 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             String instanceId = String.valueOf(analysis.getInstanceId());
             analyseObject.setObjectId(instanceId);
 
+            String targetParent = StringUtils.isEmpty(analysis.getTargetParent()) ? "" : analysis.getTargetParent() + "/";
             String prefixAbsolutePath = hashOperations.get("t_sys_param:prefixAbsolutePath", "content");
-            String targetNamePath = StringUtils.substringAfter(analysis.getPicPath(), prefixAbsolutePath);
+            String targetNamePath = targetParent + StringUtils.substringAfter(analysis.getPicPath(), prefixAbsolutePath);
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);

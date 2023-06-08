@@ -42,4 +42,6 @@ public interface TAlgorithmInfoDao {
     List<TAlgorithmMeteInfo> selectAlgorithmMete(@Param(value = "deviceMeteId") String deviceMeteId);
 
     String selectEdgeCodeByInstanceId(@Param(value = "instanceId") Long instanceId);
+
+    String selectRecognizeTypeByPresetId(@Param(value = "presetId") Long presetId);
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.module.config.service.SystemConfigService;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
@@ -71,7 +72,6 @@ public class PlatformApplication  implements CommandLineRunner {
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
 
-
     private NettyClient nettyClient = new NettyClient();
     @Value("${spring.websocket.send.url}")
     private String url;
@@ -85,10 +85,10 @@ public class PlatformApplication  implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         redisTemplate.delete("AllRobotCode");
+        DictConvertUtil.DICT.loadDict(dictBusinessService);
         sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis(true);
         tCameraInfoService.intoRedis();
-        DictConvertUtil.DICT.loadDict(dictBusinessService);
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         tCameraPresetService.startSilentTask();//开启摄像头静默任务
         sysUserService.insertIntoRedis();

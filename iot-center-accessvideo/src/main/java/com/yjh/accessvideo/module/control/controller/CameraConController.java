@@ -51,8 +51,17 @@ public class CameraConController {
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
 //    @Logs(title = "相机播放",content = "根据用户传递的参数相机播放",logType = 5, authority = "1234,1235")
-    public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId) {
+    public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId, @RequestParam(value = "presetId", required = false) Long presetId) {
         Result result = new Result();
+        if (presetId != null && presetId > 0) {
+            try {
+                cameraConService.isCameraControlled(cameraId);
+                cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET);
+                cameraConService.pushCtrlTime(cameraId);
+            } catch (BusinessException b) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+            }
+        }
         try {
             result.setData(cameraConService.startRealPlay(cameraId));
         } catch (BusinessException b) {

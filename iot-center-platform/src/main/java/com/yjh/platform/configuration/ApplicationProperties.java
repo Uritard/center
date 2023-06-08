@@ -2,17 +2,21 @@ package com.yjh.platform.configuration;
 
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.module.config.dao.SystemConfigDao;
+import com.yjh.platform.module.config.entity.SystemConfig;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +25,6 @@ import java.util.Map;
  */
 @Data
 @Slf4j
-@Accessors(chain = true)
 @Configuration
 public class ApplicationProperties {
 
@@ -39,7 +42,10 @@ public class ApplicationProperties {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    private final String systemConfigKey="systemConfigKey:";
+    @Autowired
+    private SystemConfigDao systemConfigDao;
+
+    public final static String SYSTEM_CONFIG_KEY ="systemConfigKey:";
 
     //上级系统ftps
     private FtpsConfig upSystemFtps;
@@ -51,14 +57,23 @@ public class ApplicationProperties {
     private ManagerMqttConfig managerMqttConfig;
     //算法调用配置
     private AlgorithmServerConfig algorithmServerConfig;
+    // 分析主机配置
+    private IntelligentAlgorithmConfig intelAlgorithmConfig;
     //顺控相关配置
     private SequentialConfig sequentialConfig;
     //声纹相关配置
     private AudioConfig audioConfig;
     //其他配置
     private OtherConfig otherConfig;
+
     @PostConstruct
     public void flushCatch() {
+        List<SystemConfig> configList = systemConfigDao.selectAll();
+        configList.forEach(systemConfig ->{
+            Map<String,String> map = new HashMap<>();
+            map.put(systemConfig.getConfigKey(),systemConfig.getConfigValue());
+            redisTemplate.opsForHash().putAll(SYSTEM_CONFIG_KEY + systemConfig.getConfigType(),map);
+        });
         this.flush();
     }
 
@@ -103,6 +118,22 @@ public class ApplicationProperties {
         private String confFileName;
     }
 
+    /**
+     * 若使用 BeanUtils.populate 方法则不可以使用链式编程，需设置 @Accessors(chain = false)
+     */
+    @Data
+    @Accessors(chain = false)
+    public static class IntelligentAlgorithmConfig {
+        private String analysisUrl;
+        private String updateUrl;
+        private String resultIp;
+        private String resultPort;
+        private String presetCheck;
+        private String defectType;
+        private String distinguishType;
+        private String silentMonitorNameAndType;
+
+    }
 
     @Data
     @Accessors(chain = true)
@@ -150,7 +181,7 @@ public class ApplicationProperties {
 
     public void flush(){
 
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"upSystem");
+        Map<String,String> redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"upSystem");
         ApplicationProperties.FtpsConfig upSystemFtps = new ApplicationProperties.FtpsConfig();
         upSystemFtps.setIp(redisMap.get("upSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("upSystemFtpsPort"),10012))
@@ -158,7 +189,7 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("upSystemFtpsPassword"));
         this.upSystemFtps = upSystemFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"algorithmSystem");
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"algorithmSystem");
         ApplicationProperties.FtpsConfig intelAnalysisFtps = new ApplicationProperties.FtpsConfig();
         intelAnalysisFtps.setIp(redisMap.get("algorithmSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("algorithmSystemFtpsPort"),10012))
@@ -166,7 +197,24 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("algorithmSystemFtpsPassword"));
         this.intelAnalysisFtps = intelAnalysisFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystem");
+        try {
+            if (this.intelAlgorithmConfig == null) {
+                this.intelAlgorithmConfig = new IntelligentAlgorithmConfig();
+            }
+            BeanUtils.populate(this.intelAlgorithmConfig, redisMap);
+
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error("智能分析主机配置解析失败", e);
+        }
+
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"algorithmServerConfig");
+        ApplicationProperties.AlgorithmServerConfig algorithmServerConfig = new ApplicationProperties.AlgorithmServerConfig();
+        algorithmServerConfig.setNettyRecognizePort(ValueUtil.toInteger(redisMap.get("nettyRecognizePort"),13668))
+            .setNettyAiPort(ValueUtil.toInteger(redisMap.get("nettyAiPort"),13669))
+            .setConfFileName(inspectionConf);
+        this.algorithmServerConfig = algorithmServerConfig;
+
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"managerSystem");
         ApplicationProperties.FtpsConfig managerSystemFtps = new ApplicationProperties.FtpsConfig();
         managerSystemFtps.setIp(redisMap.get("managerSystemFtpsIp"))
                 .setPort(ValueUtil.toInteger(redisMap.get("managerSystemFtpsPort"),10012))
@@ -174,7 +222,7 @@ public class ApplicationProperties {
                 .setPassword(redisMap.get("managerSystemFtpsPassword"));
         this.managerSystemFtps = managerSystemFtps;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"managerSystem");
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"managerSystem");
         ApplicationProperties.ManagerMqttConfig managerMqttConfig = new ApplicationProperties.ManagerMqttConfig();
         managerMqttConfig.setMqttHost(redisMap.get("mqttHost"))
                 .setMqttUser(redisMap.get("mqttUser"))
@@ -191,14 +239,7 @@ public class ApplicationProperties {
                 .setManagerServerFtpsRemotePath(redisMap.get("mqttHost"));
         this.managerMqttConfig = managerMqttConfig;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"algorithmServerConfig");
-        ApplicationProperties.AlgorithmServerConfig algorithmServerConfig = new ApplicationProperties.AlgorithmServerConfig();
-        algorithmServerConfig.setNettyRecognizePort(ValueUtil.toInteger(redisMap.get("nettyRecognizePort"),13668))
-                .setNettyAiPort(ValueUtil.toInteger(redisMap.get("nettyAiPort"),13669))
-                .setConfFileName(inspectionConf);
-        this.algorithmServerConfig = algorithmServerConfig;
-
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"sequentialConfig");
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"sequentialConfig");
         ApplicationProperties.SequentialConfig sequentialConfig = new ApplicationProperties.SequentialConfig();
         sequentialConfig.setSequentialVideocfmResult(redisMap.get("sequentialVideocfmResult"))
                 .setSequentialReturnLinkage(redisMap.get("sequentialReturnLinkage"))
@@ -206,7 +247,7 @@ public class ApplicationProperties {
                 .setSequentialResultFlag(sequentialResultFlag);
         this.sequentialConfig = sequentialConfig;
 
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"audioConfig");
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"audioConfig");
         ApplicationProperties.AudioConfig audioConfig = new ApplicationProperties.AudioConfig();
         audioConfig.setAudioTcpServerPort(ValueUtil.toInteger(redisMap.get("audioTcpServerPort"),10021))
                 .setAudioTcpByteOrderLittleEndianEnabled(ValueUtil.toBoolean(redisMap.get("audioTcpByteOrderLittleEndianEnabled"),false))
@@ -214,7 +255,7 @@ public class ApplicationProperties {
                 .setAudioMqttUser(redisMap.get("audioMqttUser"))
                 .setAudioMqttPwd(redisMap.get("audioMqttPwd"));
         this.audioConfig = audioConfig;
-        redisMap = redisTemplate.opsForHash().entries(systemConfigKey+"otherConfig");
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
         otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("springInterfaceApi"),false))
                 .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
@@ -225,6 +266,6 @@ public class ApplicationProperties {
         Constant.apiPermissions= this.getOtherConfig().getSpringInterfaceApi();
         Constant.nonhomologousWarn = this.getOtherConfig().getNonhomologousWarn();
 
-        log.info("系统配置: {}",this);
+        log.info("系统配置: {}", this);
     }
 }

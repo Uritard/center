@@ -510,14 +510,6 @@
         where origin_id = #{presetId}
     </select>
 
-    <select id="selectRecognizeTypeByPresetId" resultType="java.lang.String">
-        select
-            silent.recognize_type
-        from t_camera_preset preset
-        left join silent_conf silent on preset.preset_type = silent.preset_type
-            where preset.preset_id = #{presetId}
-    </select>
-
     <select id="selectPresetTypeInfo" resultType="com.yjh.platform.module.user.entity.SilentConf">
         select id, preset_type, preset_type_name, recognize_type, chill_time, editable
         from silent_conf
