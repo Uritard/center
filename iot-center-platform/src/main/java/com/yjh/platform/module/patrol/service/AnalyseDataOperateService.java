@@ -11,7 +11,6 @@ import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
@@ -431,9 +430,9 @@ public class AnalyseDataOperateService {
            int flag = warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2,
                    highLimit3, lowLimit3, highLimit4, lowLimit4);
            if (flag !=1 ){
-               // 未配置告警规则
+               log.info("未配置告警规则");
                resultMap.put("isWarn", false);
-               resultMap.put("warnLevel", 0);
+               resultMap.put("warnLevel", null);
                resultMap.put("warnName", null);
                resultMap.put("warnContent", null);
                resultMap.put("outRange", null);
@@ -457,10 +456,9 @@ public class AnalyseDataOperateService {
                                                Float lowLimit3, Float highLimit4, Float lowLimit4,
                                                Map<String, Object> resultMap) {
         Boolean isWarn = false;
-        Integer warnLevel = 0;
+        Integer warnLevel = null;
         String warnName = null;
         String warnContent = null;
-        //超越浮动值
         String outRange = null;
         Date warnTime = null;
         String valueDesc = StringUtils.defaultIfBlank(valDesc, value);
@@ -544,7 +542,6 @@ public class AnalyseDataOperateService {
     /**
      * 判断是否配置了告警规则
      */
-    @Transactional(rollbackFor = Exception.class)
     public int warnSettings(String meteKind, String stateZero, Integer alarmState,
                             Float highLimit1, Float lowLimit1,
                             Float highLimit2, Float lowLimit2,

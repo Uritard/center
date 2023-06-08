@@ -1,12 +1,8 @@
 package com.yjh.platform.module.user.service;
 
-import com.alibaba.druid.sql.ast.statement.SQLForeignKeyImpl;
-import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
@@ -16,33 +12,23 @@ import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgDevice;
-import com.yjh.platform.module.patrol.controller.AnalysisController;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
-import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
-import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
-import com.yjh.platform.module.user.controller.TSequentialConfController;
-import com.yjh.platform.module.user.dao.TSysParamDao;
-import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
+import com.yjh.platform.module.user.entity.TSequentialConf;
+import com.yjh.platform.module.video.FileUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import com.yjh.platform.module.user.entity.TSysParam;
-import com.yjh.platform.module.video.FileUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.NumberUtils;
-
-import javax.management.ObjectName;
 
 import static com.yjh.platform.common.Constant.redisTemplate;
 
@@ -69,17 +55,15 @@ public class TSequentialConfService{
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
     @Autowired
-    private TSysParamDao tSysParamDao;
-    @Autowired
     private TCfgDeviceDao tCfgDeviceDao;
 
 
-    private Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
+    private final Logger log = LoggerFactory.getLogger(TSequentialConfService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
         List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
-        if(cameraIdList != null && cameraIdList.size() >0 && cameraIdList.contains(tSequentialConf.getCameraId())){
+        if(CollectionUtils.isNotEmpty(cameraIdList) && cameraIdList.contains(tSequentialConf.getCameraId())){
             return -1;
         }
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
@@ -236,414 +220,311 @@ public class TSequentialConfService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sequential(String meteId) throws Exception{
+    public String sequential(String meteId) {
+        // 获取一键顺控配置
         List<Map<String, Object>> list = sequentialInfo(meteId);
         if (list.isEmpty()){
-            log.info("meteId {} sequential config is empty!", meteId);
+            log.info("【meteId {} sequential config is empty!】", meteId);
             return "ok";
         }
-        {
-            Map<String,Object> map = this.sequentialInfo(meteId).get(0);
-            Map<String, String> jasonMaps2 = new HashMap<>();
-            jasonMaps2.put("type", "newSequential");
-            jasonMaps2.put("cfgDeviceId", meteId);
-            jasonMaps2.put("sort", /*String.valueOf(Double.valueOf(*/map.get("sort").toString()/*).intValue())*/);
-            Constant.sequentialState.put("state",((Long)map.get("sort")).intValue());
-            Constant.sequentialState.put("cfgDeviceId",meteId);
-            Constant.sequentialState.put("meteResult",map.get("state"));
-            jasonMaps2.put("state", "进行中");
-            String json = JSON.toJSONString(jasonMaps2);
-            log.info("发送给前端的消息：" + json);
-            try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
-            }catch (Exception e){
-                System.out.println("发送websocket出错");
-            }
 
-            if(meteId != null && !"".equals(meteId)){
-                TSequentialConf sequentialConf = this.selectByPrimaryId(meteId);
-                if(sequentialConf != null && sequentialConf.getPresetId() != null){
-                    this.update(sequentialConf);
-                }
-            }
+        Map<String,Object> map = sequentialInfo(meteId).get(0);
+        Map<String, String> jasonMaps2 = new HashMap<>(8);
+        jasonMaps2.put("type", "newSequential");
+        jasonMaps2.put("cfgDeviceId", meteId);
+        jasonMaps2.put("sort", map.get("sort").toString());
+        jasonMaps2.put("state", "进行中");
+        log.info("发送给前端的消息:{}", JSON.toJSONString(jasonMaps2));
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
 
+        Constant.sequentialState.put("state", ((Long)map.get("sort")).intValue());
+        Constant.sequentialState.put("cfgDeviceId", meteId);
+        // 为了后续的假数据处理
+        Constant.sequentialState.put("meteResult", map.get("state"));
+        log.info("sequentialState:{}", Constant.sequentialState);
+
+        if(StringUtils.isNotEmpty(meteId)){
+            TSequentialConf sequentialConf = selectByPrimaryId(meteId);
+            if(sequentialConf != null && sequentialConf.getPresetId() != null){
+                update(sequentialConf);
+            }
+        }
+
+        try {
             Thread.sleep(1000);
-            // 开关
-            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
-            if (StringUtils.equals("true", flag)){
-                // 收到聚焦信号停止录视频
-                try {
-                    String services = HttpClientUtils.getInstance().getUrl(startRecordVideo+ "?cameraId=" +  map.get("cameraId").toString(), null);
-                    JSONObject jsonObject =JSONObject.parseObject(services);
-                    String result = String.valueOf(jsonObject.get("data"));
-                    Constant.filePath = result;
-                }catch (Exception e){
-                    log.error(e.getMessage(), e);
-                }
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+        if (StringUtils.equals("true", flag)){
+            // 收到聚焦信号开始录视频
+            try {
+                String services = HttpClientUtils.getInstance().getUrl(startRecordVideo+ "?cameraId=" +  map.get("cameraId").toString(), null);
+                JSONObject jsonObject =JSONObject.parseObject(services);
+                Constant.filePath = String.valueOf(jsonObject.get("data"));
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
             }
-
-            //结果
-//            {"type": "newSequentialResult",
-//                    "cfgDeviceId": "1001",
-//                    "sort": "1",
-//                    "state": "控合",
-//                    "identifyResult": "合"
-//            }
-//            顺控
-//            {"type": "newSequential",
-//                    "cfgDeviceId": "1001",
-//                    "sort": "1",
-//                    "state": "控合"
-//            }
-
-//            Thread.sleep(20000);
-//            //todo 生成一个巡视任务
-//
-//            //todo 发给算法进行分析
-//
-//            try{
-//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
-//                //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
-//                TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-//                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace(".",simpleDateFormat2.format(new Date())+".");
-//
-//                File txt=new File(devicePath);
-//                if(txt.exists()){
-//                    txt.delete();
-//                }
-//                if (!txt.exists()) {
-//                    txt.createNewFile();
-//                }
-////                FileWriter fw = new FileWriter(txt, true);
-//                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-//                        new FileOutputStream(txt,true), "UTF-8"));
-//                bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
-//                bw.write("<DeviceInfo::设备状态>\r\n");
-//                bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-//                bw.write("#1\t"+1+"\t"+meteId+"\t"+map.get("deviceName")+"\t"+map.get("state")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
-//                bw.write("</DeviceInfo::设备状态>\r\n");
-//                bw.flush();
-//                bw.close();
-////                fw.close();
-//                //将生成的顺控确认文件发送给主辅监控系统
-//                Map<String,List<String>> mapForSend = new HashMap<>();
-//                List<String> list = new ArrayList<>();
-//                list.add(devicePath);
-//                mapForSend.put("list",list);
-//                Constant.otherServer(mapForSend,Constant.UDP_SEND);
-//            }catch (Exception e){log.info("生成顺控确认文件失败"+e.getMessage());}
-//
-//            Map<String, String> jasonMapsResult = new HashMap<>();
-//            jasonMapsResult.put("type", "newSequentialResult");
-//            jasonMapsResult.put("cfgDeviceId", meteId);
-//            jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
-//            jasonMapsResult.put("state", map.get("state").toString());
-//            jasonMapsResult.put("identifyResult", map.get("state").toString());
-//            String jsonResult = JSON.toJSONString(jasonMapsResult);
-//            log.info("发送给前端的消息：" + jsonResult);
-//            try{
-//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
-//            }catch (Exception e){
-//                System.out.println("发送websocket出错");
-//            }
-//
-//            List<String> listSort = tSequentialConfDao.selectLastStep();
-//            if(listSort.get(listSort.size()-1).equals(meteId) ){
-//                //这是最后一个步骤
-//                TSysParam time = tSysParamDao.selectByParamType("cleanTime");
-//                Thread.sleep(Integer.valueOf(time.getContent())*1000);
-//                Constant.sequentialState.put("state",-1);
-//                Constant.sequentialState.put("cfgDeviceId","");
-//            }
-            //todo 生成顺控文件
         }
        return "ok";
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sequentialRec(String meteId) throws Exception{
-        {
-            String edgeLevel = Constant.getLevelEdge();
-            List<Map<String,Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
-            if (list.isEmpty()){
-                log.info("meteId {} sequentialRec config is empty!", meteId);
-                return "fail";
-            }
-            Map<String , Object> param = new HashMap<>();
-            // 开关
-            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
-            if (StringUtils.equals("true", flag)){
-                // 收到变位信号停止录视频
-                try {
-                    String filePath = Constant.filePath;
-                    //等3s再停止录像
-                    Thread.sleep(3000);
-//                    //收到变位信号抓图
-//                    try{
-//                        String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId"), null);
-//                        log.info("抓图结果: {}", services);
-//                        JSONObject jsonObject =JSONObject.parseObject(services);
-//                        Map<String,Object> re = jsonObject.getJSONObject("data");
-//                        if(!Objects.isNull(re) && !Objects.isNull(re.get("absPath"))){
-//                            param.put("picPath",re.get("absPath").toString());
-//                            param.put("fileType", "2");
-//                        }else{
-//                            throw new BusinessException("一键顺控-变位信号-抓图地址为空");
-//                        }
-//                    }catch (Exception e){
-//                        log.error("一键顺控-变位信号-抓图失败", e);
-//                    }
-                    if(StringUtils.isNotEmpty(filePath)) {
-                        String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
-                        String services = HttpClientUtils.getInstance().getUrl(endRecordVideo + "?fileName=" + fileName, null);
-                        log.info("视频结果: {}", services);
-                        filePath = filePath.replace(".h264", ".mp4");
-                        if (StringUtils.isNotEmpty(filePath)) {
-                            param.put("picPath", filePath);
-                            param.put("fileName", fileName);
-                            param.put("fileType", "4");
-                        } else {
-                            throw new BusinessException("一键顺控-变位信号-录像地址为空");
-                        }
-                    }
-                }catch (Exception e){
-                    log.error(e.getMessage(), e);
-                }
-            }else{
-                //收到变位信号抓图
-                try{
-                    Thread.sleep(1000);
-                    String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  list.get(0).get("cameraId").toString(), null);
-                    JSONObject jsonObject =JSONObject.parseObject(services);
-                    Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
-                    if(!Objects.isNull(re.get("absPath"))){
-                        param.put("picPath",re.get("absPath").toString());
-                        param.put("fileType", "2");
-                    }else{
-                        throw new BusinessException("一键顺控-变位信号-抓图地址为空");
-                    }
-                }catch (Exception e){
-                    log.error("一键顺控-变位信号-抓图失败",e);
-                }
-            }
+    public String sequentialRec(String meteId) {
+        // 获取一键顺控配置
+        List<Map<String,Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
+        if (list.isEmpty()){
+            log.info("meteId {} sequentialRec config is empty!", meteId);
+            return "fail";
+        }
 
-            //节点为 边缘节点
-            if ("1".equals(edgeLevel)){
-                //发送结果到区域巡视主机
-                //发文件 picPath /home/yjh_iot_center/iot-picture/resultImg/120920221041304111061.jpg
-                String stationId = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
-                Map<String ,Object> filePathMap = new HashMap<>();
-                String filePath = String.valueOf(param.get("picPath"));
-                String fileName = StringUtils.substringAfterLast(filePath, "/");
-                filePathMap.put("filePath", filePath);
-                filePathMap.put("targetPath", stationId + "/" + "videoFile" + "/" + fileName);
-                Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
-//                String videoName = String.valueOf(param.get("fileName"));
-//                String videoFilePath = String.valueOf(param.get("voicePath"));
-//                log.info("视频文件: {} {}", videoName, videoFilePath);
-//                if (StringUtils.isNotEmpty(videoName)) {
-//                    filePathMap.put("filePath", videoFilePath);
-//                    filePathMap.put("targetPath", "VideoFile" + "/" + videoName);
-//                    Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
-//                }
-                //上送结果（视频文件）
-                XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                List<Map<String, Object>> xmlItems = new ArrayList<>();
-                Map<String, Object> xmlItem = new HashMap<>(5);
-                xmlBaseModel.setType("61");
-                xmlItem.put("patroldevice_name", "");
-                xmlItem.put("patroldevice_code", "");
-                xmlItem.put("task_name", "一键顺控任务");
-                xmlItem.put("task_code", stationId + meteId);
-                xmlItem.put("device_name", list.get(0).get("deviceName"));
-                xmlItem.put("device_id", list.get(0).get("instanceId"));
-                xmlItem.put("value_type", "0");
-                xmlItem.put("value", "");
-                xmlItem.put("value_unit", "");
-                xmlItem.put("unit", "");
-                xmlItem.put("time", "");
-                //一键顺控检测
-                xmlItem.put("recognition_type", "1001");
-                xmlItem.put("file_type",  param.get("fileType"));
-                xmlItem.put("file_path", stationId + "/videoFile" + "/" + fileName);
-                xmlItem.put("rectangle", "");
-                xmlItem.put("task_patrolled_id", meteId);
-                xmlItem.put("data_type", "1");
-                xmlItem.put("valid", "1");
-                xmlItems.add(xmlItem);
-                xmlBaseModel.setItems(xmlItems);
-                List<XMLBaseModel> xmlBaseModelArrayList = new ArrayList<>();
-                xmlBaseModelArrayList.add(xmlBaseModel);
-                Map<String,List<XMLBaseModel>> taskStatus = new HashMap<>(2);
-                taskStatus.put("list", xmlBaseModelArrayList);
-                Constant.otherServer(taskStatus, Constant.TCP_URL);
-            }else {
-                //节点为 巡视主机
-                //todo 发给算法进行分析
-                try{
-                    Analysis analysis = new Analysis();
-                    analysis.setAnalyseType("6");
-                    analysis.setInstanceId(Long.valueOf(list.get(0).get("cfgDeviceId").toString()));
-                    analysis.setIsAi(1);
-                    //模板图片路径
-                    Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-                    String picModelPath = (String) mapForPicModelPath.get("content");
-                    analysis.setPicModelPath(picModelPath+"/"+ list.get(0).get("presetId"));
-                    analysis.setTaskId("yjsk#meteId="+ list.get(0).get("cfgDeviceId"));
-                    analysis.setPicPath(param.get("picPath").toString());
-                    List<Analysis> analysisList = new ArrayList<>();
-                    analysisList.add(analysis);
-                    // 调用智能分析主机接口进行分析
-                    try {
-                        intelAnalysisService.picAnalyseNoDetection(analysisList);
-                    } catch (Exception e) {
-                        log.error("调用智能分析主机进行缺陷分析异常：", e);
+        Map<String , Object> param = new HashMap<>(4);
+        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+        if (StringUtils.equals("true", flag)) {
+            // 收到变位信号停止录视频
+            try {
+                String filePath = Constant.filePath;
+                //等3s再停止录像
+                Thread.sleep(3000);
+                if (StringUtils.isNotEmpty(filePath)) {
+                    String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+                    String services = HttpClientUtils.getInstance().getUrl(endRecordVideo + "?fileName=" + fileName, null);
+                    log.info("视频结果: {}", services);
+                    filePath = filePath.replace(".h264", ".mp4");
+                    if (StringUtils.isNotEmpty(filePath)) {
+                        param.put("picPath", filePath);
+                        param.put("fileName", fileName);
+                        param.put("fileType", "4");
+                    } else {
+                        throw new BusinessException("一键顺控-变位信号-录像地址为空");
                     }
-//
-//                String services = HttpClientUtils.getInstance().postUrl(picRec, JSON.toJSONString(analysis));
-//                JSONObject jsonObject =JSONObject.parseObject(services);
-//                if(!Objects.isNull(jsonObject.get("code"))&&jsonObject.get("code").toString().equals("200")){
-//                    log.info("一键顺控-变位信号-发送至算法识别主机成功");
-//                }else{
-//                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
-//                }
-                }catch (Exception e){
-                    log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
                 }
+            } catch (Exception e) {
+                log.error("一键顺控-变位信号-录像失败", e);
+            }
+        } else {
+            //收到变位信号抓图
+            try {
+                Thread.sleep(1000);
+                String services = HttpClientUtils.getInstance().getUrl(cameraCapture + "?cameraId=" + list.get(0).get("cameraId").toString(), null);
+                JSONObject jsonObject = JSONObject.parseObject(services);
+                Map<String, Object> re = (Map<String, Object>) jsonObject.get("data");
+                if (!Objects.isNull(re.get("absPath"))) {
+                    param.put("picPath", re.get("absPath").toString());
+                    param.put("fileType", "2");
+                } else {
+                    throw new BusinessException("一键顺控-变位信号-抓图地址为空");
+                }
+            } catch (Exception e) {
+                log.error("一键顺控-变位信号-抓图失败", e);
             }
         }
+
+        // 一键顺控结果具体处理
+        sequentialRecHandler(param, meteId, list);
         return "ok";
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public String sequentialRecBack(Map<String,String> recBack) throws Exception{
-        {
-            Map<String,Object> map = this.sequentialInfo(recBack.get("meteId")).get(0);
-            Map<String , String> param = new HashMap<>();
+    public void sequentialRecHandler(Map<String , Object> param, String meteId, List<Map<String,Object>> list) {
+        String edgeLevel = Constant.getLevelEdge();
+        //边缘节点:发送结果到区域巡视主机   巡视主机:发给算法进行分析
+        if ("1".equals(edgeLevel)){
+            String stationId = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
+            Map<String ,Object> filePathMap = new HashMap<>();
+            String filePath = String.valueOf(param.get("picPath"));
+            String fileName = StringUtils.substringAfterLast(filePath, "/");
+            filePathMap.put("filePath", filePath);
+            filePathMap.put("targetPath", stationId + "/" + "videoFile" + "/" + fileName);
+            Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
+           /* String videoName = String.valueOf(param.get("fileName"));
+            String videoFilePath = String.valueOf(param.get("voicePath"));
+            log.info("视频文件: {} {}", videoName, videoFilePath);
+            if (StringUtils.isNotEmpty(videoName)) {
+                filePathMap.put("filePath", videoFilePath);
+                filePathMap.put("targetPath", "VideoFile" + "/" + videoName);
+                Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
+            }*/
+            //上送视频文件结果
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+            Map<String, Object> xmlItem = new HashMap<>(16);
+            xmlBaseModel.setType("61");
+            xmlItem.put("patroldevice_name", "");
+            xmlItem.put("patroldevice_code", "");
+            xmlItem.put("task_name", "一键顺控任务");
+            xmlItem.put("task_code", stationId + meteId);
+            xmlItem.put("device_name", list.get(0).get("deviceName"));
+            xmlItem.put("device_id", list.get(0).get("instanceId"));
+            xmlItem.put("value_type", "0");
+            xmlItem.put("value", "");
+            xmlItem.put("value_unit", "");
+            xmlItem.put("unit", "");
+            xmlItem.put("time", "");
+            //一键顺控检测 自定义为1001
+            xmlItem.put("recognition_type", "1001");
+            xmlItem.put("file_type",  param.get("fileType"));
+            xmlItem.put("file_path", stationId + "/videoFile" + "/" + fileName);
+            xmlItem.put("rectangle", "");
+            xmlItem.put("task_patrolled_id", meteId);
+            xmlItem.put("data_type", "1");
+            xmlItem.put("valid", "1");
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> xmlBaseModelArrayList = new ArrayList<>();
+            xmlBaseModelArrayList.add(xmlBaseModel);
+            Map<String,List<XMLBaseModel>> taskStatus = new HashMap<>(2);
+            taskStatus.put("list", xmlBaseModelArrayList);
+            Constant.otherServer(taskStatus, Constant.TCP_URL);
+            return;
+        }
+        try{
+            Analysis analysis = new Analysis();
+            analysis.setAnalyseType("6");
+            analysis.setInstanceId(Long.valueOf(list.get(0).get("cfgDeviceId").toString()));
+            analysis.setIsAi(1);
+            Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+            String picModelPath = (String) mapForPicModelPath.get("content");
+            analysis.setPicModelPath(picModelPath + "/" + list.get(0).get("presetId"));
+            analysis.setTaskId("yjsk#meteId=" + list.get(0).get("cfgDeviceId"));
+            analysis.setPicPath(param.get("picPath").toString());
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            // 调用智能分析主机接口进行分析
             try {
-                // 开关
-                String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
-                log.info("一键顺控开关isIntelAlgorithmAnalysis ： {}", flag);
-                if (StringUtils.equals("false", flag)) {
-                    String value = "";
-                    if (!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")) {
-                        String orcMete = (String) Constant.sequentialState.get("meteResult");
-                        String orc;
-                        if (StringUtils.contains(orcMete, "分")) {
-                            orc = "分";
-                        } else {
-                            orc = "合";
-                        }
-                        if ("200".equals(recBack.get("code")) && !Objects.isNull(recBack.get("desc"))) {
-                            String ret = recBack.get("desc");
-                            log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
-                            if ("unknown".equals(ret) || !ret.equals(orc)) {
-                                param.put("resultValue", orc + "闸异常");
-                                param.put("resultState", orc + "不到位");
-                                if (StringUtils.equals("分", orc)){
-                                    value = "3";
-                                }else{
-                                    value = "4";
-                                }
+                intelAnalysisService.picAnalyseNoDetection(analysisList);
+            } catch (Exception e) {
+                log.error("调用智能分析主机进行缺陷分析异常：", e);
+            }
+        }catch (Exception e){
+            log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String sequentialRecBack(Map<String,String> recBack) {
+        // 获取一键顺控配置
+        Map<String, Object> map = sequentialInfo(recBack.get("meteId")).get(0);
+        Map<String, String> param = new HashMap<>();
+        try {
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
+            if (StringUtils.equals("false", flag)) {
+                String value = "";
+                if (!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")) {
+                    String orcMete = (String) Constant.sequentialState.get("meteResult");
+                    String orc;
+                    if (StringUtils.contains(orcMete, "分")) {
+                        orc = "分";
+                    } else {
+                        orc = "合";
+                    }
+                    if ("200".equals(recBack.get("code")) && !Objects.isNull(recBack.get("desc"))) {
+                        String ret = recBack.get("desc");
+                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
+                        if ("unknown".equals(ret) || !ret.equals(orc)) {
+                            param.put("resultValue", orc + "闸异常");
+                            param.put("resultState", orc + "不到位");
+                            if (StringUtils.equals("分", orc)) {
+                                value = "3";
                             } else {
-                                param.put("resultValue", orc + "闸正常");
-                                param.put("resultState", orc + "位");
-                                if (StringUtils.equals("分", orc)){
-                                    value = "1";
-                                }else{
-                                    value = "2";
-                                }
+                                value = "4";
                             }
-                        } else if ("2000".equals(recBack.get("code")) && !Objects.isNull(recBack.get("value"))) {
-                            String ret = recBack.get("value");
-                            log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
-                            if ("1".equals(ret) && "分".equals(orc)) {
-                                param.put("resultValue", "分闸正常");
+                        } else {
+                            param.put("resultValue", orc + "闸正常");
+                            param.put("resultState", orc + "位");
+                            if (StringUtils.equals("分", orc)) {
                                 value = "1";
-                                param.put("resultState", orc + "位");
-                            } else if ("2".equals(ret) && "合".equals(orc)) {
-                                param.put("resultValue", "合闸正常");
-                                value = "2";
-                                param.put("resultState", orc + "位");
                             } else {
-                                // 识别返回 3 和 4
-                                param.put("resultValue", orc + "闸异常");
-                                param.put("resultState", orc + "不到位");
-                                if (StringUtils.equals("分", orc)){
-                                    value = "3";
-                                }else{
-                                    value = "4";
-                                }
+                                value = "2";
                             }
+                        }
+                    } else if ("2000".equals(recBack.get("code")) && !Objects.isNull(recBack.get("value"))) {
+                        String ret = recBack.get("value");
+                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
+                        if ("1".equals(ret) && "分".equals(orc)) {
+                            param.put("resultValue", "分闸正常");
+                            value = "1";
+                            param.put("resultState", orc + "位");
+                        } else if ("2".equals(ret) && "合".equals(orc)) {
+                            param.put("resultValue", "合闸正常");
+                            value = "2";
+                            param.put("resultState", orc + "位");
                         } else {
-                            param.put("resultValue", "分析失败");
-                            param.put("resultState", "无效状态");
+                            // 识别返回 3 和 4
+                            param.put("resultValue", orc + "闸异常");
+                            param.put("resultState", orc + "不到位");
+                            if (StringUtils.equals("分", orc)) {
+                                value = "3";
+                            } else {
+                                value = "4";
+                            }
                         }
                     } else {
                         param.put("resultValue", "分析失败");
                         param.put("resultState", "无效状态");
                     }
-                    upToMonitorSystem(recBack, map, value);
-                }else{
-                    // 一键顺控是否使用自定义结果 true-是
-                    String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
-                    log.info("一键顺控开关sequentialFlag ： {}", sequentialFlag);
-                    if (StringUtils.equals("true", sequentialFlag)){
-                        String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
-                        recBack.put("value", sequentialResult);
-                        log.info("干预一键顺控结果结束，recBack： {}", JSONUtil.toJSONString(recBack));
-                        // 关闭人工干预开关，下次继续走算法分析
-                        redisTemplate.opsForHash().put("t_sys_param:sequentialFlag", "content", "false");
-                    }
-
-                    if(!Objects.isNull(recBack.get("code")) && "2000".equals(recBack.get("code"))){
-                        if(!Objects.isNull(recBack.get("value"))){
-                            String ret = recBack.get("value");
-                            switch (ret){
-                                case "1": param.put("resultValue", "分闸正常"); break;
-                                case "2": param.put("resultValue", "合闸正常"); break;
-                                case "3": param.put("resultValue", "分闸异常"); break;
-                                case "4": param.put("resultValue", "合闸异常"); break;
-                                default: break;
-                            }
-                        }else{
-                            param.put("resultValue", "分析失败");
-                        }
-                    }else{
-                        param.put("resultValue", "分析失败");
-                    }
-
-                    upToMonitorSystem(recBack, map, recBack.get("value"));
+                } else {
+                    param.put("resultValue", "分析失败");
+                    param.put("resultState", "无效状态");
                 }
-            }catch (Exception e){
-                log.error(e.getMessage(), e);
+                upToMonitorSystem(recBack, map, value);
+            } else {
+                // 一键顺控是否使用自定义结果 true-是
+                String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
+                log.info("sequentialFlag ： {}", sequentialFlag);
+                if (StringUtils.equals("true", sequentialFlag)) {
+                    String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
+                    recBack.put("value", sequentialResult);
+                    log.info("干预一键顺控结果结束，recBack： {}", JSONUtil.toJSONString(recBack));
+                    // 关闭人工干预开关，下次继续走算法分析
+                    redisTemplate.opsForHash().put("t_sys_param:sequentialFlag", "content", "false");
+                }
+
+                if ("2000".equals(recBack.get("code"))) {
+                    String ret = recBack.getOrDefault("value", "0");
+                    switch (ret) {
+                        case "1":
+                            param.put("resultValue", "分闸正常");
+                            break;
+                        case "2":
+                            param.put("resultValue", "合闸正常");
+                            break;
+                        case "3":
+                            param.put("resultValue", "分闸异常");
+                            break;
+                        case "4":
+                            param.put("resultValue", "合闸异常");
+                            break;
+                        default:
+                            param.put("resultValue", "分析失败");
+                            break;
+                    }
+                } else {
+                    param.put("resultValue", "分析失败");
+                }
+                upToMonitorSystem(recBack, map, recBack.get("value"));
             }
 
-            Map<String, String> jasonMapsResult = new HashMap<>();
+            Map<String, String> jasonMapsResult = new HashMap<>(8);
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
             jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
             jasonMapsResult.put("state", param.get("resultValue"));
             jasonMapsResult.put("identifyResult", param.get("resultValue"));
-            String jsonResult = JSON.toJSONString(jasonMapsResult);
-            log.info("发送给前端的消息：" + jsonResult);
-            try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
-            }catch (Exception e){
-                log.error("发送websocket出错",e);
-            }
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMapsResult));
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapsResult);
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
             log.info("顺控执行完毕， {}-{}", JSONUtil.toJSONString(listSort), JSONUtil.toJSONString(map));
-            if(listSort.get(listSort.size()-1).equals(map.get("cfgDeviceId")) ){
-                //这是最后一个步骤
+            if (listSort.get(listSort.size() - 1).equals(map.get("cfgDeviceId"))) {
+                // 这是最后一个步骤
                 String time = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "content"));
-                Thread.sleep(Integer.valueOf(time)*1000);
-                Constant.sequentialState.put("state",-1);
-                Constant.sequentialState.put("cfgDeviceId","");
+                Thread.sleep(Integer.parseInt(time) * 1000);
+                Constant.sequentialState.put("state", -1);
+                Constant.sequentialState.put("cfgDeviceId", "");
             }
-            //todo 生成顺控文件
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return "ok";
     }
@@ -710,9 +591,6 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
-
-
-
         return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
     @Transactional(rollbackFor = Exception.class)

@@ -1,14 +1,12 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.ArrayList;
@@ -64,21 +62,6 @@ public class SequenceThread implements Runnable {
             intelAnalysisService.picAnalyseNoDetection(analysisList);
         } catch (Exception e) {
             log.error("一键顺控-变位信号-调用算法识别主机失败", e);
-        }
-    }
-
-    /**
-     * 将文件上传至巡视主机ftp服务器
-     *
-     * @param sourcePath 源文件地址
-     * @param targetPathName 目标文件地址名称
-     */
-    public void uploadFileToFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig ftpsConfig) {
-        try {
-            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(), ftpsConfig.getUserName(), ftpsConfig.getPassword());
-        } catch (Exception e) {
-            log.error("将文件上传至巡视主机ftp服务器错误:{}", e);
         }
     }
 }

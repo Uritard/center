@@ -2290,7 +2290,7 @@ CREATE TABLE `u_patrol_data_result` (
   `device_mete_name` varchar(50) DEFAULT '' COMMENT '测点名称',
   `custom_id` varchar(50) DEFAULT '' COMMENT '部位id',
   `custom_name` varchar(50) DEFAULT '' COMMENT '测点名称',
-  `device_point_id` bigint(32) DEFAULT '0' COMMENT '设备点位id',
+  `device_point_id` varchar(50) DEFAULT '' COMMENT '设备点位id',
   `instance_id` bigint(48) DEFAULT '0' COMMENT '巡检点实例ID',
   `instance_name` varchar(255) DEFAULT '' COMMENT '巡检点实例名称',
   `cruise_id` bigint(48) DEFAULT '0' COMMENT '巡检点ID',

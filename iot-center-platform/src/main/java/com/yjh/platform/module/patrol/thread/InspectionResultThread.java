@@ -324,10 +324,10 @@ public class InspectionResultThread implements Runnable{
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
             String sysLevel = Constant.getLevelEdge();
-
-            // 下级上报异常的点不调用算法，如超时，任务终止，异常的情况
             boolean isInterrupt = "0".equals(robotPatrolTaskResult.getValid());
-            log.info("isInterrupt:{}", isInterrupt);
+            log.info("algorithm:【{}】,cruiseType:【{}】,fileFound:【{}】,sysLevel:【{}】,isInterrupt:【{}】",
+                    algorithm, cruiseType, fileFound, sysLevel, isInterrupt);
+            // 调用算法的条件:配置了算法 + 非声纹的点 + resultImg能找到文件 + 巡视主机 + 正常的点
             if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel) && !isInterrupt) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);

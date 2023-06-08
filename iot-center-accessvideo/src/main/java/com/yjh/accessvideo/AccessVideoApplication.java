@@ -77,6 +77,7 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         Constant.redisTemplate = redisTemplate;
+        Constant.SYSTEM_ARCH = System.getProperty("os.arch");
         log.info("videoAccess is running...");
         setSDKCom();
         if (!hCNetSDK.NET_DVR_Init()) {

@@ -1,33 +1,21 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
-import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.patrol.controller.UPatrolTaskController;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
-import com.yjh.platform.module.task.controller.TCruiseTaskController;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
-import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.user.entity.TCameraPreset;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class TCfgDataCurrentService {
 
-    private Logger log = LoggerFactory.getLogger(TCfgDataCurrentService.class);
+    private final Logger log = LoggerFactory.getLogger(TCfgDataCurrentService.class);
 
     @Autowired
     private TCfgDataCurrentDao tCfgDataCurrentDao;
@@ -59,16 +46,7 @@ public class TCfgDataCurrentService {
     private TUnionTaskService tUnionTaskService;
 
     @Autowired
-    private TUnionTaskDao tUnionTaskDao;
-
-    @Autowired
     private TCruisePlanDao tCruisePlanDao;
-
-    @Autowired
-    private TCruiseTaskService tCruiseTaskService;
-
-    @Autowired
-    private TCruiseTaskController tCruiseTaskController;
 
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
@@ -188,12 +166,7 @@ public class TCfgDataCurrentService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCfgDataCurrent> select(Long meteId, Long deviceId, String cunstomId, Date recordTime, Integer meteKind, String regionId, String meteValue, String lastMeteValue) throws ScriptException {
-        List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.select(meteId, deviceId, cunstomId, recordTime, meteKind, regionId, meteValue, lastMeteValue);
-
-//        Log cLogger = LogFactory.getLog(this.getClass());
-//        cLogger.info();
-
-        return tCfgDataCurrentList;
+        return tCfgDataCurrentDao.select(meteId, deviceId, cunstomId, recordTime, meteKind, regionId, meteValue, lastMeteValue);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -222,29 +195,19 @@ public class TCfgDataCurrentService {
     }
 
 
-
-
-    //TODO: 测试方法 用完删除
-//    @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws Exception {
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Set<Long> plans = new HashSet<>();//满足触发条件的预案
-        Log cLogger = LogFactory.getLog(this.getClass());
-        cLogger.info("清华方数据："+meteMap);
-        cLogger.info("meteId--"+meteMap);
-        //联动规则一次匹配
+    public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) {
+        log.info("【meteMap】:{}", meteMap);
+        // 联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
-
-        cLogger.info("开始");
-        List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
-        for (TCfgUnionRule rule : unionrules) {
-            cLogger.info(rule.getInputParam());
+        List<TCfgUnionRule> unionRules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
+        for (TCfgUnionRule rule : unionRules) {
+            log.info(rule.getInputParam());
             rules.add(rule);
         }
-        cLogger.info("结束");
-        cLogger.info("规则："+rules);
+        log.info("【rules】:{}", rules);
 
-        List<Long> meteIdR = new ArrayList<>();//一次匹配到的规则所涵盖的所有meteId
+        // 一次匹配到的规则所涵盖的所有meteId
+        List<Long> meteIdR = new ArrayList<>();
         for (TCfgUnionRule rule : rules) {
             String[] currentMeteId = rule.getInputParam().split(", ");
             for (int i = 0; i < currentMeteId.length; i++) {
@@ -252,132 +215,135 @@ public class TCfgDataCurrentService {
             }
         }
 
-        //根据一次匹配拿到的meteId获取实时数据
+        // 根据一次匹配拿到的meteId获取实时数据
         List<TCfgDataCurrent> currents = new ArrayList<>();
         for (Long meteId : meteIdR) {
-            TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
+            // 根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
+            TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);
             if (currentDatas != null) {
-                //汉字四遥值映射转换
-                String finalValues=meteValues(currentDatas.getMeteValue());
+                // 汉字四遥值映射转换
+                String finalValues = meteValues(currentDatas.getMeteValue());
                 if(Objects.nonNull(finalValues)){
                     currentDatas.setMeteValue(finalValues);
                 }
                 currents.add(currentDatas);
             }
-
         }
 
-        //规则二次匹配与规则计算，判断表达式是否触发
-        //
-
-        List<TCfgUnionRule> unionRule=new ArrayList<>();//触发联动的规则
-        List<String> contents=new ArrayList<>();//触发联动的断面数据
+        // 规则二次匹配与规则计算，判断表达式是否触发
+        List<TCfgUnionRule> unionRule = new ArrayList<>();
+        // 触发联动的断面数据
+        List<String> contents = new ArrayList<>();
+        // 满足触发条件的预案
+        Set<Long> plans = new HashSet<>();
         for (TCfgUnionRule rule : rules) {
-            String content = rule.getRuleContent().replaceAll("\\{", "").replaceAll("}", "").replaceAll(",", "");
+            String content = rule.getRuleContent()
+                    .replaceAll("\\{", "")
+                    .replaceAll("}", "")
+                    .replaceAll(",", "");
             for (TCfgDataCurrent current : currents) {
                 StringBuilder stringBuilder = new StringBuilder("id:");
                 String contentTemp = content.replaceAll((stringBuilder.append((current.getMeteId()).toString())).toString(), current.getMeteValue());
                 content = contentTemp;
 
                 if (content.contains("id:")) {
-                    cLogger.info("未完成");
+                    log.info("未完成");
                 } else if (content.contains("<") || content.contains(">") || content.contains("=")) {
-                    ScriptEngineManager sm = new ScriptEngineManager();//字符串表达式计算
+                    // 字符串表达式计算
+                    ScriptEngineManager sm = new ScriptEngineManager();
                     ScriptEngine engine = sm.getEngineByName("js");
-                    String sum = engine.eval(content).toString();
-                    if (sum == "true") {
+                    String sum = null;
+                    try {
+                        sum = engine.eval(content).toString();
+                    } catch (ScriptException e) {
+                        log.error(e.getMessage(), e);
+                    }
 
-                        //预案为空
-                        if (rule.getPlanId() == null && rule.getPresetId() != null){
-                            //配了联动预置位
-                            Map<String,String> map = new HashMap<>();
-                            map.put("type","linkagePresetPopUp");
-                            map.put("cameraId", String.valueOf(rule.getCameraId()));
-                            map.put("presetId",String.valueOf(rule.getPresetId()));
-                            map.put("meteName",current.getDeviceName());
-                            map.put("meteKindName",current.getMeteKindName());
-                            map.put("meteValue",current.getMeteValue());
-                            map.put("time", DateTimeUtil.format(current.getRecordTime()));
-                            String json = JSON.toJSONString(map);
-                            log.info("发送给前端的联动预置位消息：" + json);
-                            //将摄像机转到预置位
-                            ThreadPoolUtil.COMMON_POOL.addThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    String str = "camera_info:" + rule.getCameraId();
-                                    Map<String, String> map = redisTemplate.opsForHash().entries(str);
-                                    if ("0".equals(map.get("state"))) {
-                                        HashMap<String, Object> moveMap = new HashMap<>();
-                                        moveMap.put("presetId", rule.getPresetId());
-                                        moveMap.put("cameraId", rule.getCameraId());
-                                        move(moveMap);
-                                        map.put("lastTime",simpleDateFormat.format(new Date()));
-                                        redisTemplate.opsForHash().putAll(str,map);
-                                    }
-                                }
-                            });
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
-                        }
-                        unionRule.add(rule);
-                        contents.add(content);
-                        try {
-                            int delay = rule.getRuleDelay();
-                            Thread.sleep(delay * 1000);
-                            cLogger.info(rule.getRuleName());
-                            plans.add(rule.getPlanId());
-                        } catch (Exception e) {
-                            e.getMessage();
-                        }
-                        cLogger.info("执行预案");
-                        cLogger.info(rule.getRuleName());
-                        break;
-                    } else if (sum == "false") {
-                        cLogger.info("不满足触发条件");
+                    if (StringUtils.equals("false", sum)) {
+                        log.info("不满足触发条件");
                         break;
                     }
 
-                } else {
-                    cLogger.info("表达式错误");
+                    // 预案为空
+                    if (rule.getPlanId() == null && rule.getPresetId() != null){
+                        // 配了联动预置位
+                        Map<String,String> map = new HashMap<>();
+                        map.put("type","linkagePresetPopUp");
+                        map.put("cameraId", String.valueOf(rule.getCameraId()));
+                        map.put("presetId",String.valueOf(rule.getPresetId()));
+                        map.put("meteName",current.getDeviceName());
+                        map.put("meteKindName",current.getMeteKindName());
+                        map.put("meteValue",current.getMeteValue());
+                        map.put("time", DateTimeUtil.format(current.getRecordTime()));
+                        String json = JSON.toJSONString(map);
+                        log.info("发送给前端的联动预置位消息{}", json);
+                        // 将摄像机转到预置位
+                        ThreadPoolUtil.COMMON_POOL.addThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String str = "camera_info:" + rule.getCameraId();
+                                Map<String, String> map = redisTemplate.opsForHash().entries(str);
+                                if ("0".equals(map.get("state"))) {
+                                    HashMap<String, Object> moveMap = new HashMap<>();
+                                    moveMap.put("presetId", rule.getPresetId());
+                                    moveMap.put("cameraId", rule.getCameraId());
+                                    move(moveMap);
+                                    map.put("lastTime",DateTimeUtil.format(new Date()));
+                                    redisTemplate.opsForHash().putAll(str,map);
+                                }
+                            }
+                        });
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
+                    }
+                    unionRule.add(rule);
+                    contents.add(content);
                     try {
                         int delay = rule.getRuleDelay();
                         Thread.sleep(delay * 1000);
-                        cLogger.info(rule.getRuleName());
+                        log.info(rule.getRuleName());
                         plans.add(rule.getPlanId());
                     } catch (Exception e) {
-                        e.getMessage();
+                       log.error(e.getMessage(), e);
+                    }
+                    log.info("【执行预案】:{}", rule.getRuleName());
+
+                } else {
+                    log.info("表达式错误");
+                    try {
+                        int delay = rule.getRuleDelay();
+                        Thread.sleep(delay * 1000);
+                        log.info(rule.getRuleName());
+                        plans.add(rule.getPlanId());
+                    } catch (Exception e) {
+                       log.error(e.getMessage(), e);
                     }
                 }
-
             }
-
         }
+
         //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
-        for(Long plan:plans){
-            log.info("planId----"+plan);
+        for(Long plan : plans){
+            log.info("【planId】:{}", plan);
             if (plan == null){
                 continue;
             }
-//            TCruiseTask tCruiseTask=new TCruiseTask();
             TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
-//            tCruiseTasks.add(tCruiseTask);
             TCruiseTaskAdd tCruiseTaskAdd=new TCruiseTaskAdd();
             tCruiseTaskAdd.setPlanId(tCruisePlan.getPlanId());
-            tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName()+simpleDateFormat.format(new Date()));
+            tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName() + DateTimeUtil.format(new Date()));
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
             tCruiseTaskAdd.setCycleExecuteTime("");
-//            tCruiseTaskAdd.setTaskType(218);
             tCruiseTaskAdd.setUnionTaskStatus("1");
-//            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
             Map<String, Object> taskMap = uPatrolTaskService.addTask(tCruiseTaskAdd, true);
-            //联动任务ID
+            // 联动任务ID
             String taskId= String.valueOf(taskMap.get("taskId"));
-            cLogger.info("联动开始执行");
-            //联动记录插库
+            log.info("联动开始执行");
+            // 联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
-            tUnionTaskService.insertRecord(meteIdR.get(0),taskId,unionRule.get(0).getRuleId(), null, new Date(), contents.get(0),unionForGetTime.getRecordTime());
-            // TODO: 2020/12/12 待优化WB
+            tUnionTaskService.insertRecord(meteIdR.get(0), taskId, unionRule.get(0).getRuleId(), null, new Date(),
+                    contents.get(0),unionForGetTime.getRecordTime());
 
             Map<String,String> currentUnionInfo=new HashMap<>();
             currentUnionInfo.put("unionId",taskId);
@@ -386,37 +352,35 @@ public class TCfgDataCurrentService {
             // webSocket通知前端产生联动信息
             Map<String, String> jasonMap = new HashMap<>();
             jasonMap.put("type", "newLinkage");
-            log.info("cfgDevice:"+currents.get(0).getDeviceId().toString());
+            log.info("cfgDevice:{}", currents.get(0).getDeviceId().toString());
             jasonMap.put("deviceName", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName());
-            jasonMap.put("time",simpleDateFormat.format(new Date()));
-            jasonMap.put("warnContent",  tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName()+"触发联动");
-            String jsonT = JSON.toJSONString(jasonMap);
-            log.info("发送给前端的消息：" + jsonT);
+            jasonMap.put("time", DateTimeUtil.format(new Date()));
+            jasonMap.put("warnContent", tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName()+"触发联动");
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
 
             TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(unionRule.get(0).getRuleId());
-            //根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
+            // 根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
             if ("1".equals(tCfgUnionRule.getRuleType())){
-                //webSocket通知前端调联动弹框的接口
                 currentUnionInfo.put("isPop","true");
                 Map<String, String> jasonMaps2 = new HashMap<>();
                 jasonMaps2.put("type", "linkagePopUp");
                 jasonMaps2.put("unionId", taskId);
-                String json = JSON.toJSONString(jasonMaps2);
-                log.info("发送给前端的消息：" + json);
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
+                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps2));
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps2);
             }
-
             redisTemplate.opsForValue().set("currentUnion",currentUnionInfo,3, TimeUnit.MINUTES);
         }
-
-        cLogger.info("联动任务：----"+tCruiseTasks);
-//        return plans;
+        log.info("【联动任务】:{}", tCruiseTasks);
         return tCruiseTasks;
     }
 
 
-    //相机转到预置位
+    /**
+     * 相机转到预置位
+     * @param map 参数
+     * @return void
+     */
     private void move(HashMap<String, Object> map) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -427,98 +391,5 @@ public class TCfgDataCurrentService {
             log.error(e.getMessage(), e);
         }
     }
-
-//    @Transactional(rollbackFor = Exception.class)
-//    public List<TCruiseTask> unionRulesMatchAndCalculate(List<Long> meteIds) throws ScriptException {
-//        Set<Long> plans = new HashSet<>();//满足触发条件的预案
-//        Log cLogger = LogFactory.getLog(this.getClass());
-//        cLogger.info("清华方数据："+meteIds);
-//        //联动规则一次匹配
-//        Set<TCfgUnionRule> rules = new HashSet<>();
-//
-//        for (Long meteId : meteIds) {
-//            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteId.toString());
-//            for (TCfgUnionRule rule : unionrules) {
-//                cLogger.info(rule.getInputParam());
-//                rules.add(rule);
-//            }
-//        }
-//        Set<Long> meteIdR = new HashSet<>();//一次匹配到的规则所涵盖的所有meteId
-//        for (TCfgUnionRule rule : rules) {
-//            String[] currentMeteId = rule.getInputParam().split(", ");
-//            for (int i = 0; i < currentMeteId.length; i++) {
-//                meteIdR.add(Long.valueOf(currentMeteId[i]));
-//            }
-//        }
-//
-//        //根据一次匹配拿到的meteId获取实时数据
-//        List<TCfgDataCurrent> currents = new ArrayList<>();
-//        for (Long meteId : meteIdR) {
-//            TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);//根据传来的发生变化的量的MeteId条件查询需要比较计算的实时数据
-//            if (currentDatas != null) {
-//                currents.add(currentDatas);
-//            }
-//
-//        }
-//
-//        //规则二次匹配与规则计算，判断表达式是否触发
-//        // TODO: 2020/9/25 待完善--触发条件向巡检模块微服务发送预案信息Post方法;
-//
-//        for (TCfgUnionRule rule : rules) {
-//            String content = rule.getRuleContent().replaceAll("\\{", "").replaceAll("}", "").replaceAll(",", "");
-//            for (TCfgDataCurrent current : currents) {
-//                StringBuilder stringBuilder = new StringBuilder("id:");
-//                String contentTemp = content.replaceAll((stringBuilder.append((current.getMeteId()).toString())).toString(), current.getMeteValue());
-//                content = contentTemp;
-//
-//                if (content.contains("id:")) {
-//                    cLogger.info("未完成");
-//                } else if (content.contains("<") || content.contains(">") || content.contains("=")) {
-//                    ScriptEngineManager sm = new ScriptEngineManager();//字符串表达式计算
-//                    ScriptEngine engine = sm.getEngineByName("js");
-//                    String sum = engine.eval(content).toString();
-//                    if (sum == "true") {
-//                        tUnionTaskService.insertRecord(rule.getRuleId(), null, new Date(), content);
-//                        try {
-//                            int delay = rule.getRuleDelay();
-//                            Thread.sleep(delay * 1000);
-//                            cLogger.info(rule.getRuleName());
-//                            plans.add(rule.getPlanId());
-//                        } catch (Exception e) {
-//                            e.getMessage();
-//                        }
-//                        cLogger.info("执行预案");
-//                        cLogger.info(rule.getRuleName());
-//                        break;
-//                    } else if (sum == "false") {
-//                        cLogger.info("不满足触发条件");
-//                        break;
-//                    }
-//
-//                } else {
-//                    cLogger.info("表达式错误");
-//                }
-//
-//            }
-//
-//        }
-//        //将满足条件的联动规则预案生成任务并执行
-//        List<TCruiseTask>tCruiseTasks=new ArrayList<>();
-//        for(Long plan:plans){
-//        TCruiseTask tCruiseTask=new TCruiseTask();
-//        TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
-//        tCruiseTask.setPlanId(tCruisePlan.getPlanId());
-//        tCruiseTask.setTaskName(tCruisePlan.getPlanName());
-//        tCruiseTask.setIfRun(173);
-//        tCruiseTaskService.insert(tCruiseTask);//执行联动任务
-//        cLogger.info("联动开始执行");
-//        tCruiseTasks.add(tCruiseTask);
-//        }
-////        return plans;
-//        return tCruiseTasks;
-//    }
-
-
-
 }
 

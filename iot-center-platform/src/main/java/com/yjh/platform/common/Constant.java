@@ -97,8 +97,13 @@ public class Constant {
 
     public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
 
-    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
-        Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         log.info("request: {} \nresult: {}", url, JSON.toJSONString(re));
         return re;
     }
@@ -188,8 +193,14 @@ public class Constant {
     private static int endWaitTimes;
 
 
-    public static String websocketSendMsg(String url, Map<String, String> map) throws IOException {
-        return websocketSendMsg(url, map, null);
+    public static String websocketSendMsg(String url, Map<String, String> map) {
+        String result = null;
+        try {
+            result = websocketSendMsg(url, map, null);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return result;
     }
 
     public static String websocketSendMsg(String url, Map<String, String> map, String userId) throws IOException {
@@ -399,9 +410,13 @@ public class Constant {
 
     public static final String TCP_MODEL_DOWNLOAD_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelDownload";
 
-    public static<T> Result mapToOtherServer(Map<String, Object> map, String url) throws Exception{
+    public static<T> Result mapToOtherServer(Map<String, Object> map, String url) {
         Result re = new Result();
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         return re;
     }
 

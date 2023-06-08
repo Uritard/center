@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -207,32 +206,6 @@ public class AnalysisController {
         try {
             result.setData(analyseDataOperateService.alarmJudge(value, valueDesc, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
                     highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4));
-        } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("告警判断处理异常:", e);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("告警判断处理错误:", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "test")
-    @GetMapping(value = "/test")
-    public Result test(){
-        Result result = new Result();
-        try {
-            List<Analysis> analysisList = new ArrayList<>();
-            Analysis analysis = new Analysis();
-            analysis.setAnalyseType("11");
-            analysis.setTaskId("123");
-            analysis.setInstanceId(111L);
-            analysis.setIsAi(0);
-            analysis.setPicPath("/home/xx");
-            analysis.setDevicePointId("3");
-            analysis.setReferenceImage("/home/yjh_iot_center/iot-picture/specimens/123/123.jpg");
-            analysisList.add(analysis);
-            abstractVideoCruise.defect(analysisList);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("告警判断处理异常:", e);
