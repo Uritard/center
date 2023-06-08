@@ -175,8 +175,7 @@ public class TCfgDataCurrentController {
 
 
     @ApiOperation(value = "联动控制--测试接口")
-    @RequestMapping(value = "/unionTest",method = RequestMethod.GET)
-    //@Logs(title = "批量插入",content = "根据用户传递的参数批量插入实时数据",logType = 2)
+    @GetMapping(value = "/unionTest")
     public Result unionTest(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
