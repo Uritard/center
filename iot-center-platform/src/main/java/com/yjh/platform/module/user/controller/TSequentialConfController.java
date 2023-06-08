@@ -1,28 +1,27 @@
 package com.yjh.platform.module.user.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.user.service.TSequentialConfService;
 import com.yjh.platform.module.user.entity.TSequentialConf;
-import java.util.HashMap;
-import java.util.List;
-
-import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.module.user.service.TSequentialConfService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 @RestController
 @RequestMapping("/tSequentialConf/v1")
-@Api(value = "/tSequentialConf", description = "顺控配置表操作接口")
+@Api(value = "/tSequentialConf", tags = "顺控配置表操作接口")
 public class TSequentialConfController {
 
     @Autowired
@@ -39,14 +38,14 @@ public class TSequentialConfController {
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    private Logger log = LoggerFactory.getLogger(TSequentialConfController.class);
+    private final Logger log = LoggerFactory.getLogger(TSequentialConfController.class);
 
     public TSequentialConfController(TSequentialConfService tSequentialConfService) {
         this.tSequentialConfService = tSequentialConfService;
     }
 
     @ApiOperation(value = "插入")
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @PostMapping(value = "/add")
     @Logs(title = "新增顺控配置信息",content = "根据用户传递的参数新增顺控配置信息",logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody TSequentialConf tSequentialConf) {
         Result result = new Result();
@@ -69,7 +68,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @PostMapping(value = "/delete")
     @Logs(title = "删除顺控配置信息",content = "根据用户传递的参数删除顺控配置信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "cfgDeviceId", required = true) String cfgDeviceId) {
         Result result = new Result();
@@ -86,7 +85,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @PostMapping(value = "/update")
     @Logs(title = "修改顺控配置信息",content = "根据用户传递的参数修改顺控配置信息",logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody TSequentialConf tSequentialConf) {
         Result result = new Result();
@@ -109,7 +108,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询顺控配置信息",content = "根据用户传递的参数查询顺控配置信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "cfgDeviceId", required = true) String cfgDeviceId) {
         Result result = new Result();
@@ -124,7 +123,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "查询")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @GetMapping(value = "/select")
     @Logs(title = "查询顺控配置信息",content = "根据用户传递的参数查询顺控配置信息",logType = 1)
     public Result select(@RequestParam(value = "cfgDeviceId", required = false) String cfgDeviceId,
                             @RequestParam(value = "cfgMeteId", required = false) String cfgMeteId,
@@ -142,7 +141,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    @GetMapping(value = "/selectByPage")
     @Logs(title = "查询顺控配置信息",content = "根据用户传递的参数分页查询顺控配置信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "cfgDeviceName", required = false) String cfgDeviceName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
@@ -163,7 +162,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "批量插入")
-    @RequestMapping(value = "/batchAdd", method = RequestMethod.POST)
+    @PostMapping(value = "/batchAdd")
     @Logs(title = "批量插入顺控配置信息",content = "根据用户传递的参数批量插入顺控配置信息",logType = 2)
     public Result batchAdd(@RequestBody List<TSequentialConf> list) {
         Result result = new Result();
@@ -177,7 +176,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
+    @PostMapping(value = "/batchDelete")
     @Logs(title = "批量删除顺控配置信息",content = "根据用户传递的参数批量删除顺控配置信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "cfgDeviceIds") String cfgDeviceIds) {
     Result result = new Result();
@@ -193,25 +192,8 @@ public class TSequentialConfController {
     return result;
     }
 
-
-//    //@ApiOperation(value = "查询顺控设备树")
-//    @RequestMapping(value = "/sequenceControlResponse", method = RequestMethod.GET)
-//    //@Logs(title = "查询",content = "根据用户传递的参数查询",logType = 1)
-//    public Result sequenceControlResponse(@RequestParam(value = "map", required = false) Map<String,List<Long>> map) {
-//        Result result = new Result();
-//        try {
-//
-//            //List<AreaInfo> list = tSequentialConfService.selectForCfgDeviceTree(cfgDeviceName);
-//            result.setData(1);
-//        } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-//            log.error("失败描述：", e);
-//        }
-//        return result;
-//    }
-
     @ApiOperation(value = "查询顺控设备树")
-    @RequestMapping(value = "/selectForCfgDeviceTree", method = RequestMethod.GET)
+    @GetMapping(value = "/selectForCfgDeviceTree")
     @Logs(title = "查询顺控设备树",content = "根据用户传递的参数查询顺控设备树",logType = 1)
     public Result selectForCfgDeviceTree(@RequestParam(value = "cfgDeviceName", required = false) String cfgDeviceName) {
         Result result = new Result();
@@ -226,7 +208,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "触发顺控视频聚焦")
-    @RequestMapping(value = "/sequential",method = RequestMethod.GET)
+    @GetMapping(value = "/sequential")
     public Result sequential(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
@@ -239,7 +221,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "手动干预一键顺控结果")
-    @RequestMapping(value = "/sequentialResult",method = RequestMethod.GET)
+    @GetMapping(value = "/sequentialResult")
     public Result sequentialResult(@RequestParam(value = "resultNum", required = false) Integer resultNum){
         Result result=new Result();
         try {
@@ -252,7 +234,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "手动干预一静默监视结果")
-    @RequestMapping(value = "/silentMonitorResult",method = RequestMethod.GET)
+    @GetMapping(value = "/silentMonitorResult")
     public Result silentMonitorResult(@RequestParam(value = "type", required = false) Integer type){
         Result result=new Result();
         try {
@@ -265,7 +247,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "触发顺控抓图识别")
-    @RequestMapping(value = "/sequentialRec",method = RequestMethod.GET)
+    @GetMapping(value = "/sequentialRec")
     public Result sequentialRec(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
@@ -278,15 +260,17 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "触发顺控抓图识别返回值处理")
-    @RequestMapping(value = "/sequentialRecBack",method = RequestMethod.POST)
+    @PostMapping(value = "/sequentialRecBack")
     public Result sequentialRecBack(@RequestBody Map<String,String> recBack){
         Result result=new Result();
         try {
-            log.info("一键顺控："+recBack);
-//            recBack.put("meteId","1001");
-//            recBack.put("code","200");
-//            recBack.put("desc","合");
-            if(applicationProperties.getSequentialConfig().getSequentialResultFlag() != null && "1".equals(applicationProperties.getSequentialConfig().getSequentialResultFlag())){
+            log.info("一键顺控：{}", recBack);
+            /*// 测试数据
+            recBack.put("meteId","1001");
+            recBack.put("code","200");
+            recBack.put("desc","合");*/
+            if(applicationProperties.getSequentialConfig().getSequentialResultFlag() != null &&
+                    "1".equals(applicationProperties.getSequentialConfig().getSequentialResultFlag())){
                 recBack.put("code","200");
                 recBack.put("desc",String.valueOf(Constant.sequentialState.get("meteResult")));
             }
@@ -299,7 +283,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "顺控信息")
-    @RequestMapping(value = "/sequentialInfo",method = RequestMethod.GET)
+    @GetMapping(value = "/sequentialInfo")
     public Result sequentialInfo(@RequestParam(value = "cfgDeviceId",required = false) String cfgDeviceId){
         Result result=new Result();
         try {
@@ -312,7 +296,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "反向联动任务下发")
-    @RequestMapping(value = "/unionTask",method = RequestMethod.GET)
+    @GetMapping(value = "/unionTask")
     public Result unionTask(@RequestParam(value = "cfgDeviceId",required = false) String cfgDeviceId,
                             @RequestParam(value = "order",required = false) String order){
         Result result=new Result();
@@ -326,7 +310,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "获取顺控处于那一步")
-    @RequestMapping(value = "/getStep",method = RequestMethod.GET)
+    @GetMapping(value = "/getStep")
     public Result getStep(){
         Result result=new Result();
         try {

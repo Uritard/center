@@ -3,8 +3,6 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yjh.commons.DateUtils;
-import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -16,17 +14,14 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
-import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.user.dao.*;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -79,8 +73,6 @@ public class TCruiseTaskService {
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
-    @Autowired
-    private ApplicationProperties applicationProperties;
 
     //任务超期时间
     private Float tasksAreTime;
@@ -92,7 +84,6 @@ public class TCruiseTaskService {
     private final SimpleDateFormat daySdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
-
 
     @Transactional(rollbackFor = Exception.class)
     public String insert(TCruiseTask tCruiseTask,TCruiseTaskAdd tCruiseTaskAdd) {

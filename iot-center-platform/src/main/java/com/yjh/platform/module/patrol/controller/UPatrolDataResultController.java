@@ -1,30 +1,11 @@
 package com.yjh.platform.module.patrol.controller;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import com.alibaba.excel.write.metadata.style.WriteFont;
-import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
-import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
-import com.alibaba.excel.write.style.row.SimpleRowHeightStyleStrategy;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.aop.handler.CustomCellWriteHandler;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.ImageConverter;
-import com.yjh.platform.common.utils.MyUrlImageConverter;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
-import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
-import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
@@ -33,10 +14,6 @@ import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
 import com.yjh.platform.module.task.entity.FirAndPicInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author czh
@@ -68,8 +42,6 @@ public class UPatrolDataResultController {
     private TStdDeviceService tStdDeviceService;
     @Autowired
     private TStdRegionService tStdRegionService;
-    @Resource
-    private RedisTemplate redisTemplate;
     @Autowired
     private LogsRecord logsRecord;
 
@@ -200,54 +172,7 @@ public class UPatrolDataResultController {
 
             List<Map<String, Object>> cruiseResultAnalyzeInfoList = uPatrolDataResultService.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    //创建本地文件路径
-                    Map<String, String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-                    String filePathAndName = resMap.get("content") + File.separator;
-                    //创建文件夹
-                    FileUtil.createDirectory(filePathAndName);
-                    //拼接Excel文件名
-                    String fileName = "巡检点列表数据" + System.currentTimeMillis() + ".xlsx";
-                    String fileNamePath = filePathAndName + fileName;
-
-                    //设置表头
-                    List<List<String>> heads = Lists.newArrayList();
-                    List<String> strings = Arrays.asList(typeString.split(","));
-                    strings.forEach(s -> heads.add(Lists.newArrayList(s)));
-                    //设置内容
-                    List<List<String>> contents = Lists.newArrayList();
-                    cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
-                        List<String> content = Lists.newArrayList();
-                        strings.forEach(s -> content.add(String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""))));
-                        contents.add(content);
-                    });
-                    ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
-                    WriteSheet writeSheet = EasyExcel.writerSheet(0, "巡检点列表数据")
-                            .includeColumnFiledNames(ExportUtil.getCruiseDataReportModel(strings))
-                            .registerWriteHandler(new SimpleColumnWidthStyleStrategy(25))
-                            .registerWriteHandler(new SimpleRowHeightStyleStrategy((short) 25, (short) 100))
-                            .registerConverter(new ImageConverter())
-                            .head(heads).registerWriteHandler(ExportUtil.getCellStyle()).build();
-                    excelWriter.write(contents, writeSheet);
-                    //关闭写excel
-                    excelWriter.finish();
-                    Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-                    String fileRelativePath = map.get("content") + "/" + fileName;
-
-                    Map<String, String> jasonMap = new HashMap<>(2);
-                    jasonMap.put("type", "cruiseDataReport");
-                    jasonMap.put("url", fileRelativePath);
-                    try {
-                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            ThreadPoolUtil.COMMON_POOL.addThread(runnable);
-
+            uPatrolDataResultService.createCruiseDataReport(userId, cruiseResultAnalyzeInfoList, typeString);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视报表失败描述：", e);

@@ -44,7 +44,7 @@ public class TCameraPresetService {
     public void sycPresetInfoToEdge(TCameraPreset tCameraPreset) {
         log.info("处理sycPresetInfoToEdge数据");
         if (StringUtils.isNotEmpty(tCameraPreset.getEdgeCode())){
-            // 边缘节点-任务下发
+            // 检查下级节点是否在线
             boolean edgeStatus = robotService.checkEdgeStatus(tCameraPreset.getEdgeCode());
             if (edgeStatus) {
                 Runnable runnable = new Runnable() {

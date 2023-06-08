@@ -93,6 +93,7 @@
                           LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id
                  WHERE tri.robot_id = #{robotId,jdbcType=BIGINT}
                    AND updr.cruise_time IS NOT NULL
+                   AND tr.commission_date <![CDATA[<=]]> updr.`createtime`
              ) result
     </select>
 

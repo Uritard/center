@@ -69,8 +69,8 @@
         AND tr.commission_date IS TRUE
         LEFT JOIN t_robot_inspection tri ON tri.robot_id = tr.robot_id
         LEFT JOIN `t_cruise_point_instance` tcpi ON tcpi.cruise_id = tri.inspection_id
-        LEFT JOIN `u_patrol_data_result` tcdr ON tcdr.`cruise_id` = tcpi.`instance_id`
-        AND tr.commission_date <![CDATA[<=]]> tcdr.`createtime`
+        LEFT JOIN `u_patrol_data_result` updr ON updr.`cruise_id` = tcpi.`instance_id`
+        AND tr.commission_date <![CDATA[<=]]> updr.`createtime`
         WHERE 1=1
         <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
         GROUP BY

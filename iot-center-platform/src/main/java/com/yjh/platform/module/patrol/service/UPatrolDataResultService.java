@@ -1,10 +1,21 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
+import com.alibaba.excel.write.style.row.SimpleRowHeightStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.common.utils.ImageConverter;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
+import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -16,12 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -167,6 +180,57 @@ public class UPatrolDataResultService {
         return cruiseResultAnalyzeInfoList;
     }
 
+    @Async
+    public void createCruiseDataReport(String userId, List<Map<String, Object>> cruiseResultAnalyzeInfoList, String typeString) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //创建本地文件路径
+                    Map<String, String> resMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+                    String filePathAndName = resMap.get("content") + File.separator;
+                    //创建文件夹
+                    FileUtil.createDirectory(filePathAndName);
+                    //拼接Excel文件名
+                    String fileName = "巡检点列表数据" + System.currentTimeMillis() + ".xlsx";
+                    String fileNamePath = filePathAndName + fileName;
+
+                    //设置表头
+                    List<List<String>> heads = Lists.newArrayList();
+                    List<String> strings = Arrays.asList(typeString.split(","));
+                    strings.forEach(s -> heads.add(Lists.newArrayList(s)));
+                    //设置内容
+                    List<List<String>> contents = Lists.newArrayList();
+                    cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
+                        List<String> content = Lists.newArrayList();
+                        strings.forEach(s -> content.add(String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""))));
+                        contents.add(content);
+                    });
+                    ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
+                    WriteSheet writeSheet = EasyExcel.writerSheet(0, "巡检点列表数据")
+                            .includeColumnFiledNames(ExportUtil.getCruiseDataReportModel(strings))
+                            .registerWriteHandler(new SimpleColumnWidthStyleStrategy(25))
+                            .registerWriteHandler(new SimpleRowHeightStyleStrategy((short) 25, (short) 100))
+                            .registerConverter(new ImageConverter())
+                            .head(heads).registerWriteHandler(ExportUtil.getCellStyle()).build();
+                    excelWriter.write(contents, writeSheet);
+                    //关闭写excel
+                    excelWriter.finish();
+                    Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+                    String fileRelativePath = map.get("content") + "/" + fileName;
+
+                    Map<String, String> jasonMap = new HashMap<>(2);
+                    jasonMap.put("type", "cruiseDataReport");
+                    jasonMap.put("url", fileRelativePath);
+                    log.info("发送给前端的消息:{}", jasonMap);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        };
+        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
+    }
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime, int pageNum, int pageSize) {
 
