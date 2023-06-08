@@ -8,14 +8,17 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,8 @@ public class TWarnInfoService{
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
@@ -572,11 +577,35 @@ public class TWarnInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public TWarnInfoDetail selectRobotWarn(Long warnId){
-        return tDefectInfoDao.selectRobotWarn(warnId);
+        TWarnInfoDetail tWarnInfoDetail = tDefectInfoDao.selectRobotWarn(warnId);
+        Long robotId = tWarnInfoDetail.getDeviceId();
+        TRobotInfo tRobotInfo = selectRobotInfoById(robotId);
+        TStdRegion tStdRegion = getRegionByRegionId(tRobotInfo.getUpRegionId());
+        TStdRegion tStdRegion2 = getRegionByEdgeCode(tRobotInfo.getEdgeCode());
+        tWarnInfoDetail.setStationName(tStdRegion2.getRegionName());
+        tWarnInfoDetail.setRegionName(tStdRegion.getRegionName());
+        return tWarnInfoDetail;
     }
 
     public TRobotAlarm selectByRobotIdAndContent(Long robotId,String content){
         return tRobotAlarmDao.selectByRobotIdAndContent(robotId,content);
     }
+
+    public TRobotInfo selectRobotInfoById(Long robotId) {
+        return tRobotInfoDao.selectByPrimaryId(robotId);
+    }
+
+    public TStdRegion getRegionByRegionId(Long id) {
+        return tStdRegionDao.selectByPrimaryId(id);
+    }
+
+    public TStdRegion getRegionByEdgeCode(String edgeCode) {
+        List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode,1);
+        if (CollectionUtils.isNotEmpty(tStdRegionList)) {
+            return tStdRegionList.get(0);
+        }
+        return new TStdRegion();
+    }
+
 }
 
