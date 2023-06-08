@@ -2164,6 +2164,7 @@ public class UPatrolTaskService {
      * @param taskId 任务id
      */
     private void completionOfTask(String taskId) {
+        log.info("\n————————————————————\n等待任务执行完毕————————————————————\n");
         // 延迟15秒执行
         ScheduledMapConfig.schedule(15, taskId, this::completionOfTaskDone);
     }
@@ -2249,7 +2250,10 @@ public class UPatrolTaskService {
 
             if (CollectionUtils.isNotEmpty(missInstanceMapList)) {
                 UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
-                omitInstanceRetry(missInstanceMapList,uPatrolTask);
+                UPatrolTask uPatrolTask1 =  omitInstanceRetry(missInstanceMapList,uPatrolTask);
+
+                // 设置定时器，不走事物逻辑，否则会延时
+                setQuartzTask(uPatrolTask1);
             }
 
             // 更新upr
@@ -3152,6 +3156,17 @@ public class UPatrolTaskService {
         tCruiseTaskAdd.setIfRun(173);
         tCruiseTaskAdd.setTaskName(uPatrolTaskParam.getTaskName() + TASK_RETRY_SUFFIX);
         tCruiseTaskAdd.setPlanId(uPatrolTaskParam.getPlanId());
+        tCruiseTaskAdd.setCycleExecuteTime("");
+        tCruiseTaskAdd.setCycleMonth("");
+        tCruiseTaskAdd.setCycleWeek("");
+        tCruiseTaskAdd.setIntervalEndTime("");
+        tCruiseTaskAdd.setIntervalExecuteTime("");
+        tCruiseTaskAdd.setIntervalNumber("");
+        tCruiseTaskAdd.setIntervalStartTime("");
+        tCruiseTaskAdd.setIntervalType("");
+        tCruiseTaskAdd.setMin("");
+        tCruiseTaskAdd.setMonth("");
+        tCruiseTaskAdd.setYear("");
         UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
 
         // 设置任务优先级
