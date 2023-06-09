@@ -669,9 +669,11 @@ public class TCruiseTaskResultService {
                     cruisedCount ++;
                 } else if ("247".equals(body.get("cruiseResult"))) {
                     cruiseNotCount++;
-                    if ("250".equals(body.get("cruiseAbnormal"))) {
-                        alarmCount ++;
-                    }
+                }
+
+                // 统计告警点位数
+                if ("1".equals(body.get("isWarn"))) {
+                    alarmCount ++;
                 }
             }
         }

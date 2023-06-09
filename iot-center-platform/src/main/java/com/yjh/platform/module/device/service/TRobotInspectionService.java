@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.netflix.discovery.converters.Auto;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -1057,5 +1059,34 @@ public class TRobotInspectionService {
         return Collections.singletonList(robotInspectionTree);
     }
 
+    /**
+     * 从redis获取无人机坐标
+     *
+     * @param robotCode robotCode
+     * @return result
+     */
+    public List<DroneCoordinateInfo> droneCoordinate(String robotCode) {
+        String redisKey = String.format("DroneCoordinate:%s", robotCode);
+        List<Object> list = redisTemplate.opsForList().range(redisKey, 0, -1);
+        return convertToEntity(list);
+    }
+
+    private List<DroneCoordinateInfo> convertToEntity(List<Object> listObj) {
+        if (CollectionUtils.isEmpty(listObj)) {
+            return new ArrayList<>();
+        }
+
+        List<DroneCoordinateInfo> listEntity = new ArrayList<>();
+        listObj.forEach(item -> {
+            try {
+                DroneCoordinateInfo entity = JSONUtil.toBean(JSONUtil.toJSONString(item), DroneCoordinateInfo.class);
+                listEntity.add(entity);
+            } catch (Exception e) {
+                log.error("convertToEntity err: ", e);
+            }
+        });
+
+        return listEntity;
+    }
 }
 

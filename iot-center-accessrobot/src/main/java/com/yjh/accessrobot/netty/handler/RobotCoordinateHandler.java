@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.handler;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -33,6 +34,8 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -55,24 +58,42 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(coordinateProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
+        int num = tRobotInfoDao.checkDroneByRobotCode(sendCode);
+        if (num <= 0) {
+            // 处理机器人上报的坐标信息
+            processRobotCoordinate(xmlBaseModel, sendCode);
+        } else {
+            // 处理无人机上报的坐标信息
+            processDroneCoordinate(xmlBaseModel, sendCode);
+        }
+
+        // 国网要求
+        //上报 Code 为 变电站编码
+        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+        xmlBaseModel.setCode(stationCode);
+        robotService.upToCruise(xmlBaseModel);
+    }
+
+    /**
+     * 处理机器人坐标信息
+     *
+     * @param xmlBaseModel xmlBaseModel
+     * @param sendCode sendCode
+     */
+    private void processRobotCoordinate(XMLBaseModel xmlBaseModel, String sendCode) {
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotCoordinateList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
-            Map<String, String> robotCoordinateMap = new HashMap<>(16);
+            Map<String, String> robotCoordinateMap = getCoordinateMap(res, robotCode);
             if (res.containsKey("file_path")){
                 String filePath = String.valueOf(res.get("file_path"));
                 robotCoordinateMap.put("filePath", filePath);
                 robotService.uploadFile(filePath, filePath);
-            }else {
+            } else {
                 robotCoordinateMap.put("filePath", "");
             }
+
             // 2022过检 robot_name -> patroldevice_name
-            robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
-            robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-            robotCoordinateMap.put("robotCode",robotCode);
-            robotCoordinateMap.put("time", String.valueOf(res.get("time")));
-            robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
-            robotCoordinateMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
             robotCoordinateList.add(robotCoordinateMap);
         });
 
@@ -81,12 +102,36 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
             redisTemplate.opsForHash().putAll(robotCoordinate, robotCoordinateList.get(i));
             redisTemplate.expire(robotCoordinate, 7, TimeUnit.DAYS);
         }
+    }
 
-        // 国网要求
-        //上报 Code 为 变电站编码
-        String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-        xmlBaseModel.setCode(stationCode);
-        robotService.upToCruise(xmlBaseModel);
+    /**
+     * 处理无人机坐标信息
+     *
+     * @param xmlBaseModel xmlBaseModel
+     * @param sendCode sendCode
+     */
+    private void processDroneCoordinate(XMLBaseModel xmlBaseModel, String sendCode) {
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
+        List<Map<String, String>> robotCoordinateList = new ArrayList<>();
+        xmlBaseModel.getItems().forEach(res -> {
+            Map<String, String> robotCoordinateMap = getCoordinateMap(res, robotCode);
+            robotCoordinateList.add(robotCoordinateMap);
+        });
+
+        // 将无人机坐标信息
+        String redisKey = String.format("DroneCoordinate:%s", robotCode);
+        redisTemplate.opsForList().leftPushAll(redisKey, robotCoordinateList);
+    }
+
+    private Map<String, String> getCoordinateMap(Map<String,Object> res, String robotCode) {
+        Map<String, String> robotCoordinateMap = new HashMap<>(16);
+        robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
+        robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
+        robotCoordinateMap.put("robotCode",robotCode);
+        robotCoordinateMap.put("time", String.valueOf(res.get("time")));
+        robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
+        robotCoordinateMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
+        return robotCoordinateMap;
     }
 
     @Override

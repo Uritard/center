@@ -20,6 +20,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.commons.utils.JSONUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
@@ -1052,6 +1053,7 @@ public class RobotService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void feignRobotTaskIssued(Map<String, List<RobotTaskInstanceInfo>> itemMap) throws Exception {
+        log.info("feignRobotTaskIssued 方法入参：itemMap： {}", JSONUtil.toJSONString(itemMap));
         List<RobotTaskInstanceInfo> robotTaskInfoList = itemMap.get("robotTaskInfoList");
         log.info("robotTaskInfoList是==={}", robotTaskInfoList);
 
@@ -1152,8 +1154,10 @@ public class RobotService {
 
         StringJoiner str = new StringJoiner(",");
         // 机器人任务临时信息存放至redis
+        log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList());
 
+        log.info("packageXMLBaseModel参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         packageXMLBaseModel(item, robotCode, taskId, str);
     }
 
@@ -1322,6 +1326,9 @@ public class RobotService {
                     continue;
                 }
 
+                // 初始化无人机坐标
+                initDroneCoordinate(robotCode);
+
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
                         .setSendCode(Constant.sendCode())
@@ -1367,6 +1374,20 @@ public class RobotService {
         return true;
     }
 
+    /**
+     * 初始化无人机坐标，只保留最后一条坐标
+     *
+     * @param robotCode robotCode
+     */
+    private void initDroneCoordinate(String robotCode) {
+        // 将无人机坐标信息
+        String redisKey = String.format("DroneCoordinate:%s", robotCode);
+        if (redisTemplate.hasKey(redisKey)) {
+            Object value = redisTemplate.opsForList().leftPop(redisKey);
+            redisTemplate.delete(redisKey);
+            redisTemplate.opsForList().leftPush(redisKey, value);
+        }
+    }
 
     /**
      * 组装任务下发item内容
