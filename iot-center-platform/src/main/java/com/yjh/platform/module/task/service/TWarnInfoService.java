@@ -604,7 +604,9 @@ public class TWarnInfoService{
         if (CollectionUtils.isNotEmpty(tStdRegionList)) {
             return tStdRegionList.get(0);
         }
-        return new TStdRegion();
+        else {
+            return tStdRegionDao.selectRootRegion();
+        }
     }
 
 }
