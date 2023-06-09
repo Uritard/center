@@ -335,6 +335,12 @@
                 AND up_region_id = #{upRegionId,jdbcType=BIGINT}
             </if>
         </select>
+        <select id="selectRootRegion" resultMap="BaseResultMap">
+            select
+                <include refid="Base_Column_List"/>
+            from t_std_region a
+            where up_region_id = -1
+        </select>
     <select id="selectByRegionCodeAndState" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />

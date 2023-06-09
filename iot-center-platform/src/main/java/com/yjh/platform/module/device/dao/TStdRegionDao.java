@@ -55,4 +55,5 @@ public interface TStdRegionDao {
     List<AreaInfoRegionCode> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
     List<Long> selectAllUpRegion(@Param("regionIdString")String regionIdString);
     List<Long> selectDownRegion(@Param("regionIdString")String regionIdString);
+    TStdRegion selectRootRegion();
 }
