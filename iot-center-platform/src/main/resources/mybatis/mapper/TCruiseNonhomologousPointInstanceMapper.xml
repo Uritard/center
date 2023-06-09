@@ -158,7 +158,7 @@
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         left join t_std_device e on  a.device_id = e.device_id
         left join t_dict_business b on c.custom_id = b.dict_code and b.col_name = 'custom_type'
-        where 1 = 1
+        where 1 = 1 and c.device_mete_id is not null
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="instanceIdOne != null and instanceIdOne != ''"> and a.instance_id_one = #{instanceIdOne}</if>
         <if test="instanceIdTwo != null and instanceIdTwo != ''"> and a.instance_id_two = #{instanceIdTwo}</if>
@@ -196,7 +196,7 @@
         from t_cruise_triphase_rule a
         left join t_std_device b on a.device_id = b.device_id
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
-        where 1 = 1
+        where 1 = 1 and c.device_mete_id is not null
         <if test="cruiseType != null and cruiseType != ''"> and a.triphase_id = -1 </if>
         <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name = #{cruiseName, jdbcType=VARCHAR}</if>
         )
