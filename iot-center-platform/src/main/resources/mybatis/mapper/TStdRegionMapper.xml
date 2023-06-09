@@ -194,6 +194,14 @@
         <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
     </select>
 
+    <select id="selectRegionByRegName" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+        a.region_id
+        FROM t_std_region a
+        WHERE 1=1
+        <if test="regionName != null and regionName != ''"> AND a.region_name LIKE CONCAT('%',#{regionName, jdbcType=VARCHAR},'%')</if>
+    </select>
+
     <select id="selectDownId" resultType="java.lang.Long">
         SELECT
         DATA.region_id
@@ -335,5 +343,77 @@
         <if test="state!=null"> and state=#{state}</if>
     </select>
 
+    <select id="selectRegTreeByRegionList" resultType="com.yjh.platform.module.device.entity.AreaInfoRegionCode">
+        SELECT
+        a.region_id    AS     Id,
+        a.region_name  AS    label,
+        a.up_region_id AS    upId,
+        b.region_name  AS   upName,
+        a.region_code  AS   regionCode,
+        'region'   AS   infoType,
+        a.state,
+        a.latitude,
+        a.longitude,
+        a.voltage_level,
+        (select c.dict_note
+        from t_dict_business c
+        where c.col_name = 'voltage_class'
+        and c.dict_code = a.voltage_level) voltageLevelName,
+        a.edge_status
+        FROM t_std_region a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        WHERE 1=1
+          <if test="list.size > 0">and a.region_id in <foreach collection="list" separator="," open="(" close=")" item="regionId">
+              #{regionId}
+          </foreach>
+          </if>
 
+    </select>
+
+    <select id="selectAllUpRegion" resultType="java.lang.Long">
+        SELECT
+        upRegionId
+        FROM
+        (
+        SELECT
+        @r AS _id,
+        (
+        SELECT
+        @r := up_region_id
+        FROM
+        t_std_region
+        WHERE
+        region_id = _id
+        ) AS upRegionId
+        FROM
+        (
+        SELECT
+        @r := #{regionIdString},
+        @l := 0
+        ) vars,
+        t_std_region h
+        WHERE
+        @r != - 1
+        AND up_region_id > 0
+        )as temp where upRegionId != -1;
+    </select>
+    <select id="selectDownRegion" resultType="java.lang.Long">
+        SELECT
+            DATA.region_id
+        FROM
+            (
+                SELECT
+                    @ids AS _ids,
+            ( SELECT @ids := GROUP_CONCAT( region_id ) FROM t_std_region WHERE FIND_IN_SET( up_region_id, @ids ) ) AS cids,
+            @l := @l + 1 AS LEVEL
+                FROM
+                    t_std_region,
+                    ( SELECT @ids := #{regionIdString}, @l := 0 ) b
+                WHERE
+                    @ids IS NOT NULL
+            ) ID,
+            t_std_region DATA WHERE FIND_IN_SET( DATA.region_id, ID._ids )
+        ORDER BY
+            LEVEL,region_id
+    </select>
 </mapper>

@@ -177,7 +177,8 @@ public class TStdRegionController {
         Result result = new Result();
         try {
             //List<AreaInfo> devTreeList = tStdDeviceService.selectRegionTreeByName(regionName);
-            List<AreaInfoRegionCode> devTreeList = tStdRegionService.selectRegTreeByRegName(regionName);
+//            List<AreaInfoRegionCode> devTreeList = tStdRegionService.selectRegTreeByRegName(regionName);
+            List<AreaInfoRegionCode> devTreeList = tStdRegionService.selectRegionByName(regionName);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -549,6 +549,17 @@ public class TStdDeviceService{
         }
         List<AreaInfo> devTreeByName = new ArrayList<>();
         switch (type){
+            case "region":
+                //针对region的过滤
+                List<Long> regionIdByName = tStdRegionDao.selectRegionByRegName(name);
+                String regionIdString  = StringUtils.join(regionIdByName,",");
+                Set<Long> allRegionByName = new HashSet<>();
+                List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(regionIdString);
+                List<Long> downRegionList = tStdRegionDao.selectDownRegion(regionIdString);
+                allRegionByName.addAll(upRegionList);
+                allRegionByName.addAll(downRegionList);
+                devTreeByName = tStdDeviceDao.selectRegTreeByRegionList(allRegionByName);
+                break;
             case "dev":
                 if ("camera".equals(deviceShow)){
                     //查相机设备
@@ -869,6 +880,7 @@ public class TStdDeviceService{
             return areaInfoCountryList;
         } else {return listTree;}
     }
+
 
     private void diGuiMoHu(AreaInfo areaInfoAll, List<AreaInfo> listTreeAll, List<AreaInfo> listTree) {
         if (areaInfoAll.getUpId() != null && areaInfoAll.getUpId() != -1) {

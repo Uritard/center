@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author tt
@@ -147,5 +148,7 @@ public interface TStdDeviceDao {
     TCruisePointInstanceDetail selectDevTreeDeviceByInstacneId(@Param(value = "instanceId")Long instanceId);
 
     List<Map<String,Long>> selectFirstPresetIdByCameraIdList(@Param("list")List<String> cameraIdList);
+
+    List<AreaInfo> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
 
 }
