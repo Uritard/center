@@ -315,7 +315,20 @@ public class TRobotInspectionController {
         return result;
     }
 
+    @ApiOperation(value = "查询无人机坐标")
+    @RequestMapping(value = "/droneCoordinate", method = RequestMethod.GET)
+    @Logs(title = "查询无人机坐标", content = "根据用户传递的参数查询无人机坐标", logType = 1, authority = "1235,1237")
+    public Result droneCoordinate(@RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.droneCoordinate(robotCode));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("根据用户传递的参数查询无人机坐标：", e);
+        }
 
+        return result;
+    }
 
 
 }
