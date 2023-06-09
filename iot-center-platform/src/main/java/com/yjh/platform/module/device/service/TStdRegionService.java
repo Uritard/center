@@ -4,6 +4,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -234,6 +236,51 @@ public class TStdRegionService{
                 }
             }
         }
+    }
+
+    public List<AreaInfoRegionCode> selectRegionByName(String regionName){
+        List<Long> regionIdByName = tStdRegionDao.selectRegionByRegName(regionName);
+        String regionIdString  = StringUtils.join(regionIdByName,",");
+        Set<Long> allRegionByName = new HashSet<>();
+        List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(regionIdString);
+        List<Long> downRegionList = tStdRegionDao.selectDownRegion(regionIdString);
+        allRegionByName.addAll(upRegionList);
+        allRegionByName.addAll(downRegionList);
+        List<AreaInfoRegionCode> treeList = tStdRegionDao.selectRegTreeByRegionList(allRegionByName);
+        return assembleTrees(treeList);
+    }
+
+    public List<AreaInfoRegionCode> assembleTrees(Collection<AreaInfoRegionCode> trees) {
+        if (CollectionUtils.isEmpty(trees)) {
+            return Collections.emptyList();
+        }
+
+        // 构建树主键/实例映射表，并初始化树的子节点集合
+        Map<?, AreaInfoRegionCode> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
+                .collect(Collectors.toMap(AreaInfoRegionCode::getId, t -> t, (o, n) -> n));
+
+        // 查找并关联树节点，返回所有没有父节点的树
+        return trees.stream().filter(tree -> {
+            AreaInfoRegionCode parent = ifNull(tree.getUpId(), mapping::get);
+            if (parent != null) {
+                parent.getChildren().add(tree);
+            }
+            return Objects.isNull(parent);
+        }).collect(Collectors.toList());
+    }
+
+
+    /**
+     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
+     *
+     * @param object   目标对象
+     * @param function 目标对象方法
+     * @param <T>      目标对象类型泛型
+     * @param <R>      返回对象类型泛型
+     * @return 返回对象
+     */
+    public static <T, R> R ifNull(T object, Function<T, R> function) {
+        return object == null || function == null ? null : function.apply(object);
     }
 }
 

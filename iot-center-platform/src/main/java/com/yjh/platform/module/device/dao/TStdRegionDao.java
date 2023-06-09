@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author tt
@@ -49,4 +50,9 @@ public interface TStdRegionDao {
     List<TStdRegion> selectByRegionCodeAndState(@Param(value = "regionCode") String regionCode, @Param(value = "state") Integer state);
 
     TStdRegion selectCruiseTree(@Param("upRegionId")Long upRegionId);
+
+    List<Long> selectRegionByRegName(@Param(value = "regionName") String regionName);
+    List<AreaInfoRegionCode> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
+    List<Long> selectAllUpRegion(@Param("regionIdString")String regionIdString);
+    List<Long> selectDownRegion(@Param("regionIdString")String regionIdString);
 }
