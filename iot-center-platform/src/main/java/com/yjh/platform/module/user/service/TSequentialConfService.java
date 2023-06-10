@@ -659,14 +659,31 @@ public class TSequentialConfService{
 
     public String receiveFile(String devicePath) {
         log.info("文件路径:{}", devicePath);
+
+        // 读取内容
+        String content = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(devicePath), "GB2312"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("#")) {
+                    content = line.split("\\s+")[4];
+                    break;
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
         String cfgDeviceId = String.valueOf(Constant.sequentialState.get("cfgDeviceId"));
-        // 给前端通知已完成 要不要推结果后续再说
+        // 给前端通知已完成
         Map<String, String> jasonMapsResult = new HashMap<>(8);
         jasonMapsResult.put("type", "newSequentialResult");
         jasonMapsResult.put("cfgDeviceId", cfgDeviceId);
-        jasonMapsResult.put("sort", "");
-        jasonMapsResult.put("state", String.valueOf(Constant.sequentialState.get("state")));
-        jasonMapsResult.put("identifyResult", String.valueOf(Constant.sequentialState.get("state")));
+        jasonMapsResult.put("sort", "0");
+        jasonMapsResult.put("state", content);
+        jasonMapsResult.put("identifyResult", content);
         log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMapsResult));
         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapsResult);
 

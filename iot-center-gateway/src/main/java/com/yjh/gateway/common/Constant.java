@@ -97,6 +97,10 @@ public class Constant {
      * video服务接收语音数据接口
      */
     public static String VIDEO_RECEIVE_DATA = "";
+    /**
+     * 语音对讲音频编码方式是否为pcm编码
+     */
+    public static String IS_PCM_ENCODE = "";
 
     public static InputStream sendAudioDataToVideo(byte[] bytes) {
         HttpURLConnection connection = null;

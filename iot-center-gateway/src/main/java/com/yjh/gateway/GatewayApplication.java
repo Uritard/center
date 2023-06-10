@@ -38,6 +38,8 @@ public class GatewayApplication implements CommandLineRunner {
 
     @Value("${voice.data.receive.url}")
     private String voiceDataReceiveUrl;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
@@ -46,6 +48,7 @@ public class GatewayApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) {
         Constant.VIDEO_RECEIVE_DATA = voiceDataReceiveUrl;
+        Constant.IS_PCM_ENCODE = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isPcmEncode", "content"));
     }
     @Bean
     public static ConfigureRedisAction configureRedisAction() {

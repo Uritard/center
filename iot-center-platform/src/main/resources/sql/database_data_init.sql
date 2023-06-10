@@ -1310,6 +1310,7 @@ INSERT INTO `t_sys_param` VALUES ('100136', '404', 'robotTaskStatusUp', '机器�
 INSERT INTO `t_sys_param` VALUES ('100140', '404', 'linkMete', '是否自动绑定同步机器人测点', 'true', '此参数用于控制在机器人台账中，进行巡视点位同步时，是否自动新建测点并进行绑定', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100141', '404', 'cameraServicePort', '海康相机服务端口', '8000', '海康相机服务端口(用作语音对讲)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
 INSERT INTO `t_sys_param` VALUES ('100142', '404', 'droneOpen', '无人机任务启动报文开关', 'true', '针对普宙无人机不支持周期任务，需要额外发送启动命令，开启后会额外发送一条任务启动报文，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100143', '404', 'isPcmEncode', '语音对讲音频编码是否为pcm', 'true', '语音对讲音频编码是否为pcm，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 
 -- ----------------------------
 -- Records of t_version

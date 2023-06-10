@@ -77,7 +77,7 @@ public class WebSocketServer {
         } catch (IOException e) {
             log.error("用户: {},网络异常!!!!!!", userId);
         }
-//        initFileStream();
+        initFileStream();
     }
 
     /**
@@ -170,8 +170,9 @@ public class WebSocketServer {
             }
             byte[] messageTemp = new byte[message.length - i];
             System.arraycopy(message, i, messageTemp, 0, message.length - i);
-//            bos.write(message);
-//            bos2.write(messageTemp);
+            // 方便定位问题
+            bos.write(message);
+            bos2.write(messageTemp);
 
             byte[] deviceIdLengthByte = String.valueOf(deviceId.length()).getBytes();
             byte[] deviceIdByte = deviceId.getBytes();
