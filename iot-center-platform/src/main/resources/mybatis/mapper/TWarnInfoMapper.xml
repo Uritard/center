@@ -637,6 +637,7 @@
             ) big_table
         WHERE 1 = 1
         <if test="warnLevel != -1">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="alarmSource != -1">and alarm_source = #{alarmSource, jdbcType=INTEGER}</if>
         <if test="confMode != -1">and conf_mode = #{confMode, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''">and big_table.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''">and big_table.mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
