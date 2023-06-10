@@ -1,12 +1,15 @@
 
 package com.yjh.accesstcp.commons.result;
 
+import lombok.Data;
+
 /**
  * @author
  * @ClassName: Result
  * @Description: 封装返回对象格式类型
  * @date 2018/5/16 16:29
  */
+@Data
 public class Result {
     /**
      * 默认返回状态码

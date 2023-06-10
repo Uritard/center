@@ -20,6 +20,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.TCameraPresetService;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -324,7 +325,7 @@ public class MessageThread {
                     String robotDevice = "";
                     if (standardPoints) {
                         List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
-                        robotDevice = sendToUpSystemServices.selectIsRobotDevice(instanceIds);
+                        robotDevice = sendToUpSystemServices.selectIsDownSystem(instanceIds);
                         isRobotFlag = StringUtils.isNotEmpty(robotDevice);
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
@@ -353,7 +354,7 @@ public class MessageThread {
                             xmlItems.add(xmlItem);
                             sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                         } else if (200 == re.getCode()) {
-                            String taskPatrolledId = String.valueOf(Object2Map.objectsToMap(re.getData()).get("taskPatrolledId"));
+                            String taskPatrolledId = String.valueOf(((LinkedHashMap<?, ?>) re.getData()).get("taskPatrolledId"));
                             xmlItem.put("task_patrolled_id", taskPatrolledId);
                             xmlItem.put("error_code", "0");
                             xmlItems.add(xmlItem);
@@ -518,7 +519,7 @@ public class MessageThread {
             tCruiseTaskAdd.setStartTime(new Date());
         } else {
             level = (String)redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "902", "level");
-            if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())) {
+            if (StringUtils.isNotEmpty(MapUtils.getString(item,"fixed_start_time"))) {
                 long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
                 log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
                 if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)) {

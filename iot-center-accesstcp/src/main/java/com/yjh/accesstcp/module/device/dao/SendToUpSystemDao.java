@@ -55,4 +55,5 @@ public interface SendToUpSystemDao {
     List<String> selectForTaskInstanceId(@Param(value = "devicePointId") String devicePointId);
 
     String selectIsRobotDevice(@Param(value = "list") List<String> list);
+    String selectIsDownSystem(@Param(value = "list") List<String> list);
 }

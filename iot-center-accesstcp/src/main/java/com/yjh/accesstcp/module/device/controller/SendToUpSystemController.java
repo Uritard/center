@@ -2,13 +2,17 @@ package com.yjh.accesstcp.module.device.controller;
 
 import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.netty.server.MessageThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,4 +184,20 @@ public class SendToUpSystemController {
         }
         return result;
     }
+
+    @ApiOperation(value = "recvTest")
+    @RequestMapping(value = "/recvTest", method = RequestMethod.GET)
+    public Result recvTest(@RequestParam(value = "xml")String xml) {
+        Result result = new Result();
+        try {
+            Document document = DocumentHelper.parseText(xml);//String转XML
+            XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
+            MessageThread.doProcessMessage(xmlRes, 0, null, sendToUpSystemService, null, redisTemplate, null);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
 }

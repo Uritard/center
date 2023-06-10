@@ -1531,6 +1531,14 @@ public class SendToUpSystemServices {
     public String selectIsRobotDevice(List<String> instanceIds) {
         return sendToUpSystemDao.selectIsRobotDevice(instanceIds);
     }
+    /**
+     * 查询点位是否有下级系统
+     * @param instanceIds
+     * @return
+     */
+    public String selectIsDownSystem(List<String> instanceIds) {
+        return sendToUpSystemDao.selectIsDownSystem(instanceIds);
+    }
 
     /**
      * ftps 上传

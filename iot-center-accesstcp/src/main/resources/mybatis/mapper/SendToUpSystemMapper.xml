@@ -518,4 +518,17 @@
             #{instanceId, jdbcType=VARCHAR}
         </foreach>
     </select>
+
+    <select id="selectIsDownSystem" resultType="java.lang.String">
+        SELECT
+        GROUP_CONCAT( DISTINCT a.edge_code) AS robot
+        FROM
+        `t_cruise_point_instance` a
+        WHERE
+        1 = 1 and a.edge_code is not null
+        AND a.instance_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
+            #{instanceId, jdbcType=VARCHAR}
+        </foreach>
+    </select>
 </mapper>
