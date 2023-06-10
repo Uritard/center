@@ -664,9 +664,16 @@ public class TCameraScreenService{
                 finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
             }
 
+            // MySQL 8.0
+//            if (!CollectionUtils.isEmpty(finalCameraList)) {
+//                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+//            }
+
             if (!CollectionUtils.isEmpty(finalCameraList)) {
-                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+                String upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).map(String::valueOf).collect(Collectors.joining(","));
+                regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
             }
+
             if (!CollectionUtils.isEmpty(regionList)){
                 areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList,regionList);
             }
