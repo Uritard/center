@@ -221,8 +221,9 @@ public class IntelAnalysisService {
         analysis.setAnalyseType("14");
         analysis.setTaskId(idStr + "_presetCheck");
         analysis.setInstanceId(-1L);
+        analysis.setReferenceImage(picModelPath);
         analysis.setPicPath(picTargetPath);
-        analysis.setPicModelPath(picModelPath);
+        // analysis.setPicModelPath(picModelPath);
         analysis.setTargetParent("presetCheck");
         analysis.setIsAi(1);
 

@@ -463,7 +463,7 @@ public class SilentAlarmThread implements Runnable {
                     .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
                     .setConfMode(276)
                     .setDefectModel(450)
-                    .setAlarmSource(800)
+                    .setAlarmSource(689) // 静默监视
                     .setImagePath(defectResultRealImg);
             tWarnInfoDao.insert(tWarnInfo);
             //webSocket通知前端调用查询告警弹框的接口

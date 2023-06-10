@@ -59,7 +59,7 @@ public class CameraConController {
                 cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET);
                 cameraConService.pushCtrlTime(cameraId);
             } catch (BusinessException b) {
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+                result.setMessage(b.getMessage());
             }
         }
         try {
@@ -106,7 +106,7 @@ public class CameraConController {
     @ApiOperation(value = "相机停止播放")
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
 //    @Logs(title = "相机停止播放",content = "根据用户传递的参数停止相机播放",logType = 5, authority = "1234,1235")
-    public Result stopRealPlay(@RequestParam(value = "cameraId") Long cameraId,
+    public Result stopRealPlay(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                 @RequestParam(value = "rtmpUrl", required = false) String rtmpUrl) {
         Result result = new Result();
         try {
