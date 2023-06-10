@@ -212,7 +212,6 @@ public class TStdDevicemeteService{
         List<TStdDeviceMeteDetail> list = tStdDevicemeteDao
             .selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(), tStdDeviceMeteDetail.getRedundantType(),
                 isRedundant, listForPage);
-
         fillDeviceMeteInfo(list);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("count", page.getTotal());
@@ -517,7 +516,7 @@ public class TStdDevicemeteService{
                         Integer alarmLevel = excelEntity.getAlarmLevel();
                         tStdDeviceMete.setAlarmLevel(alarmLevel);
                         StringJoiner stringJoiner   = new StringJoiner(",");
-                        for(int i = alarmLevel; i <= 133;i++) { 
+                        for(int i = alarmLevel; i <= 133;i++) {
                             stringJoiner.add(String.valueOf(i));
                         }
                         tStdDeviceMete.setAlarmLevelString(stringJoiner.toString());

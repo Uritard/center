@@ -656,5 +656,34 @@ public class TSequentialConfService{
 
         return "ok";
     }
+
+    public String receiveFile(String devicePath) {
+        log.info("文件路径:{}", devicePath);
+        String cfgDeviceId = String.valueOf(Constant.sequentialState.get("cfgDeviceId"));
+        // 给前端通知已完成 要不要推结果后续再说
+        Map<String, String> jasonMapsResult = new HashMap<>(8);
+        jasonMapsResult.put("type", "newSequentialResult");
+        jasonMapsResult.put("cfgDeviceId", cfgDeviceId);
+        jasonMapsResult.put("sort", "");
+        jasonMapsResult.put("state", String.valueOf(Constant.sequentialState.get("state")));
+        jasonMapsResult.put("identifyResult", String.valueOf(Constant.sequentialState.get("state")));
+        log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMapsResult));
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapsResult);
+
+        List<String> listSort = tSequentialConfDao.selectLastStep();
+        log.info("顺控执行完毕:{}", JSONUtil.toJSONString(listSort));
+        if (listSort.get(listSort.size() - 1).equals(cfgDeviceId)) {
+            // 这是最后一个步骤
+            String time = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "content"));
+            try {
+                Thread.sleep(Integer.parseInt(time) * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Constant.sequentialState.put("state", -1);
+            Constant.sequentialState.put("cfgDeviceId", "");
+        }
+        return "";
+    }
 }
 

@@ -494,8 +494,7 @@
         e.device_name as deviceName,
         e.up_region_id,
         a.analyse_type,
-        a.is_temdif,
-        a.redundant_type
+        a.is_temdif
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
         left join t_dict_business f on a.alarm_type= f.dict_code
