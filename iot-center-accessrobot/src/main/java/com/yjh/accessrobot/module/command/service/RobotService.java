@@ -1356,7 +1356,12 @@ public class RobotService {
      * @return 判断结果
      */
     private boolean checkDroneTask(boolean isDevice, boolean isDrone, String robotCode) {
-        if (!isDevice || !isDrone) {
+        if (!isDrone) {
+            // 只有无人机补充发送的报文才需要判断，否则直接放过
+            return true;
+        }
+
+        if (!isDevice) {
             return false;
         }
 

@@ -142,7 +142,7 @@ public class TWarnInfoService{
         return tWarnInfoDao.selectRobotAlarm(map);
     }
 
-    public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName) {
+    public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName,Integer alarmSource) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
         map.put("confMode", confMode);
@@ -151,6 +151,7 @@ public class TWarnInfoService{
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
+        map.put("alarmSource", alarmSource);
         long time = System.currentTimeMillis();
         log.info("_________________________________time1________________________________:{}\n",System.currentTimeMillis() -time);
         List<TWarnInfoDetail> list = tWarnInfoDao.WarnConfirm(map);
