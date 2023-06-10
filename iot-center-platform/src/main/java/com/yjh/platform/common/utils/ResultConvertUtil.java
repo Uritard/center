@@ -29,6 +29,7 @@ public class ResultConvertUtil {
 //        System.out.println(convertResult(c));
 //        System.out.println(convertResult(d));
         System.out.println(convertResult("机器人任务异常"));
+        System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
     }
 
     /**

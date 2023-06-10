@@ -128,6 +128,7 @@ public interface TStdDeviceDao {
 
     List<AreaInfo> selectDeviceByRegionId(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectAllByRegionId(@Param(value = "upRegionId")Long upRegionId);
+    List<AreaInfo> getRegionMonitorDevice(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectCameraByRegionId(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectRobotByRegionId(@Param(value = "upRegionId")Long upRegionId);
     List<AreaInfo> selectCustomByRegionId(@Param(value = "deviceId")Long deviceId);
