@@ -84,4 +84,5 @@ public interface TCameraInfoDao {
 
     List<AreaInfoDetail> selectCameraTreeByName(@Param(value = "cameraList")List<TCameraInfo> cameraList,
                                                 @Param(value = "regionList")List<Long> regionList);
+    List<Long> selectRegionListByUpRegionId(@Param(value = "upRegionList")String upRegionList);
 }
