@@ -419,6 +419,9 @@ public interface TRobotInfoDao {
 
     int deleteByEdgeCodeAndType(@Param(value = "edgeCode") String edgeCode, @Param("type") String type);
 
+    int checkDroneByRobotCode(@Param(value = "robotCode") String robotCode);
 
+    List<AlarmShield> selectAlarmShield(@Param(value = "robotId") Long robotId,
+                                        @Param(value = "warnCount") String warnCount);
 
 }

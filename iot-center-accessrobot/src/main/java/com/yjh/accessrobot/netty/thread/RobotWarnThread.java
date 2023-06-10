@@ -2,16 +2,13 @@ package com.yjh.accessrobot.netty.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
-import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.module.command.entity.AlarmShield;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author YC
@@ -51,17 +48,35 @@ public class RobotWarnThread implements Runnable{
                         .setAlarmTime(DateTimeUtil.parse(robotAlarmMap.get("time")))
                         .setAlarmState(276);
                 log.info("tRobotAlarm的内容==={}", tRobotAlarm);
-                int res = robotService.insertRobotAlarm(tRobotAlarm);
-                log.info("插告警表的结果="+res);
+                //告警屏蔽处理
+                AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
+                List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getRobotId(), tRobotAlarm.getAlarmInfo());
+                if (alarmShieldList.size() > 0){
+                    alarmShieldList.forEach(alarmShield -> {
+                        Date now  = new Date();
+                        Date endTime = alarmShield.getEndTime();
+                        if (now.before(endTime)){
+                            log.info("告警屏蔽：{}",alarmShield);
+                            isWarn.set(false);
+                        }
+                    });
+                }
+                if (isWarn.get()){
+                    int res = robotService.insertRobotAlarm(tRobotAlarm);
+                    log.info("插告警表的结果="+res);
 
-                Map<String, Object> jasonMaps = new HashMap<>(16);
-                jasonMaps.put("type", "alarmPopUp");
-                jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
-                jasonMaps.put("warnType", "2");
-                jasonMaps.put("warnLevel", tRobotAlarm.getAlarmLevel());
-                String json = JSON.toJSONString(jasonMaps);
-                log.info("发送给前端的消息：{}", json);
-                Constant.postUrl(syncWebsocketUrl, json);
+                    Map<String, Object> jasonMaps = new HashMap<>(16);
+                    jasonMaps.put("type", "alarmPopUp");
+                    jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
+                    jasonMaps.put("warnType", "2");
+                    jasonMaps.put("warnLevel", tRobotAlarm.getAlarmLevel());
+                    String json = JSON.toJSONString(jasonMaps);
+                    log.info("发送给前端的消息：{}", json);
+                    Constant.postUrl(syncWebsocketUrl, json);
+                } else {
+                    log.info("此告警被屏蔽了，不入库，不弹窗");
+                }
+
 
             }
         } catch (Exception e) {

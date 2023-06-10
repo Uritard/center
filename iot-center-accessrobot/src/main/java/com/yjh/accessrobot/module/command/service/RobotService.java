@@ -1282,12 +1282,14 @@ public class RobotService {
 //                TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
                 String status;
                 String isEdge = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
+                boolean isDevice = false;
                 if (StringUtils.isNotEmpty(isEdge)){
                     // 下级节点
                     status = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
                 }else{
                     // 设备
                     status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+                    isDevice = true;
                 }
 
 //                if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
@@ -1308,6 +1310,17 @@ public class RobotService {
                     return result;
                 }
 
+                // 判断是否是为无人机补充发送的报文
+                boolean isDrone = false;
+                if (robotTaskControlMap.containsKey("isDrone")) {
+                    isDrone = (boolean) robotTaskControlMap.get("isDrone");
+                }
+
+                if (!checkDroneTask(isDevice, isDrone, robotCode)) {
+                    log.info("该robotCode 无需额外发送任务启动报文，robotCode: {}", robotCode);
+                    continue;
+                }
+
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
                         .setSendCode(Constant.sendCode())
@@ -1325,6 +1338,34 @@ public class RobotService {
         }
         return result;
     }
+
+    /**
+     * 判断是否需要额外给无人机发送启动命令（普宙无人机暂时定时任务逻辑，需要手动启动任务）
+     *
+     * @param isDevice 判断是设备还是下级系统
+     * @param isDrone 是否为无人机补充发送启动命令
+     * @param robotCode 无人机code，用于判断是否为无人机
+     * @return 判断结果
+     */
+    private boolean checkDroneTask(boolean isDevice, boolean isDrone, String robotCode) {
+        if (!isDevice || !isDrone) {
+            return false;
+        }
+
+        boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
+        if (!droneOpen) {
+            // 无人机开关，打开时才需要补充发送任务启动报文
+            return false;
+        }
+
+        int num = tRobotInfoDao.checkDroneByRobotCode(robotCode);
+        if (num <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * 组装任务下发item内容
@@ -2183,6 +2224,38 @@ public class RobotService {
         TimeUnit.MILLISECONDS.sleep(2000);
 
 //        return RobotServerHandler.getRobotResultMap().get("Code").toString();
+        return "200";
+    }
+
+    /**
+     * 删除任务
+     *
+     * @param edgeCode 机器人唯一标识
+     * @param taskId     值
+     * @return String
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String deleteTransfer(List<String> edgeCode, String taskId,String startTime,String source) {
+        if (StringUtils.isNotBlank(taskId)) {
+            if (CollectionUtils.isNotEmpty(edgeCode)) {
+                edgeCode.forEach(code -> {
+                    if (StringUtils.isNotBlank(code)) {
+                        List<Map<String, Object>> item = new LinkedList<>();
+                        Map<String, Object> map = new HashMap<>(5);
+                        map.put("taskId", taskId);
+                        map.put("startTime",startTime);
+                        map.put("source",source);
+                        item.add(map);
+
+                        XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode(Constant.sendCode()).setReceiveCode(code)
+                            .setTime(DateTimeUtil.format(new Date())).setType("101").setCommand("102").setItems(item);
+                        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                        log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
+                        RobotServerHandler.send(generateByteOrder(xmlString, code), code);
+                    }
+                });
+            }
+        }
         return "200";
     }
 
@@ -3046,6 +3119,10 @@ public class RobotService {
         Map<ChannelFuture, ServerBootstrap> serverMap = new HashMap<>(1);
         serverMap.put(newFuture, map.get(future));
         Constant.futureServerBootstrapHashMap.put(1, serverMap);
+    }
+
+    public List<AlarmShield> selectAlarmShield(Long robotId,String warnCount){
+        return tRobotInfoDao.selectAlarmShield(robotId,warnCount);
     }
 }
 

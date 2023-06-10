@@ -976,6 +976,8 @@
             warn_name,
             warn_content,
             device_id,
+            device_name,
+            device_mete_name,
             cunstom_id,
             instance_id,
             std_mete_id,
@@ -1002,6 +1004,8 @@
                 #{warnName, jdbcType=VARCHAR},
                 #{warnContent, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
+                #{deviceName, jdbcType=VARCHAR},
+                #{deviceMeteName, jdbcType=VARCHAR},
                 #{cunstomId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=BIGINT},
                 #{stdMeteId, jdbcType=BIGINT},
@@ -1453,4 +1457,15 @@
             image_size           = #{imageSize,jdbcType=VARCHAR}
         where robot_id = #{robotId,jdbcType=BIGINT}
     </update>
+    <select id="checkDroneByRobotCode" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_robot_info a
+        WHERE a.robot_code = #{robotCode} and drone_type is not null
+    </select>
+
+    <select id="selectAlarmShield" resultType="com.yjh.accessrobot.module.command.entity.AlarmShield">
+        select * from alarm_shield
+        where warn_count like concat('%',#{warnCount},'%')
+        and shield_id = #{robotId}
+    </select>
 </mapper>

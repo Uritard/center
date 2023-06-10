@@ -27,6 +27,7 @@ import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
+import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -63,6 +64,8 @@ public class UPatrolResultService {
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
+    private TWarnInfoService tWarnInfoService;
+    @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
@@ -86,10 +89,10 @@ public class UPatrolResultService {
     }
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
-        String startTime, String endTime, List<Long> deviceIdList, String customId) {
+        String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
         List<CruiseResultDetail> cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
-                    customId);
+                    customId, isWarn);
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
             .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("alarmLevel").add("meteKind");
@@ -197,7 +200,7 @@ public class UPatrolResultService {
                     KEY_PREFIX ="JUDGE:" + cruiseManualReview.getInstanceId();
                 }
                 //塞
-                if (!KEY_PREFIX.equals("")) {
+                if (StringUtils.isNotEmpty(KEY_PREFIX)) {
                     redisTemplateForThree.opsForValue().set(KEY_PREFIX,cruiseManualReview.getPersonCheck());
                 }
             }
@@ -378,8 +381,8 @@ public class UPatrolResultService {
                 //触发告警
                 if (Boolean.TRUE.equals(isWarN) || 279 == alarmSource || 997 == alarmSource) {
                     // 修改告警信息表
-                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")),
-                        Integer.valueOf(map.get("warnLevel").toString()), isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")),
+                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : MapUtils.getString(map,"warnName"),
+                        Integer.valueOf(MapUtils.getString(map,"warnLevel")), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map ,"warnContent"),
                             "程序正常，告警属实",286, isTemDif ? initInfo.get("outRange") : outRange, userId,
                         date);
                     sendWebSocket(warnId);
@@ -400,7 +403,7 @@ public class UPatrolResultService {
                 warnInfo.setDealTime(date);
                 warnInfo.setDealPersonId(userId);
                 log.info("要插库的告警数据是===" + warnInfo);
-                tWarnInfoDao.insert(warnInfo);
+                tWarnInfoService.insert(warnInfo);
                 sendWebSocket(warnInfo.getWarnId());
                 uPatrolResultDao.updateIsWarn(taskId, instanceId);
             }
