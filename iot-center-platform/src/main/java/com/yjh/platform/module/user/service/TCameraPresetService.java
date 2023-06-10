@@ -979,5 +979,14 @@ public class TCameraPresetService {
             log.error("SycPresetToEdge err", e);
         }
     }
+
+    public String getImageLocalPath(String presetImg, boolean toLocal) {
+        // /home/yjh_iot_center/iot-picture/specimens
+        String presetRealImgPath = getPresetBasePath();
+        // https://172.24.39.9/imgs/specimens
+        String presetImgPath = getPresetUrlPath();
+
+        return toLocal ? presetImg.replaceAll(presetImgPath, presetRealImgPath) : presetImg.replaceAll(presetRealImgPath, presetImgPath);
+    }
 }
 

@@ -96,8 +96,6 @@ public class IntelAnalysisService {
     private FtpsService ftpsService;
     @Autowired
     private AlarmService alarmService;
-    @Autowired
-    private TCameraPresetDao tCameraPresetDao;
     @Lazy
     @Autowired
     private TSequentialConfService tSequentialConfService;
@@ -221,8 +219,9 @@ public class IntelAnalysisService {
         analysis.setAnalyseType("14");
         analysis.setTaskId(idStr + "_presetCheck");
         analysis.setInstanceId(-1L);
-        analysis.setReferenceImage(picModelPath);
-        analysis.setPicPath(picTargetPath);
+        String imgPath = tCameraPresetService.getImageLocalPath(picTargetPath, true);
+        analysis.setReferenceImage(imgPath);
+        analysis.setPicPath(picModelPath);
         // analysis.setPicModelPath(picModelPath);
         analysis.setTargetParent("presetCheck");
         analysis.setIsAi(1);
@@ -839,8 +838,11 @@ public class IntelAnalysisService {
                 return;
             }
 
-            boolean silentMonitorNeedManMade = Boolean.parseBoolean(
-                (String)redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade"));
+            Object needManMadeObj = redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade");
+            boolean silentMonitorNeedManMade = false;
+            if (needManMadeObj != null) {
+                silentMonitorNeedManMade = (Boolean) needManMadeObj;
+            }
 
             if (!silentMonitorNeedManMade) {
                 log.info("人工干预静默监视识，needManMade开关关闭， 返回");
