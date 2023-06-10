@@ -558,6 +558,9 @@ public class TStdDeviceService{
             case "region":
                 //针对region的过滤
                 List<Long> regionIdByName = tStdRegionDao.selectRegionByRegName(name);
+                if(regionIdByName.isEmpty()){
+                    return devTreeByName;
+                }
                 String regionIdString  = StringUtils.join(regionIdByName,",");
                 Set<Long> allRegionByName = new HashSet<>();
                 List<Long> upRegionListTemp = tStdRegionDao.selectAllUpRegion(regionIdString);
@@ -654,6 +657,9 @@ public class TStdDeviceService{
                         case "all":
                             area.getChildren().addAll(tStdDeviceDao.selectAllByRegionId(area.getId()));
                             break;
+                        case "allDevice":
+                            area.getChildren().addAll(tStdDeviceDao.getRegionMonitorDevice(area.getId()));
+                            break;
                         case "dev":
                             area.getChildren().addAll(tStdDeviceDao.selectDeviceByRegionId(area.getId()));
                             break;
@@ -677,6 +683,9 @@ public class TStdDeviceService{
         switch (deviceShow){
             case "all":
                 deviceTree = tStdDeviceDao.selectAllByRegionId(upRegionId);
+                break;
+            case "allDevice":
+                deviceTree = tStdDeviceDao.getRegionMonitorDevice(upRegionId);
                 break;
             case "dev":
                 deviceTree = tStdDeviceDao.selectDeviceByRegionId(upRegionId);

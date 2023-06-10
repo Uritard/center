@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -502,7 +503,7 @@ public class CommonUtils {
         if (StringUtils.isEmpty(str)) {
             return "0";
         }
-        String num = str.replaceAll("[^0-9\\.-\\\\,]", "");
+        String num = str.replaceAll("[^0-9.,-]", "");
         return StringUtils.isEmpty(num) ? "0" : num;
     }
 }
