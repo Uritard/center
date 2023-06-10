@@ -557,6 +557,11 @@ public class CameraConService {
         } else {
             cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
         }
+        Integer lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
+        if (Objects.isNull(lUserIDLong)) {
+            //摄像机id和预置位Id不正确
+            throw new BusinessException("此摄像机注册失败或未注册");
+        }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         // 超脑类型 NVR 不加 32
         if("813".equals(cameraConInfo.getRecorderType())){
@@ -569,7 +574,6 @@ public class CameraConService {
         lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 0;/* 图片质量系数 0-最好 1-较好 2-一般 */
         if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
-            int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
             log.info("lUserIDLong: {}", lUserIDLong);
             if (cameraConInfo.getCameraType() == 207) {
                 log.info("红外相机，特殊拍照");

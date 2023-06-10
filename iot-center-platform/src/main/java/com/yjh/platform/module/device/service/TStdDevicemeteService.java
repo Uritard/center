@@ -250,7 +250,7 @@ public class TStdDevicemeteService{
                 if (StringUtils.isNotBlank(rules.toString())) {
                     rules.append('：').append(tStdDeviceMeteDetail.getAlarmState() == 0 ?
                         (StringUtils.isNotBlank(tStdDeviceMeteDetail.getStateZero()) ? tStdDeviceMeteDetail.getStateZero() : "") :
-                        (StringUtils.isNotBlank(tStdDeviceMeteDetail.getStateZero()) ? tStdDeviceMeteDetail.getStateZero() : ""));
+                        (StringUtils.isNotBlank(tStdDeviceMeteDetail.getStateOne()) ? tStdDeviceMeteDetail.getStateOne() : ""));
                 }
                 else {
                     rules.append("--");

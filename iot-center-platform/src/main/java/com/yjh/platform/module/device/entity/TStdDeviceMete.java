@@ -108,10 +108,12 @@ public class TStdDeviceMete implements Serializable {
     private String alarmType;
 
     @Digits(integer = 4, fraction = 3)
+    @Length(max = 4, message = "upEffect长度必须小于等于4")
     @ApiModelProperty(value = "有效上限")
     private Float upEffect;
 
     @Digits(integer = 4, fraction = 3)
+    @Length(max = 4, message = "downEffect长度必须小于等于4")
     @ApiModelProperty(value = "有效下限")
     private Float downEffect;
 
