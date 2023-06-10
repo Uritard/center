@@ -59,7 +59,7 @@ public class CameraConController {
                 cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET);
                 cameraConService.pushCtrlTime(cameraId);
             } catch (BusinessException b) {
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+                result.setMessage(b.getMessage());
             }
         }
         try {

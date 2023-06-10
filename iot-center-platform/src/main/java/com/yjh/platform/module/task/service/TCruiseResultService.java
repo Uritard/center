@@ -7,25 +7,22 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.commons.CollectionUtil;
 import com.yjh.platform.common.Constant;
-
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
-import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.ibatis.annotations.Param;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +183,7 @@ public class TCruiseResultService{
             warnInfo.setDealInfo("程序正常，告警属实");
             Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
             warnInfo.setDefectModel(warnFlag);//其他
-            warnInfo.setAlarmSource(282);//主辅设备
+            warnInfo.setAlarmSource(NumberUtils.toInt(PatrolResultHandler.getAlarmSource(afterManualReviewInfo.getCruiseType())));//主辅设备
             warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
             warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
             warnInfo.setTaskId(afterManualReviewInfo.getTaskId());

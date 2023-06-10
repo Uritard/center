@@ -442,7 +442,8 @@ public class TCameraScreenService{
         return areaInfoCountryList;
     }
 
-    public List<AreaInfoDetail> selectCameraTreeWithRobotNew(String cameraName, Integer flag, String robotFlag, Long userId,String level,Long id){
+    public List<AreaInfoDetail> selectCameraTreeWithRobotNew(String cameraName, Integer flag, String robotFlag, Long userId, String level,
+        Long id, Integer cameraType) {
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
 
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
@@ -450,34 +451,34 @@ public class TCameraScreenService{
         } else {
             if (1234L == sysUser.getRoleId()) {
                 userId = null;
-            }
-            else if(1235L == sysUser.getRoleId()) {
+            } else if (1235L == sysUser.getRoleId()) {
 
             } else {
-                throw  new BusinessException("当前用户角色不可查看");
+                throw new BusinessException("当前用户角色不可查看");
             }
         }
         List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
         //获取相机的状态
-        Map<String,String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
-        for(Long recordId:recordIdList){
+        for (Long recordId : recordIdList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",recordId );
+            recordIdMap.put("recordId", recordId);
             Result re = cameraStates(recordIdMap);
-            if(re == null){
+            if (re == null) {
                 continue;
             }
-            map.putAll((Map<String,String>)re.getData());
+            map.putAll((Map<String, String>)re.getData());
         }
-        switch (level){
+        switch (level) {
             case "5":
-                return areaTree(cameraName,flag,robotFlag,userId,map);
+                return areaTree(cameraName, flag, robotFlag, userId, map);
             case "6":
-                return cameraTree(cameraName,flag,robotFlag,userId,id,map);
+                return cameraTree(cameraName, flag, robotFlag, userId, id, map, cameraType);
             case "66":
                 return new ArrayList<>();
-            default:throw new BusinessException("参数错误！");
+            default:
+                throw new BusinessException("参数错误！");
         }
     }
     public List<AreaInfoDetail> assembleTrees(Collection<AreaInfoDetail> trees) {
@@ -525,7 +526,7 @@ public class TCameraScreenService{
         areaTree.forEach(area ->{
             if ("region".equals(area.getInfoType())){
                 if (area.getChildren() != null && area.getChildren().size() > 0){
-                    area.getChildren().addAll(cameraTree(cameraName,flag,robotFlag,userId,area.getId(),map));
+                    area.getChildren().addAll(cameraTree(cameraName,flag,robotFlag,userId,area.getId(),map, null));
                     areaAddDeviceTree(area.getChildren(),cameraName,flag,robotFlag,userId,map);
                 }
             }
@@ -533,25 +534,26 @@ public class TCameraScreenService{
         return areaTree;
     }
 
-    private List<AreaInfoDetail> cameraTree(String cameraName, Integer flag, String robotFlag, Long userId,Long upRegionId,Map<String,String> map){
+    private List<AreaInfoDetail> cameraTree(String cameraName, Integer flag, String robotFlag, Long userId, Long upRegionId,
+        Map<String, String> map, Integer cameraType) {
         List<AreaInfoDetail> childrenList = new ArrayList<>();
-        List<AreaInfoDetail> child = tCameraInfoDao.selectCameraTreeWithRobotNew(cameraName,robotFlag,userId,upRegionId);
-        child.forEach(childs ->{
-            if("camera".equals(childs.getInfoType())){
-                if(map.get(childs.getId().toString()) != null){
+        List<AreaInfoDetail> child = tCameraInfoDao.selectCameraTreeWithRobotNew(cameraName, robotFlag, userId, upRegionId, cameraType);
+        child.forEach(childs -> {
+            if ("camera".equals(childs.getInfoType())) {
+                if (map.get(childs.getId().toString()) != null) {
                     childs.setState(Integer.valueOf(map.get(childs.getId().toString())));
-                }else {
+                } else {
                     childs.setState(0);
                 }
-                if(flag != null){
-                    if(flag.equals(childs.getState())){
+                if (flag != null) {
+                    if (flag.equals(childs.getState())) {
                         childrenList.add(childs);
-                    } else if (flag == 2){
+                    } else if (flag == 2) {
                         childrenList.add(childs);
                     }
                 }
             }
-            if("robot".equals(childs.getInfoType())){
+            if ("robot".equals(childs.getInfoType())) {
                 //机器人
                 TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(childs.getId());
                 List<AreaInfoDetail> robotCameraList = new ArrayList<>();
@@ -563,18 +565,18 @@ public class TCameraScreenService{
                 lightCamera.setInfoType("robotCamera");
                 lightCamera.setUpId(childs.getId());
                 lightCamera.setUpName(tRobotInfo.getRobotCode());
-                if("在线".equals(tRobotInfo.getRobotStatus())){
+                if ("在线".equals(tRobotInfo.getRobotStatus())) {
                     childs.setState(1);
                     lightCamera.setState(1);
-                }else {
+                } else {
                     childs.setState(0);
                     lightCamera.setState(0);
                 }
 
-                if(flag != null){
-                    if(flag == lightCamera.getState() && (flag == 1 || flag == 0)){
+                if (flag != null) {
+                    if (flag == lightCamera.getState() && (flag == 1 || flag == 0)) {
                         robotCameraList.add(lightCamera);
-                    }else {
+                    } else {
                         robotCameraList.add(lightCamera);
                     }
                 }
@@ -586,28 +588,28 @@ public class TCameraScreenService{
                 redCamera.setInfoType("robotCamera");
                 redCamera.setUpId(childs.getId());
                 redCamera.setUpName(tRobotInfo.getRobotCode());
-                if("在线".equals(tRobotInfo.getRobotStatus())){
+                if ("在线".equals(tRobotInfo.getRobotStatus())) {
                     childs.setState(1);
                     redCamera.setState(1);
-                }else {
+                } else {
                     childs.setState(0);
                     redCamera.setState(0);
                 }
 
-                if(flag != null){
-                    if(flag == redCamera.getState()&& (flag == 1 || flag == 0)){
+                if (flag != null) {
+                    if (flag == redCamera.getState() && (flag == 1 || flag == 0)) {
                         robotCameraList.add(redCamera);
-                    }else {
+                    } else {
                         robotCameraList.add(redCamera);
                     }
                 }
                 childs.setChildren(robotCameraList);
-                if(flag != null){
-                    if((flag == 1 || flag == 0)){
-                        if(flag == childs.getState()){
+                if (flag != null) {
+                    if ((flag == 1 || flag == 0)) {
+                        if (flag == childs.getState()) {
                             childrenList.add(childs);
                         }
-                    }else {
+                    } else {
                         childrenList.add(childs);
                     }
                 }

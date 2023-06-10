@@ -471,28 +471,20 @@
         f.robot_id AS deviceId,
         f.robot_name AS device_name,
         f.alarm_level,
-        c.dict_note AS alarm_level_name,
         f.alarm_state AS conf_mode,
-        e.dict_note AS conf_mode_name,
         IF
         ( a.robot_type IS NULL, 997, 279 ) AS alarm_source,
         IF
         ( a.robot_type IS NULL, '无人机', '机器人' ) AS alarm_source_name,
         f.deal_info,
         f.deal_type,
-        h.dict_note as deal_type_name,
         f.deal_person_id,
-        k.user_name as deal_person_name,
         f.deal_time,
         1 as defect_model,
         f.robot_id as real_code
         FROM
         t_robot_alarm f
         LEFT JOIN t_robot_info a ON a.robot_id = f.robot_id
-        LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
-        LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
-        LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
-        LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
         where 1 = 1
         <if test="warnLevel != null">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <choose>

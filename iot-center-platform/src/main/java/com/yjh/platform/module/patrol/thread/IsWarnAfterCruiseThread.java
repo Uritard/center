@@ -157,6 +157,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
         boolean isTemDif = Boolean.parseBoolean(initInfo.get("isTemDif"));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
+            String cruiseType = (String)redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseType");
+
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
@@ -164,7 +166,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
             warnInfo.setConfMode(276);
             warnInfo.setDefectModel(Integer.valueOf(uPatrolTaskService.selectDictCodeByNote("其他", "defect_model")));
-            warnInfo.setAlarmSource(282);
+            warnInfo.setAlarmSource(NumberUtils.toInt(PatrolResultHandler.getAlarmSource(cruiseType), 998));
             warnInfo.setImagePath(threadMap.getOrDefault("relativePath", ""));
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);

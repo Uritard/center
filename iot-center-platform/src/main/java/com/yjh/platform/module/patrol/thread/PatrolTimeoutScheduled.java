@@ -115,7 +115,7 @@ public class PatrolTimeoutScheduled {
             int cruiseStatus = MapUtils.getIntValue(m, "cruiseStatus", CRUISE_STATE_UN);
             String cruiseResult = MapUtils.getString(m, "cruiseResult");
             // 已经执行点位
-            if (cruiseStatus != CRUISE_STATE_UN && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
+            if (!ArrayUtils.contains(new int[]{CRUISE_STATE_UN, CRUISE_STATE_ANALYSE_DOING}, cruiseStatus) && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
                 return;
             }
 

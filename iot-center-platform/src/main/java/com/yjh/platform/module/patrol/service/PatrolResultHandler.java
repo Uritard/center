@@ -48,7 +48,7 @@ public class PatrolResultHandler {
 
     private static final String METER = "meter";
 
-    Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
         UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao) {
@@ -565,7 +565,10 @@ public class PatrolResultHandler {
                     warnMap.put("value", resultStringValue);
                     warnMap.put("imagePath", cruiseResultMap.get("picpath"));
                     warnMap.put("confMode", "276");
-                    warnMap.put("alarmSource", DictConvertUtil.DICT.getDictCode("alarmSource", "巡视任务"));
+
+                    String alarmSource = getAlarmSource(cruiseResultMap.get("cruiseType"));
+
+                    warnMap.put("alarmSource", alarmSource);
                     warnMap.put("defectModel", DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
 
                     switch (meteKind){
@@ -1123,7 +1126,7 @@ public class PatrolResultHandler {
             defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
             defectMap.put("confMode", DictConvertUtil.DICT.getDictCode("confMode", "未核查"));
             defectMap.put("imagePath", resultImage);
-            defectMap.put("alarmSource", DictConvertUtil.DICT.getDictCode("alarmSource", "巡视任务"));
+            defectMap.put("alarmSource", getAlarmSource(cruiseResultMap.get("cruiseType")));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", resultValueItem);
         }catch (Exception e){
@@ -1169,5 +1172,43 @@ public class PatrolResultHandler {
         }catch (Exception e){
             log.error("判别结果处理异常：", e);
         }
+    }
+
+    public static String getAlarmSource(int cruiseType) {
+        return getAlarmSource(String.valueOf(cruiseType));
+    }
+
+    public static String getAlarmSource(String cruiseType) {
+        String alarmSource = null;
+        String typeName = DictConvertUtil.DICT.covertToDict("cruiseType", cruiseType);
+        if (StringUtils.isNotEmpty(typeName)){
+            alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", typeName);
+        }
+        log.info("get alarm_source by cruise_type: {} {} {}", cruiseType, typeName, alarmSource);
+        if (StringUtils.isEmpty(alarmSource)) {
+            alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "主辅设备");
+        }
+        /*switch (cruiseType){
+            case 228:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "机器人");
+                break;
+            case 229:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "可见光");
+                break;
+            case 230:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "红外");
+                break;
+            case 232:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "声纹");
+                break;
+            case 524:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "无人机");
+                break;
+            case 231:
+            default:
+                alarmSource = DictConvertUtil.DICT.getDictCode("alarmSource", "主辅设备");
+                break;
+        }*/
+        return alarmSource;
     }
 }
