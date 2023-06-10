@@ -471,6 +471,7 @@
         f.robot_id AS deviceId,
         f.robot_name AS device_name,
         f.alarm_level,
+        c.dict_note AS alarm_level_name,
         f.alarm_state AS conf_mode,
         IF
         ( a.robot_type IS NULL, 997, 279 ) AS alarm_source,
@@ -485,6 +486,7 @@
         FROM
         t_robot_alarm f
         LEFT JOIN t_robot_info a ON a.robot_id = f.robot_id
+        LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
         where 1 = 1
         <if test="warnLevel != null">and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
         <choose>
