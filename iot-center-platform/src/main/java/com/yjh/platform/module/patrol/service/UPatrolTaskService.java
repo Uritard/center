@@ -277,7 +277,7 @@ public class UPatrolTaskService {
                     }
                     // 时: 秒 分 */时 * * ？
                     else {
-                        cronExpressionDate = String.format("%s %s %s/%s * * ?", second, min, hour,intervalNumber);
+                        cronExpressionDate = String.format("%s %s %s/%s * * ?", second, min, 0,intervalNumber);
                     }
                 }
                 log.info("cronExpressionDate==================: {}", cronExpressionDate);
@@ -3140,11 +3140,13 @@ public class UPatrolTaskService {
      * @return
      */
     public UPatrolTask omitInstanceRetry(List<Long> instanceIdList,UPatrolTask uPatrolTaskParam) {
+        log.info("任务：{}正在发起重试",uPatrolTaskParam);
         if (!Constant.isHost()) {
             log.info("当前任务 \"{}\" 非巡视主机，不执行重试！",uPatrolTaskParam.getTaskName());
             return null;
         }
         Object retry = redisTemplate.opsForValue().get(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId());
+        log.info("{}",retry);
         if (Objects.nonNull(retry)) {
             log.info("当前任务 \"{}\"为重试任务不再重试！",uPatrolTaskParam.getTaskName());
             return null;
