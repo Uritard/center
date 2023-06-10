@@ -123,8 +123,11 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * 静默识别文件保存，用以人工干预识别结果
      */
     private void saveSilentMonitorImageUrlToRedis(AnalyseObject analysis) {
-        boolean needManMade = Boolean.parseBoolean(
-            (String)redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade"));
+        Object needManMadeObj = redisTemplate.opsForValue().get("t_sys_param.silentMonitorAnalyseResult.needManMade");
+        boolean needManMade = false;
+        if (needManMadeObj != null) {
+            needManMade = (Boolean) needManMadeObj;
+        }
 
         if (!needManMade) {
             log.info("t_sys_param.silentMonitorAnalyseResult.needManMade is {}", needManMade);
