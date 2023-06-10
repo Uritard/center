@@ -1100,6 +1100,7 @@
         f.evaluation_state,
         x.dict_note as evaluation_state_name,
         f.result_num,
+        f.result_desc as resultDesc,
         f.picpath as picPath,
         F.cruise_result,
         g.dict_note as cruise_result_name,
