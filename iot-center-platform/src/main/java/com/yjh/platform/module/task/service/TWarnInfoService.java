@@ -536,5 +536,9 @@ public class TWarnInfoService{
     public TWarnInfoDetail selectRobotWarn(Long warnId){
         return tDefectInfoDao.selectRobotWarn(warnId);
     }
+
+    public TRobotAlarm selectByRobotIdAndContent(Long robotId,String content){
+        return tRobotAlarmDao.selectByRobotIdAndContent(robotId,content);
+    }
 }
 

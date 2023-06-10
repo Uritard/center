@@ -40,7 +40,6 @@ public class SecondLevelSilentTaskScheduled {
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
 
-    @Async
     @Scheduled(cron = "${seconds.silent.task.cron}")
     public void startAlarmGuard() {
         // 静默任务开关
