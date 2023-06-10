@@ -121,16 +121,16 @@ public class TCameraInfoService {
                 return -1;
             }
         }
-        Map<String,String> channelMap=new HashMap<>();
-        channelMap.put("channelId", tCameraInfoDao.selectMonitorId(cameraId));
-        if(Objects.nonNull(channelMap.get("channelId"))) {
-            try {
-                Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
-            }catch (Exception e){
-                log.error("调用vqd服务异常", e);
-                // return -2;
-            }
-        }
+//        Map<String,String> channelMap=new HashMap<>();
+//        channelMap.put("channelId", tCameraInfoDao.selectMonitorId(cameraId));
+//        if(Objects.nonNull(channelMap.get("channelId"))) {
+//            try {
+//                Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+//            }catch (Exception e){
+//                log.error("调用vqd服务异常", e);
+//                // return -2;
+//            }
+//        }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
         return this.intoRedis();
     }
@@ -144,16 +144,16 @@ public class TCameraInfoService {
                 return -1;
             }
 
-            Map<String,String> channelMap=new HashMap<>();
-            channelMap.put("channelId", tCameraInfoDao.selectMonitorId(Long.valueOf(item)));
-            if(Objects.nonNull(channelMap.get("channelId"))) {
-                try {
-                    Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
-                }catch (Exception e){
-                    log.error("调用vqd服务异常", e);
-                    // return -2;
-                }
-            }
+//            Map<String,String> channelMap=new HashMap<>();
+//            channelMap.put("channelId", tCameraInfoDao.selectMonitorId(Long.valueOf(item)));
+//            if(Objects.nonNull(channelMap.get("channelId"))) {
+//                try {
+//                    Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+//                }catch (Exception e){
+//                    log.error("调用vqd服务异常", e);
+//                    // return -2;
+//                }
+//            }
         }
         int i = this.tCameraInfoDao.deleteSelectedCamera(list);
         this.intoRedis();
@@ -532,7 +532,7 @@ public class TCameraInfoService {
             }
             channel.setDevBrand("0");
 
-            Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+//            Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
 
             log.info("channel:" + channel);
         }catch (Exception e){
