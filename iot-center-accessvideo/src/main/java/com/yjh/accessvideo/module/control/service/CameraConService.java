@@ -655,7 +655,8 @@ public class CameraConService {
                 if (!flag) {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.error("capture picture fail(NET_DVR_CaptureJPEGPicture), error code: {}", iErr);
-                    return "capture picture fail(NET_DVR_CaptureJPEGPicture), error code: " + iErr;
+                    throw new BusinessException("此摄像机离线或未知状态,抓图失败！");
+//                    return "capture picture fail(NET_DVR_CaptureJPEGPicture), error code: " + iErr;
                 } else {
                     if (StringUtils.isNotEmpty(meteName)) {
                         if (captureMethod == 3){
