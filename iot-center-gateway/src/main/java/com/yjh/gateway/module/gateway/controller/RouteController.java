@@ -1,5 +1,6 @@
 package com.yjh.gateway.module.gateway.controller;
 
+import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.common.authFilter.zuulFilter;
 import com.yjh.gateway.common.websocket.WebSocketServer;
 import com.yjh.gateway.commons.result.BusinessException;
@@ -75,7 +76,8 @@ public class RouteController {
         try {
             InputStream reader = request.getInputStream();
             // G711编码:320 + 44 = 364 PCM编码:1920 + 44 = 1964
-            byte[] bytes = new byte[364];
+            int size = StringUtils.equals("true", Constant.IS_PCM_ENCODE) ? 1964 : 364;
+            byte[] bytes = new byte[size];
             int n = reader.read(bytes);
             ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, 0, n);
             WebSocketServer.sendMsgBuffer(byteBuffer);
