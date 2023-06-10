@@ -605,6 +605,7 @@ public class StatisticsService {
         int endIndex = pageSize;
 
         List<Map<String, Object>> list = new ArrayList<>();
+        log.info("开始时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
         // 机器人无人机处理
         if (ROBOT.equals(key) || DRONE.equals(key)) {
             List<Long> idList;
@@ -630,6 +631,8 @@ public class StatisticsService {
                 }
                 list.addAll(deviceStaticsInfoList);
             }
+            log.info("结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+
 
             /*if (!CollectionUtils.isEmpty(idList)) {
                 idList.forEach(robotId -> {

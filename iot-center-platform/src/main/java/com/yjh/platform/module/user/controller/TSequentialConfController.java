@@ -329,4 +329,18 @@ public class TSequentialConfController {
         return result;
     }
 
+    @ApiOperation(value = "接收上一级系统发送的反馈信息文件")
+    @PostMapping(value = "/receiveFile")
+    public Result receiveFile(@RequestBody Map<String, List<String>> map){
+        Result result = new Result();
+        try {
+            String path  = map.get("list").get(0);
+            result.setData(tSequentialConfService.receiveFile(path));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("接收上一级系统发送的反馈信息文件失败描述：", e);
+        }
+        return result;
+    }
+
 }

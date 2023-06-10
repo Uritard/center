@@ -90,11 +90,18 @@ public class Constant {
 
     public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
 
-    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
+    /**
+     * platform接收一键顺控反馈文件
+     */
+    public static final String PLATFORM_SEND ="http://iot-center-platform/tSequentialConf/v1/receiveFile";
+
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         return re;
     }
 

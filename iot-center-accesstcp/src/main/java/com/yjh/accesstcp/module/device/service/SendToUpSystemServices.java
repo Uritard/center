@@ -1192,6 +1192,8 @@ public class SendToUpSystemServices {
             list.add(localFilePath);
             mapForSend.put("list", list);
             Constant.otherServer(mapForSend, Constant.UDP_SEND);
+            // 发送到platform告知已完成
+            Constant.otherServer(mapForSend, Constant.PLATFORM_SEND);
         } catch (Exception e) {
             e.printStackTrace();
         }
