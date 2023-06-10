@@ -591,7 +591,19 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
-        return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+        List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+
+        Integer step = (Integer) Constant.sequentialState.get("state");
+        if(-1 == step) {
+            list.get(0).put("state", -1);
+            return list;
+        } else {
+            if (StringUtils.isEmpty(cfgDeviceId)) {
+                list.get(0).put("state", 1);
+                return list;
+            }
+        }
+        return list;
     }
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
