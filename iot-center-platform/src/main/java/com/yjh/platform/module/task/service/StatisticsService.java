@@ -617,7 +617,7 @@ public class StatisticsService {
             }
 
             if (!CollectionUtils.isEmpty(idList)) {
-                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex);
+                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex,idList);
                 for (Map<String, Object> deviceStaticsInfo : deviceStaticsInfoList){
                     String robotId = String.valueOf(deviceStaticsInfo.get("robotId"));
 

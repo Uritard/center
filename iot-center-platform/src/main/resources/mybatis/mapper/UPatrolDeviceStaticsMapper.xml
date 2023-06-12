@@ -201,6 +201,10 @@
         FROM
             t_robot_info a
                 LEFT JOIN device_statics_info_result b ON a.robot_num = b.device_code
+        where 1=1
+        and a.robot_id IN <foreach collection="list" item="robotId" open="(" close=")" separator=",">
+        #{robotId}
+    </foreach>
         <if test="startIndex != 0 and endIndex != 0">
             LIMIT #{startIndex},#{endIndex}
         </if>
