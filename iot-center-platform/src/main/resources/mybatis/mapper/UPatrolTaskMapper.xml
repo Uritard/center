@@ -253,8 +253,8 @@
             result.task_id
         from u_patrol_result result
         where result.task_state = 239
-        <if test="lowerLevel != null and lowerLevel != ''"> and result.task_level &lt; #{lowerLevel}</if>
-        <if test="highLevel != null and highLevel != ''"> and result.task_level > #{highLevel}</if>
+        <if test="lowerLevel != null and lowerLevel != ''"> and result.task_level <![CDATA[ < ]]> #{lowerLevel}</if>
+        <if test="highLevel != null and highLevel != ''"> and result.task_level <![CDATA[ > ]]> #{highLevel}</if>
 
     </select>
 
