@@ -56,7 +56,9 @@ public class UPatrolPlanAttrService {
         tCruisePlan.setPlanCode(map.get("planCode") == null ? "" : map.get("planCode").toString());
         tCruisePlan.setRobotId(map.get("robotId") == null ? null : Long.parseLong(map.get("robotId").toString()));
         tCruisePlan.setPlanPointTypes(map.get("simulationSteps") == null ? "" : map.get("simulationSteps").toString());//该字段用于操作票初始状态
-        if (Objects.isNull(map.get("instanceList"))) return this.tCruisePlanDao.insert(tCruisePlan);
+        if (Objects.isNull(map.get("instanceList"))) {
+            return this.tCruisePlanDao.insert(tCruisePlan);
+        }
         List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
         //处理操作票数据 新增的操作票不绑定设备以及区域 之前绑定的操作票进行更新
         if (InstanceMapList.size() == 0) {

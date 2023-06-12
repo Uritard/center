@@ -712,7 +712,15 @@
         a.cruise_id,
         a.cruise_name,
         a.cruise_type,
-        c.robot_id,
+        (
+        CASE
+        WHEN a.cruise_type = '228' or a.cruise_type = '524'
+        THEN c.robot_id
+        WHEN a.cruise_type = '229' or a.cruise_type = '230'
+        THEN d.camera_id
+        ELSE a.cruise_id
+        END
+        ) AS robot_id,
         b.device_mete_id,
         b.mete_name as deviceMeteName
         from t_cruise_point_instance a

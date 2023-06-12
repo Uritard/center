@@ -59,8 +59,8 @@
                 #{areaId, jdbcType=VARCHAR},
                 #{pointType, jdbcType=INTEGER},
                 #{cruiseRegionIds, jdbcType=VARCHAR},
-                #{createTime, jdbcType=TIMESTAMP},
-                #{updateTime, jdbcType=TIMESTAMP}
+                now(),
+                now()
         )
     </insert>
 
@@ -82,8 +82,7 @@
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
         <if test="pointType != null and pointType != ''">a.point_type = #{pointType},</if>
         <if test="cruiseRegionIds != null and cruiseRegionIds != ''">a.cruise_region_ids = #{cruiseRegionIds, jdbcType=VARCHAR},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="updateTime != null and updateTime != ''">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
+        a.update_time = now(),
     </set>
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>
@@ -185,8 +184,8 @@
             plan_id,
             device_id,
             device_name,
-        device_mete_id,
-        device_mete_name,
+            device_mete_id,
+            device_mete_name,
             instance_id,
             instance_name,
             position_id,
@@ -213,8 +212,8 @@
                 #{UPatrolPlanAttr.areaId, jdbcType=VARCHAR},
                 #{UPatrolPlanAttr.pointType, jdbcType=INTEGER},
                 #{UPatrolPlanAttr.cruiseRegionIds, jdbcType=VARCHAR},
-                #{UPatrolPlanAttr.createTime, jdbcType=TIMESTAMP},
-                #{UPatrolPlanAttr.updateTime, jdbcType=TIMESTAMP}
+                now(),
+                now()
             )
         </foreach>
     </insert>

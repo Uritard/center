@@ -75,10 +75,10 @@ public class ScheduledMapConfig {
             int currTimes = times + 1;
             boolean succ = taskFunction.test(currTimes);
             if (!succ && numRetries - currTimes > 0) {
-                LOGGER.error("schedule running times {}", currTimes);
+                LOGGER.info("schedule running times {}", currTimes);
                 schedule(seconds, numRetries, currTimes, taskFunction);
             } else {
-                LOGGER.error("schedule ended, times: {}, return: {}", times, succ);
+                LOGGER.info("schedule ended, times: {}, return: {}", currTimes, succ);
             }
 
         }, seconds, TimeUnit.SECONDS);

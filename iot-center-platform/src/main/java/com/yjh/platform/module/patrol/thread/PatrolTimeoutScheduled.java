@@ -81,7 +81,7 @@ public class PatrolTimeoutScheduled {
                 Map<String, String> taskMap = hashOperations.entries(key);
                 String lastDate = taskMap.get("lastCruiseTime");
                 String taskStart = taskMap.get("taskStart");
-                int taskState = NumberUtils.toInt(taskMap.get("taskState"), TASK_STATE_EXECUTING);
+                int taskState = task.getTaskState();
                 Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
                 if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !uPatrolTaskService.taskIsEnded(taskState) && TASK_STATE_PAUSE != taskState) {
                     // 设置任务状态超时
