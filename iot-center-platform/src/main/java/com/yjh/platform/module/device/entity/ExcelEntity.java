@@ -88,5 +88,6 @@ public class ExcelEntity implements Serializable {
 
     private Long deviceId;
 
+    @ExcelProperty(value = "失败原因")
     private String errorInfo;
 }

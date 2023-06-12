@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import com.yjh.platform.common.logs.Logs;
@@ -355,6 +356,10 @@ public class TStdDevicemeteController {
 
             if (CollectionUtils.isNotEmpty(excelEntities)) {
                 tStdDevicemeteService.importExcel(excelEntities);
+            }
+            List<ExcelEntity> errorExcelList = modelExcelListener.getErrorExcelEntities();
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(errorExcelList.size());
             }
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
