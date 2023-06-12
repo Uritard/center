@@ -362,6 +362,26 @@ public class TStdDevicemeteController {
         }
         return result;
     }
+
+
+    @ApiOperation(value = "下载模板")
+    @RequestMapping(value = "download",method = RequestMethod.GET)
+    @Logs(title = "下载模板",content = "下载模板",logType = 9,authority = "1234")
+    public Result download () {
+        Result result =new Result();
+        try {
+            result.setData(tStdDevicemeteService.createModel());
+        }  catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("生成模板异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("生成模板错误:", e);
+        }
+
+        return  result;
+    }
+
     @ApiOperation(value = "测点预置位查询")
     @RequestMapping(value = "/queryPresetByCameraAndMete", method = RequestMethod.GET)
     @Logs(title = "excel导入测点",content = "excel导入测点",logType = 1)

@@ -36,6 +36,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -83,6 +84,9 @@ public class TStdDevicemeteService{
     private TCameraPresetService tCameraPresetService  ;
     @Autowired
     private TCruisePointInstanceService tCruisePointInstanceService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -566,6 +570,21 @@ public class TStdDevicemeteService{
         if (CollectionUtils.isNotEmpty(totalMete)) {
             linkAutoMapper.insertDeviceMete(totalMete);
         }
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public String createModel(){
+        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String path = (String) mapForCreatePath.get("content");
+        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
+        String returnPath = StringUtils.substringAfter((String) mapForReturnPath.get("content"), "/imgs");
+
+        //        String path = "D:/code/voice";
+        //        String returnPath = "D:/code/voice";
+
+        String fileName = "测点导入模板.xls";
+            return "/imgs" + returnPath+"/"+fileName;
     }
 
     public TCameraPreset queryPresetByCameraAndMete(Long cameraId,Long meteId) {
