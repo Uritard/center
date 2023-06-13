@@ -8,21 +8,27 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -617,7 +623,18 @@ public class StatisticsService {
             }
 
             if (!CollectionUtils.isEmpty(idList)) {
-                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex,idList);
+                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfoByOptimize(idList);
+
+                // 将List<Map<String, Object>>转为List<Map<String, String>>
+                List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
+                        .map(map -> map.entrySet().stream()
+                                .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
+                        .collect(Collectors.toList());
+                // 批量插入redis
+                piplinePutStaticsInfo(deviceStaticsInfoTempList);
+
+                // First revision-By-yc
+                /*List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex,idList);
                 for (Map<String, Object> deviceStaticsInfo : deviceStaticsInfoList){
                     String robotId = String.valueOf(deviceStaticsInfo.get("robotId"));
 
@@ -628,12 +645,12 @@ public class StatisticsService {
 
                     deviceStaticsInfo.replaceAll((k, v) -> String.valueOf(v));
                     redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + robotId, deviceStaticsInfo);
-                }
+                }*/
                 list.addAll(deviceStaticsInfoList);
             }
             log.info("结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
 
-
+            // By-zx
             /*if (!CollectionUtils.isEmpty(idList)) {
                 idList.forEach(robotId -> {
                     Map<String, Object> deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(robotId);
@@ -958,6 +975,8 @@ public class StatisticsService {
                     case 3:
                         statistics1.setMonth(resultMap.get("month").toString());
                         break;
+                    default:
+                        break;
                 }
                 statistics.add(statistics1);
             });
@@ -966,7 +985,36 @@ public class StatisticsService {
             statistics.sort(Comparator.comparing(Statistics::getWeek));
         }
         return statistics;
-
     }
 
+    public void piplinePutStaticsInfo(List<Map<String, String>> storageList) {
+        try {
+            redisTemplate.executePipelined(new SessionCallback<Object>() {
+                @Override
+                public Object execute(RedisOperations operations) throws DataAccessException {
+                    storageList.forEach(sm -> {
+                        putRedis(sm, operations);
+                    });
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void putRedis(Map<String, String> m, RedisOperations operations) {
+        try {
+            if (MapUtils.isEmpty(m)) {
+                log.warn("detail map is empty.");
+                return;
+            }
+
+            String robotId = m.get("robotId");
+            String key = "deviceStaticsInfo:robotId:" + robotId;
+            operations.opsForHash().putAll(key, m);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
