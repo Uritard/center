@@ -21,7 +21,7 @@
 
     <select id="selectByWarnCount" resultType="com.yjh.platform.module.user.entity.AlarmShield">
         select * from alarm_shield
-        where warn_count like concat('%',#{warnCount},'%')
+        where warn_content like concat('%',#{warnCount},'%')
         and shield_type = #{shieldType}
         order by end_time asc
         limit 1
