@@ -68,7 +68,6 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -931,23 +930,8 @@ public class UPatrolTaskService {
         if (1 == check) {
             //这个点 没有做
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-            String rname = "";
-            switch (cruiseTypeEnum) {
-                case ROBOT:
-                    rname = "机器人";
-                    break;
-                case UAV:
-                    rname = "无人机";
-                    break;
-                case VIDEO:
-                    rname = "可见光相机";
-                    break;
-                case INFRARED:
-                    rname = "红外相机";
-                    break;
-                default:
-                    break;
-            }
+            String rname = cruiseTypeEnum.getDesc();
+
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));//执行遗漏
             result.put("resultNum", "-1");
             String desc = taskState == CruiseConstant.TASK_STATE_TIMEOUT ? AbnormalResDescEnum.TASK_TIMEOUT.getDesc(): rname + "任务异常";

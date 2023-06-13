@@ -123,53 +123,61 @@ public interface CruiseConstant {
      */
     int EVALUATION_STATE_UN = 257;
 
+    String FAILED_VALUE = "-1";
+
     enum TypeEnum {
 
         /**
          * 巡视类型，视频（可见光）
          */
-        VIDEO(229),
+        VIDEO(229, "可见光相机"),
         /**
          * 巡视类型，红外
          */
-        INFRARED(230),
+        INFRARED(230, "红外相机"),
         /**
          * 巡视类型，声纹
          */
-        VOICE(232),
+        VOICE(232, "声纹"),
         /**
          * 巡视类型，机器人
          */
-        ROBOT(228),
+        ROBOT(228, "机器人"),
         /**
          * 巡视类型，无人机
          */
-        UAV(524),
+        UAV(524, "无人机"),
         /**
          * 巡视类型，在线监控
          */
-        ONLINE(231),
+        ONLINE(231, "在线监控"),
         /**
          * 其他类型，未识别类型
          */
-        OTHERS(-1);
+        OTHERS(-1, "");
 
         final int code;
+        final String desc;
 
         private static final Map<Integer, TypeEnum> CRUISE_ENUM_MAP = new HashMap<>();
 
         static {
-            for (TypeEnum value : TypeEnum.values()) {
-                CRUISE_ENUM_MAP.put(value.getCode(), value);
+            for (TypeEnum val : TypeEnum.values()) {
+                CRUISE_ENUM_MAP.put(val.getCode(), val);
             }
         }
 
-        TypeEnum(int code) {
+        TypeEnum(int code, String value) {
             this.code = code;
+            this.desc = value;
         }
 
         public int getCode() {
             return code;
+        }
+
+        public String getDesc() {
+            return desc;
         }
 
         public static TypeEnum getEnum(int code) {
@@ -273,7 +281,31 @@ public interface CruiseConstant {
         /**
          * 任务终止
          */
-        TERMINATION_OF_TASK("任务终止");
+        TERMINATION_OF_TASK("任务终止"),
+        /**
+         * 机器人任务异常
+         */
+        ROBOT_ANOMALY_TASK("机器人任务异常"),
+        /**
+         * 无人机任务异常
+         */
+        DRONE_ANOMALY_TASK("无人机任务异常"),
+        /**
+         * 可见光相机任务异常
+         */
+        VIDEO_ANOMALY_TASK("可见光相机任务异常"),
+        /**
+         * 红外相机任务异常
+         */
+        INFRARED_ANOMALY_TASK("红外相机任务异常"),
+        /**
+         * 声纹任务异常
+         */
+        VOICE_ANOMALY_TASK("声纹任务异常"),
+        /**
+         * 任务异常
+         */
+        ANOMALY_TASK("任务异常");
 
         public String getDesc() {
             return desc;

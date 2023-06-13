@@ -56,12 +56,13 @@ public enum RecogniseStatusEnum {
     LIGHT_ON(52, "灯亮"),
     /**
      * 指示灯、闪烁灯-绿灯(常)亮
+     * // 根据测试意见，改为绿灯亮，去掉 (常)
      */
-    LIGHT_GREEN_ON(53, "绿灯(常)亮"),
+    LIGHT_GREEN_ON(53, "绿灯亮"),
     /**
      * 指示灯、闪烁灯-红灯(常)亮
      */
-    LIGHT_RED_ON(54, "红灯(常)亮"),
+    LIGHT_RED_ON(54, "红灯亮"),
     /**
      * 指示灯、闪烁灯-绿灯闪烁
      */
