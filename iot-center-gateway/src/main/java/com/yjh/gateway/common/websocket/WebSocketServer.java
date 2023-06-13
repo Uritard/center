@@ -3,6 +3,7 @@ package com.yjh.gateway.common.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.gateway.common.Constant;
+import com.yjh.gateway.common.utils.HttpClientUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class WebSocketServer {
         log.info("用户退出: {},当前在线人数为: {}", userId, getOnlineCount());
 
         // 刷新页面断开所有设备的语音对讲
-        Constant.restTemplateGet(Constant.VIDEO_CLOSE_VOICE, 5201314L);
+        HttpClientUtils.getInstance().getUrl(Constant.VIDEO_CLOSE_VOICE + "?deviceId=" + 5201314L);
     }
 
     /**
