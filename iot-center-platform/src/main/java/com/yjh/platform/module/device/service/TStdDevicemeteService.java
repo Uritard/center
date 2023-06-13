@@ -22,6 +22,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -58,6 +59,8 @@ public class TStdDevicemeteService{
     @Autowired
     private TCruiseTypeDao tCruiseTypeDao;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Autowired
     private LinkAutoMapper linkAutoMapper;
 
@@ -558,6 +561,17 @@ public class TStdDevicemeteService{
         if (CollectionUtils.isNotEmpty(totalMete)) {
             linkAutoMapper.insertDeviceMete(totalMete);
         }
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public String createModel(){
+        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String path = (String) mapForCreatePath.get("content");
+        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
+        String returnPath = StringUtils.substringAfter((String) mapForReturnPath.get("content"), "/imgs");
+        String fileName = "测点导入模板.xls";
+        return "/imgs" + returnPath+"/"+fileName;
     }
 
 }
