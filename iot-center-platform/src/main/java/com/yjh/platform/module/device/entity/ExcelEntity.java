@@ -54,7 +54,7 @@ public class ExcelEntity implements Serializable {
     private String isJudge;
     @ExcelProperty(value = "测点类型")
     private String meteKindName;
-    @ExcelProperty(value = "是否生成告警提示")
+    @ExcelProperty(value = "是否告警弹框")
     private String alarmNote;
     @ExcelProperty(value = "告警上限1")
     private String highLimit1;
@@ -76,7 +76,7 @@ public class ExcelEntity implements Serializable {
     private String unit;
     @ExcelProperty(value = "告警级别")
     private String alarmLevelName;
-    @ExcelProperty(value = "测点类型")
+    @ExcelProperty(value = "测点属性")
     private String inspectionType;
     private Integer alarmLevel;
     private Integer meteKindId;
@@ -87,4 +87,7 @@ public class ExcelEntity implements Serializable {
     private Integer analyseTypeId;
 
     private Long deviceId;
+
+    @ExcelProperty(value = "失败原因")
+    private String errorInfo;
 }
