@@ -1,6 +1,9 @@
 package com.yjh.gateway.common;
 
-import java.io.DataOutputStream;
+import com.yjh.gateway.common.utils.StaticContextAccessor;
+import com.yjh.gateway.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.gateway.commons.result.Result;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -101,6 +104,14 @@ public class Constant {
      * 语音对讲音频编码方式是否为pcm编码
      */
     public static String IS_PCM_ENCODE = "";
+    /**
+     * video服务关闭语音对讲接口
+     */
+    public static String VIDEO_CLOSE_VOICE = "";
+
+    public static Result restTemplateGet(String url, Long params) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class, params);
+    }
 
     public static InputStream sendAudioDataToVideo(byte[] bytes) {
         HttpURLConnection connection = null;

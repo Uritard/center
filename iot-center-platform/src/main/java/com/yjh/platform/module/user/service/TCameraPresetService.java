@@ -23,6 +23,7 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -958,6 +959,17 @@ public class TCameraPresetService {
         }
 
         sendMsg(tCameraPreset);
+
+        // 删除创建的预置位目录(本级只更新,不创建)
+        String value = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
+        String filePath = value + "/" + tCameraPreset.getPresetId();
+        File file = new File(filePath);
+        try {
+            FileUtils.deleteDirectory(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

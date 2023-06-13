@@ -9,6 +9,7 @@ import com.yjh.accessvideo.hik.transmit.*;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.CameraConInfo;
 import com.yjh.accessvideo.module.control.entity.RobotConInfo;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author 丫C
@@ -41,6 +43,7 @@ public class VoiceComService {
     private static final int G711_DATA_SIZE = 640;
     private static final int PCM_DATA_SIZE = 1920;
     private static final int G711_ENCODE_DATA_SIZE = 160;
+    private static final long CONSTANT = 5201314L;
 
     private static final HCNetSDK HC_NET_SDK = HCNetSDK.INSTANCE;
     private CbVoiceDataCallBack cbVoiceDataCallBack;
@@ -113,6 +116,7 @@ public class VoiceComService {
     }
 
     public Result stopVoiceTrans(Long deviceId, Result result) {
+        // (如果是刷新页面【deviceId:5201314】,关闭所有正在连接的语音设备)
         // 稍等一下再停止操作,防止还有正在发送和接收的数据处理
         try {
             Thread.sleep(2000);
@@ -125,7 +129,9 @@ public class VoiceComService {
             HC_NET_SDK.NET_DVR_ReleaseG711Decoder(Constant.pDecHandle);
         }
         // 删除编码类型
-        Constant.hikDeviceEncodeFormatMaps.remove(deviceId);
+        if (CONSTANT == deviceId) {
+            Constant.hikDeviceEncodeFormatMaps = new ConcurrentHashMap<>();
+        }
 
         // 关闭文件流
         if (Constant.outputStream != null) {
@@ -144,6 +150,21 @@ public class VoiceComService {
                 log.error(e.getMessage(), e);
             }
         }
+
+        if (CONSTANT == deviceId) {
+            Constant.hikDeviceEncodeFormatMaps = new ConcurrentHashMap<>();
+            if (MapUtils.isNotEmpty(Constant.hikDeviceUserIdMaps) && MapUtils.isNotEmpty(Constant.hikDeviceVoiceTransHandleMaps)) {
+                Constant.hikDeviceVoiceTransHandleMaps.forEach((key, value) -> {
+                    HikUtilsApp hikUtilsApp = new HikUtilsApp();
+                    hikUtilsApp.stopVoiceTrans(value);
+                });
+            }
+            result.setMessage(200, "关闭所有设备语音对讲功能成功!");
+            log.info("--------------Stop all voice trans success!--------------");
+            return result;
+        }
+        // 删除编码类型
+        Constant.hikDeviceEncodeFormatMaps.remove(deviceId);
 
         // 未登录
         if (Constant.hikDeviceUserIdMaps.isEmpty() || !Constant.hikDeviceUserIdMaps.containsKey(deviceId)) {
