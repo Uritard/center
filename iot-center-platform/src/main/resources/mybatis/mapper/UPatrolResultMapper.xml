@@ -829,9 +829,10 @@
         ),
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="checkUser != null ">check_user = #{checkUser},</if>
-        evaluation_state = 256,
         identify_result = IF(evaluation_state = 256, identify_result, IF (cruise_result = 246, 261, 264)),
-        identify_state = IF(evaluation_state = 256, identify_state, IF (cruise_result = 246, 258, 259))
+        identify_state = IF(evaluation_state = 256, identify_state, IF (cruise_result = 246, 258, 259)),
+        evaluation_state = 256,
+        modify_num = result_num
         WHERE
         task_id = #{taskId,jdbcType=VARCHAR}
     </update>

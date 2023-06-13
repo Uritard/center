@@ -8,7 +8,6 @@ import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
-import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.hik.transmit.HikUtilsApp;
 import com.yjh.accessvideo.module.control.service.VoiceComService;
 import io.swagger.annotations.Api;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 
 /**
  * <功能描述>

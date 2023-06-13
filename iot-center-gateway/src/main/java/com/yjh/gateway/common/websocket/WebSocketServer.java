@@ -92,9 +92,14 @@ public class WebSocketServer {
         }
         UserStatusChange.logOut(userId, token);
         log.info("用户退出: {},当前在线人数为: {}", userId, getOnlineCount());
+
+        // 刷新页面断开所有设备的语音对讲
+        Constant.restTemplateGet(Constant.VIDEO_CLOSE_VOICE, 5201314L);
     }
 
-    // 初始化文件流
+    /**
+     * 初始化文件流
+     */
     private void initFileStream() {
         String filePathTemp = System.getProperty("user.dir");
         String filePathName = filePathTemp + "/AudioFile/ReceiveData/cnm.pcm";
@@ -159,7 +164,7 @@ public class WebSocketServer {
      */
     @OnMessage(maxMessageSize = 40960)
     public void onMessage(byte[] message, @PathParam("deviceId") String deviceId) {
-        log.info("token:{},data length:{}", token, message.length);
+        log.info("deviceId:{},data length:{}", deviceId, message.length);
         try {
             // 前端发送的数据前面一段为0,去除无效数据
             int i;
