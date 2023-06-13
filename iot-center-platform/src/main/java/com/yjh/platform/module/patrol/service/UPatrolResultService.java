@@ -6,6 +6,7 @@ import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -293,7 +294,7 @@ public class UPatrolResultService {
         log.info("tStdDeviceMete===" + tStdDevicemete);
 
         // 该巡视点无了,找不到对应
-        if (Objects.isNull(tStdDevicemete)){
+        if (Objects.isNull(tStdDevicemete) || "-1".equals(afterManualReviewInfo.getModifyNum())){
             return;
         }
         String personCheck = afterManualReviewInfo.getModifyNum().split(",")[0];
@@ -373,44 +374,129 @@ public class UPatrolResultService {
         warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
         log.info("warnInfo==" + warnInfo);
 
-        //判断该点是否已在告警表
-        if (afterManualReviewInfo.getIsWarn() >= 1) {
-            List<Long> warnIdList =
-                uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
-            for (Long warnId : warnIdList) {
-                //存在
-                //判断该点是否产生告警以及告警信息(机器人上报告警默认有告警信息)
-                //触发告警
-                if (Boolean.TRUE.equals(isWarN) || 279 == alarmSource || 997 == alarmSource) {
-                    // 修改告警信息表
-                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : MapUtils.getString(map,"warnName"),
-                        Integer.valueOf(MapUtils.getString(map,"warnLevel")), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map ,"warnContent"),
-                            "程序正常，告警属实",286, isTemDif ? initInfo.get("outRange") : outRange, userId,
-                        date);
-                    sendWebSocket(warnId);
-                } else {
-                    uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
-                            "程序异常，告警误报", 287, null, userId, date);
-                    sendWebSocket(warnId);
+        //判断该点是否已在告警表  声纹测点分开处理
+        if (995 == alarmSource){
+            //声纹测点 声纹告警规则
+            map = voiceIsWarn(afterManualReviewInfo.getModifyNum(),tStdDevicemete.getDBValue(),
+                    tStdDevicemete.getFValue(),tStdDevicemete.getMeteName());
+            reviewVoiceWarn(afterManualReviewInfo,map,userId,date,warnInfo,taskId,instanceId);
+        }else {
+            if (afterManualReviewInfo.getIsWarn() >= 1) {
+                List<TWarnInfo> warnIdList =
+                        uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+                for (TWarnInfo tWarnInfo : warnIdList) {
+                    //存在
+                    //判断该点是否产生告警以及告警信息(机器人上报告警默认有告警信息)
+                    //触发告警
+                    if (Boolean.TRUE.equals(isWarN) || 279 == alarmSource || 997 == alarmSource) {
+                        // 修改告警信息表
+                        uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), isTemDif ? initInfo.get("warnName") : MapUtils.getString(map, "warnName"),
+                                Integer.valueOf(MapUtils.getString(map, "warnLevel")), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map, "warnContent"),
+                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userId,
+                                date);
+                        sendWebSocket(tWarnInfo.getWarnId());
+                    } else {
+                        uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
+                                "程序异常，告警误报", 287, null, userId, date);
+                        sendWebSocket(tWarnInfo.getWarnId());
+                    }
                 }
-            }
-        } else {
-            //不存在
-            //判断该点是否产生告警以及告警信息
-            if (Boolean.TRUE.equals(isWarN)) {//触发告警
-                warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
-                warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
-                warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
-                warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") :outRange);
-                warnInfo.setDealTime(date);
-                warnInfo.setDealPersonId(userId);
-                log.info("要插库的告警数据是===" + warnInfo);
-                tWarnInfoService.insert(warnInfo);
-                sendWebSocket(warnInfo.getWarnId());
-                uPatrolResultDao.updateIsWarn(taskId, instanceId);
+            } else {
+                //不存在
+                //判断该点是否产生告警以及告警信息
+                if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                    warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
+                    warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
+                    warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
+                    warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : outRange);
+                    warnInfo.setDealTime(date);
+                    warnInfo.setDealPersonId(userId);
+                    log.info("要插库的告警数据是===" + warnInfo);
+                    tWarnInfoService.insert(warnInfo);
+                    sendWebSocket(warnInfo.getWarnId());
+                    uPatrolResultDao.updateIsWarn(taskId, instanceId);
+                }
             }
         }
 
+    }
+
+    public void reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userId, Date date,
+                                TWarnInfo warnInfo,String taskId,Long instanceId){
+        List<TWarnInfo> warnIdList =
+                uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+        warnIdList.forEach(tWarnInfo ->{
+            //声纹的特殊处理
+            if (tWarnInfo.getWarnName().contains("分贝") && ValueUtil.toBoolean(map.get("isDbWarn"),false) ){
+                uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
+                        null, MapUtils.getString(map, "dbWarnContent"),
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outDbRange"), userId,
+                        date);
+                map.remove("isDbWarn");
+            } else if (tWarnInfo.getWarnName().contains("频率") && ValueUtil.toBoolean(map.get("isFWarn"),false)){
+                uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
+                        null, MapUtils.getString(map, "fWarnContent"),
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outFRange"), userId,
+                        date);
+                map.remove("isFWarn");
+            } else {
+                uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
+                        "程序异常，告警误报", 287, null, userId, date);
+            }
+        });
+        //处理声纹的
+        if (ValueUtil.toBoolean(map.get("isDbWarn"),false)){
+            warnInfo.setWarnId(null);
+            warnInfo.setWarnName(MapUtils.getString(map, "warnDbName"));
+            warnInfo.setWarnLevel(131);
+            warnInfo.setWarnContent(MapUtils.getString(map, "dbWarnContent"));
+            warnInfo.setOutRange(MapUtils.getString(map, "outDbRange"));
+            warnInfo.setDealTime(date);
+            warnInfo.setDealPersonId(userId);
+            log.info("要插库的告警数据是===" + warnInfo);
+            tWarnInfoService.insert(warnInfo);
+            sendWebSocket(warnInfo.getWarnId());
+            uPatrolResultDao.updateIsWarn(taskId, instanceId);
+        }
+        if (ValueUtil.toBoolean(map.get("isFWarn"),false)){
+            warnInfo.setWarnId(null);
+            warnInfo.setWarnName(MapUtils.getString(map, "warnFName"));
+            warnInfo.setWarnLevel(131);
+            warnInfo.setWarnContent(MapUtils.getString(map, "fWarnContent"));
+            warnInfo.setOutRange(MapUtils.getString(map, "outFRange"));
+            warnInfo.setDealTime(date);
+            warnInfo.setDealPersonId(userId);
+            log.info("要插库的告警数据是===" + warnInfo);
+            tWarnInfoService.insert(warnInfo);
+            sendWebSocket(warnInfo.getWarnId());
+            uPatrolResultDao.updateIsWarn(taskId, instanceId);
+        }
+    }
+
+    public Map<String, Object> voiceIsWarn(String personCheck,int warnDbVal, int warnfVal,String meteName){
+        Map<String, Object> map =new HashMap<>(8);
+        String[] str = personCheck.split(",");
+        log.info("personCheck:{},warnDbVal:{},warnfVal:{}",personCheck,warnDbVal,warnfVal);
+        if (str.length == 2){
+            //按照要求 前面是分贝  后面是频率
+            int maxDbVal = ValueUtil.toInteger(str[0],0);
+            int maxfVal = ValueUtil.toInteger(str[1],0);
+            if (maxDbVal > warnDbVal){
+                map.put("isDbWarn",true);
+                map.put("warnDbName",meteName+"分贝数据异常");
+                map.put("dbWarnContent",meteName+"分贝:"+maxDbVal+"--一般告警");
+                map.put("outDbRange",maxDbVal-warnDbVal);
+            }
+            if (maxfVal > warnfVal){
+                map.put("isFWarn",true);
+                map.put("warnFName",meteName+"频率数据异常");
+                map.put("fWarnContent",meteName+"频率:"+maxfVal+"--一般告警");
+                map.put("outFRange",maxfVal-warnfVal);
+            }
+        } else {
+            map.put("isWarn",false);
+        }
+        return map;
     }
 
     public static void main(String[] args) {

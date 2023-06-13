@@ -892,9 +892,13 @@
         a.threshold_per,
         a.modulus,
         a.is_temdif,
-        a.remark
+        a.remark,
+        conf.db_value as dBValue,
+        conf.f_value as FValue
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
+        left join t_voice_device v  on b.cruise_id = v.voice_device_id
+        left join t_voice_config conf on v.config_id = conf.config_id
         where b.instance_id=#{instanceId,jdbcType=BIGINT}
     </select>
 
@@ -945,8 +949,10 @@
         a.task_id = #{taskId, jdbcType=VARCHAR} and a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectWarnId" resultType="java.lang.Long">
-        SELECT a.warn_id
+    <select id="selectWarnId" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        SELECT
+               a.warn_id,
+               a.warn_name
         FROM
         t_warn_info a
         WHERE

@@ -47,9 +47,9 @@ public class ResultConvertUtil {
             return String.valueOf(StringUtils.split(result,"_").length);
         } else if (StringUtils.contains(result, "正常")) {
             return "0";
-        } else if (StringUtils.contains(result, "异常")) {
+        } else if (StringUtils.contains(result, "任务异常")) {
             return "-1";
-        }else if (CommonUtils.containsChinese(result)) {
+        } else if (CommonUtils.containsChinese(result)) {
             return String.valueOf(StringUtils.split(result).length);
         } else {
             return CommonUtils.getNumberStr(result);
@@ -138,7 +138,7 @@ public class ResultConvertUtil {
                     return StringUtils.substring(code, code.length() - 1, code.length());
                 } else if (StringUtils.contains(result, "正常")) {
                     return "0";
-                } else if (StringUtils.contains(result, "异常")) {
+                } else if (StringUtils.contains(result, "任务异常")) {
                     return "-1";
                 }else {
                     return "0";

@@ -162,7 +162,7 @@ public interface UPatrolResultDao {
                              @Param(value = "dealTime") Date dealTime,
                              @Param(value = "taskId") String taskId);
 
-    List<Long> selectWarnId(@Param(value = "taskId")String taskId,
+    List<TWarnInfo> selectWarnId(@Param(value = "taskId")String taskId,
                             @Param(value = "instanceId")Long instanceId);
 
     int updateCheck(@Param(value = "taskId")String taskId,
