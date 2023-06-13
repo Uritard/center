@@ -1045,34 +1045,17 @@ public class PatrolResultHandler {
             currentWarnInfo.put("defectModel", infoMap.get("defectModel"));
             currentWarnInfo.put("isPop", "false");
 
-            Integer alarmLevel = NumberUtils.toInt(infoMap.get("alarmLevel"));
-//            boolean isSet = StringUtils.isNotEmpty(tStdDevicemete.getAlarmNote()) && StringUtils.equals("1", tStdDevicemete.getAlarmNote());
-            boolean reachDefectLevel = Objects.equals(133, alarmLevel);
-            boolean reachAlarmLevel = Objects.nonNull(tStdDevicemete.getAlarmLevel()) &&
-                    (alarmLevel.compareTo(tStdDevicemete.getAlarmLevel()) == 0 || alarmLevel > tStdDevicemete.getAlarmLevel());
-
-            boolean reachWarnCondition;
-            if (StringUtils.equals("warn", infoMap.get("flag"))){
-                reachWarnCondition =  Boolean.TRUE.equals(reachAlarmLevel);
-            }else if (StringUtils.equals("defect", infoMap.get("flag"))){
-                reachWarnCondition = Boolean.TRUE.equals(reachDefectLevel);
-            }else {
-                reachWarnCondition = true;
-            }
-
-            if (Boolean.TRUE.equals(reachWarnCondition)){
-                //webSocket通知前端调用查询告警弹框的接口
-                Map<String, String> jasonMaps = new HashMap<>();
-                jasonMaps.put("type", "alarmPopUp");
-                jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
-                jasonMaps.put("warnType", "1");
-                jasonMaps.put("warnId", warnId);
-                jasonMaps.put("defectModel", infoMap.get("defectModel"));
-                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
-                currentWarnInfo.put("isPop","true");
-                if (!Constant.isUpSystem()){
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
-                }
+            //webSocket通知前端调用查询告警弹框的接口
+            Map<String, String> jasonMaps = new HashMap<>();
+            jasonMaps.put("type", "alarmPopUp");
+            jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
+            jasonMaps.put("warnType", "1");
+            jasonMaps.put("warnId", warnId);
+            jasonMaps.put("defectModel", infoMap.get("defectModel"));
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
+            currentWarnInfo.put("isPop","true");
+            if (!Constant.isUpSystem()){
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
             }
             redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
         }catch (Exception e){
