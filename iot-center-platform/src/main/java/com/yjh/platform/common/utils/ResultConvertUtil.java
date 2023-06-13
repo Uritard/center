@@ -23,11 +23,11 @@ public class ResultConvertUtil {
 //        String a = " 表计表盘模糊 ";
 //        String b = " 挂空悬浮物  鸟巢  鸟巢 ";
 //        String c = "分";
-//        String d = "分_合_合_合_合_合_合";
+       String d = "分_合_合_合_合 合 合";
 //        System.out.println(convertResult(a));
 //        System.out.println(convertResult(b));
 //        System.out.println(convertResult(c));
-//        System.out.println(convertResult(d));
+       System.out.println(convertResult(d));
         System.out.println(convertResult("机器人任务异常"));
         System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
     }
@@ -40,11 +40,15 @@ public class ResultConvertUtil {
      */
     public static String convertResult(String result) {
         RecogniseStatusEnum statusEnum = RecogniseStatusEnum.getCodeByValue(result);
+        RecogniseStatusExEnum statusExEnum = RecogniseStatusExEnum.getCodeByValue(result);
         if (Objects.nonNull(statusEnum)) {
             String code = String.valueOf(statusEnum.getCode());
             return StringUtils.substring(code, code.length() - 1, code.length());
+        } else if (Objects.nonNull(statusExEnum)) {
+            String code = String.valueOf(statusExEnum.getCode());
+            return StringUtils.substring(code, code.length() - 1, code.length());
         } else if (StringUtils.containsAny(result, ARR)) {
-            return String.valueOf(StringUtils.split(result,"_").length);
+            return String.valueOf(StringUtils.split(result,"_ ").length);
         } else if (StringUtils.contains(result, "正常")) {
             return "0";
         } else if (StringUtils.contains(result, "任务异常")) {
@@ -136,6 +140,8 @@ public class ResultConvertUtil {
                 } else if (Objects.nonNull(statusExEnum)) {
                     String code = String.valueOf(statusExEnum.getCode());
                     return StringUtils.substring(code, code.length() - 1, code.length());
+                } else if (StringUtils.containsAny(result, ARR)) {
+                    return String.valueOf(StringUtils.split(result,"_ ").length);
                 } else if (StringUtils.contains(result, "正常")) {
                     return "0";
                 } else if (StringUtils.contains(result, "任务异常")) {
