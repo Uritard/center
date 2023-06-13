@@ -84,7 +84,7 @@ public class NonhomologousWarnThread implements Runnable{
             String desc = robotPatrolTaskAlarm.getValueUnit();
             CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(desc);
             if (resDescEnum != null || CruiseConstant.FAILED_VALUE.equals(robotInsResult)){
-                log.warn("巡视结果异常，不判断是否产生告警");
+                log.warn("巡视结果异常，不判断是否产生告警 {}，{}", desc, robotInsResult);
                 return;
             }
 
@@ -161,6 +161,10 @@ public class NonhomologousWarnThread implements Runnable{
                 if (isRunning) {
                     log.info("robotInsResult === {}, videoInsResult === {}, 阈值 === {}, cruiseStatus === {}，redisInfoMap === {}, 非同源告警另一个任务未完成", robotInsResult, videoInsResult, warnThreshold, cruiseStatus, JSON.toJSONString(redisInfoMap));
                     continue;
+                }
+                if (StringUtils.equalsAny(CruiseConstant.FAILED_VALUE, videoInsResult, robotInsResult)){
+                    log.warn("巡视结果异常，不判断是否产生告警 {}，{}", videoInsResult, robotInsResult);
+                    return;
                 }
                 log.info("非同源告警---,redisInfoMap==={}", redisInfoMap);
                 // 1-红外 2-位置 3-表计数显 4-表计指针 5-相别 6-区间 7-五次不变
@@ -416,10 +420,7 @@ public class NonhomologousWarnThread implements Runnable{
         }
 
         String desc = robotPatrolTaskAlarm.getValueUnit();
-        CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(desc);
-        if (resDescEnum != null || "-1".equals(robotResult)){
-            return false;
-        }
+
         String robotInsResult = StringUtils.substringBefore(robotResult, ",");
         boolean retFlag = false;
         for (Map<String, Object> map : list) {

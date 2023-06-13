@@ -364,9 +364,13 @@ public class InspectionResultThread implements Runnable{
                                       String value, boolean fileFound) {
         log.info("====This is the result of no algorithm==={}", value);
         try {
+            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
+            if (TypeEnum.INFRARED.getCode() == cruiseType || "已拍照".equals(value)) {
+                // 如果是红外，且没有配置算法，结果是已拍照，则num为-1，因为他需要调用算法获取结果或者直接得到结果
+                tCruiseTaskResultMap.put("resultNum", "-1");
+            }
             String resultValue = tCruiseTaskResultMap.get("resultNum");
 
-            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
             if (fileFound){
                 if (TypeEnum.VOICE.getCode() != cruiseType) {
                     resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
