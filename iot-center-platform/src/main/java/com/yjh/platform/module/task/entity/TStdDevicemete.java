@@ -126,4 +126,10 @@ public class TStdDevicemete implements Serializable {
     @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
     private Integer isTemdif;
 
+    @ApiModelProperty(value = "分贝告警值")
+    private Integer dBValue;
+
+    @ApiModelProperty(value = "频率限值")
+    private Integer fValue;
+
 }
