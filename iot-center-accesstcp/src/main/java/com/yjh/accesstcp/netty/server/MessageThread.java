@@ -329,6 +329,9 @@ public class MessageThread {
                         isRobotFlag = StringUtils.isNotEmpty(robotDevice);
                         tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                     }else {
+                        List<String> insList = Arrays.asList(item.get("device_list").toString());
+                        robotDevice = sendToUpSystemServices.selectIsDownSystem(insList);
+                        isRobotFlag = StringUtils.isNotEmpty(robotDevice);
                         tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
                     }
                     tCruiseTaskAdd.setUnionTaskStatus("1");
