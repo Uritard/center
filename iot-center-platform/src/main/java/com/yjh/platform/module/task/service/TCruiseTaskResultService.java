@@ -634,7 +634,7 @@ public class TCruiseTaskResultService {
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
             Integer normal = ValueUtil.toInteger(normalCounts, 0);
             Integer abnormal = ValueUtil.toInteger(abnormalCounts,0);
-            cruiseResultCounter.setAlarmCount(abnormal);
+            cruiseResultCounter.setAlarmCount(getAlarmCount(taskId));
             cruiseResultCounter.setCruisedCount(normal+abnormal);
             cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
             Date d1 = DateTimeUtil.parse(startTime, new Date());
@@ -648,6 +648,36 @@ public class TCruiseTaskResultService {
             cruiseResultCounter.setRunningTime(Long.valueOf("0"));
         }
         return cruiseResultCounter;
+    }
+
+    /**
+     * 获取告警数量
+     *
+     * @param taskId taskId
+     * @return result
+     */
+    private int getAlarmCount(String taskId) {
+        int alarmCount = 0;
+
+        try {
+            Set<String> warnKeys = redisScan("warnInfo:" + taskId);
+            //表计告警
+            for (String warnKey : warnKeys) {
+                Map<String, String> warnMap = redisTemplate.opsForHash().entries(warnKey);
+                String instanceId = warnMap.get("instanceId");
+                Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+                if (!MapUtils.isEmpty(cruiseMap)) {
+                    alarmCount++;
+                }
+            }
+
+            Set<String> defectKeys = redisScan("defectInfo:" + taskId);
+            alarmCount += defectKeys.size();
+        } catch (Exception e) {
+            log.error("getAlarmCount err: ", e);
+        }
+
+        return alarmCount;
     }
 
 
