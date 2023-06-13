@@ -345,24 +345,28 @@ public class ReportManageService {
         taskVO.setStationName(stationName);
         taskVO.setVoltageClasses(voltageClasses);
         taskVO.setStationType(stationType);
-
+        //总点数
         long allCount = tCruiseDataResultDetailList.size();
+//        审核结果正常
         long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> StringUtils.equals("正常", detail.getIdentifyResultName())).count();
-        long abnormalCount = allCount - normalCount;
+        //未审核
         long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> StringUtils.equals("未审核", detail.getEvaluationStateName())).count();
+        //已检点数
         long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
-                !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultNum())).count();
+                !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
+        //未检点数
         long waitCount= allCount - alreadyCount;
+        //异常点数
+        long abnormalCount = allCount - normalCount - unReviewCount;
 
-        String cruiseStatistics = "总点位" + allCount + "个" +
-                ",已检点位" + alreadyCount + "个" +
-                ",未检点位" + waitCount + "个" +
-                ",正常点位" + normalCount + "个" +
-                ",异常点位" + abnormalCount +  "个";
-        if (0 != unReviewCount){
-            cruiseStatistics = cruiseStatistics +  ",待人工确认点位" + unReviewCount + "个。";
-        }
-        taskVO.setCruiseStatistics(cruiseStatistics);
+        StringJoiner stringJoiner = new StringJoiner(",","","。");
+        stringJoiner.add("总点位" + allCount + "个");
+        stringJoiner.add("已检点位" + alreadyCount + "个");
+        stringJoiner.add("未检点位" + waitCount + "个");
+        stringJoiner.add("正常点位" + normalCount + "个");
+        stringJoiner.add("异常点位" + abnormalCount + "个");
+        stringJoiner.add("待人工确认点位" + unReviewCount + "个");
+        taskVO.setCruiseStatistics(stringJoiner.toString());
         // 当前站内环境信息
         String stationWeather = uPatrolTaskService.getStationWeather();
         taskVO.setEnvInfo(stationWeather);
