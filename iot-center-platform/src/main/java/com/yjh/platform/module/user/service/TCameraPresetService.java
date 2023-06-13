@@ -967,7 +967,7 @@ public class TCameraPresetService {
         try {
             FileUtils.deleteDirectory(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
     }
