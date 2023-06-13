@@ -707,7 +707,19 @@ public class TStdDeviceService{
 
     public List<AreaInfo> deviceMeteTree(Long deviceId,String deviceType, String analyseType){
         List<AreaInfo> areaInfos = tStdDeviceDao.selectDeviceMeteByDeviceAndCustom(deviceId,deviceType,analyseType);
-        return areaInfos;
+        List<AreaInfo> uniqueAreaInfos = areaInfos.stream()
+                .collect(Collectors.toMap(AreaInfo::getId, Function.identity(), (existing, replacement) -> {
+                    if (StringUtils.isBlank(existing.getCameraId()) && StringUtils.isBlank(replacement.getCameraId())) {
+                        return existing;
+                    } else if (StringUtils.isNotBlank(existing.getCameraId()) && StringUtils.isNotBlank(replacement.getCameraId())) {
+                        return existing;
+                    } else if (StringUtils.isNotBlank(existing.getCameraId())) {
+                        return existing;
+                    } else {
+                        return replacement;
+                    }
+                })).values().stream().collect(Collectors.toList());
+        return uniqueAreaInfos;
     }
 
     public List<AreaInfo> cruisePoint(Long deviceMeteId){
