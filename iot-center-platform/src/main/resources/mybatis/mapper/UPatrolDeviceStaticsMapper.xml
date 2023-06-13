@@ -210,4 +210,32 @@
         </if>
     </select>
 
+    <select id="selectRobotStaticsInfoByOptimize" resultType="java.util.Map">
+        SELECT
+        a.robot_id robotId,
+        a.robot_name AS robotName,
+        a.robot_num AS deviceCode,
+        a.last_online_time AS lastOnlineTime,
+        IFNULL(CONCAT(CONVERT(a.duration / 60 / 1000,DECIMAL (10, 0)),'分钟'),0) AS duration,
+        a.off_line_count AS offLineCount,
+        a.commission_date,
+        CASE b.device_run WHEN 0 THEN b.commission_days + TO_DAYS(NOW()) - TO_DAYS(b.device_resume_date) ELSE b.commission_days END AS normal_day,
+        TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1 AS commissio_days,
+        COUNT(DISTINCT TO_DAYS(updr.cruise_time)) AS cruiseDay,
+        IFNULL(CONVERT(COUNT(DISTINCT TO_DAYS(updr.cruise_time)) / (TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1) * 100, DECIMAL(15, 3)), 0) AS cruise_rate
+        FROM
+        t_robot_info a
+        LEFT JOIN device_statics_info_result b ON a.robot_num = b.device_code
+        LEFT JOIN t_robot_inspection tri ON tri.robot_id = a.robot_id
+        LEFT JOIN t_cruise_point_instance tcpi ON tri.inspection_id = tcpi.cruise_id
+        LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id AND updr.cruise_time IS NOT NULL AND a.commission_date <![CDATA[<=]]> updr.`createtime`
+        WHERE
+        1 = 1
+        and a.robot_id IN
+            <foreach collection="list" item="robotId" open="(" close=")" separator=",">
+                #{robotId}
+            </foreach>
+        GROUP BY a.robot_id
+    </select>
+
 </mapper>

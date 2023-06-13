@@ -36,4 +36,6 @@ public interface UPatrolDeviceStaticsDao {
     List<Map<String, Object>> selectRobotStaticsInfo(@Param("startIndex")int startIndex,
                                                      @Param("endIndex")int endIndex,
                                                      @Param("list")List<Long> list);
+
+    List<Map<String, Object>> selectRobotStaticsInfoByOptimize(@Param("list")List<Long> list);
 }
