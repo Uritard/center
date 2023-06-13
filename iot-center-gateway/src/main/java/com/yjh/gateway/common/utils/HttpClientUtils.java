@@ -6,10 +6,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,16 +31,20 @@ import java.util.Map.Entry;
 public class HttpClientUtils {
 
     private static HttpClientUtils instance;
-    private static Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
+    private static CloseableHttpClient client;
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
+
     private HttpClientUtils() {
     }
 
     public static synchronized HttpClientUtils getInstance() {
         if (instance == null) {
-            logger.info("初始化instance");
             instance = new HttpClientUtils();
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(5000).setConnectionRequestTimeout(10000)
+                .setSocketTimeout(10000).build();
+            client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
         }
-        logger.info("instance:="+instance);
         return instance;
     }
 
@@ -77,7 +83,11 @@ public class HttpClientUtils {
         } catch (IOException ex) {
             throw new BusinessException(ex.getMessage());
         } finally {
+            try {
                 closeHttpClient(httpClient);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
         return content;
     }
@@ -129,44 +139,67 @@ public class HttpClientUtils {
         } catch (IOException ex) {
             throw new BusinessException(ex.getMessage());
         } finally {
+            try {
                 closeHttpClient(httpClient);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
         return content;
     }
 
-    public String getUrl(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+    public void getUrl(String url) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.addHeader("Content-type", "application/json;charset=utf-8");
         httpGet.setHeader("Accept", "application/json");
-        CloseableHttpResponse response = client.execute(httpGet);
-        HttpEntity entity = response.getEntity();
-        String result = EntityUtils.toString(entity, "UTF-8");
-        return result;
+        try {
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public String postUrl(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+        // CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader("Content-type", "application/json;charset=utf-8");
         httpPost.setHeader("Accept", "application/json");
         httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
         CloseableHttpResponse response = client.execute(httpPost);
         HttpEntity entity = response.getEntity();
-        return entity==null?null:EntityUtils.toString(entity, "UTF-8");
+        return EntityUtils.toString(entity, "UTF-8");
+    }
+
+    public String putUrl(String url, String json) throws IOException {
+//        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPut.setHeader("Accept", "application/json");
+        httpPut.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPut);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
     }
 
     public CloseableHttpClient getHttpClient() {
         return HttpClients.createDefault();
     }
 
-    private void closeHttpClient(CloseableHttpClient client) {
-        try{
+    public void close() {
+        try {
             if (client != null) {
                 client.close();
             }
-        }catch (Exception e) {
-            throw new BusinessException(e.getMessage());
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    private void closeHttpClient(CloseableHttpClient client) throws IOException {
+        if (client != null) {
+            client.close();
         }
     }
 
@@ -178,7 +211,7 @@ public class HttpClientUtils {
                 EntityUtils.toString(response.getEntity());
             }
         } catch (Exception e) {
-
+            logger.error(e.getMessage());
         }
     }
 
