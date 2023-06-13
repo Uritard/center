@@ -8,6 +8,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -209,7 +210,11 @@ public class PatrolResultHandler {
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
-                    taskAlarm.setValue(ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue()));
+                    String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
+                    if ("0".equals(robotPatrolTaskResult.getValid())){
+                        value = CruiseConstant.FAILED_VALUE;
+                    }
+                    taskAlarm.setValue(value);
                     taskAlarm.setValueUnit(robotPatrolTaskResult.getValue());
                     taskAlarm.setDeviceId(instanceId);
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
@@ -287,7 +292,7 @@ public class PatrolResultHandler {
             isAlarmMap.put("instanceId", instanceId);
             String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
             if ("0".equals(robotPatrolTaskResult.getValid())){
-                value = "-1";
+                value = CruiseConstant.FAILED_VALUE;
             }
             isAlarmMap.put("value", value);
             isAlarmMap.put("valueDesc", robotPatrolTaskResult.getValueUnit());

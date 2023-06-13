@@ -15,6 +15,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
@@ -82,6 +83,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             // 该巡视点无了,找不到对应
             if (Objects.isNull(tStdDevicemete)) {
+                return;
+            }
+
+            if (CruiseConstant.FAILED_VALUE.equals(threadMap.get("value"))) {
+                log.warn("异常点位，不需要告警处理， {}， {}", taskId, instanceId);
                 return;
             }
 

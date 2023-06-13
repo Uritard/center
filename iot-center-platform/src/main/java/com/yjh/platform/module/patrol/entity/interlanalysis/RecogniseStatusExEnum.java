@@ -27,7 +27,15 @@ public enum RecogniseStatusExEnum {
     /**
      * 非储能
      */
-    ISOLATOR_ON_ABNORMAL(102, "非储能")
+    ISOLATOR_ON_ABNORMAL(102, "非储能"),
+    /**
+     * 开关/压板-开状态
+     */
+    GATE_SWITCH_OFF(101, "开"),
+    /**
+     * 开关/压板-关状态
+     */
+    GATE_SWITCH_ON(102, "关")
     ;
 
     private int code;

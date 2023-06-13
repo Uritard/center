@@ -81,6 +81,13 @@ public class NonhomologousWarnThread implements Runnable{
             String taskCode = robotPatrolTaskAlarm.getTaskCode();
             String robotInsResult = robotPatrolTaskAlarm.getValue();
 
+            String desc = robotPatrolTaskAlarm.getValueUnit();
+            CruiseConstant.AbnormalResDescEnum resDescEnum = CruiseConstant.AbnormalResDescEnum.getEnum(desc);
+            if (resDescEnum != null || CruiseConstant.FAILED_VALUE.equals(robotInsResult)){
+                log.warn("巡视结果异常，不判断是否产生告警");
+                return;
+            }
+
             String warnId = String.valueOf(UUID.randomUUID()).replace("-", "");
             if (0 == isResult){
                 // 三相告警
