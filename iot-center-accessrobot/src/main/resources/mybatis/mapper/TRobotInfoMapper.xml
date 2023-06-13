@@ -1465,7 +1465,7 @@
 
     <select id="selectAlarmShield" resultType="com.yjh.accessrobot.module.command.entity.AlarmShield">
         select * from alarm_shield
-        where warn_count like concat('%',#{warnCount},'%')
+        where warn_content like concat('%',#{warnCount},'%')
         and shield_id = #{robotId}
     </select>
 </mapper>
