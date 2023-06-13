@@ -503,7 +503,7 @@
         left join t_std_device e on a.device_id = e.device_id
         where 1=1
           <choose>
-              <when test="isRedundant == 1">
+              <when test="isRedundant == 0">
                   AND EXISTS (
                   SELECT
                   1
@@ -517,7 +517,7 @@
                   count(*) > 1
                   )
               </when>
-                <when test="isRedundant == 0">
+                <when test="isRedundant == 1">
                     AND NOt EXISTS (
                     SELECT
                     1

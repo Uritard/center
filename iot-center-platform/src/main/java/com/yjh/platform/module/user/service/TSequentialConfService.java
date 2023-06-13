@@ -517,11 +517,14 @@ public class TSequentialConfService{
             List<String> listSort = tSequentialConfDao.selectLastStep();
             log.info("顺控执行完毕， {}-{}", JSONUtil.toJSONString(listSort), JSONUtil.toJSONString(map));
             if (listSort.get(listSort.size() - 1).equals(map.get("cfgDeviceId"))) {
+                Constant.sequentialState.put("status", 1);
+                Constant.sequentialState.put("content", param.get("resultValue"));
                 // 这是最后一个步骤
                 String time = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "content"));
                 Thread.sleep(Integer.parseInt(time) * 1000);
                 Constant.sequentialState.put("state", -1);
                 Constant.sequentialState.put("cfgDeviceId", "");
+                Constant.sequentialState.put("status", null);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -591,7 +594,21 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
-        return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+        List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+        Integer state = (Integer) Constant.sequentialState.get("state");
+        if(state == -1) {
+            list.get(0).put("status", "未开始");
+            return list;
+        }
+        Integer status = (Integer) Constant.sequentialState.get("status");
+        if (status != null){
+            list.get(0).put("status", "已完成");
+            list.get(0).put("identifyResult", Constant.sequentialState.get("content"));
+            return list;
+        }
+
+        list.get(0).put("status", "正在进行中");
+        return list;
     }
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
@@ -690,6 +707,8 @@ public class TSequentialConfService{
         List<String> listSort = tSequentialConfDao.selectLastStep();
         log.info("顺控执行完毕:{}", JSONUtil.toJSONString(listSort));
         if (listSort.get(listSort.size() - 1).equals(cfgDeviceId)) {
+            Constant.sequentialState.put("status", 1);
+            Constant.sequentialState.put("content", content);
             // 这是最后一个步骤
             String time = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cleanTime", "content"));
             try {
@@ -699,6 +718,7 @@ public class TSequentialConfService{
             }
             Constant.sequentialState.put("state", -1);
             Constant.sequentialState.put("cfgDeviceId", "");
+            Constant.sequentialState.put("status", null);
         }
         return "";
     }

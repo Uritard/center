@@ -208,15 +208,32 @@ public class TStdDevicemeteService{
 
         Integer isRedundant = tStdDeviceMeteDetail.getIsRedundant();
 
-        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        List<TStdDeviceMeteDetail> list = tStdDevicemeteDao
-            .selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(), tStdDeviceMeteDetail.getRedundantType(),
-                isRedundant, listForPage);
+        List<TStdDeviceMeteDetail> list = new ArrayList<>();
+        // 0:是 1:否 -1:全部
+        if (isRedundant != -1) {
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+                    tStdDeviceMeteDetail.getRedundantType(), isRedundant, listForPage);
+            list.stream().forEach(detail -> detail.setIsRedundant(isRedundant == 0 ? 0 : 1));
+            fillDeviceMeteInfo(list);
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list",list);
+            result.setData(resultMap);
+            return result;
+        }
+
+        List<TStdDeviceMeteDetail> isRedundantList = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+                tStdDeviceMeteDetail.getRedundantType(), 0, listForPage);
+        isRedundantList.stream().forEach(detail -> detail.setIsRedundant(0));
+        List<TStdDeviceMeteDetail> isNotRedundantList = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+                tStdDeviceMeteDetail.getRedundantType(), 1, listForPage);
+        isNotRedundantList.stream().forEach(detail -> detail.setIsRedundant(1));
+        list.addAll(isRedundantList);
+        list.addAll(isNotRedundantList);
         fillDeviceMeteInfo(list);
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("count", page.getTotal());
-        resultMap.put("list",list);
-        result.setData(resultMap);
+        StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
+        result.setData(dataResult);
         return result;
     }
 
