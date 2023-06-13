@@ -128,10 +128,6 @@ public class VoiceComService {
         if (Constant.pDecHandle != null) {
             HC_NET_SDK.NET_DVR_ReleaseG711Decoder(Constant.pDecHandle);
         }
-        // 删除编码类型
-        if (CONSTANT == deviceId) {
-            Constant.hikDeviceEncodeFormatMaps = new ConcurrentHashMap<>();
-        }
 
         // 关闭文件流
         if (Constant.outputStream != null) {
