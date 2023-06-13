@@ -15,6 +15,7 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "TCruisePointInstance对象", description = "巡检点实例表")
 public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String deviceName;
+    private Integer deviceType;
     private String instanceName;
     private String cruiseName;
     private String analyseType;
@@ -25,6 +26,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private Long cameraId;
     private String meteType;
     private String devicePointId;
+    private Integer UpRegionId;
     /**
      * 是否温差测试
      */

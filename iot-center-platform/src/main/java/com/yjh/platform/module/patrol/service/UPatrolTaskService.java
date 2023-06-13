@@ -33,6 +33,7 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
@@ -1267,7 +1268,7 @@ public class UPatrolTaskService {
         });
     }
 
-    private void setQuartzTask(UPatrolTask task) {
+    public void setQuartzTask(UPatrolTask task) {
         //开启定时任务
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(task.getTaskId());
@@ -2235,11 +2236,8 @@ public class UPatrolTaskService {
             }
 
             if (CollectionUtils.isNotEmpty(missInstanceMapList)) {
-                UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
-                UPatrolTask uPatrolTask1 =  omitInstanceRetry(missInstanceMapList,uPatrolTask);
-
-                // 设置定时器，不走事物逻辑，否则会延时
-                setQuartzTask(uPatrolTask1);
+                log.info("任务：{}开始重试！",taskId);
+                ThreadPoolUtil.PATROL_POOL.addThread(new CruiseRetryThread(uPatrolTaskDao,this,missInstanceMapList,taskId));
             }
 
             // 更新upr
@@ -3168,7 +3166,9 @@ public class UPatrolTaskService {
         }
 
         List<Long> instanceList = insertTaskAttrForRetry(uPatrolTask, tCruiseTaskAdd,instanceIdList);
-
+        if (CollectionUtils.isEmpty(instanceList)) {
+            return null;
+        }
         List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
             // 找出下级设备或下级节点的点让其做任务
             String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
@@ -3182,24 +3182,29 @@ public class UPatrolTaskService {
     private List<Long> insertTaskAttrForRetry(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd,List<Long> instanceIdList) {
         List<Long> instanceList = new ArrayList<>();
         List<UPatrolTaskAttr> uPatrolTaskAttrs = new ArrayList<>();
-        List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
-        for (UPatrolPlanAttr uPatrolPlanAttr : uPatrolPlanAttrList) {
-            if (!instanceIdList.contains(uPatrolPlanAttr.getInstanceId())) {
+        List<TCruisePointInstanceNameDetail> tCruisePointInstanceNameDetails = tCruisePointInstanceDao.selectForTask(instanceIdList);
+        if (CollectionUtils.isEmpty(tCruisePointInstanceNameDetails)) {
+            log.info("遗漏点位重试任务执行失败，点位已全部取消！");
+            return new ArrayList<>();
+        }
+        for (TCruisePointInstanceNameDetail tCruisePointInstanceNameDetail : tCruisePointInstanceNameDetails) {
+            if (!instanceIdList.contains(tCruisePointInstanceNameDetail.getInstanceId())) {
                 continue;
             }
+
+            //通过巡视点为关联关系判断遗漏点位是否重做
             UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
             uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
-            uPatrolTaskAttr.setInstanceId(uPatrolPlanAttr.getInstanceId());
-            uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
-            uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
-            uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
-            uPatrolTaskAttr.setPointTaskId(uPatrolPlanAttr.getPointTaskId());
-            uPatrolTaskAttr.setPointType(uPatrolPlanAttr.getPointType());
-            uPatrolTaskAttr.setDeviceType(uPatrolPlanAttr.getDeviceType());
-            uPatrolTaskAttr.setMeteType(uPatrolPlanAttr.getMeteType());
-            uPatrolTaskAttr.setRegionId(uPatrolPlanAttr.getUpRegionId());
+            uPatrolTaskAttr.setInstanceId(tCruisePointInstanceNameDetail.getInstanceId());
+            uPatrolTaskAttr.setDeviceMeteId(tCruisePointInstanceNameDetail.getDeviceMeteId());
+            uPatrolTaskAttr.setDeviceId(tCruisePointInstanceNameDetail.getDeviceId());
+            uPatrolTaskAttr.setCustomId(tCruisePointInstanceNameDetail.getCustomId());
+            uPatrolTaskAttr.setPointType(tCruisePointInstanceNameDetail.getCruiseType());
+            uPatrolTaskAttr.setDeviceType(tCruisePointInstanceNameDetail.getDeviceType());
+            uPatrolTaskAttr.setMeteType(NumberUtils.toInt(tCruisePointInstanceNameDetail.getMeteType()));
+            uPatrolTaskAttr.setRegionId(tCruisePointInstanceNameDetail.getUpRegionId());
 
-            instanceList.add(uPatrolPlanAttr.getInstanceId());
+            instanceList.add(tCruisePointInstanceNameDetail.getInstanceId());
             uPatrolTaskAttrs.add(uPatrolTaskAttr);
             if (uPatrolTaskAttrs.size() % 2000 == 0) {
                 this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
