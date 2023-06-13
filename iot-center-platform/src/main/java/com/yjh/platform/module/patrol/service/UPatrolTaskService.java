@@ -3054,7 +3054,7 @@ public class UPatrolTaskService {
             robotTaskMessage.setInstanceName(mapForRobotTaskMessage.get("instanceName"));
             if (mapForRobotTaskMessage.get("cruiseTime") != null && !"null".equals(mapForRobotTaskMessage.get("cruiseTime"))) {
                 robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
-                robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
+                robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultDesc"));
             } else {
                 robotTaskMessage.setCruiseTime("");
                 robotTaskMessage.setResult("");
