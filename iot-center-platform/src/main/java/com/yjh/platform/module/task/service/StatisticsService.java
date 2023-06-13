@@ -22,6 +22,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -738,6 +739,7 @@ public class StatisticsService {
                     redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), tempMap);
                 }
         );
+        log.info("结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
         return mapList;
     }
 
@@ -987,6 +989,7 @@ public class StatisticsService {
         return statistics;
     }
 
+    @Async
     public void piplinePutStaticsInfo(List<Map<String, String>> storageList) {
         try {
             redisTemplate.executePipelined(new SessionCallback<Object>() {

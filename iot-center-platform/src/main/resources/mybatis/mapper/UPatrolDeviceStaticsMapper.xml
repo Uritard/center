@@ -222,7 +222,7 @@
         CASE b.device_run WHEN 0 THEN b.commission_days + TO_DAYS(NOW()) - TO_DAYS(b.device_resume_date) ELSE b.commission_days END AS normal_day,
         TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1 AS commissio_days,
         COUNT(DISTINCT TO_DAYS(updr.cruise_time)) AS cruiseDay,
-        IFNULL(CONVERT(COUNT(DISTINCT TO_DAYS(updr.cruise_time)) / (TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1) * 100, DECIMAL(15, 3)), 0) AS cruise_rate
+        IFNULL(CONVERT(COUNT(DISTINCT TO_DAYS(updr.cruise_time)) / (TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1) * 100, DECIMAL(15, 3)), 0) AS cruisePercent
         FROM
         t_robot_info a
         LEFT JOIN device_statics_info_result b ON a.robot_num = b.device_code
