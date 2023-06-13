@@ -524,7 +524,10 @@ public class PatrolResultHandler {
             }
 
             int cruiseResult = MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL);
-            if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+") && cruiseResult == CRUISE_RESULT_NORMAL) {
+
+            // 必须是中文和数字，且巡视结果正常，且结果不为 -1才判断是否产生告警
+            boolean needCheckAlarm = resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+") && cruiseResult == CRUISE_RESULT_NORMAL && !CruiseConstant.FAILED_VALUE.equals(resultValue);
+            if (needCheckAlarm) {
                 // 判断是否为红外识别且获取FIR文件 放入缓存中
                 if(StringUtils.isNotEmpty(firDocPath)) {
                     firDocPath = firDocPath.replaceAll(
