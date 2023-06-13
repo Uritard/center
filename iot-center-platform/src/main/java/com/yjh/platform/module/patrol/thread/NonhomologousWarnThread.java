@@ -595,6 +595,12 @@ public class NonhomologousWarnThread implements Runnable{
         warnInfo.put("twoCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "instanceTwoName"));
         warnInfo.put("threeCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "instanceTriName"));
 
+        warnInfo.put("deviceName", MapUtils.getString(triphaseRuleMap, "deviceName"));
+        warnInfo.put("deviceTypeName", MapUtils.getString(triphaseRuleMap, "deviceTypeName"));
+        warnInfo.put("deviceMeteName", MapUtils.getString(triphaseRuleMap, "deviceMeteName"));
+        warnInfo.put("regionName", MapUtils.getString(triphaseRuleMap, "regionName"));
+        warnInfo.put("customName", MapUtils.getString(triphaseRuleMap, "customName"));
+
         String alarmType = triphaseType == 2 ? "3" : "4";
 
         insertNonhomologousWarnInfo(warnInfo, alarmType);

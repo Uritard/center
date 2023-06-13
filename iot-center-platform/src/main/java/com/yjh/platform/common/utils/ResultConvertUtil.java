@@ -21,13 +21,13 @@ public class ResultConvertUtil {
 
     public static void main(String[] args) {
 //        String a = " 表计表盘模糊 ";
-//        String b = " 挂空悬浮物  鸟巢  鸟巢 ";
+       String b = " 挂空悬浮物,鸟巢,鸟巢    鸟巢,meibn, ";
 //        String c = "分";
        String d = "分_合_合_合_合 合 合";
 //        System.out.println(convertResult(a));
 //        System.out.println(convertResult(b));
 //        System.out.println(convertResult(c));
-       System.out.println(convertResult(d));
+       System.out.println(convertQXResult(b));
         System.out.println(convertResult("机器人任务异常"));
         System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
     }
@@ -49,7 +49,7 @@ public class ResultConvertUtil {
             return StringUtils.substring(code, code.length() - 1, code.length());
         } else if (StringUtils.containsAny(result, ARR)) {
             return String.valueOf(StringUtils.split(result,"_ ").length);
-        } else if (StringUtils.contains(result, "正常")) {
+        } else if (StringUtils.containsAny(result, "正常", "未见异常")) {
             return "0";
         } else if (StringUtils.contains(result, "任务异常")) {
             return "-1";
@@ -112,10 +112,11 @@ public class ResultConvertUtil {
      * @return resultNum 目标值
      */
     public static String convertQXResult(String result) {
+        if (StringUtils.containsAny(result, "正常", "未见异常")) {
+            return "0";
+        }
         if (StringUtils.isNotEmpty(result)){
-            result = result.replace(","," ")
-                    .replace("，"," ");
-            return String.valueOf(result.split(" ").length);
+            return String.valueOf(StringUtils.split(result, ", ").length);
         }
         return "0";
     }
@@ -142,7 +143,7 @@ public class ResultConvertUtil {
                     return StringUtils.substring(code, code.length() - 1, code.length());
                 } else if (StringUtils.containsAny(result, ARR)) {
                     return String.valueOf(StringUtils.split(result,"_ ").length);
-                } else if (StringUtils.contains(result, "正常")) {
+                } else if (StringUtils.containsAny(result, "正常", "未见异常")) {
                     return "0";
                 } else if (StringUtils.contains(result, "任务异常")) {
                     return "-1";
