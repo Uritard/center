@@ -640,14 +640,14 @@ public class UPatrolTaskService {
             //判断是不是机器人或者无人机
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
 
+            // 如果不是上报的任务结束，则走更新任务状态逻辑
+            updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
+
             // 如果下级上报任务结束，则走任务结束处理逻辑，避免提前更改任务状态
             if (robotEnd) {
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
                 ScheduledMapConfig.schedule(15, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
-            } else {
-                // 如果不是上报的任务结束，则走更新任务状态逻辑
-                updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
             }
 
             if (robotId != null){
@@ -866,7 +866,7 @@ public class UPatrolTaskService {
      */
     public void checkCompletionTask(String taskId) {
         String taskState = (String)redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "taskState");
-        if (taskIsEnded(NumberUtils.toInt(taskState))) {
+        if (!taskIsEnded(NumberUtils.toInt(taskState))) {
             forceCompletionTask(taskId);
         }
     }
@@ -2172,7 +2172,10 @@ public class UPatrolTaskService {
 
                 all = MapUtils.getIntValue(resultCountsMap, "all", 0);
 
-                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
+                resultCountsMap.put("taskState", String.valueOf(taskStatus));
+                resultCountsMap.put("ended", "true");
+
+                redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
             }
             if (ended) {
                 log.warn("taskId is:{} , already ended； {}", taskId, ended);
