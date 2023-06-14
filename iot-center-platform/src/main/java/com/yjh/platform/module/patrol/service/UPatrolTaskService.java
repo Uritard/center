@@ -1445,7 +1445,9 @@ public class UPatrolTaskService {
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
                 //删除初始化的一条
                 uPatrolTaskDao.deleteInitByPrimaryId(taskId);
-                return uPatrolTaskDao.deleteByPrimaryId(taskId);
+                int result = uPatrolTaskDao.deleteByPrimaryId(taskId);
+                deleteTransfer(source, planId, taskId, startTime);
+                return result;
             }
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
             JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName);
@@ -1453,7 +1455,20 @@ public class UPatrolTaskService {
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条
         uPatrolTaskDao.deleteInitByPrimaryId(taskId);
-        int result = this.uPatrolTaskDao.deleteByPrimaryId(taskId);
+        deleteTransfer(source, planId, taskId, startTime);
+        int result = uPatrolTaskDao.deleteByPrimaryId(taskId);
+        deleteTransfer(source, planId, taskId, startTime);
+        return result;
+    }
+
+    /**
+     * 任务删除同步
+     * @param source
+     * @param planId
+     * @param taskId
+     * @param startTime
+     */
+    public void deleteTransfer(String source, Long planId, String taskId, String startTime){
         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
         //边缘节点无需上报或下发
         if (!"1".equals(edgeLevel)) {
@@ -1463,9 +1478,9 @@ public class UPatrolTaskService {
                 List<Long> instanceIdList = uPatrolPlanAttrList.stream().map(UPatrolPlanAttr::getInstanceId).collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(instanceIdList)) {
                     List<TCruisePointInstanceNameDetail> tCruisePointInstanceNameDetails =
-                        tCruisePointInstanceDao.selectForTask(instanceIdList);
+                            tCruisePointInstanceDao.selectForTask(instanceIdList);
                     Set<String> edgeCode = tCruisePointInstanceNameDetails.stream().map(TCruisePointInstanceNameDetail::getEdgeCode)
-                        .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
+                            .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
                     if (CollectionUtils.isNotEmpty(edgeCode)) {
                         //删除下级系统任务信息
                         robotProxy.deleteTransfer(new ArrayList<>(edgeCode), taskId, startTime,source);
@@ -1495,11 +1510,7 @@ public class UPatrolTaskService {
                     e.printStackTrace();
                 }
             }
-
         }
-
-
-        return result;
     }
 
     public int taskPauseWithoutRobot(String taskId) {
