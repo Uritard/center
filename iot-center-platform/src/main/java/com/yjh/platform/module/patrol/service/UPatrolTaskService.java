@@ -3136,7 +3136,6 @@ public class UPatrolTaskService {
             return null;
         }
 
-        redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId(),"done",3,TimeUnit.DAYS);
 
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
         tCruiseTaskAdd.setIfRun(173);
@@ -3164,6 +3163,8 @@ public class UPatrolTaskService {
         if (Objects.isNull(uPatrolTask.getTaskCode())) {
             uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
         }
+
+        redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTask.getTaskId(),"done",3,TimeUnit.DAYS);
 
         List<Long> instanceList = insertTaskAttrForRetry(uPatrolTask, tCruiseTaskAdd,instanceIdList);
         if (CollectionUtils.isEmpty(instanceList)) {
