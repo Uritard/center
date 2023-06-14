@@ -122,11 +122,11 @@ public class TCruiseNonhomologousPointInstanceService {
                 String taskCode = listMaps.get(0).get("task_id").toString();
                 Long inspectionId = (Long)listMaps.get(0).get("inspection_id");
                 String robotName = tCruiseNonhomologousPointInstanceDao.getCruiseDeviceInfo(taskCode,inspectionId);
-                StringJoiner meteNames = new StringJoiner("/");
-                listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
+                // StringJoiner meteNames = new StringJoiner("/");
+                // listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
                 tCruiseNonhomologousWarnInfo.put("deviceName",tCruiseNonhomologousWarnDO.getDeviceName());
                 tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",robotName);
-                tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
+                tCruiseNonhomologousWarnInfo.put("deviceMeteTime", tCruiseNonhomologousWarnDO.getDeviceMeteName());
                 tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
                 tCruiseNonhomologousWarnInfo.put("delayName", tCruiseNonhomologousWarnDO.getRegionName());
                 tCruiseNonhomologousWarnInfo.put("customName", tCruiseNonhomologousWarnDO.getCustomName());
@@ -136,9 +136,9 @@ public class TCruiseNonhomologousPointInstanceService {
                 tCruiseNonhomologousWarnInfo.put("oneCruiseDeviceName",tCruiseNonhomologousWarnDO.getOneCruiseDeviceName());
                 tCruiseNonhomologousWarnInfo.put("twoCruiseDeviceName",tCruiseNonhomologousWarnDO.getTwoCruiseDeviceName());
                 tCruiseNonhomologousWarnInfo.put("threeCruiseDeviceName",tCruiseNonhomologousWarnDO.getThreeCruiseDeviceName());
-                StringJoiner meteNames = new StringJoiner("/");
-                listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
-                tCruiseNonhomologousWarnInfo.put("deviceMeteTime",meteNames.toString());
+                // StringJoiner meteNames = new StringJoiner("/");
+                // listMaps.forEach(map -> meteNames.add(map.get("mete_name").toString()));
+                tCruiseNonhomologousWarnInfo.put("deviceMeteTime", tCruiseNonhomologousWarnDO.getDeviceMeteName());
                 tCruiseNonhomologousWarnInfo.put("warnTime", tCruiseNonhomologousWarnDO.getWarnTime());
                 tCruiseNonhomologousWarnInfo.put("delayName", tCruiseNonhomologousWarnDO.getRegionName());
                 tCruiseNonhomologousWarnInfo.put("customName", tCruiseNonhomologousWarnDO.getCustomName());

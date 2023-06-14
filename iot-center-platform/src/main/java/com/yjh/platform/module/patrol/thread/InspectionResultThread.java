@@ -140,6 +140,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("resultDesc", AbnormalResDescEnum.DATA_ERROR.getDesc());
             tCruiseTaskResultMap.put("cruiseResult", "" + CRUISE_RESULT_ABNORMAL);
             tCruiseTaskResultMap.put("cruiseAbnormal", "" + CRUISE_ABNORMAL_DATAABNORMAL);
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             robotPatrolTaskResult.setValid("0");
             return;
         }
@@ -365,8 +366,8 @@ public class InspectionResultThread implements Runnable{
         log.info("====This is the result of no algorithm==={}", value);
         try {
             int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
-            if (TypeEnum.INFRARED.getCode() == cruiseType || "已拍照".equals(value)) {
-                // 如果是红外，且没有配置算法，结果是已拍照，则num为-1，因为他需要调用算法获取结果或者直接得到结果
+            if (TypeEnum.INFRARED.getCode() == cruiseType && "已拍照".equals(value)) {
+                // 如果是红外，且没有配置算法，并且结果是已拍照，则num为-1，因为他需要调用算法获取结果或者直接得到结果
                 tCruiseTaskResultMap.put("resultNum", "-1");
             }
             String resultValue = tCruiseTaskResultMap.get("resultNum");
