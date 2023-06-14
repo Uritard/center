@@ -39,11 +39,11 @@
         `warn_content` )
         VALUES
             (
-            #{AlarmShield.shieldId, jdbcType=BIGINT},
-            #{AlarmShield.createUserId, jdbcType=BIGINT},
-            #{AlarmShield.endTime, jdbcType=TIMESTAMP},
-            #{AlarmShield.shieldType, jdbcType=INTEGER},
-            #{AlarmShield.warnCount, jdbcType=VARCHAR}
+            #{shieldId, jdbcType=BIGINT},
+            #{createUserId, jdbcType=BIGINT},
+            #{endTime, jdbcType=TIMESTAMP},
+            #{shieldType, jdbcType=INTEGER},
+            #{warnCount, jdbcType=VARCHAR}
             );
     </insert>
 
