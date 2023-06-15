@@ -253,7 +253,11 @@ public class TCruisePlanService{
     public List<InstanceTree> findInstanceByRegion(Long regionId) {
         List<Long> regionList = tStdRegionDao.selectDownId(regionId);
         List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionList);
-        return tCruisePlanDao.findInstanceTree(deviceIdList);
+        List<InstanceTree> list = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(deviceIdList)) {
+            list = tCruisePlanDao.findInstanceTree(deviceIdList);
+        }
+        return list;
     }
 
     @Transactional(rollbackFor = Exception.class)

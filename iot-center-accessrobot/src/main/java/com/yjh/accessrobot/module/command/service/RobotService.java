@@ -17,6 +17,7 @@ import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
@@ -332,7 +333,7 @@ public class RobotService {
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (StringUtils.equals(OFF_LINE, robotStatus)) {
             log.error("==========该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备==========");
-            return false;
+            throw new BusinessException("该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备！");
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(Constant.sendCode())
@@ -357,6 +358,10 @@ public class RobotService {
     public boolean feignEdgeTransfer(String edgeCode, String command) {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, 1);
         if (CollectionUtils.isNotEmpty(stdRegionList)) {
+            String edgeStatus = stdRegionList.get(0).getEdgeStatus();
+            if (StringUtils.isEmpty(edgeStatus) || StringUtils.equals(OFF_LINE, edgeStatus)){
+                throw new BusinessException("当前节点不在线，同步指令下发失败！");
+            }
             String stationCode = stdRegionList.get(0).getStationId();
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode())
@@ -370,7 +375,7 @@ public class RobotService {
             RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
             return true;
         } else {
-            return false;
+            throw new BusinessException("当前节点编码不匹配,请检查后下发！");
         }
     }
 
