@@ -1260,7 +1260,7 @@ public class UPatrolTaskService {
 
         taskList.forEach(task -> {
             if (task != null && StringUtils.isNoneBlank(task.getTaskId())) {
-                if (task.getIfRun().equals(TaskTypeEnum.NOW.getType())) {
+                if (task.getIfRun().equals(String.valueOf(TaskTypeEnum.NOW.getType()))) {
                     // 只有立即执行任务才需要额外发送启动命令
                     taskStart(task.getTaskId(), null, true);
                 }
