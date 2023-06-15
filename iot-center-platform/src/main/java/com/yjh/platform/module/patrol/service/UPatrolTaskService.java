@@ -866,7 +866,7 @@ public class UPatrolTaskService {
      */
     public void checkCompletionTask(String taskId) {
         String taskState = (String)redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "taskState");
-        if (!taskIsEnded(NumberUtils.toInt(taskState))) {
+        if (taskIsEnded(NumberUtils.toInt(taskState))) {
             forceCompletionTask(taskId);
         }
     }
