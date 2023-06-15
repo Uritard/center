@@ -151,5 +151,6 @@ public interface TStdDeviceDao {
     List<Map<String,Long>> selectFirstPresetIdByCameraIdList(@Param("list")List<String> cameraIdList);
 
     List<AreaInfo> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
+    List<AreaInfo> selectAreaTree();
 
 }

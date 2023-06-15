@@ -557,18 +557,14 @@ public class TStdDeviceService{
         switch (type){
             case "region":
                 //针对region的过滤
-                List<Long> regionIdByName = tStdRegionDao.selectRegionByRegName(name);
-                if(regionIdByName.isEmpty()){
-                    return devTreeByName;
+                List<AreaInfo> allTree = tStdDeviceDao.selectAreaTree();
+                allTree = assembleTrees(allTree);
+                if (StringUtils.isNotEmpty(name)){
+                    if (!matchName(allTree.get(0),name)){
+                        allTree.remove(0);
+                    };
                 }
-                String regionIdString  = StringUtils.join(regionIdByName,",");
-                Set<Long> allRegionByName = new HashSet<>();
-                List<Long> upRegionListTemp = tStdRegionDao.selectAllUpRegion(regionIdString);
-                List<Long> downRegionList = tStdRegionDao.selectDownRegion(regionIdString);
-                allRegionByName.addAll(upRegionListTemp);
-                allRegionByName.addAll(downRegionList);
-                devTreeByName = tStdDeviceDao.selectRegTreeByRegionList(allRegionByName);
-                break;
+                return allTree;
             case "dev":
                 if ("camera".equals(deviceShow)){
                     //查相机设备
@@ -616,6 +612,27 @@ public class TStdDeviceService{
             default: throw new BusinessException("设备树展示层级输入有误！");
         }
         return assembleTrees(devTreeByName);
+    }
+
+    private Boolean matchName(AreaInfo node,String regionName){
+        if (node.getLabel().contains(regionName)){
+            return true;
+        }else {
+            List<AreaInfo> child = node.getChildren();
+            List<AreaInfo> newChild = new ArrayList<>();
+            if (child != null && child.size() > 0){
+                for (AreaInfo nodeItem : child){
+                    if (matchName(nodeItem,regionName)){
+                        newChild.add(nodeItem);
+                    }
+                }
+            }
+            node.setChildren(newChild);
+            if (newChild.size() > 0){
+                return true;
+            }
+            return false;
+        }
     }
 
     //设备树查询(level：5-间隔，6-设备，7-部位，8-点位，9巡视点；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人
