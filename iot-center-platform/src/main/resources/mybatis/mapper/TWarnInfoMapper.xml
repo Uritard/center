@@ -162,7 +162,8 @@
                                 video_path,
                                 value,
                                 out_range,
-                                task_id)
+                                task_id,
+                                alarm_owner)
         values (#{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
                 #{warnTime, jdbcType=TIMESTAMP},
@@ -189,7 +190,8 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR})
+                #{taskId, jdbcType=VARCHAR},
+                #{alarmOwner, jdbcType=INTEGER})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">

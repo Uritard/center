@@ -182,6 +182,7 @@ public class RobotInspectionWarnThread implements Runnable{
             if (StringUtils.isNotEmpty(type)) {
                 alarmSource = NumberUtils.toInt(analyseDataOperateService.selectDictCode("alarm_source", type),998);
             }
+            warnInfo.setAlarmOwner(1);
             warnInfo.setAlarmSource(alarmSource);
             warnInfo.setValue(taskAlarm.getValue());
             warnInfo.setTaskId(taskId);

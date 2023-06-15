@@ -2260,6 +2260,7 @@ CREATE TABLE `t_warn_info` (
   `value` varchar(100) DEFAULT '',
   `out_range` varchar(100) DEFAULT '',
   `task_id` varchar(512) DEFAULT '' COMMENT '任务ID',
+  `alarm_owner` int(11) DEFAULT NULL COMMENT '告警是用谁的告警规则产生的',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
 
