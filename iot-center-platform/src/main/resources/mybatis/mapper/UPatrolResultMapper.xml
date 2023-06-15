@@ -953,7 +953,8 @@
     <select id="selectWarnId" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         SELECT
                a.warn_id,
-               a.warn_name
+               a.warn_name,
+               a.alarm_owner
         FROM
         t_warn_info a
         WHERE
