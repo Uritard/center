@@ -322,18 +322,23 @@ public class MessageThread {
                     String taskId = item.get("task_code").toString();
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, true, edgeLevel);
                     boolean isRobotFlag = false;
+                    boolean isEdgeFlag = false;
                     String robotDevice = "";
+                    String edgeDevice = "";
+                    List<String> insList = new ArrayList<>();
                     if (standardPoints) {
-                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
-                        robotDevice = sendToUpSystemServices.selectIsDownSystem(instanceIds);
-                        isRobotFlag = StringUtils.isNotEmpty(robotDevice);
-                        tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
+                        insList = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_list").toString());
+                        tCruiseTaskAdd.setDeviceList(StringUtils.join(insList, ","));
                     }else {
-                        List<String> insList = Arrays.asList(item.get("device_list").toString());
-                        robotDevice = sendToUpSystemServices.selectIsDownSystem(insList);
-                        isRobotFlag = StringUtils.isNotEmpty(robotDevice);
+                        insList = Arrays.asList(item.get("device_list").toString());
                         tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
                     }
+                    robotDevice = sendToUpSystemServices.selectIsRobotDevice(insList);
+                    isRobotFlag = StringUtils.isNotEmpty(robotDevice);
+
+                    edgeDevice = sendToUpSystemServices.selectIsDownSystem(insList);
+                    isEdgeFlag = StringUtils.isNotEmpty(edgeDevice);
+
                     tCruiseTaskAdd.setUnionTaskStatus("1");
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     log.info("102联动任务组装好发送platform:{}", tCruiseTaskAdd);
@@ -344,9 +349,10 @@ public class MessageThread {
                     taskList.add(tCruiseTaskAdd);
                     map.put("list", taskList);
                     Result re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
-                    //非机器人的直接返回 机器人点的等待机器人返回结果
+                    //非机器人的和下级系统的直接返回 机器人点的等待机器人返回结果 下级的等下级返回
+                    log.info("platform响应结果:{}",re);
                     Constant.getParamMap.put("sendSessionId",sendSessionId);
-                    if (!isRobotFlag) {
+                    if (!isRobotFlag && !isEdgeFlag) {
                         List<Map<String, Object>> xmlItems = new ArrayList<>();
                         Map<String, Object> xmlItem = new HashMap<>();
                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
