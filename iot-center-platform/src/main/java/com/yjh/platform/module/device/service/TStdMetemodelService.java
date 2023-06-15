@@ -282,7 +282,7 @@ public class TStdMetemodelService {
 //        String path = "D:/code/voice";
 //        String returnPath = "D:/code/voice";
 
-        String fileName = "meteModel.xls";
+        String fileName = "meteModel.xlsx";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
