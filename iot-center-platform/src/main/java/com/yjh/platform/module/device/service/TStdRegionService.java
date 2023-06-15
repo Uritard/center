@@ -239,15 +239,35 @@ public class TStdRegionService{
     }
 
     public List<AreaInfoRegionCode> selectRegionByName(String regionName){
-        List<Long> regionIdByName = tStdRegionDao.selectRegionByRegName(regionName);
-        String regionIdString  = StringUtils.join(regionIdByName,",");
-        Set<Long> allRegionByName = new HashSet<>();
-        List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(regionIdString);
-        List<Long> downRegionList = tStdRegionDao.selectDownRegion(regionIdString);
-        allRegionByName.addAll(upRegionList);
-        allRegionByName.addAll(downRegionList);
-        List<AreaInfoRegionCode> treeList = tStdRegionDao.selectRegTreeByRegionList(allRegionByName);
-        return assembleTrees(treeList);
+        List<AreaInfoRegionCode> allTree = tStdRegionDao.selectAreaTree();
+        allTree = assembleTrees(allTree);
+        if (StringUtils.isNotEmpty(regionName)){
+            if (!matchName(allTree.get(0),regionName)){
+                allTree.remove(0);
+            };
+        }
+        return allTree;
+    }
+
+    private Boolean matchName(AreaInfoRegionCode node,String regionName){
+        if (node.getLabel().contains(regionName)){
+            return true;
+        }else {
+            List<AreaInfoRegionCode> child = node.getChildren();
+            List<AreaInfoRegionCode> newChild = new ArrayList<>();
+            if (child != null && child.size() > 0){
+                for (AreaInfoRegionCode nodeItem : child){
+                    if (matchName(nodeItem,regionName)){
+                     newChild.add(nodeItem);
+                    }
+                }
+            }
+            node.setChildren(newChild);
+            if (newChild.size() > 0){
+                return true;
+            }
+            return false;
+        }
     }
 
     public List<AreaInfoRegionCode> assembleTrees(Collection<AreaInfoRegionCode> trees) {
