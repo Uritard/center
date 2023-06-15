@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.user.mapper.CommonMenuDao">
+<mapper namespace="com.yjh.platform.module.user.dao.CommonMenuDao">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.CommonMenu">
@@ -8,13 +8,58 @@
         <result column="user_id" property="userId" />
         <result column="menu_code" property="menuCode" />
         <result column="menu_name" property="menuName" />
+        <result column="menu_img" property="menuImg" />
         <result column="sort" property="sort" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        user_id, menu_code, menu_name, sort
+        user_id, menu_code, menu_name, menu_img, sort
     </sql>
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.user.entity.CommonMenu">
+        INSERT INTO `common_menu` (
+            `user_id`,
+            `menu_code`,
+            `menu_name`,
+            `menu_img`,
+            `sort` )
+        VALUES
+            (
+                #{userId, jdbcType=BIGINT},
+                #{menuCode, jdbcType=VARCHAR},
+                #{menuName, jdbcType=VARCHAR},
+                #{menuImg, jdbcType=VARCHAR},
+                #{sort, jdbcType=VARCHAR}
+            );
+    </insert>
+
+    <insert id="batchAdd" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.user.entity.CommonMenu">
+        INSERT INTO `common_menu` (
+            `user_id`,
+            `menu_code`,
+            `menu_name`,
+            `menu_img`,
+            `sort` )
+        VALUES
+               <foreach collection="list" separator="," item="CommonMenu">
+            (
+                #{CommonMenu.userId, jdbcType=BIGINT},
+                #{CommonMenu.menuCode, jdbcType=VARCHAR},
+                #{CommonMenu.menuName, jdbcType=VARCHAR},
+                #{CommonMenu.menuImg, jdbcType=VARCHAR},
+                #{CommonMenu.sort, jdbcType=VARCHAR}
+            )
+               </foreach>
+    </insert>
+
+    <select id="selectByUserId" resultType="com.yjh.platform.module.user.entity.CommonMenu">
+        select * from common_menu where user_id = #{userId}
+    </select>
+
+    <delete id="deleteByUserId">
+        delete from common_menu where user_id = #{userId}
+    </delete>
 
 </mapper>

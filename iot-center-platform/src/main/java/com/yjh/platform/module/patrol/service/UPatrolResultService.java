@@ -89,10 +89,10 @@ public class UPatrolResultService {
     }
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
-        String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
+        String startTime, String endTime, List<Long> deviceIdList, String customId) {
         List<CruiseResultDetail> cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
-                    customId, isWarn);
+                    customId);
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
             .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("alarmLevel").add("meteKind");
