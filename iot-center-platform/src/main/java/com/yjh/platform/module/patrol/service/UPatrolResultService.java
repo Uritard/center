@@ -294,7 +294,7 @@ public class UPatrolResultService {
         log.info("tStdDeviceMete===" + tStdDevicemete);
 
         // 该巡视点无了,找不到对应
-        if (Objects.isNull(tStdDevicemete) || "-1".equals(afterManualReviewInfo.getModifyNum())){
+        if (Objects.isNull(tStdDevicemete)){
             return;
         }
         String personCheck = afterManualReviewInfo.getModifyNum().split(",")[0];
@@ -348,6 +348,10 @@ public class UPatrolResultService {
             if (Objects.nonNull(map.get("outRange"))) {
                 outRange = map.get("outRange").toString();
             }
+        }
+        // 审核值为-1 不会产生告警
+        if ("-1".equals(afterManualReviewInfo.getModifyNum())) {
+            isWarN = false;
         }
 
         //组装告警基本信息

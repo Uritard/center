@@ -229,18 +229,6 @@ public class TCruiseTaskResultController {
         return  result;
     }
 
-//    @ApiOperation(value = "B-展示任务采集图片阵列")
-//    @RequestMapping(value = "/selectImagePosition",method = RequestMethod.GET)
-//    public Result selectImagePosition(@RequestParam String taskId){
-//        Result result=new Result();
-//        try {
-//            result.setData(tCruiseTaskResultService.selectImagePosition(taskId));
-//        }catch (Exception e){
-//
-//        }
-//        return result;
-//    }
-
     @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
     @Logs(title = "查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间",content = "根据用户传递的参数查询当前任务异常巡视点、未巡视巡视点、已巡视巡视点",logType = 1,authority = "1234,1235")
