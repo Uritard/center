@@ -523,7 +523,8 @@ public class TCameraPresetService {
             executor.setRemoveOnCancelPolicy(true);
         }
         SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
-                silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode());
+                silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode()
+                ,silentConf.getChillTime());
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }
