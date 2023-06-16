@@ -321,7 +321,7 @@ public class PatrolResultHandler {
 
         String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
         String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
-        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+        String ftpsFilePath = String.valueOf(   redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
         boolean isAlarm = false;
         String descFilePath = "";
@@ -989,8 +989,12 @@ public class PatrolResultHandler {
             Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
             StringBuilder retVal  = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
             log.info("value: {}, defectMap=={}", retVal, JSON.toJSONString(defectMap));
-            redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
-            redisTemplate.opsForHash().putAll("defect:" + msgId + ":" + redisKeyTemp, defectMap);
+            String defectInfoKey = "defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp;
+            redisTemplate.opsForHash().putAll(defectInfoKey, defectMap);
+            redisTemplate.expire(defectInfoKey, 3, TimeUnit.DAYS);
+            String defectKey = "defect:" + msgId + ":" + redisKeyTemp;
+            redisTemplate.opsForHash().putAll(defectKey, defectMap);
+            redisTemplate.expire(defectKey, 3, TimeUnit.DAYS);
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
             log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));

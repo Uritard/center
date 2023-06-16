@@ -26,6 +26,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -251,6 +252,7 @@ public class RobotInspectionWarnThread implements Runnable{
         }
         log.info("defectMap==={}", defectMap);
         redisTemplate.opsForHash().putAll(defectName, defectMap);
+        redisTemplate.expire(defectName, 3, TimeUnit.DAYS);
     }
 
     private Map<String, String> getWarnOrDefectInfo(String taskId, Long instanceId){

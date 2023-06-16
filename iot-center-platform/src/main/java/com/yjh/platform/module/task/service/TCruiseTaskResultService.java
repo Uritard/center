@@ -28,7 +28,6 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -80,22 +79,7 @@ public class TCruiseTaskResultService {
     private TCruisePointInstanceDao tCruisePointInstanceDao;
 
     @Autowired
-    private TStdDeviceDao stdDeviceDao;
-
-    @Autowired
     private TDictBusinessDao tDictBusinessDao;
-
-    @Autowired
-    private TRobotInfoDao tRobotInfoDao;
-
-    @Autowired
-    private TCruiseTaskDao tCruiseTaskDao;
-
-    @Autowired
-    private TCruiseTaskAttrDao tCruiseTaskAttrDao;
-
-    @Autowired
-    private TCruiseResultDao tCruiseResultDao;
 
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
@@ -446,33 +430,10 @@ public class TCruiseTaskResultService {
                     Date date2 = o2.getCruiseTime();
                     return Long.compare(date2.getTime(), date1.getTime());
                 }
-        ).distinct().collect(Collectors.toList());
+        ).collect(Collectors.toList());
 
     }
 
-//    @Transactional(rollbackFor = Exception.class)
-//    public List<String> selectImagePosition(String taskId) {
-//        List<String> imageArray = new ArrayList<>();
-//        Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
-//        Long instanceCount = tCruiseResultDao.cruiseInspectCount(taskId).get(3);
-//
-//        for (int i = 0; i < instanceCount; i++) {
-//            imageArray.add(null);
-//        }
-//        if(cruiseKeys.size() !=0){
-//            int i=0;
-//            for(String key:cruiseKeys){
-//                Map<String,Object>cruiseMap=redisTemplate.opsForHash().entries(key);
-//                String imagePath=cruiseMap.get("picpath").toString();
-//                imageArray.set(i,imagePath);
-//                i++;
-//
-//            }
-//        }
-//
-//
-//        return imageArray;
-//    }
 
     public Map<String, Object> selectCruiseAdvance(String taskId) {
 
