@@ -1489,6 +1489,11 @@ public class RobotService {
         return tRobotInfoDao.selectTaskByTaskCode(taskCode);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public UPatrolTask selectTaskIdByTaskCode(String taskCode,Date time){
+        return tRobotInfoDao.selectTaskIdByTaskCode(taskCode,time);
+    }
+
     /**
      * 发送确认消息指令接口
      *

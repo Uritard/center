@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.handler;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.EdgeEnum;
+import com.yjh.accessrobot.module.command.entity.UPatrolTask;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -35,6 +36,8 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
     private RobotService robotService;
     @Autowired
     private RedisTemplate redisTemplate;
+
+    private static final String countForAbnormalKey = "countForAbnormal:";
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -80,6 +83,23 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         }
                     }
                     String taskPatrolledId = MapUtils.getString(resultMap, "task_patrolled_id");
+                    //所有返回给上级的taskPatrolledId 都是本级别生成的
+                    // 变电站编码_taskCode_执行时间
+                    log.info("机器人返回的taskPatrolledId：{}",taskPatrolledId);
+                    try {
+                        String taskCode = taskPatrolledId.split("_")[1];
+                        String time = taskPatrolledId.split("_")[2];
+                        Date robotTime = DateTimeUtil.parseFormat(time,DateTimeUtil.getDateTimePattern3());
+                        //根据taskCode找到taskId
+                        UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,robotTime);
+                        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+                        String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey+task.getTaskId(), "taskStart");
+                        taskPatrolledId = stationCode+"_"+task.getTaskId()+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
+                        log.info("本级上报的taskPatrolledId：{}",taskPatrolledId);
+                        xmlBaseModel.getItems().get(0).put("task_patrolled_id",taskPatrolledId);
+                    }catch (Exception e){
+                        log.info("构造本级taskPatrolledId出错：",e);
+                    }
                     if (StringUtils.isNotEmpty(errorCode)) {
                         log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskPatrolledId);
                         // 联动的返回结果直接向上反
