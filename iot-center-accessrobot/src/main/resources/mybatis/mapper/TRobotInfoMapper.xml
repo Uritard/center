@@ -1349,7 +1349,20 @@
             a.create_user_id
         from u_patrol_task a
         where 1 = 1
-          and a.task_id = #{taskCode, jdbcType=VARCHAR}
+          and a.task_code = #{taskCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectTaskIdByTaskCode" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.UPatrolTask">
+        SELECT
+        a.task_id
+        FROM
+        u_patrol_result a left join u_patrol_task b on a.task_id = b.task_id
+        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.task_state in (238,239,241)
+        <if test="executeTime != null">
+            and b.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
+        </if>
+        ORDER BY a.create_time desc
+        LIMIT 1
     </select>
     <select id="selectRobotCodeByNestNum" resultType="java.lang.String">
         SELECT
