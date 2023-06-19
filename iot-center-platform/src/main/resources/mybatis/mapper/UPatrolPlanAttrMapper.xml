@@ -305,7 +305,7 @@
         LEFT JOIN t_camera_info j ON g.camera_id = j.camera_id
         LEFT JOIN t_voice_device c ON a.position_id = c.voice_device_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = a.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id
         AND i.col_name = "custom_type"
         WHERE
         1 = 1
