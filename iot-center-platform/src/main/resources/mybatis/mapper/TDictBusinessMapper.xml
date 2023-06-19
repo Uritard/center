@@ -158,9 +158,10 @@
             <foreach item="item" index="index" collection="colNames" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        ORDER BY a.sort asc
     </select>
 
-    
+
     <select id="selectCameraTypeAndRobotPosition" resultType="java.lang.String">
         SELECT dict_code FROM t_dict_business WHERE col_name= #{colName,jdbcType=VARCHAR} AND dict_note=#{dictNote,jdbcType=VARCHAR}
     </select>
