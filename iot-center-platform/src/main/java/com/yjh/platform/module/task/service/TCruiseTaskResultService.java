@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -221,6 +222,8 @@ public class TCruiseTaskResultService {
     }
 
     private void getDataFromRedis(CruiseInspectResult inspectResult, Map<String, String> resultMap) throws ParseException {
+        log.info("getDataFromRedis 方法入参：inspectResult：{}， resultMap：{}", JSONUtil.toJSONString(inspectResult), JSONUtil.toJSONString(resultMap));
+
         //最终结果集容器
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //从redis拿数据
@@ -261,8 +264,12 @@ public class TCruiseTaskResultService {
         }
         Map<String, String> videoInfo = new HashMap<>();
         if ("230".equals(resultMap.containsKey("cruiseType") ?
-                String.valueOf(resultMap.get("cruiseType")) : "")) {
+            String.valueOf(resultMap.get("cruiseType")) : "")) {
             videoInfo.put("videoCameraType", "2");
+        } else if ("524".equals(resultMap.containsKey("cruiseType") ?
+            String.valueOf(resultMap.get("cruiseType")) : "")) {
+            // 无人机视频流红外和可见光为一路流，需要额外处理
+            videoInfo.put("videoCameraType", "3");
         } else {
             videoInfo.put("videoCameraType", "1");
         }
@@ -283,8 +290,10 @@ public class TCruiseTaskResultService {
                 HashMap<String, Long> robot = new HashMap<>();
                 robot.put("robotId", Long.valueOf(resultMap.get("robotId")));
 
+                log.info("switch (videoInfo.get(\"videoCameraType\")), 参数：{}", JSONUtil.toJSONString(videoInfo));
                 switch (videoInfo.get("videoCameraType")) {
                     case "1":
+
                         Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                         List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>)result.getData();
                         if (CollectionUtils.isNotEmpty(robotVideoInfo)) {
@@ -310,11 +319,34 @@ public class TCruiseTaskResultService {
                         videoInfo.put("cameraId", robot.get("robotId").toString());
                         inspectResult.setVideoInfo(videoInfo);
                         break;
+                    case "3":
+                        // 获取无人机视频流
+                        Map<String, String> map = getDroneVideoInfo(robotId);
+                        if (map != null && map.size() == 3) {
+                            videoInfo.put("flvUrl", map.get("flvUrl"));
+                            videoInfo.put("rtmpUrl", map.get("rtmpUrlInferad"));
+                            videoInfo.put("webRtcUrl", map.get("webRtcUrl"));
+                        } else {
+                            videoInfo.put("flvUrl", null);
+                            videoInfo.put("rtmpUrl", null);
+                            videoInfo.put("webRtcUrl", null);
+                        }
+
+                        videoInfo.put("cameraId", robot.get("robotId").toString());
+                        inspectResult.setVideoInfo(videoInfo);
+                        break;
                     default:
                         break;
                 }
-                redisTemplate.opsForHash().putAll(cacheKey, videoInfo);
-                redisTemplate.expire(cacheKey, 60, TimeUnit.SECONDS);
+
+                log.info("视频流信息存入redis， cacheKey: {}, videoInfo: {}", cacheKey, JSONUtil.toJSONString(videoInfo));
+
+                try {
+                    redisTemplate.opsForHash().putAll(cacheKey, videoInfo);
+                    redisTemplate.expire(cacheKey, 60, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    log.error("redisTemplate.opsForHash().putAll(cacheKey, videoInfo) err", e);
+                }
             }
 
             //拉机器人的红外和可见光的视频流
@@ -341,6 +373,17 @@ public class TCruiseTaskResultService {
                 redisTemplate.opsForHash().putAll(cacheKey, videoInfo);
                 redisTemplate.expire(cacheKey, 60, TimeUnit.SECONDS);
             }
+        }
+    }
+
+    private Map<String, String> getDroneVideoInfo(String robotId) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            Result re = serviceRestTemplate.getForObject(Constant.DRONE_VIDEO, Result.class, robotId);
+            return ((List<Map<String, String>>)re.getData()).get(0);
+        } catch (Exception e) {
+            log.error("getDroneVideoInfo err, ", e);
+            return null;
         }
     }
 
