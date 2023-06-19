@@ -304,6 +304,30 @@
                 #{mpValue, jdbcType=VARCHAR}
         )
     </insert>
+
+    <insert id="batchAddConfig">
+        insert into t_voice_config
+        ( ftp_url,
+        owner,
+        owner_code,
+        port,
+        channel_num,
+        db_value,
+        f_value,
+        mp_value)
+        values
+        <foreach collection="list" item="TVoiceDevice" separator=",">
+            (#{TVoiceDevice.ftpUrl, jdbcType=VARCHAR},
+            #{TVoiceDevice.owner, jdbcType=VARCHAR},
+            #{TVoiceDevice.ownerCode, jdbcType=VARCHAR},
+            #{TVoiceDevice.port, jdbcType=INTEGER},
+            #{TVoiceDevice.channelNum, jdbcType=VARCHAR},
+            #{TVoiceDevice.dbValue, jdbcType=VARCHAR},
+            #{TVoiceDevice.fValue, jdbcType=VARCHAR},
+            #{TVoiceDevice.mpValue, jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
     <update id="updateConf" parameterType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">
         update t_voice_config a <set>
         <if test="ftpUrl != null">a.ftp_url = #{ftpUrl, jdbcType=VARCHAR},</if>

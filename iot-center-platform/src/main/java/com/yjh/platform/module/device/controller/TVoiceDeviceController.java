@@ -1,25 +1,33 @@
 package com.yjh.platform.module.device.controller;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.ExcelReadListener;
+import com.yjh.platform.common.utils.ModelExcelListener;
+import com.yjh.platform.module.device.entity.ExcelEntity;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDevice;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -332,6 +340,38 @@ public class TVoiceDeviceController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "excel导入声纹设备")
+    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    @Logs(title = "excel导入声纹设备",content = "excel导入声纹设备",logType = 1)
+    public Result importExcel(MultipartFile file) {
+        Result result = new Result();
+        try {
+            InputStream inputStream = file.getInputStream();
+            String[] heards = new String[] {"设备名称", "所属区域", "IP", "端口号", "通道号", "分贝告警值", "频率告警值", "设备类型", "设备型号", "生产厂家"};
+            ExcelReadListener<VoiceDeviceAllInfoDetail> modelExcelListener = new ExcelReadListener<>(heards);
+            ReadSheet readSheet = new ReadSheet(0);
+            EasyExcelFactory.read(inputStream, VoiceDeviceAllInfoDetail.class, modelExcelListener).headRowNumber(1).build().read(readSheet);
+
+            List<VoiceDeviceAllInfoDetail> excelEntities = modelExcelListener.getExcelEntities();
+            List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
+
+            if (CollectionUtils.isNotEmpty(excelEntities)) {
+                List<String> errorList = tVoiceDeviceService.importExcel(excelEntities);
+                errorExcelList.addAll(errorList);
+            }
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(ExcelReadListener.prettyErrors(errorExcelList));
+            }
+        } catch (BusinessException e){
+            result.setCode(e.getCode(), e.getMessage());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "导入失败，请检查上传 excel 格式是否正确!");
+            log.error("发生异常:", e);
         }
         return result;
     }

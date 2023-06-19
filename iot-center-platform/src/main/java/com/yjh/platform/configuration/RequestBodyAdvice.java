@@ -3,11 +3,8 @@ package com.yjh.platform.configuration;
 
 import com.yjh.platform.common.utils.LogUtil;
 import com.yjh.platform.common.utils.NumConstant;
-import com.yjh.platform.common.utils.SecretAnnotation;
+import com.yjh.platform.common.annotation.SecretAnnotation;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.common.utils.smUtil.SM2Utils;
-import com.yjh.platform.common.utils.smUtil.Util;
-import org.bouncycastle.util.encoders.Base64;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
