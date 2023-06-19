@@ -5,11 +5,15 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.KeepWatchJob;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -24,12 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
-
-
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,6 +58,8 @@ public class TCameraInfoService {
     private SysUserDao sysUserDao;
     @Autowired
     private SysUserDevicePermissionDao sysUserDevicePermissionDao;
+    @Resource
+    private TStdRegionDao tStdRegionDao;
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
@@ -574,6 +579,50 @@ public class TCameraInfoService {
             log.info("cameraId: {} stopStream failed", cameraId);
         }
     }
+
+    public void importCameraInfo(List<TCameraInfoExcel> excelEntities) {
+        List<String> errorStr = new ArrayList<>();
+        List<TCameraInfo> tCameraInfos = new ArrayList<>();
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
+        List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
+        excelEntities.forEach(t -> {
+            TCameraInfo tCameraInfo = new TCameraInfo();
+            List<TStdRegion> regionList = stdRegionList.stream().filter(r -> r.getRegionName().equals(t.getRegionName())).collect(Collectors.toList());
+            List<TCameraRecorder> recorderList = tCameraRecorderList.stream().filter(r -> r.getRecordName().equals(t.getRecordName())).collect(Collectors.toList());
+            //只插入匹配的数据 其余不插入
+            if (CollectionUtils.isNotEmpty(regionList) && CollectionUtils.isNotEmpty(recorderList)){
+                tCameraInfo.setUpRegionId(regionList.get(0).getRegionId());
+                tCameraInfo.setRecordId(recorderList.get(0).getRecordId());
+                tCameraInfo.setPmsId(t.getPmsId());
+                tCameraInfo.setCameraType(t.getCameraType());
+                tCameraInfo.setCameraModel(t.getCameraModel());
+                tCameraInfo.setCameraName(t.getCameraName());
+                tCameraInfo.setAliasName(t.getAliasName());
+                tCameraInfo.setCameraIp(t.getCameraIp());
+                tCameraInfo.setPort(t.getPort());
+                tCameraInfo.setInfreadPort(t.getInfreadPort());
+                tCameraInfo.setCameraManager(t.getCameraManager());
+                tCameraInfo.setCameraCode(t.getCameraCode());
+                tCameraInfo.setChannelNum(t.getChannelNum());
+                tCameraInfo.setUnit(t.getUnit());
+                tCameraInfo.setAddress(t.getAddress());
+                tCameraInfo.setVendorId(t.getVendorId());
+                tCameraInfo.setLongitude(t.getLongitude());
+                tCameraInfo.setLatitude(t.getLatitude());
+                tCameraInfo.setIsControl(t.getIsControl());
+                tCameraInfo.setCommissionDate(t.getCommissionDate());
+            }else {
+                errorStr.add(t.getCameraName());
+            }
+            tCameraInfos.add(tCameraInfo);
+        });
+        tCameraInfoDao.batchInsert(tCameraInfos);
+        this.intoRedis();
+        if (!errorStr.isEmpty()){
+            throw new BusinessException("摄像机台账导入失败！请检查台账信息！" + errorStr);
+        }
+    }
+
 }
 
 
