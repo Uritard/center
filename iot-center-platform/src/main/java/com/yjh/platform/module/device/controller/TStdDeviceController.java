@@ -553,4 +553,21 @@ public class TStdDeviceController {
         }
         return result;
     }
+
+
+
+    @ApiOperation(value = "根据设备查询设备下的点位树")
+    @RequestMapping(value = "/selectMeteTreeByDeviceId", method = RequestMethod.GET)
+    @Logs(title = "根据设备查询设备下的点位树",content = "根据设备查询设备下的点位树",logType = 1)
+    public Result selectDevTreeByName(@RequestParam(value = "id", required = false) Long id) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeNew("8",null,null,null,id,null);
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }
