@@ -306,7 +306,7 @@ public class TCameraRecorderController {
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询Id和name失败：" + e);
+            log.error("导入NVR台账失败：" + e);
         }
         return result;
     }
