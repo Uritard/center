@@ -191,11 +191,11 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> selectByPage(Integer robotPosition,String robotName,String buildingUser,Integer robotFactory,Integer robotType, Integer droneType,String robotSource,Integer isUse,
+    public List<TRobotInfo> selectByPage(Integer dronePosition,Integer robotPosition,String robotName,String buildingUser,Integer robotFactory,Integer robotType, Integer droneType,String robotSource,Integer isUse,
                                           String address,Integer type, List<Long> regionIdList) {
         List<TRobotInfo> tRobotInfoList = new ArrayList<>();
         if (type != null && type == 2){
-            tRobotInfoList = tRobotInfoDao.selectDroneByPage(robotName,buildingUser,robotFactory,droneType,robotSource,isUse,address,regionIdList);
+            tRobotInfoList = tRobotInfoDao.selectDroneByPage(dronePosition,robotName,buildingUser,robotFactory,droneType,robotSource,isUse,address,regionIdList);
         }else {
             tRobotInfoList = tRobotInfoDao.selectRobotByPage(robotPosition,robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
         }
