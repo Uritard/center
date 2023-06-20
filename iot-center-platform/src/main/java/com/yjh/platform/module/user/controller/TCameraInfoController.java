@@ -395,7 +395,7 @@ public class TCameraInfoController {
                 tCameraInfoService.importCameraInfo(excelEntities);
             }
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("导入摄像机台账失败：" + e);
         }
         return result;

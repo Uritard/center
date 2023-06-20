@@ -580,6 +580,7 @@ public class TCameraInfoService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void importCameraInfo(List<TCameraInfoExcel> excelEntities) {
         List<String> errorStr = new ArrayList<>();
         List<TCameraInfo> tCameraInfos = new ArrayList<>();
@@ -611,13 +612,15 @@ public class TCameraInfoService {
                 tCameraInfo.setLatitude(t.getLatitude());
                 tCameraInfo.setIsControl(t.getIsControl());
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
+                tCameraInfos.add(tCameraInfo);
             }else {
                 errorStr.add(t.getCameraName());
             }
-            tCameraInfos.add(tCameraInfo);
         });
-        tCameraInfoDao.batchInsert(tCameraInfos);
-        this.intoRedis();
+        if (CollectionUtils.isNotEmpty(tCameraInfos)) {
+            tCameraInfoDao.batchInsert(tCameraInfos);
+            this.intoRedis();
+        }
         if (!errorStr.isEmpty()){
             throw new BusinessException("摄像机台账导入失败！请检查台账信息！" + errorStr);
         }
