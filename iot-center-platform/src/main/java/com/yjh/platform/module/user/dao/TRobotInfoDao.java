@@ -79,14 +79,15 @@ public interface TRobotInfoDao {
         @Param(value = "isUse") Integer isUse,
         @Param(value = "regionIdList") List<Long> regionIdList);
 
-    List<TRobotInfo> selectDroneByPage(@Param(value = "robotName") String robotName,
-                                @Param(value = "buildingUser") String buildingUser,
-                                  @Param(value = "robotFactory") Integer robotFactory,
-                                  @Param(value = "droneType") Integer droneType,
-                                  @Param(value = "robotSource") String robotSource,
-                                  @Param(value = "isUse") Integer isUse,
-                                  @Param(value = "address") String address,
-                                  @Param(value = "regionIdList") List<Long> regionIdList);
+    List<TRobotInfo> selectDroneByPage(@Param(value = "dronePosition") Integer dronePosition,
+                                       @Param(value = "robotName") String robotName,
+                                       @Param(value = "buildingUser") String buildingUser,
+                                       @Param(value = "robotFactory") Integer robotFactory,
+                                       @Param(value = "droneType") Integer droneType,
+                                       @Param(value = "robotSource") String robotSource,
+                                       @Param(value = "isUse") Integer isUse,
+                                       @Param(value = "address") String address,
+                                       @Param(value = "regionIdList") List<Long> regionIdList);
 
     int batchInsert(@Param("list") List<TRobotInfo> list);
     List<TRobotInspectionTree> selectInspectionTree(@Param(value = "robotId")  Long robotId,

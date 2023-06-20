@@ -491,7 +491,7 @@
         <if test="robotSource != null and robotSource != '' ">and a.robot_source LIKE CONCAT('%',#{robotSource, jdbcType=VARCHAR},'%')</if>
         <if test="isUse != -1 ">and a.is_use = #{isUse,jdbcType=INTEGER}</if>
         <if test="address != null and address != '' ">and a.address LIKE CONCAT('%',#{address, jdbcType=VARCHAR},'%')</if>
-
+        <if test="dronePosition != -1 ">and a.drone_position = #{dronePosition,jdbcType=INTEGER}</if>
         <if test="regionIdList != null and regionIdList.size() > 0">and a.up_region_id in
             <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >
                 #{upRegionIds,jdbcType=BIGINT}
