@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
 import com.yjh.platform.common.result.BusinessException;
@@ -13,6 +15,9 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.dao.TSysParamDao;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -32,6 +37,9 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author lqh
@@ -741,6 +749,41 @@ public class TVoiceDeviceService{
                 audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(tVoiceDevice.getVoiceCode()));
             }
         });
+    }
+
+
+    /**
+     * 新建测点
+     *
+     * @param buildList 模型巡视点列表
+     */
+    @Transactional
+    public List<String> importExcel(List<VoiceDeviceAllInfoDetail> buildList)  {
+        log.info("开始执行导入:{}", new Date());
+
+        List<TStdRegion> regionList = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
+
+        //替换区域Id
+        Map<String, TStdRegion> regionNameToId =
+            regionList.stream().collect(Collectors.toMap(TStdRegion::getRegionName, Function.identity(), (o1, o2) -> o1));
+
+        List<String> errorList = new ArrayList<>();
+        List<VoiceDeviceAllInfoDetail> insetList = new ArrayList<>();
+        buildList.forEach(o -> {
+            Long regionId = regionNameToId.getOrDefault(o.getRegionName(), new TStdRegion()).getRegionId();
+            if (regionId == null) {
+                errorList.add("【" + o.getVoiceDeviceName() + "】设备所属区域不存在");
+                return;
+            }
+            o.setUpRegionId(regionId);
+            if(StringUtils.isNotEmpty(o.getVoiceCode())){
+                audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(o.getVoiceCode()));
+            }
+            tVoiceDeviceDao.addConf(o);
+            insetList.add(o);
+        });
+        tVoiceDeviceDao.batchAdd(insetList);
+        return errorList;
     }
 
 }

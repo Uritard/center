@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils;
+package com.yjh.platform.common.annotation;
 
 import org.springframework.stereotype.Component;
 

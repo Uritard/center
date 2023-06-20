@@ -1,7 +1,9 @@
 package com.yjh.platform.module.device.entity;
 
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.yjh.platform.common.annotation.ExcelExtend;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
@@ -24,6 +26,7 @@ public class VoiceDeviceAllInfoDetail{
 
     @Length(max = 255, message = "voiceDeviceName长度必须小于等于255")
     @ApiModelProperty(value = "声纹监控设备名称（）")
+    @ExcelProperty(value = "设备名称")
     private String voiceDeviceName;
 
     @Max(value = 999999999999999999L)
@@ -47,21 +50,28 @@ public class VoiceDeviceAllInfoDetail{
 
     @Length(max = 32, message = "voiceType长度必须小于等于32")
     @ApiModelProperty(value = "设备类型")
+    @ExcelProperty(value = "设备类型")
+    @ExcelExtend(dictType = "voiceType")
     private String voiceType;
     private String voiceTypeName;
 
     @Length(max = 32, message = "voiceModel长度必须小于等于32")
     @ApiModelProperty(value = "设备型号")
+    @ExcelProperty(value = "设备型号")
+    @ExcelExtend(dictType = "voiceModel")
     private String voiceModel;
     private String voiceModelName;
 
     @Length(max = 32, message = "voiceFactory长度必须小于等于32")
     @ApiModelProperty(value = "生产厂家")
+    @ExcelProperty(value = "生产厂家")
+    @ExcelExtend(dictType = "voiceFactory")
     private String voiceFactory;
     private String voiceFactoryName;
 
     @Length(max = 255, message = "ftp地址长度必须小于等于255")
     @ApiModelProperty(value = "ftp地址")
+    @ExcelProperty(value = "IP")
     private String ftpUrl;
 
     @Length(max = 32, message = "所属电站长度必须小于等于32")
@@ -78,6 +88,7 @@ public class VoiceDeviceAllInfoDetail{
 
     @Max(value = 999999)
     @ApiModelProperty(value = "端口号")
+    @ExcelProperty(value = "端口号")
     private Integer port;
 
     @Length(max = 255, message = "Ftp声纹绝对路径长度必须小于等于255")
@@ -92,11 +103,13 @@ public class VoiceDeviceAllInfoDetail{
 
     @Length(max = 11, message = "分贝告警值长度必须小于等于11")
     @ApiModelProperty(value = "分贝告警值")
+    @ExcelProperty(value = "分贝告警值")
     @TableField("dbValue")
     private String dbValue;
 
     @Length(max = 11, message = "频率限值长度必须小于等于11")
     @ApiModelProperty(value = "频率限值")
+    @ExcelProperty(value = "频率告警值")
     private String fValue;
 
     @Length(max = 11, message = "幅值限值长度必须小于等于11")
@@ -108,8 +121,10 @@ public class VoiceDeviceAllInfoDetail{
     private String filePath;
 
     @Length(max = 32, message = "channelNum长度必须小于等于32")
+    @ExcelProperty(value = "通道号")
     private String channelNum;
 
+    @ExcelProperty(value = "所属区域")
     private String regionName;
 
     private String deviceName;
@@ -137,6 +152,7 @@ public class VoiceDeviceAllInfoDetail{
         this.state = state;
     }
 
+    @ExcelExtend(defaultValue = "离线")
     private String state;
     /**
      * 节点编码

@@ -3,10 +3,7 @@ package com.yjh.platform.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yjh.platform.common.utils.LogUtil;
-import com.yjh.platform.common.utils.SecretAnnotation;
-import com.yjh.platform.common.utils.SecretAnnotations;
-import com.yjh.platform.common.utils.smUtil.SM2Utils;
-import com.yjh.platform.common.utils.smUtil.Util;
+import com.yjh.platform.common.annotation.SecretAnnotations;
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
