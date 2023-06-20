@@ -556,13 +556,13 @@ public class TStdDeviceController {
 
 
 
-    @ApiOperation(value = "根据设备查询设备下的点位树")
-    @RequestMapping(value = "/selectMeteTreeByDeviceId", method = RequestMethod.GET)
-    @Logs(title = "根据设备查询设备下的点位树",content = "根据设备查询设备下的点位树",logType = 1)
-    public Result selectDevTreeByName(@RequestParam(value = "id", required = false) Long id) {
+    @ApiOperation(value = "根据设备名称模糊查询，然后查出设备下的所有测点")
+    @RequestMapping(value = "/selectMeteTreeByDeviceName", method = RequestMethod.GET)
+    @Logs(title = "根据设备名称模糊查询，然后查出设备下的所有测点",content = "根据设备名称模糊查询，然后查出设备下的所有测点",logType = 1)
+    public Result selectDevTreeByName(@RequestParam(value = "name", required = false) String name) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeNew("8",null,null,null,id,null);
+            List<AreaInfo> devTreeList = tStdDeviceService.selectMeteTreeByDeviceName(name);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
