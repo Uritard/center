@@ -7,6 +7,8 @@ import com.yjh.accessvideo.module.control.entity.DroneLoginResult;
 import com.yjh.accessvideo.module.control.entity.DronePlayStreamResult;
 import com.yjh.accessvideo.module.control.entity.DronePlayStreamResultData;
 import com.yjh.accessvideo.module.control.entity.RobotConInfo;
+import com.yjh.accessvideo.module.control.entity.VideoInfo;
+import com.yjh.accessvideo.videostreamer.ProcessManager;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,9 @@ public class DroneCameraConService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Resource
+    private ProcessManager manager;
 
     /**
      * 获取无人机的三路视频流（无人机、机巢内、机巢外）
@@ -91,6 +96,54 @@ public class DroneCameraConService {
         log.info("获取无人机的三路视频流,getPlayStreamMap 结果,nestOutsideMap：{}", JSONUtil.toJSONString(nestOutsideMap));
 
         return Arrays.asList(droneMap, nestInnerMap, nestOutsideMap);
+    }
+
+    /**
+     * 获取无人机的三路视频流（无人机、机巢内、机巢外）
+     *
+     * @param robotId robotId
+     * @return result
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String, Object>> droneStartRealPlayNew(Long robotId) {
+        // 登录，获取token
+        RobotConInfo robotConInfo = cameraConDao.selectDroneConInfo(robotId);
+        log.info("cameraConDao.selectDroneConInfo(robotId), 查询结果：{}", JSONUtil.toJSONString(robotConInfo));
+
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
+        String nestInner = "0";
+        String nestOuter = "1";
+        String droneCamera = "3";
+
+        Map<String, Object> nestInnerMap = getWebRtcMap(robotConInfo, nestInner);
+        returnMapList.add(nestInnerMap);
+
+        Map<String, Object> nestOuterMap = getWebRtcMap(robotConInfo, nestOuter);
+        returnMapList.add(nestOuterMap);
+
+        Map<String, Object> droneCameraMap = getWebRtcMap(robotConInfo, droneCamera);
+        returnMapList.add(droneCameraMap);
+
+        return returnMapList;
+    }
+
+    private Map<String, Object> getWebRtcMap(RobotConInfo robotConInfo, String nestInner) {
+        Map<String, Object> returnInferadMap = new HashMap<>();
+        try {
+            String transUrlinferad = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "droneVideo"));
+            transUrlinferad = String.format(transUrlinferad, robotConInfo.getRobotIp(), robotConInfo.getNestCode() + nestInner, nestInner);
+            log.info("transUrlinferad: {}" , transUrlinferad);
+            VideoInfo videoInfoNestInner = new VideoInfo().setCommand(transUrlinferad).setId(nestInner);
+            manager.run(videoInfoNestInner);
+
+            String webRtc = "webrtc://" + hostIp + "/live/" + nestInner;
+            returnInferadMap.put("cameraType", nestInner);
+            returnInferadMap.put("webRtcUrl", webRtc);
+        } catch (Exception e) {
+            log.error("获取无人机视频流失败 getWebRtcMap err: ", e);
+        }
+
+        return returnInferadMap;
     }
 
     /**

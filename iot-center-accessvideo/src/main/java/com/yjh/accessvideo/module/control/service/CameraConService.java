@@ -121,7 +121,7 @@ public class CameraConService {
             String videoDefinition = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "realtimeVideoDefinition"));
             String transUrl = String.format(nvrRtmpVideo, userName, password, cameraIp, cameraPort, iChanNum,
                     videoDefinition, cameraId);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId.toString());
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");
@@ -172,7 +172,7 @@ public class CameraConService {
             int cameraType = cameraConInfo.getCameraType();
             String transUrl = String.format(nvrRtmpVideo, userName, password, cameraIp, cameraPort, iChanNum,
                     videoDefinition, cameraId);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId.toString());
             try {
                 manager.run(videoInfo);
             } catch (Exception e) {
@@ -238,7 +238,7 @@ public class CameraConService {
                 String robotInfraredVideo =  String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotInfraredVideo"));
                 transUrlinferad = String.format(robotInfraredVideo, inferadIp, inferadPort, infraredCameraId);
             }
-            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(Long.parseLong(infraredCameraId));
+            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(infraredCameraId);
             manager.run(videoInfo2);
 
             log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort,
@@ -272,7 +272,7 @@ public class CameraConService {
             String robotLightVideo =  String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotLightVideo"));
             String transUrlLight = String.format(robotLightVideo, lightUsername, lightPassword, lightIp, lightPort, 1,
                 robotCameraId);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrlLight).setId(Long.parseLong(robotCameraId));
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrlLight).setId(robotCameraId);
             manager.run(videoInfo);
             log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword,
                 lightIp, lightPort, robotCameraId, transUrlLight);
@@ -343,7 +343,7 @@ public class CameraConService {
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                             "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id.toString());
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");
@@ -386,7 +386,7 @@ public class CameraConService {
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                             "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-            VideoInfo videoInfo = new VideoInfo().setBack(true).setCommand(transUrl).setId(id);
+            VideoInfo videoInfo = new VideoInfo().setBack(true).setCommand(transUrl).setId(id.toString());
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");
@@ -440,7 +440,7 @@ public class CameraConService {
                     , endtime, lightId);
 
             log.info("historyTransUrl: {}", transUrl);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(lightId);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(lightId.toString());
             manager.run(videoInfo);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -468,7 +468,7 @@ public class CameraConService {
                     starttime, endtime, infraredId);
 
             log.info("historyTransUrl: {}", transUrlIn);
-            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(infraredId);
+            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(infraredId.toString());
             manager.run(videoInfo2);
             String[] rtmpUrlsIn = transUrlIn.split("rtmp");
             String rtmpUrlIn = "rtmp" + rtmpUrlsIn[rtmpUrlsIn.length - 1];
@@ -3050,7 +3050,7 @@ public class CameraConService {
         //回放视频流可停止
         if (StringUtils.isNotBlank(rtmpUrl) && rtmpUrl.contains("history")) {
             cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
-            manager.terminate(cameraId);
+            manager.terminate(cameraId.toString());
             log.info("kill all history stream");
             StreamStopThread streamStopThread = new StreamStopThread();
             TaskExecutePool.getInstance().execute(streamStopThread);
@@ -3065,7 +3065,7 @@ public class CameraConService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String stopStream(Long cameraId) {
+    public String stopStream(String cameraId) {
         manager.terminate(cameraId);
         return "stop " + cameraId + " preview success!";
     }
@@ -3233,7 +3233,7 @@ public class CameraConService {
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                     "historyPath:{}, historyTransUrl: {}"
                 , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id.toString());
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");

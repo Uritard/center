@@ -75,7 +75,7 @@ public class CameraConController {
 
     @ApiOperation(value = "结束推流")
     @RequestMapping(value = "/stopStream", method = RequestMethod.GET)
-    public Result stopStream(@RequestParam(value = "cameraId") Long cameraId) {
+    public Result stopStream(@RequestParam(value = "cameraId") String cameraId) {
         Result result = new Result();
         try {
             result.setData(cameraConService.stopStream(cameraId));
@@ -831,7 +831,7 @@ public class CameraConController {
     public Result droneStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
-            result.setData(droneCameraConService.droneStartRealPlay(robotId));
+            result.setData(droneCameraConService.droneStartRealPlayNew(robotId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
