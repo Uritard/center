@@ -302,7 +302,10 @@ public class TCameraRecorderController {
             EasyExcelFactory.read(inputStream, TCameraRecorderExcel.class,cameraRecordModelExcelListener).headRowNumber(1).build().read(readSheet);
             List<TCameraRecorderExcel> excelEntities = cameraRecordModelExcelListener.getExcelEntities();
             if (CollectionUtils.isNotEmpty(excelEntities)) {
-                tCameraRecorderService.importCameraRecorder(excelEntities);
+                List<TCameraRecorder> tCameraRecorders = tCameraRecorderService.importCameraRecorder(excelEntities);
+                tCameraRecorders.forEach(t -> {
+                    sendPostRequest(Constant.NVR_REGISTER_URL,t.getRecordId());
+                });
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
