@@ -240,7 +240,7 @@ public class TCameraRecorderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void importCameraRecorder(List<TCameraRecorderExcel> excelEntities) {
+    public List<TCameraRecorder> importCameraRecorder(List<TCameraRecorderExcel> excelEntities) {
         List<TCameraRecorder> tCameraRecorders = new ArrayList<>();
         excelEntities.forEach(t -> {
             TCameraRecorder tCameraRecorder = new TCameraRecorder();
@@ -267,6 +267,7 @@ public class TCameraRecorderService {
         if (CollectionUtils.isNotEmpty(tCameraRecorders)) {
             this.batchInsert(tCameraRecorders);
         }
+        return tCameraRecorders;
     }
 
     @Transactional(rollbackFor = Exception.class)

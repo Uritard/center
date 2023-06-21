@@ -594,7 +594,7 @@ public class TCameraInfoService {
             if (CollectionUtils.isNotEmpty(regionList) && CollectionUtils.isNotEmpty(recorderList)){
                 tCameraInfo.setUpRegionId(regionList.get(0).getRegionId());
                 tCameraInfo.setRecordId(recorderList.get(0).getRecordId());
-                tCameraInfo.setPmsId(t.getPmsId());
+                tCameraInfo.setPmsId(StringUtils.isNotEmpty(t.getPmsId()) ? t.getPmsId() : "");
                 tCameraInfo.setCameraType(t.getCameraType());
                 tCameraInfo.setCameraModel(t.getCameraModel());
                 tCameraInfo.setCameraName(t.getCameraName());
