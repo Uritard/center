@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,8 +22,8 @@ public class ProcessManager {
     @Resource
     private RedisTemplate redisTemplate;
 
-    private final ConcurrentHashMap<Long, AutoRecoveredProcessRunner> runnerMap = new ConcurrentHashMap<Long, AutoRecoveredProcessRunner>();
-    private final ConcurrentHashMap<Long, AutoRecoveredProcessRunner> runnerBackMap = new ConcurrentHashMap<Long, AutoRecoveredProcessRunner>();
+    private final ConcurrentHashMap<String, AutoRecoveredProcessRunner> runnerMap = new ConcurrentHashMap<String, AutoRecoveredProcessRunner>();
+    private final ConcurrentHashMap<String, AutoRecoveredProcessRunner> runnerBackMap = new ConcurrentHashMap<String, AutoRecoveredProcessRunner>();
 
     public void run(VideoInfo videoInfo) throws RuntimeException, Exception {
         if (Optional.ofNullable(runnerMap.get(videoInfo.getId())).isPresent()) {
@@ -47,13 +48,13 @@ public class ProcessManager {
         }
     }
 
-    public void terminate(Long cameraId) {
+    public void terminate(String cameraId) {
         Optional.ofNullable(runnerMap.get(cameraId)).ifPresent(runner -> runner.terminate());
         runnerMap.remove(cameraId);
     }
 
     public void terminateAll() {
-        for (Long cameraId : runnerMap.keySet()) {
+        for (String cameraId : runnerMap.keySet()) {
             Optional.ofNullable(runnerMap.get(cameraId)).ifPresent(runner -> runner.terminate());
         }
         runnerMap.clear();
@@ -65,7 +66,7 @@ public class ProcessManager {
 
     @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 10 * 60 * 1000)
     public void checkOvertime() {
-        for (Long cameraId : runnerMap.keySet()) {
+        for (String cameraId : runnerMap.keySet()) {
             Optional.ofNullable(runnerMap.get(cameraId)).ifPresent(runner -> {
                 int runnedTime = Math.toIntExact((System.currentTimeMillis() - runner.getStartTime()) / (1000 * 60));
                 int overTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
