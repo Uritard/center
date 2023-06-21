@@ -414,6 +414,10 @@ public class TVoiceDeviceService{
         String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
         String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
 
+        if (!voicePath.contains(realPath)) {
+            // 异常保护，如果待分析的音频文件不是固定格式，不需要处理
+            return new ArrayList<>();
+        }
 
         String[] getId = voicePath.replaceAll(realPath,"").split("/");
         if(getId != null && getId.length>2){
