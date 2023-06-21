@@ -111,7 +111,9 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
                 channelHandlerContext.channel().close();
             }
         }
-        Constant.robotChannels.put(robotCode, ctx.channel().id().toString());
+        synchronized (Constant.robotChannels) {
+            Constant.robotChannels.put(robotCode, ctx.channel().id().toString());
+        }
         log.info("++++++之后的Constant.robotChannels:{}", Constant.robotChannels);
         Constant.robotThreadFlag.put(robotCode, true);
 

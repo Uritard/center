@@ -100,20 +100,22 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
         for (Map.Entry<String, String> vo : Constant.robotChannels.entrySet()) {
             log.info("当前的robotChannels的key为" + vo.getKey());
             String robotCode = vo.getKey();
-            String channelId = Constant.robotChannels.get(robotCode);
+            synchronized (robotChannels) {
+                String channelId = Constant.robotChannels.get(robotCode);
 
-            if (channelId.equals(String.valueOf(id))) {
-                robotService.updateRobotInfo(robotCode, "离线");
-                Map<String, String> robotStatusMap = redisTemplate.opsForHash()
-                        .entries("RobotStatus:" + robotCode + ":2");
-                // abnormal
-                robotStatusMap.put("value", "1");
-                // Update Robot Network Status
-                redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
-                Constant.robotChannels.remove(robotCode);
-                Constant.robotThreadFlag.put(robotCode, false);
-                Constant.robotRegisterFlag.put(robotCode, false);
-                log.info("id: " + channel.id() + ", robotCode: " + robotCode + " left," + "_onlineSize: " + maps.size());
+                if (channelId.equals(String.valueOf(id))) {
+                    robotService.updateRobotInfo(robotCode, "离线");
+                    Map<String, String> robotStatusMap = redisTemplate.opsForHash()
+                            .entries("RobotStatus:" + robotCode + ":2");
+                    // abnormal
+                    robotStatusMap.put("value", "1");
+                    // Update Robot Network Status
+                    redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
+                    Constant.robotChannels.remove(robotCode);
+                    Constant.robotThreadFlag.put(robotCode, false);
+                    Constant.robotRegisterFlag.put(robotCode, false);
+                    log.info("id: " + channel.id() + ", robotCode: " + robotCode + " left," + "_onlineSize: " + maps.size());
+                }
             }
         }
 
