@@ -1022,5 +1022,12 @@
         WHERE
             task_id = #{taskId, jdbcType=VARCHAR}
     </select>
-
+    <select id="selectDroneCodeByTaskCode" resultType="java.lang.String">
+        SELECT DISTINCT a.robot_code FROM t_robot_info a
+        LEFT JOIN t_robot_inspection b ON a.robot_id = b.robot_id
+        LEFT JOIN t_cruise_point_instance c ON b.inspection_id = c.cruise_id
+        LEFT JOIN u_patrol_task_attr d ON d.instance_id = c.instance_id
+        WHERE d.task_id = #{taskCode,jdbcType=VARCHAR}
+        and a.drone_type is not null
+    </select>
 </mapper>

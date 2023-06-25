@@ -166,4 +166,5 @@ public interface UPatrolTaskDao {
                                   @Param(value = "level")Integer level);
 
     String selectTaskName(@Param(value = "taskId") String taskId);
+    List<String> selectDroneCodeByTaskCode(@Param(value = "taskCode") String taskCode);
 }
