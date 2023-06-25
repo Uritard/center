@@ -26,12 +26,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -45,10 +47,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -2449,6 +2457,105 @@ public class CameraConService {
         HttpResponse response = httpclient.execute(httpPost);
         return  EntityUtils.toByteArray(response.getEntity());
     }
+
+    /**
+     *
+     *
+     * @param nStartX 参数范围 0~255
+     * @param nStartY 参数范围 0~255
+     * @param nEndX 参数范围 0~255
+     * @param nEndY 参数范围 0~255
+     * @param cameraId 相机编码
+     * @return
+     */
+    public Map<String, String> regionFocus(int nStartX, int nStartY, int nEndX, int nEndY, long cameraId) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            String cameraIp = cameraConInfo.getCameraIp();
+            String userName = cameraConInfo.getCameraManager();
+            String password = cameraConInfo.getCameraCode();
+            String inUrl = "/ISAPI/PTZCtrl/channels/1/position3D";
+            String inBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<position3D>\n" +
+                    "    <StartPoint>\n" +
+                    "        <positionX>" + nStartX + "</positionX>\n" +
+                    "        <positionY>" + nStartY + "</positionY>\n" +
+                    "    </StartPoint>\n" +
+                    "    <EndPoint>\n" +
+                    "        <positionX>" + nEndX + "</positionX>\n" +
+                    "        <positionY>" + nEndY + "</positionY>\n" +
+                    "    </EndPoint>\n" +
+                    "</position3D>\n";
+            HttpEntity entity = putISAPI(cameraIp, userName, password, inUrl, inBuffer);
+            if (entity != null) {
+                String xmlString = EntityUtils.toString(entity);
+                Map<String, String> resultMap = formatXmlString(xmlString);
+                if ("OK".equals(resultMap.get("statusString"))) {
+                    map.put("result", "ok");
+                } else {
+                    map.put("result", resultMap.get("subStatusCode"));
+                }
+            } else {
+                map.put("result", "error");
+            }
+        } catch (Exception e) {
+            log.error("区域对焦失败", e);
+        }
+        return map;
+    }
+
+    /**
+     * xml转换
+     * @param xmlString
+     * @return
+     */
+    public static Map<String, String> formatXmlString(String xmlString) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            // 将XML字符串转换为Document对象
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
+            // 获取根元素
+            Node rootElement = document.getDocumentElement();
+            // 遍历子元素
+            NodeList childNodes = rootElement.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childNode = childNodes.item(i);
+                if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                    map.put(childNode.getNodeName(), childNode.getTextContent());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
+     * 透传ISAPI
+     * @param ip
+     * @param username
+     * @param password
+     * @param isapiUrl
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public static HttpEntity putISAPI(String ip, String username, String password, String isapiUrl, String json)
+            throws Exception {
+        String url = "http://" + ip + isapiUrl;
+        HttpPut httpPut = new HttpPut(url);
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, creds);
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        httpPut.setEntity(new StringEntity(json, "UTF-8"));
+        HttpResponse response = httpclient.execute(httpPut);
+        return  response.getEntity();
+    }
+
 //    /**
 //     * 语音对讲开始
 //     *
