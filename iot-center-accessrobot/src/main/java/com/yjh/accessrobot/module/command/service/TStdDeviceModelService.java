@@ -288,7 +288,7 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setAlarmCnt(objToInt(device.get("alarm_cnt")));
             tStdDeviceMete.setThresholdAbs(objToBigDecimal(device.get("threshold_abs")));
             tStdDeviceMete.setThresholdPer(objToBigDecimal(device.get("threshold_per")));
-            tStdDeviceMete.setMeteType((String) device.get("mete_type"));
+            tStdDeviceMete.setMeteType(String.valueOf(device.getOrDefault("mete_type", "221")));
             tStdDeviceMete.setStateZero((String) device.get("state_zero"));
             tStdDeviceMete.setStateOne((String) device.get("state_one"));
             tStdDeviceMete.setAlarmState(objToInt(device.get("alarm_state")));
