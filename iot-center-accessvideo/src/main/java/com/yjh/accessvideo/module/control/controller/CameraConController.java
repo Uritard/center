@@ -681,6 +681,20 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "区域对焦")
+    @RequestMapping(value = "/regionFocus", method = RequestMethod.POST)
+    public Result regionFocus(@RequestParam(value = "nStartX") int nStartX,
+                              @RequestParam(value = "nStartY") int nStartY,
+                              @RequestParam(value = "nEndX") int nEndX,
+                              @RequestParam(value = "nEndY") int nEndY,
+                              @RequestParam(value = "cameraId") long cameraId){
+        Result result = new Result();
+        Map<String,String> map = cameraConService.regionFocus(nStartX, nStartY, nEndX, nEndY,cameraId);
+        result.setData(map);
+        result.setMessage("success");
+        return result;
+    }
+
 //    @ApiOperation(value = "开启可视对讲")
 //    @RequestMapping(value = "/startVoiceTalk", method = RequestMethod.GET)
 //    public Result startVoiceTalk( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
