@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.DeviceBaseReport;
 import com.yjh.platform.module.task.entity.DeviceMeteBaseReport;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -153,4 +154,8 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectRegTreeByRegionList(@Param(value = "list") Set<Long> list);
     List<AreaInfo> selectAreaTree();
 
+    List<TCameraInfo> selectAllPatrolDeviceByName(@Param(value = "name") String name);
+
+    List<AreaInfo> selectAllPatrolDeviceTreeByName(@Param(value = "cameraList") List<TCameraInfo> cameraList,
+                                                   @Param(value = "regionList") List<Long> regionList);
 }

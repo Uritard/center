@@ -16,6 +16,7 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -579,7 +580,17 @@ public class TStdDeviceService{
                             devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList);
                         }
                     }
-                } else {
+                }else if ("allDevice".equals(deviceShow)){
+                    List<TCameraInfo> cameraList = tStdDeviceDao.selectAllPatrolDeviceByName(name);
+                    if (CollectionUtils.isNotEmpty(cameraList)) {
+                        List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+                        String upRegionList = cameraList.stream().map(TCameraInfo::getUpRegionId).map(String::valueOf).collect(Collectors.joining(","));
+                        regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                        if (CollectionUtils.isNotEmpty(regionList)) {
+                            devTreeByName = tStdDeviceDao.selectAllPatrolDeviceTreeByName(cameraList, regionList);
+                        }
+                    }
+                }else {
                     //查设备
                     List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
                     if (CollectionUtils.isNotEmpty(deviceList)){
