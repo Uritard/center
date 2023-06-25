@@ -1075,8 +1075,8 @@ public class UPatrolTaskService {
                 // 调用robot服务下发任务
                 Result result = robotTask(robotTaskInfoMap);
 
-                // 针对普宙无人机无法自启动任务，需要额外发送一条任务启动报文
-                droneTaskStart(robotTaskInfoList);
+//                // 针对普宙无人机无法自启动任务，需要额外发送一条任务启动报文
+//                droneTaskStart(robotTaskInfoList);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

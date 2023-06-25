@@ -5,6 +5,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
@@ -13,6 +14,7 @@ import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
+import com.yjh.platform.module.task.entity.RobotTaskInstanceInfo;
 import com.yjh.platform.module.task.entity.TCruiseTaskDel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -112,6 +114,9 @@ public class TaskJob extends QuartzJobBean {
         // 如果是一天多个时间点 调度走本级 给下级设备或节点发立即任务
         uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
 
+        // 增加下发给下级系统的
+        droneTaskStart(task);
+
         boolean canRunning = true;
         try {
             log.info("当前任务优先级：{}", task.getTaskLevel());
@@ -139,6 +144,42 @@ public class TaskJob extends QuartzJobBean {
             log.info("周期任务初始化下一次任务");
             uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
         }
+
+    }
+
+    /**
+     * 针对普宙无人机无法自启动任务，需要额外发送一条任务启动报文
+     *
+     * @param task 任务信息
+     */
+    private void droneTaskStart(UPatrolTask task) {
+        log.info("普宙无人机额外发送启动报文：task: {}", JSONUtil.toJSONString(task));
+
+        boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
+        if (!droneOpen) {
+            // 无人机开关，打开时才需要补充发送任务启动报文
+            return;
+        }
+
+        List<String> robotCodes = uPatrolTaskDao.selectDroneCodeByTaskCode(task.getTaskCode());
+        if (CollectionUtils.isEmpty(robotCodes)) {
+            return;
+        }
+
+        robotCodes.forEach(robotCode -> {
+            try {
+                List<String> robotCodeList = new ArrayList<>();
+                robotCodeList.add(robotCode);
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", task.getTaskId());
+                robotTaskStatesMap.put("commandValue", 1);
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
+            } catch (Exception e) {
+                log.info("额外发送无人机启动任务报错，task: {}", JSONUtil.toJSONString(task));
+                log.info("额外发送无人机启动任务报错，err:", e);
+            }
+        });
 
     }
 
