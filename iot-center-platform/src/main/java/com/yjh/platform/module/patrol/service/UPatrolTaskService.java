@@ -1074,11 +1074,57 @@ public class UPatrolTaskService {
 
                 // 调用robot服务下发任务
                 Result result = robotTask(robotTaskInfoMap);
+
+                // 针对普宙无人机无法自启动任务，需要额外发送一条任务启动报文
+                droneTaskStart(robotTaskInfoList);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return "";
+    }
+
+    /**
+     * 针对普宙无人机无法自启动任务，需要额外发送一条任务启动报文
+     *
+     * @param robotTaskInfoList 任务列表
+     */
+    private void droneTaskStart(List<RobotTaskInstanceInfo> robotTaskInfoList) {
+        robotTaskInfoList.forEach(task -> {
+            try {
+                if (checkIsDroneTask(task.getRobotCode())) {
+                    Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                    robotTaskStatesMap.put("taskId", task.getTaskId());
+                    robotTaskStatesMap.put("commandValue", 1);
+                    robotTaskStatesMap.put("robotCodeList", task.getRobotCode());
+                    robotTaskStates(robotTaskStatesMap);
+                }
+            } catch (Exception e) {
+                log.info("额外发送无人机启动任务报错，task: {}", JSONUtil.toJSONString(task));
+                log.info("额外发送无人机启动任务报错，err:", e);
+            }
+        });
+    }
+
+    /**
+     * 判断开关和是否未无人机
+     *
+     * @param robotCode robotCode
+     * @return result
+     */
+    private boolean checkIsDroneTask(String robotCode) {
+        boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
+        if (!droneOpen) {
+            // 无人机开关，打开时才需要补充发送任务启动报文
+            return false;
+        }
+
+        int num = tRobotInfoDao.checkDroneByRobotCode(robotCode);
+        if (num <= 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public void taskToRobotOrDroneStart(UPatrolTask task, String dateType, List<Long> allInstanceList){
@@ -1237,35 +1283,12 @@ public class UPatrolTaskService {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
                 Result result = serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, Result.class);
-                // 处理普宙无人机
-                sendDroneTaskStart(robotTaskInfoMap);
                 return result;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return null;
-    }
-
-    /**
-     * 针对无人机任务目前还没有定时任务触发功能，需要额外发送启动命令执行任务启动
-     *
-     * @param robotTaskInfoMap robotTaskInfoMap
-     */
-    private void sendDroneTaskStart(Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-        List<RobotTaskInstanceInfo> taskList = robotTaskInfoMap.get("robotTaskInfoList");
-        if (CollectionUtils.isEmpty(taskList)) {
-            return;
-        }
-
-        taskList.forEach(task -> {
-            if (task != null && StringUtils.isNoneBlank(task.getTaskId())) {
-                if (task.getIfRun().equals(String.valueOf(TaskTypeEnum.NOW.getType()))) {
-                    // 只有立即执行任务才需要额外发送启动命令
-                    taskStart(task.getTaskId(), null, true);
-                }
-            }
-        });
     }
 
     public void setQuartzTask(UPatrolTask task) {
@@ -1567,7 +1590,7 @@ public class UPatrolTaskService {
     }
 
 //    @Transactional(rollbackFor = Exception.class)
-    public String taskStart(String taskId, HttpServletRequest request, boolean isDrone) {
+    public String taskStart(String taskId, HttpServletRequest request) {
         String taskPatrolledId = "";
         try {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -1601,11 +1624,6 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("taskId", taskId);
                 robotTaskStatesMap.put("commandValue", 1);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                if (isDrone) {
-                    // 如果是无人机任务，需要额外发送启动命名
-                    robotTaskStatesMap.put("isDrone", isDrone);
-                }
-
                 robotTaskStates(robotTaskStatesMap);
             }
         } catch (Exception e) {
@@ -3109,7 +3127,7 @@ public class UPatrolTaskService {
         log.info("taskId : {} control", taskId);
         switch (com) {
             case "1":
-                return this.taskStart(taskId, null, false);
+                return this.taskStart(taskId, null);
             case "2":
                 return String.valueOf(this.taskPause(taskId, null));
             case "3":

@@ -121,4 +121,5 @@ public interface TRobotInfoDao {
     int selectRobotCount();
 
     int selectDroneCount();
+    int checkDroneByRobotCode(@Param(value = "robotCode") String robotCode);
 }

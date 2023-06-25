@@ -1292,14 +1292,12 @@ public class RobotService {
 //                TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
                 String status;
                 String isEdge = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
-                boolean isDevice = false;
                 if (StringUtils.isNotEmpty(isEdge)){
                     // 下级节点
                     status = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
                 }else{
                     // 设备
                     status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
-                    isDevice = true;
                 }
 
 //                if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
@@ -1320,20 +1318,6 @@ public class RobotService {
                     return result;
                 }
 
-                // 判断是否是为无人机补充发送的报文
-                boolean isDrone = false;
-                if (robotTaskControlMap.containsKey("isDrone")) {
-                    isDrone = (boolean) robotTaskControlMap.get("isDrone");
-                }
-
-                if (!checkDroneTask(isDevice, isDrone, robotCode)) {
-                    log.info("该robotCode 无需额外发送任务启动报文，robotCode: {}", robotCode);
-                    continue;
-                }
-
-                // 初始化无人机坐标
-                initDroneCoordinate(robotCode);
-
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("41")
                         .setSendCode(Constant.sendCode())
@@ -1350,53 +1334,6 @@ public class RobotService {
             log.error("给下级节点下发任务控制指令异常:", e);
         }
         return result;
-    }
-
-    /**
-     * 判断是否需要额外给无人机发送启动命令（普宙无人机暂时定时任务逻辑，需要手动启动任务）
-     *
-     * @param isDevice 判断是设备还是下级系统
-     * @param isDrone 是否为无人机补充发送启动命令
-     * @param robotCode 无人机code，用于判断是否为无人机
-     * @return 判断结果
-     */
-    private boolean checkDroneTask(boolean isDevice, boolean isDrone, String robotCode) {
-        if (!isDrone) {
-            // 只有无人机补充发送的报文才需要判断，否则直接放过
-            return true;
-        }
-
-        if (!isDevice) {
-            return false;
-        }
-
-        boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
-        if (!droneOpen) {
-            // 无人机开关，打开时才需要补充发送任务启动报文
-            return false;
-        }
-
-        int num = tRobotInfoDao.checkDroneByRobotCode(robotCode);
-        if (num <= 0) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * 初始化无人机坐标，只保留最后一条坐标
-     *
-     * @param robotCode robotCode
-     */
-    private void initDroneCoordinate(String robotCode) {
-        // 将无人机坐标信息
-        String redisKey = String.format("DroneCoordinate:%s", robotCode);
-        if (redisTemplate.hasKey(redisKey)) {
-            Object value = redisTemplate.opsForList().leftPop(redisKey);
-            redisTemplate.delete(redisKey);
-            redisTemplate.opsForList().leftPush(redisKey, value);
-        }
     }
 
     /**

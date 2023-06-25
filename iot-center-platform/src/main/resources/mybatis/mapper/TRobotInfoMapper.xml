@@ -677,4 +677,9 @@
            from t_robot_info
         where drone_type is not null
     </select>
+    <select id="checkDroneByRobotCode" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_robot_info a
+        WHERE a.robot_code = #{robotCode} and drone_type is not null
+    </select>
 </mapper>
