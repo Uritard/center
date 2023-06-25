@@ -112,18 +112,16 @@ public class TaskJob extends QuartzJobBean {
 
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
         // 如果是一天多个时间点 调度走本级 给下级设备或节点发立即任务
+        // 若任务优先级低，则需给这个任务下发暂停 todo
         uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
 
         // 增加下发给下级系统的
         droneTaskStart(task);
 
-        boolean canRunning = true;
-        try {
-            log.info("当前任务优先级：{}", task.getTaskLevel());
-            canRunning =  pauseFormerLowerTask(task);
-        } catch (Exception e) {
-            log.info("将低优先任务暂停失败:", e);
-        }
+        log.info("当前任务优先级：{}", task.getTaskLevel());
+        // 判断当前任务是否可继续执行，低优先级任务暂停
+        boolean canRunning = pauseFormerLowerTask(task);
+
         log.info("任务 {} 开始执行", task.getTaskName());
         log.info("任务Id {} ", task.getTaskId());
         log.info("任务执行时间 {}, fireTime: {} ", DateTimeUtil.format(new Date()), taskDate);
@@ -206,30 +204,19 @@ public class TaskJob extends QuartzJobBean {
 
     private void setTaskResult(UPatrolTask task, Date date, int taskState) {
         String taskId = task.getTaskId();
-        // String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(taskId);
         log.info("TaskResult update, taskId: {}, result: {}", taskId, JSON.toJSONString(result));
         if (uPatrolTaskService.taskIsEnded(result.getTaskState())) {
             log.error("任务已经结束，不可再次执行，task: {}，taskState: {}", taskId, result.getTaskState());
             return;
         }
-        // 周期任务的下一次任务时间和名称在初始化时就通过cron表达式进行计算，不再通过任务执行时再修改名称
-        // if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
-        //     // 周期任务修改任务名称
-        //     result.setTaskName(task.getTaskName());
-        // }
+
         result.setTaskState(taskState);
         //任务开始时间
         result.setExecuteTime(date);
         uPatrolResultDao.update(result);
 
         uPatrolTaskService.updateTaskStateForRedis(taskId, String.valueOf(taskState));
-        // 周期任务的下一次任务时间和名称在初始化时就通过cron表达式进行计算，不再通过任务执行时再修改名称
-        // if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
-        //     // 周期任务修改任务名称
-        //     UPatrolTask utask = new UPatrolTask().setTaskId(taskId).setTaskName(task.getTaskName()).setStartTime(task.getStartTime());
-        //     uPatrolTaskDao.update(utask);
-        // }
         // 更新 Redis 任务开始时间
         redisTemplate.opsForHash().put(PATROL_SUMMARY_PREFIX + taskId, "taskStart", DateTimeUtil.format(date));
         try {
@@ -253,36 +240,34 @@ public class TaskJob extends QuartzJobBean {
      * @param task
      */
     private boolean pauseFormerLowerTask(UPatrolTask task) {
-        if (task.getTaskLevel() != null) {
-            //任务开始前 判断任务优先级 找到优先级比当前任务小的任务
-            List<String> lowTaskList = uPatrolTaskDao.selectPlanRunningTask(task.getTaskLevel(), null);
-
-            List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, task.getTaskLevel());
-            if (CollectionUtils.isNotEmpty(highTaskList)) {
+        try {
+            if (task.getTaskLevel() != null) {
                 String taskId = task.getTaskId();
-                log.info("存在高优先级任务，当前任务暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
-                for (String htId : highTaskList ) {
-                    String highKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + htId;
-                    redisTemplate.opsForSet().add(highKey, taskId);
-                    redisTemplate.expire(highKey, 3, TimeUnit.DAYS);
+                //任务开始前 判断任务优先级 找到优先级比当前任务小的任务
+                List<String> lowTaskList = uPatrolTaskDao.selectPlanRunningTask(task.getTaskLevel(), null);
+
+                List<String> highTaskList = uPatrolTaskDao.selectPlanRunningTask(null, task.getTaskLevel());
+                boolean pauseFlag = uPatrolTaskService.highTaskPause(taskId, highTaskList);
+                // 有高优先级任务，当前任务暂停
+                if (pauseFlag) {
+                    return false;
                 }
-                uPatrolTaskService.taskPauseStateAnsy(taskId);
-                return false;
-            }
 
-            //将此任务暂停的任务放入 redis
-            log.info("低优先级任务id：{}", JSON.toJSONString(lowTaskList));
-            if (lowTaskList != null && lowTaskList.size() > 0) {
-                String lowTaskKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + task.getTaskId();
-                redisTemplate.opsForSet().add(lowTaskKey, lowTaskList.toArray(new String[0]));
-                redisTemplate.expire(lowTaskKey, 3, TimeUnit.DAYS);
-                //将低优先任务暂停
-                lowTaskList.forEach(lowTask -> {
-                    uPatrolTaskService.taskPauseWithoutRobot(lowTask);
-                });
+                //将此任务暂停的任务放入 redis
+                log.info("低优先级任务id：{}", JSON.toJSONString(lowTaskList));
+
+                List<String> interList = uPatrolTaskService.cruiseDeviceIntersect(taskId, lowTaskList);
+                if (CollectionUtils.isNotEmpty(interList)) {
+                    String lowTaskKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + taskId;
+                    redisTemplate.opsForSet().add(lowTaskKey, interList.toArray(new String[0]));
+                    redisTemplate.expire(lowTaskKey, 3, TimeUnit.DAYS);
+                    //将低优先任务暂停
+                    interList.forEach(lowTask -> uPatrolTaskService.taskPauseWithoutRobot(lowTask));
+                }
             }
+        } catch (Exception e) {
+            log.info("将低优先任务暂停失败:", e);
         }
-
         return true;
     }
 

@@ -454,6 +454,7 @@ public class UPatrolTaskService {
             log.info("instancesList==={}", detailList);
         }
         Set<String> nodeSet = new HashSet<>(8);
+        Set<String> cruiseDeviceSet = new HashSet<>(128);
         for (TCruisePointInstanceNameDetail item : detailList) {
             UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
             uPatrolDataResult.setTaskId(task.getTaskId())
@@ -479,9 +480,15 @@ public class UPatrolTaskService {
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 map.put("robotId", String.valueOf(item.getRobotId()));
+                cruiseDeviceSet.add("robotId_" + item.getRobotId());
             }else {
                 map.put("cameraId", String.valueOf(item.getCameraId()));
                 map.put("robotId","");
+                if (item.getCameraId() == null) {
+                    cruiseDeviceSet.add(item.getCruiseType() + "_" + item.getCruiseId());
+                } else {
+                    cruiseDeviceSet.add("cameraId_" + item.getCameraId());
+                }
             }
 
             if (StringUtils.isEmpty(edgeCode)) {
@@ -519,6 +526,8 @@ public class UPatrolTaskService {
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
+        redisTemplate.opsForSet().intersect(TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice", cruiseDeviceSet);
+        redisTemplate.expire(TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice", 7, TimeUnit.DAYS);
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
         if (!Constant.isHost()) {
             sendTaskStateToUp(task, 5);
@@ -594,11 +603,10 @@ public class UPatrolTaskService {
      */
     public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList) {
         statusList.forEach(robotPatrolTaskStatus -> {
-            String[] patrolledIds = robotPatrolTaskStatus.getTaskPatrolledId().split("_");
+            String patrolledId = robotPatrolTaskStatus.getTaskPatrolledId();
             String taskCode = robotPatrolTaskStatus.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
-            String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
-            String patrolledId = patrolledIds.length > 2 ? patrolledIds[1] : patrolledIds[0];
+            String timeStr = StringUtils.substringAfterLast(patrolledId, "_");
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = null;
 
@@ -1589,6 +1597,38 @@ public class UPatrolTaskService {
         sendTaskStateToUp(task, 3);
     }
 
+    /**
+     * 判断任务与其他任务之间是否有重复巡视设备
+     * @return 有重复巡视设备的任务ID
+     */
+    public List<String> cruiseDeviceIntersect(String taskId, List<String> otherTaskIds) {
+        if (CollectionUtils.isNotEmpty(otherTaskIds)) {
+            return Collections.emptyList();
+        }
+        List<String> interList = new ArrayList<>();
+        for (String otherTaskId : otherTaskIds) {
+            if (cruiseDeviceIntersect(taskId, otherTaskId)) {
+                interList.add(otherTaskId);
+            }
+        }
+
+        log.info("当前任务与其他优先级任务公用巡视设备：{}，interList: {}", taskId, JSON.toJSONString(interList));
+        return interList;
+    }
+
+    /**
+     * 判断两个任务是否有重复巡视设备
+     * @return true: 有重复巡视设备  false: 无重复巡视设备
+     */
+    public boolean cruiseDeviceIntersect(String taskId, String otherTaskId) {
+        String localCruiseDeviceKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + taskId + ":cruiseDevice";
+        String otherCruiseDeviceKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + otherTaskId + ":cruiseDevice";
+        Set<String> interSet = redisTemplate.opsForSet().intersect(localCruiseDeviceKey, otherCruiseDeviceKey);
+
+        log.info("当前任务与其他优先级任务公用巡视设备：{}， {}, interSet: {}", taskId, otherTaskId, JSON.toJSONString(interSet));
+        return CollectionUtils.isNotEmpty(interSet);
+    }
+
 //    @Transactional(rollbackFor = Exception.class)
     public String taskStart(String taskId, HttpServletRequest request) {
         String taskPatrolledId = "";
@@ -1718,16 +1758,12 @@ public class UPatrolTaskService {
         log.info("当前低优先级任务，force： {}, uPatrolResult: {}", force, JSON.toJSONString(uPatrolResult));
         //暂停的任务也考虑进去
         List<String> highTaskList = uPatrolTaskDao.selectPlanRunningOrPauseTask(null, uPatrolResult.getTaskLevel());
-        if (!force && CollectionUtils.isNotEmpty(highTaskList)) {
-            log.info("存在高优先级任务，当前任务暂停，taskId: {}, taskLevel: {}, List：{}", taskId, uPatrolResult.getTaskLevel(), JSON.toJSONString(highTaskList));
-            for (String htId : highTaskList) {
-                String highKey = TASK_LOWER_REDIS_KEY + htId;
-                redisTemplate.opsForSet().add(highKey, taskId);
-                redisTemplate.expire(highKey, 3, TimeUnit.DAYS);
+        if (!force) {
+            boolean pauseFlag = highTaskPause(taskId, highTaskList);
+            // 有高优先级任务，当前任务暂停
+            if (pauseFlag) {
+                return -1;
             }
-            taskPauseStateAnsy(taskId);
-
-            return -1;
         }
 
         try {
@@ -2915,6 +2951,34 @@ public class UPatrolTaskService {
                 }
             });
         }
+    }
+
+    /**
+     * 判断是否存在高优先级任务暂停当前任务
+     * @param taskId 当前任务
+     * @param highTaskList 高优先级任务列表
+     * @return true: 当前任务暂停   false: 没有公用巡视设备，当前任务继续
+     */
+    public boolean highTaskPause(String taskId, List<String> highTaskList) {
+        boolean pauseFlag = false;
+        if (CollectionUtils.isNotEmpty(highTaskList)) {
+            log.info("存在高优先级任务，判断当前任务是否暂停，taskId: {}, List：{}", taskId, JSON.toJSONString(highTaskList));
+            for (String htId : highTaskList) {
+                boolean interDevice = cruiseDeviceIntersect(taskId, htId);
+                if (interDevice) {
+                    String highKey = TASK_LOWER_REDIS_KEY + htId;
+                    redisTemplate.opsForSet().add(highKey, taskId);
+                    redisTemplate.expire(highKey, 3, TimeUnit.DAYS);
+                    pauseFlag = true;
+                }
+            }
+            if (pauseFlag) {
+                taskPauseStateAnsy(taskId);
+            } else {
+                log.info("当前任务与所有高优先级任务不存在公用巡视设备，无需暂停：{}， highTaskList： {}", taskId, JSON.toJSONString(highTaskList));
+            }
+        }
+        return pauseFlag;
     }
 
     @Transactional(rollbackFor = Exception.class)
