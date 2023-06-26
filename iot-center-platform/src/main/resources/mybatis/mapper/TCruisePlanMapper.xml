@@ -288,7 +288,7 @@
         a.instance_id,
         a.device_mete_id,
         a.station_id,
-        a.custom_id,
+        j.custom_id,
         a.station_name,
         a.cruise_id,
         a.cruise_name,
@@ -356,7 +356,7 @@
         </foreach>
         AND j.inspection_type = 1
         GROUP BY a.instance_id
-        ORDER BY a.instance_id asc,a.device_id, a.custom_id
+        ORDER BY a.device_id, j.custom_id
     </select>
 
     <select id="selectCruiseType" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
