@@ -225,7 +225,7 @@ public class UPatrolResultService {
         //更新测点信息
         Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(cruiseManualReview.getInstanceId());
         TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-            new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(cruiseManualReview.getIdentifyResult());
+            new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(cruiseManualReview.getCruiseTime());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
@@ -550,7 +550,7 @@ public class UPatrolResultService {
             //更新测点信息
             Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(review.getInstanceId());
             TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-                new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult());
+                new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult()).setUpdateTime(review.getCruiseTime());
             uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
             // 下级系统同步审核信息不对告警进行重新判断
             // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());

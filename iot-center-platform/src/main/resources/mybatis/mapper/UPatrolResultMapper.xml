@@ -856,7 +856,7 @@
         <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
         <if test="picPath != null">a.pic_path = #{picPath},</if>
     </set>
-        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT} and a.update_time <![CDATA[<=]]> STR_TO_DATE(#{updateTime}, '%Y-%m-%d %H:%i:%s')
     </update>
 
     <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TStdDevicemete">
@@ -989,7 +989,8 @@
         b.evaluation_state,
         e.dict_note as evaluation_state_name,
         b.check_user,
-        b.check_date
+        b.check_date,
+        b.cruise_time
         FROM u_patrol_data_result b
         LEFT JOIN t_dict_business e on e.dict_code = b.evaluation_state
         WHERE 1 = 1

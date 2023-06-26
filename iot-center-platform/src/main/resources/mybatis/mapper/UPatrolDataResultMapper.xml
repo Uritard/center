@@ -525,6 +525,7 @@
         f.instance_name,
         g.task_type,
         f.person_check,
+        f.modify_num,
         f.result_num,
         f.result_desc,
         f.identify_result,
@@ -774,35 +775,65 @@
     </select>
 
     <select id="selectDeviceMeteList" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
-        SELECT *FROM
+        SELECT
+        *
+        FROM
         (
         SELECT
-        a.instance_id,
-        b.device_mete_id,
-        a.cruise_time as update_time,
-        a.picpath,
-        a.cruise_result,
-        a.identify_result
+        c.device_mete_id,
+        c.cruise_time,
+        c.picpath,
+        c.cruise_result,
+        c.identify_result
         FROM
-        u_patrol_data_result a,t_cruise_point_instance b
-        WHERE 1 = 1
-        and a.instance_id = b.instance_id
-        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}
-        </if>
-        ORDER BY cruise_time DESC LIMIT 999999
-        )as bigTable
-        GROUP BY bigTable.device_mete_id
+        u_patrol_data_result c
+        WHERE
+        c.task_id = #{taskId,jdbcType=VARCHAR}
+        AND c.device_mete_id NOT IN (
+        SELECT
+        device_mete_id
+        FROM
+        t_std_devicemete_update
+        )
+        ORDER BY
+        c.cruise_time DESC
+        LIMIT 999999
+        ) big_table
+        GROUP BY
+        big_table.device_mete_id
     </select>
 
     <update id="updateDeviceMeteUpdate">
-        update t_std_devicemete_update a <set>
-        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
-        <if test="updateTime != null">a.update_time = #{updateTime},</if>
-        <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
-        a.identify_result = #{identifyResult},
-        <if test="picPath != null">a.pic_path = #{picPath},</if>
-    </set>
-        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+        UPDATE t_std_devicemete_update a
+        INNER JOIN (
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        c.device_mete_id,
+        c.cruise_time,
+        c.picpath,
+        c.cruise_result,
+        c.identify_result
+        FROM
+        u_patrol_data_result c
+        WHERE
+        c.task_id = #{taskId,jdbcType=VARCHAR}
+        ORDER BY
+        c.cruise_time DESC
+        LIMIT 999999
+        ) big_table
+        GROUP BY
+        big_table.device_mete_id
+        ) b ON a.device_mete_id = b.device_mete_id
+        <set>
+            a.update_time = b.cruise_time,
+            a.cruise_result = b.cruise_result,
+            a.identify_result = b.identify_result,
+            a.pic_path = b.picpath
+        </set>
+        WHERE a.update_time <![CDATA[<]]> b.cruise_time;
     </update>
 
     <insert id="insertDeviceMeteUpdate">
