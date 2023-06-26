@@ -1016,10 +1016,14 @@ public class TStdDeviceService{
 
     public List<AreaInfo> selectMeteTreeByDeviceName(String name){
         List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
-        List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
-        List<Long> allRegionList = getAllUpRegionId(regionList);
-        List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(deviceList,allRegionList);
-        return assembleTrees(meteTreeByDeviceName);
+        if (CollectionUtils.isNotEmpty(deviceList)) {
+            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
+            List<Long> allRegionList = getAllUpRegionId(regionList);
+            List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(deviceList, allRegionList);
+            return assembleTrees(meteTreeByDeviceName);
+        }else {
+            return new ArrayList<>();
+        }
     }
 
 
