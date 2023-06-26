@@ -115,8 +115,7 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         if (StringUtils.isNotEmpty(taskPatrolledId) ) {
                             robotService.upToCruise(xmlBaseModel);
                             taskCode.set(StringUtils.substringBetween(taskPatrolledId, "_"));
-                            String[] patrolledIds = taskPatrolledId.split("_");
-                            String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
+                            String timeStr = StringUtils.substringAfterLast(taskPatrolledId, "_");
                             date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
                         }
                         if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){

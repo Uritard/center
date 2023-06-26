@@ -242,11 +242,11 @@ public class UPatrolDataResultService {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
                 cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
             }
-            if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())) {
-                cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            if (StringUtils.isNotEmpty(cruiseResultAnalInfo.getPersonCheck())) {
+                cruiseResultAnalInfo.setResultDesc(cruiseResultAnalInfo.getPersonCheck());
             }
-            if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())) {
-                cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            if (StringUtils.isEmpty(cruiseResultAnalInfo.getModifyNum())) {
+                cruiseResultAnalInfo.setModifyNum(cruiseResultAnalInfo.getResultNum());
             }
             if (CommonUtils.isEmptyOrNullstr(cruiseResultAnalInfo.getMeterTypeName())) {
                 cruiseResultAnalInfo.setMeterTypeName(cruiseResultAnalInfo.getMeteTypeName());
@@ -301,39 +301,42 @@ public class UPatrolDataResultService {
         return listFir;
     }
 
-    public int updateCruiseAnalyze(String taskId) {
+    public void updateCruiseAnalyze(String taskId) {
         log.info("updateCruiseAnalyze taskId==={}", taskId);
         if (StringUtils.isNotEmpty(taskId)) {
-            List<TStdDeviceMeteUpdate> list = uPatrolDataResultDao.selectDeviceMeteList(taskId);
-            log.info("list==={}", JSON.toJSONString(list));
-
-            for (TStdDeviceMeteUpdate res : list) {
+            try {
+                // 查询不在 t_std_devicemete_update 表中的新节点
+                List<TStdDeviceMeteUpdate> list = uPatrolDataResultDao.selectDeviceMeteList(taskId);
+                log.info("list==={}", JSON.toJSONString(list));
                 List<Long> deviceMeteIdList = uPatrolDataResultDao.selectAllDeviceMeteId();
-                TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
-                        .setDeviceMeteId(res.getDeviceMeteId())
-                        .setIdentifyResult(res.getIdentifyResult());
-                if (Objects.nonNull(res.getUpdateTime())) {
-                    tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
+                // 批量更新点位图片和状态
+                uPatrolDataResultDao.updateDeviceMeteUpdate(taskId);
+
+                // 新节点插入
+                for (TStdDeviceMeteUpdate res : list) {
+
+                    TStdDeviceMeteUpdate tStdDeviceMeteUpdate =
+                        new TStdDeviceMeteUpdate().setDeviceMeteId(res.getDeviceMeteId()).setIdentifyResult(res.getIdentifyResult());
+                    if (StringUtils.isNotEmpty(res.getUpdateTime())) {
+                        tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
+                    }
+                    if (Objects.nonNull(res.getCruiseResult())) {
+                        tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
+                    }
+                    if (StringUtils.isNotEmpty(res.getPicPath())) {
+                        tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
+                    }
+                    log.info("此时的tStdDeviceMeteUpdate=== {}", tStdDeviceMeteUpdate);
+                    if (!deviceMeteIdList.contains(res.getDeviceMeteId())) {
+                        // 插入新的点位数据
+                        int insertRes = uPatrolDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                        log.info("{}不存在,插入结果: {}", res.getDeviceMeteId(), insertRes);
+                    }
                 }
-                if (Objects.nonNull(res.getCruiseResult())) {
-                    tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
-                }
-                if (Objects.nonNull(res.getPicPath())) {
-                    tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
-                }
-                log.info("此时的tStdDeviceMeteUpdate===" + tStdDeviceMeteUpdate);
-                if (deviceMeteIdList.contains(res.getDeviceMeteId())) {
-                    //更新
-                    int updateRes = uPatrolDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                    log.info(res.getDeviceMeteId() + "存在,更新值: " + updateRes);
-                } else {
-                    //插入
-                    int insertRes = uPatrolDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                    log.info(res.getDeviceMeteId() + "不存在,插入值: " + insertRes);
-                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         }
-        return 1;
     }
 }
 

@@ -180,7 +180,7 @@ public class TStdDevicemeteService{
         }
 
         // 非表计类型时，meter_type字段需要清空
-        if (!tStdDeviceMeteDetail.getMeteType().equals("221")) {
+        if (!"221".equals(tStdDeviceMeteDetail.getMeteType())) {
             tStdDeviceMeteDetail.setMeterType(null);
         }
 
