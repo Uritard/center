@@ -10,6 +10,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,26 +112,38 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
      * @param sendCode sendCode
      */
     private void processDroneCoordinate(XMLBaseModel xmlBaseModel, String sendCode) {
-        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
-        List<Map<String, String>> robotCoordinateList = new ArrayList<>();
-        xmlBaseModel.getItems().forEach(res -> {
-            Map<String, String> robotCoordinateMap = getCoordinateMap(res, robotCode);
-            robotCoordinateList.add(robotCoordinateMap);
-        });
+        try {
+            String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
+            List<Map<String, String>> robotCoordinateList = new ArrayList<>();
+            xmlBaseModel.getItems().forEach(res -> {
+                Map<String, String> robotCoordinateMap = getCoordinateMap(res, robotCode);
+                if (robotCoordinateMap != null && robotCoordinateMap.size() > 0) {
+                    robotCoordinateList.add(robotCoordinateMap);
+                }
+            });
 
-        // 将无人机坐标信息
-        String redisKey = String.format("DroneCoordinate:%s", robotCode);
-        redisTemplate.opsForList().leftPushAll(redisKey, robotCoordinateList);
+            if (CollectionUtils.isNotEmpty(robotCoordinateList)) {
+                // 将无人机坐标信息
+                String redisKey = String.format("DroneCoordinate:%s", robotCode);
+                redisTemplate.opsForList().leftPushAll(redisKey, robotCoordinateList);
+            }
+        } catch (Exception e) {
+            log.error("处理无人机坐标信息报错， err: ", e);
+        }
     }
 
     private Map<String, String> getCoordinateMap(Map<String,Object> res, String robotCode) {
         Map<String, String> robotCoordinateMap = new HashMap<>(16);
-        robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
-        robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-        robotCoordinateMap.put("robotCode",robotCode);
-        robotCoordinateMap.put("time", String.valueOf(res.get("time")));
-        robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
-        robotCoordinateMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
+        String coordinateGeography = String.valueOf(res.get("coordinate_geography"));
+        if (StringUtils.isNotBlank(coordinateGeography) && !coordinateGeography.contains("0E-7,0E-7")) {
+            robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
+            robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
+            robotCoordinateMap.put("robotCode",robotCode);
+            robotCoordinateMap.put("time", String.valueOf(res.get("time")));
+            robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
+            robotCoordinateMap.put("coordinateGeography", coordinateGeography);
+        }
+
         return robotCoordinateMap;
     }
 

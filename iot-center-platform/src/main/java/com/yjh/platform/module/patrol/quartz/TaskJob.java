@@ -175,12 +175,33 @@ public class TaskJob extends QuartzJobBean {
                 robotTaskStatesMap.put("commandValue", 1);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
+                // 初始化无人机坐标
+                initDroneCoordinate(robotCode);
             } catch (Exception e) {
                 log.info("额外发送无人机启动任务报错，task: {}", JSONUtil.toJSONString(task));
                 log.info("额外发送无人机启动任务报错，err:", e);
             }
         });
 
+    }
+
+    /**
+     * 初始化无人机坐标，只保留最后一条坐标
+     *
+     * @param robotCode robotCode
+     */
+    private void initDroneCoordinate(String robotCode) {
+        try {
+            // 将无人机坐标信息
+            String redisKey = String.format("DroneCoordinate:%s", robotCode);
+            if (redisTemplate.hasKey(redisKey)) {
+                Object value = redisTemplate.opsForList().leftPop(redisKey);
+                redisTemplate.delete(redisKey);
+                redisTemplate.opsForList().leftPush(redisKey, value);
+            }
+        } catch (Exception e) {
+            log.error("初始化无人机坐标失败，err: ", e);
+        }
     }
 
     private void setTaskResult(UPatrolTask task, Date date, int taskState) {
