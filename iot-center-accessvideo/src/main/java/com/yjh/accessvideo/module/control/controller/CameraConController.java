@@ -682,7 +682,7 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "区域对焦")
-    @RequestMapping(value = "/regionFocus", method = RequestMethod.POST)
+    @RequestMapping(value = "/regionFocus", method = RequestMethod.GET)
     public Result regionFocus(@RequestParam(value = "nStartX") int nStartX,
                               @RequestParam(value = "nStartY") int nStartY,
                               @RequestParam(value = "nEndX") int nEndX,

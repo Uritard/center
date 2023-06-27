@@ -2472,32 +2472,36 @@ public class CameraConService {
         Map<String, String> map = new HashMap<>();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            String cameraIp = cameraConInfo.getCameraIp();
-            String userName = cameraConInfo.getCameraManager();
-            String password = cameraConInfo.getCameraCode();
-            String inUrl = "/ISAPI/PTZCtrl/channels/1/position3D";
-            String inBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                    "<position3D>\n" +
-                    "    <StartPoint>\n" +
-                    "        <positionX>" + nStartX + "</positionX>\n" +
-                    "        <positionY>" + nStartY + "</positionY>\n" +
-                    "    </StartPoint>\n" +
-                    "    <EndPoint>\n" +
-                    "        <positionX>" + nEndX + "</positionX>\n" +
-                    "        <positionY>" + nEndY + "</positionY>\n" +
-                    "    </EndPoint>\n" +
-                    "</position3D>\n";
-            HttpEntity entity = putISAPI(cameraIp, userName, password, inUrl, inBuffer);
-            if (entity != null) {
-                String xmlString = EntityUtils.toString(entity);
-                Map<String, String> resultMap = formatXmlString(xmlString);
-                if ("OK".equals(resultMap.get("statusString"))) {
-                    map.put("result", "ok");
+            if (205 == cameraConInfo.getCameraType()) {
+                String cameraIp = cameraConInfo.getCameraIp();
+                String userName = cameraConInfo.getCameraManager();
+                String password = cameraConInfo.getCameraCode();
+                String inUrl = "/ISAPI/Image/channels/1/regionalFocus";
+                String inBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<RegionalFocus>\n" +
+                        "    <StartPoint>\n" +
+                        "        <positionX>" + nStartX + "</positionX>\n" +
+                        "        <positionY>" + nStartY + "</positionY>\n" +
+                        "    </StartPoint>\n" +
+                        "    <EndPoint>\n" +
+                        "        <positionX>" + nEndX + "</positionX>\n" +
+                        "        <positionY>" + nEndY + "</positionY>\n" +
+                        "    </EndPoint>\n" +
+                        "</RegionalFocus>\n";
+                HttpEntity entity = putISAPI(cameraIp, userName, password, inUrl, inBuffer);
+                if (entity != null) {
+                    String xmlString = EntityUtils.toString(entity);
+                    Map<String, String> resultMap = formatXmlString(xmlString);
+                    if ("OK".equals(resultMap.get("statusString"))) {
+                        map.put("result", "ok");
+                    } else {
+                        map.put("result", resultMap.get("subStatusCode"));
+                    }
                 } else {
-                    map.put("result", resultMap.get("subStatusCode"));
+                    map.put("result", "error");
                 }
             } else {
-                map.put("result", "error");
+                map.put("result", "camera type is not allowed!");
             }
         } catch (Exception e) {
             log.error("区域对焦失败", e);
