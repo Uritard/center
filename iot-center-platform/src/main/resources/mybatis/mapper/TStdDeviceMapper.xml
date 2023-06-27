@@ -962,19 +962,16 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where c.device_id =#{deviceId}
 	</select>
 
-	<select id="selectDeviceMeteByDeviceAndCustom" resultMap="AreaInfoMap">
+	<select id="selectDeviceMeteByDeviceAndCustom" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT DISTINCT
 		dm.device_mete_id AS Id,
 		dm.mete_name AS label,
 		dm.device_id AS upId,
 		sd.device_name AS upName,
-		"devicemete" AS infoType,
-		cp.camera_id AS cameraId
+		"devicemete" AS infoType
 		FROM
 		t_std_devicemete dm
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
-		LEFT JOIN t_cruise_point_instance cpi ON cpi.device_mete_id = dm.device_mete_id
-		LEFT JOIN t_camera_preset cp ON cp.preset_id=cpi.cruise_id
 		where 1=1
 		<if test="deviceId != null and deviceId != ''">and dm.device_id = #{deviceId, jdbcType=VARCHAR}</if>
 		<if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
