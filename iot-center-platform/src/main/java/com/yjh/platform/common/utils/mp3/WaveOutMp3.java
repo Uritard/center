@@ -35,7 +35,7 @@ public class WaveOutMp3 {
 //			tdl = (SourceDataLine) AudioSystem.getLine(dli);
 //			tdl.open(af, FFT.FFT_N << 1);
         } catch (Exception e) {
-            log.error("错误" + e);
+            log.error("错误" , e);
             
             throw new BusinessException(209, "音频文件读取异常");
         }
