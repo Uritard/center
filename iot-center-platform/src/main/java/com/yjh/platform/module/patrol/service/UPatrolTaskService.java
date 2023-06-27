@@ -230,10 +230,8 @@ public class UPatrolTaskService {
         //任务启动只创建任务不往下发
         if (issueFlag) {
             // 找出下级设备或下级节点的点让其做任务
-            String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
-            if (StringUtils.isNotEmpty(res)) {
-                throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
-            }
+            // 向下级下发任务另起线程执行，避免下级先返回任务状态给上级
+            ThreadPoolUtil.COMMON_POOL.addThread(() -> taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, detailList));
         }
 
         return uPatrolTask;
@@ -523,8 +521,12 @@ public class UPatrolTaskService {
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
-        redisTemplate.opsForSet().intersect(TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice", cruiseDeviceSet);
-        redisTemplate.expire(TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice", 7, TimeUnit.DAYS);
+
+        String cruiseDeviceKey = TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice";
+        log.info("cruiseDeviceSet === {}: {}", cruiseDeviceKey, JSON.toJSONString(cruiseDeviceSet));
+        redisTemplate.opsForSet().add(cruiseDeviceKey, cruiseDeviceSet.toArray(new String[0]));
+        redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
+
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
         if (!Constant.isHost()) {
             sendTaskStateToUp(task, 5);
@@ -701,17 +703,18 @@ public class UPatrolTaskService {
             if (taskExist == null || (
                     !StringUtils.equals(taskId, taskExist.getTaskId()) &&
                             Optional.ofNullable(taskExist.getTaskSource()).orElse(0) == 1)) {
+                log.warn("Task not exist, insert, task: {}", taskId);
                 uPatrolTaskDao.add(uPatrolTask);
+
+                UPatrolResult resultExsis = uPatrolResultDao.selectByPrimaryId(taskId);
+                if (resultExsis == null) {
+                    uPatrolResultDao.add(uPatrolResult);
+                } else {
+                    log.warn("Task result already exist: {}", JSON.toJSONString(resultExsis));
+                }
             } else {
                 log.warn("Task already exist, not insert, task: {}", JSON.toJSONString(taskExist));
                 return null;
-            }
-
-            UPatrolResult resultExsis = uPatrolResultDao.selectByPrimaryId(taskId);
-            if (resultExsis == null) {
-                uPatrolResultDao.add(uPatrolResult);
-            } else {
-                log.warn("Task result already exist: {}", JSON.toJSONString(resultExsis));
             }
             return taskId;
         } catch (Exception e) {
@@ -974,11 +977,10 @@ public class UPatrolTaskService {
      *
      * @param task           任务信息
      * @param tCruiseTaskAdd 任务关联信息
-     * @param format         时间格式
      * @param detailList     区域巡视主机上的巡视点信息
      * @return String
      */
-    private String taskToEdgeOrDevice(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd, DateFormat format,
+    private String taskToEdgeOrDevice(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd,
                                       List<TCruisePointInstanceNameDetail> detailList) {
         try {
             List<TCruisePointInstanceNameDetail> edgeDetailList = detailList.stream()
@@ -1599,7 +1601,7 @@ public class UPatrolTaskService {
      * @return 有重复巡视设备的任务ID
      */
     public List<String> cruiseDeviceIntersect(String taskId, List<String> otherTaskIds) {
-        if (CollectionUtils.isNotEmpty(otherTaskIds)) {
+        if (CollectionUtils.isEmpty(otherTaskIds)) {
             return Collections.emptyList();
         }
         List<String> interList = new ArrayList<>();
@@ -3282,11 +3284,8 @@ public class UPatrolTaskService {
             return null;
         }
         List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
-            // 找出下级设备或下级节点的点让其做任务
-            String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
-            if (StringUtils.isNotEmpty(res)) {
-                throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
-            }
+        // 找出下级设备或下级节点的点让其做任务
+        ThreadPoolUtil.COMMON_POOL.addThread(() -> taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, detailList));
 
         return uPatrolTask;
     }
