@@ -246,6 +246,21 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "查询音频设备树节点")
+    @RequestMapping(value = "/selectVoiceDeviceChildTree", method = RequestMethod.GET)
+    @Logs(title = "根据设备查询子节点", content = "根据设备查询子节点", logType = 1, authority = "1235,1237")
+    public Result selectVoiceDeviceChildTree(@RequestParam(value = "voiceDeviceId", required = false) Long voiceDeviceId) {
+        Result result = new Result();
+        try {
+            List<VoiceDevice> list = tVoiceDeviceService.selectChildNode(voiceDeviceId);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "音频分析")
     @RequestMapping(value = "/voiceAnalyse", method = RequestMethod.GET)
 //    @Logs(title = "音频分析",content = "音频频谱分析",logType = 5)
