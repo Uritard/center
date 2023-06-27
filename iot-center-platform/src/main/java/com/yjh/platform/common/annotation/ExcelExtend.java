@@ -31,4 +31,9 @@ public @interface ExcelExtend {
      * 转为 dict 表数值类型
      */
     String dictType() default "";
+
+    /**
+     * 是否需要转换为 int类型
+     */
+    String convent() default "";
 }
