@@ -345,7 +345,9 @@
             a.picpath,
             a.modify_num,
             a.cruise_type,
-            a.unit
+            a.unit,
+            a.device_mete_id,
+            a.cruise_time
         FROM
             u_patrol_data_result a
             WHERE
@@ -856,7 +858,7 @@
         <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
         <if test="picPath != null">a.pic_path = #{picPath},</if>
     </set>
-        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT} and a.update_time <![CDATA[<=]]> STR_TO_DATE(#{updateTime}, '%Y-%m-%d %H:%i:%s')
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT} and a.update_time <![CDATA[<=]]> #{updateTime}
     </update>
 
     <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TStdDevicemete">

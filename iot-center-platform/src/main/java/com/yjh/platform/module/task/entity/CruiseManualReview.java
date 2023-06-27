@@ -57,8 +57,9 @@ public class CruiseManualReview {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "审核时间")
     private Date checkDate;
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "巡视时间")
-    private String cruiseTime;
+    private Date cruiseTime;
     @ApiModelProperty(value = "下级同步时需要，下级唯一标识")
     private String sendCode;
     @ApiModelProperty(value = "审核结果数值")

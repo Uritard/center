@@ -222,14 +222,16 @@ public class UPatrolResultService {
         //manualReview
         int result1 = uPatrolResultDao.manualReview(cruiseManualReview);
 
+        //查询该巡检点审核后的相关信息
+        AfterManualReviewInfo afterManualReviewInfo =
+            uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
         //更新测点信息
-        Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(cruiseManualReview.getInstanceId());
-        TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-            new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(cruiseManualReview.getCruiseTime());
+        TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate().setDeviceMeteId(afterManualReviewInfo.getDeviceMeteId())
+            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(afterManualReviewInfo.getCruiseTime());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
-        afterManualReviewInfo(cruiseManualReview.getTaskId(), cruiseManualReview.getInstanceId(), userId, date);
+        afterManualReviewInfo(afterManualReviewInfo, userId, date);
 
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
@@ -286,11 +288,11 @@ public class UPatrolResultService {
     /**
      * 对审核后的任务进行处理，判断告警
      */
-    private void afterManualReviewInfo(String taskId, Long instanceId, String userId, Date date) {
-        //查询该巡检点审核后的相关信息
-        AfterManualReviewInfo afterManualReviewInfo = uPatrolResultDao.selectJudgeCondition(instanceId, taskId);
+    private void afterManualReviewInfo(AfterManualReviewInfo afterManualReviewInfo, String userId, Date date) {
+        String taskId = afterManualReviewInfo.getTaskId();
+        Long instanceId = afterManualReviewInfo.getInstanceId();
         //查询该巡检点对应测点配置的告警阈值相关信息
-        TStdDevicemete tStdDevicemete = uPatrolResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
+        TStdDevicemete tStdDevicemete = uPatrolResultDao.selectDeviceMeteInfo(instanceId);
         log.info("tStdDeviceMete===" + tStdDevicemete);
 
         // 该巡视点无了,找不到对应

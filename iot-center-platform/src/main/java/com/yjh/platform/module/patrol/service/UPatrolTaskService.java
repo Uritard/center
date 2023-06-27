@@ -73,10 +73,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -2894,16 +2891,30 @@ public class UPatrolTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public void batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList) {
-        if (uPatrolDataResultList.size() > 1000) {
-            List<List<UPatrolDataResult>> lists = Lists.partition(uPatrolDataResultList, 1000);
-            ExecutorService executorService = Executors.newFixedThreadPool(lists.size());
-            lists.forEach(subList ->
-                    executorService.submit(() -> {
-                        uPatrolDataResultDao.batchInsertUPatrolDataResult(subList);
-                    }));
-            executorService.shutdown();
-        } else {
-            uPatrolDataResultDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+        try {
+            if (uPatrolDataResultList.size() > 1000) {
+                List<List<UPatrolDataResult>> lists = Lists.partition(uPatrolDataResultList, 1000);
+                ExecutorService executorService = Executors.newFixedThreadPool(lists.size());
+                CountDownLatch cdl = new CountDownLatch(lists.size());
+                lists.forEach(subList ->
+                        executorService.submit(() -> {
+                            try {
+                                uPatrolDataResultDao.batchInsertUPatrolDataResult(subList);
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            } finally {
+                                cdl.countDown();
+                            }
+                        }));
+                if (!cdl.await(60, TimeUnit.SECONDS)) {
+                    log.error("任务结果没有在60S内入库完成，请注意！！！ taskId: {}", uPatrolDataResultList.get(0).getTaskId());
+                }
+                executorService.shutdown();
+            } else {
+                uPatrolDataResultDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 

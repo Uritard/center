@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -24,7 +25,7 @@ public class TStdDeviceMeteUpdate implements Serializable {
 
     @ApiModelProperty(value = "巡检时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private String updateTime;
+    private Date updateTime;
     @ApiModelProperty(value = "测点id")
     private Long deviceMeteId;
     @ApiModelProperty(value = "巡视执行结果")
