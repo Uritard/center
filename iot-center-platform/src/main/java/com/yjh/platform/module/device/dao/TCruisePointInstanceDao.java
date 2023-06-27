@@ -50,6 +50,8 @@ public interface TCruisePointInstanceDao {
     int delete(TCruisePointInstance tCruisePointInstance);
 
     List<Long> selectForCruiseByPage(TStdDeviceMete tStdDeviceMete);
+    List<Long> selectByBindNew(TStdDeviceMete tStdDeviceMete);
+    List<Long> selectByBind(@Param(value = "bindMultiple") Integer bindMultiple);
     List<TCruisePointByPageDetail> selectCruisePointByPage(@Param(value = "meteName") String meteName,
                                                            @Param(value = "deviceId") Long deviceId,
                                                            @Param(value = "customId") String customId,

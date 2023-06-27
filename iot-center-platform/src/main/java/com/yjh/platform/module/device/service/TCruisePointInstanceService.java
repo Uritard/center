@@ -207,13 +207,25 @@ public class TCruisePointInstanceService{
 //        }
 //        return result;
 //    }
+    /*
+    * 过滤掉A数组中不在数组B中的元素
+    */
+    private List<Long> listFilter(List<Long> listA,List<Long> listB){
+        List<Long> listC = new ArrayList<>();
+        for (Long element : listA) {
+            if (listB.contains(element)) {
+                listC.add(element);
+            }
+        }
+        return listC;
+    }
 
     public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
+            List<Long> listForPage = tCruisePointInstanceDao.selectByBindNew(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
             List<TCruisePointByPageDetail> listAll = new LinkedList<>();
             if(listForPage != null && listForPage.size()!=0) {
