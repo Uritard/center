@@ -3014,11 +3014,15 @@ public class UPatrolTaskService {
             reMap.put("taskId", taskId);
             Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+taskCode+":"+robotId);
             if (robotOrDroneTaskInfo.size() == 0) {
-                reMap.put("taskProgress", 0);
-                reMap.put("taskName", "");
-                reMap.put("startTime", "");
-                reMap.put("taskState", "");
-                return reMap;
+                robotOrDroneTaskInfo.put("taskState", "2");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                robotOrDroneTaskInfo.put("startTime", simpleDateFormat.format(new Date()));
+                robotOrDroneTaskInfo.put("taskProgress", "0");
+//                reMap.put("taskProgress", 0);
+//                reMap.put("taskName", "");
+//                reMap.put("startTime", "");
+//                reMap.put("taskState", "");
+//                return reMap;
             }
             String re = Optional.ofNullable(robotOrDroneTaskInfo.get("taskProgress")).orElse("0");
             UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
