@@ -10,7 +10,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.CameraInfoModelExcelListener;
+import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
@@ -387,15 +387,25 @@ public class TCameraInfoController {
         Result result = new Result();
         try {
             InputStream inputStream = file.getInputStream();
-            CameraInfoModelExcelListener cameraInfoModelExcelListener = new CameraInfoModelExcelListener();
+            String[] heads = new String[] {"所属区域", "PMS编码", "设备类型", "设备型号", "设备名称", "IP", "端口", "录像机", "红外测温端口",
+                    "用户名", "用户名", "密码", "录像机通道号", "使用单位", "安装位置", "生产厂家", "经度", "纬度", "是否可控", "投运时间"};
+            ExcelReadListener<TCameraInfoExcel> modelExcelListener = new ExcelReadListener<>(heads);
             ReadSheet readSheet = new ReadSheet(0);
-            EasyExcelFactory.read(inputStream, TCameraInfoExcel.class, cameraInfoModelExcelListener).headRowNumber(1).build().read(readSheet);
-            List<TCameraInfoExcel> excelEntities = cameraInfoModelExcelListener.getExcelEntities();
+            EasyExcelFactory.read(inputStream, TCameraInfoExcel.class, modelExcelListener).headRowNumber(1).build().read(readSheet);
+
+            List<TCameraInfoExcel> excelEntities = modelExcelListener.getExcelEntities();
+            List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
+
             if (CollectionUtils.isNotEmpty(excelEntities)) {
                 tCameraInfoService.importCameraInfo(excelEntities);
             }
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(ExcelReadListener.prettyErrors(errorExcelList));
+            }
+        } catch (BusinessException e) {
+            result.setCode(e.getCode(), e.getMessage());
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "导入失败，请检查上传 excel 格式是否正确!");
             log.error("导入摄像机台账失败：" + e);
         }
         return result;

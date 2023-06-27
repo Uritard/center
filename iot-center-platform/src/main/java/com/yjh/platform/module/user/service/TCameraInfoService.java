@@ -582,7 +582,6 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public void importCameraInfo(List<TCameraInfoExcel> excelEntities) {
-        List<String> errorStr = new ArrayList<>();
         List<TCameraInfo> tCameraInfos = new ArrayList<>();
         List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
@@ -610,19 +609,14 @@ public class TCameraInfoService {
                 tCameraInfo.setVendorId(t.getVendorId());
                 tCameraInfo.setLongitude(t.getLongitude());
                 tCameraInfo.setLatitude(t.getLatitude());
-                tCameraInfo.setIsControl(t.getIsControl());
+                tCameraInfo.setIsControl("云台球机".equals(t.getIsControlStr()) ? 1 : 0);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
                 tCameraInfos.add(tCameraInfo);
-            }else {
-                errorStr.add(t.getCameraName());
             }
         });
         if (CollectionUtils.isNotEmpty(tCameraInfos)) {
             tCameraInfoDao.batchInsert(tCameraInfos);
             this.intoRedis();
-        }
-        if (!errorStr.isEmpty()){
-            throw new BusinessException("摄像机台账导入失败！请检查台账信息！" + errorStr);
         }
     }
 
