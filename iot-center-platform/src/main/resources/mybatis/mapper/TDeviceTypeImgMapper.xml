@@ -123,5 +123,6 @@
         from t_dict_business a
         left join t_device_type_img b on a.dict_code = b.type_id
         WHERE a.col_name = "device_type"
+        ORDER BY a.sort asc
     </select>
 </mapper>
