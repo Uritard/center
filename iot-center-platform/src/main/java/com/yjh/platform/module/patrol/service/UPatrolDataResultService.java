@@ -21,6 +21,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,7 +31,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -307,31 +307,13 @@ public class UPatrolDataResultService {
             try {
                 // 查询不在 t_std_devicemete_update 表中的新节点
                 List<TStdDeviceMeteUpdate> list = uPatrolDataResultDao.selectDeviceMeteList(taskId);
-                log.info("list==={}", JSON.toJSONString(list));
-                List<Long> deviceMeteIdList = uPatrolDataResultDao.selectAllDeviceMeteId();
                 // 批量更新点位图片和状态
                 uPatrolDataResultDao.updateDeviceMeteUpdate(taskId);
 
                 // 新节点插入
-                for (TStdDeviceMeteUpdate res : list) {
-
-                    TStdDeviceMeteUpdate tStdDeviceMeteUpdate =
-                        new TStdDeviceMeteUpdate().setDeviceMeteId(res.getDeviceMeteId()).setIdentifyResult(res.getIdentifyResult());
-                    if (StringUtils.isNotEmpty(res.getUpdateTime())) {
-                        tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
-                    }
-                    if (Objects.nonNull(res.getCruiseResult())) {
-                        tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
-                    }
-                    if (StringUtils.isNotEmpty(res.getPicPath())) {
-                        tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
-                    }
-                    log.info("此时的tStdDeviceMeteUpdate=== {}", tStdDeviceMeteUpdate);
-                    if (!deviceMeteIdList.contains(res.getDeviceMeteId())) {
-                        // 插入新的点位数据
-                        int insertRes = uPatrolDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
-                        log.info("{}不存在,插入结果: {}", res.getDeviceMeteId(), insertRes);
-                    }
+                if (CollectionUtils.isNotEmpty(list)) {
+                    log.info("点位不存在，插入新数据，list==={}", JSON.toJSONString(list));
+                    uPatrolDataResultDao.batchInsertDeviceMeteUpdate(list);
                 }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

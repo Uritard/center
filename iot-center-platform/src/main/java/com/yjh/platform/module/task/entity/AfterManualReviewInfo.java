@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author YC
@@ -39,4 +40,8 @@ public class AfterManualReviewInfo implements Serializable {
     private Integer cruiseType;
     @ApiModelProperty(value = "单位")
     private String unit;
+    @ApiModelProperty(value = "测点ID")
+    private Long deviceMeteId;
+    @ApiModelProperty(value = "巡视时间")
+    private Date cruiseTime;
 }

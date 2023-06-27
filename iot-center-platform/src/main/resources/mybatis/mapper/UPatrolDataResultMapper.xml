@@ -781,8 +781,8 @@
         (
         SELECT
         c.device_mete_id,
-        c.cruise_time,
-        c.picpath,
+        c.cruise_time as update_time,
+        c.picpath as pic_path,
         c.cruise_result,
         c.identify_result
         FROM
@@ -836,19 +836,22 @@
         WHERE a.update_time <![CDATA[<]]> b.cruise_time;
     </update>
 
-    <insert id="insertDeviceMeteUpdate">
+    <insert id="batchInsertDeviceMeteUpdate">
         insert into t_std_devicemete_update(
         device_mete_id,
         update_time,
         cruise_result,
         identify_result,
         pic_path
-        )values(
-        #{deviceMeteId, jdbcType=BIGINT},
-        #{updateTime, jdbcType=TIMESTAMP},
-        #{cruiseResult, jdbcType=INTEGER},
-        #{identifyResult, jdbcType=INTEGER},
-        #{picPath, jdbcType=VARCHAR}
+        ) values
+        <foreach collection="list" item="meteUpdate" separator=",">
+        (
+        #{meteUpdate.deviceMeteId, jdbcType=BIGINT},
+        #{meteUpdate.updateTime, jdbcType=TIMESTAMP},
+        #{meteUpdate.cruiseResult, jdbcType=INTEGER},
+        #{meteUpdate.identifyResult, jdbcType=INTEGER},
+        #{meteUpdate.picPath, jdbcType=VARCHAR}
         )
+        </foreach>
     </insert>
 </mapper>

@@ -115,5 +115,5 @@ public interface UPatrolDataResultDao {
 
     int updateDeviceMeteUpdate(@Param(value = "taskId") String taskId);
 
-    int insertDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
+    int batchInsertDeviceMeteUpdate(List<TStdDeviceMeteUpdate> list);
 }
