@@ -130,7 +130,7 @@ public class JobManager {
     }
 
     /**
-     *新建一个周期巡视任务
+     * 新建一个巡视任务定时器
      * 不使用事物，否则会导致事物未提交 quartz 即开始查询触发器，查不到数据需要第二次查询才能获取数据，延时 20~30 秒
      * 没有卵用，因为事物挂起，会导致任务正式执行时任务信息还未写入库中，导致任务失败
      */
@@ -173,7 +173,7 @@ public class JobManager {
         }
 
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, trigger);
-        logger.info("周期任务创建成功--taskId {}",task.getTaskId());
+        logger.info("任务创建成功--taskId {}",task.getTaskId());
         return "success";
     }
 }
