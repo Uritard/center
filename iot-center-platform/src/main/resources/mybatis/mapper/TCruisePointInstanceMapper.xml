@@ -231,6 +231,53 @@
 <!--    a.device_id,-->
 <!--    a.custom_id,-->
 <!--    a.mete_name,-->
+    <select id="selectByBindNew" resultType="java.lang.Long">
+        <choose>
+            <when test="isBind != null and isBind == 2">
+                select a.device_mete_id
+                from  t_std_devicemete a
+                where 1=1
+                <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+                <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+                <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+            </when>
+            <when test="isBind != null and isBind == 0">
+                select a.device_mete_id
+                from  t_std_devicemete a
+                where 1=1
+                <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+                <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+                <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+                and a.device_mete_id not in (
+                SELECT DISTINCT
+                device_mete_id from  t_cruise_point_instance
+                )
+            </when>
+            <otherwise>
+                SELECT DISTINCT
+                a.device_mete_id
+                from t_cruise_point_instance a
+                where 1=1
+                and a.device_mete_id in (
+                select a.device_mete_id
+                from  t_std_devicemete a
+                where 1=1
+                <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+                <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+                <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+                )
+                GROUP BY a.device_mete_id
+                <if test="bindMultiple != null and bindMultiple != 2"> HAVING count(a.device_mete_id) > 1 </if>
+            </otherwise>
+        </choose>
+    </select>
+    <select id="selectByBind" resultType="java.lang.Long">
+        SELECT DISTINCT
+        a.device_mete_id
+        from t_cruise_point_instance a
+        GROUP BY a.device_mete_id
+        <if test="bindMultiple != null and bindMultiple != 2"> HAVING count(a.device_mete_id) > 1 </if>
+    </select>
     <select id="selectCruisePointByPage"  parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TCruisePointByPageDetail">
     SELECT
     a.device_mete_id,
