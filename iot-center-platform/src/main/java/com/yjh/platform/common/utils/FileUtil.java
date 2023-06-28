@@ -45,7 +45,7 @@ public class FileUtil {
     public static String picCompression(String filePath) {
         try {
             String thumbnailFilePath = "";
-            if (StringUtils.isNotEmpty(filePath)) {
+            if (StringUtils.isNotEmpty(filePath) && isImageFile(filePath)) {
                 File file = new File(filePath);
                 if (!file.isDirectory() && file.exists()) {
                     String path = StringUtils.substringBeforeLast(filePath, ".");
@@ -64,6 +64,32 @@ public class FileUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 判断是不是图片格式
+     * @param filePath 文件路径
+     * @return
+     */
+    public static boolean isImageFile(String filePath) {
+        String extension = getFileExtension(filePath);
+        if (extension != null) {
+            // 判断常见图片格式的后缀
+            return "jpg".equalsIgnoreCase(extension) ||
+                    "jpeg".equalsIgnoreCase(extension) ||
+                    "png".equalsIgnoreCase(extension) ||
+                    "gif".equalsIgnoreCase(extension) ||
+                    "bmp".equalsIgnoreCase(extension);
+        }
+        return false;
+    }
+
+    public static String getFileExtension(String filePath) {
+        int dotIndex = filePath.lastIndexOf('.');
+        if (dotIndex >= 0 && dotIndex < filePath.length() - 1) {
+            return filePath.substring(dotIndex + 1).toLowerCase();
+        }
+        return null;
     }
 
     public static boolean checkFileName(String fileName){
