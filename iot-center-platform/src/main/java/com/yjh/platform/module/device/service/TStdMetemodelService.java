@@ -17,6 +17,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -294,12 +296,12 @@ public class TStdMetemodelService {
     private  boolean createModel(List<String> list, String modelName, String modelPath) {
         boolean newFile = false;
         //创建excel工作簿
-        HSSFWorkbook workbook = new HSSFWorkbook();
+        XSSFWorkbook workbook = new XSSFWorkbook();
         //创建工作表sheet
-        HSSFSheet sheet = workbook.createSheet();
+        XSSFSheet sheet = workbook.createSheet();
         //创建第一行
-        HSSFRow row = sheet.createRow(0);
-        HSSFCell cell;
+        Row row = sheet.createRow(0);
+        Cell cell;
         //设置样式
             CellStyle style = workbook.createCellStyle();
             style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
@@ -339,9 +341,11 @@ public class TStdMetemodelService {
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(deviceType);
+                    XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+                    XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper
+                            .createExplicitListConstraint(deviceType);
                     // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    XSSFDataValidation dataValidation3 = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions3);
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
@@ -350,9 +354,11 @@ public class TStdMetemodelService {
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(meteType);
+                    XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+                    XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper
+                            .createExplicitListConstraint(meteType);
                     // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    XSSFDataValidation dataValidation3 = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions3);
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
@@ -361,9 +367,11 @@ public class TStdMetemodelService {
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(meteKind);
+                    XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+                    XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper
+                            .createExplicitListConstraint(meteKind);
                     // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    XSSFDataValidation dataValidation3 = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions3);
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
@@ -383,9 +391,11 @@ public class TStdMetemodelService {
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(analyseType);
+                    XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+                    XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper
+                            .createExplicitListConstraint(analyseType);
                     // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    XSSFDataValidation dataValidation3 = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions3);
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
@@ -394,9 +404,11 @@ public class TStdMetemodelService {
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(alarmLevel);
+                    XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+                    XSSFDataValidationConstraint dvConstraint = (XSSFDataValidationConstraint) dvHelper
+                            .createExplicitListConstraint(alarmLevel);
                     // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+                    XSSFDataValidation dataValidation3 = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, regions3);
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
