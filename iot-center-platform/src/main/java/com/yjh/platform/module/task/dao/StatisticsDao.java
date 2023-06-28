@@ -147,4 +147,6 @@ public interface StatisticsDao {
   List<Map<String,Object>> selectDrone();
 
   List<Map<String,Object>> selectCamera();
+
+  List<Map<String, Object>> selectCameraStaticsInfoByOptimize(@Param(value = "cameraId") Long cameraId);
 }
