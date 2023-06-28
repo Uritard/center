@@ -348,4 +348,53 @@
     <select id="selectCount" resultType="java.lang.Integer">
         select count(1)  from t_voice_device
     </select>
+
+    <select id="getUpRegionByVoiceDeviceName" resultType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfo">
+        select up_region_id,voice_device_id
+        from t_voice_device
+        where voice_device_name like concat
+            ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')
+        and voice_device_id NOT IN (
+            SELECT
+                monitor_device_id
+            FROM
+                sys_role_monitor_device srmd
+                    LEFT JOIN sys_user su ON srmd.role_id = su.role_id
+            WHERE
+                su.user_id = #{userId, jdbcType = BIGINT}
+        )
+    </select>
+
+    <select id="getTreeByName" resultType="com.yjh.platform.module.device.entity.VoiceDevice">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS
+        infoType,
+        "" as dbValue, "" as fvalue
+        FROM t_std_region a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        where a.region_id in (
+            <foreach collection="regionList" item="regionId" separator=",">
+                #{regionId}
+            </foreach>
+        )
+        UNION ALL (
+        SELECT
+        a.voice_device_id AS id,
+        a.voice_device_name AS label,
+        a.up_region_id AS upId,
+        b.region_name as upName,
+        "device" AS infoType,
+        concat(c.db_value, 'dB') as dbValue,
+        concat(c.f_value, 'Hz')as fvalue
+        FROM
+        t_voice_device a
+        left join t_voice_config c on a.config_id = c.config_id
+        LEFT JOIN t_std_region b on a.up_region_id = b.region_id
+        WHERE
+        a.voice_device_id  IN (
+        <foreach collection="deviceList" item="item" separator=",">
+            #{item.voiceDeviceId}
+        </foreach>
+        )
+        )
+    </select>
 </mapper>

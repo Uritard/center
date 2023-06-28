@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.dao.TSysParamDao;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -228,23 +229,78 @@ public class TVoiceDeviceService{
 //        voiceDeviceTree.setChildren(child);
 //        re.add(voiceDeviceTree);
 //        return re;
-        List<VoiceDevice> listTree = new ArrayList<>();
-        listTree = tVoiceDeviceDao.selectAll(voiceDeviceName, userId);
-        List<VoiceDevice> areaInfoCountryList = new ArrayList<>();
-        for(Iterator<VoiceDevice> it = listTree.iterator(); it.hasNext();){
-            VoiceDevice areaInfoMap = it.next();
-            if (Objects.nonNull(areaInfoMap.getUpId()) && "-1".equals(areaInfoMap.getUpId())) {
-                VoiceDevice areaInfoCountry = new VoiceDevice();
-                areaInfoCountry.setId(areaInfoMap.getId());
-                areaInfoCountry.setLabel(areaInfoMap.getLabel());
-                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
-                areaInfoCountryList.add(areaInfoCountry);
+        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
+        if (StringUtils.isNotEmpty(voiceDeviceName)){
+            List<VoiceDeviceAllInfo> voiceDeviceList = tVoiceDeviceDao.getUpRegionByVoiceDeviceName(voiceDeviceName, userId);
+            if (voiceDeviceList.isEmpty()){
+                return new ArrayList<>();
+            }
+            List<Long> upRegionList = new ArrayList<>();
+            voiceDeviceList.forEach(voiceDeviceAllInfo -> {
+                upRegionList.add(voiceDeviceAllInfo.getUpRegionId());
+            });
+            List<Long> allRegionList = getAllUpRegionId(upRegionList);
+            List<VoiceDevice> byNameTree = tVoiceDeviceDao.getTreeByName(voiceDeviceList,allRegionList);
+            List<VoiceDevice> areaInfoCountryList = new ArrayList<>();
+            for (Iterator<VoiceDevice> it = byNameTree.iterator(); it.hasNext(); ) {
+                VoiceDevice areaInfoMap = it.next();
+                if (Objects.nonNull(areaInfoMap.getUpId()) && "-1".equals(areaInfoMap.getUpId())) {
+                    VoiceDevice areaInfoCountry = new VoiceDevice();
+                    areaInfoCountry.setId(areaInfoMap.getId());
+                    areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                    areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoCountryList.add(areaInfoCountry);
+                }
+            }
+            diGui(areaInfoCountryList,byNameTree,realPath,absPath);
+            return areaInfoCountryList;
+        } else {
+            List<VoiceDevice> listTree = new ArrayList<>();
+            listTree = tVoiceDeviceDao.selectAll(voiceDeviceName, userId);
+
+            List<VoiceDevice> areaInfoCountryList = new ArrayList<>();
+            for (Iterator<VoiceDevice> it = listTree.iterator(); it.hasNext(); ) {
+                VoiceDevice areaInfoMap = it.next();
+                if (Objects.nonNull(areaInfoMap.getUpId()) && "-1".equals(areaInfoMap.getUpId())) {
+                    VoiceDevice areaInfoCountry = new VoiceDevice();
+                    areaInfoCountry.setId(areaInfoMap.getId());
+                    areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                    areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoCountryList.add(areaInfoCountry);
+                }
+            }
+            diGui(areaInfoCountryList, listTree, realPath, absPath);
+            return areaInfoCountryList;
+        }
+    }
+
+    private List<Long> getAllUpRegionId(List<Long> regionList){
+        List<AreaInfo> allRegionList = tStdDeviceDao.selectAllRegion();
+        List<Long> reList = new ArrayList<>(regionList);
+        for (Long regionId : regionList){
+            Long id = getUpRegionId(allRegionList,regionId);
+            if (reList.contains(id)){
+                continue;
+            }
+            while (true){
+                reList.add(id);
+                id = getUpRegionId(allRegionList,reList.get(reList.size() - 1));
+                if (id == -1){
+                    break;
+                }
             }
         }
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
-        String absPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
-        diGui(areaInfoCountryList, listTree,realPath,absPath);
-        return areaInfoCountryList;
+        return reList;
+    }
+
+    private Long getUpRegionId(List<AreaInfo> regionList,Long regionId){
+        for (AreaInfo areaInfo: regionList){
+            if (Objects.equals(areaInfo.getId(), regionId)){
+                return areaInfo.getUpId();
+            }
+        }
+        return  -1L;
     }
     private void diGui(List<VoiceDevice> areaInfoList, List<VoiceDevice> listTree,String realPath,String absPath) {
         for(VoiceDevice areaInfo : areaInfoList){

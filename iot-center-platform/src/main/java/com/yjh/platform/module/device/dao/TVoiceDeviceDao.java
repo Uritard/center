@@ -47,4 +47,12 @@ public interface TVoiceDeviceDao {
     int deleteConf(@Param(value = "configId") Long configId);
     VoiceDeviceInfoDetail selectFrequencyInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     List<VoiceDevice> selectVoiceTree();
-    int  selectCount();}
+    int  selectCount();
+
+    List<VoiceDeviceAllInfo> getUpRegionByVoiceDeviceName(@Param(value = "voiceDeviceName") String voiceDeviceName,
+                                            @Param(value = "userId")Long userId);
+
+    List<VoiceDevice> getTreeByName(@Param(value = "deviceList") List<VoiceDeviceAllInfo> deviceList,
+                                    @Param(value = "regionList") List<Long> regionList);
+
+}
