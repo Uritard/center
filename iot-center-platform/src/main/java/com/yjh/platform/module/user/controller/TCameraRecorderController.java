@@ -12,7 +12,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.CameraRecordModelExcelListener;
+import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
@@ -297,15 +297,22 @@ public class TCameraRecorderController {
         Result result = new Result();
         try {
             InputStream inputStream = file.getInputStream();
-            CameraRecordModelExcelListener cameraRecordModelExcelListener = new CameraRecordModelExcelListener();
+            String[] heads = new String[] {"设备名称", "PMS编码", "设备别名", "设备类型", "设备型号", "生产厂家", "使用单位", "IP",
+                    "服务端口", "RTSP端口", "传输协议", "协议路径", "用户名", "密码", "最大通道数", "缓存天数", "缓存大小", "录制时长"};
+            ExcelReadListener<TCameraRecorderExcel> modelExcelListener = new ExcelReadListener<>(heads);
             ReadSheet readSheet = new ReadSheet(0);
-            EasyExcelFactory.read(inputStream, TCameraRecorderExcel.class,cameraRecordModelExcelListener).headRowNumber(1).build().read(readSheet);
-            List<TCameraRecorderExcel> excelEntities = cameraRecordModelExcelListener.getExcelEntities();
+            EasyExcelFactory.read(inputStream, TCameraRecorderExcel.class,modelExcelListener).headRowNumber(1).build().read(readSheet);
+            List<TCameraRecorderExcel> excelEntities = modelExcelListener.getExcelEntities();
+            List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
+
             if (CollectionUtils.isNotEmpty(excelEntities)) {
                 List<TCameraRecorder> tCameraRecorders = tCameraRecorderService.importCameraRecorder(excelEntities);
                 tCameraRecorders.forEach(t -> {
                     sendPostRequest(Constant.NVR_REGISTER_URL,t.getRecordId());
                 });
+            }
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(ExcelReadListener.prettyErrors(errorExcelList));
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
