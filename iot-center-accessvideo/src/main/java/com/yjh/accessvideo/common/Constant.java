@@ -38,6 +38,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Constant {
 
+    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
+    public static final String COPY_FILE_URL = "http://iot-center-platform/file/v1/copy-ftps";
+
     public static Map<String, Integer> maps = new ConcurrentHashMap<>();
     /**
      * 海康设备用户句柄集合
@@ -74,8 +77,6 @@ public class Constant {
 
     public static Map<String, String> mapsForCamera = new HashMap<>();
 
-    public static Map<String, String> mapsForHistory = new HashMap<>();
-
     /**
      录像信息
      */
@@ -105,10 +106,6 @@ public class Constant {
     public static RedisTemplate redisTemplate;
 
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
-        //将websocket信息写入redis
-        String json= JSON.toJSONString(map);
-        //WebSocketServer.sendMsg(json);
-        // String.valueOf(map);
         if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
                 || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
             redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);
@@ -117,6 +114,7 @@ public class Constant {
         CloseableHttpClient client = HttpClients.createDefault();
         String result = "";
         try {
+            String json= JSON.toJSONString(map);
             URI uri = new URIBuilder(url).setParameter("json", json).build();
             HttpPost httpGet = new HttpPost(uri);
             httpGet.addHeader("Content-type", "application/json;charset=utf-8");
@@ -130,6 +128,13 @@ public class Constant {
         //return "666";
     }
 
+    /**
+     * 给其他服务的接口发送字节数组
+     *
+     * @param url   地址
+     * @param bytes 数据
+     * @return InputStream
+     */
     public static InputStream websocketSendMsgBuffer(String url, byte[] bytes){
         HttpURLConnection con = null;
         InputStream inputStream = null;
@@ -158,24 +163,10 @@ public class Constant {
         return inputStream;
     }
 
-    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
-        Result re = new Result();
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
-        return re;
-    }
-    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
-
-
-    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
-
     public static<T> Result otherServerList( List<T> list, String url) {
         Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
         return re;
     }
-
-    public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
-
-    public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
 
     public static void  otherServerMap( Map<String,String> map, String url) {
         try{
@@ -188,10 +179,6 @@ public class Constant {
         }
     }
 
-    public static String algorithmTestPicPath= "";
-    public static String algorithmTestBasePicPath= "";
-
-    public static final String COPY_FILE_URL = "http://iot-center-platform/file/v1/copy-ftps";
     /**
      * 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
      */

@@ -9,8 +9,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -23,7 +25,6 @@ import java.util.List;
 @Api(value = "/statistics", tags = "统计信息接口")
 public class StatisticsController {
 
-  @Autowired
   private final StatisticsService statisticsService;
 
   private final Logger log = LoggerFactory.getLogger(StatisticsController.class);
@@ -36,15 +37,13 @@ public class StatisticsController {
   @GetMapping(value = "/robot")
   @Logs(title = "机器人/无人机可靠性",content = "根据用户传递的参数查询机器人/无人机可靠性",logType = 1, authority = "1234")
   public Result robot(@RequestParam(value = "id", required = false) Long id,
-                      @RequestParam(value = "type") String type,
-                      @RequestParam(defaultValue = "1") int pageNum,
-                      @RequestParam( defaultValue = "8") int pageSize) {
+                      @RequestParam(value = "type") String type) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.selectStatisticsRobot(id, type, pageNum, pageSize));
+      result.setData(statisticsService.selectStatisticsRobot(id, type));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("查询失败：", e);
+      log.error("机器人/无人机可靠性查询失败：", e);
     }
     return result;
   }
@@ -52,15 +51,13 @@ public class StatisticsController {
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
   @Logs(title = "摄像机可靠性",content = "根据用户传递的参数查询摄像机可靠性",logType = 1, authority = "1234")
-  public Result camera(@RequestParam(value = "id", required = false) Long id,
-                       @RequestParam(defaultValue = "1") int pageNum,
-                       @RequestParam( defaultValue = "8") int pageSize) {
+  public Result camera(@RequestParam(value = "id", required = false) Long id) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countCamera(id, pageNum, pageSize));
+      result.setData(statisticsService.countCamera(id));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("查询失败：", e);
+      log.error("摄像机可靠性查询失败：", e);
     }
     return result;
   }
@@ -78,7 +75,7 @@ public class StatisticsController {
       result.setData(statisticsService.countInstanceLoss(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("失败查询描述：", e);
+      log.error("巡视点位漏检率失败查询描述：", e);
     }
     return result;
   }
@@ -98,7 +95,7 @@ public class StatisticsController {
       result.setData(list);
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("失败查询描述：", e);
+      log.error("告警审核完成率失败查询描述：", e);
     }
     return result;
   }
@@ -117,7 +114,7 @@ public class StatisticsController {
       result.setData(statisticsService.countWarnAccuracy(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("失败查询描述：", e);
+      log.error("巡视告警准确率失败查询描述：", e);
     }
     return result;
   }
@@ -136,7 +133,7 @@ public class StatisticsController {
       result.setData(statisticsService.countResultCheck(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("失败查询描述：", e);
+      log.error("巡视结果人工审核完成率失败查询描述：", e);
     }
     return result;
   }
@@ -154,7 +151,7 @@ public class StatisticsController {
       result.setData(statisticsService.countTask(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-      log.error("失败查询描述：", e);
+      log.error("巡视任务闭环率失败查询描述：", e);
     }
     return result;
   }
@@ -174,7 +171,7 @@ public class StatisticsController {
       result.setData(statisticsService.countTaskFrequency(type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
-      log.error("统计失败：", e);
+      log.error("执行巡视任务次数统计失败：", e);
     }
     return result;
   }
@@ -193,7 +190,7 @@ public class StatisticsController {
       result.setData(statisticsService.countTaskExecutedDuration(type, year, month));
     }catch (Exception e){
       result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
-      log.info("统计失败：",e);
+      log.info("统计巡视任务时长统计失败：",e);
     }
     return result;
   }
@@ -210,7 +207,7 @@ public class StatisticsController {
     try {
       result.setData(statisticsService.countDefectsOfTask(type, year, month));
     }catch (Exception e){
-      log.error("缺陷信息查询失败：",e);
+      log.error("统计任务执行发现的缺陷查询失败：",e);
       result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
     }
     return result;

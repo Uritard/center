@@ -7,7 +7,6 @@ import com.yjh.accessvideo.hik.HCNetSDK;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.Objects;
@@ -28,6 +27,15 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
     public CbVoiceDataCallBack(String webSocketUrl, Long deviceId){
         this.webSocketUrl = webSocketUrl;
         this.deviceId = deviceId;
+    }
+
+    /**
+     * 保证多线程修改不会共同操作
+     */
+    public static synchronized void setDecHandle() {
+        if (Constant.pDecHandle == null) {
+            Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
+        }
     }
 
     @Override
@@ -52,12 +60,10 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
 
             // 若编码格式为G711时,需要解码   G711 -> PCM
             if (VoiceTransConstant.AudioEncType.G711_A.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)){
-                // X86:amd64    Arm:aarch64
-                if (StringUtils.equals("amd64", Constant.SYSTEM_ARCH)) {
+                if (StringUtils.equals(VoiceTransConstant.X86, Constant.SYSTEM_ARCH)) {
                     // 初始化音频解码
-                    if (Constant.pDecHandle == null) {
-                        Constant.pDecHandle = HC_NET_SDK.NET_DVR_InitG711Decoder();
-                    }
+                    setDecHandle();
+
                     // G711音频解码
                     HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM strutAudioParam = new HCNetSDK.NET_DVR_AUDIODEC_PROCESS_PARAM();
                     strutAudioParam.in_buf = receiveDataBuffer;
@@ -138,28 +144,6 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
         System.arraycopy(headerBytes, 0, byteResult, 0, headerBytes.length);
         System.arraycopy(originBytes, 0, byteResult, headerBytes.length, originBytes.length);
         return byteResult;
-    }
-
-    /**
-     * 生成音频文件头部消息
-     * @param totalAudioLen 不包括header的音频数据总长度
-     * @param sampleRate 采样率,也就是录制时使用的频率、音频采样级别 8000 = 8KHz
-     * @param channels audioRecord的声道数1/2
-     * @param audioFormat  采样精度; 譬如 16bit
-     * @return byte[]
-     */
-    private byte[] getWaveFileHeader2(int totalAudioLen, int sampleRate, short channels, short audioFormat) throws IOException {
-        WaveHeader header = new WaveHeader();
-        header.fileLength = totalAudioLen + (44 - 8);
-        header.fmtHdrLength = 16;
-        header.formatTag = 0x0001;
-        header.channels = channels;
-        header.samplesPerSec = sampleRate;
-        header.bitsPerSample = audioFormat;
-        header.blockAlign = (short) (header.channels * header.bitsPerSample / 8);
-        header.avgBytesPerSec = header.blockAlign * header.samplesPerSec;
-        header.dataHdrLength = totalAudioLen;
-        return header.getHeader();
     }
 
     /**

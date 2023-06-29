@@ -68,9 +68,9 @@ public class DeviceStaticsToUpSystem {
         List<Map<String, Object>> cameraList = statisticsDao.selectCamera();
         List<Map<String, Object>> droneList = statisticsDao.selectDrone();
         // 加载进入redis缓存
-        statisticsService.selectStatisticsRobot(null, "robot", 0, 0);
-        statisticsService.selectStatisticsRobot(null, "", 0, 0);
-        statisticsService.countCamera(null, 0, 0);
+        statisticsService.selectStatisticsRobot(null, "robot");
+        statisticsService.selectStatisticsRobot(null, "");
+        statisticsService.countCamera(null);
         robotList.addAll(cameraList);
         robotList.addAll(droneList);
         robotList.forEach(device -> {

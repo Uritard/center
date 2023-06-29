@@ -33,8 +33,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 
     private Logger log = LoggerFactory.getLogger(AnalysisClientHandler.class);
 
-    private long hisT3 = System.currentTimeMillis();
-    private long T3 = 20000;
     public boolean isThreadStart;
     private ChannelHandlerContext ctx;
 
@@ -122,31 +120,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         }
 
         ReferenceCountUtil.release(byteBuf);
-    }
-
-    public void ProcSend() {
-        try {
-            // 心跳报文(客户端,服务端均可发起测试);
-            if (isTimeout(TYPET3, hisT3, false)) {
-//                SendHeartBeat();
-                hisT3 = System.currentTimeMillis();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private boolean isTimeout(byte type, long value, boolean set) {
-        if (type == TYPET3) {
-            //log.info("commandSend:68 04 43 00 00 00 "+System.currentTimeMillis() + ":" + value +":" +(System.currentTimeMillis() - value));
-            if ((System.currentTimeMillis() - value) > T3) {
-                if (set) hisT3 = System.currentTimeMillis();
-                return true;
-            } else {
-                return false;
-            }
-        } else return false;
     }
 
     @Override

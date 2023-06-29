@@ -25,10 +25,6 @@ public class HikUtilsApp {
      */
     @Value("${nvr.log.path}")
     private String sdkLogPath;
-    /**
-     * 语音转发句柄
-     */
-    private int lVoiceTranHandle = -1;
 
     private static final HCNetSDK HC_NET_SDK = HCNetSDK.INSTANCE;
     private VoiceDataCallBack voiceDataCallBack = null;
@@ -148,7 +144,7 @@ public class HikUtilsApp {
     public int startVoiceTrans(int lUserId, CbVoiceDataCallBack cbVoiceDataCallBack, Pointer pointer){
         // 语音通道号。对于设备本身的语音对讲通道，从1开始
         int dwVoiceChan = 1;
-        lVoiceTranHandle = HC_NET_SDK.NET_DVR_StartVoiceCom_MR_V30(lUserId, dwVoiceChan, cbVoiceDataCallBack, pointer);
+        int lVoiceTranHandle = HC_NET_SDK.NET_DVR_StartVoiceCom_MR_V30(lUserId, dwVoiceChan, cbVoiceDataCallBack, pointer);
         if (lVoiceTranHandle == -1){
             log.error("Start voice trans fail, error code:{}", HC_NET_SDK.NET_DVR_GetLastError());
         }else {

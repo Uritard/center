@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 优化发送数据到设备的逻辑
+ * 优化ARM架构发送数据到设备的逻辑
  *
  * @author 丫C
  * @date 2023/5/16
@@ -55,6 +55,7 @@ public class VoiceDataSendToDevice {
             }
         } catch (Exception e){
             log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
     }
 }

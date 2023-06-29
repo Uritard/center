@@ -8,7 +8,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
-import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
@@ -16,8 +15,6 @@ import com.yjh.platform.module.task.entity.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,10 +23,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -39,21 +34,21 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class StatisticsService {
-    @Autowired
-    private StatisticsDao statisticsDao;
-
-    @Autowired
-    private UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final StatisticsDao statisticsDao;
+    private final UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public static final String ROBOT = "robot";
     public static final String DRONE = "drone";
-
     public static final String CAMERA = "CAMERA";
 
-    private Result getNVRInfo(Long recordId) {
+    public StatisticsService(StatisticsDao statisticsDao, UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao, RedisTemplate<String, Object> redisTemplate) {
+        this.statisticsDao = statisticsDao;
+        this.uPatrolDeviceStaticsDao = uPatrolDeviceStaticsDao;
+        this.redisTemplate = redisTemplate;
+    }
+
+    private Result getNVRInfo(Object recordId) {
         Result re = new Result();
         try {
             String entries = (String) redisTemplate.opsForValue().get("recorderInfo:" + recordId);
@@ -118,7 +113,7 @@ public class StatisticsService {
         calendar.set(Calendar.MILLISECOND, 999);
         // 获取最后一天的时间
         Date end = calendar.getTime();
-        Map<String, Object> dateMap = new HashMap<>();
+        Map<String, Object> dateMap = new HashMap<>(8);
         dateMap.put("startTime", start);
         dateMap.put("endTime", end);
         if (type == 2) {
@@ -132,7 +127,7 @@ public class StatisticsService {
 
     private static List<String> getMonths(Date start, Date end) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Calendar tempStart = Calendar.getInstance();
         tempStart.setTime(start);
         tempStart.add(Calendar.DATE, 0);
@@ -146,203 +141,44 @@ public class StatisticsService {
         return result;
     }
 
-    public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type, int pageNum, int pageSize) {
-        List<Map<String, Object>> list = null;
+    public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type) {
+        List<Map<String, Object>> list;
         if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(robotId,ROBOT.equals(type) ? "0":"1");
         } else {
-            list = packageInfo(type,robotId, pageNum, pageSize);
+            list = packageInfo(type,robotId);
         }
-/*        Long duration = null;
-        String robotStatus = null;
-        Long lastOnlineTime = null;
-        Long offLineCount = null;
-        Number commissionDay = null;
-        Number cruiseDay = null;
-        Number normalDay = null;
-        List<Map<String, Object>> maps = statisticsDao.selectNormalDayRobot(robotId);
-        for (Map<String, Object> map : list) {
-            List<TRobotInfo> tRobotInfoList =
-                    statisticsDao.selectByPage(new TRobotInfo().setRobotId((Long) map.get("robotId")));
-            if (CollectionUtils.isEmpty(tRobotInfoList)) {
-                log.error("查询不到robotId={}的机器人信息", robotId);
-                continue;
-            }
-            robotStatus = tRobotInfoList.get(0).getRobotStatus();
-            lastOnlineTime = tRobotInfoList.get(0).getLastOnlineTime();
-            duration = tRobotInfoList.get(0).getDuration();
-            offLineCount = tRobotInfoList.get(0).getOffLineCount();
-            // 在线总时长
-            if (duration != null) {
-                long totalHour = duration / 1000 / 60 / 60;
-                map.put("duration", totalHour);
-            } else {
-                map.put("duration", 0);
-            }
-            // 在线状态
-            map.put("robotStatus", robotStatus);
-            // 上次在线时间
-            map.put("lastOnlineTime", lastOnlineTime);
-            // 离线次数
-            map.put("offLineCount", offLineCount);
-            // 出勤率 投运期间累计正常巡检天数/总投运天数
-            commissionDay =
-                    Integer.parseInt(StringUtils.isEmpty(map.get(
-                            "commissionDays").toString()) ? "0" : map.get("commissionDays").toString()) + 1;
-            map.put("normalDay", 0);
-            maps.forEach(data -> {
-                if (data.get("robotId").equals(map.get("robotId"))) {
-                    map.put("normalDay", data.get("normalDay"));
-                }
-            });
-            normalDay =
-                    Integer.parseInt(StringUtils.isEmpty(map.get(
-                            "commissionDays").toString()) ? "0" : map.get("commissionDays").toString()) - Integer.parseInt(StringUtils.isEmpty(map.get(
-                            "normalDay").toString()) ? "0" : map.get("normalDay").toString()) + 1;
-
-            map.put("normalDay", normalDay);
-
-            cruiseDay = (Number) map.getOrDefault("cruiseDay", 0);
-            String cruiseAttend = commissionDay.intValue() == 0
-                    ? "N/A" : numberCover(cruiseDay.intValue(), commissionDay.intValue());
-            map.put("cruisePercent", cruiseAttend);
-            robotId = (Long) map.get("robotId");
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            String beginDate = dateFormat.format(map.get("commissionDate"));
-
-            HashMap<String, Object> percentMap =
-                    countInstanceLoss(
-                            null, robotId, beginDate, DateTimeUtil.getDateByLong(System.currentTimeMillis()));
-            if (percentMap.size() > 0 && percentMap.get("percent") != null) {
-                map.put("lossPercent", percentMap.get("percent"));
-            }
-            Map<String, String> cacheMap = Maps.newHashMap();
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                cacheMap.put(entry.getKey(), String.valueOf(entry.getValue()));
-            }
-            redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + map.get("robotId"), cacheMap);
-        }*/
         return list;
-    }
-
-    /**
-     * 巡视点位漏检率
-     *
-     * @param startTime
-     * @param endTime
-     * @return
-     */
-    public HashMap<String, Object> countInstanceLoss(
-            String taskId, Long robotId, String startTime, String endTime) {
-        return dealCount(statisticsDao.countInstanceLoss(taskId, robotId, startTime, endTime));
-    }
-
-    private HashMap<String, Object> dealCount(HashMap<String, Object> countMap) {
-        HashMap<String, Object> reMap = new HashMap<>();
-        if (countMap.get("totalNum") != null && countMap.get("validNum") != null) {
-            double totalNum = Double.parseDouble(countMap.get("totalNum").toString());
-            double validNum = Double.parseDouble(countMap.get("validNum").toString());
-            String percent = String.format("%.3f", validNum * 100 / totalNum);
-            reMap.put("total_num", totalNum);
-            reMap.put("valid_num", validNum);
-            reMap.put("percent", percent + "%");
-        }
-        return reMap;
     }
 
     /**
      * 摄像机 巡检率，漏检率，巡检天数
      *
-     * @return
+     * @return List<Map<String, Object>>
      */
-    public List<Map<String, Object>> countCamera(Long id, int pageNum, int pageSize) {
-        List<Map<String, Object>> list = null;
+    public List<Map<String, Object>> countCamera(Long id) {
+        List<Map<String, Object>> list;
         if (Constant.isUpSystem()) {
             // 当前系统是上级系统,从数据中获取数据
             list = uPatrolDeviceStaticsDao.selectStatisticsRobot(id,"2");
         } else {
-            list = packageInfo(CAMERA, id, pageNum, pageSize);
+            list = packageInfo(CAMERA, id);
         }
 
         return list;
-/*
-        List<Map<String, Object>> mapList = statisticsDao.countCamera(id);
-        Set<Long> set = new HashSet();
-        for (Map<String, Object> map : mapList) {
-            double totalNum = Double.parseDouble(map.get("totalNum").toString());
-            double lossNum = Double.parseDouble(map.get("lossNum").toString());
-            if (totalNum != 0) {
-                String lossPercent = String.format("%.2f", lossNum * 100 / totalNum);
-                map.put("lossPercent", lossPercent + "%");
-            }
-
-            double commissionDay = Double.parseDouble(map.get("commissionDay").toString());
-            double cruiseDay = Double.parseDouble(map.get("cruiseDay").toString());
-            if (commissionDay != 0) {
-                String cruisePercent = String.format("%.2f", cruiseDay * 100 / commissionDay);
-                map.put("cruisePercent", cruisePercent + "%");
-            }
-
-            // 根据cameraId查询recordId，查询摄像机完整率
-            Long cameraId = (Long) map.get("cameraId");
-            Long recordId = statisticsDao.selectRecordByCamera(cameraId);
-            map.put("recordId", recordId);
-            if (recordId == null) {
-                log.error("相机cameraId={}无对应的录像机", cameraId);
-                continue;
-            }
-            set.add(recordId);
-        }
-        Map<Integer, String> percentMap = new HashMap<>(8);
-        for (Long recordId : set) {
-            Result re = getNVRInfo(recordId);
-            if (re == null || re.getData() == null) {
-                continue;
-            }
-            Map<String, Object> mapData = (Map<String, Object>) re.getData();
-
-            List<Map<String, Object>> chanInfo = new ArrayList<>();
-            if (mapData.get("channel") != null) {
-                chanInfo = (List<Map<String, Object>>) mapData.get("channel");
-                for (Map<String, Object> mapChannel : chanInfo) {
-                    int intactTime = (int) mapChannel.get("intactTime");
-                    int ipChanNum = (int) mapChannel.get("ipChanNum");
-                    if (intactTime != 0) {
-                        String intactPercent = String.format("%.2f", intactTime / 100d);
-                        percentMap.put(ipChanNum, intactPercent + "%");
-                    }
-                }
-            }
-        }
-        if (percentMap.size() > 0) {
-            for (Map<String, Object> map : mapList) {
-                int ipChanNum = (int) map.get("channelNum");
-                map.put("intactPercent", percentMap.get(ipChanNum));
-            }
-        }
-        mapList.forEach(map -> {
-                    Map<String, String> tempMap = Maps.newHashMap();
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        tempMap.put(entry.getKey(), String.valueOf(entry.getValue()));
-                    }
-                    redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), tempMap);
-                }
-        );
-        return mapList;
-*/
     }
 
     /**
      * 巡视任务闭环率
      *
-     * @return
+     * @return List<Statistics>
      */
     public List<Statistics> countTask(String robotCode, Integer type, Integer year, Integer month) {
 
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
 
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
@@ -377,11 +213,12 @@ public class StatisticsService {
     /**
      * 巡视点位漏检率
      *
-     * @return
+     * @return List<Statistics>
      */
     public List<Statistics> countInstanceLoss(String regionCode,Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
         String systemLevel  = Constant.getLevelEdge();
@@ -413,7 +250,8 @@ public class StatisticsService {
     }
 
     private void dealDay(List<Statistics> result, Map<String, Object> objectMap) {
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<String> dateList = getBetweenDates(startTime, endTime);
         for (String date : dateList) {
             boolean b = result.stream().anyMatch(m -> m.getDay().equals(date));
@@ -444,7 +282,8 @@ public class StatisticsService {
     }
 
     private void dealMonth(List<Statistics> result, Map<String, Object> objectMap) {
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<String> getMonths = getMonths(startTime, endTime);
         for (String date : getMonths) {
             boolean b = result.stream().anyMatch(m -> m.getMonth().equals(date));
@@ -462,11 +301,12 @@ public class StatisticsService {
      *
      * @param type  类型 1:日历 2:周历 3:月历
      * @param month 月份
-     * @return
+     * @return List<Statistics>
      */
     public List<Statistics> countWarnCheck(String regionCode,Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
         String systemLevel  = Constant.getLevelEdge();
@@ -500,11 +340,12 @@ public class StatisticsService {
     /**
      * 巡视告警准确率
      *
-     * @return
+     * @return List<Statistics>
      */
     public List<Statistics> countWarnAccuracy(String regionCode,Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
         String systemLevel  = Constant.getLevelEdge();
@@ -538,11 +379,12 @@ public class StatisticsService {
     /**
      * 巡视结果人工审核完成率
      *
-     * @return
+     * @return List<Statistics>
      */
     public List<Statistics> countResultCheck(String regionCode,Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         //处理上级系统逻辑
         String systemLevel  = Constant.getLevelEdge();
@@ -575,7 +417,7 @@ public class StatisticsService {
 
     private List<String> getBetweenDates(Date start, Date end) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Calendar tempStart = Calendar.getInstance();
         tempStart.setTime(start);
         tempStart.add(Calendar.DATE, 0);
@@ -598,21 +440,9 @@ public class StatisticsService {
         }
     }
 
-    private String numberCover(Integer num1, Integer num2) {
-
-        // 创建一个数值格式化对象
-        NumberFormat numberFormat = NumberFormat.getInstance();
-        // 设置精确到小数点后2位
-        numberFormat.setMaximumFractionDigits(2);
-        return numberFormat.format((float) num1 / (float) num2 * 100) + "%";
-    }
-
-    private List<Map<String, Object>> packageInfo(String key, Long id, int pageNum, int pageSize) {
-        int startIndex = pageSize * (pageNum - 1);
-        int endIndex = pageSize;
-
+    private List<Map<String, Object>> packageInfo(String key, Long id) {
         List<Map<String, Object>> list = new ArrayList<>();
-        log.info("开始时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+        log.info("处理开始时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
         // 机器人无人机处理
         if (ROBOT.equals(key) || DRONE.equals(key)) {
             List<Long> idList;
@@ -632,24 +462,10 @@ public class StatisticsService {
                                 .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
                         .collect(Collectors.toList());
                 // 批量插入redis
-                piplinePutStaticsInfo(deviceStaticsInfoTempList);
-
-                // First revision-By-yc
-                /*List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfo(startIndex, endIndex,idList);
-                for (Map<String, Object> deviceStaticsInfo : deviceStaticsInfoList){
-                    String robotId = String.valueOf(deviceStaticsInfo.get("robotId"));
-
-                    // 正常巡检天数 & 巡检出勤率
-                    Map<String, Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(NumberUtils.toLong(robotId));
-                    deviceStaticsInfo.put("cruiseDay", result.getOrDefault("cruise_day", 0));
-                    deviceStaticsInfo.put("cruisePercent", result.get("cruise_rate") == null ? 0 : result.get("cruise_rate") + "%");
-
-                    deviceStaticsInfo.replaceAll((k, v) -> String.valueOf(v));
-                    redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + robotId, deviceStaticsInfo);
-                }*/
+                pipelinePutStaticsInfo(deviceStaticsInfoTempList,"robotId");
                 list.addAll(deviceStaticsInfoList);
             }
-            log.info("结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+            log.info("机器人无人机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
 
             // By-zx
             /*if (!CollectionUtils.isEmpty(idList)) {
@@ -675,46 +491,21 @@ public class StatisticsService {
             return list;
         }
         // 摄像机处理
-        List<Map<String, Object>> mapList = statisticsDao.countCamera(id, startIndex, endIndex);
+        List<Map<String, Object>> deviceStaticsInfoList = statisticsDao.selectCameraStaticsInfoByOptimize(id);
 
-        Set<Long> set = new HashSet();
-        for (Map<String, Object> map : mapList) {
-            // 巡检出勤率
-            double cruiseDay = NumberUtils.toDouble(map.get("cruiseDay").toString());
-            double commissionDay = NumberUtils.toDouble(map.get("commissionDay").toString());
-            if (commissionDay != 0) {
-                String cruisePercent = String.format("%.3f", cruiseDay * 100 / commissionDay);
-                map.put("cruisePercent", cruisePercent + "%");
-            }
+        List<Object> recordIdList = deviceStaticsInfoList.stream().map(map -> map.get("recordId")).distinct().collect(Collectors.toList());
 
-            // 漏检率
-            double totalNum = NumberUtils.toDouble(map.get("totalNum").toString());
-            double lossNum = NumberUtils.toDouble(map.get("lossNum").toString());
-            if (totalNum != 0) {
-                String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
-                map.put("lossPercent", lossPercent + "%");
-            }
-
-            Long recordId = NumberUtils.toLong(map.get("recordId").toString());
-            map.put("recordId", recordId);
-            if (0 == recordId) {
-                log.error("存在无对应的录像机");
-                continue;
-            }
-            set.add(recordId);
-        }
-        // 下面的太ex了后面再优化
+        // 计算完整率
         Map<Integer, String> percentMap = new HashMap<>(8);
-        for (Long recordId : set) {
+        for (Object recordId : recordIdList) {
             Result re = getNVRInfo(recordId);
             if (re == null || re.getData() == null) {
                 continue;
             }
             Map<String, Object> mapData = (Map<String, Object>) re.getData();
 
-            List<Map<String, Object>> chanInfo = new ArrayList<>();
             if (mapData.get("channel") != null) {
-                chanInfo = (List<Map<String, Object>>) mapData.get("channel");
+                List<Map<String, Object>> chanInfo = (List<Map<String, Object>>) mapData.get("channel");
                 for (Map<String, Object> mapChannel : chanInfo) {
                     int intactTime = (int) mapChannel.get("intactTime");
                     int ipChanNum = (int) mapChannel.get("ipChanNum");
@@ -725,37 +516,36 @@ public class StatisticsService {
                 }
             }
         }
-        if (percentMap.size() > 0) {
-            for (Map<String, Object> map : mapList) {
-                int ipChanNum = (int) map.get("channelNum");
-                map.put("intactPercent", percentMap.get(ipChanNum));
-            }
-        }
-        mapList.forEach(map -> {
-                    Map<String, String> tempMap = Maps.newHashMap();
-                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        tempMap.put(entry.getKey(), String.valueOf(entry.getValue()));
-                    }
-                    redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), tempMap);
-                }
-        );
-        log.info("结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
-        return mapList;
-    }
+        deviceStaticsInfoList.stream().filter(map -> MapUtils.isNotEmpty(percentMap)).forEach(map -> {
+            int ipChanNum = (int) map.get("channelNum");
+            map.put("intactPercent", percentMap.getOrDefault(ipChanNum, "0.000%"));
+        });
 
+        // 将List<Map<String, Object>>转为List<Map<String, String>>
+        List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
+                .map(map -> map.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
+                .collect(Collectors.toList());
+        // 批量插入redis
+        pipelinePutStaticsInfo(deviceStaticsInfoTempList,"cameraId");
+
+        log.info("相机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+        return deviceStaticsInfoList;
+    }
 
 
     /**
      * 巡视任务执行次数
      *
-     * @param type
-     * @param year
-     * @param month
-     * @return
+     * @param type  类型
+     * @param year  年
+     * @param month 月
+     * @return List<Statistics>
      */
     public List<Statistics> countTaskFrequency(Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         switch (type) {
             case 1:
@@ -780,14 +570,15 @@ public class StatisticsService {
     /**
      * 统计任务执行时间
      *
-     * @param type
-     * @param year
-     * @param month
-     * @return
+     * @param type  类型
+     * @param year  年
+     * @param month 月
+     * @return List<Statistics>
      */
     public List<Statistics> countTaskExecutedDuration(Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         switch (type) {
             case 1:
@@ -815,22 +606,24 @@ public class StatisticsService {
     private void formatDuration(Statistics statistics) {
         Integer originDuration = statistics.getValidNum();
         if (originDuration != null && originDuration > 0) {
-            Integer hourData = originDuration / 60;
-            Integer minData = originDuration % 60;
+            int hourData = originDuration / 60;
+            int minData = originDuration % 60;
             statistics.setDuration(hourData + "小时" + minData + "分钟");
         }
     }
 
     /**
      * 统计识别缺陷类型与数量
-     * @param type
-     * @param year
-     * @param month
-     * @return
+     *
+     * @param type  类型
+     * @param year  年
+     * @param month 月
+     * @return List<Statistics>
      */
     public List<Statistics> countDefectsOfTask(Integer type, Integer year, Integer month) {
         Map<String, Object> objectMap = getDateByMonth(type, year, month);
-        Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
+        Date startTime = (Date) objectMap.get("startTime");
+        Date endTime = (Date) objectMap.get("endTime");
         List<Statistics> result = new ArrayList<>();
         switch (type) {
             case 1:
@@ -853,7 +646,7 @@ public class StatisticsService {
 
     private List<Statistics> dealDefect(List<StatisticalDefectMapping> defectResult) {
         List<Statistics> result = new ArrayList<>();
-        if(defectResult == null |defectResult.size()==0){
+        if(defectResult.isEmpty()){
             return result;
         }
         if(defectResult.iterator().next().getDay() != null){
@@ -921,7 +714,7 @@ public class StatisticsService {
     }
 
     private void createDefectInfo(List<StatisticalDefectMapping> defectInfos, ExportedStatisticsTableVo vo){
-        if(defectInfos != null && defectInfos.size()>0){
+        if(!defectInfos.isEmpty()){
             for (StatisticalDefectMapping defectItem:defectInfos){
                 if(vo.getDefectAndCount()==null){
                     vo.setDefectAndCount(defectItem.getDefectType()+":"+defectItem.getCount()+"个 ");
@@ -957,7 +750,7 @@ public class StatisticsService {
         stringBuffer.append(month);
         stringBuffer.append(":");
 
-        Set<String> instanceKey = redisTemplate.keys(stringBuffer.toString() + "*");
+        Set<String> instanceKey = redisTemplate.keys(stringBuffer + "*");
         if (!CollectionUtils.isEmpty(instanceKey)) {
             TreeSet<String> sortedSet = new TreeSet<>(instanceKey);
 
@@ -990,14 +783,12 @@ public class StatisticsService {
     }
 
     @Async
-    public void piplinePutStaticsInfo(List<Map<String, String>> storageList) {
+    public void pipelinePutStaticsInfo(List<Map<String, String>> storageList, String deviceType) {
         try {
             redisTemplate.executePipelined(new SessionCallback<Object>() {
                 @Override
                 public Object execute(RedisOperations operations) throws DataAccessException {
-                    storageList.forEach(sm -> {
-                        putRedis(sm, operations);
-                    });
+                    storageList.forEach(sm -> putRedis(sm, operations, deviceType));
                     return null;
                 }
             });
@@ -1006,15 +797,15 @@ public class StatisticsService {
         }
     }
 
-    private void putRedis(Map<String, String> m, RedisOperations operations) {
+    private void putRedis(Map<String, String> m, RedisOperations operations, String deviceTypeFlag) {
         try {
             if (MapUtils.isEmpty(m)) {
                 log.warn("detail map is empty.");
                 return;
             }
 
-            String robotId = m.get("robotId");
-            String key = "deviceStaticsInfo:robotId:" + robotId;
+            String deviceId = m.get(deviceTypeFlag);
+            String key = "deviceStaticsInfo:" + deviceTypeFlag + ":" + deviceId;
             operations.opsForHash().putAll(key, m);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
