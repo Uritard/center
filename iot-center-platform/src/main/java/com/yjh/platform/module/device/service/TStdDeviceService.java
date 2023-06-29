@@ -584,10 +584,9 @@ public class TStdDeviceService{
                     List<TCameraInfo> cameraList = tStdDeviceDao.selectAllPatrolDeviceByName(name);
                     if (CollectionUtils.isNotEmpty(cameraList)) {
                         List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
-                        String upRegionList = cameraList.stream().map(TCameraInfo::getUpRegionId).map(String::valueOf).collect(Collectors.joining(","));
-                        regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                        List<Long> allRegionList = getAllUpRegionId(regionList);
                         if (CollectionUtils.isNotEmpty(regionList)) {
-                            devTreeByName = tStdDeviceDao.selectAllPatrolDeviceTreeByName(cameraList, regionList);
+                            devTreeByName = tStdDeviceDao.selectAllPatrolDeviceTreeByName(cameraList, allRegionList);
                         }
                     }
                 }else {
