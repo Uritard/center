@@ -2,6 +2,7 @@ package com.yjh.platform.common.utils;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.exception.ExcelDataConvertException;
 import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.alibaba.fastjson.JSON;
@@ -38,9 +39,20 @@ public class ExcelReadListener<E> implements ReadListener<E> {
     }
 
     @Override
-    public void onException(Exception e, AnalysisContext analysisContext) throws Exception {
-        log.error("模型文件读取失败！，错误：{}", e.getMessage());
-        throw e;
+    public void onException(Exception e, AnalysisContext analysisContext){
+        int idx = analysisContext.readRowHolder().getRowIndex() + 1;
+        try {
+            throw e;
+        }catch (ExcelDataConvertException e1){
+            int idy = e1.getColumnIndex() + 1;
+            String errorStr = "行号: " + idx + "列数: " + idy + ";内容" + e1.getCellData() + "异常";
+            log.error(errorStr);
+            errorExcelEntities.add(errorStr);
+        } catch (Exception ex) {
+            errorExcelEntities.add("导入失败，请检查上传 excel 格式是否正确!");
+            log.error("模型文件读取失败！，错误", ex);
+        }
+
     }
 
     @Override

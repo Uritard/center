@@ -397,7 +397,8 @@ public class TCameraInfoController {
             List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
 
             if (CollectionUtils.isNotEmpty(excelEntities)) {
-                tCameraInfoService.importCameraInfo(excelEntities);
+                List<String> errorList = tCameraInfoService.importCameraInfo(excelEntities);
+                errorExcelList.addAll(errorList);
             }
             if (CollectionUtils.isNotEmpty(errorExcelList)) {
                 result.setData(ExcelReadListener.prettyErrors(errorExcelList));

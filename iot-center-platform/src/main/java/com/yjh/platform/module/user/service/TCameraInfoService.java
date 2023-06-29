@@ -581,8 +581,9 @@ public class TCameraInfoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void importCameraInfo(List<TCameraInfoExcel> excelEntities) {
+    public List<String> importCameraInfo(List<TCameraInfoExcel> excelEntities) {
         List<TCameraInfo> tCameraInfos = new ArrayList<>();
+        List<String> errorList = new ArrayList<>();
         List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
         excelEntities.forEach(t -> {
@@ -612,12 +613,15 @@ public class TCameraInfoService {
                 tCameraInfo.setIsControl("云台球机".equals(t.getIsControlStr()) ? 1 : 0);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
                 tCameraInfos.add(tCameraInfo);
+            } else {
+                errorList.add("【" + t.getCameraName() + "】设备所属区域或录像机不存在");
             }
         });
         if (CollectionUtils.isNotEmpty(tCameraInfos)) {
             tCameraInfoDao.batchInsert(tCameraInfos);
             this.intoRedis();
         }
+        return errorList;
     }
 
 }
