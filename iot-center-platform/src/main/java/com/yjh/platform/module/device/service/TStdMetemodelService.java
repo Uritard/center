@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
@@ -285,7 +286,12 @@ public class TStdMetemodelService {
 //        String returnPath = "D:/code/voice";
 
         String fileName = "meteModel.xlsx";
-        List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
+//        List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
+        List<String> name = new ArrayList<>(Arrays.asList("测点id", "设备类型", "识别类型", "测点类型", "测点标准名称", "信号说明", "信号解释",
+                "告警分类", "识别算法", "单位", "有效上限", "有效下限", "告警级别", "告警门限", "告警延时", "状态一", "状态二",
+                "告警上限1", "告警下限1", "告警上限2", "告警下限2", "告警上限3", "告警下限3", "告警上限4", "告警下限4", "告警次数",
+                "绝对阀值", "百分比阀值", "系数", "备注", "巡点类型", "有效值上限", "有效值下限", "预警上限", "预警下限", "一般上限",
+                "一般下限", "严重上限", "严重下限", "危急上限", "危急下限", "绝对阈值", "百分比阈值"));
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
            return "/imgs" + returnPath+"/"+fileName;
