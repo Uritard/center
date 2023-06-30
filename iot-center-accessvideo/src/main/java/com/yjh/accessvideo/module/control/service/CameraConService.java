@@ -111,6 +111,11 @@ public class CameraConService {
 
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            if (Objects.isNull(cameraConInfo)) {
+                // 相机不存在
+                returnMap.put("webRtcUrl", "");
+                return returnMap;
+            }
             String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
             String password = cameraConInfo.getIdentityCode();    //nvr 密码
             String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
