@@ -93,7 +93,7 @@ public class VoiceComService {
         CompressionAudio audioCompress = hikUtilsApp.getAudioCompress(lUserId);
         Constant.hikDeviceEncodeFormatMaps.put(deviceId, (int) audioCompress.getByAudioEncType());
 
-//        TestAudioFile.testRecAudioFile(deviceId, (int) audioCompress.getByAudioEncType());
+        TestAudioFile.testRecAudioFile(deviceId, (int) audioCompress.getByAudioEncType());
 
         if (cbVoiceDataCallBack == null) {
             cbVoiceDataCallBack = new CbVoiceDataCallBack(webSocketUrl, deviceId);
