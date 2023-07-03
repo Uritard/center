@@ -1,11 +1,13 @@
 package com.yjh.platform.module.device.controller;
 
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.entity.DeviceTreeCondition;
+import com.yjh.platform.module.device.entity.InspectedDevTreeCondition;
+import com.yjh.platform.module.device.entity.PatrolDevTreeCondition;
 import com.yjh.platform.module.device.service.TStdDeviceTreeService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +35,30 @@ public class TStdDeviceTreeController {
         this.tStdDeviceTreeService = tStdDeviceTreeService;
     }
 
-    @GetMapping(value = "/selectDevTree")
-    public Result selectDevTree(@RequestBody DeviceTreeCondition deviceTreeCondition) {
+    @ApiOperation(value = "巡视设备树")
+    @GetMapping(value = "/selectPatrolDevTree")
+    public Result selectPatrolDevTree(@RequestBody PatrolDevTreeCondition patrolDevTreeCondition,
+                                      HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tStdDeviceTreeService.selectDevTree(deviceTreeCondition));
+            Long userId = NumberUtils.toLong(request.getHeader("userId"));
+            result.setData(tStdDeviceTreeService.selectPatrolDevTree(patrolDevTreeCondition, userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("设备树查询失败描述：", e);
+            log.error("巡视设备树查询失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "被巡视设备树")
+    @GetMapping(value = "/selectInspectedDevTree")
+    public Result selectInspectedDevTree(@RequestBody InspectedDevTreeCondition deviceTreeCondition) {
+        Result result = new Result();
+        try {
+            result.setData(tStdDeviceTreeService.selectInspectedDevTree(deviceTreeCondition));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("被巡视设备树查询失败描述：", e);
         }
         return result;
     }

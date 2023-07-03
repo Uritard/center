@@ -551,7 +551,7 @@ public class IntelAnalysisService {
                             Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN)
                                 .getValue();
                         String descVal = result.getDesc();
-                        if (StringUtils.containsAny(descVal, "储能", "红", "蓝")) {
+                        if (StringUtils.containsAny(descVal, "储能", "非储能", "红", "蓝", "远方", "就地", "开")) {
                             resultDescTemp = descVal;
                         }
                         taskResult.setResultDesc(resultDescTemp);
