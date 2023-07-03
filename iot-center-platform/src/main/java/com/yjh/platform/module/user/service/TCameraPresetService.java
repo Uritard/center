@@ -325,11 +325,11 @@ public class TCameraPresetService {
 
             List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
             if(cameraHavePresetList == null){
-                result.setCode(209,"fail");
+                result.setCode(209,"该相机无采集文件!");
                 return result;
             }
             if(cameraHavePresetList.size() == 0 ){
-                result.setCode(209,"fail");
+                result.setCode(209,"该相机没有需要标定的文件!");
                 return result;
             }
             //删除zipPath下的所有文件
@@ -376,7 +376,7 @@ public class TCameraPresetService {
 
                 }else {
                     if(cameraIdList.size() == 1){
-                        result.setCode(209,"fail");
+                        result.setCode(209,"该相机没有需要标定的文件!");
                         return result;
                     }
                 }
