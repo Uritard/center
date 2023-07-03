@@ -43,7 +43,11 @@ public class ImageConverter implements Converter<String> {
         String isPath = "/home/yjh_iot_center/";
         if (!file.isDirectory() && file.exists()) {
             //文件存在
-            return new CellData(FileUtils.readFileToByteArray(new File(FileUtil.picCompression(value))));
+            String picCompression = FileUtil.picCompression(value);
+            if (StringUtils.isEmpty(picCompression)) {
+                return new CellData("");
+            }
+            return new CellData(FileUtils.readFileToByteArray(new File(picCompression)));
         } else if (value.contains(isPath)) {
             return new CellData(FileUtils.readFileToByteArray(new File(Objects.requireNonNull(this.getClass().getResource("/")).getPath()
                     + "nopic2.png")));
