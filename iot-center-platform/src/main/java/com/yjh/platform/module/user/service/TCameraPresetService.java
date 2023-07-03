@@ -14,8 +14,9 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
@@ -74,6 +75,10 @@ public class TCameraPresetService {
     private ApplicationProperties applicationProperties;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;
@@ -1033,6 +1038,25 @@ public class TCameraPresetService {
         } catch (Exception e) {
             log.error("SycPresetToEdge err", e);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int updateInstance(TCameraPreset tCameraPreset) {
+        TCruisePointInstance instance = new TCruisePointInstance();
+        instance.setCruiseId(tCameraPreset.getCameraId());
+        instance.setCruiseName(tCameraPreset.getPresetName());
+        instance.setDeviceMeteId(tCameraPreset.getDeviceMeteId());
+        TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(tCameraPreset.getCameraId());
+        int cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
+        instance.setCruiseType(cruiseType);
+        TStdDeviceMete tStdDeviceMete = tStdDevicemeteDao.selectByPrimaryId(tCameraPreset.getDeviceMeteId());
+        instance.setDeviceId(tStdDeviceMete.getDeviceId());
+        instance.setCustomId(tStdDeviceMete.getCustomId());
+        instance.setIfSy(1);
+        TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
+        instance.setStationId(tStdRegion.getStationId());
+        instance.setStationName(tStdRegion.getStationName());
+        return tCruisePointInstanceDao.insert(instance);
     }
 }
 
