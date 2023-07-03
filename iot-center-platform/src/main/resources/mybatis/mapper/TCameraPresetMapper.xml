@@ -357,8 +357,11 @@
         SELECT
         preset_img
        FROM
-	    t_camera_preset
-       WHERE camera_id=#{cameraId, jdbcType=BIGINT}
+	    t_camera_preset a
+            LEFT JOIN t_cruise_point_instance b ON a.preset_id = b.cruise_id
+            LEFT JOIN t_std_devicemete c on b.device_mete_id = c.device_mete_id
+        WHERE c.is_ai='off' AND c.is_judge ='off'  AND c.analyse_type IS NOT NULL
+            AND a.camera_id=#{cameraId, jdbcType=BIGINT}
     </select>
     <select id="selectCameraIdList" resultType="java.lang.Long">
         SELECT
@@ -370,8 +373,11 @@
         SELECT
 	     preset_id
        FROM
-	    t_camera_preset
-       WHERE camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
+	    t_camera_preset a
+        LEFT JOIN t_cruise_point_instance b ON a.preset_id = b.cruise_id
+        LEFT JOIN t_std_devicemete c on b.device_mete_id = c.device_mete_id
+        WHERE c.is_ai='off' AND c.is_judge ='off'  AND c.analyse_type IS NOT NULL
+        AND a.camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
         #{cameraId, jdbcType=BIGINT}
     </foreach>
     </select>
