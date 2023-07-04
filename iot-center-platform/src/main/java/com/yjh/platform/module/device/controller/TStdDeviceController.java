@@ -553,4 +553,19 @@ public class TStdDeviceController {
         }
         return result;
     }
+
+    @ApiOperation(value = "根据设备名称模糊查询，然后查出设备下的所有测点")
+    @RequestMapping(value = "/selectMeteTreeByDeviceName", method = RequestMethod.GET)
+    @Logs(title = "根据设备名称模糊查询，然后查出设备下的所有测点",content = "根据设备名称模糊查询，然后查出设备下的所有测点",logType = 1)
+    public Result selectDevTreeByName(@RequestParam(value = "name", required = false) String name) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tStdDeviceService.selectMeteTreeByDeviceName(name);
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

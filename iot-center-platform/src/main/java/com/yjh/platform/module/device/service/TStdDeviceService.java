@@ -937,5 +937,42 @@ public class TStdDeviceService{
         return tStdDeviceDao.selectDeviceIdListByRegion(regionIds);
     }
 
+    public List<AreaInfo> selectMeteTreeByDeviceName(String name){
+        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
+        if (CollectionUtils.isNotEmpty(deviceList)) {
+            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
+            List<Long> allRegionList = getAllUpRegionId(regionList);
+            List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(deviceList, allRegionList);
+            return assembleTrees(meteTreeByDeviceName);
+        }else {
+            return new ArrayList<>();
+        }
+    }
+    private List<Long> getAllUpRegionId(List<Long> regionList){
+        List<AreaInfo> allRegionList = tStdDeviceDao.selectAllRegion();
+        List<Long> reList = new ArrayList<>(regionList);
+        for (Long regionId : regionList){
+            Long id = getUpRegionId(allRegionList,regionId);
+            if (reList.contains(id)){
+                continue;
+            }
+            while (true){
+                reList.add(id);
+                id = getUpRegionId(allRegionList,reList.get(reList.size() - 1));
+                if (id == -1){
+                    break;
+                }
+            }
+        }
+        return reList;
+    }
+    private Long getUpRegionId(List<AreaInfo> regionList,Long regionId){
+        for (AreaInfo areaInfo: regionList){
+            if (Objects.equals(areaInfo.getId(), regionId)){
+                return areaInfo.getUpId();
+            }
+        }
+        return  -1L;
+    }
 }
 
