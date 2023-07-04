@@ -29,17 +29,17 @@ public class InspectedDevTreeCondition implements Serializable {
     @ApiModelProperty(value = "name")
     private String name;
 
+    /**
+     * 过滤类型:region,dev,ins
+     */
     @ApiModelProperty(value = "type")
     private String type;
 
     /**
-     * 5-间隔，6-设备，7-部位，8-点位，9巡视点
+     * 5-间隔，6-设备，7-部位，8-测点，9巡视点
      */
     @ApiModelProperty(value = "level")
     private String level;
-
-    @ApiModelProperty(value = "customId")
-    private String customId;
 
     /**
      * all-所有，dev-设备，camera-摄像头，robot-机器人
@@ -47,8 +47,11 @@ public class InspectedDevTreeCondition implements Serializable {
     @ApiModelProperty(value = "deviceShow")
     private String deviceShow;
 
-    @ApiModelProperty(value = "deviceType")
-    private String deviceType;
+    /**
+     * 识别类型
+     */
+    @ApiModelProperty(value = "meteType")
+    private String meteType;
 
     @ApiModelProperty(value = "analyseType")
     private String analyseType;

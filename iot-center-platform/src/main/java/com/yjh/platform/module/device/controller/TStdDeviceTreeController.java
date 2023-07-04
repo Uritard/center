@@ -55,6 +55,9 @@ public class TStdDeviceTreeController {
     public Result selectInspectedDevTree(@RequestBody InspectedDevTreeCondition deviceTreeCondition) {
         Result result = new Result();
         try {
+            if (String.valueOf(-1).equals(deviceTreeCondition.getMeteType())){
+                deviceTreeCondition.setMeteType(null);
+            }
             result.setData(tStdDeviceTreeService.selectInspectedDevTree(deviceTreeCondition));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

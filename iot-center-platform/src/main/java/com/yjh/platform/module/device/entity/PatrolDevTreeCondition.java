@@ -23,15 +23,15 @@ public class PatrolDevTreeCondition implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     *  区域间隔id
-     */
     @ApiModelProperty(value = "id")
     private Long id;
 
     @ApiModelProperty(value = "name")
     private String name;
 
+    /**
+     * 相机类型:红外,可见光
+     */
     @ApiModelProperty(value = "type")
     private Integer type;
 
