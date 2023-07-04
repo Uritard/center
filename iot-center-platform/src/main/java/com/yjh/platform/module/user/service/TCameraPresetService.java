@@ -76,6 +76,7 @@ public class TCameraPresetService {
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
 
+    @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
@@ -1043,7 +1044,7 @@ public class TCameraPresetService {
     @Transactional(rollbackFor = Exception.class)
     public int updateInstance(TCameraPreset tCameraPreset) {
         TCruisePointInstance instance = new TCruisePointInstance();
-        instance.setCruiseId(tCameraPreset.getCameraId());
+        instance.setCruiseId(tCameraPreset.getPresetId());
         instance.setCruiseName(tCameraPreset.getPresetName());
         instance.setDeviceMeteId(tCameraPreset.getDeviceMeteId());
         TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(tCameraPreset.getCameraId());
