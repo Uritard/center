@@ -19,15 +19,18 @@
         shield_id, create_user_id, end_time, shield_type, warn_content, create_time
     </sql>
 
-    <select id="selectByWarnCount" resultType="com.yjh.platform.module.user.entity.AlarmShield">
+    <select id="selectByWarnContent" resultType="com.yjh.platform.module.user.entity.AlarmShield">
         select * from alarm_shield
-        where warn_count like concat('%',#{warnCount},'%')
+        where warn_content like concat('%',#{warnContent},'%')
         and shield_type = #{shieldType}
         order by end_time asc
         limit 1
     </select>
     <select id="select" resultType="com.yjh.platform.module.user.entity.AlarmShield">
-        select * from alarm_shield
+        select a.*,b.true_name as userName from alarm_shield a
+        left join `sys_user` b on a.create_user_id = b.user_id
+        where 1=1 <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+        and a.end_time between #{startTime} and #{endTime}</if>
     </select>
 
     <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.user.entity.AlarmShield">
@@ -43,7 +46,7 @@
             #{createUserId, jdbcType=BIGINT},
             #{endTime, jdbcType=TIMESTAMP},
             #{shieldType, jdbcType=INTEGER},
-            #{warnCount, jdbcType=VARCHAR}
+            #{warnContent, jdbcType=VARCHAR}
             );
     </insert>
 

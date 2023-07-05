@@ -38,8 +38,7 @@ public interface TRobotAlarmDao {
                                 @Param(value = "endTime") Date endTime);
     List<TRobotAlarm> selectByPage(TRobotAlarm tRobotAlarm);
 
-    TRobotAlarm selectByRobotIdAndContent(@Param(value = "robotId") Long robotId,
-                                           @Param(value = "content") String content);
+    TRobotAlarm selectByRobotIdAndContent(@Param(value = "content") String content);
 
     int batchInsert(List<TRobotAlarm> list);
 }

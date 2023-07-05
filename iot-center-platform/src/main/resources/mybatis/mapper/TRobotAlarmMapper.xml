@@ -214,9 +214,8 @@
         select
         a.*
         from t_robot_alarm a
-        where robot_id = #{robotId}
-        and a.content like concat("%",#{content},"%")
-        order by warn_time  desc
+        where a.alarm_name like concat("%",#{content},"%")
+        order by alarm_time  desc
         limit 1
     </select>
 

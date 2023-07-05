@@ -18,9 +18,10 @@ import java.util.List;
 @Repository
 public interface AlarmShieldDao {
 
-    AlarmShield selectByWarnCount(@Param(value = "warnCount")String warnCount,
+    AlarmShield selectByWarnContent(@Param(value = "warnContent")String warnContent,
                                         @Param(value = "shieldType")Integer shieldType);
-    List<AlarmShield> select();
+    List<AlarmShield> select(@Param(value = "startTime")String startTime,
+                             @Param(value = "endTime")String endTime);
 
     int add(AlarmShield alarmShield);
 
