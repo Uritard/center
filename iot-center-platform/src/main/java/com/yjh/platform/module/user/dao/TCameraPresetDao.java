@@ -104,4 +104,5 @@ public interface TCameraPresetDao {
     TCameraPreset queryPresetByCameraAndMete(@Param(value = "cameraId") Long cameraId,@Param(value = "meteId")Long meteId);
     int queryMaxPresetNum(@Param(value = "cameraId") Long cameraId);
 
+    List<String> selectImgListById(@Param(value = "list") List<Long> list);
 }
