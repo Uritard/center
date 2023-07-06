@@ -99,4 +99,6 @@ public interface LinkAutoMapper {
      * @return
      */
     int insertDeviceMete(@Param("list")List<TStdDeviceMete> record);
+
+    int selectCruiseTypeByRobotId(@Param("robotId") Long robotId);
 }
