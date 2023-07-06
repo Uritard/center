@@ -672,6 +672,24 @@ public class TStdDeviceService{
         }
     }
 
+    public List<AreaInfo> selectDevTest(String level, String deviceShow,String deviceType, String analyseType, Long id){
+        switch (level){
+            case "5":
+                return areaTree(deviceShow);
+            case "6":
+                return deviceTree(id,deviceShow);
+            case "7":
+                return customTree(id);
+            case "8":
+                return deviceMeteTree(id,deviceType,analyseType);
+            case "9":
+                return cruisePoint(id);
+            case "66":
+                return new ArrayList<>();
+            default: throw new BusinessException("设备树展示层级输入有误！");
+        }
+    }
+
     private List<AreaInfo> areaTree(String deviceShow){
         List<AreaInfo> areaTree = tStdDeviceDao.selectDevTreeRegion();
         areaTree =  assembleTrees(areaTree);
