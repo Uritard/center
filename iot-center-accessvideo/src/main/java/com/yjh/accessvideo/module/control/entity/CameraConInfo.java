@@ -76,5 +76,4 @@ public class CameraConInfo implements Serializable {
 
     @ApiModelProperty(value = "上级区域ID")
     private Long upRegionId;
-
 }

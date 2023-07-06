@@ -12,6 +12,7 @@ import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
+import com.yjh.accessvideo.commons.utils.JSONUtil;
 import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -32,7 +33,10 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -63,6 +67,13 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.util.Base64;
 
 import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 
@@ -99,6 +110,16 @@ public class CameraConService {
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
     //设备信息
     private HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
+
+    /**
+     * 调用海康 配置导入导出接口
+     */
+    private static final String CONF_DATA_URL = "/ISAPI/System/configurationData?secretkey=test1234";
+
+    /**
+     * 调用海康 相机重启接口
+     */
+    private static final String REBOOT_URL = "/ISAPI/System/reboot";
 
     @Resource
     private ProcessManager manager;
@@ -3316,5 +3337,312 @@ public class CameraConService {
         }
 
         return "";
+    }
+
+    /**
+     * 导出相机设备参数
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    public boolean exportCameraConfig(Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        log.info("exportCameraConfig 参数，cameraConInfo：{}", JSONUtil.toJSONString(cameraConInfo));
+        String userName = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+
+        try {
+            byte[] result = getISAPI(cameraIp, userName, password, CONF_DATA_URL);
+            String filePath = getConfigFileDir();
+            String fileName = getConfigFileName(cameraId.toString());
+            log.info("相机 {} 配置文件路径：{}{}", cameraId, filePath, fileName);
+            bytesToFile(result, filePath, fileName);
+        } catch (Exception e) {
+            log.info("exportCameraConfig err: {}", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 批量配分相机设备参数
+     *
+     * @param cameraIds cameraIds
+     * @return result
+     */
+    public boolean exportCameraConfigBatch(List<Long> cameraIds) {
+        if (CollectionUtils.isEmpty(cameraIds)) {
+            log.info("exportCameraConfigBatch 入参cameraIds为空！");
+            return false;
+        }
+
+        log.info("exportCameraConfigBatch 入参cameraIds: {}", JSONUtil.toJSONString(cameraIds));
+        cameraIds.forEach(cameraId -> {
+            try {
+                exportCameraConfig(cameraId);
+            } catch (Exception e) {
+                log.info("相机{}备份失败，errMsg:{}", cameraId, e.getMessage());
+            }
+        });
+
+        return true;
+    }
+
+    /**
+     * 恢复相机配置信息
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    public boolean importCameraConfig(Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        log.info("exportCameraConfig 参数，cameraConInfo：{}", JSONUtil.toJSONString(cameraConInfo));
+        // 导入配置文件
+        boolean processResult = uploadConfigFile(cameraConInfo);
+        if (processResult) {
+            log.info("相机：{} 导入配置文件成功，即将重启", cameraId);
+            // 重启相机
+            processResult = reboot(cameraConInfo);
+            log.info("相机：{} 重启相机结果：{}", cameraId, processResult);
+        }
+
+        log.info("相机：{} 恢复相机配置信息结果：{}", cameraId, processResult);
+        return processResult;
+    }
+
+    /**
+     * 发送get请求，调用ISAPI接口
+     *
+     * @param ip ip
+     * @param username username
+     * @param password password
+     * @param isapiUrl isapiUrl
+     * @return result
+     * @throws Exception
+     */
+    public byte[] getISAPI(String ip, String username, String password, String isapiUrl) throws Exception {
+        log.info("getISAPI入参，ip：{}， port：{}， username：{}， password：{}， isapiUrl：{}", ip, username, password, isapiUrl);
+
+        String url = "http://" + ip + ":80" + isapiUrl;
+        log.info("getISAPI url:{}", url);
+        HttpGet httpGet = new HttpGet(url);
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, creds);
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        HttpResponse response = httpclient.execute(httpGet);
+        return  EntityUtils.toByteArray(response.getEntity());
+    }
+
+    /**
+     * 发送put请求，调用ISAPI接口
+     *
+     * @param ip ip
+     * @param username username
+     * @param password password
+     * @param isapiUrl isapiUrl
+     * @param fileBytes fileBytes
+     * @return result
+     * @throws Exception
+     */
+    public String putISAPI(String ip, String username, String password, String isapiUrl, byte[] fileBytes) throws Exception {
+        log.info("putISAPI入参，ip：{}， username：{}， password：{}， isapiUrl：{}", ip, username, password, isapiUrl);
+        String url = "http://" + ip + isapiUrl;
+        HttpPut httpPut = new HttpPut(url);
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, creds);
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        if (fileBytes != null && fileBytes.length > 0) {
+            httpPut.setEntity(new ByteArrayEntity(fileBytes));
+        }
+
+        HttpResponse response = httpclient.execute(httpPut);
+        return  EntityUtils.toString(response.getEntity());
+    }
+
+    /**
+     * put请求导入相机设备参数配置文件
+     *
+     * @param cameraConInfo cameraConInfo
+     * @return result
+     */
+    private boolean uploadConfigFile(CameraConInfo cameraConInfo) {
+        log.info("uploadConfigFile入参，cameraConInfo： {}", JSONUtil.toJSONString(cameraConInfo));
+
+        try {
+            String username = cameraConInfo.getCameraManager();
+            String password = cameraConInfo.getCameraCode();
+            String cameraIp = cameraConInfo.getCameraIp();
+            String cameraId = cameraConInfo.getCameraId().toString();
+            String port = cameraConInfo.getPort().toString();
+
+            String url = "http://" + cameraIp + ":80" + CONF_DATA_URL;
+            log.info("uploadConfigFile中 url： {}", url);
+
+            URL apiUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+
+            // 设置请求方法为PUT
+            connection.setRequestMethod("PUT");
+
+            // 添加用户名密码验证
+            String authHeaderValue = getAuthorizationHeader(username, password);
+            connection.setRequestProperty("Authorization", authHeaderValue);
+
+            // 添加请求体数据（如果有）
+            byte[] requestBody = getConfigFileBytes(cameraId);
+            connection.setDoOutput(true);
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(requestBody);
+            outputStream.flush();
+
+            // 获取响应结果
+            int responseCode = connection.getResponseCode();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            log.info("Response Code: " + responseCode);
+            log.info("Response Body: " + response.toString());
+
+            // 关闭连接
+            connection.disconnect();
+        } catch (Exception e) {
+            log.info("err", e);
+            return false;
+        }
+        return true;
+    }
+
+    private String getAuthorizationHeader(String username, String password) {
+        String credentials = username + ":" + password;
+        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
+        return "Basic " + encodedCredentials;
+    }
+
+    /**
+     * 重启相机
+     *
+     * @param cameraConInfo cameraConInfo
+     * @return result
+     */
+    private boolean reboot(CameraConInfo cameraConInfo) {
+        String userName = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+
+        try {
+            String putResult = putISAPI(cameraIp, userName, password, REBOOT_URL, null);
+            log.info("reboot result is, putResult: {}", putResult);
+        } catch (Exception e) {
+            log.info("camera reboot err: {}", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 本地目录读取相机设备参数配置文件二进制流
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    private byte[] getConfigFileBytes(String cameraId) {
+        String filePath = getConfigFileDir() + getConfigFileName(cameraId);
+        return getBytesByFile(filePath);
+    }
+
+    /**
+     * 获取相机设备参数的文件名存储路径
+     *
+     * @return result
+     */
+    private String getConfigFileDir() {
+        return String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cameraConfigPath", "content"));
+    }
+
+    /**
+     * 生成相机设备参数的文件名
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    private String getConfigFileName(String cameraId) {
+        return String.format("configurationData_%s.data", cameraId);
+    }
+
+    /**
+     * 将Byte数组转换成文件
+     *
+     * @param bytes byte数组
+     * @param filePath 文件路径  如 D://test/ 最后“/”结尾
+     * @param fileName  文件名
+     */
+    public static void bytesToFile(byte[] bytes, String filePath, String fileName) {
+        BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        File file = null;
+        try {
+            file = new File(filePath + fileName);
+            if (!file.getParentFile().exists()){
+                //文件夹不存在 生成
+                file.getParentFile().mkdirs();
+            }
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+            bos.write(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 将文件转换成Byte数组
+     *
+     * @param pathStr pathStr
+     * @return result
+     */
+    public static byte[] getBytesByFile(String pathStr) {
+        File file = new File(pathStr);
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
+            byte[] b = new byte[1000];
+            int n;
+            while ((n = fis.read(b)) != -1) {
+                bos.write(b, 0, n);
+            }
+            fis.close();
+            byte[] data = bos.toByteArray();
+            bos.close();
+            return data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
