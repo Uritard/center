@@ -7,6 +7,7 @@ import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
 import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.module.control.entity.CameraConfigBatchReq;
 import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.control.service.DroneCameraConService;
@@ -842,4 +843,51 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "相机配置信息导出")
+    @RequestMapping(value = "/exportCameraConfig", method = RequestMethod.GET)
+    public Result exportCameraConfig(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.exportCameraConfig(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息导出失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "批量备份相机配置")
+    @PostMapping("/exportCameraConfigBatch")
+    public Result exportCameraConfigBatch(@RequestBody CameraConfigBatchReq cameraConfigBatchReq) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.exportCameraConfigBatch(cameraConfigBatchReq.getCameraIds()));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息导出失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "相机配置信息恢复")
+    @RequestMapping(value = "/importCameraConfig", method = RequestMethod.GET)
+    public Result importCameraConfig(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.importCameraConfig(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息恢复失败:", e);
+        }
+
+        return result;
+    }
 }
