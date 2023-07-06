@@ -105,8 +105,8 @@ public class TStdDeviceTreeService {
 //            }
 
             if (!CollectionUtils.isEmpty(finalCameraList)) {
-                String upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).map(String::valueOf).collect(Collectors.joining(","));
-                regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                List<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+                regionList.addAll(getRegionIdByLeafNode(new HashSet<>(upRegionList)));
             }
 
             if (!CollectionUtils.isEmpty(regionList)) {
@@ -140,6 +140,19 @@ public class TStdDeviceTreeService {
         areaTree = areaAddDeviceTree(areaTree, cameraName, flag, robotFlag, userId, map);
         return areaTree;
     }
+
+
+
+    public List<Long> getRegionIdByLeafNode(Set<Long> regionParam) {
+        Set<Long> regionTemp = new HashSet<>(regionParam);
+        do {
+            //通过regionList查询上层节点，后将结果放入插入参数继续查询，直到结果与入参一致
+            regionParam.addAll(regionTemp);
+            regionTemp.addAll(tCameraInfoDao.selectRegionListByUpRegionId(regionParam));
+        } while (!regionParam.containsAll(regionTemp));
+        return  new ArrayList<>(regionTemp);
+    }
+
 
     public List<AreaInfo> assembleTrees2(Collection<AreaInfo> trees) {
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(trees)) {
@@ -394,8 +407,7 @@ public class TStdDeviceTreeService {
                             List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(cameraList);
                             //  MySQL 8.0
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                            String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                            regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                            regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
                             if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
                                 devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList);
                             }
@@ -416,8 +428,7 @@ public class TStdDeviceTreeService {
                             List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
                             //  MySQL 8.0
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                            String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                            regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                            regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
                             if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
                                 devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(deviceList,regionList);
                             }
@@ -431,8 +442,7 @@ public class TStdDeviceTreeService {
                         List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
                         //  MySQL 8.0
 //                    regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                        String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                        regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                        regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
                         if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
 
                             devTreeByName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(insList,regionList);
