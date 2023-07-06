@@ -837,6 +837,7 @@
         modify_num = result_num
         WHERE
         task_id = #{taskId,jdbcType=VARCHAR}
+        AND evaluation_state = 257
     </update>
 
     <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">

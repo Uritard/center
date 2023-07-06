@@ -260,6 +260,7 @@ public class UPatrolResultService {
     private int patrolTaskReview(String taskId) {
         //获取审核后该任务下的巡检点审核信息
         List<CruiseManualReview> cruiseManualReviewList = uPatrolResultDao.selectManualDetail(taskId);
+
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
         int checkedSize = 0;
@@ -511,21 +512,23 @@ public class UPatrolResultService {
         //审核任务
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
         logsRecord.LogsSend(request, "5", "审核任务", "一键审核任务-" + uPatrolResult.getTaskName());
-        if (StringUtils.isNotEmpty(uPatrolResult.getCheckUser()) ){
-            if (uPatrolResult.getCheckUser().contains(userName)){
-                userName = uPatrolResult.getCheckUser();
-            } else {
-                userName = uPatrolResult.getCheckUser() + ", "+userName;
-            }
-        }
-        int result = uPatrolResultDao.updateCheck(taskId, userName, date, "1");
         //审核未被审核的巡视点
         CruiseManualReview cruiseManualReview = new CruiseManualReview().setCheckUser(userName).setCheckDate(date).setTaskId(taskId);
         uPatrolResultDao.manualReviewByTask(cruiseManualReview);
+
+        List<CruiseManualReview> reviewList =  uPatrolResultDao.selectManualDetail(taskId);
+
+        //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
+        HashSet<String> haS1 = new HashSet<>();
+        for (CruiseManualReview cmr : reviewList) {
+            haS1.add(cmr.getCheckUser());
+        }
+        String checkUserName = StringUtils.join(haS1, ",");
+        int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, "1");
+
         uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
         tStdDeviceDao.updateByTask(taskId);
 
-        List<CruiseManualReview> reviewList =  uPatrolResultDao.selectManualDetail(taskId);
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(reviewList, true);
 

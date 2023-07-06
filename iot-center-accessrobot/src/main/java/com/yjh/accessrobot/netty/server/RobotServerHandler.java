@@ -108,7 +108,7 @@ public interface RobotServerHandler {
      * @param robotCode 机器人唯一标识
      * @return void
      */
-    static void send(byte[] bytes, String robotCode) {
+    static int send(byte[] bytes, String robotCode) {
         log.info("+++++++++++++++++robotCode:{}发送消息+++++++++++++++++", robotCode);
         ChannelHandlerContext context = getChannelHandlerContextByRobot(robotCode);
         if (null != context) {
@@ -119,8 +119,10 @@ public interface RobotServerHandler {
             if (byteBuf.refCnt() >= 1) {
                 ReferenceCountUtil.release(context);
             }
+            return 0;
         } else {
             log.error("robotCode:{},通道为空,发送指令失败", robotCode);
+            return 1;
         }
     }
 
