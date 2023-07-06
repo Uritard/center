@@ -354,6 +354,24 @@ public class TStdDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "巡视设备树查询")
+    @RequestMapping(value = "/selectPatrolDeviceTree", method = RequestMethod.GET)
+    @Logs(title = "巡视设备树查询",content = "巡视设备树查询",logType = 1)
+    public Result selectPatrolDeviceTree(@RequestParam(value = "name", required = false) String name) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tStdDeviceService.selectPatrolDeviceTree();
+            if (StringUtils.isNotEmpty(name)) {
+                tStdDeviceService.filter(devTreeList, name);
+            }
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "设备树查询根绝名称模糊查询")
     @RequestMapping(value = "/selectDevTreeByName", method = RequestMethod.GET)
     @Logs(title = "设备树查询根绝名称模糊查询",content = "设备树查询根绝名称模糊查询",logType = 1)
