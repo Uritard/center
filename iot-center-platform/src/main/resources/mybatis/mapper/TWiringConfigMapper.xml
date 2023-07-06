@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TWiringConfigDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TWiringConfig">
+        <id column="wiring_config_id" jdbcType="BIGINT" property="wiringConfigId" />
+        <result column="wiring_diagram_id" jdbcType="INTEGER" property="wiringDiagramId" />
+        <result column="equipment_id" jdbcType="BIGINT" property="equipmentId" />
+        <result column="equipment_name" jdbcType="VARCHAR" property="equipmentName" />
+        <result column="equipment_type" jdbcType="INTEGER" property="equipmentType" />
+        <result column="x_coordinate" jdbcType="REAL" property="xCoordinate" />
+        <result column="y_coordinate" jdbcType="REAL" property="yCoordinate" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="update_person" jdbcType="VARCHAR" property="updatePerson" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        wiring_config_id,wiring_diagram_id,equipment_id,equipment_name,equipment_type,x_coordinate,y_coordinate,update_time,update_person
+    </sql>
+
+
+    <insert id="insert">
+        insert into t_wiring_config(
+        <include refid="Base_Column_List" />
+        )values(
+        <foreach collection="tWiringConfigList" item="TWiringConfig" separator=",">
+                   #{TWiringConfig.wiringConfigId, jdbcType=BIGINT},
+                   #{TWiringConfig.wiringDiagramId, jdbcType=INTEGER},
+                   #{TWiringConfig.equipmentId, jdbcType=BIGINT},
+                   #{TWiringConfig.equipmentName, jdbcType=VARCHAR},
+                   #{TWiringConfig.equipmentType, jdbcType=INTEGER},
+                   #{TWiringConfig.xCoordinate, jdbcType=REAL},
+                   #{TWiringConfig.yCoordinate, jdbcType=REAL},
+                   #{TWiringConfig.updateTime, jdbcType=TIMESTAMP},
+                   #{TWiringConfig.updatePerson, jdbcType=INTEGER}
+               )
+        </foreach>
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from t_wiring_config
+        where wiring_config_id = #{wiringConfigId, jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByWiringDiagramId" parameterType="java.lang.Integer">
+        delete from t_wiring_config
+        where wiring_diagram_id = #{wiringDiagramId, jdbcType=INTEGER}
+    </delete>
+
+    <update id="update">
+        <foreach collection="tWiringConfigList" item="TWiringConfig" separator=";">
+            update t_wiring_config a <set>
+                <if test="TWiringConfig.wiringDiagramId != null">a.wiring_diagram_id = #{TWiringConfig.wiringDiagramId},</if>
+                <if test="TWiringConfig.equipmentId != null">a.equipment_id = #{TWiringConfig.equipmentId},</if>
+                <if test="TWiringConfig.equipmentName != null">a.equipment_name = #{TWiringConfig.equipmentName},</if>
+                <if test="TWiringConfig.equipmentType != null ">a.equipment_type = #{TWiringConfig.equipmentType},</if>
+                <if test="TWiringConfig.xCoordinate != null ">a.x_coordinate = #{TWiringConfig.xCoordinate},</if>
+                <if test="TWiringConfig.yCoordinate != null ">a.y_coordinate = #{TWiringConfig.yCoordinate},</if>
+                <if test="TWiringConfig.updateTime != null ">a.update_time = #{TWiringConfig.updateTime},</if>
+                <if test="TWiringConfig.updatePerson != null ">a.update_person = #{TWiringConfig.updatePerson},</if>
+            </set>
+            where a.wiring_config_id = #{TWiringConfig.wiringConfigId, jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TWiringConfig">
+        select
+            a.wiring_config_id,
+            a.wiring_diagram_id,
+            a.equipment_id,
+            a.equipment_name,
+            a.equipment_type,
+            a.x_coordinate,
+            a.y_coordinate,
+            a.update_time,
+            a.update_person
+        from t_wiring_config a
+        where 1 = 1
+          and a.wiring_config_id = #{wiringConfigId, jdbcType=BIGINT}
+            limit 1
+    </select>
+
+    <select id="selectByCondition"  resultType="com.yjh.platform.module.user.entity.TWiringConfigVo">
+        select
+            a.wiring_config_id,
+            a.wiring_diagram_id,
+            a.equipment_id,
+            a.equipment_name,
+            a.equipment_type,
+            a.x_coordinate,
+            a.y_coordinate,
+            a.update_time,
+            a.update_person,
+            if(d.camera_id is NULL, 0, 1) as is_exist
+        from t_wiring_config a
+        left join t_wiring_diagram b on a.wiring_diagram_id = b.wiring_diagram_id
+        LEFT JOIN t_camera_info d on a.equipment_id = d.camera_id
+        where 1 = 1
+        and b.region_id = #{regionId, jdbcType=BIGINT}
+    </select>
+
+</mapper>
