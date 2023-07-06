@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TWiringDiagramDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TWiringDiagram">
+        <id column="wiring_diagram_id" jdbcType="INTEGER" property="wiringDiagramId" />
+        <result column="region_id" jdbcType="BIGINT" property="regionId" />
+        <result column="region_name" jdbcType="VARCHAR" property="regionName" />
+        <result column="pic_path" jdbcType="VARCHAR" property="picPath" />
+        <result column="pic_length" jdbcType="INTEGER" property="picLength" />
+        <result column="pic_width" jdbcType="INTEGER" property="picWidth" />
+        <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime" />
+        <result column="upload_person" jdbcType="VARCHAR" property="uploadPerson" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="update_person" jdbcType="VARCHAR" property="updatePerson" />
+        <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        wiring_diagram_id,region_id,region_name,pic_path,pic_length,pic_width,upload_time,upload_person,update_time,update_person,delete_flag
+    </sql>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="wiringDiagramId" parameterType="com.yjh.platform.module.user.entity.TWiringDiagram">
+        insert into t_wiring_diagram(
+        <include refid="Base_Column_List" />
+        )values(
+                   #{wiringDiagramId, jdbcType=INTEGER},
+                   #{regionId, jdbcType=BIGINT},
+                   #{regionName, jdbcType=VARCHAR},
+                   #{picPath, jdbcType=VARCHAR},
+                   #{picLength, jdbcType=INTEGER},
+                   #{picWidth, jdbcType=INTEGER},
+                   #{uploadTime, jdbcType=TIMESTAMP},
+                   #{uploadPerson, jdbcType=VARCHAR},
+                   #{updateTime, jdbcType=TIMESTAMP},
+                   #{updatePerson, jdbcType=VARCHAR},
+                   #{deleteFlag, jdbcType=INTEGER}
+               )
+    </insert>
+
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.TWiringDiagram">
+        update t_wiring_diagram a <set>
+        <if test="regionId != null">a.region_id = #{regionId},</if>
+        <if test="regionName != null">a.region_name = #{regionName},</if>
+        <if test="picPath != null">a.pic_path = #{picPath},</if>
+        <if test="picLength != null ">a.pic_length = #{picLength},</if>
+        <if test="picWidth != null ">a.pic_width = #{picWidth},</if>
+        <if test="uploadTime != null ">a.upload_time = #{uploadTime},</if>
+        <if test="uploadPerson != null ">a.upload_person = #{uploadPerson},</if>
+        <if test="updateTime != null ">a.update_time = #{updateTime},</if>
+        <if test="updatePerson != null ">a.update_person = #{updatePerson},</if>
+        <if test="deleteFlag != null ">a.delete_flag = #{deleteFlag},</if>
+    </set>
+        where a.wiring_diagram_id = #{wiringDiagramId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.TWiringDiagram">
+        select
+            a.wiring_diagram_id,
+            a.region_id,
+            a.region_name,
+            a.pic_path,
+            a.pic_length,
+            a.pic_width,
+            a.upload_time,
+            a.upload_person,
+            a.update_time,
+            a.update_person,
+            a.delete_flag
+        from t_wiring_diagram a
+        where 1 = 1
+          and a.wiring_diagram_id = #{wiringDiagramId, jdbcType=INTEGER}
+            limit 1
+    </select>
+
+    <select id="selectByCondition"  resultType="com.yjh.platform.module.user.entity.TWiringDiagram">
+        select
+            a.wiring_diagram_id,
+            a.region_id,
+            a.region_name,
+            a.pic_path,
+            a.pic_length,
+            a.pic_width,
+            a.upload_time,
+            a.upload_person,
+            a.update_time,
+            a.update_person,
+            a.delete_flag
+        from t_wiring_diagram a
+        where 1 = 1
+        and a.delete_flag = 0
+        and a.region_id = #{regionId, jdbcType=BIGINT}
+    </select>
+
+</mapper>
