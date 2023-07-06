@@ -1263,7 +1263,11 @@ public class RobotService {
                 .setItems((List<Map<String, Object>>) resMap.get("mapList"));
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的任务的xml是<start>{}<end>", xmlString);
-        RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
+        int number = RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
+        if (1 == number) {
+            //通道为空 设置为离线
+            this.updateRobotInfo(uniqueFlag, "离线");
+        }
     }
 
     /**
