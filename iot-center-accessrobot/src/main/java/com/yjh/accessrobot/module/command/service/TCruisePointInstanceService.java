@@ -51,6 +51,7 @@ public class TCruisePointInstanceService {
     public void instanceLinkAuto(List<TRobotInspection> tRobotInspectionsInfoModelFile, Long robotId) {
         //取出当前根节点
         Long rootId = linkAutoMapper.selectRoot();
+Integer cruiseType = linkAutoMapper.selectCruiseTypeByRobotId(robotId);
         //取出所有未连接测点
         List<TRobotInspection> tRobotInspections = linkAutoMapper.selectInspectionNonLink(robotId);
         Map<String, Long> inspectionMap =
@@ -215,13 +216,18 @@ public class TCruisePointInstanceService {
                     tStdDeviceMete.setInspectionType(1);
                     tStdDeviceMete.setCustomName(CustomTypeEnum.CUSTOM_TYPE_700.getDictNote());
                     tStdDeviceMete.setMeterType(MeterTypeEnum.getDictCodeByUpDict(tRobotInspection.getMeterType()));
-                    if (StringUtils.isNotBlank(tRobotInspection.getRecognitionTypeList())) {
-                        String[] meteTypes = tRobotInspection.getRecognitionTypeList().split(",");
-                        if (meteTypes.length != 0) {
-                            Integer meteType = Integer.parseInt(meteTypes[0]);
-                            String meteTypeSys = MeteTypeEnum.getEnumByUpDict(meteType) == null ? null :
-                                String.valueOf(MeteTypeEnum.getEnumByUpDict(meteType).getDictCode());
-                            tStdDeviceMete.setMeteType(meteTypeSys);
+                    if (cruiseType == 524) {
+                        tStdDeviceMete.setMeteType(String.valueOf(MeteTypeEnum.METE_TYPE_220.getDictCode()));
+                    }
+                    else {
+                        if (StringUtils.isNotBlank(tRobotInspection.getRecognitionTypeList())) {
+                            String[] meteTypes = tRobotInspection.getRecognitionTypeList().split(",");
+                            if (meteTypes.length != 0) {
+                                Integer meteType = Integer.parseInt(meteTypes[0]);
+                                String meteTypeSys = MeteTypeEnum.getEnumByUpDict(meteType) == null ? null :
+                                    String.valueOf(MeteTypeEnum.getEnumByUpDict(meteType).getDictCode());
+                                tStdDeviceMete.setMeteType(meteTypeSys);
+                            }
                         }
                     }
                     tStdDeviceMete.setMeteName(tRobotInspection.getDeviceName());
@@ -256,7 +262,7 @@ public class TCruisePointInstanceService {
                         tCruisePointInstance.setDeviceMeteId(o.getDeviceMeteId());
                         tCruisePointInstance.setDeviceId(o.getDeviceId());
                         tCruisePointInstance.setCustomId(o.getCustomId());
-                        tCruisePointInstance.setCruiseType(228);
+                        tCruisePointInstance.setCruiseType(cruiseType);
                         tCruisePointInstance.setIfSy(1);
                         tCruisePointInstance.setStationId(tStdRegion.getStationId());
                         tCruisePointInstance.setStationName(tStdRegion.getStationName());
@@ -280,7 +286,7 @@ public class TCruisePointInstanceService {
                         tCruisePointInstance.setDeviceMeteId(o.getDeviceMeteId());
                         tCruisePointInstance.setDeviceId(o.getDeviceId());
                         tCruisePointInstance.setCustomId(o.getCustomId());
-                        tCruisePointInstance.setCruiseType(228);
+                        tCruisePointInstance.setCruiseType(cruiseType);
                         tCruisePointInstance.setIfSy(1);
                         tCruisePointInstance.setStationId(tStdRegion.getStationId());
                         tCruisePointInstance.setStationName(tStdRegion.getStationName());
