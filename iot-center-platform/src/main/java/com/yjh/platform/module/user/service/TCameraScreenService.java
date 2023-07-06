@@ -672,8 +672,13 @@ public class TCameraScreenService{
 //            }
 
             if (!CollectionUtils.isEmpty(finalCameraList)) {
-                String upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).map(String::valueOf).collect(Collectors.joining(","));
-                regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                Set<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toSet());
+                Set<Long> upRegionResult = new HashSet<>(upRegionList);
+                do {
+                    upRegionList.addAll(upRegionResult);
+                    upRegionResult.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                } while (!upRegionList.containsAll(upRegionResult));
+                regionList.addAll(upRegionResult);
             }
 
             if (!CollectionUtils.isEmpty(regionList)){

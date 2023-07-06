@@ -515,8 +515,8 @@ public class TStdDeviceService{
                 upRegionList.add(insInfo.getUpRegionId());
                 //  MySQL 8.0
 //                List<Long> regionList  = tStdDeviceDao.selectUpIdByRegionList(upRegionList);
-                String upRegionListTemp = upRegionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                List<Long> regionList = tCameraInfoDao.selectRegionListByUpRegionId(upRegionListTemp);
+
+                List<Long> regionList = getRegionIdByLeafNode(new HashSet<>(upRegionList));
                 Collections.reverse(regionList);
                 regionList.remove(-1L);
                 regionList.addAll(upRegionList);
@@ -537,8 +537,9 @@ public class TStdDeviceService{
                 upRegionList.add(region.getRegionId());
                 //  MySQL 8.0
 //                List<Long> regionList  = tStdDeviceDao.selectUpIdByRegionList(upRegionList);
-                String upRegionListTemp = upRegionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                List<Long> regionList = tCameraInfoDao.selectRegionListByUpRegionId(upRegionListTemp);
+
+                List<Long> regionList = getRegionIdByLeafNode(new HashSet<>(upRegionList));
+
                 Collections.reverse(regionList);
                 regionList.remove(-1L);
                 regionList.addAll(upRegionList);
@@ -574,8 +575,7 @@ public class TStdDeviceService{
                         List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(cameraList);
                         //  MySQL 8.0
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                        String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                        regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                        regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
                         if (CollectionUtils.isNotEmpty(regionList)){
                             devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList);
                         }
@@ -596,8 +596,7 @@ public class TStdDeviceService{
                         List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
                         //  MySQL 8.0
 //                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                        String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                        regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                        regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
                         if (CollectionUtils.isNotEmpty(regionList)){
                             devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(deviceList,regionList);
                         }
@@ -611,8 +610,7 @@ public class TStdDeviceService{
                     List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
                     //  MySQL 8.0
 //                    regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                    String upRegionList = regionList.stream().map(String :: valueOf).collect(Collectors.joining(","));
-                    regionList.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                    regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
                     if (CollectionUtils.isNotEmpty(regionList)){
 
                         devTreeByName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(insList,regionList);
@@ -622,6 +620,16 @@ public class TStdDeviceService{
             default: throw new BusinessException("设备树展示层级输入有误！");
         }
         return assembleTrees(devTreeByName);
+    }
+
+    public List<Long> getRegionIdByLeafNode(Set<Long> regionParam) {
+        Set<Long> regionTemp = new HashSet<>(regionParam);
+        do {
+            //通过regionList查询上层节点，后将结果放入插入参数继续查询，直到结果与入参一致
+            regionParam.addAll(regionTemp);
+            regionTemp.addAll(tCameraInfoDao.selectRegionListByUpRegionId(regionParam));
+        } while (!regionParam.containsAll(regionTemp));
+        return  new ArrayList<>(regionTemp);
     }
 
     private Boolean matchName(AreaInfo node,String regionName){
