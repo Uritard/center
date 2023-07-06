@@ -73,7 +73,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
 
         List<CleanStep> stepList = new ArrayList<>();
 
-        boolean flag = false;
+        boolean flag;
         int i = 0;
         // 开始
         stepProcess(stepList, 0, 2, false);
@@ -84,16 +84,18 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         flag = stepProcess(stepList, ++i, cleanup.getDelTaskData(), flag);
         flag = stepProcess(stepList, ++i, cleanup.getDelLogs(), flag);
         // 结束
-        stepProcess(stepList, 7, !flag ? 1 : 2, flag);
+        stepProcess(stepList, 7, flag ? 1 : 2, flag);
 
         Map<String, Object> map = new HashMap<>(4);
         map.put("id", cleanup.getId());
+        map.put("cleanStatus", flag ? 0 : 2);
+        map.put("list", stepList);
         return map;
     }
 
     private boolean stepProcess(List<CleanStep> stepList, int order, int status, boolean waitClean) {
         if (status == 0) {
-            return false;
+            return waitClean;
         }
         if (waitClean && status == 1) {
             status = 3;
@@ -120,9 +122,10 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
             String retainedDataTime = (String)redisTemplate.opsForHash().get("t_sys_param:retainedDataTime", "content");
 
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, -NumberUtils.toInt(retainedDataTime, 36));
+            int retainedMonth = NumberUtils.toInt(retainedDataTime, 36);
+            calendar.add(Calendar.MONTH, -retainedMonth);
             if (sysDiskCleanup.getExpiryDate() == null || calendar.getTime().compareTo(sysDiskCleanup.getExpiryDate()) < 0) {
-                throw new BusinessException(ResultCodeEnum.CODE10018, "清理数据时间不正确，请重新选择！");
+                throw new BusinessException(ResultCodeEnum.CODE10018, "清理数据时间不正确，必须是"+ retainedMonth +"个月之前，请重新选择！");
             }
         }
 
