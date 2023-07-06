@@ -12,9 +12,13 @@ import com.yjh.platform.module.config.service.ISysDiskCleanupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -31,9 +35,11 @@ import java.util.Date;
 public class SysDiskCleanupController {
 
     private final ISysDiskCleanupService sysDiskCleanupService;
+    private final RedisTemplate redisTemplate;
 
-    public SysDiskCleanupController(ISysDiskCleanupService sysDiskCleanupService) {
+    public SysDiskCleanupController(ISysDiskCleanupService sysDiskCleanupService, RedisTemplate redisTemplate) {
         this.sysDiskCleanupService = sysDiskCleanupService;
+        this.redisTemplate = redisTemplate;
     }
 
     @ApiOperation(value = "查询历史磁盘清理任务")
@@ -46,7 +52,11 @@ public class SysDiskCleanupController {
             QueryWrapper<SysDiskCleanup> queryWrapper = new QueryWrapper<>(new SysDiskCleanup()).eq("clean_status", 2);
             IPage<SysDiskCleanup> pages = sysDiskCleanupService.page(page, queryWrapper);
 
-            result.setData(pages);
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("count",pages.getTotal());
+            resultMap.put("list", pages.getRecords());
+
+            result.setData(resultMap);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -73,9 +83,12 @@ public class SysDiskCleanupController {
 
     @ApiOperation(value = "新增磁盘清理任务")
     @PostMapping(value = "/add")
-    public Result add(@RequestBody SysDiskCleanup sysDiskCleanup) {
+    public Result add(@RequestBody SysDiskCleanup sysDiskCleanup, HttpServletRequest request) {
         Result result = new Result();
         try {
+            String userId = request.getHeader("userId");
+            String userName = (String)redisTemplate.opsForHash().get("userInfo:" + userId, "userName");
+            sysDiskCleanup.setCreator(userName);
             result.setData(sysDiskCleanupService.addTask(sysDiskCleanup));
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
@@ -91,8 +104,13 @@ public class SysDiskCleanupController {
     public Result confirm(@RequestParam(value = "id") int cleanId) {
         Result result = new Result();
         try {
+            SysDiskCleanup cleanup = sysDiskCleanupService.getById(cleanId);
+            if (cleanup.getCleanStatus() != 0) {
+                result.setCode(ResultCodeEnum.CODE10009.getCode(), "当前任务未完成或已经确认，无法进行确认");
+                return result;
+            }
             boolean up = sysDiskCleanupService.update().eq("id", cleanId).set("clean_status", 2).set("update_time", new Date()).update();
-            if (up) {
+            if (!up) {
                 result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), "更新任务状态失败");
             }
             result.setData(up);

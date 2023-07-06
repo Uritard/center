@@ -3,6 +3,7 @@ package com.yjh.platform.module.config.entity;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -70,6 +71,7 @@ public class SysDiskCleanup {
      * 是否备份数据库，0: 否 1: 是，如果有删除数据库记录则必须备份
      */
     @ApiModelProperty(value = "是否备份文件，0: 否 1: 是，数据库中根据 backFilePath 判断是否备份")
+    @TableField(exist=false)
     private Integer backFile;
 
     /**
@@ -109,6 +111,12 @@ public class SysDiskCleanup {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date expiryDate;
+
+    /**
+     * 创建人
+     */
+    @ApiModelProperty(value = "创建人")
+    private String creator;
 
     /**
      * 更新时间
