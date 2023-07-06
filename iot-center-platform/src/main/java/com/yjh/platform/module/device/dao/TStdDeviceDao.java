@@ -158,4 +158,6 @@ public interface TStdDeviceDao {
 
     List<AreaInfo> selectAllPatrolDeviceTreeByName(@Param(value = "cameraList") List<TCameraInfo> cameraList,
                                                    @Param(value = "regionList") List<Long> regionList);
+
+    List<AreaInfo> selectPatrolDeviceTree();
 }

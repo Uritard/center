@@ -2380,7 +2380,7 @@ public class UPatrolTaskService {
         precipitation = StringUtils.isEmpty(precipitation) ? "暂无" : precipitation;
         windDirection = StringUtils.isEmpty(windDirection) ? "暂无" : windDirection;
         airPressure = StringUtils.isEmpty(airPressure) ? "暂无" : airPressure;
-        String weather = "气温:" + temperature + ",湿度:" + humidity + ",风速:" + windSpeed + ",雨量:" + precipitation + ",风向:" + windDirection + ",气压:" + airPressure;
+        String weather = "温度:" + temperature + ",湿度:" + humidity + ",风速:" + windSpeed + ",雨量:" + precipitation + ",风向:" + windDirection + ",气压:" + airPressure;
         log.info("====Now the environmental data is {}", weather);
        return weather;
     }

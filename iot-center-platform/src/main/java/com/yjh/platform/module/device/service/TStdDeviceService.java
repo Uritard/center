@@ -20,6 +20,7 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -1037,6 +1038,33 @@ public class TStdDeviceService{
     }
     public List<Long> selectDeviceIdListByRegion(List<Long> regionIds){
         return tStdDeviceDao.selectDeviceIdListByRegion(regionIds);
+    }
+
+    public List<AreaInfo> selectPatrolDeviceTree() {
+        //查巡视设备
+        List<AreaInfo> devTreeByName = tStdDeviceDao.selectPatrolDeviceTree();
+        return assembleTrees(devTreeByName);
+    }
+
+    /**
+     * 对巡视设备进行名称筛选
+     * @param areaInfoList
+     * @param name
+     */
+    public void filter(List<AreaInfo> areaInfoList, String name) {
+        Iterator<AreaInfo> it = areaInfoList.iterator();
+        while (it.hasNext()) {
+            AreaInfo areaInfo = it.next();
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(areaInfo.getChildren())) {
+                this.filter(areaInfo.getChildren(), name);
+            }
+            //根据输入的名称
+            if (ArrayUtils.contains(new String[]{"camera", "robot", "voice"}, areaInfo.getInfoType())) {
+                if (StringUtils.isNotEmpty(name) && !areaInfo.getLabel().contains(name)) {
+                    it.remove();
+                }
+            }
+        }
     }
 
     public List<AreaInfo> selectMeteTreeByDeviceName(String name){
