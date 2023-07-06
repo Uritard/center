@@ -312,6 +312,16 @@
 </foreach>
     </insert>
 
+    <select id="selectCruiseTypeByRobotId" resultType="java.lang.Integer">
+        select CASE
+                   WHEN isnull(a.robot_type)
+                       THEN 524
+                   ELSE 228
+                   END
+        from t_robot_info a
+        where robot_id = #{robotId,jdbcType=BIGINT}
+
+    </select>
 
     <select id="selectTSRegionForStation" resultType="com.yjh.accessrobot.module.command.entity.TStdRegion">
         select

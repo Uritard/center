@@ -24,8 +24,8 @@ public class AudioFormatUtil {
         String pcmFilePath = "D:\\testFile\\cnhc-1-16000.pcm";
 //        convertAudioFiles(wavFilePath, pcmFilePath);
 
-        String srcFilePath = "D:\\testFile\\g7\\originAudio-20230519164938.g7";
-        String destFilePath = "D:\\testFile\\pcm\\originAudio-20230519164938.pcm";
+        String srcFilePath = "D:\\testFile\\g7\\originAudio-20230629155214.g7";
+        String destFilePath = "D:\\testFile\\pcm\\originAudio-20230629155214.pcm";
         decodeTest(srcFilePath, destFilePath);
 
         String srcFilePath2 = "D:\\testFile\\pcm\\audio-1-16-8000.pcm";

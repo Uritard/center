@@ -299,9 +299,9 @@ public class TCruiseTaskResultService {
                         if (CollectionUtils.isNotEmpty(robotVideoInfo)) {
                             videoInfo.putAll(robotVideoInfo.get(0));
                         } else {
-                            videoInfo.put("flvUrl", null);
-                            videoInfo.put("rtmpUrl", null);
-                            videoInfo.put("webRtcUrl", null);
+                            videoInfo.put("flvUrl", "null");
+                            videoInfo.put("rtmpUrl", "null");
+                            videoInfo.put("webRtcUrl", "null");
                         }
                         videoInfo.put("cameraId", robot.get("robotId").toString());
                         inspectResult.setVideoInfo(videoInfo);
@@ -312,9 +312,9 @@ public class TCruiseTaskResultService {
                         if (CollectionUtils.isNotEmpty(robotInfraredVideoInfo)) {
                             videoInfo.putAll(robotInfraredVideoInfo.get(1));
                         } else {
-                            videoInfo.put("flvUrl", null);
-                            videoInfo.put("rtmpUrl", null);
-                            videoInfo.put("webRtcUrl", null);
+                            videoInfo.put("flvUrl", "null");
+                            videoInfo.put("rtmpUrl", "null");
+                            videoInfo.put("webRtcUrl", "null");
                         }
                         videoInfo.put("cameraId", robot.get("robotId").toString());
                         inspectResult.setVideoInfo(videoInfo);
@@ -327,9 +327,9 @@ public class TCruiseTaskResultService {
                             videoInfo.put("rtmpUrl", map.get("rtmpUrlInferad"));
                             videoInfo.put("webRtcUrl", map.get("webRtcUrl"));
                         } else {
-                            videoInfo.put("flvUrl", null);
-                            videoInfo.put("rtmpUrl", null);
-                            videoInfo.put("webRtcUrl", null);
+                            videoInfo.put("flvUrl", "null");
+                            videoInfo.put("rtmpUrl", "null");
+                            videoInfo.put("webRtcUrl", "null");
                         }
 
                         videoInfo.put("cameraId", robot.get("robotId").toString());
