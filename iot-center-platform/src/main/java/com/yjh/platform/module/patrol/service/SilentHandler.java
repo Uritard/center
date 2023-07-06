@@ -6,11 +6,15 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,5 +63,7 @@ public class SilentHandler {
         analysisList.add(analysis);
         List<Response> responseList= intelAnalysisService.picAnalyseNoDetection(analysisList);
         log.info("param:{} result:{}", StringUtils.join(analysisList),StringUtils.join( responseList));
+
+        FileUtils.deleteQuietly(new File(tarPath));
     }
 }
