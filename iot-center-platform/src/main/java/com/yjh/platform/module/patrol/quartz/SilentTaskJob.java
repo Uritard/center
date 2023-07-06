@@ -8,6 +8,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
@@ -16,6 +17,7 @@ import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -25,6 +27,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -142,12 +146,16 @@ public class SilentTaskJob implements Runnable {
                 String edgeLevel = Constant.getLevelEdge();
                 log.info("edgeLevel:{}",edgeLevel);
                 //如果是边缘节点 上传巡视主机
+                String resultImgPath;
                 if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
-                    uploadPicture(result, cameraId, presetId, presetName);
+                    resultImgPath = uploadPicture(result, cameraId, presetId, presetName);
                     //否则调用算法分析
                 } else {
                     // 分析
-                    analysePicture(result, Long.valueOf(presetId));
+                    resultImgPath = analysePicture(result, Long.valueOf(presetId));
+                }
+                if (StringUtils.isNotEmpty(resultImgPath)) {
+                    Files.delete(Paths.get(resultImgPath));
                 }
             } catch (Exception e) {
                 log.error("设置摄像机状态出错" + e.getMessage());
@@ -164,11 +172,12 @@ public class SilentTaskJob implements Runnable {
      * @param cameraId 相机id  充当巡检设备编码
      * @param presetId 预置位id  充当巡视点ID
      */
-    private void uploadPicture(Result result, String cameraId, String presetId, String presetName) {
+    private String uploadPicture(Result result, String cameraId, String presetId, String presetName) {
+        String absPath = "";
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-            String absPath = String.valueOf(jsonForRe.get("absPath"));
+            absPath = String.valueOf(jsonForRe.get("absPath"));
 
             //静默数据上送
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -203,10 +212,9 @@ public class SilentTaskJob implements Runnable {
             log.info("信息上报：- " + cruiseResult);
             Constant.otherServer(cruiseResult, Constant.TCP_URL);
         } catch (Exception e) {
-            log.error("静默监视异常: " + e);
-            e.printStackTrace();
+            log.error("静默监视异常: ", e);
         }
-
+        return absPath;
     }
 
     /**
@@ -215,7 +223,7 @@ public class SilentTaskJob implements Runnable {
      * @param result   相机抓图返回结果
      * @param presetId 预置位id  充当巡视点ID
      */
-    private void analysePicture(Result result, Long presetId) {
+    private String analysePicture(Result result, Long presetId) {
         JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
         String absPath = String.valueOf(jsonForRe.get("absPath"));
         // 调用算法接口分析结果
@@ -229,6 +237,7 @@ public class SilentTaskJob implements Runnable {
         analysisList.add(analysis);
         List<Response> responseList= intelAnalysisService.picAnalyseNoDetection(analysisList);
         log.info("param:{} result:{}",StringUtils.join(analysisList),StringUtils.join( responseList));
+        return absPath;
     }
 
     /**
