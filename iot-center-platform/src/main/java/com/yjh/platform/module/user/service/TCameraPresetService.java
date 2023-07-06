@@ -352,36 +352,25 @@ public class TCameraPresetService {
                 log.error("复制文件错误："+e);
             }
 
-            for(Long cameraId: cameraIdList){
-                //找到这个cameraId下的所有预置位
-                List<String> presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
-                log.info("cameraId: {}", cameraId);
-                log.info("presetImgList: {}", presetImgList);
-                if(!CollectionUtils.isEmpty(presetImgList)){
-                    for(String presetImg : presetImgList){
-                        try {
-                            if (StringUtils.isNotEmpty(presetImg)) {
-                                String realPath = presetImg.replace(picUrl, picPath);
-                                realPath = StringUtils.substringBeforeLast(realPath, "/");
-                                //将所有的文件移动到一个文件内
-                                //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
-                                FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
-                                // String url = "cp -r " + realPath + " " + zipPath + "/picture/";
-                                // String[] cmds = new String[] {"sh", "-c", url};
-                                // Runtime.getRuntime().exec(cmds);
-                            }
-                        } catch (Exception e) {
-                            log.error("复制文件错误："+e);
+            List<String> presetImgList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(presetList)) {
+                presetImgList = tCameraPresetDao.selectImgListById(presetList);
+                copePresetImage(presetImgList, picUrl, picPath, zipPath);
+            } else {
+                for (Long cameraId : cameraIdList) {
+                    //找到这个cameraId下的所有预置位
+                    presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
+                    log.info("cameraId: {}", cameraId);
+                    log.info("presetImgList: {}", presetImgList);
+                    if (!CollectionUtils.isEmpty(presetImgList)) {
+                        copePresetImage(presetImgList, picUrl, picPath, zipPath);
+                    } else {
+                        if (cameraIdList.size() == 1) {
+                            result.setCode(209, "fail");
+                            return result;
                         }
                     }
-
-                }else {
-                    if(cameraIdList.size() == 1){
-                        result.setCode(209,"该相机没有需要标定的文件!");
-                        return result;
-                    }
                 }
-                presetList =null;
             }
             //压缩
             try {
@@ -407,6 +396,25 @@ public class TCameraPresetService {
         }
         result.setCode(209,"fail");
         return result;
+    }
+
+    private void copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath){
+        for (String presetImg : presetImgList) {
+            try {
+                if (StringUtils.isNotEmpty(presetImg)) {
+                    String realPath = presetImg.replace(picUrl, picPath);
+                    realPath = StringUtils.substringBeforeLast(realPath, "/");
+                    //将所有的文件移动到一个文件内
+                    //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                    FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
+                    // String url = "cp -r " + realPath + " " + zipPath + "/picture/";
+                    // String[] cmds = new String[] {"sh", "-c", url};
+                    // Runtime.getRuntime().exec(cmds);
+                }
+            } catch (Exception e) {
+                log.error("复制文件错误：" + e);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
