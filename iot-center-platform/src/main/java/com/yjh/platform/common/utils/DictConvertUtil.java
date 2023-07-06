@@ -226,6 +226,19 @@ public enum DictConvertUtil {
         return dictOptional;
     }
 
+    /**
+     * 组装 DictOptional 信息
+     * colName 和 codeName 值相同，必须为驼峰格式，如 alarmLevel, deviceType
+     * 最终结果存入 colName + "Name"
+     * aliasColName是别名
+     */
+    public static DictOptional optionalAliasColName(String colName, String aliasColName) {
+        DictOptional dictOptional = new DictOptional();
+        dictOptional.add(colName, aliasColName, aliasColName + "Name");
+        return dictOptional;
+    }
+
+
     public static class DictOptional {
         private final List<OptionalItem> list;
 
