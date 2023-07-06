@@ -37,6 +37,8 @@ public interface TVoiceDeviceDao {
 
     int batchAdd(List<VoiceDeviceAllInfoDetail> list);
     int batchDelete(List<String> list);
+    int batchAddConfig(List<VoiceDeviceAllInfoDetail> list);
+
     List<VoiceDevice> selectAll(@Param(value = "voiceDeviceName") String voiceDeviceName,
                                 @Param(value = "userId")Long userId);
     VoiceDeviceInfoDetail selectVoiceInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);

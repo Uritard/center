@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -12,8 +13,9 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
@@ -69,6 +71,11 @@ public class TCameraPresetService {
     private ApplicationProperties applicationProperties;
     @Autowired
     private TWarnInfoService tWarnInfoDao;
+
+    @Autowired
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;
@@ -315,11 +322,11 @@ public class TCameraPresetService {
 
             List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
             if(cameraHavePresetList == null){
-                result.setCode(209,"fail");
+                result.setCode(209,"该相机无采集文件!");
                 return result;
             }
             if(cameraHavePresetList.size() == 0 ){
-                result.setCode(209,"fail");
+                result.setCode(209,"该相机没有需要标定的文件!");
                 return result;
             }
             //删除zipPath下的所有文件
@@ -341,36 +348,25 @@ public class TCameraPresetService {
                 log.error("复制文件错误："+e);
             }
 
-            for(Long cameraId: cameraIdList){
-                //找到这个cameraId下的所有预置位
-                List<String> presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
-                log.info("cameraId: {}", cameraId);
-                log.info("presetImgList: {}", presetImgList);
-                if(!CollectionUtils.isEmpty(presetImgList)){
-                    for(String presetImg : presetImgList){
-                        try {
-                            if (StringUtils.isNotEmpty(presetImg)) {
-                                String realPath = presetImg.replace(picUrl, picPath);
-                                realPath = StringUtils.substringBeforeLast(realPath, "/");
-                                //将所有的文件移动到一个文件内
-                                //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
-                                FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
-                                // String url = "cp -r " + realPath + " " + zipPath + "/picture/";
-                                // String[] cmds = new String[] {"sh", "-c", url};
-                                // Runtime.getRuntime().exec(cmds);
-                            }
-                        } catch (Exception e) {
-                            log.error("复制文件错误："+e);
+            List<String> presetImgList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(presetList)) {
+                presetImgList = tCameraPresetDao.selectImgListById(presetList);
+                copePresetImage(presetImgList, picUrl, picPath, zipPath);
+            } else {
+                for (Long cameraId : cameraIdList) {
+                    //找到这个cameraId下的所有预置位
+                    presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
+                    log.info("cameraId: {}", cameraId);
+                    log.info("presetImgList: {}", presetImgList);
+                    if (!CollectionUtils.isEmpty(presetImgList)) {
+                        copePresetImage(presetImgList, picUrl, picPath, zipPath);
+                    } else {
+                        if (cameraIdList.size() == 1) {
+                            result.setCode(209, "fail");
+                            return result;
                         }
                     }
-
-                }else {
-                    if(cameraIdList.size() == 1){
-                        result.setCode(209,"fail");
-                        return result;
-                    }
                 }
-                presetList =null;
             }
             //压缩
             try {
@@ -396,6 +392,25 @@ public class TCameraPresetService {
         }
         result.setCode(209,"fail");
         return result;
+    }
+
+    private void copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath){
+        for (String presetImg : presetImgList) {
+            try {
+                if (StringUtils.isNotEmpty(presetImg)) {
+                    String realPath = presetImg.replace(picUrl, picPath);
+                    realPath = StringUtils.substringBeforeLast(realPath, "/");
+                    //将所有的文件移动到一个文件内
+                    //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                    FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
+                    // String url = "cp -r " + realPath + " " + zipPath + "/picture/";
+                    // String[] cmds = new String[] {"sh", "-c", url};
+                    // Runtime.getRuntime().exec(cmds);
+                }
+            } catch (Exception e) {
+                log.error("复制文件错误：" + e);
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -520,7 +535,8 @@ public class TCameraPresetService {
         String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
 
         SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
-                silentConf.getPresetType(),applicationProperties,stationCode);
+                silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode()
+                ,silentConf.getChillTime());
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }
@@ -972,6 +988,52 @@ public class TCameraPresetService {
 
     }
 
+    public Result add(TCameraPreset tCameraPreset) {
+        int resultNum = 0;
+        Result result = new Result();
+        //判断该预置位是否已被设置
+        if(judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+            return result;
+        }else {
+            int isMicro = microCamera(tCameraPreset);
+            if (isMicro > 0) {
+                result.setMessage(ResultCodeEnum.CODE10009.getCode(), "微型相机只可以设置一个预置位");
+                return result;
+            }
+            //操作数据库
+            resultNum = insert(tCameraPreset);
+
+            if (resultNum != 0) {
+                //操作预置位
+                //                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
+
+                HashMap<String, Object> params = new HashMap<>();
+                params.put("cameraId",tCameraPreset.getCameraId());
+                params.put("presetId",tCameraPreset.getPresetId());
+                params.put("meteName",tCameraPreset.getPresetName());
+                params.put("edgeCode",tCameraPreset.getEdgeCode());
+
+                Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
+                String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
+                if (!org.springframework.util.StringUtils.isEmpty(resData) || isMicro == 0) {
+                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                    JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
+                    tCameraPreset.setPresetImg((String) json.get("urlPath"));
+                    tCameraPreset.setPresetPtz(resData);
+                    update(tCameraPreset);//存图
+                    result.setData(resultNum);
+                } else {
+                    tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+                    resultNum = 0;
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                    result.setData(resultNum);
+                }
+            }
+        }
+        return result;
+    }
+
     /**
      * 发送同步预置位消息
      *
@@ -999,6 +1061,25 @@ public class TCameraPresetService {
         String presetImgPath = getPresetUrlPath();
 
         return toLocal ? presetImg.replaceAll(presetImgPath, presetRealImgPath) : presetImg.replaceAll(presetRealImgPath, presetImgPath);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int updateInstance(TCameraPreset tCameraPreset) {
+        TCruisePointInstance instance = new TCruisePointInstance();
+        instance.setCruiseId(tCameraPreset.getPresetId());
+        instance.setCruiseName(tCameraPreset.getPresetName());
+        instance.setDeviceMeteId(tCameraPreset.getDeviceMeteId());
+        TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(tCameraPreset.getCameraId());
+        int cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
+        instance.setCruiseType(cruiseType);
+        TStdDeviceMete tStdDeviceMete = tStdDevicemeteDao.selectByPrimaryId(tCameraPreset.getDeviceMeteId());
+        instance.setDeviceId(tStdDeviceMete.getDeviceId());
+        instance.setCustomId(tStdDeviceMete.getCustomId());
+        instance.setIfSy(1);
+        TStdRegion tStdRegion = tCruisePointInstanceDao.selectTSRegionForStation();
+        instance.setStationId(tStdRegion.getStationId());
+        instance.setStationName(tStdRegion.getStationName());
+        return tCruisePointInstanceDao.insert(instance);
     }
 }
 

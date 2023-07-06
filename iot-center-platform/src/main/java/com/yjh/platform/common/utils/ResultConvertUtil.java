@@ -5,6 +5,7 @@ import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusExEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Objects;
 

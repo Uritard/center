@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -50,10 +51,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -2481,6 +2488,109 @@ public class CameraConService {
         HttpResponse response = httpclient.execute(httpPost);
         return  EntityUtils.toByteArray(response.getEntity());
     }
+
+    /**
+     *
+     *
+     * @param nStartX 参数范围 0~255
+     * @param nStartY 参数范围 0~255
+     * @param nEndX 参数范围 0~255
+     * @param nEndY 参数范围 0~255
+     * @param cameraId 相机编码
+     * @return
+     */
+    public Map<String, String> regionFocus(int nStartX, int nStartY, int nEndX, int nEndY, long cameraId) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            if (205 == cameraConInfo.getCameraType()) {
+                String cameraIp = cameraConInfo.getCameraIp();
+                String userName = cameraConInfo.getCameraManager();
+                String password = cameraConInfo.getCameraCode();
+                String inUrl = "/ISAPI/Image/channels/1/regionalFocus";
+                String inBuffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<RegionalFocus>\n" +
+                        "    <StartPoint>\n" +
+                        "        <positionX>" + nStartX + "</positionX>\n" +
+                        "        <positionY>" + nStartY + "</positionY>\n" +
+                        "    </StartPoint>\n" +
+                        "    <EndPoint>\n" +
+                        "        <positionX>" + nEndX + "</positionX>\n" +
+                        "        <positionY>" + nEndY + "</positionY>\n" +
+                        "    </EndPoint>\n" +
+                        "</RegionalFocus>\n";
+                HttpEntity entity = putISAPI(cameraIp, userName, password, inUrl, inBuffer);
+                if (entity != null) {
+                    String xmlString = EntityUtils.toString(entity);
+                    Map<String, String> resultMap = formatXmlString(xmlString);
+                    if ("OK".equals(resultMap.get("statusString"))) {
+                        map.put("result", "ok");
+                    } else {
+                        map.put("result", resultMap.get("subStatusCode"));
+                    }
+                } else {
+                    map.put("result", "error");
+                }
+            } else {
+                map.put("result", "camera type is not allowed!");
+            }
+        } catch (Exception e) {
+            log.error("区域对焦失败", e);
+        }
+        return map;
+    }
+
+    /**
+     * xml转换
+     * @param xmlString
+     * @return
+     */
+    public static Map<String, String> formatXmlString(String xmlString) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            // 将XML字符串转换为Document对象
+            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
+            // 获取根元素
+            Node rootElement = document.getDocumentElement();
+            // 遍历子元素
+            NodeList childNodes = rootElement.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node childNode = childNodes.item(i);
+                if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+                    map.put(childNode.getNodeName(), childNode.getTextContent());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    /**
+     * 透传ISAPI
+     * @param ip
+     * @param username
+     * @param password
+     * @param isapiUrl
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public static HttpEntity putISAPI(String ip, String username, String password, String isapiUrl, String json)
+            throws Exception {
+        String url = "http://" + ip + isapiUrl;
+        HttpPut httpPut = new HttpPut(url);
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, creds);
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        httpPut.setEntity(new StringEntity(json, "UTF-8"));
+        HttpResponse response = httpclient.execute(httpPut);
+        return  response.getEntity();
+    }
+
 //    /**
 //     * 语音对讲开始
 //     *
@@ -3443,11 +3553,10 @@ public class CameraConService {
      * @param username username
      * @param password password
      * @param isapiUrl isapiUrl
-     * @param fileBytes fileBytes
      * @return result
      * @throws Exception
      */
-    public String putISAPI(String ip, String username, String password, String isapiUrl, byte[] fileBytes) throws Exception {
+    public String putISAPI(String ip, String username, String password, String isapiUrl) throws Exception {
         log.info("putISAPI入参，ip：{}， username：{}， password：{}， isapiUrl：{}", ip, username, password, isapiUrl);
         String url = "http://" + ip + isapiUrl;
         HttpPut httpPut = new HttpPut(url);
@@ -3455,10 +3564,6 @@ public class CameraConService {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(AuthScope.ANY, creds);
         CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-        if (fileBytes != null && fileBytes.length > 0) {
-            httpPut.setEntity(new ByteArrayEntity(fileBytes));
-        }
-
         HttpResponse response = httpclient.execute(httpPut);
         return  EntityUtils.toString(response.getEntity());
     }
@@ -3539,7 +3644,7 @@ public class CameraConService {
         String cameraIp = cameraConInfo.getCameraIp();
 
         try {
-            String putResult = putISAPI(cameraIp, userName, password, REBOOT_URL, null);
+            String putResult = putISAPI(cameraIp, userName, password, REBOOT_URL);
             log.info("reboot result is, putResult: {}", putResult);
         } catch (Exception e) {
             log.info("camera reboot err: {}", e);

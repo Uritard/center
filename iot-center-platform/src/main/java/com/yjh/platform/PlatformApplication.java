@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.module.config.service.SystemConfigService;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;

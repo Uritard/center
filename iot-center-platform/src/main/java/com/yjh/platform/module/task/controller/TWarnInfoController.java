@@ -568,16 +568,17 @@ public class TWarnInfoController {
         Result result = new Result();
         try {
             //查看是否已设置过
-            AlarmShield alarmShieldOld = alarmShieldDao.selectByWarnCount(alarmShield.getWarnContent(),alarmShield.getShieldType());
+            AlarmShield alarmShieldOld = alarmShieldDao.selectByWarnContent(alarmShield.getWarnContent(),alarmShield.getShieldType());
             if (alarmShieldOld == null){
                 //新增的 直接插入
+                alarmShield.setCreateTime(new Date());
                 alarmShieldDao.add(alarmShield);
             } else {
                 //不是新增的 更新
                 alarmShieldOld.setEndTime(alarmShield.getEndTime());
                 alarmShieldDao.update(alarmShieldOld);
             }
-            if (alarmShield.getShieldType() == 1){
+            if (alarmShield.getShieldType() == 1) {
                 TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getShieldId(),alarmShield.getWarnContent());
                 tRobotAlarm.setEndTime(alarmShield.getEndTime());
                 tRobotAlarmDao.update(tRobotAlarm);
@@ -592,12 +593,20 @@ public class TWarnInfoController {
 
 
     @ApiOperation(value = "告警屏蔽查询")
-    @PostMapping(value = "/warnShieldInfo")
+    @GetMapping(value = "/warnShieldInfo")
     @Logs(title = "告警屏蔽查询",content = "告警屏蔽查询",logType = 1,authority = "1235")
-    public Result warnShieldInfo() {
+    public Result warnShieldInfo(@RequestParam(value = "startTime",required = false) String startTime,
+                                 @RequestParam(value = "endTime",required = false) String endTime,
+                                 @RequestParam(value = "pageNum") Integer pageNum,
+                                 @RequestParam(value = "pageSize") Integer pageSize) {
         Result result = new Result();
         try {
-            result.setData(alarmShieldDao.select());
+            Map<String,Object> resultMap = new HashMap<>(2);
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<AlarmShield> list = alarmShieldDao.select(startTime,endTime);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("告警屏蔽设置失败：", e);

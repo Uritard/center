@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.EasyExcelFactory;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import com.yjh.platform.common.logs.Logs;
@@ -7,6 +8,7 @@ import com.yjh.platform.common.utils.ModelExcelListener;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.ExcelEntity;
+import com.yjh.platform.module.device.entity.LockPresetCommand;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
@@ -356,15 +358,15 @@ public class TStdDevicemeteController {
                 tStdDevicemeteService.importExcel(excelEntities);
             }
             List<ExcelEntity> errorExcelList = modelExcelListener.getErrorExcelEntities();
-            result.setData(errorExcelList.size());
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(errorExcelList.size());
+            }
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("发生异常:", e);
         }
         return result;
     }
-
-
 
     @ApiOperation(value = "下载模板")
     @RequestMapping(value = "download",method = RequestMethod.GET)
@@ -383,4 +385,32 @@ public class TStdDevicemeteController {
 
         return  result;
     }
+
+    @ApiOperation(value = "测点预置位查询")
+    @RequestMapping(value = "/queryPresetByCameraAndMete", method = RequestMethod.GET)
+    @Logs(title = "excel导入测点",content = "excel导入测点",logType = 1)
+    public Result queryPresetByCameraAndMete(@RequestParam("cameraId")Long cameraId,@RequestParam("meteId")Long meteId) {
+        Result result = new Result();
+        try {
+            result.setData(tStdDevicemeteService.queryPresetByCameraAndMete(cameraId,meteId));
+        }catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("发生异常:", e);
+        }
+        return result;
+    }
+       @ApiOperation(value = "测点预置位自锁定")
+    @RequestMapping(value = "/linkOrEditPreset", method = RequestMethod.POST)
+    @Logs(title = "excel导入测点",content = "excel导入测点",logType = 1)
+    public Result linkOrEditPreset(@RequestBody LockPresetCommand lockPresetCommand) {
+        Result result = new Result();
+        try {
+            result = tStdDevicemeteService.linkOrEditPreset(lockPresetCommand);
+        }catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("发生异常:", e);
+        }
+        return result;
+    }
+
 }

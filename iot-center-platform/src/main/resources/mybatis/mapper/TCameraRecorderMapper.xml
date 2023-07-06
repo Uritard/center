@@ -245,4 +245,9 @@
     <select id="selectPmsIdById" resultType="java.lang.String">
         SELECT a.pms_id FROM t_camera_recorder a where a.record_id = #{recordId, jdbcType=BIGINT}
     </select>
+    <select id="selectAll" resultType="com.yjh.platform.module.user.entity.TCameraRecorder">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_recorder a
+    </select>
 </mapper>

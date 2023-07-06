@@ -1,21 +1,32 @@
 package com.yjh.platform.module.device.service;
 
+import cn.hutool.http.HttpStatus;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.enums.AlarmLevelEnum;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
-import com.yjh.platform.module.user.entity.TDictBusiness;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.TCameraPresetService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -25,12 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -63,6 +71,15 @@ public class TStdDevicemeteService{
     private RedisTemplate redisTemplate;
     @Autowired
     private LinkAutoMapper linkAutoMapper;
+
+    @Autowired
+    private TCameraPresetDao tCameraPresetDao;
+    @Autowired
+    private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private TCameraPresetService tCameraPresetService  ;
+    @Autowired
+    private TCruisePointInstanceService tCruisePointInstanceService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -536,7 +553,7 @@ public class TStdDevicemeteService{
                         Integer alarmLevel = excelEntity.getAlarmLevel();
                         tStdDeviceMete.setAlarmLevel(alarmLevel);
                         StringJoiner stringJoiner   = new StringJoiner(",");
-                        for(int i = alarmLevel; i <= 133;i++) {
+                        for(int i = alarmLevel; i <= 134;i++) {
                             stringJoiner.add(String.valueOf(i));
                         }
                         tStdDeviceMete.setAlarmLevelString(stringJoiner.toString());
@@ -555,6 +572,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setRedundantType(excelEntity.getRedundantType());
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     tStdDeviceMete.setIsTemdif(0);
+                    tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     totalMete.add(tStdDeviceMete);
                 }
             });
@@ -571,8 +589,114 @@ public class TStdDevicemeteService{
         String path = (String) mapForCreatePath.get("content");
         Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String returnPath = StringUtils.substringAfter((String) mapForReturnPath.get("content"), "/imgs");
+
+        //        String path = "D:/code/voice";
+        //        String returnPath = "D:/code/voice";
+
         String fileName = "测点导入模板.xls";
-        return "/imgs" + returnPath+"/"+fileName;
+            return "/imgs" + returnPath+"/"+fileName;
+    }
+
+    public TCameraPreset queryPresetByCameraAndMete(Long cameraId,Long meteId) {
+        TCameraPreset tCameraPreset = tCameraPresetDao.queryPresetByCameraAndMete(cameraId,meteId);
+        if (Objects.isNull(tCameraPreset)) {
+            Integer presetNum = tCameraPresetDao.queryMaxPresetNum(cameraId);
+            tCameraPreset = new TCameraPreset();
+            tCameraPreset.setPresetNum(presetNum);
+        }
+        return tCameraPreset;
+    }
+
+    public Result linkOrEditPreset(LockPresetCommand lockPresetCommand) {
+        TCameraPreset tCameraPreset = new TCameraPreset();
+        Result result = new Result();
+        if (Objects.isNull(lockPresetCommand.getPresetId())) {
+            tCameraPreset.setCameraId(lockPresetCommand.getCameraId());
+            tCameraPreset.setPresetNum(lockPresetCommand.getPresetNum());
+            tCameraPreset.setPresetName(lockPresetCommand.getPresetName());
+            tCameraPreset.setCameraName(lockPresetCommand.getCameraName());
+            result = tCameraPresetService.add(tCameraPreset);
+            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
+            if (HttpStatus.HTTP_OK == result.getCode()) {
+                TCruisePointInstanceDetail tCruisePointInstanceDetail = new TCruisePointInstanceDetail();
+                if (tCameraInfo.getCameraType() == 205) {
+                    tCruisePointInstanceDetail.setCruiseType(229);
+                } else if (tCameraInfo.getCameraType() == 206) {
+                    tCruisePointInstanceDetail.setCruiseType(230);
+                }
+                tCruisePointInstanceDetail.setDeviceMeteId(lockPresetCommand.getDeviceMeteId());
+                tCruisePointInstanceDetail.setDeviceId(lockPresetCommand.getDeviceId());
+                tCruisePointInstanceDetail.setCustomId(lockPresetCommand.getCustomId());
+                tCruisePointInstanceDetail.setIds(Collections.singletonList(tCameraPreset.getPresetId()));
+                tCruisePointInstanceDetail.setMeteName(lockPresetCommand.getMeteName());
+                int i = tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail);
+                if (i == -3) {
+                    tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+                    result.setMessage("巡视点已经绑定了预案,操作无法生效！");
+                    result.setCode(10102);
+                } else {
+                    result.setData(i);
+                    //巡视点有变动 同步模型
+                    if (Constant.updateSyncModel()) {
+                        Constant.modelUpload("1");
+                    }
+                }
+            }
+        } else {
+            try {
+                TCameraPreset cameraPreset = tCameraPresetService.selectByPrimaryId(lockPresetCommand.getPresetId());
+                if (cameraPreset == null) {
+                    result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), "预置位信息有误，请检查预置位信息或联系管理员");
+                    result.setData(0);
+                    return result;
+                }
+                HashMap<String, Object> params = new HashMap<>();
+                params.put("cameraId", cameraPreset.getCameraId());
+                params.put("presetId", cameraPreset.getPresetId());
+                params.put("meteName", cameraPreset.getPresetName());
+                params.put("edgeCode", cameraPreset.getEdgeCode());
+
+                Result response1 = sendPostRequest(Constant.SET_PRESET_URL, params);//设置预置点
+                if (!org.springframework.util.StringUtils.isEmpty(response1.getData().toString())) {
+                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                    JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
+                    log.info("重置预置位相机抓图结果：{}", response2.getData());
+
+                    String urlPath = (String)json.get("urlPath");
+                    String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
+
+                    String presetPtz = response1.getData().toString();
+                    cameraPreset.setPresetPtz(presetPtz);
+                    tCameraPresetService.update(cameraPreset); // 更新PTZ信息
+
+                    cameraPreset.setPresetImg(remotePath);
+                    tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
+                    result.setData(1);
+                } else {
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                    result.setData(0);
+                }
+            } catch (BusinessException b) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+            } catch (Exception e) {
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                log.error("添加预置位信息错误:", e);
+            }
+        }
+        return result;
+    }
+
+    public Result sendPostRequest(String url,HashMap<String, Object> params) {
+        Result response = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                response = serviceRestTemplate.getForObject(url, Result.class,params);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return response;
     }
 
 }

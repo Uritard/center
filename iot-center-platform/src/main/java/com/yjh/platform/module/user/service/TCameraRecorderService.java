@@ -15,6 +15,7 @@ import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
+import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -237,6 +238,38 @@ public class TCameraRecorderService {
         }
         return true;
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCameraRecorder> importCameraRecorder(List<TCameraRecorderExcel> excelEntities) {
+        List<TCameraRecorder> tCameraRecorders = new ArrayList<>();
+        excelEntities.forEach(t -> {
+            TCameraRecorder tCameraRecorder = new TCameraRecorder();
+            tCameraRecorder.setRecordName(t.getRecordName());
+            tCameraRecorder.setPmsId(t.getPmsId());
+            tCameraRecorder.setAliasName(t.getAliasName());
+            tCameraRecorder.setRecorderType(t.getRecorderType());
+            tCameraRecorder.setRecorderModel(t.getRecorderModel());
+            tCameraRecorder.setVendorId(t.getVendorId());
+            tCameraRecorder.setUnit(t.getUnit());
+            tCameraRecorder.setRecordIp(t.getRecordIp());
+            tCameraRecorder.setHttpPort(t.getHttpPort());
+            tCameraRecorder.setRtspPort(t.getRtspPort());
+            tCameraRecorder.setProtocol(t.getProtocol());
+            tCameraRecorder.setProtocolUrl(t.getProtocolUrl());
+            tCameraRecorder.setIdentityManager(t.getIdentityManager());
+            tCameraRecorder.setIdentityCode(t.getIdentityCode());
+            tCameraRecorder.setMaxChannel(t.getMaxChannel());
+            tCameraRecorder.setBufferDay(t.getBufferDay());
+            tCameraRecorder.setHddSize(t.getHddSize());
+            tCameraRecorder.setTimeLong(t.getTimeLong());
+            tCameraRecorders.add(tCameraRecorder);
+        });
+        if (CollectionUtils.isNotEmpty(tCameraRecorders)) {
+            this.batchInsert(tCameraRecorders);
+        }
+        return tCameraRecorders;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderDetail> selectIdAndName(){
         return tCameraRecorderDao.selectIdAndName();
@@ -254,5 +287,6 @@ public class TCameraRecorderService {
     public String selectPmsIdById(Long recordId) {
         return tCameraRecorderDao.selectPmsIdById(recordId);
     }
+
 }
 

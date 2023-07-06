@@ -90,6 +90,13 @@ public class TCameraPresetController {
                         tCameraPreset.setPresetPtz(resData);
                         tCameraPresetService.update(tCameraPreset);//存图
                         result.setData(resultNum);
+                        if (Objects.nonNull(tCameraPreset.getDeviceMeteId())) {
+                            //绑定关系
+                            int a = tCameraPresetService.updateInstance(tCameraPreset);
+                            if (a > 0) {
+                                log.info("{} 和 {} 绑定关系成功", tCameraPreset.getCameraId(), tCameraPreset.getDeviceMeteId());
+                            }
+                        }
                     } else {
                         tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
                         resultNum = 0;

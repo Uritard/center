@@ -865,7 +865,6 @@ public class UPatrolTaskService {
         if (ret != -1) {
             checkCompletionTask(taskId);
         }
-
         return ret != -1;
     }
 
@@ -3248,7 +3247,6 @@ public class UPatrolTaskService {
             log.info("当前任务 \"{}\"为重试任务不再重试！",uPatrolTaskParam.getTaskName());
             return null;
         }
-
 
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
         tCruiseTaskAdd.setIfRun(173);

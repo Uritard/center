@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
@@ -8,13 +10,16 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
+import com.yjh.platform.module.user.entity.TCameraInfoExcel;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +27,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -369,6 +376,38 @@ public class TCameraInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "导入摄像机台账")
+    @RequestMapping(value = "/importCameraInfo", method = RequestMethod.POST)
+    @Logs(title = "导入摄像机台账", content = "根据用户传递的参数导入摄像机台账", logType = 5)
+    public Result importCameraInfo(MultipartFile file) {
+        Result result = new Result();
+        try {
+            InputStream inputStream = file.getInputStream();
+            String[] heads = new String[] {"所属区域", "PMS编码", "设备类型", "设备型号", "设备名称", "IP", "端口", "录像机", "红外测温端口",
+                    "用户名", "用户名", "密码", "录像机通道号", "使用单位", "安装位置", "生产厂家", "经度", "纬度", "是否可控", "投运时间"};
+            ExcelReadListener<TCameraInfoExcel> modelExcelListener = new ExcelReadListener<>(heads);
+            ReadSheet readSheet = new ReadSheet(0);
+            EasyExcelFactory.read(inputStream, TCameraInfoExcel.class, modelExcelListener).headRowNumber(1).build().read(readSheet);
+
+            List<TCameraInfoExcel> excelEntities = modelExcelListener.getExcelEntities();
+            List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
+
+            if (CollectionUtils.isNotEmpty(excelEntities)) {
+                List<String> errorList = tCameraInfoService.importCameraInfo(excelEntities);
+                errorExcelList.addAll(errorList);
+            }
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(ExcelReadListener.prettyErrors(errorExcelList));
+            }
+        } catch (BusinessException e) {
+            result.setCode(e.getCode(), e.getMessage());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "导入失败，请检查上传 excel 格式是否正确!");
+            log.error("导入摄像机台账失败：" + e);
         }
         return result;
     }

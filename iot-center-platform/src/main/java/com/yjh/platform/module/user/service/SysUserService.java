@@ -62,6 +62,8 @@ public class SysUserService {
 
     @Autowired
     private SysUserDevicePermissionDao sysUserDevicePermissionDao;
+    @Autowired
+    private CommonMenuDao commonMenuDao;
 
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
@@ -766,6 +768,29 @@ public class SysUserService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int addCommonMenu(List<CommonMenu> list,Long userId){
+        //先删除 后增加
+        commonMenuDao.deleteByUserId(userId);
+        return commonMenuDao.batchAdd(list);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CommonMenu> selectCommonMenu(Long userId){
+        List<CommonMenu> menuList = commonMenuDao.selectByUserId(userId);
+        if (menuList.isEmpty()){
+            //没有初始化 进行初始化
+            menuList = commonMenuDao.selectNewCommonMenu(userId);
+            this.addCommonMenu(menuList,userId);
+        }
+        return menuList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CommonMenu> selectCommonMenuConf(){
+        return commonMenuDao.selectCommonMenuConf();
     }
 }
 

@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -48,18 +49,22 @@ public class SilentTaskJob implements Runnable {
 
     private String stationCode;
 
+    private Integer waitTime;
+
     public SilentTaskJob(TCameraPresetDao tCameraPresetDao,
                          RedisTemplate redisTemplate,
                          IntelAnalysisService intelAnalysisService,
                          Integer presetType,
                          ApplicationProperties applicationProperties,
-                         String stationCode){
+                         String stationCode,
+                         Integer waitTime){
         this.tCameraPresetDao = tCameraPresetDao;
         this.redisTemplate = redisTemplate;
         this.intelAnalysisService = intelAnalysisService;
         this.presetType = presetType;
         this.applicationProperties = applicationProperties;
         this.stationCode = stationCode;
+        this.waitTime = waitTime;
     }
     /**
      * 调用相机转到预置位接口
@@ -115,38 +120,40 @@ public class SilentTaskJob implements Runnable {
             return;
         }
 
-        log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
-        try {
-            HashMap<String, Object> moveMap = new HashMap<>(5);
-            moveMap.put("cameraId", cameraId);
-            moveMap.put("presetId", presetId);
-            moveToPreset(moveMap);
-            // 等待摄像头转到预置位
-            Long waitTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content")));
-            TimeUnit.MILLISECONDS.sleep(waitTime);
-            HashMap<String, Object> captureMap = new HashMap<>(3);
-            captureMap.put("cameraId", cameraId);
-            captureMap.put("meteName", presetName);
-            // 拍照
-            Result result = capturePicture(captureMap);
-            if (result == null || !MSG.equals(result.getMessage())) {
-                log.info("抓图失败 result:{}", result);
-                return;
+        Date now = new Date();
+        Date lastDate = DateUtils.dateFromString(lastTime);
+        if ((now.getTime() - lastDate.getTime()) >= (waitTime*1000) ){
+            log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
+            try {
+                HashMap<String, Object> moveMap = new HashMap<>(5);
+                moveMap.put("cameraId", cameraId);
+                moveMap.put("presetId", presetId);
+                moveToPreset(moveMap);
+                // 静默不等待摄像头转到预置位
+                HashMap<String, Object> captureMap = new HashMap<>(3);
+                captureMap.put("cameraId", cameraId);
+                captureMap.put("meteName", presetName);
+                // 拍照
+                Result result = capturePicture(captureMap);
+                if (result == null || !MSG.equals(result.getMessage())) {
+                    log.info("抓图失败 result:{}", result);
+                    return;
+                }
+                String edgeLevel = Constant.getLevelEdge();
+                log.info("edgeLevel:{}",edgeLevel);
+                //如果是边缘节点 上传巡视主机
+                if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
+                    uploadPicture(result, cameraId, presetId, presetName);
+                    //否则调用算法分析
+                } else {
+                    // 分析
+                    analysePicture(result, Long.valueOf(presetId));
+                }
+            } catch (Exception e) {
+                log.error("设置摄像机状态出错" + e.getMessage());
+                redisInfoMap.put("state", "0");
+                redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
             }
-            String edgeLevel = Constant.getLevelEdge();
-            log.info("edgeLevel:{}",edgeLevel);
-            //如果是边缘节点 上传巡视主机
-            if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
-                uploadPicture(result, cameraId, presetId, presetName);
-                //否则调用算法分析
-            } else {
-                // 分析
-                analysePicture(result, Long.valueOf(presetId));
-            }
-        } catch (Exception e) {
-            log.error("设置摄像机状态出错" + e.getMessage());
-            redisInfoMap.put("state", "0");
-            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
         }
     }
 

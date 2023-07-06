@@ -1033,7 +1033,6 @@ public class TStdDeviceService{
         }
     }
 
-
     private List<Long> getAllUpRegionId(List<Long> regionList){
         List<AreaInfo> allRegionList = tStdDeviceDao.selectAllRegion();
         List<Long> reList = new ArrayList<>(regionList);
@@ -1061,7 +1060,5 @@ public class TStdDeviceService{
         }
         return  -1L;
     }
-
-
 }
 

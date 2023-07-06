@@ -357,8 +357,14 @@
         SELECT
         preset_img
        FROM
-	    t_camera_preset
-       WHERE camera_id=#{cameraId, jdbcType=BIGINT}
+	    t_camera_preset a
+            LEFT JOIN t_cruise_point_instance b ON a.preset_id = b.cruise_id
+            LEFT JOIN t_std_devicemete c on b.device_mete_id = c.device_mete_id
+        WHERE c.is_ai='off'
+          AND c.is_judge ='off'
+          AND c.analyse_type IS NOT NULL
+          AND c.analyse_type NOT IN (8,9,13)
+          AND a.camera_id=#{cameraId, jdbcType=BIGINT}
     </select>
     <select id="selectCameraIdList" resultType="java.lang.Long">
         SELECT
@@ -370,8 +376,11 @@
         SELECT
 	     preset_id
        FROM
-	    t_camera_preset
-       WHERE camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
+	    t_camera_preset a
+        LEFT JOIN t_cruise_point_instance b ON a.preset_id = b.cruise_id
+        LEFT JOIN t_std_devicemete c on b.device_mete_id = c.device_mete_id
+        WHERE c.is_ai='off' AND c.is_judge ='off'  AND c.analyse_type IS NOT NULL
+        AND a.camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
         #{cameraId, jdbcType=BIGINT}
     </foreach>
     </select>
@@ -523,4 +532,43 @@
     </set>
         where a.id = #{id}
     </update>
+
+    <select id="queryPresetByCameraAndMete" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        SELECT preset_id,
+               edge_code,
+               origin_id,
+               camera_id,
+               preset_num,
+               preset_name,
+               preset_type,
+               creator_user,
+               creator_time,
+               is_use,
+               preset_img,
+               inspection_postion,
+               collect_status,
+               preset_ptz,
+               calibration_status,
+               remark
+        FROM t_camera_preset
+        WHERE camera_id = #{cameraId,jdbcType=BIGINT}
+          AND preset_id IN (
+            SELECT cruise_id
+            FROM t_cruise_point_instance
+            WHERE device_mete_id = #{meteId,jdbcType=BIGINT})
+    </select>
+    <select id="queryMaxPresetNum" resultType="java.lang.Integer">
+        SELECT MAX(preset_num) + 1
+        FROM t_camera_preset
+        WHERE camera_id = #{cameraId,jdbcType=BIGINT}
+    </select>
+    <select id="selectImgListById" resultType="java.lang.String">
+        select
+        preset_img
+        from t_camera_preset
+        WHERE preset_id in
+        <foreach collection="list" item="presetId" open="(" separator="," close=")">
+            #{presetId, jdbcType=BIGINT}
+        </foreach>
+    </select>
 </mapper>

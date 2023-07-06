@@ -141,7 +141,6 @@ public class TCruiseResultService{
             Map<String,Object> params = new HashMap<>();
             String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0].replaceAll(afterManualReviewInfo.getUnit(), "");;
             params.put("value", personCheck);
-            params.put("value", personCheck);
             params.put("stdDeviceMeteName",tStdDevicemete.getMeteName());
             params.put("meteKind",tStdDevicemete.getMeteKind());
             params.put("alarmState",tStdDevicemete.getAlarmState());

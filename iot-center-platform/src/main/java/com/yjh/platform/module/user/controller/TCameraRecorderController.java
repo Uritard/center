@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.controller;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
@@ -10,12 +12,15 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
+import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
 import com.yjh.platform.module.user.service.TCameraRecorderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +28,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -282,6 +289,38 @@ public class TCameraRecorderController {
         }
         return result;
     }
+
+    @ApiOperation(value = "导入NVR台账")
+    @RequestMapping(value = "/importCameraRecorder", method = RequestMethod.POST)
+    @Logs(title = "导入NVR台账",content = "根据用户传递的参数导入NVR台账",logType = 5)
+    public Result importCameraRecorder(MultipartFile file) {
+        Result result = new Result();
+        try {
+            InputStream inputStream = file.getInputStream();
+            String[] heads = new String[] {"设备名称", "PMS编码", "设备别名", "设备类型", "设备型号", "生产厂家", "使用单位", "IP",
+                    "服务端口", "RTSP端口", "传输协议", "协议路径", "用户名", "密码", "最大通道数", "缓存天数", "缓存大小", "录制时长"};
+            ExcelReadListener<TCameraRecorderExcel> modelExcelListener = new ExcelReadListener<>(heads);
+            ReadSheet readSheet = new ReadSheet(0);
+            EasyExcelFactory.read(inputStream, TCameraRecorderExcel.class,modelExcelListener).headRowNumber(1).build().read(readSheet);
+            List<TCameraRecorderExcel> excelEntities = modelExcelListener.getExcelEntities();
+            List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
+
+            if (CollectionUtils.isNotEmpty(excelEntities)) {
+                List<TCameraRecorder> tCameraRecorders = tCameraRecorderService.importCameraRecorder(excelEntities);
+                tCameraRecorders.forEach(t -> {
+                    sendPostRequest(Constant.NVR_REGISTER_URL,t.getRecordId());
+                });
+            }
+            if (CollectionUtils.isNotEmpty(errorExcelList)) {
+                result.setData(ExcelReadListener.prettyErrors(errorExcelList));
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("导入NVR台账失败：" + e);
+        }
+        return result;
+    }
+
     public Result sendPostRequest(String url,Long recordId) {
         Result response = null;
         try {
