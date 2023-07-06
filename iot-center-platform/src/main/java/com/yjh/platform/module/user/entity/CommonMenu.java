@@ -37,8 +37,11 @@ public class CommonMenu implements Serializable {
     @ApiModelProperty(value = "菜单名称")
     private String menuName;
 
+    @ApiModelProperty(value = "菜单路径")
+    private String path;
+
     @ApiModelProperty(value = "菜单图片")
-    private String menuImg;
+    private String img;
 
     @ApiModelProperty(value = "顺序")
     private Integer sort;

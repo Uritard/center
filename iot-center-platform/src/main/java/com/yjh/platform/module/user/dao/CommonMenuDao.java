@@ -24,4 +24,7 @@ public interface CommonMenuDao {
 
     int deleteByUserId(@Param(value = "userId") Long userId);
 
+    List<CommonMenu> selectNewCommonMenu(@Param(value = "userId") Long userId);
+    List<CommonMenu> selectCommonMenuConf();
+
 }

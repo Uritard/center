@@ -881,6 +881,7 @@ public class SysUserController {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
+//            Long userId = 10001L;
             result.setData(sysUserService.addCommonMenu(list,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -895,6 +896,19 @@ public class SysUserController {
         Result result = new Result();
         try {
             result.setData(sysUserService.selectCommonMenu(userId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("用户查询常用功能失败: ", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "用户查询常用功能配置查询")
+    @RequestMapping(value = "/selectCommonMenuConf", method = RequestMethod.GET)
+    public Result selectCommonMenuConf() {
+        Result result = new Result();
+        try {
+            result.setData(sysUserService.selectCommonMenuConf());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("用户查询常用功能失败: ", e);

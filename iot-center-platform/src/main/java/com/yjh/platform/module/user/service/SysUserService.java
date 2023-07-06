@@ -779,7 +779,18 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<CommonMenu> selectCommonMenu(Long userId){
-        return commonMenuDao.selectByUserId(userId);
+        List<CommonMenu> menuList = commonMenuDao.selectByUserId(userId);
+        if (menuList.isEmpty()){
+            //没有初始化 进行初始化
+            menuList = commonMenuDao.selectNewCommonMenu(userId);
+            this.addCommonMenu(menuList,userId);
+        }
+        return menuList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CommonMenu> selectCommonMenuConf(){
+        return commonMenuDao.selectCommonMenuConf();
     }
 }
 
