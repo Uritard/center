@@ -6,6 +6,7 @@ import net.coobird.thumbnailator.name.Rename;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -185,4 +186,22 @@ public class FileUtil {
             }
         }
     }
+
+    /**
+     * 将MultipartFile文件保存在指定的文件中
+     *
+     * @param file     MultipartFile文件
+     * @param filePath 指定文件
+     */
+    public static void saveFile(MultipartFile file, String filePath) throws IOException {
+        File fileTemp = new File(filePath);
+        if (!fileTemp.exists()) {
+            if (!fileTemp.getParentFile().exists()) {
+                fileTemp.getParentFile().mkdirs();
+            }
+            fileTemp.createNewFile();
+            file.transferTo(fileTemp);
+        }
+    }
+
 }

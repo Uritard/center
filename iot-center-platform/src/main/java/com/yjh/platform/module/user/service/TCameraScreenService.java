@@ -225,7 +225,7 @@ public class TCameraScreenService{
             }
         }
     }
-    private static Result cameraStates(HashMap map) {
+    static Result cameraStates(HashMap map) {
         Result re = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -710,6 +710,7 @@ public class TCameraScreenService{
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
                     areaInfoTem.setCameraId(areaInfoMap.getCameraId());
+                    areaInfoTem.setDeviceType(areaInfoMap.getDeviceType());
                     if("camera".equals(areaInfoMap.getInfoType())){
                         if(map.get(areaInfoMap.getId().toString()) != null){
                             areaInfoTem.setState(Integer.valueOf(map.get(areaInfoMap.getId().toString())));
