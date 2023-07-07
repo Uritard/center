@@ -1011,7 +1011,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		LEFT JOIN t_cruise_point_instance cpi ON dm.device_mete_id = cpi.device_mete_id
 		WHERE 1 =1
 		<if test="name != null and name != ''"> and dm.mete_name like concat('%',#{name, jdbcType=VARCHAR},'%')</if>
-		<if test="deviceType != null and deviceType != ''"> and dm.mete_type = #{deviceType}</if>
+		<if test="deviceType != null and deviceType != '' and deviceType != -1"> and dm.mete_type = #{deviceType}</if>
 	</select>
 
 	<select id="selectRegionByDeviceList" resultType="java.lang.Long">
