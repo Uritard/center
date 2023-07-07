@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceDao">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceTreeDao">
 
 	<!-- 通用查询映射结果 -->
 	<resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDevice">
@@ -21,19 +21,6 @@
 		<result column="preset_id" jdbcType="BIGINT" property="presetId" />
 		<result column="camera_id" jdbcType="BIGINT" property="cameraId" />
 	</resultMap>
-	<!-- 通用查询映射结果 -->
-	<resultMap id="AreaInfoMap" type="com.yjh.platform.module.device.entity.AreaInfo">
-		<id column="Id" jdbcType="BIGINT" property="Id" />
-		<result column="label" jdbcType="VARCHAR" property="label" />
-		<result column="upId" jdbcType="BIGINT" property="upId" />
-		<result column="upName" jdbcType="VARCHAR" property="upName" />
-		<result column="infoType" jdbcType="VARCHAR" property="infoType" />
-		<result column="cameraId" jdbcType="VARCHAR" property="cameraId" />
-		<collection property="presetId" javaType="java.util.List" select="com.yjh.platform.module.device.dao.TStdDeviceDao.findPresetByCameraIdAndMeteId"
-					ofType="java.lang.Long" column="{cameraId=cameraId,meteId=Id}"/>
-	</resultMap>
-
-
 
 	<!-- 通用查询结果列 -->
 	<sql id="Base_Column_List">
@@ -848,7 +835,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		LIMIT 1
 	</select>
 
-	<select id="selectDeviceByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectDeviceByRegionId" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT DISTINCT
 		b.device_id AS Id,
 		b.device_name AS label,
@@ -861,7 +848,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where b.up_region_id =#{upRegionId}
 	</select>
 
-	<select id="selectAllByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectAllByRegionId" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT DISTINCT
 		b.device_id AS Id,
 		b.device_name AS label,
@@ -886,7 +873,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where d.up_region_id =#{upRegionId}
 		)
 	</select>
-	<select id="getRegionMonitorDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+
+	<select id="getRegionMonitorDevice" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT
 				d.camera_id AS Id,
 				d.camera_name AS label,
@@ -924,6 +912,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 			where tvd.up_region_id =#{upRegionId}
 		)
 	</select>
+
 	<select id="selectCameraByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT
 		d.camera_id AS Id,
@@ -949,7 +938,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where b.up_region_id =#{upRegionId}
 	</select>
 
-	<select id="selectCustomByRegionId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectCustomByRegionId" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT DISTINCT
 		c.custom_id AS Id,
 		c.custom_name AS label,
@@ -962,7 +951,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		where c.device_id =#{deviceId}
 	</select>
 
-	<select id="selectDeviceMeteByDeviceAndCustom" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectDeviceMeteByDeviceAndCustom" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT DISTINCT
 		dm.device_mete_id AS Id,
 		dm.mete_name AS label,
@@ -974,11 +963,11 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
 		where 1=1
 		<if test="deviceId != null and deviceId != ''">and dm.device_id = #{deviceId, jdbcType=VARCHAR}</if>
-		<if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+		<if test="meteType != null and meteType != ''">and dm.mete_type = #{meteType, jdbcType=VARCHAR}</if>
 		<if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
 	</select>
 
-	<select id="selectCruisePointByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectCruisePointByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT
 		cpi.instance_id AS Id,
 		cpi.cruise_name AS label,
@@ -1037,7 +1026,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT DISTINCT up_region_id FROM cte;
 	</select>
 
-	<select id="selectAllMeteCruiseTreeByNameTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectAllMeteCruiseTreeByNameTree" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
 		FROM t_std_region a
 		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
@@ -1090,7 +1079,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		<if test="name != null and name != ''"> and device_name like concat('%',#{name, jdbcType=VARCHAR},'%')</if>
 	</select>
 
-	<select id="selectDevTreeDeviceByNameTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectDevTreeDeviceByNameTree" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType, "" AS deviceTypeId
 		FROM t_std_region a
 		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
@@ -1166,7 +1155,7 @@ group by camera_id
 		FROM t_std_region a
 				 LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
 	</select>
-	<select id="selectAllPatrolDeviceTreeByName" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+	<select id="selectAllPatrolDeviceTreeByName" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
 		FROM t_std_region a
 		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
@@ -1208,8 +1197,7 @@ group by camera_id
 			)
 		</if>
 	</select>
-	<select id="
-	selectAllPatrolDeviceByName" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+	<select id="selectAllPatrolDeviceByName" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
 		SELECT d.up_region_id,
 			   d.camera_id
 		FROM t_camera_info d
@@ -1230,31 +1218,90 @@ group by camera_id
 			  and f.voice_device_name like concat('%', #{name}, '%')
 		)
 	</select>
-	<select id="selectPatrolDeviceTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
-		FROM t_std_region a
-				 LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
-		UNION  (
-			SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType
-			FROM  t_robot_info e
-					  LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
-		)
-		UNION  (
-			SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
-			FROM t_camera_info d
-					 LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
-		)
-		UNION ALL (
-			SELECT f.voice_device_id AS Id, f.voice_device_name AS label, f.up_region_id AS upId, b.region_name AS upName, "voice" AS infoType
-			FROM t_voice_device f
-					 LEFT JOIN t_std_region b ON f.up_region_id = b.region_id
-		)
-	</select>
 
 	<select id="selectSynthesisTreeRegion" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
 		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
 		FROM t_std_region a
 				 LEFT JOIN t_std_region b ON a.up_region_id = b.region_id;
+	</select>
+
+	<select id="selectCameraOrRobot" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
+		SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType,
+		if(camera_type = 205, 229, 230) as deviceType
+		FROM t_camera_info d
+		LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
+		where 1=1 and d.up_region_id = #{upRegionId}
+		<if test="userId != null">
+			AND d.camera_id IN (
+			SELECT
+			monitor_device_id
+			FROM
+			sys_user_device_permission sudp
+			WHERE
+			sudp.user_id = #{userId, jdbcType = BIGINT}
+			)
+		</if>
+		<if test="cameraType != null">
+			and d.camera_type = #{cameraType}
+		</if>
+		<if test="robotFlag != null and robotFlag != ''">
+			UNION ALL (
+			SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType,
+			if(robot_type is null, 524, 228) as deviceType
+			FROM  t_robot_info e
+			LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
+			WHERE 1 = 1 and e.up_region_id = #{upRegionId}
+			<if test="userId != null">
+				AND e.robot_id IN (
+				SELECT
+				monitor_device_id
+				FROM
+				sys_user_device_permission sudp
+				WHERE
+				sudp.user_id = #{userId, jdbcType = BIGINT}
+				)
+			</if>
+			)
+		</if>
+	</select>
+
+	<select id="selectCameraTreeByName" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
+
+		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType,
+		0 as deviceType
+		FROM t_std_region a
+		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+		where a.region_id in (
+		<foreach collection="regionList" item="regionId" separator=",">
+			#{regionId}
+		</foreach>
+		)
+		<if test="cameraList != null and cameraList.size() > 0 ">
+			UNION ALL (
+			SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType,
+			if(robot_type is null, 524, 228) as deviceType
+			FROM  t_robot_info e
+			LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
+			WHERE 1 = 1 and e.robot_id in (
+			<foreach collection="cameraList" separator="," item="item">
+				#{item.cameraId}
+			</foreach>
+			)
+			)
+		</if>
+		<if test="cameraList != null and cameraList.size() > 0 ">
+			UNION ALL (
+			SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType,
+			if(camera_type = 205, 229, 230) as deviceType
+			FROM t_camera_info d
+			LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
+			where 1=1 and d.camera_id in (
+			<foreach collection="cameraList" separator="," item="item">
+				#{item.cameraId}
+			</foreach>
+			)
+			)
+		</if>
 	</select>
 
 </mapper>

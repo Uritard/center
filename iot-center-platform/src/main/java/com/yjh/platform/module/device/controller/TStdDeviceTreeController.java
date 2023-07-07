@@ -2,15 +2,17 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.entity.InspectedDevTreeCondition;
-import com.yjh.platform.module.device.entity.PatrolDevTreeCondition;
+import com.yjh.platform.module.device.entity.DevSynthesisTreeCondition;
 import com.yjh.platform.module.device.service.TStdDeviceTreeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,33 +37,21 @@ public class TStdDeviceTreeController {
         this.tStdDeviceTreeService = tStdDeviceTreeService;
     }
 
-    @ApiOperation(value = "巡视设备树")
-    @GetMapping(value = "/selectPatrolDevTree")
-    public Result selectPatrolDevTree(@RequestBody PatrolDevTreeCondition patrolDevTreeCondition,
-                                      HttpServletRequest request) {
+    @ApiOperation(value = "设备综合树")
+    @GetMapping(value = "/selectDevSynthesisTree")
+    public Result selectDevSynthesisTree(@RequestBody DevSynthesisTreeCondition deviceTreeCondition,
+                                         HttpServletRequest request) {
         Result result = new Result();
         try {
-            Long userId = NumberUtils.toLong(request.getHeader("userId"));
-            result.setData(tStdDeviceTreeService.selectPatrolDevTree(patrolDevTreeCondition, userId));
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("巡视设备树查询失败描述：", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "被巡视设备树")
-    @GetMapping(value = "/selectInspectedDevTree")
-    public Result selectInspectedDevTree(@RequestBody InspectedDevTreeCondition deviceTreeCondition) {
-        Result result = new Result();
-        try {
-            if (String.valueOf(-1).equals(deviceTreeCondition.getMeteType())){
+            // 非同源告警趋势对比类该值为-1
+            if (String.valueOf(-1).equals(deviceTreeCondition.getMeteType())) {
                 deviceTreeCondition.setMeteType(null);
             }
-            result.setData(tStdDeviceTreeService.selectInspectedDevTree(deviceTreeCondition));
+            Long userId = NumberUtils.toLong(request.getHeader("userId"));
+            result.setData(tStdDeviceTreeService.selectDevSynthesisTree(deviceTreeCondition, userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("被巡视设备树查询失败描述：", e);
+            log.error("设备综合树查询失败描述：", e);
         }
         return result;
     }

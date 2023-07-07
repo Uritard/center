@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.ibatis.annotations.Param;

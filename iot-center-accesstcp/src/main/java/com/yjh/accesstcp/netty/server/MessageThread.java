@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MessageThread {
     private static final ExecutorService executorService =
-        new ThreadPoolExecutor(10, 30, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(128), new MyThreadFactory(true),
+        new ThreadPoolExecutor(10, 30, 10, T10imeUnit.SECONDS, new ArrayBlockingQueue<>(128), new MyThreadFactory(true),
             new ThreadPoolExecutor.CallerRunsPolicy());
 
     public static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
