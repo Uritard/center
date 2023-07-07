@@ -1303,13 +1303,14 @@ public class UPatrolTaskService {
         quartzTask.setJobName(task.getTaskId());
         quartzTask.setJobGroup(jobName);
         if (task.getDateType() == null) {
-            if (task.getExecuteType() == TaskTypeEnum.NOW.getType()) {
-                //立即执行
-                quartzTask.setStartTime(new Date());
-            } else {
-                //定时
-                quartzTask.setStartTime(task.getStartTime());
-            }
+//            if (task.getExecuteType() == TaskTypeEnum.NOW.getType()) {
+//                //立即执行
+//                quartzTask.setStartTime(new Date());
+//            } else {
+//                //定时
+//                quartzTask.setStartTime(task.getStartTime());
+//            }
+            quartzTask.setStartTime(task.getStartTime());
         } else {
             //周期 0 */10 * * * ?
             quartzTask.setCronExpression(task.getDateType());
