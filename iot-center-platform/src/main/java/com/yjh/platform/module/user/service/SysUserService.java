@@ -772,6 +772,9 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int addCommonMenu(List<CommonMenu> list,Long userId){
+        if (list.isEmpty() || list.size() < 3){
+            throw new BusinessException(209,"常用功能至少保留三个！");
+        }
         //先删除 后增加
         commonMenuDao.deleteByUserId(userId);
         return commonMenuDao.batchAdd(list);

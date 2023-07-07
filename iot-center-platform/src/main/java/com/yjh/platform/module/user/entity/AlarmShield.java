@@ -35,7 +35,7 @@ public class AlarmShield implements Serializable {
     @ApiModelProperty(value = "创建屏蔽的用户id")
     private Long createUserId;
 
-    @ApiModelProperty(value = "屏蔽结束时间")
+    @ApiModelProperty(value = "用户名称")
     private String userName;
 
     @ApiModelProperty(value = "屏蔽结束时间")

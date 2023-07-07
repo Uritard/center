@@ -575,16 +575,18 @@ public class TWarnInfoController {
                 alarmShieldDao.add(alarmShield);
             } else {
                 //不是新增的 更新
-                alarmShieldOld.setEndTime(alarmShield.getEndTime());
                 alarmShieldDao.update(alarmShieldOld);
             }
-            if (alarmShield.getShieldType() == 1) {
-                TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getShieldId(),alarmShield.getWarnContent());
-                tRobotAlarm.setEndTime(alarmShield.getEndTime());
-                tRobotAlarmDao.update(tRobotAlarm);
+            if (alarmShield.getShieldType() == 1){
+                TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getWarnContent());
+                if(tRobotAlarm != null){
+                    tRobotAlarm.setEndTime(alarmShield.getEndTime());
+                    tRobotAlarmDao.update(tRobotAlarm);
+                }
             }
             result.setData(1);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("告警屏蔽设置失败：", e);
         }
@@ -607,7 +609,8 @@ public class TWarnInfoController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("告警屏蔽设置失败：", e);
         }

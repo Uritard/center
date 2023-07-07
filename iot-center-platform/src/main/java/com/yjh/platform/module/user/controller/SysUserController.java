@@ -884,7 +884,7 @@ public class SysUserController {
 //            Long userId = 10001L;
             result.setData(sysUserService.addCommonMenu(list,userId));
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("用户设置常用功能数据失败:", e);
         }
         return result;
