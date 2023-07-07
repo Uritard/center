@@ -73,7 +73,7 @@
         ) AS cruise_device_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -86,11 +86,11 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_camera_info k ON g.camera_id = k.camera_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         LEFT JOIN t_voice_device l ON b.cruise_id = l.voice_device_id
         where 1 = 1 and a.remark = 1
         <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseType" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -107,7 +107,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -118,10 +118,10 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where 1 = 1 and a.remark = 1
         <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
 
     <insert id="batchAdd">
@@ -180,7 +180,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -190,9 +190,9 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where 1 = 1 and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
 
     <select id="selectByAnalyse" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -209,7 +209,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -220,11 +220,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.mete_type =222
         and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
         and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <select id="selectByMeterTypeByOil" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
@@ -240,7 +240,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -251,11 +251,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.meter_type in (417,411)
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
 				 and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <select id="selectByMeterTypeByArrester" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
@@ -271,7 +271,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -282,11 +282,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.meter_type in (412,413)
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
 				 and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <select id="selectByMeterTypeBySF6" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
@@ -302,7 +302,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -313,11 +313,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.meter_type = 414
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
 				 and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <select id="selectByMeterTypeByYY" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
@@ -333,7 +333,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -344,11 +344,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.meter_type = 415
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
 				 and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <select id="selectByAnalyseByWg" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
@@ -364,7 +364,7 @@
         END) AS instance_name,
         b.device_id,
         d.device_name,
-        b.custom_id,
+        h.custom_id,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
@@ -375,11 +375,11 @@
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         where a.mete_type =219
         and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
         and b.device_mete_id is not null and h.inspection_type = 1
-        ORDER BY b.device_id, b.custom_id
+        ORDER BY b.device_id, h.custom_id
     </select>
     <update id="tagsDeleted" >
         update t_cruise_type a <set>

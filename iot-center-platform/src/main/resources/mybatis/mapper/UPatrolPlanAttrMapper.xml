@@ -270,7 +270,7 @@
         ) AS instance_name,
         a.device_id,
         a.device_name,
-        b.custom_id,
+        h.custom_id,
         b.text_desc AS behavior,
         i.dict_note AS custom_name,
         a.point_type,
@@ -309,7 +309,7 @@
         AND i.col_name = "custom_type"
         WHERE
         1 = 1
-        and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id,a.instance_id
+        and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, h.custom_id,a.instance_id
     </select>
 
     <delete id="deleteByInstanceId" parameterType="java.lang.Long">
