@@ -3,7 +3,9 @@ package com.yjh.platform.module.config.entity;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -29,6 +31,7 @@ public class SysDiskCleanup {
     /**
      * 主键ID
      */
+    @TableId(type = IdType.AUTO)
     private String id;
 
     /**
@@ -91,6 +94,12 @@ public class SysDiskCleanup {
      */
     @ApiModelProperty(value = "备份过期状态，0: 未过期 1: 过期失效  2: 手动删除")
     private Integer backExpire;
+    /**
+     * 备份过期状态名称
+     */
+    @ApiModelProperty(value = "备份过期状态名称")
+    @TableField(exist=false)
+    private String backExpireName;
 
     /**
      * 清理具体内容说明

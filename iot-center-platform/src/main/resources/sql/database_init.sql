@@ -2510,3 +2510,27 @@ CREATE TABLE `system_config` (
   `rules` varchar(500) default NULL  COMMENT '规则校验',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统配置表';
+
+-- ----------------------------
+-- Table structure for sys_disk_cleanup
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_disk_cleanup`;
+CREATE TABLE `sys_disk_cleanup` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `del_tmp` int DEFAULT '0' COMMENT '是否删除临时文件，0: 否 1: 是  2: 清理完成  -1: 清理失败',
+  `del_task_file` int DEFAULT '0' COMMENT '是否删除任务文件，0: 否 1: 是  2: 清理完成  -1: 清理失败',
+  `del_task_report` int DEFAULT '0' COMMENT '是否删除任务报告，0: 否 1: 是  2: 清理完成  -1: 清理失败',
+  `del_task_data` int DEFAULT '0' COMMENT '是否删除任务数据库记录，0: 否 1: 是  2: 清理完成  -1: 清理失败',
+  `del_logs` int DEFAULT '0' COMMENT '是否删除日志记录，0: 否 1: 是  2: 清理完成  -1: 清理失败',
+  `back_database` int DEFAULT '0' COMMENT '是否备份数据库，0: 否 1: 是，如果有删除数据库记录则必须备份',
+  `back_file_path` varchar(128) DEFAULT NULL COMMENT '备份文件路径',
+  `back_data_path` varchar(128) DEFAULT NULL COMMENT '备份数据库文件',
+  `back_expire` int DEFAULT '0' COMMENT '备份过期状态，0: 未过期 1: 过期失效  2: 手动删除',
+  `clean_content` varchar(258) DEFAULT NULL COMMENT '清理具体内容说明',
+  `clean_status` int DEFAULT '0' COMMENT '清理状态，0: 未完成 1: 待确认  2: 已确认',
+  `expiry_date` datetime DEFAULT NULL COMMENT '清理时限',
+  `creator` varchar(64) DEFAULT NULL COMMENT '创建人',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='磁盘清理记录';
