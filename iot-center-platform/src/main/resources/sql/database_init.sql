@@ -2534,3 +2534,38 @@ CREATE TABLE `sys_disk_cleanup` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='磁盘清理记录';
+
+
+DROP TABLE IF EXISTS `common_menu_conf`;
+CREATE TABLE `common_menu_conf` (
+   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+   `menu_code` varchar(50) DEFAULT NULL COMMENT '菜单编码',
+   `menu_name` varchar(50) DEFAULT NULL COMMENT '菜单名称',
+   `path` varchar(255) DEFAULT NULL COMMENT '菜单路径',
+   `img` varchar(255) DEFAULT NULL COMMENT '菜单图片',
+   `sort` int DEFAULT NULL COMMENT '顺序值 ',
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='常用菜单配置表';
+
+DROP TABLE IF EXISTS `common_menu`;
+CREATE TABLE `common_menu` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `user_id` bigint DEFAULT NULL COMMENT '用户id',
+    `menu_code` varchar(50) DEFAULT NULL COMMENT '菜单编码',
+    `menu_name` varchar(50) DEFAULT NULL COMMENT '菜单名称',
+    `path` varchar(255) DEFAULT NULL COMMENT '菜单路径',
+    `img` varchar(255) DEFAULT NULL COMMENT '菜单图片',
+    `sort` int DEFAULT NULL COMMENT '顺序 小于4为常用默认',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='常用功能配置表';
+
+DROP TABLE IF EXISTS `alarm_shield`;
+CREATE TABLE `alarm_shield` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `create_user_id` bigint DEFAULT NULL COMMENT '创建屏蔽的用户id',
+    `end_time` datetime DEFAULT NULL COMMENT '屏蔽结束时间',
+    `shield_type` int DEFAULT NULL COMMENT '屏蔽类型：1-巡视设备，2-测点',
+    `warn_content` varchar(258) DEFAULT NULL COMMENT '屏蔽的告警内容',
+    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';

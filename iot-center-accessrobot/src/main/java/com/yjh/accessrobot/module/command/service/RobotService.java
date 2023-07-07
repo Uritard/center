@@ -3134,8 +3134,8 @@ public class RobotService {
         platformProxy.delete(taskId,startTime,source);
     }
 
-    public List<AlarmShield> selectAlarmShield(Long robotId,String warnCount){
-        return tRobotInfoDao.selectAlarmShield(robotId,warnCount);
+    public List<AlarmShield> selectAlarmShield(String warnCount){
+        return tRobotInfoDao.selectAlarmShield(warnCount);
     }
 }
 

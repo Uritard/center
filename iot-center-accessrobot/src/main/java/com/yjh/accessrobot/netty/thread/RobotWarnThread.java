@@ -50,7 +50,7 @@ public class RobotWarnThread implements Runnable{
                 log.info("tRobotAlarm的内容==={}", tRobotAlarm);
                 //告警屏蔽处理
                 AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-                List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getRobotId(), tRobotAlarm.getAlarmInfo());
+                List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getAlarmInfo());
                 if (alarmShieldList.size() > 0){
                     alarmShieldList.forEach(alarmShield -> {
                         Date now  = new Date();

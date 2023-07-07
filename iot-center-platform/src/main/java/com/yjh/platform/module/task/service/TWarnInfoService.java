@@ -588,8 +588,8 @@ public class TWarnInfoService{
         return tWarnInfoDetail;
     }
 
-    public TRobotAlarm selectByRobotIdAndContent(Long robotId,String content){
-        return tRobotAlarmDao.selectByRobotIdAndContent(robotId,content);
+    public TRobotAlarm selectByRobotIdAndContent(String content){
+        return tRobotAlarmDao.selectByRobotIdAndContent(content);
     }
 
     public TRobotInfo selectRobotInfoById(Long robotId) {
