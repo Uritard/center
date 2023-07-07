@@ -44,6 +44,10 @@ public class TWiringDiagramService {
 
     @Transactional(rollbackFor = Exception.class)
     public Result insert(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
+        if (file == null) {
+            result.setMessage(209, "文件错误,请重试");
+            return result;
+        }
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
@@ -107,6 +111,10 @@ public class TWiringDiagramService {
 
     @Transactional(rollbackFor = Exception.class)
     public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
+        if (file == null) {
+            result.setMessage(209, "文件错误,请重试");
+            return result;
+        }
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
