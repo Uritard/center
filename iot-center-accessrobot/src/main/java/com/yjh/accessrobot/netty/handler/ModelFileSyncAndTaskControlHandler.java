@@ -87,8 +87,16 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     // 变电站编码_taskCode_执行时间
                     log.info("机器人返回的taskPatrolledId：{}",taskPatrolledId);
                     try {
-                        String taskCode = taskPatrolledId.split("_")[1];
-                        String time = taskPatrolledId.split("_")[2];
+                        String[] taskPatrolledSplit = taskPatrolledId.split("_");
+                        String taskCode = "", time = "";
+                        if (taskPatrolledSplit.length == 2) {
+                            taskCode = taskPatrolledSplit[0];
+                            time = taskPatrolledSplit[1];
+                        }
+                        else {
+                            taskCode = taskPatrolledSplit[1];
+                            time = taskPatrolledSplit[2];
+                        }
                         Date robotTime = DateTimeUtil.parseFormat(time,DateTimeUtil.getDateTimePattern3());
                         //根据taskCode找到taskId
                         UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,robotTime);
