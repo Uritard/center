@@ -7,9 +7,10 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.StdDeviceTreeConstant;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceTreeDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.device.entity.InspectedDevTreeCondition;
-import com.yjh.platform.module.device.entity.PatrolDevTreeCondition;
+import com.yjh.platform.module.device.entity.DevSynthesisTreeCondition;
+import com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -20,11 +21,11 @@ import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -45,296 +46,243 @@ public class TStdDeviceTreeService {
     private final TCameraInfoDao tCameraInfoDao;
     private final TRobotInfoDao tRobotInfoDao;
     private final TStdDeviceDao tStdDeviceDao;
+    private final TStdDeviceTreeDao stdDeviceTreeDao;
     private static final Logger log = LoggerFactory.getLogger(TStdDeviceTreeService.class);
 
     public TStdDeviceTreeService(SysUserDao sysUserDao, TCameraScreenDao tCameraScreenDao, TCameraInfoDao tCameraInfoDao,
-                                 TRobotInfoDao tRobotInfoDao, TStdDeviceDao tStdDeviceDao) {
+                                 TRobotInfoDao tRobotInfoDao, TStdDeviceDao tStdDeviceDao, TStdDeviceTreeDao stdDeviceTreeDao) {
         this.sysUserDao = sysUserDao;
         this.tCameraScreenDao = tCameraScreenDao;
         this.tCameraInfoDao = tCameraInfoDao;
         this.tRobotInfoDao = tRobotInfoDao;
         this.tStdDeviceDao = tStdDeviceDao;
+        this.stdDeviceTreeDao = stdDeviceTreeDao;
     }
 
-    public List<AreaInfoDetail> selectPatrolDevTree(PatrolDevTreeCondition condition, Long userIdTemp) {
+    public List<SynthesisTreeAreaInfo> selectDevSynthesisTree(DevSynthesisTreeCondition condition, Long userId) {
         String name = condition.getName();
         if (StringUtils.isEmpty(name)) {
-            List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
-            return assembleTrees(areaTree);
+            // 直接获取树
+            return devSynthesisTree(condition, userId);
         }
+        // 根据名称获取树
+        return devSynthesisTreeByName(condition, userId);
+    }
 
-        Long userId = updateUserId(userIdTemp);
-        Map<String, String> map = getCameraStatus();
-
-        Integer flag = condition.getFlag();
-        Long id = condition.getId();
-        Integer type = condition.getType();
+    private List<SynthesisTreeAreaInfo> devSynthesisTree(DevSynthesisTreeCondition condition, Long userId) {
         String level = condition.getLevel();
+        StdDeviceTreeConstant.InspectedDevLevel levelTemp = StdDeviceTreeConstant.InspectedDevLevel.getLevel(level);
 
-        if (StringUtils.isNotEmpty(level)) {
-            StdDeviceTreeConstant.PatrolDevLevel devLevel = StdDeviceTreeConstant.PatrolDevLevel.getLevel(level);
-            switch (devLevel) {
-                case REGION:
-                    return areaTree(name, flag, "robotFlag", userId, map);
-                case DEVICE:
-                    return cameraTree(name, flag, "robotFlag", userId, id, map, type);
-                case LAZY:
-                    return new ArrayList<>();
-                default:
-                    throw new BusinessException("参数错误！");
-            }
+        String deviceShow = condition.getDeviceShow();
+        Long id = condition.getId();
+        String meteType = condition.getMeteType();
+        Integer flag = condition.getFlag();
+        String type = condition.getType();
+        String analyseType = condition.getAnalyseType();
+        switch (levelTemp) {
+            case REGION:
+                return areaTree(deviceShow, flag, userId, type);
+            case DEVICE:
+                return deviceTree(id, deviceShow, flag, userId, type);
+            case POSITION:
+                return customTree(id);
+            case DEVICE_METE:
+                return deviceMeteTree(id, meteType, analyseType);
+            case INSTANCE:
+                return cruisePoint(id);
+            case LAZY:
+                return new ArrayList<>();
+            default:
+                throw new BusinessException("设备树展示层级输入有误！");
         }
-
-        List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, null, userId);
-        if (!CollectionUtils.isEmpty(cameraList)) {
-            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
-
-            List<TCameraInfo> finalCameraList = new ArrayList<>();
-            if (flag == StdDeviceTreeConstant.OnlineState.ALL.getFlag()) {
-                finalCameraList = cameraList;
-            } else if (flag == StdDeviceTreeConstant.OnlineState.ONLINE.getFlag()) {
-                finalCameraList = cameraList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
-            } else if (flag == StdDeviceTreeConstant.OnlineState.OFFLINE.getFlag()) {
-                finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
-            }
-
-            // MySQL 8.0
-//            if (!CollectionUtils.isEmpty(finalCameraList)) {
-//                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
-//            }
-
-            if (!CollectionUtils.isEmpty(finalCameraList)) {
-                List<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
-                regionList.addAll(getRegionIdByLeafNode(new HashSet<>(upRegionList)));
-            }
-
-            if (!CollectionUtils.isEmpty(regionList)) {
-                areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList, regionList);
-            }
-        }
-        areaInfoDetails.forEach(treeNode -> {
-            if ("camera".equals(treeNode.getInfoType())) {
-                if (map.get(treeNode.getId().toString()) != null) {
-                    treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
-                } else {
-                    treeNode.setState(0);
-                }
-            }
-        });
-        return assembleTrees(areaInfoDetails);
     }
 
-    private List<AreaInfo> areaTree(String deviceShow){
-        List<AreaInfo> areaTree = tStdDeviceDao.selectDevTreeRegion();
-        areaTree =  assembleTrees2(areaTree);
-        if (!StringUtils.isEmpty(deviceShow)){
-            areaTree =  areaAddDeviceTree(areaTree,deviceShow);
+    private List<SynthesisTreeAreaInfo> areaTree(String deviceShow, Integer flag, Long userId, String type) {
+        List<SynthesisTreeAreaInfo> areaTree = stdDeviceTreeDao.selectSynthesisTreeRegion();
+        areaTree = assembleSynthesisTrees(areaTree);
+        if (StringUtils.isNotEmpty(deviceShow)) {
+            areaTree = areaAddDeviceTree(areaTree, deviceShow, flag, userId, type);
         }
         return areaTree;
     }
 
-    private List<AreaInfoDetail> areaTree(String cameraName, Integer flag, String robotFlag, Long userId, Map<String,String> map){
-        List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
-        areaTree = assembleTrees(areaTree);
-        areaTree = areaAddDeviceTree(areaTree, cameraName, flag, robotFlag, userId, map);
-        return areaTree;
-    }
-
-
-
-    public List<Long> getRegionIdByLeafNode(Set<Long> regionParam) {
-        Set<Long> regionTemp = new HashSet<>(regionParam);
-        do {
-            //通过regionList查询上层节点，后将结果放入插入参数继续查询，直到结果与入参一致
-            regionParam.addAll(regionTemp);
-            regionTemp.addAll(tCameraInfoDao.selectRegionListByUpRegionId(regionParam));
-        } while (!regionParam.containsAll(regionTemp));
-        return  new ArrayList<>(regionTemp);
-    }
-
-
-    public List<AreaInfo> assembleTrees2(Collection<AreaInfo> trees) {
-        if (org.apache.commons.collections4.CollectionUtils.isEmpty(trees)) {
-            return Collections.emptyList();
-        }
-
-        // 构建树主键/实例映射表，并初始化树的子节点集合
-        Map<?, AreaInfo> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
-                .collect(Collectors.toMap(AreaInfo::getId, t -> t, (o, n) -> n));
-
-        // 查找并关联树节点，返回所有没有父节点的树
-        return trees.stream().filter(tree -> {
-            AreaInfo parent = ifNull(tree.getUpId(), mapping::get);
-            if (parent != null) {
-                parent.getChildren().add(tree);
-            }
-            return Objects.isNull(parent);
-        }).collect(Collectors.toList());
-    }
-
-    public List<AreaInfoDetail> assembleTrees(Collection<AreaInfoDetail> trees) {
-        if (CollectionUtils.isEmpty(trees)) {
-            return Collections.emptyList();
-        }
-
-        // 构建树主键/实例映射表，并初始化树的子节点集合
-        Map<?, AreaInfoDetail> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
-                .collect(Collectors.toMap(AreaInfoDetail::getId, t -> t, (o, n) -> n));
-
-        // 查找并关联树节点，返回所有没有父节点的树
-        return trees.stream().filter(tree -> {
-            AreaInfoDetail parent = ifNull(tree.getUpId(), mapping::get);
-            if (parent != null) {
-                parent.getChildren().add(tree);
-            }
-            return Objects.isNull(parent);
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
-     *
-     * @param object   目标对象
-     * @param function 目标对象方法
-     * @param <T>      目标对象类型泛型
-     * @param <R>      返回对象类型泛型
-     * @return 返回对象
-     */
-    public static <T, R> R ifNull(T object, Function<T, R> function) {
-        return object == null || function == null ? null : function.apply(object);
-    }
-
-    private List<AreaInfo> areaAddDeviceTree(List<AreaInfo> areaTree, String deviceShow) {
+    private List<SynthesisTreeAreaInfo> areaAddDeviceTree(List<SynthesisTreeAreaInfo> areaTree, String deviceShow, Integer flag, Long userId, String type) {
         if (areaTree == null) {
             return Collections.emptyList();
         }
+
         areaTree.forEach(area -> {
             if ("region".equals(area.getInfoType())) {
-                if (!CollectionUtils.isEmpty(area.getChildren())) {
+                if (CollectionUtils.isNotEmpty(area.getChildren())) {
                     StdDeviceTreeConstant.DeviceShowEnum value = StdDeviceTreeConstant.DeviceShowEnum.getValue(deviceShow);
                     switch (value) {
                         case ALL:
-                            area.getChildren().addAll(tStdDeviceDao.selectAllByRegionId(area.getId()));
+                            area.getChildren().addAll(stdDeviceTreeDao.selectAllByRegionId(area.getId()));
                             break;
                         case ALL_DEVICE:
-                            area.getChildren().addAll(tStdDeviceDao.getRegionMonitorDevice(area.getId()));
+                            area.getChildren().addAll(stdDeviceTreeDao.getRegionMonitorDevice(area.getId()));
                             break;
                         case DEV:
-                            area.getChildren().addAll(tStdDeviceDao.selectDeviceByRegionId(area.getId()));
+                            area.getChildren().addAll(stdDeviceTreeDao.selectDeviceByRegionId(area.getId()));
                             break;
                         case CAMERA:
-                            area.getChildren().addAll(tStdDeviceDao.selectCameraByRegionId(area.getId()));
+                            area.getChildren().addAll(cameraAndRobotTree(flag, userId, "", area.getId(), type));
                             break;
                         case ROBOT:
-                            area.getChildren().addAll(tStdDeviceDao.selectRobotByRegionId(area.getId()));
+                            area.getChildren().addAll(cameraAndRobotTree(flag, userId, "不为空", area.getId(), type));
                             break;
                         default:
                             throw new BusinessException("设备树展示内容输入有误！");
                     }
-                    areaAddDeviceTree(area.getChildren(), deviceShow);
+                    areaAddDeviceTree(area.getChildren(), deviceShow, flag, userId, type);
                 }
             }
         });
         return areaTree;
     }
 
-    private List<AreaInfoDetail> areaAddDeviceTree(List<AreaInfoDetail> areaTree, String cameraName, Integer flag, String robotFlag, Long userId,Map<String,String> map){
-        if (areaTree == null){
-            return Collections.emptyList();
+    private List<SynthesisTreeAreaInfo> deviceTree(Long upRegionId, String deviceShow, Integer flag, Long userId, String type){
+        List<SynthesisTreeAreaInfo> deviceTree;
+        StdDeviceTreeConstant.DeviceShowEnum value = StdDeviceTreeConstant.DeviceShowEnum.getValue(deviceShow);
+
+        switch (value) {
+            case ALL:
+                deviceTree = stdDeviceTreeDao.selectAllByRegionId(upRegionId);
+                break;
+            case ALL_DEVICE:
+                deviceTree = stdDeviceTreeDao.getRegionMonitorDevice(upRegionId);
+                break;
+            case DEV:
+                deviceTree = stdDeviceTreeDao.selectDeviceByRegionId(upRegionId);
+                break;
+            case CAMERA:
+                deviceTree = cameraAndRobotTree(flag, userId, "", upRegionId, type);
+                break;
+            case ROBOT:
+                deviceTree = cameraAndRobotTree(flag, userId, "不为空", upRegionId, type);
+                break;
+            default:throw new BusinessException("设备树展示内容输入有误！");
         }
-        areaTree.forEach(area ->{
-            if ("region".equals(area.getInfoType())){
-                if (!CollectionUtils.isEmpty(area.getChildren())){
-                    area.getChildren().addAll(cameraTree(cameraName,flag,robotFlag,userId,area.getId(),map, null));
-                    areaAddDeviceTree(area.getChildren(),cameraName,flag,robotFlag,userId,map);
-                }
-            }
-        });
-        return areaTree;
+        return deviceTree;
     }
 
-    private List<AreaInfoDetail> cameraTree(String cameraName, Integer flag, String robotFlag, Long userId, Long upRegionId,
-                                            Map<String, String> map, Integer cameraType) {
-        List<AreaInfoDetail> childrenList = new ArrayList<>();
-        List<AreaInfoDetail> child = tCameraInfoDao.selectCameraTreeWithRobotNew(cameraName, robotFlag, userId, upRegionId, cameraType);
-        child.forEach(children -> {
-            if ("camera".equals(children.getInfoType())) {
-                if (map.get(children.getId().toString()) != null) {
-                    children.setState(Integer.valueOf(map.get(children.getId().toString())));
-                } else {
-                    children.setState(0);
-                }
-                if (flag != null) {
-                    if (flag.equals(children.getState())) {
-                        childrenList.add(children);
-                    } else if (flag == 2) {
-                        childrenList.add(children);
+    private List<SynthesisTreeAreaInfo> customTree(Long deviceId){
+        return stdDeviceTreeDao.selectCustomByRegionId(deviceId);
+    }
+
+    private List<SynthesisTreeAreaInfo> deviceMeteTree(Long deviceId, String meteType, String analyseType){
+        List<SynthesisTreeAreaInfo> areaInfos = stdDeviceTreeDao.selectDeviceMeteByDeviceAndCustom(deviceId, meteType, analyseType);
+        List<SynthesisTreeAreaInfo> uniqueAreaInfos = areaInfos.stream()
+                .collect(Collectors.toMap(SynthesisTreeAreaInfo::getId, Function.identity(), (existing, replacement) -> {
+                    if (StringUtils.isBlank(existing.getCameraId()) && StringUtils.isBlank(replacement.getCameraId())) {
+                        return existing;
+                    } else if (StringUtils.isNotBlank(existing.getCameraId()) && StringUtils.isNotBlank(replacement.getCameraId())) {
+                        return existing;
+                    } else if (StringUtils.isNotBlank(existing.getCameraId())) {
+                        return existing;
+                    } else {
+                        return replacement;
                     }
-                }
+                })).values().stream().collect(Collectors.toList());
+        return uniqueAreaInfos;
+    }
+
+    private List<SynthesisTreeAreaInfo> cruisePoint(Long deviceMeteId){
+        return stdDeviceTreeDao.selectCruisePointByDeviceMeteId(deviceMeteId);
+    }
+
+    private List<SynthesisTreeAreaInfo> cameraAndRobotTree(Integer flag, Long userId, String robotFlag, Long upRegionId, String cameraType) {
+        Long userIdTemp = null;
+        Integer cameraTypeTemp = null;
+        // flag为空：被巡视设备 否则为巡视设备
+        Map<String, String> mapTemp = new HashMap<>(8);
+        if (null != flag){
+            userIdTemp = updateUserId(userId);
+            mapTemp = getCameraStatus();
+            if (StringUtils.equals("light", cameraType) || StringUtils.equals("infrared", cameraType)) {
+                cameraTypeTemp = StringUtils.equals("light", cameraType) ? 205 : 206;
             }
-            if ("robot".equals(children.getInfoType())) {
-                //机器人
-                TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(children.getId());
-                List<AreaInfoDetail> robotCameraList = new ArrayList<>();
-                //可见光
-                AreaInfoDetail lightCamera = new AreaInfoDetail();
-                String light = tRobotInfo.getRobotId() + "9901";
-                lightCamera.setId(Long.parseLong(light));
-                lightCamera.setLabel("机器人可见光");
-                lightCamera.setInfoType("robotCamera");
-                lightCamera.setUpId(children.getId());
-                lightCamera.setUpName(tRobotInfo.getRobotCode());
-                if ("在线".equals(tRobotInfo.getRobotStatus())) {
-                    children.setState(1);
-                    lightCamera.setState(1);
-                } else {
-                    children.setState(0);
-                    lightCamera.setState(0);
-                }
+        }
+        List<SynthesisTreeAreaInfo> child = stdDeviceTreeDao.selectCameraOrRobot(robotFlag, userIdTemp, upRegionId, cameraTypeTemp);
 
-                if (flag != null) {
-                    if (flag.equals(lightCamera.getState()) && (flag == 1 || flag == 0)) {
-                        robotCameraList.add(lightCamera);
-                    } else {
-                        robotCameraList.add(lightCamera);
-                    }
-                }
-                //红外
-                AreaInfoDetail redCamera = new AreaInfoDetail();
-                String infrared = tRobotInfo.getRobotId() + "9902";
-                redCamera.setId(Long.parseLong(infrared));
-                redCamera.setLabel("机器人红外");
-                redCamera.setInfoType("robotCamera");
-                redCamera.setUpId(children.getId());
-                redCamera.setUpName(tRobotInfo.getRobotCode());
-                if ("在线".equals(tRobotInfo.getRobotStatus())) {
-                    children.setState(1);
-                    redCamera.setState(1);
-                } else {
-                    children.setState(0);
-                    redCamera.setState(0);
-                }
+        List<SynthesisTreeAreaInfo> childrenList = new ArrayList<>();
+        if (null != userIdTemp) {
+            Map<String, String> map = mapTemp;
+            child.forEach(children -> {
+                if (StringUtils.equals("camera", children.getInfoType())) {
+                    String id = map.get(children.getId().toString());
+                    children.setState(id != null ? Integer.valueOf(id) : 0);
 
-                if (flag != null) {
-                    if (flag.equals(redCamera.getState()) && (flag == 1 || flag == 0)) {
-                        robotCameraList.add(redCamera);
-                    } else {
-                        robotCameraList.add(redCamera);
-                    }
-                }
-                children.setChildren(robotCameraList);
-                if (flag != null) {
-                    if ((flag == 1 || flag == 0)) {
-                        if (flag.equals(children.getState())) {
+                    if (flag != null) {
+                        if (children.getState().equals(flag) || (flag instanceof Integer && flag == 2)) {
                             childrenList.add(children);
                         }
-                    } else {
-                        childrenList.add(children);
                     }
                 }
-            }
-        });
+                if (StringUtils.equals("robot", children.getInfoType())) {
+                    TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(children.getId());
+                    List<SynthesisTreeAreaInfo> robotCameraList = new ArrayList<>();
+
+                    SynthesisTreeAreaInfo lightCamera = new SynthesisTreeAreaInfo();
+                    String light = tRobotInfo.getRobotId() + "9901";
+                    lightCamera.setId(Long.parseLong(light));
+                    lightCamera.setLabel("机器人可见光");
+                    lightCamera.setInfoType("robotCamera");
+                    lightCamera.setUpId(children.getId());
+                    lightCamera.setUpName(tRobotInfo.getRobotCode());
+
+                    if ("在线".equals(tRobotInfo.getRobotStatus())) {
+                        children.setState(1);
+                        lightCamera.setState(1);
+                    } else {
+                        children.setState(0);
+                        lightCamera.setState(0);
+                    }
+
+                    if (flag != null) {
+                        if (flag.equals(lightCamera.getState()) && (flag == 1 || flag == 0)) {
+                            robotCameraList.add(lightCamera);
+                        } else {
+                            robotCameraList.add(lightCamera);
+                        }
+                    }
+
+                    SynthesisTreeAreaInfo redCamera = new SynthesisTreeAreaInfo();
+                    String infrared = tRobotInfo.getRobotId() + "9902";
+                    redCamera.setId(Long.parseLong(infrared));
+                    redCamera.setLabel("机器人红外");
+                    redCamera.setInfoType("robotCamera");
+                    redCamera.setUpId(children.getId());
+                    redCamera.setUpName(tRobotInfo.getRobotCode());
+
+                    if ("在线".equals(tRobotInfo.getRobotStatus())) {
+                        children.setState(1);
+                        redCamera.setState(1);
+                    } else {
+                        children.setState(0);
+                        redCamera.setState(0);
+                    }
+
+                    if (flag != null) {
+                        if (flag.equals(redCamera.getState()) && (flag == 1 || flag == 0)) {
+                            robotCameraList.add(redCamera);
+                        } else {
+                            robotCameraList.add(redCamera);
+                        }
+                    }
+                    children.setChildren(robotCameraList);
+                    if (flag != null) {
+                        if ((flag == 1 || flag == 0)) {
+                            if (flag.equals(children.getState())) {
+                                childrenList.add(children);
+                            }
+                        } else {
+                            childrenList.add(children);
+                        }
+                    }
+                }
+            });
+        }
         return childrenList;
     }
 
@@ -380,108 +328,66 @@ public class TStdDeviceTreeService {
         return map;
     }
 
-    public List<AreaInfo> selectInspectedDevTree(InspectedDevTreeCondition condition) {
-        String name = condition.getName();
-        String type = condition.getType();
-        String deviceShow = condition.getDeviceShow();
-        String meteType = condition.getMeteType();
-        if (StringUtils.isNotEmpty(name)) {
-            List<AreaInfo> devTreeByName = new ArrayList<>();
-            StdDeviceTreeConstant.FilterType filterType = StdDeviceTreeConstant.FilterType.getType(type);
-            switch (filterType){
-                case REGION:
-                    //针对region的过滤
-                    List<AreaInfo> allTree = tStdDeviceDao.selectAreaTree();
-                    allTree = assembleTrees2(allTree);
-                    if (StringUtils.isNotEmpty(name)){
-                        if (!matchName(allTree.get(0),name)){
-                            allTree.remove(0);
-                        }
-                    }
-                    return allTree;
-                case DEV:
-                    if ("camera".equals(deviceShow)){
-                        //查相机设备
-                        List<TCruisePointInstance> cameraList = tStdDeviceDao.selectCameraTreeDeviceByName(name);
-                        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(cameraList)){
-                            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(cameraList);
-                            //  MySQL 8.0
-//                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                            regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
-                            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
-                                devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(cameraList,regionList);
-                            }
-                        }
-                    }else if ("allDevice".equals(deviceShow)){
-                        List<TCameraInfo> cameraList = tStdDeviceDao.selectAllPatrolDeviceByName(name);
-                        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(cameraList)) {
-                            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
-                            List<Long> allRegionList = getAllUpRegionId(regionList);
-                            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)) {
-                                devTreeByName = tStdDeviceDao.selectAllPatrolDeviceTreeByName(cameraList, allRegionList);
-                            }
-                        }
-                    }else {
-                        //查设备
-                        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
-                        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(deviceList)){
-                            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
-                            //  MySQL 8.0
-//                        regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                            regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
-                            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
-                                devTreeByName = tStdDeviceDao.selectDevTreeDeviceByNameTree(deviceList,regionList);
-                            }
-                        }
-                    }
-                    break;
-                case INS:
-                    //查巡视点
-                    List<TCruisePointInstance> insList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name, meteType);
-                    if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(insList)){
-                        List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
-                        //  MySQL 8.0
-//                    regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
-                        regionList.addAll(getRegionIdByLeafNode(new HashSet<>(regionList)));
-                        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(regionList)){
-
-                            devTreeByName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(insList,regionList);
-                        }
-                    }
-                    break;
-                default: throw new BusinessException("设备树展示层级输入有误！");
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
             }
-            return assembleTrees2(devTreeByName);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
-
-        Long id = condition.getId();
-        StdDeviceTreeConstant.InspectedDevLevel level = StdDeviceTreeConstant.InspectedDevLevel.getLevel(condition.getLevel());
-        switch (level) {
-            case REGION:
-                return areaTree(deviceShow);
-            case DEVICE:
-                return deviceTree(id, deviceShow);
-            case POSITION:
-                return customTree(id);
-            case DEVICE_METE:
-                return deviceMeteTree(id, meteType, condition.getAnalyseType());
-            case INSTANCE:
-                return cruisePoint(id);
-            case LAZY:
-                return new ArrayList<>();
-            default:
-                throw new BusinessException("设备树展示层级输入有误！");
-        }
+        return re;
     }
 
-    private Boolean matchName(AreaInfo node,String regionName){
+    private List<SynthesisTreeAreaInfo> devSynthesisTreeByName(DevSynthesisTreeCondition condition, Long userId) {
+        String name = condition.getName();
+        if (StringUtils.isEmpty(name)) {
+            //这不是傻逼嘛 没有名称  查啥
+        }
+        String level = condition.getLevel();
+
+        // level为空：被巡视设备 否则为巡视设备
+        if (StringUtils.isNotEmpty(level)) {
+            String type = condition.getType();
+            String meteType = condition.getMeteType();
+            String deviceShow = condition.getDeviceShow();
+
+            StdDeviceTreeConstant.FilterType filterType = StdDeviceTreeConstant.FilterType.getType(type);
+            switch (filterType) {
+                case REGION:
+                    return areaTreeByName(name);
+                case DEV:
+                    return devTreeByName(name, deviceShow);
+                case INS:
+                    return cruisePointByName(name, meteType);
+                default:
+                    throw new BusinessException("设备树展示过滤条件输入有误！");
+            }
+        }
+
+        List<SynthesisTreeAreaInfo> patrolTree = devPatrolTreeByName(condition, userId);
+        return patrolTree;
+    }
+
+    private List<SynthesisTreeAreaInfo> areaTreeByName(String name) {
+        List<SynthesisTreeAreaInfo> areTree = stdDeviceTreeDao.selectSynthesisTreeRegion();
+        areTree = assembleSynthesisTrees(areTree);
+        if (StringUtils.isNotEmpty(name) && !matchName(areTree.get(0), name)) {
+            areTree.remove(0);
+        }
+        return areTree;
+    }
+
+    private Boolean matchName(SynthesisTreeAreaInfo node,String regionName){
         if (node.getLabel().contains(regionName)){
             return true;
         }else {
-            List<AreaInfo> child = node.getChildren();
-            List<AreaInfo> newChild = new ArrayList<>();
+            List<SynthesisTreeAreaInfo> child = node.getChildren();
+            List<SynthesisTreeAreaInfo> newChild = new ArrayList<>();
             if (child != null && child.size() > 0){
-                for (AreaInfo nodeItem : child){
+                for (SynthesisTreeAreaInfo nodeItem : child){
                     if (matchName(nodeItem,regionName)){
                         newChild.add(nodeItem);
                     }
@@ -493,6 +399,41 @@ public class TStdDeviceTreeService {
             }
             return false;
         }
+    }
+
+    private List<SynthesisTreeAreaInfo> devTreeByName(String name, String deviceShow) {
+        StdDeviceTreeConstant.DeviceShowEnum value = StdDeviceTreeConstant.DeviceShowEnum.getValue(deviceShow);
+        switch (value) {
+            case CAMERA:
+                // 暂时没用到 先不管
+                return devTreeCameraByName();
+            case ALL_DEVICE:
+                return devTreeAllDeviceByName(name);
+            case DEV:
+                return devTreeDevByName(name);
+            default:
+                throw new BusinessException("设备树展示过滤条件输入有误！");
+        }
+    }
+
+    private List<SynthesisTreeAreaInfo> devTreeCameraByName() {
+        List<SynthesisTreeAreaInfo> devTreeByName = new ArrayList<>();
+        // 暂时还没有 后面出现再完善
+        return assembleSynthesisTrees(devTreeByName);
+    }
+
+    private List<SynthesisTreeAreaInfo> devTreeAllDeviceByName(String name) {
+        List<SynthesisTreeAreaInfo> devTreeByName = new ArrayList<>();
+
+        List<TCameraInfo> cameraList = stdDeviceTreeDao.selectAllPatrolDeviceByName(name);
+        if (CollectionUtils.isNotEmpty(cameraList)) {
+            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+            List<Long> allRegionList = getAllUpRegionId(regionList);
+            if (CollectionUtils.isNotEmpty(regionList)) {
+                devTreeByName = stdDeviceTreeDao.selectAllPatrolDeviceTreeByName(cameraList, allRegionList);
+            }
+        }
+        return assembleSynthesisTrees(devTreeByName);
     }
 
     private List<Long> getAllUpRegionId(List<Long> regionList){
@@ -523,66 +464,133 @@ public class TStdDeviceTreeService {
         return  -1L;
     }
 
-    public List<AreaInfo> customTree(Long deviceId){
-        return tStdDeviceDao.selectCustomByRegionId(deviceId);
-    }
+    private List<SynthesisTreeAreaInfo> devTreeDevByName(String name) {
+        List<SynthesisTreeAreaInfo> devTreeByName = new ArrayList<>();
 
-    public List<AreaInfo> cruisePoint(Long deviceMeteId){
-        return tStdDeviceDao.selectCruisePointByDeviceMeteId(deviceMeteId);
-    }
-
-    public List<AreaInfo> deviceMeteTree(Long deviceId,String deviceType, String analyseType){
-        List<AreaInfo> areaInfos = tStdDeviceDao.selectDeviceMeteByDeviceAndCustom(deviceId,deviceType,analyseType);
-        List<AreaInfo> uniqueAreaInfos = areaInfos.stream()
-                .collect(Collectors.toMap(AreaInfo::getId, Function.identity(), (existing, replacement) -> {
-                    if (StringUtils.isBlank(existing.getCameraId()) && StringUtils.isBlank(replacement.getCameraId())) {
-                        return existing;
-                    } else if (StringUtils.isNotBlank(existing.getCameraId()) && StringUtils.isNotBlank(replacement.getCameraId())) {
-                        return existing;
-                    } else if (StringUtils.isNotBlank(existing.getCameraId())) {
-                        return existing;
-                    } else {
-                        return replacement;
-                    }
-                })).values().stream().collect(Collectors.toList());
-        return uniqueAreaInfos;
-    }
-
-    public List<AreaInfo> deviceTree(Long upRegionId,String deviceShow){
-        List<AreaInfo> deviceTree;
-        switch (deviceShow){
-            case "all":
-                deviceTree = tStdDeviceDao.selectAllByRegionId(upRegionId);
-                break;
-            case "allDevice":
-                deviceTree = tStdDeviceDao.getRegionMonitorDevice(upRegionId);
-                break;
-            case "dev":
-                deviceTree = tStdDeviceDao.selectDeviceByRegionId(upRegionId);
-                break;
-            case "camera":
-                deviceTree = tStdDeviceDao.selectCameraByRegionId(upRegionId);
-                break;
-            case "robot":
-                deviceTree = tStdDeviceDao.selectRobotByRegionId(upRegionId);
-                break;
-            default:throw new BusinessException("设备树展示内容输入有误！");
-        }
-        return deviceTree;
-    }
-
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+        List<TCruisePointInstance> deviceList = stdDeviceTreeDao.selectDevTreeDeviceByName(name);
+        if (CollectionUtils.isNotEmpty(deviceList)){
+            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
+            //  MySQL 8.0
+//            regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
+            regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
+            if (CollectionUtils.isNotEmpty(regionList)){
+                devTreeByName = stdDeviceTreeDao.selectDevTreeDeviceByNameTree(deviceList, regionList);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
         }
-        return re;
+        return assembleSynthesisTrees(devTreeByName);
     }
 
+    private List<SynthesisTreeAreaInfo> cruisePointByName(String name, String meteType) {
+        List<SynthesisTreeAreaInfo> devTreeByName = new ArrayList<>();
+
+        List<TCruisePointInstance> insList = stdDeviceTreeDao.selectAllMeteCruiseTreeByName(name, meteType);
+        if (CollectionUtils.isNotEmpty(insList)){
+            List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
+            //  MySQL 8.0
+//            regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
+            regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
+            if (CollectionUtils.isNotEmpty(regionList)){
+                devTreeByName = stdDeviceTreeDao.selectAllMeteCruiseTreeByNameTree(insList, regionList);
+            }
+        }
+        return assembleSynthesisTrees(devTreeByName);
+    }
+
+    private List<Long> getRegionIdByLeafNode(Set<Long> regionParam) {
+        Set<Long> regionTemp = new HashSet<>(regionParam);
+        do {
+            //通过regionList查询上层节点，后将结果放入插入参数继续查询，直到结果与入参一致
+            regionParam.addAll(regionTemp);
+            regionTemp.addAll(tCameraInfoDao.selectRegionListByUpRegionId(regionParam));
+        } while (!regionParam.containsAll(regionTemp));
+        return  new ArrayList<>(regionTemp);
+    }
+
+    private List<SynthesisTreeAreaInfo> assembleSynthesisTrees(Collection<SynthesisTreeAreaInfo> trees) {
+        if (CollectionUtils.isEmpty(trees)) {
+            return Collections.emptyList();
+        }
+
+        // 构建树主键/实例映射表，并初始化树的子节点集合
+        Map<?, SynthesisTreeAreaInfo> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
+                .collect(Collectors.toMap(SynthesisTreeAreaInfo::getId, t -> t, (o, n) -> n));
+
+        // 查找并关联树节点，返回所有没有父节点的树
+        return trees.stream().filter(tree -> {
+            SynthesisTreeAreaInfo parent = ifNull(tree.getUpId(), mapping::get);
+            if (parent != null) {
+                parent.getChildren().add(tree);
+            }
+            return Objects.isNull(parent);
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
+     *
+     * @param object   目标对象
+     * @param function 目标对象方法
+     * @param <T>      目标对象类型泛型
+     * @param <R>      返回对象类型泛型
+     * @return 返回对象
+     */
+    private static <T, R> R ifNull(T object, Function<T, R> function) {
+        return object == null || function == null ? null : function.apply(object);
+    }
+
+    private List<SynthesisTreeAreaInfo> devPatrolTreeByName(DevSynthesisTreeCondition condition, Long userId) {
+        Long updateUserId = updateUserId(userId);
+        Map<String, String> map = getCameraStatus();
+
+
+        List<SynthesisTreeAreaInfo> areaInfoDetails = new ArrayList<>();
+        String name = condition.getName();
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, "", updateUserId);
+        if (!CollectionUtils.isEmpty(cameraList)){
+            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+            Integer flag = condition.getFlag();
+
+            List<TCameraInfo> finalCameraList = new ArrayList<>();
+            if (StdDeviceTreeConstant.OnlineState.ALL.getFlag() == flag){
+                finalCameraList = cameraList;
+            } else if (StdDeviceTreeConstant.OnlineState.ONLINE.getFlag() == flag) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            } else if (StdDeviceTreeConstant.OnlineState.OFFLINE.getFlag() == flag) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            }
+
+            // MySQL 8.0
+//            if (!CollectionUtils.isEmpty(finalCameraList)) {
+//                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+//            }
+
+            if (CollectionUtils.isNotEmpty(finalCameraList)) {
+                Set<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toSet());
+                Set<Long> upRegionResult = new HashSet<>(upRegionList);
+                do {
+                    upRegionList.addAll(upRegionResult);
+                    upRegionResult.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                } while (!upRegionList.containsAll(upRegionResult));
+                regionList.addAll(upRegionResult);
+            }
+
+            if (CollectionUtils.isNotEmpty(regionList)){
+                areaInfoDetails = stdDeviceTreeDao.selectCameraTreeByName(finalCameraList,regionList);
+            }
+        }
+        areaInfoDetails.forEach(treeNode ->{
+            if("camera".equals(treeNode.getInfoType())){
+                String id = map.get(treeNode.getId().toString());
+                treeNode.setState(id != null ? Integer.valueOf(id) : 0);
+
+                if(map.get(treeNode.getId().toString()) != null){
+                    treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
+                }else {
+                    treeNode.setState(0);
+                }
+            }
+        });
+        return assembleSynthesisTrees(areaInfoDetails);
+    }
 }
 

@@ -146,7 +146,7 @@ public interface StdDeviceTreeConstant {
          */
         REGION("region"),
         /**
-         * 设备
+         * 设备:相机设备、所有巡视设备、被巡视设备
          */
         DEV("dev"),
         /**

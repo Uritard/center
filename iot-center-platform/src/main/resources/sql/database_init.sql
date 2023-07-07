@@ -2512,6 +2512,7 @@ CREATE TABLE `system_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统配置表';
 
 -- ----------------------------
+<<<<<<< Updated upstream
 -- Table structure for sys_disk_cleanup
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_disk_cleanup`;
@@ -2569,3 +2570,39 @@ CREATE TABLE `alarm_shield` (
     `create_time` datetime DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
+
+-- Table structure for t_wiring_config
+-- ----------------------------
+DROP TABLE IF EXISTS `t_wiring_config`;
+CREATE TABLE `t_wiring_config` (
+`wiring_config_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`wiring_diagram_id` smallint DEFAULT NULL COMMENT '主接线图id',
+`equipment_id` bigint DEFAULT NULL COMMENT '关联设备id',
+`equipment_name` varchar(128) DEFAULT '' COMMENT '关联设备名称',
+`equipment_type` int DEFAULT '1' COMMENT '关联设备类型',
+`x_coordinate` float(7,3) DEFAULT '0.000' COMMENT '坐标位置x',
+`y_coordinate` float(7,3) DEFAULT '0.000' COMMENT '坐标位置y',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+`update_person` varchar(20) DEFAULT '' COMMENT '更新人',
+PRIMARY KEY (`wiring_config_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb3;
+
+-- ----------------------------
+-- Table structure for t_wiring_diagram
+-- ----------------------------
+DROP TABLE IF EXISTS `t_wiring_diagram`;
+CREATE TABLE `t_wiring_diagram` (
+`wiring_diagram_id` int NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`region_id` bigint DEFAULT NULL COMMENT '区域id',
+`region_name` varchar(128) DEFAULT NULL COMMENT '区域名称',
+`pic_path` varchar(255) DEFAULT '' COMMENT '主接线图路径',
+`pic_length` smallint DEFAULT '1' COMMENT '图片长度',
+`pic_width` smallint DEFAULT '1' COMMENT '图片宽度',
+`upload_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
+`upload_person` varchar(20) DEFAULT '' COMMENT '上传人',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+`update_person` varchar(20) DEFAULT '' COMMENT '更新人',
+`delete_flag` tinyint DEFAULT '0' COMMENT '删除标记，1-是0-否',
+PRIMARY KEY (`wiring_diagram_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb3;
+
