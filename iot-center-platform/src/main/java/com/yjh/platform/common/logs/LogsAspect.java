@@ -187,6 +187,9 @@ public class LogsAspect {
                         break;
                 }
                 if (flag) {
+                    if (result != null && result instanceof Result && !((Result)result).isSuccess()) {
+                        params.set("state", 2);
+                    }
                     post(params);
                 }
                 return result;

@@ -57,6 +57,8 @@ public class Constant {
     public static final String SILENT_SECOND = "silent_second:";
     public static final Integer INTEGER_1 = 1;
 
+    public static final long MANAGER_USER_ID = 10001L;
+
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 
     public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
