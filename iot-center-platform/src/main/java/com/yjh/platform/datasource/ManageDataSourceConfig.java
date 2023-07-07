@@ -6,7 +6,10 @@ import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 import com.alibaba.druid.wall.WallConfig;
 import com.alibaba.druid.wall.WallFilter;
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInterceptor;
@@ -142,7 +145,11 @@ public class ManageDataSourceConfig {
         //p.setProperty("dialect","mysql");
         pageHelper.setProperties(p);
         //添加插件
-        bean.setPlugins(pageHelper);
+
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+
+        bean.setPlugins(pageHelper, mybatisPlusInterceptor);
 
 
         bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mybatis/mapper/*.xml"));

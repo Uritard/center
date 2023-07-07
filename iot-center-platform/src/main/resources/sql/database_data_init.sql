@@ -722,6 +722,9 @@ INSERT INTO `t_dict_business` VALUES ('300751', '342', 'cruise_data_state', '算
 INSERT INTO `t_dict_business` VALUES ('300752', '350', 'abnormal_type', '调用失败', NULL, '巡视异常原因', 0);
 INSERT INTO `t_dict_business` VALUES ('300753', '351', 'abnormal_type', '分析失败', NULL, '巡视异常原因', 0);
 INSERT INTO `t_dict_business` VALUES ('300754', '352', 'abnormal_type', '系统异常', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business` VALUES ('300755', '0', 'back_expire', '未过期', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business` VALUES ('300756', '1', 'back_expire', '过期失效', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
 
 -- ----------------------------
 -- Records of t_period_model

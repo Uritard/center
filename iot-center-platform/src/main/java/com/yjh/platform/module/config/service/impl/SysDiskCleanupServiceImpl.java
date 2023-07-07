@@ -143,7 +143,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         sysDiskCleanup.setId(null);
         boolean ins = super.save(sysDiskCleanup);
 
-        cleanup(sysDiskCleanup);
+        // cleanup(sysDiskCleanup);
 
         return ins;
     }

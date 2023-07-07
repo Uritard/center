@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.config.entity.SysDiskCleanup;
 import com.yjh.platform.module.config.service.ISysDiskCleanupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,11 +52,12 @@ public class SysDiskCleanupController {
         try {
             IPage<SysDiskCleanup> page = new Page<SysDiskCleanup>(pageNum, pageSize).addOrder(OrderItem.desc("create_time"));
             QueryWrapper<SysDiskCleanup> queryWrapper = new QueryWrapper<>(new SysDiskCleanup()).eq("clean_status", 2);
-            IPage<SysDiskCleanup> pages = sysDiskCleanupService.page(page, queryWrapper);
+            page = sysDiskCleanupService.page(page, queryWrapper);
+            DictConvertUtil.optional("backExpire").covertToDict(page.getRecords());
 
             Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("count",pages.getTotal());
-            resultMap.put("list", pages.getRecords());
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", page.getRecords());
 
             result.setData(resultMap);
         } catch (BusinessException b) {
@@ -101,9 +104,10 @@ public class SysDiskCleanupController {
 
     @ApiOperation(value = "磁盘清理任务执行完成确认")
     @PostMapping(value = "/confirm")
-    public Result confirm(@RequestParam(value = "id") int cleanId) {
+    public Result confirm(@RequestBody Map<String, Object> cleanMap) {
         Result result = new Result();
         try {
+            int cleanId = MapUtils.getIntValue(cleanMap, "id");
             SysDiskCleanup cleanup = sysDiskCleanupService.getById(cleanId);
             if (cleanup.getCleanStatus() != 0) {
                 result.setCode(ResultCodeEnum.CODE10009.getCode(), "当前任务未完成或已经确认，无法进行确认");
@@ -125,10 +129,12 @@ public class SysDiskCleanupController {
 
     @ApiOperation(value = "恢复数据")
     @PostMapping(value = "/recovery")
-    public Result recovery(@RequestParam(value = "id") int cleanId, @RequestParam(value = "type") int type) {
+    public Result recovery(@RequestBody Map<String, Object> cleanMap, @RequestParam(value = "id") int cleanId,
+        @RequestParam(value = "type") int type) {
         Result result = new Result();
         try {
-            result.setData(sysDiskCleanupService.recoveryTask(cleanId, type));
+            result.setData(
+                sysDiskCleanupService.recoveryTask(MapUtils.getIntValue(cleanMap, "id"), MapUtils.getIntValue(cleanMap, "type")));
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -140,10 +146,10 @@ public class SysDiskCleanupController {
 
     @ApiOperation(value = "删除备份")
     @PostMapping(value = "/deleteBack")
-    public Result deleteBack(@RequestParam(value = "id") int cleanId) {
+    public Result deleteBack(@RequestBody Map<String, Object> cleanMap) {
         Result result = new Result();
         try {
-            result.setData(sysDiskCleanupService.deleteBack(cleanId));
+            result.setData(sysDiskCleanupService.deleteBack(MapUtils.getIntValue(cleanMap, "id")));
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
