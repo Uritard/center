@@ -1485,7 +1485,6 @@ public class UPatrolTaskService {
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条
         uPatrolTaskDao.deleteInitByPrimaryId(taskId);
-        deleteTransfer(source, planId, taskId, startTime);
         int result = uPatrolTaskDao.deleteByPrimaryId(taskId);
         deleteTransfer(source, planId, taskId, startTime);
         return result;

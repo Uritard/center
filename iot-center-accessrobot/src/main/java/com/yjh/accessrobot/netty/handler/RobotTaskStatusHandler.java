@@ -10,6 +10,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.RobotPatrolTaskStatus;
+import com.yjh.accessrobot.module.command.entity.UPatrolTask;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -114,7 +115,12 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             List<Map<String,Object>> upItems = new ArrayList<>(xmlBaseModel.getItems().size());
             Map<String,Object> downItem = xmlBaseModel.getItems().get(0);
             Map<String,Object> upItem = Maps.newHashMap();
-            upItem.put("taskPatrolledId", downItem.get("task_patrolled_id") == null ? null:downItem.get("task_patrolled_id").toString());
+            UPatrolTask uPatrolTask = robotService.selectTaskByTaskCode(downItem.get("task_code") == null ? null:downItem.get("task_code").toString());
+            if (Objects.nonNull(uPatrolTask)) {
+                String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+                String taskPatrolledId = stationCode+"_"+ uPatrolTask.getTaskCode()+"_"+DateTimeUtil.format(uPatrolTask.getStartTime(), DateTimeUtil.getDateTimePattern3());
+                upItem.put("taskPatrolledId",taskPatrolledId);
+            }
             upItem.put("taskName", downItem.get("task_name") == null ? null:downItem.get("task_name").toString());
             upItem.put("taskCode", downItem.get("task_code") == null ? null:downItem.get("task_code").toString());
             upItem.put("taskState", downItem.get("task_state") == null ? null:downItem.get("task_state").toString());
