@@ -59,12 +59,11 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(coordinateProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
+        // 处理机器人或无人机上报的坐标信息
+        processRobotCoordinate(xmlBaseModel, sendCode);
         int num = tRobotInfoDao.checkDroneByRobotCode(sendCode);
-        if (num <= 0) {
-            // 处理机器人上报的坐标信息
-            processRobotCoordinate(xmlBaseModel, sendCode);
-        } else {
-            // 处理无人机上报的坐标信息
+        if (num > 0) {
+            // 如果是无人机坐标，要增加额外处理
             processDroneCoordinate(xmlBaseModel, sendCode);
         }
 
