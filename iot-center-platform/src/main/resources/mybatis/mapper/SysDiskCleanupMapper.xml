@@ -2,4 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.platform.module.config.dao.SysDiskCleanupMapper">
 
+    <delete id="deleteTask" parameterType="java.util.Date">
+        delete
+        from
+        u_patrol_task a,
+        u_patrol_task_attr b
+        where
+        a.task_id = b.task_id
+        and a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
+    </delete>
+
+    <delete id="deleteTaskResult" parameterType="java.util.Date">
+        delete
+        from
+        u_patrol_result a,
+        u_patrol_data_result b
+        where
+        a.task_id = b.task_id
+        and a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
+    </delete>
+
+    <delete id="deleteLogs" parameterType="java.util.Date">
+        delete
+        from
+        sys_logs a
+        where
+        a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
+    </delete>
 </mapper>

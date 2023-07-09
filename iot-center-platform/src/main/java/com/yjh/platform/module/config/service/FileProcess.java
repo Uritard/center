@@ -21,7 +21,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -38,9 +40,10 @@ import java.util.zip.ZipOutputStream;
 public class FileProcess implements Closeable {
     private Date expiryDate;
     private boolean needBack;
-    private String folderPath;
+    private String[] folderPaths;
     private String backPath;
     private String parentSub;
+    private String[] excludes;
 
     private int level = Deflater.BEST_SPEED;
     private long truncateSize = 0L;
@@ -50,41 +53,48 @@ public class FileProcess implements Closeable {
     private WritableByteChannel zosByteChannel;
 
     public FileProcess(Date expiryDate, boolean needBack, String folderPath, String backPath, String parentSub) {
-        this.expiryDate = expiryDate;
-        this.needBack = needBack;
-        this.folderPath = folderPath;
-        this.backPath = backPath;
-        this.parentSub = parentSub;
+        this(expiryDate, needBack, new String[] {folderPath}, backPath, parentSub, Deflater.BEST_SPEED);
     }
 
-    public FileProcess(Date expiryDate, boolean needBack, String folderPath, String backPath, String parentSub, int level) {
+    public FileProcess(Date expiryDate, boolean needBack, String[] folderPath, String backPath, String parentSub) {
+        this(expiryDate, needBack, folderPath, backPath, parentSub, Deflater.BEST_SPEED);
+    }
+
+    public FileProcess(Date expiryDate, boolean needBack, String[] folderPath, String backPath, String parentSub, int level) {
         this.expiryDate = expiryDate;
         this.needBack = needBack;
-        this.folderPath = folderPath;
+        this.folderPaths = folderPath;
         this.backPath = backPath;
         this.parentSub = parentSub;
         this.level = level;
     }
 
     public void nextProcess(String folderPath, String parentSub) {
-        this.folderPath = folderPath;
-        this.parentSub = parentSub;
-        this.started = false;
-        this.truncateSize = 0L;
+        this.nextProcess(null, needBack, new String[] {folderPath}, parentSub);
+    }
+
+    public void nextProcess(String[] folderPaths, String parentSub) {
+        this.nextProcess(null, needBack, folderPaths, parentSub);
     }
 
     public void nextProcess(boolean needBack, String folderPath, String parentSub) {
-        this.needBack = needBack;
-        this.folderPath = folderPath;
-        this.parentSub = parentSub;
-        this.started = false;
-        this.truncateSize = 0L;
+        this.nextProcess(null, needBack, new String[] {folderPath}, parentSub);
+    }
+
+    public void nextProcess(Date expiryDate, String folderPath, String parentSub) {
+        this.nextProcess(expiryDate, needBack, new String[] {folderPath}, parentSub);
     }
 
     public void nextProcess(Date expiryDate, boolean needBack, String folderPath, String parentSub) {
-        this.expiryDate = expiryDate;
+        this.nextProcess(expiryDate, needBack, new String[] {folderPath}, parentSub);
+    }
+
+    public void nextProcess(Date expiryDate, boolean needBack, String[] folderPaths, String parentSub) {
+        if (expiryDate != null) {
+            this.expiryDate = expiryDate;
+        }
         this.needBack = needBack;
-        this.folderPath = folderPath;
+        this.folderPaths = folderPaths;
         this.parentSub = parentSub;
         this.started = false;
         this.truncateSize = 0L;
@@ -95,27 +105,37 @@ public class FileProcess implements Closeable {
         String folderPath = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置";
         String backPath = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\back_picture.zip";
         // String parentSub = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture";
-        String parentSub = "";
-        FileProcess process = new FileProcess(expiryDate, true, folderPath, backPath, parentSub);
+        String parentSub = "/home/yjh_iot_center";
+
+        String[] folders = new String[]{"/home/yjh_iot_center/iot-files/voiceFile","/home/yjh_iot_center/iot-picture/analyseResultImg"};
+
+        FileProcess process = new FileProcess(expiryDate, true, folders, backPath, parentSub);
+        // process.setExcludes(new String[]{"D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files\\temporaryFiles","D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture\\ftpImg\\Map", "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture\\resultImg"});
         // process.cleanup();
         //
         // process.nextProcess(true, "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files", backPath, parentSub);
         // process.cleanup();
 
-        process.recovery();
+        // process.nextProcess(folderPath, parentSub);
+        // process.recovery();
+        //
+        // process.close();
 
-        process.close();
+        for (String folder : folders) {
+            String parentDir = process.parentDir(folder, parentSub);
+            log.info("zip parentDir: {}", parentDir);
+        }
 
     }
 
-    public void cleanup() {
+    public boolean cleanup() {
         if (started) {
             throw new BusinessException(ResultCodeEnum.CODE10009, "该清理任务已经执行！");
         }
         started = true;
-
+        boolean flag = true;
         long startTime = System.currentTimeMillis();
-        log.info("开始执行清理任务：needBack: {}\n\t\t folderPath: {}\n\t\t backPath: {}", needBack, folderPath, backPath);
+        log.info("开始执行清理任务：needBack: {}\n\t\t folderPath: {}\n\t\t backPath: {}", needBack, folderPaths, backPath);
         try {
 
             if (needBack && zos == null) {
@@ -125,26 +145,34 @@ public class FileProcess implements Closeable {
                 zosByteChannel = Channels.newChannel(zos);
             }
 
-            String parentDir = parentDir(folderPath, parentSub);
-            log.info("zip parentDir: {}", parentDir);
-            compressAndDelete(new File(folderPath), parentDir);
+            for (String folder : folderPaths) {
+                String parentDir = parentDir(folder, parentSub);
+                log.info("zip parentDir: {}", parentDir);
+                compressAndDelete(new File(folder), parentDir);
+            }
         } catch (IOException e) {
+            flag = false;
             log.error("清理文件失败", e);
         }
+
         String spaceTime = CommonUtils.percentFormat((System.currentTimeMillis() - startTime) / 1000F, "#.##") + "s";
-        log.info("Files added to the zip successfully! truncateSpace: {} {}, {} -> {}", truncateSpace(), spaceTime, folderPath, backPath);
+        log.info("Files added to the zip successfully! flag: {}, truncateSpace: {} {}, {} -> {}", flag, truncateSpace(), spaceTime,
+            folderPaths, backPath);
+
+        excludes = null;
+        return flag;
     }
 
     public void recovery() {
         long startTime = System.currentTimeMillis();
-        log.info("开始恢复备份文件：\n\t\t folderPath: {}\n\t\t backPath: {}", folderPath, backPath);
+        log.info("开始恢复备份文件：\n\t\t folderPath: {}\n\t\t backPath: {}", folderPaths, backPath);
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(backPath))) {
 
             byte[] buffer = new byte[4 * 1024];
             ZipEntry entry;
 
             while ((entry = zis.getNextEntry()) != null) {
-                String filePath = FilenameUtils.concat(folderPath, entry.getName());
+                String filePath = FilenameUtils.concat(folderPaths[0], entry.getName());
                 File outFile = new File(filePath);
                 if (entry.isDirectory()) {
                     FileUtil.mkdir(outFile);
@@ -167,7 +195,7 @@ public class FileProcess implements Closeable {
             log.error("恢复备份失败", e);
         }
         String spaceTime = CommonUtils.percentFormat((System.currentTimeMillis() - startTime) / 1000F, "#.##") + "s";
-        log.info("Zip File decompress successfully! timeSpace: {}, {} -> {}", spaceTime, backPath, folderPath);
+        log.info("Zip File decompress successfully! timeSpace: {}, {} -> {}", spaceTime, backPath, folderPaths);
     }
 
     @Override
@@ -176,11 +204,11 @@ public class FileProcess implements Closeable {
         IOUtils.closeQuietly(zosByteChannel);
     }
 
-    private static String parentDir(String sourcePath, String parentSub) {
+    private String parentDir(String sourcePath, String parentSub) {
         // 处理截断父目录，判断截断父目录是否存在，并规范路径格式，以“/”或“\”分隔符结尾
         String parentDir = "";
         if (StringUtils.isNotEmpty(parentSub)) {
-            String parentPath = FilenameUtils.normalizeNoEndSeparator(sourcePath, true);
+            String parentPath = FilenameUtils.normalizeNoEndSeparator(FilenameUtils.concat(sourcePath, "../"), true);
             String psub = FilenameUtils.normalizeNoEndSeparator(parentSub, true);
             parentDir = StringUtils.substringAfter(parentPath, psub) + "/";
         }
@@ -211,7 +239,7 @@ public class FileProcess implements Closeable {
         for (File file : listFiles) {
             // 传入父文件夹的目录结构，并在最后加一斜杠,
             // 否则最后压缩包中无法保留原始文件结构，所有文件都压缩到包根目录下
-            if (!compressAndDelete(file, parentDir + sourceFile.getName() + "/")) {
+            if (!compressAndDelete(file, FilenameUtils.concat(parentDir, sourceFile.getName()) + "/")) {
                 deleteAll = false;
             }
         }
@@ -283,13 +311,60 @@ public class FileProcess implements Closeable {
         return flag;
     }
 
+    private void excludePrepare(String[] excs) {
+
+        if (ArrayUtils.isEmpty(excs)) {
+            return;
+        }
+
+        // 处理排除路径列表，确认路径是否存在，并格式化路径，若是目录则以“/”或“\”分隔符结尾
+        List<String> excludeList = new ArrayList<>();
+
+        for (String exclude : excs) {
+            if (StringUtils.isBlank(exclude)) {
+                continue;
+            }
+
+            if (StringUtils.containsAny(exclude, "?", "*")) {
+                excludeList.add(FilenameUtils.separatorsToUnix(exclude));
+            } else {
+                File exFile = new File(exclude);
+                if (exFile.exists()) {
+                    // 若是目录则以“/”或“\”分隔符结尾
+                    //                String exPath = exFile.getAbsolutePath() + (exFile.isFile() ? "" : File.separator);
+                    String exPath = exFile.getAbsolutePath();
+                    excludeList.add(exPath);
+                }
+            }
+        }
+
+        // 排除文件/文件夹，文件夹以 / 结尾, 使用 ThreadLocal 存储，少传一个参数
+        if (!excludeList.isEmpty()) {
+            this.excludes = excludeList.toArray(new String[0]);
+        }
+    }
+
     private boolean filterDate(File file) {
+
+        // 例外文件/目录判断
+        for (String exPath : excludes) {
+            // 支持通配符 *? 的判断
+            if (FilenameUtils.wildcardMatch(file.getAbsolutePath(), exPath)) {
+                return true;
+            }
+        }
+
         if (file.isDirectory()) {
             return false;
         }
         long lastDate = file.lastModified();
 
         return lastDate > expiryDate.getTime();
+    }
+
+    public FileProcess setExcludes(String[] excludes) {
+        excludePrepare(excludes);
+        return this;
     }
 
     public int getLevel() {
@@ -305,15 +380,6 @@ public class FileProcess implements Closeable {
     }
 
     public String truncateSpace() {
-        String[] units = new String[] {"B", "K", "M", "G", "T", "P"};
-        double size = truncateSize;
-        int i = 0;
-        while (size > 1024) {
-            size = size / 1024;
-            if (++i == 5) {
-                break;
-            }
-        }
-        return CommonUtils.percentFormat((float)size, "#.##") + units[i];
+        return CommonUtils.fileSpace(truncateSize);
     }
 }

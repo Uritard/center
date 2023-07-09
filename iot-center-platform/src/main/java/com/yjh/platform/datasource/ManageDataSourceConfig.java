@@ -11,8 +11,8 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInterceptor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -44,11 +44,14 @@ public class ManageDataSourceConfig {
 
     private Logger log = LoggerFactory.getLogger(ManageDataSourceConfig.class);
 
-    @Value("${spring.datasource.platform.publicKey}")
-    private String publicKey;
+    private static String publicKey;
 
-    @Value("${spring.datasource.platform.password}")
-    private String password;
+    private static String username;
+
+    private static String password;
+
+    private static String database;
+
 
     @Bean(name = "baseDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.platform")
@@ -187,4 +190,46 @@ public class ManageDataSourceConfig {
 //            e.getMessage();
 //        }
 //    }
+
+    public static String getPublicKey() {
+        return publicKey;
+    }
+
+    @Value("${spring.datasource.platform.publicKey}")
+    public void setPublicKey(String publicKey) {
+        ManageDataSourceConfig.publicKey = publicKey;
+    }
+
+    public static String getUsername() {
+        return username;
+    }
+
+    @Value("${spring.datasource.platform.username}")
+    public void setUsername(String username) {
+        ManageDataSourceConfig.username = username;
+    }
+
+    public static String getPassword() {
+        return password;
+    }
+
+    @Value("${spring.datasource.platform.password}")
+    public void setPassword(String password) {
+        try {
+            ManageDataSourceConfig.password = ConfigTools.decrypt(publicKey, password);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public static String getDatabase() {
+        return database;
+    }
+
+    @Value("${spring.datasource.platform.url}")
+    public void setDatabase(String url) {
+        String pre = StringUtils.substringBefore(url, "?");
+        String db = StringUtils.substringAfterLast(pre, "/");
+        ManageDataSourceConfig.database = db;
+    }
 }

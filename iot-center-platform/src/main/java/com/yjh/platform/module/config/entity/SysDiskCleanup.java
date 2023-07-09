@@ -32,7 +32,7 @@ public class SysDiskCleanup {
      * 主键ID
      */
     @TableId(type = IdType.AUTO)
-    private String id;
+    private Long id;
 
     /**
      * 是否删除临时文件，0: 否 1: 是  2: 清理完成  -1: 清理失败
