@@ -130,7 +130,7 @@ public class SysDiskCleanupController {
 
             int cleanId = MapUtils.getIntValue(cleanMap, "id");
             SysDiskCleanup cleanup = sysDiskCleanupService.getById(cleanId);
-            if (cleanup == null || cleanup.getCleanStatus() != 0) {
+            if (cleanup == null || cleanup.getCleanStatus() != 1) {
                 result.setCode(ResultCodeEnum.CODE10009.getCode(), "当前任务未完成或已经确认，无法进行确认");
                 return result;
             }

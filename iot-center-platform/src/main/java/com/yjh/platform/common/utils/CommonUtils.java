@@ -507,4 +507,17 @@ public class CommonUtils {
         String num = str.replaceAll("[^0-9.,-]", "");
         return StringUtils.isEmpty(num) ? "0" : num;
     }
+
+    public static String fileSpace(long sizeTotal) {
+        String[] units = new String[] {"B", "K", "M", "G", "T", "P"};
+        double size = sizeTotal;
+        int i = 0;
+        while (size > 1024) {
+            size = size / 1024;
+            if (++i == 5) {
+                break;
+            }
+        }
+        return CommonUtils.percentFormat((float)size, "#.##") + units[i];
+    }
 }

@@ -35,4 +35,7 @@ public class CleanStep {
 
     @ApiModelProperty(value = "进度，保留字段")
     private float rate;
+
+    @ApiModelProperty(value = "备注信息")
+    private String remark;
 }

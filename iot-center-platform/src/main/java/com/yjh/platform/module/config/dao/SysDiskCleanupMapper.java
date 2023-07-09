@@ -6,6 +6,9 @@ package com.yjh.platform.module.config.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yjh.platform.module.config.entity.SysDiskCleanup;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -17,4 +20,24 @@ import com.yjh.platform.module.config.entity.SysDiskCleanup;
  */
 public interface SysDiskCleanupMapper extends BaseMapper<SysDiskCleanup> {
 
+    /**
+     * 根据时间删除历史任务记录
+     * @param expireDate 时间
+     * @return 返回
+     */
+    int deleteTask(@Param("expireDate") Date expireDate);
+
+    /**
+     * 根据时间删除任务结果记录
+     * @param expireDate 时间
+     * @return 返回
+     */
+    int deleteTaskResult(@Param("expireDate") Date expireDate);
+
+    /**
+     * 根据时间删除日志记录
+     * @param expireDate 时间
+     * @return 返回
+     */
+    int deleteLogs(@Param("expireDate") Date expireDate);
 }
