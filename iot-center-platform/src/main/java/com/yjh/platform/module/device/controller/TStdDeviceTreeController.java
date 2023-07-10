@@ -9,10 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,7 +35,7 @@ public class TStdDeviceTreeController {
     }
 
     @ApiOperation(value = "设备综合树")
-    @GetMapping(value = "/selectDevSynthesisTree")
+    @PostMapping(value = "/selectDevSynthesisTree")
     public Result selectDevSynthesisTree(@RequestBody DevSynthesisTreeCondition deviceTreeCondition,
                                          HttpServletRequest request) {
         Result result = new Result();

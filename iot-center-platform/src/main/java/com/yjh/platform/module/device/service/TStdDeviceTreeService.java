@@ -16,7 +16,6 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.user.entity.AreaInfoDetail;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -205,100 +204,99 @@ public class TStdDeviceTreeService {
         }
         List<SynthesisTreeAreaInfo> child = stdDeviceTreeDao.selectCameraOrRobot(robotFlag, userIdTemp, upRegionId, cameraTypeTemp);
 
-        List<SynthesisTreeAreaInfo> childrenList = new ArrayList<>();
-        if (null != userIdTemp) {
-            Map<String, String> map = mapTemp;
-            child.forEach(children -> {
-                if (StringUtils.equals("camera", children.getInfoType())) {
-                    String id = map.get(children.getId().toString());
-                    children.setState(id != null ? Integer.valueOf(id) : 0);
-
-                    if (flag != null) {
-                        if (children.getState().equals(flag) || (flag instanceof Integer && flag == 2)) {
-                            childrenList.add(children);
-                        }
-                    }
-                }
-                if (StringUtils.equals("robot", children.getInfoType())) {
-                    TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(children.getId());
-                    List<SynthesisTreeAreaInfo> robotCameraList = new ArrayList<>();
-
-                    SynthesisTreeAreaInfo lightCamera = new SynthesisTreeAreaInfo();
-                    String light = tRobotInfo.getRobotId() + "9901";
-                    lightCamera.setId(Long.parseLong(light));
-                    lightCamera.setLabel("机器人可见光");
-                    lightCamera.setInfoType("robotCamera");
-                    lightCamera.setUpId(children.getId());
-                    lightCamera.setUpName(tRobotInfo.getRobotCode());
-
-                    if ("在线".equals(tRobotInfo.getRobotStatus())) {
-                        children.setState(1);
-                        lightCamera.setState(1);
-                    } else {
-                        children.setState(0);
-                        lightCamera.setState(0);
-                    }
-
-                    if (flag != null) {
-                        if (flag.equals(lightCamera.getState()) && (flag == 1 || flag == 0)) {
-                            robotCameraList.add(lightCamera);
-                        } else {
-                            robotCameraList.add(lightCamera);
-                        }
-                    }
-
-                    SynthesisTreeAreaInfo redCamera = new SynthesisTreeAreaInfo();
-                    String infrared = tRobotInfo.getRobotId() + "9902";
-                    redCamera.setId(Long.parseLong(infrared));
-                    redCamera.setLabel("机器人红外");
-                    redCamera.setInfoType("robotCamera");
-                    redCamera.setUpId(children.getId());
-                    redCamera.setUpName(tRobotInfo.getRobotCode());
-
-                    if ("在线".equals(tRobotInfo.getRobotStatus())) {
-                        children.setState(1);
-                        redCamera.setState(1);
-                    } else {
-                        children.setState(0);
-                        redCamera.setState(0);
-                    }
-
-                    if (flag != null) {
-                        if (flag.equals(redCamera.getState()) && (flag == 1 || flag == 0)) {
-                            robotCameraList.add(redCamera);
-                        } else {
-                            robotCameraList.add(redCamera);
-                        }
-                    }
-                    children.setChildren(robotCameraList);
-                    if (flag != null) {
-                        if ((flag == 1 || flag == 0)) {
-                            if (flag.equals(children.getState())) {
-                                childrenList.add(children);
-                            }
-                        } else {
-                            childrenList.add(children);
-                        }
-                    }
-                }
-            });
+        if (null == flag) {
+            return child;
         }
+        // 给设备赋值在线状态
+        List<SynthesisTreeAreaInfo> childrenList = new ArrayList<>();
+        Map<String, String> map = mapTemp;
+        child.forEach(children -> {
+            if (StringUtils.equals("camera", children.getInfoType())) {
+                String id = map.get(children.getId().toString());
+                children.setState(id != null ? Integer.valueOf(id) : 0);
+
+                if (children.getState().equals(flag) || (flag == 2)) {
+                    childrenList.add(children);
+                }
+            }
+            if (StringUtils.equals("robot", children.getInfoType())) {
+                TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(children.getId());
+                List<SynthesisTreeAreaInfo> robotCameraList = new ArrayList<>();
+
+                SynthesisTreeAreaInfo lightCamera = new SynthesisTreeAreaInfo();
+                String light = tRobotInfo.getRobotId() + "9901";
+                lightCamera.setId(Long.parseLong(light));
+                lightCamera.setLabel("机器人可见光");
+                lightCamera.setInfoType("robotCamera");
+                lightCamera.setUpId(children.getId());
+                lightCamera.setUpName(tRobotInfo.getRobotCode());
+
+                if ("在线".equals(tRobotInfo.getRobotStatus())) {
+                    children.setState(1);
+                    lightCamera.setState(1);
+                } else {
+                    children.setState(0);
+                    lightCamera.setState(0);
+                }
+
+                if (flag.equals(lightCamera.getState()) && (flag == 1 || flag == 0)) {
+                    robotCameraList.add(lightCamera);
+                } else {
+                    robotCameraList.add(lightCamera);
+                }
+
+                SynthesisTreeAreaInfo redCamera = new SynthesisTreeAreaInfo();
+                String infrared = tRobotInfo.getRobotId() + "9902";
+                redCamera.setId(Long.parseLong(infrared));
+                redCamera.setLabel("机器人红外");
+                redCamera.setInfoType("robotCamera");
+                redCamera.setUpId(children.getId());
+                redCamera.setUpName(tRobotInfo.getRobotCode());
+
+                if ("在线".equals(tRobotInfo.getRobotStatus())) {
+                    children.setState(1);
+                    redCamera.setState(1);
+                } else {
+                    children.setState(0);
+                    redCamera.setState(0);
+                }
+
+                if (flag.equals(redCamera.getState()) && (flag == 1 || flag == 0)) {
+                    robotCameraList.add(redCamera);
+                } else {
+                    robotCameraList.add(redCamera);
+                }
+                children.setChildren(robotCameraList);
+                if ((flag == 1 || flag == 0)) {
+                    if (flag.equals(children.getState())) {
+                        childrenList.add(children);
+                    }
+                } else {
+                    childrenList.add(children);
+                }
+            }
+        });
         return childrenList;
     }
 
     private Long updateUserId(Long userId) {
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
-        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
-            throw new BusinessException("用户不存在或已删除");
-        } else {
-            if (1234L == sysUser.getRoleId()) {
-                userId = null;
-            }
-            else if(1235L == sysUser.getRoleId()) {
 
-            } else {
-                throw  new BusinessException("当前用户角色不可查看");
-            }
+        if (sysUser == null) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+        if (UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+        Long roleId = sysUser.getRoleId();
+
+        if (1234L == roleId) {
+            userId = null;
+        }
+        else if(1235L == roleId) {
+
+        } else {
+            throw new BusinessException("当前用户角色不可查看");
         }
         return userId;
     }
@@ -348,7 +346,7 @@ public class TStdDeviceTreeService {
         }
         String level = condition.getLevel();
 
-        // level为空：被巡视设备 否则为巡视设备
+        // level不为空：被巡视设备 否则为巡视设备
         if (StringUtils.isNotEmpty(level)) {
             String type = condition.getType();
             String meteType = condition.getMeteType();
