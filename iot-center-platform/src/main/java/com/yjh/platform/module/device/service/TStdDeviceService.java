@@ -1072,7 +1072,7 @@ public class TStdDeviceService{
         if (CollectionUtils.isNotEmpty(deviceList)) {
             List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
             List<Long> allRegionList = getAllUpRegionId(regionList);
-            List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByNameTree(deviceList, allRegionList);
+            List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByDeviceNameTree(deviceList, allRegionList);
             return assembleTrees(meteTreeByDeviceName);
         }else {
             return new ArrayList<>();

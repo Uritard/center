@@ -145,6 +145,9 @@ public interface TStdDeviceDao {
     List<Long> selectUpIdByRegionList(@Param(value = "list")List<Long> list);
     List<AreaInfo> selectAllMeteCruiseTreeByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
                                                                  @Param(value = "regionList")List<Long> regionList);
+
+    List<AreaInfo> selectAllMeteCruiseTreeByDeviceNameTree(@Param(value = "list")List<TCruisePointInstance> list,
+                                                                 @Param(value = "regionList")List<Long> regionList);
     List<AreaInfo> selectDevTreeDeviceByNameTree(@Param(value = "list")List<TCruisePointInstance> list,
                                                                  @Param(value = "regionList")List<Long> regionList);
     TCruisePointInstanceDetail selectDevTreeDeviceByInstacneId(@Param(value = "instanceId")Long instanceId);
