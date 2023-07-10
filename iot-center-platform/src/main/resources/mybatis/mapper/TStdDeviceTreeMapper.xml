@@ -1226,43 +1226,45 @@ group by camera_id
 	</select>
 
 	<select id="selectCameraOrRobot" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">
-		SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType,
-		if(camera_type = 205, 229, 230) as deviceType
-		FROM t_camera_info d
-		LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
-		where 1=1 and d.up_region_id = #{upRegionId}
-		<if test="userId != null">
-			AND d.camera_id IN (
-			SELECT
-			monitor_device_id
-			FROM
-			sys_user_device_permission sudp
-			WHERE
-			sudp.user_id = #{userId, jdbcType = BIGINT}
-			)
-		</if>
-		<if test="cameraType != null">
-			and d.camera_type = #{cameraType}
-		</if>
-		<if test="robotFlag != null and robotFlag != ''">
-			UNION ALL (
-			SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType,
-			if(robot_type is null, 524, 228) as deviceType
-			FROM  t_robot_info e
-			LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
-			WHERE 1 = 1 and e.up_region_id = #{upRegionId}
-			<if test="userId != null">
-				AND e.robot_id IN (
-				SELECT
-				monitor_device_id
-				FROM
-				sys_user_device_permission sudp
-				WHERE
-				sudp.user_id = #{userId, jdbcType = BIGINT}
-				)
-			</if>
-			)
-		</if>
+		<choose>
+			<when test="robotFlag != null and robotFlag != ''">
+				SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType,
+				if(robot_type is null, 524, 228) as deviceType
+				FROM  t_robot_info e
+				LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
+				WHERE 1 = 1 and e.up_region_id = #{upRegionId}
+				<if test="userId != null">
+					AND e.robot_id IN (
+					SELECT
+					monitor_device_id
+					FROM
+					sys_user_device_permission sudp
+					WHERE
+					sudp.user_id = #{userId, jdbcType = BIGINT}
+					)
+				</if>
+			</when>
+			<when test="robotFlag = ''">
+				SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType,
+				if(camera_type = 205, 229, 230) as deviceType
+				FROM t_camera_info d
+				LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
+				where 1=1 and d.up_region_id = #{upRegionId}
+				<if test="userId != null">
+					AND d.camera_id IN (
+					SELECT
+					monitor_device_id
+					FROM
+					sys_user_device_permission sudp
+					WHERE
+					sudp.user_id = #{userId, jdbcType = BIGINT}
+					)
+				</if>
+				<if test="cameraType != null">
+					and d.camera_type = #{cameraType}
+				</if>
+			</when>
+		</choose>
 	</select>
 
 	<select id="selectCameraTreeByName" resultType="com.yjh.platform.module.device.entity.SynthesisTreeAreaInfo">

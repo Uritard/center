@@ -50,6 +50,10 @@ public interface StdDeviceTreeConstant {
 
     enum InspectedDevLevel {
         /**
+         * 默认值
+         */
+        DEFAULT("default"),
+        /**
          * 间隔
          */
         REGION("5"),
@@ -92,11 +96,15 @@ public interface StdDeviceTreeConstant {
         }
 
         public static InspectedDevLevel getLevel(String value) {
-            return LEVEL_ENUM_MAP.get(value);
+            return LEVEL_ENUM_MAP.getOrDefault(value, DEFAULT);
         }
     }
 
     enum DeviceShowEnum {
+        /**
+         * 默认值
+         */
+        DEFAULT("default"),
         /**
          * 所有
          */
@@ -136,11 +144,15 @@ public interface StdDeviceTreeConstant {
         }
 
         public static DeviceShowEnum getValue(String value) {
-            return SHOW_ENUM_MAP.get(value);
+            return SHOW_ENUM_MAP.getOrDefault(value, DEFAULT);
         }
     }
 
     enum FilterType {
+        /**
+         * 默认值
+         */
+        DEFAULT("default"),
         /**
          * 区域间隔
          */
@@ -172,7 +184,7 @@ public interface StdDeviceTreeConstant {
         }
 
         public static FilterType getType(String value) {
-            return TYPE_ENUM_MAP.get(value);
+            return TYPE_ENUM_MAP.getOrDefault(value, DEFAULT);
         }
     }
 
