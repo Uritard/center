@@ -24,4 +24,6 @@ public interface ISysDiskCleanupService extends IService<SysDiskCleanup> {
     boolean recoveryTask(int cleanId, int type);
 
     boolean deleteBack(int cleanId);
+
+    boolean confirmation(String userId, String pcode, String identifier);
 }

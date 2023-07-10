@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +99,9 @@ public class SysDiskCleanupController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
+
+            sysDiskCleanupService.confirmation(userId, sysDiskCleanup.getPcode(), sysDiskCleanup.getIdentifier());
+
             if (Constant.MANAGER_USER_ID != NumberUtils.toLong(userId, Constant.MANAGER_USER_ID)) {
                 result.setMessage(ResultCodeEnum.CODE10008.getCode(), "仅系统默认管理员可进行磁盘清理操作");
                 return result;
@@ -152,11 +154,12 @@ public class SysDiskCleanupController {
     @PostMapping(value = "/recovery")
     public Result recovery(@RequestBody Map<String, Object> cleanMap, HttpServletRequest request) {
         Result result = new Result();
+        String userId = request.getHeader("userId");
+        String userName = (String)redisTemplate.opsForHash().get("userInfo:" + userId, "userName");
+        int type = MapUtils.getIntValue(cleanMap, "type");
+        String name = type == 1 ? "数据库记录" : "数据文件";
         try {
-            String userId = request.getHeader("userId");
-            String userName = (String)redisTemplate.opsForHash().get("userInfo:" + userId, "userName");
-            int type = MapUtils.getIntValue(cleanMap, "type");
-            String name = type == 1 ? "数据库记录" : "数据文件";
+            sysDiskCleanupService.confirmation(userId, MapUtils.getString(cleanMap, "pcode"), MapUtils.getString(cleanMap, "identifier"));
 
             if (Constant.MANAGER_USER_ID != NumberUtils.toLong(userId, Constant.MANAGER_USER_ID)) {
                 result.setMessage(ResultCodeEnum.CODE10008.getCode(), "仅系统默认管理员可进行数据恢复");
@@ -164,14 +167,16 @@ public class SysDiskCleanupController {
                 return result;
             }
 
-            logsRecord.LoginLogsSend(request, "3", "磁盘清理数据恢复", "恢复磁盘清理删除的" + name, userName, userId, 1);
-
             result.setData(sysDiskCleanupService.recoveryTask(MapUtils.getIntValue(cleanMap, "id"), type));
+            logsRecord.LoginLogsSend(request, "3", "磁盘清理数据恢复", "恢复磁盘清理删除的" + name, userName, userId, 1);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             log.info("恢复数据出错：", e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        if (!result.isSuccess()) {
+            logsRecord.LoginLogsSend(request, "3", "磁盘清理数据恢复", "恢复磁盘清理删除的" + name + "-" + result.getMessage(), userName, userId, 2);
         }
         return result;
     }
@@ -182,7 +187,9 @@ public class SysDiskCleanupController {
     public Result deleteBack(@RequestBody Map<String, Object> cleanMap, HttpServletRequest request) {
         Result result = new Result();
         try {
-            if (Constant.MANAGER_USER_ID != NumberUtils.toLong(request.getHeader("userId"), Constant.MANAGER_USER_ID)) {
+            String userId = request.getHeader("userId");
+            sysDiskCleanupService.confirmation(userId, MapUtils.getString(cleanMap, "pcode"), MapUtils.getString(cleanMap, "identifier"));
+            if (Constant.MANAGER_USER_ID != NumberUtils.toLong(userId, Constant.MANAGER_USER_ID)) {
                 result.setMessage(ResultCodeEnum.CODE10008.getCode(), "仅系统默认管理员可删除备份");
                 return result;
             }
