@@ -1060,6 +1060,49 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT DISTINCT dm.device_mete_id AS Id, dm.mete_name AS label, dm.device_id AS upId,	sd.device_name AS upName,"devicemete" AS infoType
 		FROM t_std_devicemete dm
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
+		where dm.device_mete_id in (
+		<foreach collection="list" item="item" separator=",">
+			#{item.deviceMeteId}
+		</foreach>
+		)
+		)
+		UNION ALL (
+		SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
+		(case when cpi.cruise_type = 228 then "robotCruiseInspection"
+		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection"
+		END) AS infoType
+		FROM t_cruise_point_instance cpi
+		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
+		where cpi.instance_id in (
+		<foreach collection="list" item="item" separator=",">
+			#{item.instanceId}
+		</foreach>
+		)
+		)
+	</select>
+	<select id="selectAllMeteCruiseTreeByDeviceNameTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+		SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+		FROM t_std_region a
+		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+		where a.region_id in (
+		<foreach collection="regionList" item="regionId" separator=",">
+			#{regionId}
+		</foreach>
+		)
+		UNION ALL (
+		SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+		FROM t_std_device b
+		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+		where b.device_id in (
+		<foreach collection="list" item="item" separator=",">
+			#{item.deviceId}
+		</foreach>
+		)
+		)
+		UNION ALL (
+		SELECT DISTINCT dm.device_mete_id AS Id, dm.mete_name AS label, dm.device_id AS upId,	sd.device_name AS upName,"devicemete" AS infoType
+		FROM t_std_devicemete dm
+		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
 		where dm.device_id in (
 		<foreach collection="list" item="item" separator=",">
 			#{item.deviceId}
