@@ -1,6 +1,8 @@
 package com.yjh.platform.module.config.service.impl;
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -8,23 +10,29 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.datasource.ManageDataSourceConfig;
 import com.yjh.platform.module.config.dao.SysDiskCleanupMapper;
 import com.yjh.platform.module.config.entity.CleanStep;
 import com.yjh.platform.module.config.entity.SysDiskCleanup;
 import com.yjh.platform.module.config.service.FileProcess;
 import com.yjh.platform.module.config.service.ISysDiskCleanupService;
+import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,8 +51,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper, SysDiskCleanup> implements ISysDiskCleanupService {
     private final RedisTemplate redisTemplate;
+    private final SysUserDao sysUserDao;
+    private final Demo demo;
 
     public static final int CHECKED = 1;
+    public static final int SUCCESS = 2;
+    public static final int FAILED = -1;
     public static final String CLEAN_PREFIX = "cleanup:";
     public volatile static Long recoveryId;
     private static final Map<Integer, String> STATUS_MAP = new HashMap<>(8);
@@ -68,13 +80,50 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         STEP_MAP.put("end", new DefaultKeyValue<>(7, "清理完成"));
     }
 
-    public SysDiskCleanupServiceImpl(RedisTemplate redisTemplate) {
+    public SysDiskCleanupServiceImpl(RedisTemplate redisTemplate, SysUserDao sysUserDao, Demo demo) {
         this.redisTemplate = redisTemplate;
+        this.sysUserDao = sysUserDao;
+        this.demo = demo;
+    }
+
+    @PostConstruct
+    public void keepOnCleanTask() {
+        SysDiskCleanup cleanup = super.query().ne("clean_status", SUCCESS).one();
+        if (cleanup == null) {
+            return;
+        }
+        boolean cleanContinue = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:cleanContinue", "content"));
+        if (cleanContinue) {
+            ThreadPoolUtil.COMMON_POOL.addThread(() -> cleanup(cleanup));
+        } else {
+            if (cleanup.getDelTmp() == CHECKED) {
+                cleanup.setDelTaskData(FAILED);
+            }
+            if (cleanup.getDelTaskReport() == CHECKED) {
+                cleanup.setDelTaskReport(FAILED);
+            }
+            if (cleanup.getDelTaskFile() == CHECKED) {
+                cleanup.setDelTaskFile(FAILED);
+            }
+            if (cleanup.getDelTaskData() == CHECKED) {
+                cleanup.setDelTaskData(FAILED);
+            }
+            if (cleanup.getDelLogs() == CHECKED) {
+                cleanup.setDelLogs(FAILED);
+            }
+            if (cleanup.getBackDatabase() == CHECKED) {
+                cleanup.setBackDatabase(FAILED);
+            }
+            cleanup.setCleanStatus(CHECKED);
+            cleanup.setCleanContent(makeContent(cleanup));
+
+            super.updateById(cleanup);
+        }
     }
 
     @Override
     public Map<String, Object> runningCleanup() {
-        SysDiskCleanup cleanup = super.query().ne("clean_status", 2).one();
+        SysDiskCleanup cleanup = super.query().ne("clean_status", SUCCESS).one();
         if (cleanup == null) {
             return Collections.emptyMap();
         }
@@ -82,7 +131,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
 
         boolean flag;
         // 开始
-        stepProcess(stepList, "start", 2, false);
+        stepProcess(stepList, "start", SUCCESS, false);
         flag = stepProcess(stepList, "del_tmp", cleanup.getDelTmp(), false);
         flag = stepProcess(stepList, "del_task_report", cleanup.getDelTaskReport(), flag);
         flag = stepProcess(stepList, "del_task_file", cleanup.getDelTaskFile(), flag);
@@ -90,11 +139,11 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         flag = stepProcess(stepList, "del_task_data", cleanup.getDelTaskData(), flag);
         flag = stepProcess(stepList, "del_logs", cleanup.getDelLogs(), flag);
         // 结束
-        stepProcess(stepList, "end", flag ? 1 : 2, flag);
+        stepProcess(stepList, "end", flag ? 1 : SUCCESS, flag);
 
         Map<String, Object> map = new HashMap<>(4);
         map.put("id", cleanup.getId());
-        map.put("cleanStatus", flag ? 0 : 2);
+        map.put("cleanStatus", flag ? 0 : SUCCESS);
         map.put("list", stepList);
         return map;
     }
@@ -116,7 +165,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
 
     @Override
     public boolean addTask(SysDiskCleanup sysDiskCleanup) {
-        SysDiskCleanup cleanup = super.query().ne("clean_status", 2).one();
+        SysDiskCleanup cleanup = super.query().ne("clean_status", SUCCESS).one();
         if (cleanup != null) {
             throw new BusinessException(ResultCodeEnum.CODE10010, "当前已存在一个未结束磁盘清理任务，请等待结束或确认！");
         }
@@ -136,22 +185,25 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
             }
         }
 
-        if (sysDiskCleanup.getDelTmp() != CHECKED) {
-            throw new BusinessException(ResultCodeEnum.CODE10005, "必须选择清理临时文件！");
-        }
+        // if (sysDiskCleanup.getDelTmp() != CHECKED) {
+        //     throw new BusinessException(ResultCodeEnum.CODE10005, "必须选择清理临时文件！");
+        // }
 
         String backPath = (String)redisTemplate.opsForHash().get("t_sys_param:backPath", "content");
         String backName = DateTimeUtil.format3(new Date()) + RandomStringUtils.randomAlphanumeric(3);
+        int backExpire = 0;
         if (needCheckDate && sysDiskCleanup.getBackFile() == CHECKED) {
             String backFilePath = FilenameUtils.concat(backPath, backName + ".zip");
             sysDiskCleanup.setBackFilePath(backFilePath);
+            backExpire = 1;
         }
         if (sysDiskCleanup.getBackDatabase() == CHECKED) {
             String backDbPath = FilenameUtils.concat(backPath, backName + ".sql");
             sysDiskCleanup.setBackDataPath(backDbPath);
+            backExpire = 1;
         }
+        sysDiskCleanup.setBackExpire(backExpire);
 
-        sysDiskCleanup.setId(null);
         boolean ins = super.save(sysDiskCleanup);
 
         ThreadPoolUtil.COMMON_POOL.addThread(() -> cleanup(sysDiskCleanup));
@@ -203,7 +255,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         } catch (IOException e) {
             log.error("删除失败： {}", cleanup.getBackDataPath(), e);
         }
-        cleanup.setBackExpire(2);
+        cleanup.setBackExpire(3);
         cleanup.setUpdateTime(new Date());
         cleanup.setBackFilePath("");
         cleanup.setBackDataPath("");
@@ -211,8 +263,32 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         return super.updateById(cleanup);
     }
 
+    @Override
+    public boolean confirmation(String userId, String pcode, String identifier) {
+        SysUser sysUser = sysUserDao.selectByPrimaryId(NumberUtils.toLong(userId));
+        String password = pcode;
+        String dbPassword = Demo.decryptDB(sysUser.getPassword());
+        //判断开关
+        boolean isEncryption = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content"));
+        if (isEncryption) {
+            // 解密
+            try {
+                password = demo.decryptIdentifier(password, identifier);
+                redisTemplate.delete("pubk:" + identifier);
+            } catch (IOException e) {
+                log.error("密码解密失败", e);
+            }
+        }
+        if (!StringUtils.equals(password, dbPassword)) {
+            log.info("验证失败: {} — {}", password, dbPassword);
+            throw new BusinessException(ResultCodeEnum.CODE10106, "密码验证失败！");
+        }
+        return true;
+    }
+
     private void cleanup(SysDiskCleanup sysDiskCleanup) {
         long id = sysDiskCleanup.getId();
+        log.info("clean disk start... id: {}", id);
         // 临时文件保留时长
         String retainedTempTime = (String)redisTemplate.opsForHash().get("t_sys_param:retainedTempTime", "content");
         // 抓图文件目录
@@ -240,7 +316,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 process.nextProcess(new String[] {sequentialPath, jm, presetCheckImg, zips}, "");
                 boolean p2 = process.cleanup();
                 cleanSize += process.truncateSize();
-                int stat = p1 && p2 ? 2 : -1;
+                int stat = p1 && p2 ? SUCCESS : FAILED;
                 upStepStatus(id, "del_tmp", stat, 100, "tmp:" + process.truncateSpace());
             }
 
@@ -262,7 +338,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 process.nextProcess(calendar2.getTime(), reportReflect, "");
                 boolean p2 = process.cleanup();
                 cleanSize += process.truncateSize();
-                int stat = p1 && p2 ? 2 : -1;
+                int stat = p1 && p2 ? SUCCESS : FAILED;
                 upStepStatus(id, "del_task_report", stat, 100, "report:" + process.truncateSpace());
             }
 
@@ -286,49 +362,58 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 process.setExcludes(excs);
                 boolean p1 = process.cleanup();
                 cleanSize += process.truncateSize();
-                int stat = p1 ? 2 : -1;
+                int stat = p1 ? SUCCESS : FAILED;
                 upStepStatus(id, "del_task_file", stat, 100, "taskfile:" + process.truncateSpace());
             }
 
             if (sysDiskCleanup.getBackDatabase() == CHECKED) {
                 boolean p1 = backDatabase(sysDiskCleanup.getBackDataPath());
-                upStepStatus(id, "back_database", p1 ? 2 : -1, 100, "back database");
+                upStepStatus(id, "back_database", p1 ? SUCCESS : FAILED, 100, "back database");
             }
 
             if (sysDiskCleanup.getDelTaskData() == CHECKED) {
                 log.info("start delete task data from database...");
                 int f1 = getBaseMapper().deleteTask(expiryDate);
                 int f2 = getBaseMapper().deleteTaskResult(expiryDate);
-                upStepStatus(id, "del_task_data", (f2 > 0 && f1 > 0) ? 2 : -1, 100, "delete task");
+                upStepStatus(id, "del_task_data", (f2 > 0 && f1 > 0) ? SUCCESS : FAILED, 100, "delete task");
             }
 
             if (sysDiskCleanup.getDelLogs() == CHECKED) {
                 log.info("start delete logs data from database...");
                 int f1 = getBaseMapper().deleteLogs(expiryDate);
-                upStepStatus(id, "del_logs", f1 > 0 ? 2 : -1, 100, "delete logs");
+                upStepStatus(id, "del_logs", f1 > 0 ? SUCCESS : FAILED, 100, "delete logs");
             }
         }
         String totalSpace = CommonUtils.fileSpace(cleanSize);
-        super.update().eq("id", id).set("remark", "cleanSpace:" + totalSpace);
+
+        SysDiskCleanup cleanup = super.getById(id);
+        String content = makeContent(cleanup);
+        super.update().set("clean_status", 1).set("clean_content", content).set("remark", "cleanSpace:" + totalSpace).eq("id", id).update();
         log.info("clean disk finished!!! cleanSpace: {}", totalSpace);
     }
 
-    public boolean backDatabase(String backPath) {
-        log.info("start back database...");
-        long time1 = System.currentTimeMillis();
-        boolean flag = false;
-        try {
-            String command = "mysqldump -u " + ManageDataSourceConfig.getUsername() + " -p" + ManageDataSourceConfig.getPassword() + " "
-                + ManageDataSourceConfig.getDatabase() + " > " + backPath;
-            String[] backCmd = new String[] {"/bin/sh", "-c", command};
+    private String makeContent(SysDiskCleanup cleanup) {
+        StringJoiner content = new StringJoiner(";");
 
-            Process runtimeProcess = Runtime.getRuntime().exec(backCmd);
-            flag = runtimeProcess.waitFor(60, TimeUnit.MINUTES);
-        } catch (IOException | InterruptedException e) {
-            log.error("备份数据库失败:", e);
+        stepContent(content, "del_tmp", cleanup.getDelTmp());
+        stepContent(content, "del_task_report", cleanup.getDelTaskReport());
+        stepContent(content, "del_task_file", cleanup.getDelTaskFile());
+        stepContent(content, "back_database", cleanup.getBackDatabase());
+        stepContent(content, "del_task_data", cleanup.getDelTaskData());
+        stepContent(content, "del_logs", cleanup.getDelLogs());
+
+        return content.toString();
+    }
+
+    private String stepContent(StringJoiner content, String step, int status) {
+        if (status == 0) {
+            return "";
         }
-        log.info("end back database, result: {}, time: {}", flag, System.currentTimeMillis() - time1);
-        return flag;
+        String name = STEP_MAP.get(step).getValue();
+        String statusName = status == SUCCESS ? " - 成功" : " - 失败";
+        String stepContent = name + statusName;
+        content.add(stepContent);
+        return stepContent;
     }
 
     public boolean recoveryDatabase(String backPath) {
@@ -336,7 +421,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         long time1 = System.currentTimeMillis();
         boolean flag = false;
         try {
-            // mysql uroot -p db2 < d:\db1.sql
+            // mysql -uroot -pxxx db2 < d:\db1.sql
             String command = "mysql -u " + ManageDataSourceConfig.getUsername() + " -p" + ManageDataSourceConfig.getPassword() + " "
                 + ManageDataSourceConfig.getDatabase() + " < " + backPath;
             String[] backCmd = new String[] {"/bin/sh", "-c", command};
@@ -350,13 +435,33 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         return flag;
     }
 
+    public boolean backDatabase(String backPath) {
+        log.info("start back database...");
+        long time1 = System.currentTimeMillis();
+        boolean flag = false;
+        try {
+            FileUtil.mkParentDirs(backPath);
+            String command = "mysqldump -u " + ManageDataSourceConfig.getUsername() + " -p" + ManageDataSourceConfig.getPassword() + " "
+                + ManageDataSourceConfig.getDatabase() + " > " + backPath;
+            log.info("sql back cmd: {}", command);
+            String[] backCmd = new String[] {"/bin/sh", "-c", command};
+
+            Process runtimeProcess = Runtime.getRuntime().exec(backCmd);
+            flag = runtimeProcess.waitFor(60, TimeUnit.MINUTES);
+        } catch (IOException | InterruptedException e) {
+            log.error("备份数据库失败:", e);
+        }
+        log.info("end back database, result: {}, time: {}", flag, System.currentTimeMillis() - time1);
+        return flag;
+    }
+
     /**
      * 更新数据库和Redis中执行状态
      */
     private void upStepStatus(long id, String stpOrder, int status, float rate, String remark) {
         // 更新数据库状态
-        if (status != 1) {
-            super.update().eq("id", id).set(stpOrder, status);
+        if (status != CHECKED) {
+            super.update().set(stpOrder, status).eq("id", id).update();
         }
 
         // 更新 Redis 状态
@@ -382,7 +487,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
             if (type == 1) {
                 recoveryDatabase(path);
             } else {
-                try(FileProcess process = new FileProcess(new Date(), false, "/home/yjh_iot_center", path, "")) {
+                try (FileProcess process = new FileProcess(new Date(), false, "/home/yjh_iot_center", path, "")) {
                     process.recovery();
                 }
             }
@@ -393,4 +498,35 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         }
         log.info("备份恢复完成, path: {}, time: {}", path, System.currentTimeMillis() - time1);
     }
+
+    /**
+     * 每天晚上3点半执行
+     */
+    @Scheduled(cron = "0 30 3 * * ?")
+    public void refreshRecordsOnSchedule() {
+
+        QueryWrapper<SysDiskCleanup> queryWrapper = new QueryWrapper<>(new SysDiskCleanup()).eq("clean_status", 2).eq("back_expire", 1);
+        List<SysDiskCleanup> cleanupList = super.list(queryWrapper);
+        // 报告报表保留时长
+        String retainedBackTime = (String)redisTemplate.opsForHash().get("t_sys_param:retainedBackTime", "content");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -NumberUtils.toInt(retainedBackTime, 31));
+        long backTime = calendar.getTime().getTime();
+        for (SysDiskCleanup cleanup : cleanupList) {
+            if (backTime > cleanup.getCreateTime().getTime()) {
+                if (StringUtils.isNotEmpty(cleanup.getBackFilePath())) {
+                    FileUtil.del(cleanup.getBackFilePath());
+                }
+                if (StringUtils.isNotEmpty(cleanup.getBackDataPath())) {
+                    FileUtil.del(cleanup.getBackDataPath());
+                }
+                cleanup.setBackExpire(2);
+                cleanup.setUpdateTime(new Date());
+                cleanup.setBackFilePath("");
+                cleanup.setBackDataPath("");
+                super.updateById(cleanup);
+            }
+        }
+    }
+
 }

@@ -144,4 +144,9 @@ public class SysDiskCleanup {
     private Date createTime;
 
 
+    @TableField(exist=false)
+    private String identifier;
+
+    @TableField(exist=false)
+    private String pcode;
 }

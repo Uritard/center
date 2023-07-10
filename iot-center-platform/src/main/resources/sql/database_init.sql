@@ -2512,7 +2512,6 @@ CREATE TABLE `system_config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统配置表';
 
 -- ----------------------------
-<<<<<<< Updated upstream
 -- Table structure for sys_disk_cleanup
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_disk_cleanup`;
@@ -2526,8 +2525,8 @@ CREATE TABLE `sys_disk_cleanup` (
   `back_database` int DEFAULT '0' COMMENT '是否备份数据库，0: 否 1: 是，如果有删除数据库记录则必须备份',
   `back_file_path` varchar(128) DEFAULT NULL COMMENT '备份文件路径',
   `back_data_path` varchar(128) DEFAULT NULL COMMENT '备份数据库文件',
-  `back_expire` int DEFAULT '0' COMMENT '备份过期状态，0: 未过期 1: 过期失效  2: 手动删除',
-  `clean_content` varchar(258) DEFAULT NULL COMMENT '清理具体内容说明',
+  `back_expire` int DEFAULT '0' COMMENT '备份过期状态，0: 未备份 1: 未过期 2: 过期失效  3: 手动删除',
+  `clean_content` varchar(512) DEFAULT NULL COMMENT '清理具体内容说明',
   `clean_status` int DEFAULT '0' COMMENT '清理状态，0: 未完成 1: 待确认  2: 已确认',
   `expiry_date` datetime DEFAULT NULL COMMENT '清理时限',
   `creator` varchar(64) DEFAULT NULL COMMENT '创建人',
