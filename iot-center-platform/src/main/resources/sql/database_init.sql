@@ -2563,6 +2563,7 @@ CREATE TABLE `common_menu` (
 DROP TABLE IF EXISTS `alarm_shield`;
 CREATE TABLE `alarm_shield` (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `shield_id` bigint DEFAULT NULL COMMENT '屏蔽的设备id',
     `create_user_id` bigint DEFAULT NULL COMMENT '创建屏蔽的用户id',
     `end_time` datetime DEFAULT NULL COMMENT '屏蔽结束时间',
     `shield_type` int DEFAULT NULL COMMENT '屏蔽类型：1-巡视设备，2-测点',
@@ -2570,7 +2571,6 @@ CREATE TABLE `alarm_shield` (
     `create_time` datetime DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
-
 -- Table structure for t_wiring_config
 -- ----------------------------
 DROP TABLE IF EXISTS `t_wiring_config`;
