@@ -3,23 +3,23 @@
 <mapper namespace="com.yjh.platform.module.config.dao.SysDiskCleanupMapper">
 
     <delete id="deleteTask" parameterType="java.util.Date">
-        delete
+        delete a,b
         from
-        u_patrol_task a,
-        u_patrol_task_attr b
-        where
+        u_patrol_task a
+        join u_patrol_task_attr b on
         a.task_id = b.task_id
-        and a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
+        where
+        a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
     </delete>
 
     <delete id="deleteTaskResult" parameterType="java.util.Date">
-        delete
+        delete a,b
         from
-        u_patrol_result a,
-        u_patrol_data_result b
-        where
+        u_patrol_result a join
+        u_patrol_data_result b on
         a.task_id = b.task_id
-        and a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
+        where
+        a.create_time <![CDATA[<]]> #{expireDate, jdbcType=TIMESTAMP}
     </delete>
 
     <delete id="deleteLogs" parameterType="java.util.Date">

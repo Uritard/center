@@ -42,7 +42,7 @@ import java.util.*;
 @MapperScan(basePackages = {"com.yjh.platform.module.*.dao"}, sqlSessionTemplateRef = "baseSqlSessionTemplate")
 public class ManageDataSourceConfig {
 
-    private Logger log = LoggerFactory.getLogger(ManageDataSourceConfig.class);
+    private static Logger log = LoggerFactory.getLogger(ManageDataSourceConfig.class);
 
     private static String publicKey;
 
@@ -210,16 +210,17 @@ public class ManageDataSourceConfig {
     }
 
     public static String getPassword() {
-        return password;
+        try {
+            return ConfigTools.decrypt(publicKey, password);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return "";
     }
 
     @Value("${spring.datasource.platform.password}")
     public void setPassword(String password) {
-        try {
-            ManageDataSourceConfig.password = ConfigTools.decrypt(publicKey, password);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+        ManageDataSourceConfig.password = password;
     }
 
     public static String getDatabase() {
