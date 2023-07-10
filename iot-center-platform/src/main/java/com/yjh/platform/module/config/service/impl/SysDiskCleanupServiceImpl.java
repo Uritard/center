@@ -1,7 +1,6 @@
 package com.yjh.platform.module.config.service.impl;
 
 import cn.hutool.core.io.FileUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.result.BusinessException;
@@ -22,7 +21,6 @@ import com.yjh.platform.module.user.entity.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -97,7 +95,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
             ThreadPoolUtil.COMMON_POOL.addThread(() -> cleanup(cleanup));
         } else {
             if (cleanup.getDelTmp() == CHECKED) {
-                cleanup.setDelTaskData(FAILED);
+                cleanup.setDelTmp(FAILED);
             }
             if (cleanup.getDelTaskReport() == CHECKED) {
                 cleanup.setDelTaskReport(FAILED);
@@ -373,15 +371,27 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
 
             if (sysDiskCleanup.getDelTaskData() == CHECKED) {
                 log.info("start delete task data from database...");
-                int f1 = getBaseMapper().deleteTask(expiryDate);
-                int f2 = getBaseMapper().deleteTaskResult(expiryDate);
-                upStepStatus(id, "del_task_data", (f2 > 0 && f1 > 0) ? SUCCESS : FAILED, 100, "delete task");
+                int fg = FAILED;
+                try {
+                    getBaseMapper().deleteTask(expiryDate);
+                    getBaseMapper().deleteTaskResult(expiryDate);
+                    fg = SUCCESS;
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+                upStepStatus(id, "del_task_data", fg, 100, "delete task");
             }
 
             if (sysDiskCleanup.getDelLogs() == CHECKED) {
                 log.info("start delete logs data from database...");
-                int f1 = getBaseMapper().deleteLogs(expiryDate);
-                upStepStatus(id, "del_logs", f1 > 0 ? SUCCESS : FAILED, 100, "delete logs");
+                int fg = FAILED;
+                try {
+                    getBaseMapper().deleteLogs(expiryDate);
+                    fg = SUCCESS;
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+                upStepStatus(id, "del_logs", fg, 100, "delete logs");
             }
         }
         String totalSpace = CommonUtils.fileSpace(cleanSize);
