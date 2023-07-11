@@ -120,6 +120,9 @@ public class ExcelReadListener<E> implements ReadListener<E> {
                     String dictType = excelExtend.dictType();
                     if (StringUtils.isNotEmpty(dictType) && StringUtils.isNotBlank(value)) {
                         String localValue = DictConvertUtil.DICT.getDictCode(dictType, value);
+                        if (StringUtils.isNotBlank(excelExtend.convent())){
+                            fieldName = fieldName.replace(excelExtend.convent(),"");
+                        }
                         BeanUtils.setProperty(excelEntity, fieldName, localValue);
                     }
                 }
