@@ -618,7 +618,7 @@ public class TCameraScreenService{
         return childrenList;
     }
 
-    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag, Long userId){
+    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag, Long userId, Integer cameraType){
         if (StringUtils.isEmpty(cameraName)){
             List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
             return assembleTrees(areaTree);
@@ -652,7 +652,7 @@ public class TCameraScreenService{
             map.putAll((Map<String,String>)re.getData());
         }
 
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId);
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId, cameraType);
         if (!CollectionUtils.isEmpty(cameraList)){
             List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
 
