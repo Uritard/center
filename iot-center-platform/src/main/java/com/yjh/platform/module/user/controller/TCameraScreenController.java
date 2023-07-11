@@ -238,11 +238,12 @@ public class TCameraScreenController {
     @Logs(title = "查询摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1234,1235")
     public Result selectCameraTreeWithRobotByName(@RequestParam(value = "name",required = false) String name,
                                   @RequestParam(value = "flag",required = false) Integer flag,
+                                  @RequestParam(value = "cameraType",required = false) Integer cameraType,
                                             HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId=Long.valueOf(request.getHeader("userId"));
-            result.setData(tCameraScreenService.selectCameraTreeWithRobotByName(name,flag, null,userId));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobotByName(name,flag, null,userId, cameraType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

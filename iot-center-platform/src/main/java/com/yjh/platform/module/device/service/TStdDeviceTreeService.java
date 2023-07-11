@@ -543,7 +543,12 @@ public class TStdDeviceTreeService {
 
         List<SynthesisTreeAreaInfo> areaInfoDetails = new ArrayList<>();
         String name = condition.getName();
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, "", updateUserId);
+        String type = condition.getType();
+        Integer cameraTypeTemp = null;
+        if (StringUtils.equals("light", type) || StringUtils.equals("infrared", type)) {
+            cameraTypeTemp = StringUtils.equals("light", type) ? 205 : 206;
+        }
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(name, "", updateUserId, cameraTypeTemp);
         if (!CollectionUtils.isEmpty(cameraList)){
             List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
             Integer flag = condition.getFlag();
