@@ -484,7 +484,8 @@
         f.deal_person_id,
         f.deal_time,
         1 as defect_model,
-        f.robot_id as real_code
+        f.robot_id as real_code,
+        f.end_time
         FROM
         t_robot_alarm f
         LEFT JOIN t_robot_info a ON a.robot_id = f.robot_id
