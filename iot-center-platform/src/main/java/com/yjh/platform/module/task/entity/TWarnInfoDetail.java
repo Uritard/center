@@ -136,4 +136,8 @@ public class TWarnInfoDetail implements Serializable {
 
     @ApiModelProperty(value = "变电站名称")
     private String stationName;
+
+    @ApiModelProperty(value = "告警屏蔽结束时间",example = "2018-10-01 12:18:48")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
 }
