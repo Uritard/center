@@ -134,7 +134,9 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
     private Map<String, String> getCoordinateMap(Map<String,Object> res, String robotCode) {
         Map<String, String> robotCoordinateMap = new HashMap<>(16);
         String coordinateGeography = String.valueOf(res.get("coordinate_geography"));
-        if (StringUtils.isNotBlank(coordinateGeography) && !coordinateGeography.contains("0E-7,0E-7")) {
+        if (StringUtils.isNotBlank(coordinateGeography) && coordinateGeography.contains("0E-7,0E-7")) {
+            log.info("无人机上报原点坐标，无需记录");
+        } else {
             robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
             robotCoordinateMap.put("robotCode",robotCode);
