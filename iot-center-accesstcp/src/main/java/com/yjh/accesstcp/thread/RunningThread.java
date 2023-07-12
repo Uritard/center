@@ -100,6 +100,7 @@ public class RunningThread implements Runnable{
                         }
                         sendToUpSystemServices.sendResponse(0L, "2","",Constant.stationCode(),list, true);
                     }
+                    log.info("--运行信息已发送--");
                 }
 
             } catch (Exception e) {

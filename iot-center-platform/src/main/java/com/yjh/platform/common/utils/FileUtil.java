@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -99,6 +100,14 @@ public class FileUtil {
             return true;
         }
         log.error("上传文件不在规定文件范围内: {} - {}", fileName, name);
+        return false;
+    }
+
+    public static boolean checkFileName(String fileName, String[] type){
+        String name = StringUtils.substringAfterLast(fileName,".");
+        if (Arrays.binarySearch(type, name) >= 0){
+            return true;
+        }
         return false;
     }
 
