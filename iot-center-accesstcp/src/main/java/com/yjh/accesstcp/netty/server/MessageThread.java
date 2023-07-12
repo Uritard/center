@@ -115,16 +115,16 @@ public class MessageThread {
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(clientHandler, true);
 //                    //天气线程发天气
-//                    WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
+                    WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
 //                    //运行数据
-//                    RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+                    RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
 //                    // 无人机机巢数据线程
-////                    NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
-////                    TaskExecutePool.getInstance().execute(nestRunThread);
-//                    TaskExecutePool.getInstance().execute(runningThread);
+                    NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+                    TaskExecutePool.getInstance().execute(nestRunThread);
+                    TaskExecutePool.getInstance().execute(runningThread);
                     TaskExecutePool.getInstance().execute(heartBeatThead);
 //                    //江苏要求
-//                    TaskExecutePool.getInstance().execute(weatherThread);
+                    TaskExecutePool.getInstance().execute(weatherThread);
 
                     Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
                     List<XMLBaseModel> list = new ArrayList<>();
