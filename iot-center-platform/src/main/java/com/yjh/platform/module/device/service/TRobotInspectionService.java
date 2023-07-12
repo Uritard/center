@@ -771,8 +771,10 @@ public class TRobotInspectionService {
 
         // 机器人建站地图
         TRobotInfo robotInfo = tRobotInfoDao.selectMapPathByCode(robotCode);
-        re.put("mapPath", robotInfo.getPhotePath());
-        re.put("imageSize", robotInfo.getImageSize());
+        if (robotInfo != null) {
+            re.put("mapPath", robotInfo.getPhotePath());
+            re.put("imageSize", robotInfo.getImageSize());
+        }
 
         return re;
     }
