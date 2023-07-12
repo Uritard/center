@@ -44,10 +44,11 @@ public class TWiringDiagramService {
 
     @Transactional(rollbackFor = Exception.class)
     public Result insert(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
-        if (file == null) {
-            result.setMessage(209, "文件错误,请重试");
-            return result;
+        Result resultTemp = checkFileFormat(file, result);
+        if (resultTemp != null) {
+            return resultTemp;
         }
+
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
@@ -111,10 +112,11 @@ public class TWiringDiagramService {
 
     @Transactional(rollbackFor = Exception.class)
     public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
-        if (file == null) {
-            result.setMessage(209, "文件错误,请重试");
-            return result;
+        Result resultTemp = checkFileFormat(file, result);
+        if (resultTemp != null) {
+            return resultTemp;
         }
+
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
@@ -153,6 +155,18 @@ public class TWiringDiagramService {
         tWiringDiagramTemp.setUpdatePerson(userName);
         result.setData(tWiringDiagramDao.update(tWiringDiagramTemp));
         return result;
+    }
+
+    private Result checkFileFormat(MultipartFile file, Result result) {
+        if (file == null) {
+            result.setMessage(209, "文件错误,请重试");
+            return result;
+        }
+        if (!FileUtil.checkFileName(file.getOriginalFilename(), new String[]{"jpg", "png", "jpeg"})) {
+            result.setMessage(209, "请上传指定格式的文件");
+            return result;
+        }
+        return null;
     }
 
     @Transactional(rollbackFor = Exception.class)

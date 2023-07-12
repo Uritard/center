@@ -75,6 +75,7 @@ public class NestRunThread implements Runnable{
 
                     sendToUpSystemServices.sendResponse(0L, "10004","",Constant.stationCode(),list, true);
                 }
+                log.info("--机巢信息已发送--");
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
