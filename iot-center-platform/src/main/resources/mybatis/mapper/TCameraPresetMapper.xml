@@ -134,7 +134,6 @@
             <foreach collection="list" separator="," open="(" close=")" item="presetId">
                 #{presetId, jdbcType=BIGINT}
             </foreach>
-        limit 1
     </select>
 
 

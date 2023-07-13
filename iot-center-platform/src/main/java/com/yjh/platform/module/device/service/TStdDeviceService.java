@@ -552,7 +552,7 @@ public class TStdDeviceService{
         return reMap;
     }
 
-    public List<AreaInfo> selectDevTreeByName(String name, String type,String deviceShow,String deviceType){
+    public List<AreaInfo> selectDevTreeByName(String name, String type,String deviceShow,String deviceType,String analyseType){
         if (StringUtils.isEmpty(name)){
             return selectDevTreeNew("5",null,null,null,null,null);
         }
@@ -606,9 +606,12 @@ public class TStdDeviceService{
                 break;
             case "ins":
                 //查巡视点
-                List<TCruisePointInstance> insList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name,deviceType);
+                List<TCruisePointInstance> insList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name,deviceType,analyseType);
                 if (CollectionUtils.isNotEmpty(insList)){
                     List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(insList);
+                    if (regionList.isEmpty()){
+                        break;
+                    }
                     //  MySQL 8.0
 //                    regionList.addAll(tStdDeviceDao.selectUpIdByRegionList(regionList));
                     regionList = getRegionIdByLeafNode(new HashSet<>(regionList));
@@ -1068,9 +1071,12 @@ public class TStdDeviceService{
     }
 
     public List<AreaInfo> selectMeteTreeByDeviceName(String name){
-        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name, null);
+        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
         if (CollectionUtils.isNotEmpty(deviceList)) {
             List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
+            if (regionList.isEmpty()){
+                return new ArrayList<>();
+            }
             List<Long> allRegionList = getAllUpRegionId(regionList);
             List<AreaInfo> meteTreeByDeviceName = tStdDeviceDao.selectAllMeteCruiseTreeByDeviceNameTree(deviceList, allRegionList);
             return assembleTrees(meteTreeByDeviceName);

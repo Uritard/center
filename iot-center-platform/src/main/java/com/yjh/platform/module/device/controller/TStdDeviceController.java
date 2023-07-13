@@ -378,10 +378,11 @@ public class TStdDeviceController {
     public Result selectDevTreeByName(@RequestParam(value = "name", required = false) String name,
                                 @RequestParam(value = "type", required = false) String type,
                                 @RequestParam(value = "deviceType", required = false) String deviceType,
+                                @RequestParam(value = "analyseType", required = false) String analyseType,
                                       @RequestParam(value = "deviceShow", required = false) String deviceShow) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeByName(name,type, deviceShow,deviceType);
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTreeByName(name,type, deviceShow,deviceType,analyseType);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
