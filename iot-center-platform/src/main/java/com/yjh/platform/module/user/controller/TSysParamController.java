@@ -1,15 +1,12 @@
 package com.yjh.platform.module.user.controller;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.netflix.discovery.converters.Auto;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -18,7 +15,6 @@ import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +106,7 @@ public class TSysParamController {
                 dealSetIsSilentTask(tSysParam);
             }
             // 更新声纹日志开关
-            Constant.refreshPacketLog();
+            Constant.refreshSwitchCach();
             // 更新任务配置信息
             abstractVideoCruise.resetParams();
         } catch (BusinessException e) {

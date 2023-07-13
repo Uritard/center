@@ -396,7 +396,9 @@ public class UPatrolTaskService {
                 instanceList.add(Long.valueOf(item));
             }
             List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
-            log.info("tCruisePointInstanceList {}", tCruisePointInstanceList);
+            if (Constant.logUpLv3()) {
+                log.info("tCruisePointInstanceList {}", tCruisePointInstanceList);
+            }
             for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList) {
                 UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
                 uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
@@ -418,7 +420,9 @@ public class UPatrolTaskService {
         }
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
-        log.info("instanceList {}", instanceList);
+        if (Constant.logUpLv3()) {
+            log.info("instanceList {}", instanceList);
+        }
         if (!Constant.isHost()) {
             Constant.modelUpload("7");
         }
@@ -445,7 +449,7 @@ public class UPatrolTaskService {
                 .setRemark("0");
         uPatrolResultDao.add(uPatrolResult);
 
-        if (!Constant.fastTurbo()) {
+        if (Constant.logUpLv3()) {
             log.info("instancesList==={}", detailList);
         }
         Set<String> nodeSet = new HashSet<>(8);
@@ -2009,7 +2013,9 @@ public class UPatrolTaskService {
             }
         });
 
-        log.info("task [{}] ready, skipPointList: {}, cruiseGroupMap: {}", taskId, skipPointList.size(), cruiseGroupMap);
+        if (Constant.logUpLv2()) {
+            log.info("task [{}] ready, skipPointList: {}, cruiseGroupMap: {}", taskId, skipPointList.size(), cruiseGroupMap);
+        }
         ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
             ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));
@@ -2096,7 +2102,9 @@ public class UPatrolTaskService {
                 Map<String, String> jasonMap = new HashMap<>(3);
                 jasonMap.put("type", "finishedOneInstance");
                 jasonMap.put("taskId", taskId);
-                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+                if (Constant.logUpLv1()) {
+                    log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+                }
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
                 // 巡视结果上报上一级系统

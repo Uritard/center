@@ -130,7 +130,9 @@ public abstract class AbstractVideoCruise {
                     Map<String, Object> moveMap = new HashMap<>();
                     moveMap.put("presetId", presetId);
                     moveMap.put("cameraId", cameraId);
-                    log.info("params for preset: {}", JSON.toJSONString(moveMap));
+                    if (Constant.logUpLv1()) {
+                        log.info("params for preset: {}", JSON.toJSONString(moveMap));
+                    }
                     // 移动相机
                     moveWait(moveMap);
 
@@ -323,6 +325,7 @@ public abstract class AbstractVideoCruise {
                     Thread.sleep(waitTime + 1000);
                 } catch (InterruptedException e) {
                     log.error(e.getMessage(), e);
+                    Thread.currentThread().interrupt();
                     break;
                 }
                 log.info("任务：{} 在 {} 时已经等待了 {} 预置位,摄像机Id {} {}s", taskName, DateTimeUtil.getDateTimeString(), cameraId, presetName,
@@ -361,6 +364,7 @@ public abstract class AbstractVideoCruise {
                     Thread.sleep(waitTime + 1000);
                 } catch (InterruptedException e) {
                     log.error(e.getMessage(), e);
+                    Thread.currentThread().interrupt();
                     break;
                 }
                 log.info("任务：【{}】 在 【{}】 时已经等待了 【{}】 预置位,摄像机Id 【{}】 【{}】s", taskId, DateTimeUtil.getDateTimeString(), presetName,

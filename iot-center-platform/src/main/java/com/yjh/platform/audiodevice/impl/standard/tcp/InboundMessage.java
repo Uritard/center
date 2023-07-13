@@ -39,9 +39,15 @@ public class InboundMessage extends BaseMessage implements Msg.Inbound {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         InboundMessage that = (InboundMessage) o;
         return Objects.equals(packet, that.packet) && Objects.equals(deviceId, that.deviceId);
     }

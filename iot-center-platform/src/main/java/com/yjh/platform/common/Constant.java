@@ -22,7 +22,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -350,13 +349,14 @@ public class Constant {
         return endWaitTimes;
     }
 
-    public static void refreshPacketLog() {
+    public static void refreshSwitchCach() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
         standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
         endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
+        logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
     }
 
     /**
@@ -488,5 +488,48 @@ public class Constant {
     public static final int WARN_ACCURACY = 3;
     public static final int WARN_CHECK = 4;
     public static final int INSTANCE_LOSS = 5;
+
+    /**
+     * 日志级别 1
+     */
+    public static final int LOG_LV_ONE = 1;
+    /**
+     * 日志级别 2
+     */
+    public static final int LOG_LV_TWO = 2;
+    /**
+     * 日志级别 3
+     */
+    public static final int LOG_LV_TRI = 3;
+    /**
+     * 日志级别，级别越高，日志越详细，日志级别为0表示关闭自定义级别日志
+     */
+    private static Integer logLevel;
+
+    /**
+     * 获取日志级别
+     */
+    public static int logLevel() {
+        if (logLevel == null) {
+            try {
+                logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
+            } catch (Exception e) {
+                logLevel = LOG_LV_ONE;
+            }
+        }
+        return logLevel;
+    }
+
+    public static boolean logUpLv1() {
+        return Constant.logLevel() >= Constant.LOG_LV_ONE;
+    }
+
+    public static boolean logUpLv2() {
+        return Constant.logLevel() >= Constant.LOG_LV_TWO;
+    }
+
+    public static boolean logUpLv3() {
+        return Constant.logLevel() >= Constant.LOG_LV_TRI;
+    }
 }
 

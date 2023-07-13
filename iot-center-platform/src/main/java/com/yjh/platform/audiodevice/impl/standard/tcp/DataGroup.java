@@ -112,8 +112,12 @@ public class DataGroup {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         DataGroup dataGroup = (DataGroup) o;
         return sType == dataGroup.sType && sampleRate == dataGroup.sampleRate && bits == dataGroup.bits && channels == dataGroup.channels && bytesPerChannel == dataGroup.bytesPerChannel && Objects.equals(audioDatas, dataGroup.audioDatas);
     }
