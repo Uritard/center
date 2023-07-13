@@ -153,7 +153,9 @@ public class Packet {
         }
         int dataGroupSize = calcDataGroupSize(remainingLength);
         byte[] dataGroupBytes = new byte[dataGroupSize];
-        log.info("dataGroupBytes.len:{}",dataGroupBytes.length);
+        if (Constant.logUpLv2()) {
+            log.info("dataGroupBytes.len:{}", dataGroupBytes.length);
+        }
         in.get(dataGroupBytes);
         //调试作用，当version是0x7F时，认为每个通道数据是两个字节
         if (0x7F == version) {
@@ -170,7 +172,9 @@ public class Packet {
             log.error("Unexpected ending byte: 0X%2X");
             throw new IllegalArgumentException(String.format("Unexpected ending byte: 0X%2X", eop0));
         }
-        log.info("packet.parse success");
+        if (Constant.logUpLv2()) {
+            log.info("packet.parse success");
+        }
         return packet;
     }
 

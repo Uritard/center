@@ -4,6 +4,7 @@ import com.yjh.commons.rxbus.RxBus;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
+import com.yjh.platform.common.Constant;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +32,9 @@ public class AudioDataDispatcher {
     }
 
     private void onAudioMessage(InboundMessage inboundMessage) {
-        log.info("收到声纹设备({})的录音数据", inboundMessage.getDeviceId());
+        if (Constant.logUpLv2()) {
+            log.info("收到声纹设备({})的录音数据", inboundMessage.getDeviceId());
+        }
         AudioDevice audioDevice = audioDeviceManager.getAudioDevice(inboundMessage.getDeviceId());
         if (audioDevice == null) {
             log.warn("声纹设备还未注册({})", inboundMessage.getDeviceId());

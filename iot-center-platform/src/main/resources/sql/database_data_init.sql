@@ -1313,6 +1313,7 @@ INSERT INTO `t_sys_param` VALUES ('100142', '404', 'droneOpen', '无人机任务
 INSERT INTO `t_sys_param` VALUES ('100143', '404', 'isPcmEncode', '语音对讲音频编码是否为pcm', 'true', '语音对讲音频编码是否为pcm，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100144', '404', 'cameraConfigPath', '相机设备参数备份位置', '/home/yjh_iot_center/iot-files/cameraConfig/', '相机设备参数备份位置', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
 INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'cleanContinue', '是否继续未完成的磁盘清理任务', 'false', '服务重启后继续执行没有执行完成的磁盘清理任务，此操作会导致备份不完整', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'logLevel', '打印日志级别', '2', '调试使用，级别越高打印日志越详细，范围 1-4', '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1-4的整数\"}');
 
 -- ----------------------------
 -- Records of t_version

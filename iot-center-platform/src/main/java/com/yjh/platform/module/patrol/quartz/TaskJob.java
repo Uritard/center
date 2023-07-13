@@ -94,7 +94,7 @@ public class TaskJob extends QuartzJobBean {
 
         List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, date, null);
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
-            if (tCruiseTaskDelList != null && tCruiseTaskDelList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(tCruiseTaskDelList)) {
                 //不需要执行任务
                 log.info(task.getTaskName() + "在 " + taskDate + " 时间不需要执行");
                 return;
