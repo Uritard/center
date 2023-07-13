@@ -1003,8 +1003,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 
 	<select id="selectAllMeteCruiseTreeByName" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
 		SELECT
-		cpi.device_id,
-		cpi.device_mete_id,
+		dm.device_id,
+		dm.device_mete_id,
 		cpi.instance_id
 		FROM
 		t_std_devicemete dm
@@ -1012,6 +1012,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		WHERE 1 =1
 		<if test="name != null and name != ''"> and dm.mete_name like concat('%',#{name, jdbcType=VARCHAR},'%')</if>
 		<if test="deviceType != null and deviceType != '' and deviceType != -1"> and dm.mete_type = #{deviceType}</if>
+		<if test="analyseType != null and analyseType != ''"> and dm.analyse_type = #{analyseType}</if>
 	</select>
 
 	<select id="selectRegionByDeviceList" resultType="java.lang.Long">
@@ -1073,9 +1074,9 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		END) AS infoType
 		FROM t_cruise_point_instance cpi
 		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
-		where cpi.instance_id in (
+		where cpi.device_mete_id in (
 		<foreach collection="list" item="item" separator=",">
-			#{item.instanceId}
+			#{item.deviceMeteId}
 		</foreach>
 		)
 		)
@@ -1103,9 +1104,9 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT DISTINCT dm.device_mete_id AS Id, dm.mete_name AS label, dm.device_id AS upId,	sd.device_name AS upName,"devicemete" AS infoType
 		FROM t_std_devicemete dm
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
-		where dm.device_mete_id in (
+		where dm.device_id in (
 		<foreach collection="list" item="item" separator=",">
-			#{item.deviceMeteId}
+			#{item.deviceId}
 		</foreach>
 		)
 		)
