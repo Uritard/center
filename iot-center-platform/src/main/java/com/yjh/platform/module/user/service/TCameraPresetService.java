@@ -281,78 +281,64 @@ public class TCameraPresetService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result download(List<Long> cameraIdList, List<Long> presetList){
-        Result result =new Result();
-        Map<String,String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
+    public Result download(List<Long> cameraIdList, List<Long> presetList) {
+        Result result = new Result();
+        Map<String, String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
         String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
-        Map<String,String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        Map<String, String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String zipPath = mapForZip.get("content");///home/yjh_iot_center/iot-picture/zip
-        Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
+        Map<String, String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
 
-        String picUrl = (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+        String picUrl = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
 
         {
             //判断文件大小
-            Map<String,String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
+            Map<String, String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
             String zipFileSize = "20";
-            if(mapForZipSize != null && mapForZipSize.size()>0){
-                    zipFileSize= mapForZipSize.get("content");
+            if (mapForZipSize != null && mapForZipSize.size() > 0) {
+                zipFileSize = mapForZipSize.get("content");
             }
             //picPath ="D:\\code\\qhTest\\presets";
             File file = new File(picPath);
-            if(file.exists()){
-                long size = getFileSize(file)/(1024*1024);
+            if (file.exists()) {
+                long size = getFileSize(file) / (1024 * 1024);
 //                log.info("file.length():"+size);
-                log.info("采集文件大小："+size+"M");
-                if(size > Long.valueOf(zipFileSize)){
-                    result.setCode(209,"采集文件大于"+zipFileSize+"M，禁止下载");
+                log.info("采集文件大小：" + size + "M");
+                if (size > Long.valueOf(zipFileSize)) {
+                    result.setCode(209, "采集文件大于" + zipFileSize + "M，禁止下载");
                     return result;
                 }
             }
         }
 
-        if(cameraIdList == null){
-            cameraIdList = tCameraPresetDao.selectCameraIdList();
-        }
-        if(cameraIdList != null && cameraIdList.size()==0){
-            cameraIdList = tCameraPresetDao.selectCameraIdList();
-        }
-        if(cameraIdList != null && cameraIdList.size()>0){
-
-            List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
-            if(cameraHavePresetList == null){
-                result.setCode(209,"该相机无采集文件!");
+        List<String> presetImgList;
+        if (!CollectionUtils.isEmpty(presetList)) {
+            presetImgList = tCameraPresetDao.selectImgListById(presetList);
+            if (presetImgList == null) {
+                result.setCode(209, "该预置位无采集文件!");
                 return result;
             }
-            if(cameraHavePresetList.size() == 0 ){
-                result.setCode(209,"该相机没有需要标定的文件!");
-                return result;
+            deleteZip(zipPath);
+            copePresetImage(presetImgList, picUrl, picPath, zipPath);
+        } else {
+            if (cameraIdList == null) {
+                cameraIdList = tCameraPresetDao.selectCameraIdList();
             }
-            //删除zipPath下的所有文件
-            try {
-                String cmd= "rm -rf "+zipPath+"/*";
-                String[] cmds = new String[]{"sh","-c",cmd};
-                Runtime.getRuntime().exec(cmds);
-                log.info("linux命令："+cmd);
-                //Runtime.getRuntime().exec(cmd);
-                cmd = "mkdir "+zipPath;
-                log.info("linux命令："+cmd);
-                cmds = new String[]{"sh","-c",cmd};
-                Runtime.getRuntime().exec(cmds);
-                cmd = "mkdir "+zipPath+"/picture";
-                log.info("linux命令："+cmd);
-                cmds = new String[]{"sh","-c",cmd};
-                Runtime.getRuntime().exec(cmds);
-            } catch (IOException e) {
-                log.error("复制文件错误："+e);
+            if (cameraIdList != null && cameraIdList.size() == 0) {
+                cameraIdList = tCameraPresetDao.selectCameraIdList();
             }
-
-            List<String> presetImgList = new ArrayList<>();
-            if (!CollectionUtils.isEmpty(presetList)) {
-                presetImgList = tCameraPresetDao.selectImgListById(presetList);
-                copePresetImage(presetImgList, picUrl, picPath, zipPath);
-            } else {
+            if (cameraIdList != null && cameraIdList.size() > 0) {
+                List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
+                if (cameraHavePresetList == null) {
+                    result.setCode(209, "该相机无采集文件!");
+                    return result;
+                }
+                if (cameraHavePresetList.size() == 0) {
+                    result.setCode(209, "该相机没有需要标定的文件!");
+                    return result;
+                }
+                deleteZip(zipPath);
                 for (Long cameraId : cameraIdList) {
                     //找到这个cameraId下的所有预置位
                     presetImgList = tCameraPresetDao.selectForThisPreset(cameraId);
@@ -367,33 +353,54 @@ public class TCameraPresetService {
                         }
                     }
                 }
+            } else {
+                result.setCode(209, "fail");
+                return result;
             }
-            //压缩
-            try {
-                Thread.sleep(1000);
-                log.info("开始压缩");
-                String zipCmd= "cd "+zipPath+" && zip -r -y picture.zip picture/*";
-                log.info("linux命令："+zipCmd);
-                String[] cmds = new String[]{"sh","-c",zipCmd};
-                Process p = Runtime.getRuntime().exec(cmds);
-                BufferedReader in = null;
-                in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String str = null;
-                while ((str = in.readLine()) != null) {
-                    log.info("结果："+str);
-                }
-                in.close();
-                Thread.sleep(2000);
-            } catch (Exception e) {
-                log.error("复制文件错误："+e);
-            }
-           result.setData(zipPathReal+"/picture.zip");
-            return result;
         }
-        result.setCode(209,"fail");
+        //压缩
+        try {
+            Thread.sleep(1000);
+            log.info("开始压缩");
+            String zipCmd = "cd " + zipPath + " && zip -r -y picture.zip picture/*";
+            log.info("linux命令：" + zipCmd);
+            String[] cmds = new String[]{"sh", "-c", zipCmd};
+            Process p = Runtime.getRuntime().exec(cmds);
+            BufferedReader in = null;
+            in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String str = null;
+            while ((str = in.readLine()) != null) {
+                log.info("结果：" + str);
+            }
+            in.close();
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            log.error("复制文件错误：" + e);
+        }
+        result.setData(zipPathReal + "/picture.zip");
         return result;
     }
 
+    private void deleteZip(String zipPath) {
+        //删除zipPath下的所有文件
+        try {
+            String cmd = "rm -rf " + zipPath + "/*";
+            String[] cmds = new String[]{"sh", "-c", cmd};
+            Runtime.getRuntime().exec(cmds);
+            log.info("linux命令：" + cmd);
+            //Runtime.getRuntime().exec(cmd);
+            cmd = "mkdir " + zipPath;
+            log.info("linux命令：" + cmd);
+            cmds = new String[]{"sh", "-c", cmd};
+            Runtime.getRuntime().exec(cmds);
+            cmd = "mkdir " + zipPath + "/picture";
+            log.info("linux命令：" + cmd);
+            cmds = new String[]{"sh", "-c", cmd};
+            Runtime.getRuntime().exec(cmds);
+        } catch (IOException e) {
+            log.error("复制文件错误：" + e);
+        }
+    }
     private void copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath){
         for (String presetImg : presetImgList) {
             try {
