@@ -440,6 +440,7 @@ public class FileProcess implements Closeable {
      * 压缩并删除空目录
      */
     private boolean zipAndDelEmptyDir(File sourceFile, String parentDir) {
+
         try {
             if (zos != null) {
                 // 保留空文件夹，只增加路径，不写入内容
@@ -450,12 +451,20 @@ public class FileProcess implements Closeable {
                 zos.putNextEntry(entry);
                 zos.closeEntry();
             }
-
-            return Files.deleteIfExists(sourceFile.toPath());
         } catch (Exception e) {
-            log.error("压缩/删除目录失败：{}", sourceFile.getAbsolutePath(), e);
-            return false;
+            log.error("创建压缩目录失败：{}", sourceFile.getAbsolutePath(), e);
         }
+
+        try {
+            if (!Files.deleteIfExists(sourceFile.toPath())) {
+                log.error("删除空目录失败：{}", sourceFile.getAbsolutePath());
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("删除空目录失败：{}", sourceFile.getAbsolutePath(), e);
+        }
+        return false;
     }
 
     /**
@@ -485,7 +494,9 @@ public class FileProcess implements Closeable {
         // 删除被压缩文件，如果需要压缩却没有被压缩成功，则不删除
         try {
             long fileLen = sourceFile.length();
-            if (flag && !Files.deleteIfExists(sourceFile.toPath())) {
+            // 小于 10B 的文件默认为损坏文件，当做压缩成功处理，删除
+            boolean deleteOrEmpty = (fileLen <= 10 || flag);
+            if (deleteOrEmpty && !Files.deleteIfExists(sourceFile.toPath())) {
                 log.error("删除文件失败：{}", sourceFile.getAbsolutePath());
                 flag = false;
             } else {
@@ -493,6 +504,7 @@ public class FileProcess implements Closeable {
                     log.info("delete file： {}", sourceFile.getAbsolutePath());
                 }
                 truncateSize += fileLen;
+                flag = true;
             }
         } catch (Exception e) {
             log.error("删除文件失败：{}", sourceFile.getAbsolutePath(), e);

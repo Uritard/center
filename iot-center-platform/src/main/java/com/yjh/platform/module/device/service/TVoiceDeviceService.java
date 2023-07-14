@@ -914,7 +914,9 @@ public class TVoiceDeviceService{
             tVoiceDeviceDao.addConf(o);
             insetList.add(o);
         });
-        tVoiceDeviceDao.batchAdd(insetList);
+        if (!insetList.isEmpty()) {
+            tVoiceDeviceDao.batchAdd(insetList);
+        }
         return errorList;
     }
 
