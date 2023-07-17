@@ -358,9 +358,7 @@ public class TStdDevicemeteController {
                 tStdDevicemeteService.importExcel(excelEntities);
             }
             List<ExcelEntity> errorExcelList = modelExcelListener.getErrorExcelEntities();
-            if (CollectionUtils.isNotEmpty(errorExcelList)) {
-                result.setData(errorExcelList.size());
-            }
+            result.setData(errorExcelList.size());
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("发生异常:", e);
