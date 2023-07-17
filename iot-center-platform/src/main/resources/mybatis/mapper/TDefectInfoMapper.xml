@@ -594,8 +594,10 @@
             a.dict_note AS alarmLevelName,
             alarm.alarm_state AS confMode,
             b.dict_note AS confModeName,
-            '279' AS alarmSource,
-            '机器人' AS alarmSourceName,
+            case when isnull(c.robot_type) then '997'
+                else '279' end AS alarmSource,
+            case when isnull(c.robot_type) then '无人机'
+                 else '机器人' end  AS alarmSourceName,
             alarm.robot_id AS deviceId,
             alarm.robot_id AS cameraId,
             "1" AS videoCameraType,
