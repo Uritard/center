@@ -3034,15 +3034,13 @@ public class UPatrolTaskService {
             reMap.put("taskId", taskId);
             Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+taskCode+":"+robotId);
             if (robotOrDroneTaskInfo.size() == 0) {
-                robotOrDroneTaskInfo.put("taskState", "2");
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                robotOrDroneTaskInfo.put("startTime", simpleDateFormat.format(new Date()));
-                robotOrDroneTaskInfo.put("taskProgress", "0");
-//                reMap.put("taskProgress", 0);
-//                reMap.put("taskName", "");
-//                reMap.put("startTime", "");
-//                reMap.put("taskState", "");
-//                return reMap;
+                Map<String, Object> mapA = selectCruiseAdvance(taskId);
+                if (mapA != null && mapA.size() > 0) {
+                    robotOrDroneTaskInfo.put("taskState", "2");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    robotOrDroneTaskInfo.put("taskProgress", mapA.getOrDefault("rate", "0").toString());
+                    robotOrDroneTaskInfo.put("startTime", mapA.getOrDefault("startTime", simpleDateFormat.format(new Date())).toString());
+                }
             }
             String re = Optional.ofNullable(robotOrDroneTaskInfo.get("taskProgress")).orElse("0");
             UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
@@ -3076,6 +3074,23 @@ public class UPatrolTaskService {
             reMap.put("taskId", "");
         }
         return reMap;
+    }
+
+    public Map<String, Object> selectCruiseAdvance(String taskId) {
+
+        Map<String, String> countResult = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId);
+        String rate = countResult.get("taskProgress");
+        if (StringUtils.isEmpty(rate)){
+            rate = "0";
+        }
+        log.info("执行完成点 taskId: {}, 进度: {}", taskId, rate);
+        Map<String, Object> rateAndTaskInfo = new HashMap<>();
+        rateAndTaskInfo.put("rate", rate);
+        String taskState = countResult.getOrDefault("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
+        rateAndTaskInfo.put("taskState", taskState);
+        rateAndTaskInfo.put("startTime", countResult.get("taskStart"));
+        rateAndTaskInfo.put("taskStateName", DictConvertUtil.DICT.covertToDict("taskState", taskState));
+        return rateAndTaskInfo;
     }
 
     private String taskStatusToString(String state) {
