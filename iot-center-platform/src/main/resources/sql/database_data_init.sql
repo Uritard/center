@@ -1415,7 +1415,7 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'nonhomologousWarn', '分,合,开,关,储能,非储能,远方,就地', '非同源趋势对比支持汉字', '无', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5,]+$\",\"msg\":\"请输入正确汉字\"}');
 
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'renwuguanli.png', 1);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视报表', '/scout/resultConfirm', 'xunshibaobiao.png', 2);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'xunshibaobiao.png', 2);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (3, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'feitongyuangaojing.png', 3);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'yichangdianwei.png', 4);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (5, NULL, '测点查看', '/monitoring/autoPatrol', 'cedainchakan.png', 5);

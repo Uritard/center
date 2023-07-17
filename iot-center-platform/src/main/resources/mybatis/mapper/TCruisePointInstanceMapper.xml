@@ -267,7 +267,8 @@
                 <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
                 )
                 GROUP BY a.device_mete_id
-                <if test="bindMultiple != null and bindMultiple != 2"> HAVING count(a.device_mete_id) > 1 </if>
+                <if test="bindMultiple != null and bindMultiple == 1"> HAVING count(a.device_mete_id) > 1 </if>
+                <if test="bindMultiple != null and bindMultiple == 0"> HAVING count(a.device_mete_id) = 1 </if>
             </otherwise>
         </choose>
     </select>
