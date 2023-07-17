@@ -93,7 +93,7 @@ INSERT INTO `sys_menu` VALUES ('27', '数据维护', '0606', '5', '', '', '1', '
 INSERT INTO `sys_menu` VALUES ('28', '配置管理', '0607', '5', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 INSERT INTO `sys_menu` VALUES ('29', '标准点位库', '0608', '5', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 INSERT INTO `sys_menu` VALUES ('30', '日志管理', '0609', '5', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1236');
-INSERT INTO `sys_menu` VALUES ('31', '主接线图', '0610', '5', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('31', '主接线图', '0610', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('32', '任务诊断', '0701', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('33', '信息查询', '0702', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('34', '任务管理', '0703', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
@@ -154,7 +154,6 @@ INSERT INTO `sys_role_menu` VALUES ('210135', '01000', null, 'checked', '1235');
 INSERT INTO `sys_role_menu` VALUES ('210136', '01001', null, 'checked', '1235');
 INSERT INTO `sys_role_menu` VALUES ('210137', '0100', null, 'halfChecked', '1235');
 INSERT INTO `sys_role_menu` VALUES ('210138', '0200', null, 'halfChecked', '1235');
-INSERT INTO `sys_role_menu` VALUES ('210139', '0600', null, 'halfChecked', '1235');
 INSERT INTO `sys_role_menu` VALUES ('210140', '0206', null, 'checked', '1234');
 INSERT INTO `sys_role_menu` VALUES ('210141', '0601', null, 'checked', '1234');
 INSERT INTO `sys_role_menu` VALUES ('210142', '0602', null, 'checked', '1234');
