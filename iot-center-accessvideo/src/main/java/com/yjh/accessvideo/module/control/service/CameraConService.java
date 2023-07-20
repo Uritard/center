@@ -3516,6 +3516,8 @@ public class CameraConService {
             // 重启相机
             processResult = reboot(cameraConInfo);
             log.info("相机：{} 重启相机结果：{}", cameraId, processResult);
+        } else {
+            throw new BusinessException("相机无配置信息！");
         }
 
         log.info("相机：{} 恢复相机配置信息结果：{}", cameraId, processResult);
