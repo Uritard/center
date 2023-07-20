@@ -225,6 +225,7 @@ public class StatisticsController {
     try{
       result.setData(statisticsService.exportTable(type, year, month));
     }catch (Exception e){
+      log.info("导出任务执行可靠性报表错误：",e);
       result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
     }
     return result;
