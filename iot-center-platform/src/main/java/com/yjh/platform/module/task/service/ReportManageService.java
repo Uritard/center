@@ -199,7 +199,7 @@ public class ReportManageService {
             temporaryFile.mkdir();
             newReportPath = reportPath + "/" + reportName;
             log.info("不存在，创建的文件绝对路径是==={}", newReportPath);
-            File file = new File(reportPath);
+            File file = new File(newReportPath);
             ContentData contentData = ReportDataModel.getData(recordData);
 
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
