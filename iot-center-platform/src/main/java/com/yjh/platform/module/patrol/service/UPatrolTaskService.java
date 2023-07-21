@@ -1027,11 +1027,26 @@ public class UPatrolTaskService {
                 }
             }
 
+            // 查询检修区域
+            final String[] overhaulString = {""};
+            List<String> overhaulList = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+            overhaulList.forEach(s -> overhaulString[0] = StringUtils.isEmpty(overhaulString[0]) ? s : StringUtils.join(overhaulString[0], ",", s));
+            List<String> overhaul = new ArrayList<>();
+            if (StringUtils.isNotEmpty(overhaulString[0])) {
+                overhaul = Arrays.asList(overhaulString[0].split(","));
+            }
+            List<String> finalOverhaul = overhaul;
+            Collections.sort(finalOverhaul);
+
             // 找出机器人和无人机做任务的巡检点
             List<Long> robotCruiseList = new ArrayList<>();
             List<Long> robotInstanceList = new ArrayList<>();
             for (TCruisePointInstanceNameDetail item : detailList) {
                 if ((TypeEnum.ROBOT.getCode() == item.getCruiseType() || TypeEnum.UAV.getCode() == item.getCruiseType())) {
+                    // 排除无人机在检修区域的节点
+                    if (TypeEnum.UAV.getCode() == item.getCruiseType() && finalOverhaul.contains(item.getInstanceId())) {
+                        continue;
+                    }
                     robotCruiseList.add(item.getCruiseId());
                     robotInstanceList.add(item.getInstanceId());
                 }
