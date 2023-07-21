@@ -1479,6 +1479,7 @@ public class UPatrolTaskService {
                 }
                 tCruiseTaskDel.setCreateTime(new Date());
                 log.info("del task single...");
+                deleteTransfer(source, planId, taskId, startTime);
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             } else {
                 //判断当前周期任务是否已执行 --by tt 2021.3.10
