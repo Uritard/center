@@ -714,7 +714,7 @@ public class StatisticsService {
     }
 
     private void createDefectInfo(List<StatisticalDefectMapping> defectInfos, ExportedStatisticsTableVo vo){
-        if(!defectInfos.isEmpty()){
+        if(!CollectionUtils.isEmpty(defectInfos)){
             for (StatisticalDefectMapping defectItem:defectInfos){
                 if(vo.getDefectAndCount()==null){
                     vo.setDefectAndCount(defectItem.getDefectType()+":"+defectItem.getCount()+"个 ");
