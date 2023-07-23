@@ -69,6 +69,17 @@ public class FileUtil {
     }
 
     /**
+     * 判断图片大小是否为20kb
+     * @param filePath 文件路径
+     * @return true 大于20kb
+     */
+    public static boolean hasEffective(String filePath) {
+        File file = new File(filePath);
+        long length = file.length();
+        return length > 20L;
+    }
+
+    /**
      * 判断是不是图片格式
      * @param filePath 文件路径
      * @return

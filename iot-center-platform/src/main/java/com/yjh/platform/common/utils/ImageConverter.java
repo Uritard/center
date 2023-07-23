@@ -47,6 +47,10 @@ public class ImageConverter implements Converter<String> {
             if (StringUtils.isEmpty(picCompression)) {
                 return new CellData("");
             }
+            // 判断文件大小是否为 0 kb
+            if (!FileUtil.hasEffective(value)) {
+                return new CellData("");
+            }
             return new CellData(FileUtils.readFileToByteArray(new File(picCompression)));
         } else if (value.contains(isPath)) {
             return new CellData(FileUtils.readFileToByteArray(new File(Objects.requireNonNull(this.getClass().getResource("/")).getPath()
