@@ -196,10 +196,12 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         String backPath = (String)redisTemplate.opsForHash().get("t_sys_param:backPath", "content");
         String backName = DateTimeUtil.format3(new Date()) + RandomStringUtils.randomAlphanumeric(3);
         int backExpire = 0;
-        if (needCheckDate && sysDiskCleanup.getBackFile() == CHECKED) {
+        if (needCheckDate && sysDiskCleanup.getBackFile() == CHECKED && sysDiskCleanup.getDelTaskFile() == CHECKED) {
             String backFilePath = FilenameUtils.concat(backPath, backName + ".zip");
             sysDiskCleanup.setBackFilePath(backFilePath);
             backExpire = 1;
+        } else if (sysDiskCleanup.getBackFile() == CHECKED && sysDiskCleanup.getDelTaskFile() != CHECKED) {
+            sysDiskCleanup.setBackFile(0);
         }
         if (sysDiskCleanup.getBackDatabase() == CHECKED) {
             String backDbPath = FilenameUtils.concat(backPath, backName + ".sql");
@@ -310,6 +312,8 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, -NumberUtils.toInt(retainedTempTime, 7));
         String tmpFilePath = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
+        // 图片文件目录
+        String prefixAbsolutePath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
 
         long cleanSize = 0L;
         try (FileProcess process = new FileProcess(calendar.getTime(), false, tmpFilePath, sysDiskCleanup.getBackFilePath(), "")) {
@@ -324,8 +328,8 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 String jm = FilenameUtils.concat(resultImgPath, "jm");
                 // 预置位校验抓图文件 /home/yjh_iot_center/iot-picture/resultImg/presetCheckImg
                 String presetCheckImg = FilenameUtils.concat(resultImgPath, "presetCheckImg");
-                // 预置位图片压缩文件 /home/yjh_iot_center/iot-picture/resultImg/zip
-                String zips = FilenameUtils.concat(resultImgPath, "zip");
+                // 预置位图片压缩文件 /home/yjh_iot_center/iot-picture/zip
+                String zips = (String)redisTemplate.opsForHash().get("t_sys_param:zipPath", "content");
                 process.nextProcess(new String[] {sequentialPath, jm, presetCheckImg, zips}, "");
                 boolean p2 = process.cleanup();
                 cleanSize += process.truncateSize();
@@ -362,7 +366,7 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 boolean needBack = sysDiskCleanup.getBackFile() == CHECKED;
 
                 String absVoicePath = (String)redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
-                String analyseResultImg = FilenameUtils.concat(resultImgPath, "analyseResultImg");
+                String analyseResultImg = FilenameUtils.concat(prefixAbsolutePath, "analyseResultImg");
                 String ftpImageAbsolute = (String)redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content");
                 String infraredStorePath = (String)redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content");
 
