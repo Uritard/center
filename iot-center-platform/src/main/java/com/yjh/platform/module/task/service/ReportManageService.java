@@ -171,6 +171,12 @@ public class ReportManageService {
         // 报告名称:站所名称+任务名称+巡视时间
         TaskVO taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
         taskVO.setTaskName(taskVOtemp.getTaskName());
+        taskVO.setCruiseDate(taskVOtemp.getCruiseDate());
+        taskVO.setCruiseStartTime(taskVOtemp.getCruiseStartTime());
+        taskVO.setCruiseEndTime(taskVOtemp.getCruiseEndTime());
+        taskVO.setReviewer(taskVOtemp.getReviewer());
+        taskVO.setEnvInfo(taskVOtemp.getEnvInfo());
+        taskVO.setReviewTime(taskVOtemp.getReviewTime());
         recordData.setTaskVO(taskVO);
 
         String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
