@@ -118,6 +118,7 @@ public class StatisticsService {
         dateMap.put("endTime", end);
         if (type == 2) {
             calendar = Calendar.getInstance();
+            calendar.setFirstDayOfWeek(Calendar.MONDAY);
             dateMap.put("startWeek", startWeek);
             dateMap.put("endTime", calendar.getTime());
             dateMap.put("endWeek", calendar.get(Calendar.WEEK_OF_YEAR));
