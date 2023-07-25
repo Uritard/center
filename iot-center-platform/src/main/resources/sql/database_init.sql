@@ -2270,7 +2270,7 @@ CREATE TABLE `t_warn_info` (
 -- ----------------------------
 DROP TABLE IF EXISTS `u_patrol_task_attr`;
 CREATE TABLE `u_patrol_task_attr` (
-  `task_id` varchar(50) NOT NULL COMMENT '关联任务表id',
+  `task_id` varchar(128) NOT NULL COMMENT '关联任务表id',
   `instance_id` bigint NOT NULL COMMENT '巡检点实例ID',
   `device_mete_id` bigint DEFAULT '1' COMMENT '测点实例ID',
   `device_id` bigint DEFAULT '1' COMMENT '关联设备id',
@@ -2290,7 +2290,7 @@ CREATE TABLE `u_patrol_task_attr` (
 DROP TABLE IF EXISTS `u_patrol_data_result`;
 CREATE TABLE `u_patrol_data_result` (
   `cruise_data_id` bigint(68) NOT NULL AUTO_INCREMENT COMMENT '巡视点数据id',
-  `task_id` varchar(82) DEFAULT '' COMMENT '巡视任务id',
+  `task_id` varchar(128) DEFAULT '' COMMENT '巡视任务id',
   `device_id` bigint(32) DEFAULT '0' COMMENT '设备ID',
   `device_name` varchar(50) DEFAULT '' COMMENT '设备名称',
   `device_mete_id` bigint(32) DEFAULT '0' COMMENT '测点ID',
@@ -2365,8 +2365,8 @@ CREATE TABLE `u_patrol_plan_attr` (
 -- ----------------------------
 DROP TABLE IF EXISTS `u_patrol_result`;
 CREATE TABLE `u_patrol_result` (
-  `task_id` varchar(50) NOT NULL DEFAULT '' COMMENT '巡检任务ID',
-  `task_code` varchar(50) DEFAULT '' COMMENT '任务编码',
+  `task_id` varchar(128) NOT NULL DEFAULT '' COMMENT '巡检任务ID',
+  `task_code` varchar(128) DEFAULT '' COMMENT '任务编码',
   `task_name` varchar(50) DEFAULT '' COMMENT '巡检任务名称',
   `area_id` varchar(32) DEFAULT '' COMMENT '区域id',
   `task_type` int(11) DEFAULT '1' COMMENT '任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义',
@@ -2398,8 +2398,8 @@ CREATE TABLE `u_patrol_result` (
 -- ----------------------------
 DROP TABLE IF EXISTS `u_patrol_task`;
 CREATE TABLE `u_patrol_task` (
-  `task_id` varchar(50) NOT NULL COMMENT '巡检任务UUID',
-  `task_code` varchar(50) DEFAULT '' COMMENT '任务编码',
+  `task_id` varchar(128) NOT NULL COMMENT '巡检任务UUID',
+  `task_code` varchar(128) DEFAULT '' COMMENT '任务编码',
   `task_name` varchar(50) DEFAULT '' COMMENT '任务名称',
   `plan_id` bigint(32) DEFAULT '1' COMMENT '所属预案id',
   `area_id` varchar(32) DEFAULT '' COMMENT '所属厂站',
