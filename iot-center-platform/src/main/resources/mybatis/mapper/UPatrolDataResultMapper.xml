@@ -602,7 +602,8 @@
         e.identify_result as identifyResult,
         e.cruise_result as cruiseResult,
         e.picpath AS picPath,
-        e.origpic,
+        case e.origpic when 'null' then ''
+            else e.origpic end as origpic,
         e.device_name AS deviceName,
         e.evaluation_state AS evaluationState,
         e.task_id as taskId,
