@@ -292,6 +292,7 @@ public class TCameraPresetService {
 
         String picUrl = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
 
+        FileUtil.mkdir(zipPath);
         {
             //判断文件大小
             Map<String, String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
@@ -427,10 +428,12 @@ public class TCameraPresetService {
         }
         Map<String,String> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String path =  mapForPicModelPath.get("content");///home/yjh_iot_center/iot-picture/zip
+        FileUtil.mkdir(path);
 
         Map<String,String> mapForModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipTargetPath");
         String modelPath =  mapForModelPath.get("content");///home/yjh/iot-picture/model-picture/sync/Template/BigImg
         //String modelPath =  "/home/yjh_iot_center/iot-picture/zip";///home/yjh/iot-picture/model-picture/sync/Template/BigImg
+        FileUtil.mkdir(modelPath);
 
         String fileName = "copyZip.zip";
         // 将上传文件写入
