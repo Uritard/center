@@ -180,6 +180,8 @@ public interface UPatrolResultDao {
                                                @Param(value = "startTime")Date startTime,
                                                @Param(value = "endTime")Date endTime);
 
+    List<TCruiseDataResultDetail> selectDetailBytaskId(@Param(value = "taskId")String  taskId);
+
     int selectMeteNum(@Param(value = "list") List<String> list,
                       @Param(value = "startTime")Date startTime,
                       @Param(value = "endTime")Date endTime);

@@ -167,7 +167,10 @@ public class ReportManageService {
         //顺便处理非同源合并问题
         List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
         // 概况
-        TaskVO taskVO = getTaskVO(taskId,tCruiseDataResultDetailList,remark);
+        TaskVO taskVO = getTaskVoDefined(tCruiseDataResultDetailList);
+        // 报告名称:站所名称+任务名称+巡视时间
+        TaskVO taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
+        taskVO.setTaskName(taskVOtemp.getTaskName());
         recordData.setTaskVO(taskVO);
 
         String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");

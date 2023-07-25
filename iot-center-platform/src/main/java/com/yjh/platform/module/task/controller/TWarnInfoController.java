@@ -575,7 +575,8 @@ public class TWarnInfoController {
                 alarmShieldDao.add(alarmShield);
             } else {
                 //不是新增的 更新
-                alarmShieldDao.update(alarmShield);
+                alarmShieldOld.setEndTime(alarmShield.getEndTime());
+                alarmShieldDao.update(alarmShieldOld);
             }
             if (alarmShield.getShieldType() == 1){
                 TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getWarnContent());

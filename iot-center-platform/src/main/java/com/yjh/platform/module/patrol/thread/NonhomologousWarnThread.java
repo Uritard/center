@@ -388,7 +388,7 @@ public class NonhomologousWarnThread implements Runnable{
                             fiveResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(fiveResults);
                             warn.put("resultsInfo", insResults);
-                            warn.put("value",latestResult);
+                            warn.put("value",robotInsResult);
                             warn.put("deviceMeteId", deviceMeteId);
                             warn.put("oneCruiseDeviceName", oneCruiseName);
                             warn.put("twoCruiseDeviceName", twoCruiseName);
