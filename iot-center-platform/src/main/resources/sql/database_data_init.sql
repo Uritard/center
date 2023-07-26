@@ -107,7 +107,7 @@ INSERT INTO `sys_menu` VALUES ('43', '三维应用', '01000', '-1', '', '', '1',
 INSERT INTO `sys_menu` VALUES ('44', '三维应用', '01001', '43', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('41', '可靠性指标', '0900', '-1', '', '', '1', '1', '', '1', '1', '1', '', '1', '1', null);
 INSERT INTO `sys_menu` VALUES ('42', '可靠性指标', '0901', '41', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
-INSERT INTO `sys_menu` VALUES ('42', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('43', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -724,7 +724,7 @@ INSERT INTO `t_dict_business` VALUES ('300754', '352', 'abnormal_type', '系统�
 INSERT INTO `t_dict_business` VALUES ('300755', '0', 'back_expire', '未备份', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300756', '1', 'back_expire', '未过期', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '过期删除', NULL, '备份过期状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300757', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business` VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
 
 -- ----------------------------
 -- Records of t_period_model
