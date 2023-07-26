@@ -374,9 +374,9 @@ public abstract class AbstractVideoCruise {
 
                 waitCount = waitCount + 1;
                 if (waitCount == 30) {
-                    log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 退出等待", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
+                    log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 直接获取", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
                         presetName, cameraId);
-                    waitFlag = false;
+                    redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
                     break;
                 }
             }

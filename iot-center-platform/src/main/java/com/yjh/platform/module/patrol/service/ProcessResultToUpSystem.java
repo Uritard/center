@@ -151,7 +151,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
-                xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+                xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime()));
                 xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
