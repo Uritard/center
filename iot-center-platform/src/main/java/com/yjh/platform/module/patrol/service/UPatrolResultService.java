@@ -382,7 +382,7 @@ public class UPatrolResultService {
         log.info("warnInfo==" + warnInfo);
 
         //判断该点是否已在告警表  声纹测点分开处理
-        if (995 == alarmSource){
+        if (998 == alarmSource){
             //声纹测点 声纹告警规则
             map = voiceIsWarn(afterManualReviewInfo.getModifyNum(),tStdDevicemete.getDBValue(),
                     tStdDevicemete.getFValue(),tStdDevicemete.getMeteName());
