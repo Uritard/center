@@ -28,10 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -102,7 +99,7 @@ import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 @Service
 public class CameraConService {
 
-    private final Logger log = LoggerFactory.getLogger(CameraConService.class);
+    private final static Logger log = LoggerFactory.getLogger(CameraConService.class);
 
     @Autowired
     private CameraConDao cameraConDao;
@@ -3532,7 +3529,7 @@ public class CameraConService {
             processResult = reboot(cameraConInfo);
             log.info("相机：{} 重启相机结果：{}", cameraId, processResult);
         } else {
-            throw new BusinessException("配置失败或相机无配置信息！");
+            throw new BusinessException("相机配置信息导入失败！");
         }
 
         log.info("相机：{} 恢复相机配置信息结果：{}", cameraId, processResult);
@@ -3585,8 +3582,8 @@ public class CameraConService {
         return  EntityUtils.toString(response.getEntity());
     }
 
-    public String putFileISAPI(String cameraIp, String username, String password, String filePath) {
-        log.info("putFileISAPI入参，iurlp：{}， username：{}， password：{}， filePath：{}", cameraIp, username, password, filePath);
+    public String putFileISAPI(String cameraIp, String username, String password, File backFile) {
+        log.info("putFileISAPI入参，iurlp：{}， username：{}， password：{}， filePath：{}", cameraIp, username, password, backFile.getAbsolutePath());
 
         String host = "http://" + cameraIp;
         Credentials creds = new UsernamePasswordCredentials(username, password);
@@ -3611,19 +3608,18 @@ public class CameraConService {
 
             String url = host + CONF_DATA_URL;
             HttpPut httpPut = new HttpPut(url);
-
             httpPut.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_OCTET_STREAM.getMimeType());
 
-            NumberUtils.toInt("", 1);
-
             // 设置请求体
-            byte[] requestBody = getBytesByFile(filePath);
+            byte[] requestBody = getBytesByFile(backFile);
             httpPut.setEntity(new ByteArrayEntity(requestBody));
 
             CloseableHttpResponse response = httpclient.execute(httpPut, context);
-            res = EntityUtils.toString(response.getEntity());
+            if (response.getStatusLine().getStatusCode() < HttpStatus.SC_MULTIPLE_CHOICES) {
+                res = EntityUtils.toString(response.getEntity());
+            }
             response.close();
-            log.info("configuration:{}", res);
+            log.info("configuration: {}", res);
         } catch (Exception e) {
             log.error("使用 ISAPI 上传文件失败", e);
         }
@@ -3639,69 +3635,28 @@ public class CameraConService {
     private boolean uploadConfigFile(CameraConInfo cameraConInfo) {
         log.info("uploadConfigFile入参，cameraConInfo： {}", JSONUtil.toJSONString(cameraConInfo));
 
+        if (cameraConInfo == null) {
+            throw new BusinessException("相机不存在！");
+        }
+        String username = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+        String cameraId = cameraConInfo.getCameraId().toString();
+
+        File backFile = new File(getConfigFileDir() + getConfigFileName(cameraId));
+        if (!backFile.exists() || !backFile.isFile()) {
+            throw new BusinessException("相机配置信息不存在，请先备份！");
+        }
         try {
-            String username = cameraConInfo.getCameraManager();
-            String password = cameraConInfo.getCameraCode();
-            String cameraIp = cameraConInfo.getCameraIp();
-            String cameraId = cameraConInfo.getCameraId().toString();
-            String port = cameraConInfo.getPort().toString();
-
-            String url = "http://" + cameraIp + ":80" + CONF_DATA_URL;
-            log.info("uploadConfigFile中 url： {}", url);
-
-            boolean putISAPI = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:putISAPI","content"));
-            if (!putISAPI) {
-               String error = putFileISAPI(cameraIp, username, password, getConfigFileDir() + getConfigFileName(cameraId));
-               if ("ERROR".equals(error)) {
-                   return false;
-               }
-               return true;
+            String error = putFileISAPI(cameraIp, username, password, backFile);
+            if ("ERROR".equals(error)) {
+                return false;
             }
-
-
-            URL apiUrl = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
-
-            // 设置请求方法为PUT
-            connection.setRequestMethod("PUT");
-
-            // 添加用户名密码验证
-            String authHeaderValue = getAuthorizationHeader(username, password);
-            connection.setRequestProperty("Authorization", authHeaderValue);
-
-            // 添加请求体数据（如果有）
-            byte[] requestBody = getConfigFileBytes(cameraId);
-            connection.setDoOutput(true);
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(requestBody);
-            outputStream.flush();
-
-            // 获取响应结果
-            int responseCode = connection.getResponseCode();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
-
-            log.info("Response Code: " + responseCode);
-            log.info("Response Body: " + response.toString());
-
-            // 关闭连接
-            connection.disconnect();
         } catch (Exception e) {
             log.info("err", e);
             return false;
         }
         return true;
-    }
-
-    private String getAuthorizationHeader(String username, String password) {
-        String credentials = username + ":" + password;
-        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
-        return "Basic " + encodedCredentials;
     }
 
     /**
@@ -3724,17 +3679,6 @@ public class CameraConService {
         }
 
         return true;
-    }
-
-    /**
-     * 本地目录读取相机设备参数配置文件二进制流
-     *
-     * @param cameraId cameraId
-     * @return result
-     */
-    private byte[] getConfigFileBytes(String cameraId) {
-        String filePath = getConfigFileDir() + getConfigFileName(cameraId);
-        return getBytesByFile(filePath);
     }
 
     /**
@@ -3777,22 +3721,10 @@ public class CameraConService {
             bos = new BufferedOutputStream(fos);
             bos.write(bytes);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } finally {
-            if (bos != null) {
-                try {
-                    bos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            IOUtils.closeQuietly(bos);
+            IOUtils.closeQuietly(fos);
         }
     }
 
@@ -3803,11 +3735,14 @@ public class CameraConService {
      * @return result
      */
     public static byte[] getBytesByFile(String pathStr) {
-        File file = new File(pathStr);
+        return getBytesByFile(new File(pathStr));
+    }
+
+    public static byte[] getBytesByFile(File file) {
         try {
             FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-            byte[] b = new byte[1000];
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
+            byte[] b = new byte[8192];
             int n;
             while ((n = fis.read(b)) != -1) {
                 bos.write(b, 0, n);
@@ -3817,7 +3752,7 @@ public class CameraConService {
             bos.close();
             return data;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         return null;
