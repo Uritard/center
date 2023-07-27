@@ -29,16 +29,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Lookup;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.auth.DigestScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -122,6 +133,10 @@ public class CameraConService {
      * 调用海康 配置导入导出接口
      */
     private static final String CONF_DATA_URL = "/ISAPI/System/configurationData?secretkey=test1234";
+    /**
+     * 调用海康 获取配置信息
+     */
+    private static final String DEVICE_INFO_URL = "/ISAPI/System/deviceInfo";
 
     /**
      * 调用海康 相机重启接口
@@ -3570,6 +3585,51 @@ public class CameraConService {
         return  EntityUtils.toString(response.getEntity());
     }
 
+    public String putFileISAPI(String cameraIp, String username, String password, String filePath) {
+        log.info("putFileISAPI入参，iurlp：{}， username：{}， password：{}， filePath：{}", cameraIp, username, password, filePath);
+
+        String host = "http://" + cameraIp;
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(new AuthScope(cameraIp, 80), creds);
+
+        // 创建HttpClientContext实例，使用自定义 context，这样才能保存前后两次请求的认证信息缓存，不必每次都生成认证信息
+        HttpClientContext context = HttpClientContext.create();
+        context.setCredentialsProvider(credsProvider);
+
+        String res = "ERROR";
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            // 请求一下用户信息，完成认证
+            // 注意，有上传文件需求的PUT或POST方法会将文件结构体组装成多个包向服务端发送，如果对方没有完成鉴权认证，会返回401，但此时消息还没发完，会导致通道关闭，
+            // 客户端报通道关闭错误，这个问题在windows下不会出现，在linux下会出现，所以需要先请求一个连接，将认证信息缓存，这样第二个请求时就不会返回401消息，
+            // 可以直接携带认证信息请求服务端
+            String infoUrl = host + DEVICE_INFO_URL;
+            HttpGet httpGet = new HttpGet(infoUrl);
+            CloseableHttpResponse resp = httpclient.execute(httpGet, context);
+            log.info("cameraInfo:{}", EntityUtils.toString(resp.getEntity()));
+            resp.close();
+
+            String url = host + CONF_DATA_URL;
+            HttpPut httpPut = new HttpPut(url);
+
+            httpPut.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_OCTET_STREAM.getMimeType());
+
+            NumberUtils.toInt("", 1);
+
+            // 设置请求体
+            byte[] requestBody = getBytesByFile(filePath);
+            httpPut.setEntity(new ByteArrayEntity(requestBody));
+
+            CloseableHttpResponse response = httpclient.execute(httpPut, context);
+            res = EntityUtils.toString(response.getEntity());
+            response.close();
+            log.info("configuration:{}", res);
+        } catch (Exception e) {
+            log.error("使用 ISAPI 上传文件失败", e);
+        }
+        return res;
+    }
+
     /**
      * put请求导入相机设备参数配置文件
      *
@@ -3588,6 +3648,16 @@ public class CameraConService {
 
             String url = "http://" + cameraIp + ":80" + CONF_DATA_URL;
             log.info("uploadConfigFile中 url： {}", url);
+
+            boolean putISAPI = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:putISAPI","content"));
+            if (!putISAPI) {
+               String error = putFileISAPI(cameraIp, username, password, getConfigFileDir() + getConfigFileName(cameraId));
+               if ("ERROR".equals(error)) {
+                   return false;
+               }
+               return true;
+            }
+
 
             URL apiUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
