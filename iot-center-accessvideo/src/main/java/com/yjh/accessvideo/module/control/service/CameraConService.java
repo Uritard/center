@@ -59,6 +59,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -140,6 +141,16 @@ public class CameraConService {
      */
     private static final String REBOOT_URL = "/ISAPI/System/reboot";
 
+    /**
+     * 流媒体服务器 ZLMediaKit
+     */
+    private static final String MEDIA_ZLK = "ZLMediaKit";
+
+    /**
+     * 流媒体服务器 SRS
+     */
+    private static final String MEDIA_SRS = "SRS";
+
     @Resource
     private ProcessManager manager;
 
@@ -166,6 +177,7 @@ public class CameraConService {
             String videoDefinition = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "realtimeVideoDefinition"));
             String transUrl = String.format(nvrRtmpVideo, userName, password, cameraIp, cameraPort, iChanNum,
                     videoDefinition, cameraId);
+            transUrl = sign(transUrl, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId.toString());
             manager.run(videoInfo);
 
@@ -174,8 +186,7 @@ public class CameraConService {
             returnMap.put("rtmpUrl", rtmpUrl);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttps(videoHttps, String.valueOf(cameraId), returnMap);
-            String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
-            returnMap.put("webRtcUrl", webRtc);
+            webRtcUrl(cameraId, returnMap);
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, " +
                             "transUrl:{}"
                     , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId, transUrl);
@@ -217,6 +228,7 @@ public class CameraConService {
             int cameraType = cameraConInfo.getCameraType();
             String transUrl = String.format(nvrRtmpVideo, userName, password, cameraIp, cameraPort, iChanNum,
                     videoDefinition, cameraId);
+            transUrl = sign(transUrl, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId.toString());
             try {
                 manager.run(videoInfo);
@@ -235,8 +247,7 @@ public class CameraConService {
             returnMap.put("rtmpUrl", rtmpUrl);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttps(videoHttps, String.valueOf(cameraId), returnMap);
-            String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
-            returnMap.put("webRtcUrl", webRtc);
+            webRtcUrl(cameraId, returnMap);
             returnMapList.add(returnMap);
         });
 
@@ -283,6 +294,7 @@ public class CameraConService {
                 String robotInfraredVideo =  String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotInfraredVideo"));
                 transUrlinferad = String.format(robotInfraredVideo, inferadIp, inferadPort, infraredCameraId);
             }
+            transUrlinferad = sign(transUrlinferad, infraredCameraId);
             VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(infraredCameraId);
             manager.run(videoInfo2);
 
@@ -296,8 +308,7 @@ public class CameraConService {
             returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttps(videoHttps, infraredCameraId, returnInferadMap);
-            String InferadWebRtc = "webrtc://" + hostIp + "/live/" + infraredCameraId;
-            returnInferadMap.put("webRtcUrl", InferadWebRtc);
+            webRtcUrl(infraredCameraId, returnInferadMap);
             returnMapList.add(returnLightMap);
             returnMapList.add(returnInferadMap);
         } catch (Exception e) {
@@ -317,6 +328,7 @@ public class CameraConService {
             String robotLightVideo =  String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotLightVideo"));
             String transUrlLight = String.format(robotLightVideo, lightUsername, lightPassword, lightIp, lightPort, 1,
                 robotCameraId);
+            transUrlLight = sign(transUrlLight, robotCameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrlLight).setId(robotCameraId);
             manager.run(videoInfo);
             log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword,
@@ -326,8 +338,7 @@ public class CameraConService {
 
             returnLightMap.put("light", robotCameraId);
             returnLightMap.put("rtmpUrl", rtmpUrl);
-            String lightWebRtc = "webrtc://" + hostIp + "/live/" + robotCameraId;
-            returnLightMap.put("webRtcUrl", lightWebRtc);
+            webRtcUrl(robotCameraId, returnLightMap);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttps(videoHttps, robotCameraId, returnLightMap);
         } catch (Exception e) {
@@ -385,6 +396,7 @@ public class CameraConService {
             String nvrRtmpBack = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpBack"));
             String transUrl = String.format(nvrRtmpBack, userName, password, cameraIp, cameraPort, iChanNum, 1,
                     starttime, endtime, id);
+            transUrl = sign(transUrl, id);
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                             "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
@@ -396,12 +408,11 @@ public class CameraConService {
 
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            String webRtc = "webrtc://" + hostIp + "/history/" + id;
-            returnMap.put("webRtcUrl", webRtc);
+            webRtcUrl(id, returnMap, true);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return returnMap;
     }
@@ -428,6 +439,7 @@ public class CameraConService {
             String nvrRtmpBack = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpBack"));
             String transUrl = String.format(nvrRtmpBack, userName, password, cameraIp, cameraPort, iChanNum, 1,
                     starttime, endtime, id);
+            transUrl = sign(transUrl, id);
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                             "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
@@ -439,12 +451,11 @@ public class CameraConService {
 
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            String webRtc = "webrtc://" + hostIp + "/history/" + id;
-            returnMap.put("webRtcUrl", webRtc);
+            webRtcUrl(id, returnMap, true);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return returnMap;
     }
@@ -483,7 +494,7 @@ public class CameraConService {
             String nvrRtmpBack = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpBack"));
             String transUrl = String.format(nvrRtmpBack, userName, password, ipLight, portLigh, lightNum, 1, starttime
                     , endtime, lightId);
-
+            transUrl = sign(transUrl, lightId);
             log.info("historyTransUrl: {}", transUrl);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(lightId.toString());
             manager.run(videoInfo);
@@ -492,8 +503,7 @@ public class CameraConService {
 
             lightReturnMap.put("robotId", String.valueOf(robotId));
             lightReturnMap.put("rtmpUrl", rtmpUrl);
-            String lightWebRtc = "webrtc://" + hostIp + "/history/" + lightId;
-            lightReturnMap.put("webRtcUrl", lightWebRtc);
+            webRtcUrl(lightId, lightReturnMap, true);
             String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
             isHttpsHistory(videoHttps, String.valueOf(lightId), lightReturnMap);
 
@@ -511,7 +521,7 @@ public class CameraConService {
                     , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, infraredId);
             String transUrlIn = String.format(nvrRtmpBack, userName, password, ipLight, portLigh, lightNum, 1,
                     starttime, endtime, infraredId);
-
+            transUrlIn = sign(transUrlIn, infraredId);
             log.info("historyTransUrl: {}", transUrlIn);
             VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(infraredId.toString());
             manager.run(videoInfo2);
@@ -519,16 +529,46 @@ public class CameraConService {
             String rtmpUrlIn = "rtmp" + rtmpUrlsIn[rtmpUrlsIn.length - 1];
             infraredReturnMap.put("robotId", String.valueOf(robotId));
             infraredReturnMap.put("rtmpUrl", rtmpUrlIn);
-            String infraredWebRtc = "webrtc://" + hostIp + "/history/" + infraredId;
-            infraredReturnMap.put("webRtcUrl", infraredWebRtc);
+            webRtcUrl(infraredId, infraredReturnMap, true);
             isHttpsHistory(videoHttps, String.valueOf(infraredId), infraredReturnMap);
             Thread.sleep(3000);
             robotHistoryList.add(lightReturnMap);
             robotHistoryList.add(infraredReturnMap);
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         return robotHistoryList;
+    }
+
+    /**
+     * 组装webRtc播放路径，SRS和ZLMediaKit播放路径不同
+     */
+    private void webRtcUrl(Long id, Map<String, Object> returnMap) {
+        webRtcUrl(String.valueOf(id), returnMap, false);
+    }
+
+    private void webRtcUrl(String id, Map<String, Object> returnMap) {
+        webRtcUrl(id, returnMap, false);
+    }
+
+    private void webRtcUrl(Long id, Map<String, Object> returnMap, boolean isHistory) {
+        webRtcUrl(String.valueOf(id), returnMap, isHistory);
+    }
+
+    private void webRtcUrl(String id, Map<String, Object> returnMap, boolean isHistory) {
+        String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
+        String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig","videoHttpsEnable"));
+        String webRtcUrl;
+        if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
+            // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
+            String scheam = "1".equals(videoHttps) ? "https://" : "http://";
+            String app = isHistory ? "history" : "live";
+            webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=" + app + "&stream=" + id + "&type=play";
+        } else {
+            // webrtc://172.24.39.10/live/40001
+            webRtcUrl = "webrtc://" + hostIp + (isHistory ? "/history/" : "/live/") + id;
+        }
+        returnMap.put("webRtcUrl", webRtcUrl);
     }
 
     /**
@@ -3359,8 +3399,8 @@ public class CameraConService {
         return (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 
-    public Map<String,String> playBackByTime(Long cameraId,String startTime,String endTime) {
-        Map<String,String> returnMap = Maps.newHashMap();
+    public Map<String, Object> playBackByTime(Long cameraId,String startTime,String endTime) {
+        Map<String, Object> returnMap = Maps.newHashMap();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
@@ -3389,9 +3429,8 @@ public class CameraConService {
             log.info("rtmpUrl:{}",rtmpUrl);
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            String webRtc = "webrtc://" + hostIp + "/history/" + id;
-            log.info("webrtc:{}",webRtc);
-            returnMap.put("webRtcUrl", webRtc);
+            webRtcUrl(id, returnMap, true);
+            log.info("webrtc:{}", JSON.toJSONString(returnMap));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -3756,5 +3795,23 @@ public class CameraConService {
         }
 
         return null;
+    }
+
+    public String sign(String transUrl, Long cameraId){
+        String cameraStr = cameraId == null ? null : String.valueOf(cameraId);
+        return sign(transUrl, cameraStr);
+    }
+
+    public String sign(String transUrl, String cameraId){
+        String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
+        String mediaSignKey = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaSignKey"));
+        if (!MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
+            return transUrl;
+        }
+        String signKey = StringUtils.isEmpty(cameraId) ? mediaSignKey: cameraId + "_" + mediaSignKey;
+        String checkSign = DigestUtils.md5DigestAsHex(signKey.getBytes());
+        String checkUrl = StringUtils.substringAfterLast(transUrl, "/");
+
+        return StringUtils.contains(checkUrl, "?") ? (transUrl + "\\&sign=" + checkSign) : (transUrl + "?sign=" + checkSign);
     }
 }
