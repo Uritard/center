@@ -1071,7 +1071,7 @@ public class TStdDeviceService{
     }
 
     public List<AreaInfo> selectMeteTreeByDeviceName(String name){
-        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectDevTreeDeviceByName(name);
+        List<TCruisePointInstance> deviceList = tStdDeviceDao.selectAllMeteCruiseTreeByName(name, null, null);
         if (CollectionUtils.isNotEmpty(deviceList)) {
             List<Long> regionList = tStdDeviceDao.selectRegionByDeviceList(deviceList);
             if (regionList.isEmpty()){
