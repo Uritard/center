@@ -641,7 +641,7 @@ public class CameraConController {
         @RequestParam(value = "endTime") String endTime) {
         Result result = new Result();
         try {
-            Map<String, String> resultMap = cameraConService.playBackByTime(cameraId,startTime,endTime);
+            Map<String, Object> resultMap = cameraConService.playBackByTime(cameraId,startTime,endTime);
             result.setData(resultMap);
         } catch (Exception e) {
             result.setData(ResultCodeEnum.SYSTEMERROR);
