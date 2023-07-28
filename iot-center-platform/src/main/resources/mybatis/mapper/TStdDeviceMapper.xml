@@ -1104,9 +1104,9 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT DISTINCT dm.device_mete_id AS Id, dm.mete_name AS label, dm.device_id AS upId,	sd.device_name AS upName,"devicemete" AS infoType
 		FROM t_std_devicemete dm
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
-		where dm.device_id in (
+		where dm.device_mete_id in (
 		<foreach collection="list" item="item" separator=",">
-			#{item.deviceId}
+			#{item.deviceMeteId}
 		</foreach>
 		)
 		)
