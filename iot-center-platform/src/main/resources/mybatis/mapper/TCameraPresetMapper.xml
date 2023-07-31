@@ -557,9 +557,12 @@
             WHERE device_mete_id = #{meteId,jdbcType=BIGINT})
     </select>
     <select id="queryMaxPresetNum" resultType="java.lang.Integer">
-        SELECT MAX(preset_num) + 1
-        FROM t_camera_preset
-        WHERE camera_id = #{cameraId,jdbcType=BIGINT}
+        SELECT
+            IF(ISNULL(MAX( preset_num )),0,MAX( preset_num )) + 1
+        FROM
+            t_camera_preset
+        WHERE
+            camera_id =  #{cameraId,jdbcType=BIGINT}
     </select>
     <select id="selectImgListById" resultType="java.lang.String">
         select
