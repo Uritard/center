@@ -5,7 +5,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.KeepWatchJob;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -624,6 +623,28 @@ public class TCameraInfoService {
         return errorList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String getCameraStatusByCameraId(Long cameraId) {
+        Map<String,String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if (Objects.nonNull(re)){
+                map.putAll((Map<String,String>)re.getData());
+            }
+        }
+        if (map.containsKey(cameraId.toString())){
+            if ("0".equals(map.get(cameraId.toString()))){
+                return "离线";
+            }else{
+                return "在线";
+            }
+        }else{
+            return "未知";
+        }
+    }
 }
 
 

@@ -412,4 +412,18 @@ public class TCameraInfoController {
         return result;
     }
 
+    @ApiOperation(value = "查询相机的状态信息")
+    @RequestMapping(value = "/getCameraStatusByCameraId", method = RequestMethod.GET)
+    @Logs(title = "查询相机的状态信息",content = "根据用户传递的参数查询相机信息",logType = 1)
+    public Result getCameraStatusByCameraId(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(this.tCameraInfoService.getCameraStatusByCameraId(cameraId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }
