@@ -393,16 +393,8 @@ public class UPatrolResultService {
                         uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
                 for (TWarnInfo tWarnInfo : warnIdList) {
                     //存在
-                    //判断这个告警是用谁的告警规则产生的 如果是下级的 就是属实
-                    if (Boolean.TRUE.equals(isWarN) || (tWarnInfo.getAlarmOwner() != null && 1 == tWarnInfo.getAlarmOwner())) {
-                        //触发告警
-                        // 修改告警信息表
-                        uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), isTemDif ? initInfo.get("warnName") : MapUtils.getString(map, "warnName"),
-                                MapUtils.getInteger(map, "warnLevel"), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map, "warnContent"),
-                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userId,
-                                date);
-                        sendWebSocket(tWarnInfo.getWarnId());
-                    } else {
+                    //判断这个告警是用谁的告警规则产生的 如果是下级的 就是属实 反之不属实 并且 下级的不做处理
+                    if (!(Boolean.TRUE.equals(isWarN) || (tWarnInfo.getAlarmOwner() != null && 1 == tWarnInfo.getAlarmOwner()))) {
                         uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
                                 "程序异常，告警误报", 287, null, userId, date);
                         sendWebSocket(tWarnInfo.getWarnId());
