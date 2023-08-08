@@ -10,13 +10,11 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.entity.CruiseCountOfType;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -91,6 +89,7 @@ public class TCruiseTaskResultService {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
     private final static Cache<String, List<CruiseInspectResult>> CRUISE_TIMER_CACHE = CacheUtil.newTimedCache(15*60*1000);
+    private final static Cache<String, List<CruiseCountOfType>> CRUISE_COUNT_TIMER_CACHE = CacheUtil.newTimedCache(6*60*60*1000);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTaskResult tCruiseTaskResult) {
@@ -492,9 +491,23 @@ public class TCruiseTaskResultService {
         String taskState = countResult.getOrDefault("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
         rateAndTaskInfo.put("taskState", taskState);
         rateAndTaskInfo.put("taskStateName", DictConvertUtil.DICT.covertToDict("taskState", taskState));
+
+        try {
+            CruiseResultCounter resultCounter = selectCruiseStatusCountNew(taskId);
+            rateAndTaskInfo.putAll(Object2Map.objectToMap(resultCounter));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        try {
+            List<CruiseCountOfType> typeCountList = CRUISE_COUNT_TIMER_CACHE.get(taskId, ()-> uPatrolResultDao.selectCruiseCountByType(taskId));
+            rateAndTaskInfo.put("typeCount", typeCountList);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
         return rateAndTaskInfo;
     }
-
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public CruiseResultCounter selectCruiseStatusCount(String taskId) throws ParseException {
@@ -588,12 +601,10 @@ public class TCruiseTaskResultService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public CruiseResultCounter selectCruiseStatusCountNew(String taskId) throws ParseException {
+    public CruiseResultCounter selectCruiseStatusCountNew(String taskId) {
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
         //处理上级系统逻辑
-        String systemLevel  = Constant.getLevelEdge();
-        log.info("systemLevel:{}",systemLevel);
-        if ("3".equals(systemLevel)) {
+        if (Constant.isUpSystem()) {
             //处理巡视点数量信息
             getCruiseCountByCache(cruiseResultCounter, taskId);
             Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
@@ -602,10 +613,8 @@ public class TCruiseTaskResultService {
                 //获取任务开始时间
                 String startTime = countResult.get("taskStart").toString();
                 //将两个时间字符串转为日期类型
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date d1 = simpleDateFormat.parse(startTime);
-                String d2String = simpleDateFormat.format(new Date());
-                Date d2 = simpleDateFormat.parse(d2String);
+                Date d1 = DateTimeUtil.parse(startTime);
+                Date d2 = new Date();
                 cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
             } else {
                 cruiseResultCounter.setRunningTime(Long.valueOf("0"));
@@ -614,9 +623,7 @@ public class TCruiseTaskResultService {
 
         }
 
-
         //计算运行时间
-
         int abnormalCounts = 0;
         int normalCounts = 0;
 
