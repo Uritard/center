@@ -772,6 +772,7 @@ public class UPatrolTaskService {
                 String progress = robotPatrolTaskStatus.getTaskProgress();
                 if (StringUtils.contains(progress, "%")) {
                     float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
+                    pf = Math.min(pf, 1F);
                     progress = CommonUtils.percentFormat(pf, "#.####");
                 }
                 if (NumberUtils.isCreatable(progress)) {
@@ -2272,12 +2273,6 @@ public class UPatrolTaskService {
                 return;
             }
 
-            Map<String, String> jasonMap = new HashMap<>(2);
-            jasonMap.put("type", "lastOneInstance");
-            jasonMap.put("taskId", taskId);
-            log.info("最后一个点-前端推送：{}", JSON.toJSONString(jasonMap));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
             int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId + ":");
@@ -2380,6 +2375,12 @@ public class UPatrolTaskService {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+
+        Map<String, String> jasonMap = new HashMap<>(4);
+        jasonMap.put("type", "lastOneInstance");
+        jasonMap.put("taskId", taskId);
+        log.info("最后一个点-前端推送：{}", JSON.toJSONString(jasonMap));
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
     }
 
     private boolean canFinish(Integer taskState) {
