@@ -7,6 +7,6 @@ public class PlatformRobotStatus {
     private String netStatus;
 
     public PlatformRobotStatus(){
-        netStatus = "20";
+        netStatus = "";
     }
 }

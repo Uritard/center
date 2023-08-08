@@ -73,10 +73,6 @@ public class Constant {
      * 心跳线程存活标识
      */
     public static Map<String, Boolean> robotThreadFlag = new ConcurrentHashMap<>();
-    /**
-     * 机器人收到心跳次数
-     */
-    public static Map<String, Integer> robotHeartBeatCounts = new ConcurrentHashMap<>();
 
     public static Map<String, List<Long>> flagMap = new ConcurrentHashMap<>();
 
