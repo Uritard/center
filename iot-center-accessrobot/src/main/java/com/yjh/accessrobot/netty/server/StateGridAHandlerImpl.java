@@ -212,22 +212,16 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         byte[] heartProtocol = PlatformPacketUtil
                 .createPacket(Constant.sendSessionId, sendSessionId, false, heartXmlString);
         RobotServerHandler.send(heartProtocol, robotCode);
-        Integer heartBeat = robotHeartBeatCounts.getOrDefault(robotCode, 0);
-        heartBeat++;
-        robotHeartBeatCounts.put(robotCode, heartBeat);
-        ChannelId channelId = ctx.channel().id();
-        log.info("channelId:{},robotCode:{},成功收到第{}次心跳", channelId.toString(), robotCode, heartBeat);
         log.info("maps:{}", Constant.maps);
         log.info("robotChannels:{}", Constant.robotChannels);
         // 为了等待客户端和服务端连接稳定,收到三次以上再修改
-        if (heartBeat > 2 && Constant.robotChannels.containsKey(robotCode)) {
+        if (Constant.robotChannels.containsKey(robotCode)) {
             log.info("连接稳定且注册成功,客户端:{}正常", robotCode);
             robotService.updateRobotInfo(robotCode, "在线");
             // normal
             robotStatusMap.put("value", "0");
             // Update Robot Network Status
             redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
-            robotHeartBeatCounts.put(robotCode, 0);
         }
     }
 
@@ -246,7 +240,6 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         robotStatusMap.put("value", "1");
         // Update Robot Network Status
         redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
-        Constant.robotHeartBeatCounts.put(robotCode, 0);
     }
 
 }

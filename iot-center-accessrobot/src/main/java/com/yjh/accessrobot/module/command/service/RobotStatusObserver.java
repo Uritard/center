@@ -30,7 +30,9 @@ public class RobotStatusObserver {
                 flag = true;
             }
         }
-        if (flag) send(patrolDeviceName, patrolDeviceCode, netStatus);
+        if (flag) {
+            send(patrolDeviceName, patrolDeviceCode, netStatus);
+        }
     }
 
     private static void send(String patrolDeviceName, String patrolDeviceCode, String status) {
