@@ -45,8 +45,8 @@ public class FileUtil {
      * @return 缩略图路径
      */
     public static String picCompression(String filePath) {
+        String thumbnailFilePath = "";
         try {
-            String thumbnailFilePath = "";
             if (StringUtils.isNotEmpty(filePath) && isImageFile(filePath)) {
                 File file = new File(filePath);
                 if (!file.isDirectory() && file.exists()) {
@@ -64,19 +64,23 @@ public class FileUtil {
             }
             return thumbnailFilePath;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("获取缩略图失败 —— {}", filePath, e);
         }
+        return thumbnailFilePath;
     }
 
     /**
-     * 判断图片大小是否为20kb
+     * 判断图片是否存在且有效
+     * 文件必须存在，且必须大于20B
      * @param filePath 文件路径
-     * @return true 大于20kb
+     * @return true 大于20b
      */
     public static boolean hasEffective(String filePath) {
-        File file = new File(filePath);
-        long length = file.length();
-        return length > 20L;
+        return hasEffective(new File(filePath));
+    }
+
+    public static boolean hasEffective(File file) {
+        return file.exists() && file.isFile() && file.length() > 20L;
     }
 
     /**

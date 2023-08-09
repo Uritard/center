@@ -6,14 +6,9 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.SimpleColumnWidthStyleStrategy;
 import com.alibaba.excel.write.style.row.SimpleRowHeightStyleStrategy;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.common.utils.ImageConverter;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
 import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -34,13 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author czh
@@ -200,10 +192,17 @@ public class UPatrolDataResultService {
                     List<String> strings = Arrays.asList(typeString.split(","));
                     strings.forEach(s -> heads.add(Lists.newArrayList(s)));
                     //设置内容
-                    List<List<String>> contents = Lists.newArrayList();
+                    List<List<Object>> contents = Lists.newArrayList();
                     cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
-                        List<String> content = Lists.newArrayList();
-                        strings.forEach(s -> content.add(String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""))));
+                        List<Object> content = Lists.newArrayList();
+                        strings.forEach(s -> {
+                            String value = String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""));
+                            if (StringUtils.contains(s, "图片")) {
+                                content.add(new ImageFile(value));
+                            } else {
+                                content.add(value);
+                            }
+                        });
                         contents.add(content);
                     });
                     ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
