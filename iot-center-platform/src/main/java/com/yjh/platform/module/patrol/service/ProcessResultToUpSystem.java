@@ -97,7 +97,9 @@ public class ProcessResultToUpSystem {
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
             for(Map<String, String> cruiseResultMap : cruiseResultList) {
-                log.info("cruiseResultMap=={}", cruiseResultMap);
+                if (Constant.logUpLv2()) {
+                    log.info("cruiseResultMap=={}", cruiseResultMap);
+                }
                 String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
                 // 局放一个点多个结果单独处理
                 if (resultNum.contains("局放频次")){
@@ -172,7 +174,9 @@ public class ProcessResultToUpSystem {
                     }
                     resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif);
                 }
-                log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
+                if (Constant.logUpLv3()) {
+                    log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
+                }
                 analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
 
                 xmlItems.add(xmlItem);
@@ -192,8 +196,10 @@ public class ProcessResultToUpSystem {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("The {} information to be reported one level up is==={}",
+            if (Constant.logUpLv2()) {
+                log.info("The {} information to be reported one level up is==={}",
                     StringUtils.equals("61", xmlBaseModel.getType()) ? "cruiseResult" : "alarm", map);
+            }
             Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -762,8 +768,9 @@ public class ProcessResultToUpSystem {
                 assert fileUrl != null; assert filePath != null;
                 resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
             }
-
-            log.info("The image path after replacement is=={}", resultImage);
+            if (Constant.logUpLv3()) {
+                log.info("The image path after replacement is=={}", resultImage);
+            }
         }catch (Exception e){
             log.error("图片路径转换异常", e);
         }

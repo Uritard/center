@@ -116,7 +116,9 @@ public class PatrolResultHandler {
         }
 
         String sysLevel = Constant.getLevelEdge();
-        log.info("robotPatrolTaskResult resultList=={}", resultList);
+        if (Constant.logUpLv2()) {
+            log.info("robotPatrolTaskResult resultList=={}", resultList);
+        }
 
         //上级系统处理逻辑，因缺少attr表数据，需将任务信息放入redis
         if ("3".equals(sysLevel)) {
@@ -127,7 +129,6 @@ public class PatrolResultHandler {
             }
         }
 
-
         // 将重复的deviceId挑出来
         List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
             .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
@@ -135,7 +136,9 @@ public class PatrolResultHandler {
         HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
-                log.info("robotPatrolTaskResult: {}", JSONUtil.toJSONString(robotPatrolTaskResult));
+                if (Constant.logUpLv2()) {
+                    log.info("robotPatrolTaskResult: {}", JSONUtil.toJSONString(robotPatrolTaskResult));
+                }
                 Map<String, String> infoMap = new HashMap<>(8);
 
                 // 通过上报的任务id查询本级系统上的任务id
@@ -187,7 +190,9 @@ public class PatrolResultHandler {
                 instance = Optional.ofNullable(instance).orElse(new TCruisePointInstance());
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap, instance);
-                log.info("文件处理 isAlarmMap: {}", JSONUtil.toJSONString(isAlarmMap));
+                if (Constant.logUpLv2()) {
+                    log.info("文件处理 isAlarmMap: {}", JSONUtil.toJSONString(isAlarmMap));
+                }
 
                 // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
                 if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){

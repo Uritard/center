@@ -151,13 +151,12 @@ public class TaskJob extends QuartzJobBean {
      * @param task 任务信息
      */
     private void droneTaskStart(UPatrolTask task) {
-        log.info("普宙无人机额外发送启动报文：task: {}", JSONUtil.toJSONString(task));
-
         boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
         if (!droneOpen) {
             // 无人机开关，打开时才需要补充发送任务启动报文
             return;
         }
+        log.info("普宙无人机额外发送启动报文：task: {}", JSONUtil.toJSONString(task));
 
         List<String> robotCodes = uPatrolTaskDao.selectDroneCodeByTaskCode(task.getTaskCode());
         if (CollectionUtils.isEmpty(robotCodes)) {

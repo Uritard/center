@@ -14,7 +14,13 @@
             <el-input v-model="clientIp"></el-input>
           </el-form-item>
           <el-form-item label="客户端端口">
-            <el-input v-model="clientPort"></el-input>
+            <el-input v-model="clientPort" style="width:80px"></el-input>
+          </el-form-item>
+          <el-form-item label="sendCode">
+            <el-input v-model="sendCode" style="width:80px"></el-input>
+          </el-form-item>
+          <el-form-item label="receiveCode">
+            <el-input v-model="receiveCode" style="width:80px"></el-input>
           </el-form-item>
           <el-form-item >
             <el-button type="primary" @click="establishClient">创建客户端</el-button>
@@ -35,7 +41,7 @@
       </el-input>
     </div>
     <div class="reception">
-      <el-scrollbar style="width: 1920px;height: 500px;">
+      <el-scrollbar style="width: 100%;height: 500px;">
       <div v-for="item in textReceptionList" class="text-reception" v-text="item.name"></div>
       </el-scrollbar>
     </div>
@@ -65,6 +71,8 @@ export default {
       textReceptionList:[],
       clientIp:'',
       clientPort:'',
+      sendCode:'Robot01',
+      receiveCode:''
     }
   },
   methods:{
@@ -87,7 +95,7 @@ export default {
      * 创建客户端
      */
     establishClient() {
-      const data = "?ip="+this.clientIp+"&port=" + this.clientPort
+      const data = "?ip="+this.clientIp +"&port=" + this.clientPort + "&sendCode=" + this.sendCode + "&receiveCode=" + this.receiveCode
       this.$http.windPost(`/demo/demo-client/create${data}`).then(res => {
         this.$message.success('创建成功!!!');
       })
@@ -163,7 +171,7 @@ export default {
   height: 50%;
   .text-reception {
     width: 100%;
-    height: 50px;
+    height: auto;
     background-color: #FFFFFF;
     padding: 8px 0 7px;
     border-bottom: 4px double #d1d1d1;
