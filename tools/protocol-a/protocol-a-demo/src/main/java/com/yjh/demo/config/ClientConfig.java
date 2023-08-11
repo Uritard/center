@@ -10,6 +10,7 @@ import com.yjh.protocol_a.MessageIdGenerator;
 import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.impl.MessageCodec;
 import com.yjh.protocol_a.impl.PacketCodecFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +44,15 @@ public class ClientConfig {
     @Value("${send.batch:true}")
     public void setSendBatch(boolean sendBatch) {
         ClientConfig.sendBatch = sendBatch;
+    }
+
+    public void setSendCode(String sendCode, String receiveCode) {
+        if (StringUtils.isNotEmpty(sendCode)) {
+            this.sendCode = sendCode;
+        }
+        if (StringUtils.isNotEmpty(receiveCode)) {
+            this.receiveCode = receiveCode;
+        }
     }
 
     @Bean
