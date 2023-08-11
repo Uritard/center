@@ -258,7 +258,15 @@ public class UPatrolTaskService {
                 cycleWeek = StringUtils.equals("2,3,4,5,6,7,1", cycleWeek) ? "*" : cycleWeek;
                 // 周期
                 if (StringUtils.isNotEmpty(cycleMonth) && StringUtils.isNotEmpty(cycleWeek) && StringUtils.isNotEmpty(cycleExecuteTime)) {
-                    cronExpressionDate = String.format("0 %s %s ? %s %s", 0, cycleExecuteTime, cycleMonth, cycleWeek);
+                    String h = cycleExecuteTime;
+                    String m = "0";
+                    // 解析开始时间，cycleExecuteTime 支持 HH:mm:ss, HH:mm, HH 三种格式
+                    if (cycleExecuteTime.contains(":")) {
+                        String[] ss = cycleExecuteTime.split(":");
+                        h = StringUtils.isNotEmpty(ss[0]) ? ss[0] : h;
+                        m = StringUtils.isNotEmpty(ss[1]) ? ss[1] : m;
+                    }
+                    cronExpressionDate = String.format("0 %s %s ? %s %s", m, h, cycleMonth, cycleWeek);
                 }
                 // 间隔
                 if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
@@ -1398,7 +1406,7 @@ public class UPatrolTaskService {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("信息上报：-" + map);
+            log.info("信息上报：- {}", map);
             Constant.otherServer(map, Constant.TCP_URL);//江苏要求
         } catch (Exception e) {
             log.info("任务状态上报上一级系统出错：", e);
@@ -2119,7 +2127,7 @@ public class UPatrolTaskService {
                 Map<String, String> jasonMap = new HashMap<>(3);
                 jasonMap.put("type", "finishedOneInstance");
                 jasonMap.put("taskId", taskId);
-                if (Constant.logUpLv1()) {
+                if (Constant.logUpLv2()) {
                     log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
                 }
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);

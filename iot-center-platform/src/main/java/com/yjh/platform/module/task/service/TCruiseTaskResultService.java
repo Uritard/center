@@ -221,7 +221,9 @@ public class TCruiseTaskResultService {
     }
 
     private void getDataFromRedis(CruiseInspectResult inspectResult, Map<String, String> resultMap) throws ParseException {
-        log.info("getDataFromRedis 方法入参：inspectResult：{}， resultMap：{}", JSONUtil.toJSONString(inspectResult), JSONUtil.toJSONString(resultMap));
+        if (Constant.logUpLv3()) {
+            log.info("getDataFromRedis 方法入参：inspectResult：{}， resultMap：{}", JSONUtil.toJSONString(inspectResult), JSONUtil.toJSONString(resultMap));
+        }
 
         //最终结果集容器
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -250,11 +252,6 @@ public class TCruiseTaskResultService {
                 inspectResult.setIsWarn("无");
             }
         }
-//        Integer count = tWarnInfoDao.countByInstanceIdAndTaskId(inspectResult.getInstanceId(), inspectResult.getTaskId());
-//        inspectResult.setIsWarn(count > 0 ? "有":"无");
-
-
-//        inspectResult.setIsWarn(resultMap.get("isWarn"));
 
         if (Objects.nonNull(resultMap.get("picpath"))) {
             inspectResult.setImagePath(resultMap.get("picpath"));

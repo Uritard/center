@@ -507,7 +507,7 @@ public class MessageThread {
         // 周期任务需要处理
         String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
         if (StringUtils.isNotEmpty(cycleExecuteTime)){
-            cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,2);
+            // cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,2);
             tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTime);
         }
         String cycleWeek = tCruiseTaskAdd.getCycleWeek();
