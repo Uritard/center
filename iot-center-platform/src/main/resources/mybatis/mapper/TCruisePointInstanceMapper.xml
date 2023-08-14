@@ -812,4 +812,76 @@
         from t_cruise_point_instance
         where  edge_code = #{edgeCode} and origin_id=#{originId}
     </select>
+    <select id="selectDeviceByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT DISTINCT
+            '1' AS upId,
+            '摄像机' AS upName,
+            'camera' AS infoType,
+            c.camera_id AS id,
+            d.camera_name AS label,
+            ''as deviceTypeId,
+            (SELECT DISTINCT
+                 f.preset_id as presetId
+             FROM
+                 t_cruise_point_instance e
+                     INNER JOIN t_camera_preset f ON e.cruise_id = f.preset_id
+             WHERE
+                 e.device_mete_id = b.device_mete_id
+               AND f.camera_id = c.camera_id
+                LIMIT 1) AS presetId
+        FROM
+            t_cruise_point_instance b
+            INNER JOIN t_camera_preset c ON b.cruise_id = c.preset_id
+            LEFT JOIN t_camera_info d ON c.camera_id = d.camera_id
+        WHERE
+            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+        UNION ALL
+        SELECT DISTINCT
+            '2' AS upId,
+            '机器人' AS upName,
+            'robot' AS infoType,
+            d.robot_id AS id,
+            d.robot_name AS label,
+            d.robot_code as deviceTypeId,
+            (SELECT DISTINCT
+                 f.inspection_code as presetId
+             FROM
+                 t_cruise_point_instance e
+                     INNER JOIN t_robot_inspection f ON e.cruise_id = f.inspection_id
+             WHERE
+                 e.device_mete_id = b.device_mete_id
+               AND f.robot_id = c.robot_id
+                LIMIT 1) AS presetId
+        FROM
+            t_cruise_point_instance b
+            INNER JOIN t_robot_inspection c ON b.cruise_id = c.inspection_id
+            LEFT JOIN t_robot_info d ON c.robot_id = d.robot_id
+        WHERE
+            d.robot_type is not null and
+            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+        UNION ALL
+        SELECT DISTINCT
+            '3' AS upId,
+            '无人机' AS upName,
+            'drone' AS infoType,
+            d.robot_id AS id,
+            d.robot_name AS label,
+            d.robot_code as deviceTypeId,
+            (SELECT DISTINCT
+                 f.inspection_code as presetId
+             FROM
+                 t_cruise_point_instance e
+                     INNER JOIN t_robot_inspection f ON e.cruise_id = f.inspection_id
+             WHERE
+                 e.device_mete_id = b.device_mete_id
+               AND f.robot_id = c.robot_id
+                LIMIT 1) AS presetId
+        FROM
+            t_robot_info d
+            LEFT JOIN t_robot_inspection c ON c.robot_id = d.robot_id
+            INNER JOIN t_cruise_point_instance b ON b.cruise_id = c.inspection_id
+        WHERE
+            d.drone_type is not null and
+            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+    </select>
 </mapper>
