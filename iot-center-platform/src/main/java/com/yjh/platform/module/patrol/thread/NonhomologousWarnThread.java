@@ -14,6 +14,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -728,6 +729,7 @@ public class NonhomologousWarnThread implements Runnable{
             String simpleDateFormat = DateTimeUtil.format3(new Date());
 
             Map<String, String> patrolDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectPatrolDevice(instanceId);
+            UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
             HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
             String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
@@ -741,7 +743,7 @@ public class NonhomologousWarnThread implements Runnable{
             xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
             xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
             xmlItem.put("task_code", taskCode);
-            xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+            xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime()));
 
             dealImg(xmlItem,insList,taskId);
 
