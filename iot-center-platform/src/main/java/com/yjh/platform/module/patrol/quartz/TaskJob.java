@@ -101,7 +101,7 @@ public class TaskJob extends QuartzJobBean {
             } else if (Objects.nonNull(ancestralTask.getEndTime()) && date.after(ancestralTask.getEndTime())) {
                 log.info("此时间大于结束时间,以后都不会再做了,删除当前任务:{}", taskId);
                 String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-                uPatrolTaskService.deleteByPrimaryId(taskId, DateTimeUtil.format(date),edgeLevel, null);
+                uPatrolTaskService.deleteByPrimaryId(taskId, "-1", edgeLevel, null);
                 return;
             } else if (Objects.nonNull(ancestralTask.getStartTime()) && date.before(ancestralTask.getStartTime())) {
                 log.info(taskDate + "此时间小于开始时间,任务不需要执行:{}", taskId);
