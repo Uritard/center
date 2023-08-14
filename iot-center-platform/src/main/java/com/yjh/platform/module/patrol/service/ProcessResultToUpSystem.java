@@ -139,7 +139,7 @@ public class ProcessResultToUpSystem {
 
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
                 String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
-                UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskByTaskCode(taskCode);
+                UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
                 /*if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                     taskPatrolledIdTemp = taskCode;
                 }*/
