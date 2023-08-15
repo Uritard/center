@@ -36,7 +36,23 @@ public class AudioFormatUtil {
         hashMap.remove(123);
     }
 
-    private static void encodeTest(String srcFilePath, String destFilePath) {
+    public static void coverToWav(String path, long sampleRate, int channels, long audioFormat, int format) {
+        try {
+            FileInputStream voiceFile = new FileInputStream(path);
+            int dataLength = voiceFile.available();
+            byte[] ptrVoiceByte = new byte[dataLength];
+            voiceFile.read(ptrVoiceByte);
+
+            byte[] head = AudioFileUtils.getWaveFileHeader(dataLength, sampleRate, channels, audioFormat, format);
+            String toPath = path + "_to.wav";
+            AudioFileUtils.writeWavAudioFile(toPath, head, ptrVoiceByte);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void encodeTest(String srcFilePath, String destFilePath) {
         try {
             FileInputStream voiceFile = new FileInputStream(srcFilePath);
             int dataLength = voiceFile.available();
@@ -56,14 +72,14 @@ public class AudioFormatUtil {
         }
     }
 
-    private static void decodeTest(String srcFilePath, String destFilePath) {
+    public static void decodeTest(String srcFilePath, String destFilePath) {
         try {
             FileInputStream voiceFile = new FileInputStream(srcFilePath);
             int dataLength = voiceFile.available();
             byte[] ptrVoiceByte = new byte[dataLength];
             voiceFile.read(ptrVoiceByte);
 
-            File fileEncode1 = new File("D:\\testFile\\pcm\\audio-1-16-8000二.pcm");
+            File fileEncode1 = new File(destFilePath + "二.pcm");
             if (!fileEncode1.exists()) {
                 fileEncode1.createNewFile();
             }
@@ -117,6 +133,40 @@ public class AudioFormatUtil {
         byte[] res = new byte[count];
         for (int i = 0; i < count; i++) {
             sample = (short) (((b[j++] & 0xff) | (b[j++]) << 8));
+            res[i] = linearToAlawSample(sample);
+        }
+        return res;
+    }
+
+    public static byte[] encode(byte[] b, int pcmSampleRate) {
+        int srcLen = b.length;
+        int g7SampleRate = 8000;
+        double arc = pcmSampleRate * 1.0D / g7SampleRate;
+        int destLen = (int)(Math.ceil(srcLen / arc));
+        int lastPos = srcLen - 1;
+
+        int j = 0;
+        int count = destLen / 2;
+
+        short sample = 0;
+        byte[] res = new byte[count];
+        for (int i = 0; i < count; i++) {
+            double index = i * arc;
+            int p1 = (int)index;
+            double coef = index - p1;
+            int p2 = p1 < lastPos ? p1 + 1 : p1;
+            byte d1 = (byte)((1 - coef) * b[p1] + coef * b[p2]);
+
+            double index2 = i * arc * 2;
+            int p3 = (int)index2;
+            /*if (p3 > lastPos) {
+                break;
+            }*/
+            double coef2 = index2 - p3;
+            int p4 = p3 < lastPos ? p3 + 1 : p3;
+            byte d2 = (byte)((1 - coef2) * b[p3] + coef2 * b[p4]);
+
+            sample = (short)((d1 & 0xff) | d2 << 8);
             res[i] = linearToAlawSample(sample);
         }
         return res;

@@ -44,6 +44,10 @@ public interface VoiceTransConstant {
      */
     int G711_ENCODE_DATA_SIZE = 160;
     /**
+     * PCM 编码采样率
+     */
+    int PCM_SAMPLE_RATE = 16000;
+    /**
      * 随意的一个数值
      */
     long CONSTANT = 5201314L;

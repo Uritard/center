@@ -29,6 +29,9 @@ public class TestAudioFile {
      * @param deviceId 设备id
      */
     public static void testRecAudioFile(Long deviceId, int audioEncType) {
+        if (!Constant.logUpLv3()) {
+            return;
+        }
         String format = DateTimeUtil.formatThreadLocal(new Date());
         if (VoiceTransConstant.AudioEncType.G711_A.getCode() == audioEncType) {
             // 保存回调函数的G711解码后的音频数据
@@ -79,13 +82,23 @@ public class TestAudioFile {
     /**
      * 测试发送的音频文件
      *
-     * @param filePathNameTemp 文件路径
-     * @param fileOutputStream 文件流
+     * @param deviceId 设备ID
      */
-    public static FileOutputStream testSendAudioFile(String filePathNameTemp, FileOutputStream fileOutputStream) {
+    public static void testSendAudioFile(Long deviceId) {
+        if (!Constant.logUpLv3()) {
+            return;
+        }
         String format = DateTimeUtil.formatThreadLocal(new Date());
         // G711编码音频文件
-        File fileEncode = new File(filePathNameTemp + "encodeData-" + format + ".g7");
+        String filePathName = USE_DIR + "/AudioFile/SendData/sendEncodeData-" + format + ".g7";
+
+        if (VoiceTransConstant.AudioEncType.AAC.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)) {
+            filePathName = filePathName.replace("g7", "aac");
+        } else if (VoiceTransConstant.AudioEncType.PCM.getCode() == Constant.hikDeviceEncodeFormatMaps.get(deviceId)) {
+            filePathName = filePathName.replace("g7", "pcm");
+        }
+
+        File fileEncode = new File(filePathName);
         if (!fileEncode.exists()) {
             try {
                 if (!fileEncode.getParentFile().exists()) {
@@ -97,10 +110,28 @@ public class TestAudioFile {
             }
         }
         try {
-            fileOutputStream = new FileOutputStream(fileEncode);
+            FileOutputStream fileOutputStream = new FileOutputStream(fileEncode);
+            Constant.sendStream = fileOutputStream;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        // 保存发送的原始PCM音频数据
+        File filePcm = new File(USE_DIR + "/AudioFile/SendData/sendOriginAudio-" + format + ".pcm");
+        if (!filePcm.exists()) {
+            try {
+                if (!filePcm.getParentFile().exists()) {
+                    filePcm.getParentFile().mkdirs();
+                }
+                filePcm.createNewFile();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        try {
+            Constant.sendStreamPcm = new FileOutputStream(filePcm, true);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
         }
-        return fileOutputStream;
     }
 }

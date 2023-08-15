@@ -74,6 +74,7 @@ public class VoiceComController {
     public Result startVoiceTrans(@RequestParam(value = "deviceId") Long deviceId) {
         Result result = new Result();
         try {
+            Constant.refreshSwitchCach();
             result = voiceComService.startVoiceTrans(deviceId, result);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -145,7 +146,7 @@ public class VoiceComController {
             Integer lUserId = Constant.hikDeviceUserIdMaps.get(cameraId);
             log.info("hikDeviceVoiceTransHandleMaps:{}", Constant.hikDeviceVoiceTransHandleMaps);
             Integer lVoiceTranHandle = Constant.hikDeviceVoiceTransHandleMaps.get(lUserId);
-            voiceComService.voiceSendData(lVoiceTranHandle, fileName, armFramework, cameraId);
+            voiceComService.voiceSendDataTest(lVoiceTranHandle, fileName, armFramework, cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

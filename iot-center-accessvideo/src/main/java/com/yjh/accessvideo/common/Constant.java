@@ -8,6 +8,7 @@ import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -69,6 +70,9 @@ public class Constant {
 
     public static FileOutputStream outputStream = null;
     public static FileOutputStream outputStreamPcm = null;
+
+    public static FileOutputStream sendStream = null;
+    public static FileOutputStream sendStreamPcm = null;
 
 
     public static Map<Integer, Long> DVRMaps = new ConcurrentHashMap<>();
@@ -188,4 +192,50 @@ public class Constant {
         return ftpsTurbo;
     }
 
+    public static void refreshSwitchCach() {
+        logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
+    }
+
+    /**
+     * 日志级别 1
+     */
+    public static final int LOG_LV_ONE = 1;
+    /**
+     * 日志级别 2
+     */
+    public static final int LOG_LV_TWO = 2;
+    /**
+     * 日志级别 3
+     */
+    public static final int LOG_LV_TRI = 3;
+    /**
+     * 日志级别，级别越高，日志越详细，日志级别为0表示关闭自定义级别日志
+     */
+    private static Integer logLevel;
+
+    /**
+     * 获取日志级别
+     */
+    public static int logLevel() {
+        if (logLevel == null) {
+            try {
+                logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
+            } catch (Exception e) {
+                logLevel = LOG_LV_ONE;
+            }
+        }
+        return logLevel;
+    }
+
+    public static boolean logUpLv1() {
+        return Constant.logLevel() >= Constant.LOG_LV_ONE;
+    }
+
+    public static boolean logUpLv2() {
+        return Constant.logLevel() >= Constant.LOG_LV_TWO;
+    }
+
+    public static boolean logUpLv3() {
+        return Constant.logLevel() >= Constant.LOG_LV_TRI;
+    }
 }

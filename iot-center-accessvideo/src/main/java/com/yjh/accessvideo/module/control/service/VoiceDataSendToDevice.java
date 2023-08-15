@@ -1,10 +1,13 @@
 package com.yjh.accessvideo.module.control.service;
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,6 +41,15 @@ public class VoiceDataSendToDevice {
                 HCNetSDK.BYTE_ARRAY ptrPcmData = new HCNetSDK.BYTE_ARRAY(dataSize);
                 System.arraycopy(storeByte, 0, ptrPcmData.byValue, 0, dataSize);
                 ptrPcmData.write();
+
+                // 将编码后发送的语音数据写入到文件中
+                if (Objects.nonNull(Constant.sendStream)){
+                    try {
+                        Constant.sendStream.write(ptrPcmData.byValue);
+                    } catch (Exception e) {
+                        log.error("保存转码后发送文件失败", e);
+                    }
+                }
 
                 // 转发语音数据:G711-160字节 PCM-1920字节
                 if (!HC_NET_SDK.NET_DVR_VoiceComSendData(lVoiceTranHandle, ptrPcmData.byValue, dataSize)) {
