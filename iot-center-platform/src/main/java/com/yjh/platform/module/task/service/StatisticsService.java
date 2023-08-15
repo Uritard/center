@@ -1,6 +1,9 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -151,6 +154,26 @@ public class StatisticsService {
             list = packageInfo(type,robotId);
         }
         return list;
+    }
+
+    /**
+     * 分页查询相机*
+     * @param robotId
+     * @param type
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    public Map<String, Object> selectStatisticsRobotForPage(Long robotId, String type, Integer pageNum, Integer pageSize) {
+        Page page = PageHelper.startPage(pageNum, pageSize);
+        Map<String, Object> resultMap = packageInfoForPage(type, robotId, page);
+        return resultMap;
+    }
+
+    public Map<String, Object> countCameraForPage(Long id, Integer pageNum, Integer pageSize) {
+        Page page = PageHelper.startPage(pageNum, pageSize);
+        Map<String, Object> resultMap = packageInfoForPage(CAMERA, id, page);
+        return resultMap;
     }
 
     /**
@@ -532,6 +555,82 @@ public class StatisticsService {
 
         log.info("相机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
         return deviceStaticsInfoList;
+    }
+
+    private Map<String, Object> packageInfoForPage(String key, Long id, Page page) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+        log.info("处理开始时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+        // 机器人无人机处理
+        if (ROBOT.equals(key) || DRONE.equals(key)) {
+            List<Long> idList;
+            if (id != null) {
+                idList = new ArrayList<>();
+                idList.add(id);
+            } else {
+                idList = statisticsDao.selectAvailableRobotOrDrone(key);
+            }
+            result.put("count", page.getTotal());
+            result.put("pages", page.getPages());
+            if (!CollectionUtils.isEmpty(idList)) {
+                List<Map<String, Object>> deviceStaticsInfoList = uPatrolDeviceStaticsDao.selectRobotStaticsInfoByOptimize(idList);
+
+                // 将List<Map<String, Object>>转为List<Map<String, String>>
+                List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
+                        .map(map -> map.entrySet().stream()
+                                .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
+                        .collect(Collectors.toList());
+                // 批量插入redis
+                pipelinePutStaticsInfo(deviceStaticsInfoTempList,"robotId");
+                list.addAll(deviceStaticsInfoList);
+            }
+            log.info("机器人无人机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+            result.put("data", list);
+            return result;
+        }
+        // 摄像机处理
+        List<Map<String, Object>> deviceStaticsInfoList = statisticsDao.selectCameraStaticsInfoByOptimize(id);
+        result.put("count", page.getTotal());
+        result.put("pages", page.getPages());
+        List<Object> recordIdList = deviceStaticsInfoList.stream().map(map -> map.get("recordId")).distinct().collect(Collectors.toList());
+
+        // 计算完整率
+        Map<Integer, String> percentMap = new HashMap<>(8);
+        for (Object recordId : recordIdList) {
+            Result re = getNVRInfo(recordId);
+            if (re == null || re.getData() == null) {
+                continue;
+            }
+            Map<String, Object> mapData = (Map<String, Object>) re.getData();
+
+            if (mapData.get("channel") != null) {
+                List<Map<String, Object>> chanInfo = (List<Map<String, Object>>) mapData.get("channel");
+                for (Map<String, Object> mapChannel : chanInfo) {
+                    int intactTime = (int) mapChannel.get("intactTime");
+                    int ipChanNum = (int) mapChannel.get("ipChanNum");
+                    if (intactTime != 0) {
+                        String intactPercent = String.format("%.3f", intactTime / 100d);
+                        percentMap.put(ipChanNum, intactPercent + "%");
+                    }
+                }
+            }
+        }
+        deviceStaticsInfoList.stream().filter(map -> MapUtils.isNotEmpty(percentMap)).forEach(map -> {
+            int ipChanNum = (int) map.get("channelNum");
+            map.put("intactPercent", percentMap.getOrDefault(ipChanNum, "0.000%"));
+        });
+
+        // 将List<Map<String, Object>>转为List<Map<String, String>>
+        List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
+                .map(map -> map.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
+                .collect(Collectors.toList());
+        // 批量插入redis
+        pipelinePutStaticsInfo(deviceStaticsInfoTempList,"cameraId");
+
+        log.info("相机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+        result.put("data", deviceStaticsInfoList);
+        return result;
     }
 
 

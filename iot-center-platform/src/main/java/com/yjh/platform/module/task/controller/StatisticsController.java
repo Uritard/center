@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -7,6 +9,7 @@ import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.task.service.StatisticsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.mapping.ResultMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhou Pengcheng
@@ -37,10 +42,14 @@ public class StatisticsController {
   @GetMapping(value = "/robot")
   @Logs(title = "机器人/无人机可靠性",content = "根据用户传递的参数查询机器人/无人机可靠性",logType = 1, authority = "1234")
   public Result robot(@RequestParam(value = "id", required = false) Long id,
-                      @RequestParam(value = "type") String type) {
+                         @RequestParam(value = "type") String type,
+                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                         @RequestParam(value = "pageSize", required = false, defaultValue = "8") int pageSize) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.selectStatisticsRobot(id, type));
+      Map<String, Object> resultMap = statisticsService.selectStatisticsRobotForPage(id, type, pageNum, pageSize);
+      result.setData(resultMap);
+      result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("机器人/无人机可靠性查询失败：", e);
@@ -51,10 +60,14 @@ public class StatisticsController {
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
   @Logs(title = "摄像机可靠性",content = "根据用户传递的参数查询摄像机可靠性",logType = 1, authority = "1234")
-  public Result camera(@RequestParam(value = "id", required = false) Long id) {
+  public Result camera(@RequestParam(value = "id", required = false) Long id,
+                       @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                       @RequestParam(value = "pageSize", required = false, defaultValue = "8") int pageSize) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countCamera(id));
+      Map<String, Object> resultMap = statisticsService.countCameraForPage(id, pageNum, pageSize);
+      result.setData(resultMap);
+      result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("摄像机可靠性查询失败：", e);
