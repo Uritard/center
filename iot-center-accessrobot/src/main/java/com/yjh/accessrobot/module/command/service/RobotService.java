@@ -288,27 +288,23 @@ public class RobotService {
                 log.error("==========当前巡视设备处于任务模式,请切换模式==========");
                 scmap.put("code", 3);
                 scmap.put("result", "当前巡视设备处于任务模式,请切换模式");
-            } else {
-                RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
-
-                // Capture and video file return
-                String filePath = null;
-                if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))
-                        && JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).containsKey("file_path")) {
-                    String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
-                    String[] sArray = ftpFilePath.split("/");
-                    String ftpFileName = sArray[sArray.length - 1];
-
-                    Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-                    filePath = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
-                    if (ftpFileName.endsWith(".jpg")) {
-                        filePath = filePath + "BigImg/" + ftpFileName;
-                    } else if (ftpFileName.endsWith(".bmp")) {
-                        filePath = filePath + "Infrared/" + ftpFileName;
-                    } else if (ftpFileName.endsWith(".mp4")) {
-                        filePath = filePath + "Video/" + ftpFileName;
+            } else if (("3".equals(type) || "2".equals(type)) && ("1".equals(command) || "2".equals(command) || "3".equals(command) || "4".equals(command)) && "".equals(value)) {
+                if ("3".equals(robotPattern) || robotType == 157) {
+                    String filePath = robotDirectiveReturnFilePath(robotCode, xmlString, todayTime);
+                    scmap.put("code", 4);
+                    scmap.put("result", "指令下发成功");
+                    scmap.put("path", filePath);
+                } else {
+                    scmap.put("code", 3);
+                    scmap.put("result", "请先切换到遥操模式!");
+                    //记录控制巡视设备具体操作
+                    if (StringUtils.isNotEmpty(content)) {
+                        logsRecord.LoginLogsSend(request, "5", "控制巡视设备", content, userName, String.valueOf(userId), 2);
                     }
+                    return scmap;
                 }
+            } else {
+                String filePath = robotDirectiveReturnFilePath(robotCode, xmlString, todayTime);
                 scmap.put("code", 4);
                 scmap.put("result", "指令下发成功");
                 scmap.put("path", filePath);
@@ -320,6 +316,37 @@ public class RobotService {
         }
             return scmap;
         }
+    }
+
+    /**
+     * 下发机器人指令
+     * @param robotCode 机器人标识
+     * @param xmlString xml
+     * @param todayTime 时间
+     * @return 文件路径
+     */
+    private String robotDirectiveReturnFilePath(String robotCode,String xmlString, String todayTime) {
+        RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+
+        // Capture and video file return
+        String filePath = null;
+        if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))
+                && JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).containsKey("file_path")) {
+            String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
+            String[] sArray = ftpFilePath.split("/");
+            String ftpFileName = sArray[sArray.length - 1];
+
+            Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+            filePath = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+            if (ftpFileName.endsWith(".jpg")) {
+                filePath = filePath + "BigImg/" + ftpFileName;
+            } else if (ftpFileName.endsWith(".bmp")) {
+                filePath = filePath + "Infrared/" + ftpFileName;
+            } else if (ftpFileName.endsWith(".mp4")) {
+                filePath = filePath + "Video/" + ftpFileName;
+            }
+        }
+        return filePath;
     }
 
     /**
