@@ -135,7 +135,7 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
         byte[] headerBytes = new byte[0];
         try {
             int totalAudioLen = originBytes.length;
-            int sampleRate = 2 == encodeFormat ? 8000 : 16000;
+            int sampleRate = VoiceTransConstant.AudioEncType.G711_A.getCode() == encodeFormat ? 8000 : 16000;
             headerBytes = getWaveFileHeader(totalAudioLen, sampleRate, 1, 16);
         }catch (Exception e){
             log.error(e.getMessage(), e);
