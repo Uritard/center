@@ -2,6 +2,7 @@ package com.yjh.accessvideo.hik.transmit;
 
 import com.sun.jna.Pointer;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.websocket.WebSocketServer;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +117,10 @@ public class CbVoiceDataCallBack implements HCNetSDK.FVoiceDataCallBack_MR_V30{
             // 组装wave并调用其他服务发送ws
             byte[] bytesResult = createWaveFile(originBytes, Constant.hikDeviceEncodeFormatMaps.get(deviceId));
             log.info("bytesResult data size is {}", bytesResult.length);
-            Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
+            // Constant.websocketSendMsgBuffer(webSocketUrl, bytesResult);
+
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bytesResult);
+            WebSocketServer.sendMsgBuffer(byteBuffer, String.valueOf(deviceId));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
