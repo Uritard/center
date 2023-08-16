@@ -180,10 +180,10 @@ public class AudioFormatUtil {
     public static byte[] decode(byte[] b) {
         int j = 0;
         byte[] res = new byte[b.length * 2];
-        for (int i = 0; i < b.length; i++) {
-            short s = aLawDecompressTable[b[i] & 0xff];
-            res[j++] = (byte) s;
-            res[j++] = (byte) (s >> 8);
+        for (byte value : b) {
+            short s = aLawDecompressTable[value & 0xff];
+            res[j++] = (byte)s;
+            res[j++] = (byte)(s >> 8);
         }
         return res;
     }

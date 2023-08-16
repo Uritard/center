@@ -246,6 +246,7 @@ public class TSysParamService{
             result.put("isUkey", Boolean.valueOf(sysParamConfig.getSecure().get("isUkey")));
             result.put("summaryFlag", Boolean.valueOf(sysParamConfig.getSecure().get("isDecode")));
         }
+        result.put("pcmEncode", Boolean.valueOf((String)redisTemplate.opsForHash().get("t_sys_param:isPcmEncode", "content")));
         return result;
     }
     public Map<String,String > homePageInfo(){

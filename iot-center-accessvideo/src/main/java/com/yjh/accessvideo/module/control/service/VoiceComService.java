@@ -288,6 +288,15 @@ public class VoiceComService {
             byte[] dataByte = new byte[allDataBytes.length - 1 - i];
             System.arraycopy(allDataBytes, i + 1, dataByte, 0, allDataBytes.length - 1 - i);
 
+            receiveAndSendVoiceData(dataByte, deviceId);
+
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void receiveAndSendVoiceData(byte[] dataByte, Long deviceId) {
+        try {
             // 未登录
             if (Constant.hikDeviceUserIdMaps.isEmpty() || !Constant.hikDeviceUserIdMaps.containsKey(deviceId)) {
                 log.error("Without this device in hikDeviceUserIdMaps");
@@ -315,13 +324,14 @@ public class VoiceComService {
             ptrVoiceByte.byValue = dataByte;
             ptrVoiceByte.write();
 
-            if (StringUtils.equals(VoiceTransConstant.X86, Constant.SYSTEM_ARCH)) {
+            /*if (StringUtils.equals(VoiceTransConstant.X86, Constant.SYSTEM_ARCH)) {
                 voiceSendByNotArm(lVoiceTranHandle, deviceId, ptrVoiceByte, dataLength);
             } else {
                 voiceSendByArmOptimize(lVoiceTranHandle, deviceId, ptrVoiceByte, dataLength);
-            }
+            }*/
+            voiceSendByArmOptimize(lVoiceTranHandle, deviceId, ptrVoiceByte, dataLength);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
