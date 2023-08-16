@@ -251,7 +251,9 @@ public class TSysParamService{
     public Map<String,String > homePageInfo(){
         Map<String,String> result = Maps.newHashMap();
         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        Map<String,String> logoImageMap = redisTemplate.opsForHash().entries("t_sys_param:logoImage");
         result.put("systemName",systemNameMap.get("content"));
+        result.put("logoImage",logoImageMap.get("content"));
         return result;
     }
 
