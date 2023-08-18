@@ -144,13 +144,35 @@ public class RobotService {
         NEED_CONFIRM_SET.add("20001_6"); //无人机控制权获得
         NEED_CONFIRM_SET.add("20001_7"); //无人机控制权释放
         NEED_CONFIRM_SET.add("20001_8"); //无人机电源管理
-        NEED_CONFIRM_SET.add("20002_7"); //无人机急停
         NEED_CONFIRM_SET.add("20003_5"); //无人机云台重置
         NEED_CONFIRM_SET.add("20005_1"); //机巢
-        NEED_CONFIRM_SET.add("20005_2"); //机巢急停
         NEED_CONFIRM_SET.add("20005_3"); //机巢舱门
     }
 
+    /**
+     * 不需要获取控制权限直接下发的
+     */
+    private static final Set<String> NOT_NEED_CONTROL_SET = new HashSet<>();
+    static {
+        NOT_NEED_CONTROL_SET.add("1_8"); // 机器人急停
+        NOT_NEED_CONTROL_SET.add("1_14"); // 机器人去看看
+        NOT_NEED_CONTROL_SET.add("20002_7"); //无人机急停
+        NOT_NEED_CONTROL_SET.add("20005_2"); //机巢急停
+    }
+
+    /**
+     * 不需要判断控制模式直接下发给机器人
+     */
+    private static final Set<String> NOT_NEED_CONFIRM_SET = new HashSet<>();
+    static {
+        NOT_NEED_CONFIRM_SET.add("1_5"); // 机器人控制模式切换
+        NOT_NEED_CONFIRM_SET.add("1_6"); // 机器人控制权获得
+        NOT_NEED_CONFIRM_SET.add("1_7"); // 机器人控制权释放
+        NOT_NEED_CONFIRM_SET.add("20001_5"); //无人机控制模式切换
+        NOT_NEED_CONFIRM_SET.add("20001_6"); //无人机控制权获得
+        NOT_NEED_CONFIRM_SET.add("20001_7"); //无人机控制权释放
+        NOT_NEED_CONFIRM_SET.addAll(NOT_NEED_CONTROL_SET);
+    }
     /**
      * 巡视主机下发控制指令到机器人
      *
@@ -250,7 +272,8 @@ public class RobotService {
                 redisTemplate.opsForValue().set(controlKey, "0");
             } else {
                 String controlStatus = (String)redisTemplate.opsForValue().get(controlKey);
-                if (!"1".equals(controlStatus)) {
+                boolean needControlKey = !"1".equals(controlStatus) && !NOT_NEED_CONTROL_SET.contains(typeCommand);
+                if (needControlKey) {
                     log.error("==========当前巡视设备未获取控制权,无法操作==========");
                     scmap.put("code", 3);
                     scmap.put("result", "请先获取当前巡视设备控制权");
@@ -278,12 +301,7 @@ public class RobotService {
 
                 return scmap;
             }
-            boolean flag = StringUtils.equals("1", robotPattern)
-                    && robotType != 157
-                    && !("1".equals(type) && "5".equals(command)) //切换模式
-                    && !("20001".equals(type) && "5".equals(command)) //切换模式
-                    && !("1".equals(type) && "8".equals(command)) //急停
-                    && !("20001".equals(type) && "7".equals(command)); //急停
+            boolean flag = StringUtils.equals("1", robotPattern) && !NOT_NEED_CONFIRM_SET.contains(typeCommand);
             if (Boolean.TRUE.equals(flag)) {
                 log.error("==========当前巡视设备处于任务模式,请切换模式==========");
                 scmap.put("code", 3);
