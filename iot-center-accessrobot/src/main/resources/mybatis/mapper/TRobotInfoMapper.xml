@@ -1348,8 +1348,7 @@
             a.end_time,
             a.create_user_id
         from u_patrol_task a
-        where 1 = 1
-          and a.task_code = #{taskCode, jdbcType=VARCHAR}
+        where a.task_id = #{taskCode, jdbcType=VARCHAR} limit 1;
     </select>
 
     <select id="selectTaskIdByTaskCode" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.UPatrolTask">
