@@ -589,7 +589,7 @@ public class TCruiseTaskService {
                 for (ConcurrentHashMap<String, Object> mapItem : Constant.taskMap) {
                     //找到任务Id
                     if (mapItem.get("taskId").equals(taskId)) {
-                        JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
+                        JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString(), true);
 //                        Constant.taskMap.remove(mapItem);
                     }
                 }
@@ -605,7 +605,7 @@ public class TCruiseTaskService {
                 //找到任务Id
                 if (mapItem.get("taskId").equals(taskId)) {
                     //删除定时任务
-                    JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
+                    JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString(), true);
 //                    Constant.taskMap.remove(mapItem);
                 }
             }

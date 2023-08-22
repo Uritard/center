@@ -8,6 +8,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -66,6 +67,7 @@ public class UPatrolTaskController {
         this.patrolResultHandler = patrolResultHandler;
         this.silentHandler = silentHandler;
     }
+
 
     @ApiOperation(value = "下级系统的巡视结果")
     @PostMapping(value = "/robotPatrolTaskResult")
@@ -183,6 +185,21 @@ public class UPatrolTaskController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除过期周期任务的Job")
+    @PostMapping(value = "/deleteJob")
+    public Result deleteJob( @RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.deleteJob(taskId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理下级系统的巡视结果错误:", e);
         }
         return result;
     }
