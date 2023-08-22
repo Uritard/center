@@ -10,6 +10,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -568,15 +569,13 @@ public class TWarnInfoController {
         Result result = new Result();
         try {
             //查看是否已设置过
-            AlarmShield alarmShieldOld = alarmShieldDao.selectByWarnContent(alarmShield.getWarnContent(),alarmShield.getShieldType());
-            if (alarmShieldOld == null){
+            if (alarmShield.getId() == null){
                 //新增的 直接插入
                 alarmShield.setCreateTime(new Date());
                 alarmShieldDao.add(alarmShield);
             } else {
                 //不是新增的 更新
-                alarmShieldOld.setEndTime(alarmShield.getEndTime());
-                alarmShieldDao.update(alarmShieldOld);
+                alarmShieldDao.update(alarmShield);
             }
             if (alarmShield.getShieldType() == 1){
                 TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getWarnContent());
@@ -600,20 +599,45 @@ public class TWarnInfoController {
     @Logs(title = "告警屏蔽查询",content = "告警屏蔽查询",logType = 1,authority = "1235")
     public Result warnShieldInfo(@RequestParam(value = "startTime",required = false) String startTime,
                                  @RequestParam(value = "endTime",required = false) String endTime,
+                                 @RequestParam(value = "shieldType",required = false) Integer shieldType,
+                                 @RequestParam(value = "enable",required = false) Integer enable,
                                  @RequestParam(value = "pageNum") Integer pageNum,
                                  @RequestParam(value = "pageSize") Integer pageSize) {
         Result result = new Result();
         try {
             Map<String,Object> resultMap = new HashMap<>(2);
+            List<AlarmShield> list2 = new ArrayList<>();
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<AlarmShield> list = alarmShieldDao.select(startTime,endTime);
+            List<Long> list = alarmShieldDao.selectByCount(startTime,endTime,enable,shieldType);
+            if (!list.isEmpty()){
+                list2 = alarmShieldDao.select(list);
+                if (shieldType != 2){
+                    DictConvertUtil.optional("meteType").add("meterType").covertToDict(list2);
+                }
+            }
+
             resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
+            resultMap.put("list", list2);
             result.setData(resultMap);
         }
         catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("告警屏蔽设置失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "告警屏蔽删除")
+    @PostMapping(value = "/deleteWarnShield")
+    @Logs(title = "告警屏蔽删除",content = "告警屏蔽删除",logType = 1,authority = "1235")
+    public Result warnShieldInfo(@RequestParam(value = "id") Long id) {
+        Result result = new Result();
+        try {
+            result.setData(alarmShieldDao.delete(id));
+        }
+        catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("告警屏蔽删除失败：", e);
         }
         return result;
     }

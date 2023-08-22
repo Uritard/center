@@ -6,6 +6,10 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.AlarmShield">
     <result column="id" property="id" />
         <result column="shield_id" property="shieldId" />
+        <result column="shield_name" property="shieldName" />
+        <result column="meter_type" property="meterType" />
+        <result column="meter_type" property="meterType" />
+        <result column="enable" property="enable" />
         <result column="create_user_id" property="createUserId" />
         <result column="end_time" property="endTime" />
         <result column="shield_type" property="shieldType" />
@@ -16,33 +20,86 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,
-        shield_id, create_user_id, end_time, shield_type, warn_content, create_time
+        shield_id,shield_name,mete_type,meter_type,enable, create_user_id, end_time, shield_type, warn_content, create_time
     </sql>
 
     <select id="selectByWarnContent" resultType="com.yjh.platform.module.user.entity.AlarmShield">
         select * from alarm_shield
         where warn_content like concat('%',#{warnContent},'%')
         and shield_type = #{shieldType}
+        and enable = 1
         order by end_time asc
         limit 1
     </select>
-    <select id="select" resultType="com.yjh.platform.module.user.entity.AlarmShield">
-        select a.*,b.true_name as userName from alarm_shield a
+    <resultMap id="selectMap" type="com.yjh.platform.module.user.entity.AlarmShield">
+        <result column="id" property="id" />
+        <result column="shield_id" property="shieldId" />
+        <result column="shield_name" property="shieldName" />
+        <result column="mete_type" property="meteType" />
+        <result column="meter_type" property="meterType" />
+        <result column="enable" property="enable" />
+        <result column="create_user_id" property="createUserId" />
+        <result column="end_time" property="endTime" />
+        <result column="shield_type" property="shieldType" />
+        <result column="warn_content" property="warnContent" />
+        <result column="create_time" property="createTime" />
+        <result column="userName" property="userName" />
+        <collection property="deviceMeteList" notNullColumn="device_mete_id" ofType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
+            <id column="device_mete_id" property="deviceMeteId"/>
+            <result column="mete_name" property="meteName"/>
+            <result column="custom_id" property="customId"/>
+            <result column="custom_name" property="customName"/>
+            <result column="device_id" property="deviceId"/>
+            <result column="device_name" property="deviceName"/>
+        </collection>
+    </resultMap>
+    <select id="select" resultMap="selectMap">
+        select a.*,
+        b.true_name as userName,
+        c.device_mete_id,
+        c.mete_name,
+        c.custom_id,
+        c.custom_name,
+        c.device_id,
+        d.device_name
+        from alarm_shield a
         left join `sys_user` b on a.create_user_id = b.user_id
-        where 1=1 <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+        left join t_std_devicemete c on FIND_IN_SET(c.device_mete_id,a.shield_id)
+        left join t_std_device d on c.device_id = d.device_id
+        where 1=1
+        and a.id in <foreach collection="list" separator="," open="(" close=")" item="id">
+        #{id}
+    </foreach>
+    </select>
+    <select id="selectByCount" resultType="java.lang.Long">
+        select a.id
+        from alarm_shield a
+        where 1=1
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
         and a.end_time between #{startTime} and #{endTime}</if>
+        <if test="enable != null "> and a.enable = #{enable}</if>
+        <if test="shieldType == 2 "> and a.shield_type = 2</if>
+        <if test="shieldType != 2 "> and a.shield_type != 2</if>
     </select>
 
     <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.user.entity.AlarmShield">
         INSERT INTO `alarm_shield` (
         `shield_id`,
+        `shield_name`,
+        `mete_type`,
+        `meter_type`,
+        `enable`,
         `create_user_id`,
         `end_time`,
         `shield_type`,
         `warn_content` )
         VALUES
             (
-            #{shieldId, jdbcType=BIGINT},
+            #{shieldId, jdbcType=VARCHAR},
+            #{shieldName, jdbcType=VARCHAR},
+            #{meteType, jdbcType=INTEGER},
+            #{meterType, jdbcType=INTEGER},
+            #{enable, jdbcType=INTEGER},
             #{createUserId, jdbcType=BIGINT},
             #{endTime, jdbcType=TIMESTAMP},
             #{shieldType, jdbcType=INTEGER},
@@ -54,12 +111,30 @@
         delete from `alarm_shield` where id =#{id}
     </delete>
 
-    <update id="update" >
+    <update id="update" parameterType="com.yjh.platform.module.user.entity.AlarmShield">
         update `alarm_shield`
         <set>
-            end_time = #{endTime, jdbcType=TIMESTAMP}
+            <if test="shieldId != null"> shield_id = #{shieldId},</if>
+            <if test="shieldName != null"> shield_name = #{shieldName},</if>
+            <if test="meteType != null"> mete_type = #{meteType},</if>
+            <if test="meterType != null"> meter_type = #{meterType},</if>
+            <if test="endTime != null"> end_time = #{endTime, jdbcType=TIMESTAMP},</if>
+            <if test="enable != null"> enable = #{enable},</if>
+            <if test="warnContent != null"> warn_content = #{warnContent},</if>
         </set>
         where id =#{id}
     </update>
+
+    <select id="selectAlarmShieldByStdDeviceMete" resultType="java.lang.Long">
+        select id from alarm_shield where
+            meter_type = #{meterType} and enable = 1 and end_time &gt;= #{time,jdbcType=TIMESTAMP} and shield_type = 1
+        union all (
+            select id from alarm_shield where
+                mete_type = #{meteType} and meter_type is null and enable = 1 and end_time &gt;= #{time,jdbcType=TIMESTAMP} and shield_type = 1
+        ) union all(
+            select id from alarm_shield where
+                FIND_IN_SET(#{shieldId},shield_id) and enable = 1 and end_time &gt;= #{time,jdbcType=TIMESTAMP} and shield_type = 1
+        )
+    </select>
 
 </mapper>

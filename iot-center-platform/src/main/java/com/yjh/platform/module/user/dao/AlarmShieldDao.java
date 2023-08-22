@@ -5,6 +5,7 @@ import com.yjh.platform.module.user.entity.AlarmShield;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,12 +21,23 @@ public interface AlarmShieldDao {
 
     AlarmShield selectByWarnContent(@Param(value = "warnContent")String warnContent,
                                         @Param(value = "shieldType")Integer shieldType);
-    List<AlarmShield> select(@Param(value = "startTime")String startTime,
-                             @Param(value = "endTime")String endTime);
+    List<Long> selectByCount(@Param(value = "startTime")String startTime,
+                             @Param(value = "endTime")String endTime,
+                             @Param(value = "enable")Integer enable,
+                             @Param(value = "shieldType")Integer shieldType
+                             );
+
+    List<AlarmShield> select(@Param(value = "list")List<Long> list);
 
     int add(AlarmShield alarmShield);
 
     int delete(@Param(value = "id")Long id);
 
     int update(AlarmShield alarmShield);
+
+    List<Long> selectAlarmShieldByStdDeviceMete(@Param(value = "meteType")Integer meteType,
+                                                       @Param(value = "meterType")String meterType,
+                                                       @Param(value = "shieldId")Long shieldId,
+                                                       @Param(value = "time") Date time);
+
 }
