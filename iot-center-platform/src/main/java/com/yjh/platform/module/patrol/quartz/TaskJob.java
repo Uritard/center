@@ -150,7 +150,7 @@ public class TaskJob extends QuartzJobBean {
      * @param task 任务信息
      */
     private void droneTaskStart(UPatrolTask task) {
-        boolean droneOpen = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content").toString());
+        boolean droneOpen = Boolean.valueOf((String)redisTemplate.opsForHash().get("t_sys_param:droneOpen", "content"));
         if (!droneOpen) {
             // 无人机开关，打开时才需要补充发送任务启动报文
             return;
