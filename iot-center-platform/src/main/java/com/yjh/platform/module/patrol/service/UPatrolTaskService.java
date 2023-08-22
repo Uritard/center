@@ -1497,7 +1497,7 @@ public class UPatrolTaskService {
                 }
                 //删除整个周期任务
                 log.info("del taskId..." + taskId + ", startTime; " + startTime);
-                JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName);
+                JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
 
                 log.info("taskMap del..." + Constant.taskMap);
                 log.info("del task totally...");
@@ -1509,7 +1509,7 @@ public class UPatrolTaskService {
                 return result;
             }
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
-            JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName);
+            JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
         }
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条
@@ -1517,6 +1517,22 @@ public class UPatrolTaskService {
         int result = uPatrolTaskDao.deleteByPrimaryId(taskId);
         deleteTransfer(source, planId, taskId, startTime);
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteJob(String taskId) {
+        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+        if (Objects.isNull(task.getDateType())) {
+            taskId = task.getTaskCode();
+        }
+        //删除整个周期任务
+        log.info("deleteJob taskId..." + taskId);
+        JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, false);
+        log.info("deleteJob task totally...");
+        tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+        //删除初始化的一条
+        uPatrolTaskDao.deleteInitByPrimaryId(taskId);
+        return uPatrolTaskDao.deleteByPrimaryId(taskId);
     }
 
     /**
