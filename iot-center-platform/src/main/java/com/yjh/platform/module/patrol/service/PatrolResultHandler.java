@@ -12,6 +12,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -46,13 +47,14 @@ public class PatrolResultHandler {
     private final UPatrolTaskService uPatrolTaskService;
     private final TVoiceDeviceService tVoiceDeviceService;
     private final TCruisePointInstanceDao tCruisePointInstanceDao;
+    private final AlarmShieldService alarmShieldService;
 
     private static final String METER = "meter";
 
     private static final Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
-        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao) {
+        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao,AlarmShieldService alarmShieldServic) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -60,6 +62,7 @@ public class PatrolResultHandler {
         this.uPatrolTaskService = uPatrolTaskService;
         this.tVoiceDeviceService = tVoiceDeviceService;
         this.tCruisePointInstanceDao = tCruisePointInstanceDao;
+        this.alarmShieldService = alarmShieldServic;
     }
 
     /**
@@ -1057,18 +1060,23 @@ public class PatrolResultHandler {
             currentWarnInfo.put("defectModel", infoMap.get("defectModel"));
             currentWarnInfo.put("isPop", "false");
 
-            //webSocket通知前端调用查询告警弹框的接口
-            Map<String, String> jasonMaps = new HashMap<>();
-            jasonMaps.put("type", "alarmPopUp");
-            jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
-            jasonMaps.put("warnType", "1");
-            jasonMaps.put("warnId", warnId);
-            jasonMaps.put("defectModel", infoMap.get("defectModel"));
-            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
-            currentWarnInfo.put("isPop","true");
-            if (!Constant.isUpSystem()){
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+            if (!alarmShieldService.isShield(tStdDevicemete.getDeviceMeteId())){
+                //webSocket通知前端调用查询告警弹框的接口
+                Map<String, String> jasonMaps = new HashMap<>();
+                jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
+                jasonMaps.put("warnType", "1");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", infoMap.get("defectModel"));
+                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
+                currentWarnInfo.put("isPop","true");
+                if (!Constant.isUpSystem()){
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+                }
+            } else{
+                log.info("此告警被屏蔽了，不弹窗！");
             }
+
             redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
         }catch (Exception e){
             log.error(e.getMessage(), e);
