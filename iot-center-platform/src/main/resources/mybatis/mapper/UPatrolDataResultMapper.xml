@@ -531,7 +531,6 @@
         f.cruise_time,
         f.cruise_type,
         f.instance_name,
-        g.task_type,
         f.person_check,
         f.modify_num,
         f.result_num,
@@ -543,14 +542,12 @@
         a.meter_type
         FROM u_patrol_data_result f
         LEFT JOIN t_std_devicemete a on a.device_mete_id = f.device_mete_id
-        LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
         WHERE  a.device_mete_id in (
         <foreach collection="deviceMeteIds" item="deviceMeteId" separator=",">
             #{deviceMeteId, jdbcType=BIGINT}
         </foreach>
         )
         <if test="startTime != null and startTime != '' and endTime != null and endTime !=''" >and f.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if>
-        <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cruiseType != -1 ">and f.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
