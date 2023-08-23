@@ -241,7 +241,7 @@ public class UPatrolDataResultService {
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataResultByList(cruiseType, cType,
             splitToLong(deviceMeteIds), meteType, meterType, endTime, startTime);
-        DictConvertUtil.optional("cruiseType").add("planType", "taskType", "cTypeName").add("identifyResult")
+        DictConvertUtil.optional("cruiseType").add("identifyResult")
             .add("cruiseResult").add("meteType").add("meterType").covertToDict(cruiseResultAnalyzeInfoList);
 
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
@@ -418,6 +418,9 @@ public class UPatrolDataResultService {
                 String fileName = "巡视结果分析" + System.currentTimeMillis() + ".xlsx";
                 String fileNamePath = filePathAndName + fileName;
 
+                String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+                String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+
                 //设置表头
                 List<List<String>> heads = Lists.newArrayList();
                 List<String> strings = Arrays.asList("巡视点名称", "设备", "识别类型", "数据来源", "值", "识别结果", "巡视时间", "图片");
@@ -433,7 +436,9 @@ public class UPatrolDataResultService {
                     content.add(lineInfo.getResultDesc());
                     content.add(lineInfo.getIdentifyResultName());
                     content.add(lineInfo.getCruiseTime());
-                    content.add(new ImageFile(lineInfo.getPicPath()));
+
+                    String imagePath = StringUtils.replace(lineInfo.getPicPath(), relPath, absPath);
+                    content.add(new ImageFile(imagePath));
                     contents.add(content);
                 });
                 ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
@@ -461,9 +466,7 @@ public class UPatrolDataResultService {
                 //关闭写excel
                 excelWriter.finish();
 
-                Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-                String fileRelativePath = map.get("content") + "/" + fileName;
-
+                String fileRelativePath = redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content") + "/" + fileName;
                 Map<String, String> jasonMap = new HashMap<>(2);
                 jasonMap.put("type", "cruiseDataReport");
                 jasonMap.put("url", fileRelativePath);
