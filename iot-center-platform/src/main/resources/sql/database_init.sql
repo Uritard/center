@@ -2305,6 +2305,8 @@ CREATE TABLE `u_patrol_data_result` (
   `cruise_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡检时间',
   `cruise_status` int(11) DEFAULT '0' COMMENT '状态:0-已执行 1-未执行 2-执行失败 3-未知',
   `cruise_type` int(11) DEFAULT '1' COMMENT '巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
+  `cruise_device_id` varchar(64) DEFAULT '' COMMENT '巡视设备ID',
+  `cruise_device_name` varchar(128) DEFAULT '' COMMENT '巡视设备名称',
   `result_desc` varchar(512) DEFAULT '' COMMENT '巡检结果文字描述（暂时没用）',
   `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
   `modify_num` varchar(100) DEFAULT '' COMMENT '审核结果数值',

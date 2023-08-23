@@ -65,9 +65,9 @@ public interface UPatrolDataResultDao {
     int batchAdd(List<UPatrolDataResult> list);
     int batchDelete(List<String> list);
 
-    List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(@Param(value = "cruiseType") Integer cruiseType,
+    List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList(@Param(value = "cruiseType") Integer cruiseType,
         @Param(value = "cType") Integer cType,
-        @Param(value = "deviceMeteId") Long deviceMeteId,
+        @Param(value = "deviceMeteIds") List<Long> deviceMeteIds,
         @Param(value = "meteType") String meteType,
         @Param(value = "meterType") Integer meterType,
         @Param(value = "endTime") String endTime,
@@ -92,7 +92,7 @@ public interface UPatrolDataResultDao {
                                                      @Param(value = "stationName") String stationName);
     List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
         @Param(value = "cType") Integer cType,
-        @Param(value = "deviceMeteId") Long deviceMeteId,
+        @Param(value = "deviceMeteIds") List<Long> deviceMeteIds,
         @Param(value = "startTime") String startTime,
         @Param(value = "endTime") String endTime,
         @Param(value = "meteType") String meteType,

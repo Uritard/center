@@ -3,11 +3,13 @@ package com.yjh.platform.module.user.dao;
 import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -122,4 +124,7 @@ public interface TRobotInfoDao {
 
     int selectDroneCount();
     int checkDroneByRobotCode(@Param(value = "robotCode") String robotCode);
+
+    @MapKey("robot_id")
+    Map<String, TRobotInfo> selectAll();
 }
