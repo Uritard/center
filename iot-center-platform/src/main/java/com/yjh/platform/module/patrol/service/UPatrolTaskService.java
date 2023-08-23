@@ -460,6 +460,10 @@ public class UPatrolTaskService {
         if (Constant.logUpLv3()) {
             log.info("instancesList==={}", detailList);
         }
+
+        Map<String, TRobotInfo> allRobot = tRobotInfoDao.selectAll();
+        Map<String, String> cameraMap = new HashMap<>(32);
+
         Set<String> nodeSet = new HashSet<>(8);
         Set<String> cruiseDeviceSet = new HashSet<>(128);
         for (TCruisePointInstanceNameDetail item : detailList) {
@@ -486,15 +490,23 @@ public class UPatrolTaskService {
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
-                map.put("robotId", String.valueOf(item.getRobotId()));
+                String rbtId = String.valueOf(item.getRobotId());
+                map.put("robotId", rbtId);
+                map.put("cruiseDeviceId", rbtId);
+                map.put("cruiseDeviceName", Optional.ofNullable(allRobot.get(rbtId)).map(TRobotInfo::getRobotName).orElse(""));
                 cruiseDeviceSet.add("robotId_" + item.getRobotId());
             }else {
-                map.put("cameraId", String.valueOf(item.getCameraId()));
+                String cameraId = CommonUtils.getValue(item.getCameraId());
+                map.put("cameraId", cameraId);
                 map.put("robotId","");
                 if (item.getCameraId() == null) {
                     cruiseDeviceSet.add(item.getCruiseType() + "_" + item.getCruiseId());
                 } else {
                     cruiseDeviceSet.add("cameraId_" + item.getCameraId());
+                    String cameraName = cameraMap.computeIfAbsent(cameraId, k -> (String) redisTemplate.opsForHash().get("camera_info:" + k, "cameraName"));
+
+                    map.put("cruiseDeviceId", cameraId);
+                    map.put("cruiseDeviceName", cameraName);
                 }
             }
 
@@ -2307,6 +2319,8 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
                 uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
                 uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
+                uPatrolDataResult.setCruiseDeviceId(redisInfoMap.get("cruiseDeviceId"));
+                uPatrolDataResult.setCruiseDeviceName(redisInfoMap.get("cruiseDeviceName"));
                 uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
                 uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
                 uPatrolDataResult.setUnit(redisInfoMap.get("unit"));
