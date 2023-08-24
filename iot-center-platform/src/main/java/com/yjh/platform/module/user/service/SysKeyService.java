@@ -116,8 +116,6 @@ public class SysKeyService {
         redisTemplate.delete(keys);
 
         List<SysKey> all = sysKeyDao.selectAll();
-        Set<String> keySets = new HashSet<>();
-        Map<String, String> keyMaps = new HashMap<>();
         all.forEach(sysKey -> {
             if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
                 redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());

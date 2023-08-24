@@ -5,6 +5,7 @@
 package com.yjh.platform.module.config.service;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.PathUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -24,8 +25,10 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -131,20 +134,20 @@ public class FileProcess implements Closeable {
     }
 
     public static void main(String[] args) {
-        Date expiryDate = DateTimeUtil.parse("2022-10-15 00:00:00");
+        Date expiryDate = DateTimeUtil.parse("2022-10-18 00:00:00");
         String folderPath = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture";
-        String backPath = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\back_all2.zip";
+        String backPath = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\back_all3.zip";
         // String parentSub = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture";
         String parentSub = "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置";
 
-        String[] folders = new String[] {"D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files",
-            "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture"};
+        String[] folders = new String[] {"D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files\\temporaryFiles",
+            "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture\\ftpImg"};
 
         FileProcess process = new FileProcess(expiryDate, true, folders, backPath, parentSub);
-        process.setExcludes(new String[] {"D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files\\temporaryFiles\\**",
+        process.setExcludes(new String[] {
             "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture\\ftpImg\\Map\\**",
             "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-picture\\resultImg\\**"});
-        process.cleanup(true);
+        process.cleanup();
         //
         // process.nextProcess(true, "D:\\Project\\资料\\巡视系统\\softPackage\\packages-yjh\\环境配置\\iot-files", backPath, parentSub);
         // process.cleanup();
@@ -195,6 +198,7 @@ public class FileProcess implements Closeable {
         started = true;
         boolean flag = true;
         long startTime = System.currentTimeMillis();
+        folderPaths = Arrays.stream(folderPaths).map(m -> StringUtils.stripEnd(m, "/")).toArray(String[]::new);
         log.info("开始执行清理任务：needBack: {}\n\t\t folderPath: {}\n\t\t backPath: {}", needBack, folderPaths, backPath);
         try {
 
@@ -321,7 +325,7 @@ public class FileProcess implements Closeable {
                 deleteAll = false;
             }
         }
-        if (deleteAll) {
+        if (deleteAll && !ArrayUtils.contains(folderPaths, sourceFile.getAbsolutePath())) {
             return FileUtil.del(sourceFile);
         }
         return false;
@@ -379,7 +383,7 @@ public class FileProcess implements Closeable {
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     //进入文件夹之后
                     try (Stream<Path> pathStream = Files.list(dir)) {
-                        if (!pathStream.findAny().isPresent()) {
+                        if (!pathStream.findAny().isPresent() && !ArrayUtils.contains(folderPaths, dir.toString())) {
                             Files.delete(dir);
                         }
                     } catch (IOException e) {
@@ -456,7 +460,7 @@ public class FileProcess implements Closeable {
         }
 
         try {
-            if (!Files.deleteIfExists(sourceFile.toPath())) {
+            if (!ArrayUtils.contains(folderPaths, sourceFile.getAbsolutePath()) && !Files.deleteIfExists(sourceFile.toPath())) {
                 log.error("删除空目录失败：{}", sourceFile.getAbsolutePath());
                 return false;
             }
