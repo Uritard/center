@@ -4,16 +4,20 @@
 
 package com.yjh.platform.configuration;
 
+import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 安全配置从数据库迁移至 application.properties
@@ -34,8 +38,13 @@ public class SysParamConfig {
      */
     private Map<String, String> edge;
 
+    @Value("${spring.servlet.multipart.location:}")
+    private String multipartLocation;
+
     @Autowired
     private RedisTemplate redisTemplate;
+
+    private Set<String> dirs = new HashSet<>();
 
     public void putToRedis() {
         if (secure == null) {
@@ -50,6 +59,9 @@ public class SysParamConfig {
         for (Map.Entry<String, String> entry : secure.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
+            if (StringUtils.startsWith(value, "/home/yjh_iot_center")) {
+                dirs.add(value);
+            }
             contents.put("paramCode", key);
             contents.put("paramName", key);
             contents.put("content", value);
@@ -58,6 +70,7 @@ public class SysParamConfig {
             redisTemplate.opsForHash().putAll(str, contents);
         }
         edgeToRedis();
+        initDir();
     }
 
     /**
@@ -87,6 +100,17 @@ public class SysParamConfig {
             String str = "t_sys_param:" + key;
             log.info("paramKey: {}, value: {}", key, value);
             redisTemplate.opsForHash().putAll(str, contents);
+        }
+    }
+
+    /**
+     * 初始化文件夹
+     */
+    public void initDir() {
+        dirs.add(multipartLocation);
+        log.info("创建目录：{}", dirs);
+        for (String dir : dirs) {
+            FileUtil.mkdir(dir);
         }
     }
 }
