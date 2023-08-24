@@ -4,8 +4,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
@@ -207,11 +209,14 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
+            uPatrolDataResultService.checkDate(startTime, endTime);
             List<CruiseResultAnalyzeInfo>  list = uPatrolDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteIds, meteType,meterType,endTime, startTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (Exception e) {
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        }  catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
@@ -236,7 +241,10 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
+            uPatrolDataResultService.checkDate(startTime, endTime);
             result.setData(uPatrolDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteIds, startTime, endTime,meteType,meterType));
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("获取折线图元素信息失败描述：", e);

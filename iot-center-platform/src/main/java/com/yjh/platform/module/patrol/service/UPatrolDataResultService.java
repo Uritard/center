@@ -9,6 +9,8 @@ import com.alibaba.excel.write.style.row.SimpleRowHeightStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -20,9 +22,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -274,9 +275,23 @@ public class UPatrolDataResultService {
         return dataSetParse(meteIds, group);
     }
 
+    public boolean checkDate(String startTime, String endTime) {
+        if (StringUtils.isAnyEmpty(startTime, endTime)) {
+            return true;
+        }
+        Date start = DateTimeUtil.parse(startTime);
+        Date toEnd = DateUtils.addMonths(start, 3);
+        Date end = DateTimeUtil.parse(endTime);
+        if (DateUtils.truncatedCompareTo(toEnd, end, Calendar.DAY_OF_MONTH) < 0) {
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "日期间隔不可以大于3个月");
+        }
+        return true;
+    }
+
     private List<KeyValue<String, List<List<String>>>> dataSetParse(List<Long> meteIds, Map<Long, List<BrokenLineInfo>> group) {
         List<KeyValue<String, List<List<String>>>> dataset = new ArrayList<>();
         Map<Long, KeyValue<String, List<List<String>>>> kvMap = new HashMap<>(8);
+        // 对分组后数据进行按组遍历
         group.forEach((k, v) -> {
             Long deviceMeteId = v.get(0).getDeviceMeteId();
             String meteName = v.get(0).getMeteName();
@@ -286,19 +301,24 @@ public class UPatrolDataResultService {
             Map<Date, String[]> dateIdx = new LinkedHashMap<>(64);
             Map<KeyValue<String, String>, Integer> deviceMap = new HashMap<>(8);
 
+            // 第一行 ["product","2023-07-25 11:36:55","2023-07-25 11:41:15","2023-07-25 15:59:46","2023-07-26 11:25:44","2023-07-26 16:34:32"]
             fir.add("product");
             line.add(fir);
 
+            // 记录巡视设备编号
             int idx = 1;
+            // 解析成时间对应数组，数组内对应不同巡视设备的巡视值
             for (BrokenLineInfo vb : v) {
                 KeyValue<String, String> cruiseDevice = new DefaultKeyValue<>(vb.getCruiseDeviceId(), vb.getCruiseDeviceName());
                 Date time = vb.getCruiseTime();
+                // 获取巡视设备序号，若不存在，则表示需新增一个巡视设备编号
                 Integer dex = deviceMap.get(cruiseDevice);
                 if (dex == null) {
                     dex = idx++;
                     deviceMap.put(cruiseDevice, dex);
                 }
                 String[] dateLine = dateIdx.get(time);
+                // 根据巡视设备编号判断数组是否需要进行扩容
                 if (dateLine == null || dateLine.length < idx) {
                     String[] newLine = new String[idx];
                     if (dateLine != null) {
@@ -307,14 +327,19 @@ public class UPatrolDataResultService {
                     dateLine = newLine;
                     dateIdx.put(time, dateLine);
                 }
+                // 将巡视设备编号作为数组下标，存入巡视设备对应巡视值，对“,”分割的值取前面部分（当前特指红外测点）
                 dateLine[dex] = StringUtils.substringBefore(vb.getResultNum(), ",");
             }
 
+            // 初始化剩余行信息
+            // ["大黑红外","-1","40.29,25.54","39.49,25.09","39.72,24.88","39.70,24.98","39.78,24.81"]
+            // ["大白可见光","20","20",null,"20",null,"20"]
             List<String>[] dataLine = new List[deviceMap.size()];
             for (int i = 0; i < dataLine.length; i++) {
                 dataLine[i] = new ArrayList<>();
             }
 
+            // 将时间格式对应的测点转为需要的测点开头的数组
             dateIdx.forEach((dk, dv) -> {
                 fir.add(DateTimeUtil.format(dk));
                 int i = 0;
@@ -324,7 +349,8 @@ public class UPatrolDataResultService {
                     if (dataLine[i].isEmpty()) {
                         dataLine[i].add(ik.getValue());
                     }
-                    dataLine[i].add(dv[iv]);
+                    // 取值时判断一下下标是否超过数组长度，若两种巡视设备值没有交叉，则会导致数组长度不满足要求
+                    dataLine[i].add(dv.length <= iv ? null : dv[iv]);
                     i++;
                 }
 
