@@ -304,6 +304,7 @@
         a.custom_Name,
         a.mete_id,
         a.mete_kind,
+        a.mete_type,
         a.meter_type,
         a.mete_name,
         a.appearance_type,

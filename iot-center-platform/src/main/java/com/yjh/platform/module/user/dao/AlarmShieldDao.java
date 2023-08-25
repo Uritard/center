@@ -35,8 +35,8 @@ public interface AlarmShieldDao {
 
     int update(AlarmShield alarmShield);
 
-    List<Long> selectAlarmShieldByStdDeviceMete(@Param(value = "meteType")Integer meteType,
-                                                       @Param(value = "meterType")String meterType,
+    List<Long> selectAlarmShieldByStdDeviceMete(@Param(value = "meteType") String meteType,
+                                                       @Param(value = "meterType")Integer meterType,
                                                        @Param(value = "shieldId")Long shieldId,
                                                        @Param(value = "time") Date time);
 

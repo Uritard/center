@@ -25,7 +25,7 @@ public class AlarmShieldService {
     public Boolean isShield(Long stdDeviceMeteId){
         TStdDeviceMete stdDeviceMete = tStdDevicemeteDao.selectByPrimaryId(stdDeviceMeteId);
         List<Long> shieldList= alarmShieldDao.selectAlarmShieldByStdDeviceMete(
-                stdDeviceMete.getMeterType(),stdDeviceMete.getMeteType(),stdDeviceMeteId,new Date()
+                stdDeviceMete.getMeteType(),stdDeviceMete.getMeterType(),stdDeviceMeteId,new Date()
         );
         return !shieldList.isEmpty();
     }
