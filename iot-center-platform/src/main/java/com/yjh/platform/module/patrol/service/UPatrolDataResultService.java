@@ -17,6 +17,7 @@ import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
+import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
@@ -309,7 +310,7 @@ public class UPatrolDataResultService {
             int idx = 1;
             // 解析成时间对应数组，数组内对应不同巡视设备的巡视值
             for (BrokenLineInfo vb : v) {
-                KeyValue<String, String> cruiseDevice = new DefaultKeyValue<>(vb.getCruiseDeviceId(), vb.getCruiseDeviceName());
+                KeyValue<String, String> cruiseDevice = new LineKeyValue<>(vb.getCruiseDeviceId(), vb.getCruiseDeviceName());
                 Date time = vb.getCruiseTime();
                 // 获取巡视设备序号，若不存在，则表示需新增一个巡视设备编号
                 Integer dex = deviceMap.get(cruiseDevice);

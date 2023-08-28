@@ -32,7 +32,9 @@ import com.yjh.platform.module.task.entity.TCruiseTaskResult;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.scheduled.DeviceStaticsToUpSystem;
 import com.yjh.platform.module.task.service.AlarmShieldService;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
@@ -112,6 +114,8 @@ public class HelloController {
     private IntelAnalysisService intelAnalysisService;
     @Autowired
     private AlarmShieldService alarmShieldService;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
     private String URL;
@@ -866,4 +870,23 @@ public class HelloController {
         return result;
     }
 
+
+    @GetMapping(value = "/test-robotInfo")
+    @ApiOperation(value = "test-robotInfo")
+    public Result testRobotInfo(@RequestParam(value = "robotId", required = false) Long robotId) throws Exception{
+        Result result = new Result();
+        try {
+            Map<Long, TRobotInfo> allRobot = tRobotInfoDao.selectAll();
+            String cruiseDeviceName = Optional.ofNullable(allRobot.get(robotId)).map(TRobotInfo::getRobotName).orElse("");
+            Map<String, Object> retMap = new LinkedHashMap<>(4);
+            retMap.put("cruiseDeviceName", cruiseDeviceName);
+            retMap.put("allRobot", allRobot);
+            result.setData(retMap);
+        } catch (Exception e) {
+            log.error("获取机器人信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
 }

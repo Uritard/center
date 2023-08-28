@@ -461,7 +461,7 @@ public class UPatrolTaskService {
             log.info("instancesList==={}", detailList);
         }
 
-        Map<String, TRobotInfo> allRobot = tRobotInfoDao.selectAll();
+        Map<Long, TRobotInfo> allRobot = tRobotInfoDao.selectAll();
         Map<String, String> cameraMap = new HashMap<>(32);
 
         Set<String> nodeSet = new HashSet<>(8);
@@ -493,7 +493,7 @@ public class UPatrolTaskService {
                 String rbtId = String.valueOf(item.getRobotId());
                 map.put("robotId", rbtId);
                 map.put("cruiseDeviceId", rbtId);
-                map.put("cruiseDeviceName", Optional.ofNullable(allRobot.get(rbtId)).map(TRobotInfo::getRobotName).orElse(""));
+                map.put("cruiseDeviceName", Optional.ofNullable(allRobot.get(item.getRobotId())).map(TRobotInfo::getRobotName).orElse(""));
                 cruiseDeviceSet.add("robotId_" + item.getRobotId());
             }else {
                 String cameraId = CommonUtils.getValue(item.getCameraId());

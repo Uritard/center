@@ -568,16 +568,18 @@ public class TWarnInfoController {
     public Result warnShield(@RequestBody AlarmShield alarmShield) {
         Result result = new Result();
         try {
+            alarmShield.setCreateTime(new Date());
+
+
             //查看是否已设置过
             if (alarmShield.getId() == null){
                 //新增的 直接插入
-                alarmShield.setCreateTime(new Date());
                 alarmShieldDao.add(alarmShield);
             } else {
                 //不是新增的 更新
                 alarmShieldDao.update(alarmShield);
             }
-            if (alarmShield.getShieldType() == 1){
+            if (alarmShield.getShieldType() == 2){
                 TRobotAlarm tRobotAlarm = tRobotAlarmDao.selectByRobotIdAndContent(alarmShield.getWarnContent());
                 if(tRobotAlarm != null){
                     tRobotAlarm.setEndTime(alarmShield.getEndTime());

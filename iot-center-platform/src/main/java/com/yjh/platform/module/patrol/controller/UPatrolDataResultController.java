@@ -298,9 +298,12 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)) {
                 endTime = null;
             }
+            uPatrolDataResultService.checkDate(startTime, endTime);
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");
             uPatrolDataResultService.cruiseDataReport(cruiseType, cType, deviceMeteIds, meteType, meterType, endTime, startTime, userId);
 
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("巡视结果分析--巡检点结果列表失败描述：", e);
