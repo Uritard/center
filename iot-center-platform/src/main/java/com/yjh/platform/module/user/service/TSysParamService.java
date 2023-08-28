@@ -252,7 +252,11 @@ public class TSysParamService{
     public Map<String,String > homePageInfo(){
         Map<String,String> result = Maps.newHashMap();
         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        Map<String,String> logoImageMap = redisTemplate.opsForHash().entries("t_sys_param:logoImage");
+        Map<String,String> loginLogoImageMap = redisTemplate.opsForHash().entries("t_sys_param:loginLogoImage");
         result.put("systemName",systemNameMap.get("content"));
+        result.put("logoImage",logoImageMap.get("content"));
+        result.put("loginLogoImage",loginLogoImageMap.get("content"));
         return result;
     }
 

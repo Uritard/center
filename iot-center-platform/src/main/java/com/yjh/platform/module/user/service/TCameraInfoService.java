@@ -100,7 +100,8 @@ public class TCameraInfoService {
         Channel channel=acrossAddMonitor(tCameraInfo);
         tCameraInfo.setMonitorId(channel.getId());
         ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
-        this.tCameraInfoDao.insert(tCameraInfo);
+        int ret = this.tCameraInfoDao.insert(tCameraInfo);
+        this.intoRedis(tCameraInfo);
         //新增机器人时，对所有用户赋予机器人权限
         List<SysUserDTO> sysUserDTOList = sysUserDao.selectUserByRoleId(BUSINESS_ROLE_ID);
         if (!CollectionUtils.isEmpty(sysUserDTOList)) {
@@ -113,7 +114,7 @@ public class TCameraInfoService {
             });
             sysUserDevicePermissionDao.batchInsert(permissionDOS);
         }
-        return this.intoRedis();
+        return ret;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -135,8 +136,7 @@ public class TCameraInfoService {
 //                // return -2;
 //            }
 //        }
-        this.tCameraInfoDao.deleteByPrimaryId(cameraId);
-        return this.intoRedis();
+        return this.tCameraInfoDao.deleteByPrimaryId(cameraId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -159,9 +159,7 @@ public class TCameraInfoService {
 //                }
 //            }
         }
-        int i = this.tCameraInfoDao.deleteSelectedCamera(list);
-        this.intoRedis();
-        return i;
+        return this.tCameraInfoDao.deleteSelectedCamera(list);
     }
 
 
@@ -216,10 +214,10 @@ public class TCameraInfoService {
         }catch (Exception e){
             log.error("监测点修改失败：", e);
             return 0;
-        }finally {*/
-            ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
-            return this.tCameraInfoDao.update(tCameraInfo);
-//        }
+        } */
+        this.intoRedis(tCameraInfo);
+        ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
+        return this.tCameraInfoDao.update(tCameraInfo);
 
     }
 
@@ -456,27 +454,30 @@ public class TCameraInfoService {
         return tCameraInfoDao.selectCameraByRecord(recordId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
         List<TCameraInfo> list = tCameraInfoDao.select(null, null, null, null, null, null, null, null, null, null, null, null, null);
         for (TCameraInfo item : list) {
-            Long cameraId = item.getCameraId();
-            String str = "camera_info:" + cameraId;
-            Map<String, String> map = redisTemplate.opsForHash().entries(str);
-            if (MapUtils.isEmpty(map)) {
-                map = new HashMap<>(8);
-            }
-            if (StringUtils.isEmpty(map.get("state"))) {
-                map.put("state", "0");
-            }
-            map.put("cameraId", String.valueOf(cameraId));
-            map.put("cameraIp", item.getCameraIp());
-            map.put("pmsId", item.getPmsId());
-            redisTemplate.opsForHash().putAll(str, map);
+            intoRedis(item);
         }
         return 1;
     }
 
+    private void intoRedis(TCameraInfo item) {
+        Long cameraId = item.getCameraId();
+        String str = "camera_info:" + cameraId;
+        Map<String, String> map = redisTemplate.opsForHash().entries(str);
+        if (MapUtils.isEmpty(map)) {
+            map = new HashMap<>(8);
+        }
+        if (StringUtils.isEmpty(map.get("state"))) {
+            map.put("state", "0");
+        }
+        map.put("cameraId", String.valueOf(cameraId));
+        map.put("cameraName", item.getCameraName());
+        map.put("cameraIp", item.getCameraIp());
+        map.put("pmsId", item.getPmsId());
+        redisTemplate.opsForHash().putAll(str, map);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public Channel diagnosePointStandardThreshold(Channel channel){

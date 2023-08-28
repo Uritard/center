@@ -73,7 +73,13 @@ public class UPatrolDataResult implements Serializable {
     @ApiModelProperty(value = "巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹")
     private Integer cruiseType;
 
-    @ApiModelProperty(value = "巡检结果文字描述（暂时没用）")
+    @ApiModelProperty(value = "巡视设备ID（相机或机器人ID）")
+    private String cruiseDeviceId;
+
+    @ApiModelProperty(value = "巡视设备名称（相机或机器人名称）")
+    private String cruiseDeviceName;
+
+    @ApiModelProperty(value = "巡检结果文字描述")
     private String resultDesc;
 
     @ApiModelProperty(value = "巡检结果数值")
