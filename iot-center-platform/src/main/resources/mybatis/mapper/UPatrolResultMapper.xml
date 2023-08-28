@@ -455,6 +455,7 @@
         b.device_id,
         b.instance_id,
         e.device_mete_id,
+        q.mete_name,
         q.state_zero,
         q.state_one,
         q.high_limit1,
