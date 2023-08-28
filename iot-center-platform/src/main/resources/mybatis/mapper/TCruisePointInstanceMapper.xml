@@ -583,13 +583,11 @@
         b.is_ai,
         b.is_judge,
         b.device_point_id,
-        tsd.device_name,
-        tsd.real_code,
+        f.device_name,
+        f.real_code,
         c.robot_id,
         IFNULL(c.inspection_name,d.preset_name) as cruiseName,
         d.camera_id,
-        e.voice_device_id as cruise_device_id,
-        e.voice_device_name as cruise_device_name,
         b.is_temdif,
         b.unit,
         b.custom_id,
@@ -597,10 +595,10 @@
         FROM
         t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-        LEFT JOIN t_std_device tsd on a.device_id = tsd.device_id
+        left join t_std_device tsd on a.device_id = tsd.device_id
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-        LEFT JOIN t_voice_device e ON a.cruise_id = e.voice_device_id
+        left join (select distinct device_id,device_name,real_code from t_std_device) f on a.device_id = f.device_id
         where a.instance_id in
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId, jdbcType=BIGINT}
@@ -813,77 +811,5 @@
         <include refid="Base_Column_List" />
         from t_cruise_point_instance
         where  edge_code = #{edgeCode} and origin_id=#{originId}
-    </select>
-    <select id="selectDeviceByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-        SELECT DISTINCT
-            '1' AS upId,
-            '摄像机' AS upName,
-            'camera' AS infoType,
-            c.camera_id AS id,
-            d.camera_name AS label,
-            ''as deviceTypeId,
-            (SELECT DISTINCT
-                 f.preset_id as presetId
-             FROM
-                 t_cruise_point_instance e
-                     INNER JOIN t_camera_preset f ON e.cruise_id = f.preset_id
-             WHERE
-                 e.device_mete_id = b.device_mete_id
-               AND f.camera_id = c.camera_id
-                LIMIT 1) AS presetId
-        FROM
-            t_cruise_point_instance b
-            INNER JOIN t_camera_preset c ON b.cruise_id = c.preset_id
-            LEFT JOIN t_camera_info d ON c.camera_id = d.camera_id
-        WHERE
-            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-        UNION ALL
-        SELECT DISTINCT
-            '2' AS upId,
-            '机器人' AS upName,
-            'robot' AS infoType,
-            d.robot_id AS id,
-            d.robot_name AS label,
-            d.robot_code as deviceTypeId,
-            (SELECT DISTINCT
-                 f.inspection_code as presetId
-             FROM
-                 t_cruise_point_instance e
-                     INNER JOIN t_robot_inspection f ON e.cruise_id = f.inspection_id
-             WHERE
-                 e.device_mete_id = b.device_mete_id
-               AND f.robot_id = c.robot_id
-                LIMIT 1) AS presetId
-        FROM
-            t_cruise_point_instance b
-            INNER JOIN t_robot_inspection c ON b.cruise_id = c.inspection_id
-            LEFT JOIN t_robot_info d ON c.robot_id = d.robot_id
-        WHERE
-            d.robot_type is not null and
-            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-        UNION ALL
-        SELECT DISTINCT
-            '3' AS upId,
-            '无人机' AS upName,
-            'drone' AS infoType,
-            d.robot_id AS id,
-            d.robot_name AS label,
-            d.robot_code as deviceTypeId,
-            (SELECT DISTINCT
-                 f.inspection_code as presetId
-             FROM
-                 t_cruise_point_instance e
-                     INNER JOIN t_robot_inspection f ON e.cruise_id = f.inspection_id
-             WHERE
-                 e.device_mete_id = b.device_mete_id
-               AND f.robot_id = c.robot_id
-                LIMIT 1) AS presetId
-        FROM
-            t_robot_info d
-            LEFT JOIN t_robot_inspection c ON c.robot_id = d.robot_id
-            INNER JOIN t_cruise_point_instance b ON b.cruise_id = c.inspection_id
-        WHERE
-            d.drone_type is not null and
-            b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
 </mapper>

@@ -27,7 +27,7 @@ public interface TStdDevicemeteDao {
     int deleteByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
     int update(TStdDeviceMeteDetail tStdDeviceMeteDetail);
-    TStdDeviceMeteDetail selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    TStdDeviceMete selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<TStdDeviceMete> select(@Param(value = "deviceMeteId") Long deviceMeteId,
                                 @Param(value = "deviceId") Long deviceId,
                                 @Param(value = "devicePointId") String devicePointId,

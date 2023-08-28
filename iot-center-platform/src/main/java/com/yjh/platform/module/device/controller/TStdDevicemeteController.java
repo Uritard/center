@@ -133,8 +133,8 @@ public class TStdDevicemeteController {
     public Result selectByPrimaryId(@RequestParam(value = "deviceMeteId") Long deviceMeteId) {
         Result result = new Result();
         try {
-            TStdDeviceMeteDetail tStdDeviceMeteDetail = tStdDevicemeteService.selectByPrimaryId(deviceMeteId);
-            result.setData(tStdDeviceMeteDetail);
+            TStdDeviceMete tStdDeviceMete = tStdDevicemeteService.selectByPrimaryId(deviceMeteId);
+            result.setData(tStdDeviceMete);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("标准设备测点查询失败描述：", e);

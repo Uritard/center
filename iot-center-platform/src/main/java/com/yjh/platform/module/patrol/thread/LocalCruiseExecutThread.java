@@ -71,7 +71,6 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     public void run() {
         log.warn("cruiseExecutThread start, cruisePoints size: {}, skip: {}, forceStop: {}", CollectionUtils.size(cruisePointList), skip,
             forceStop);
-
         if (CollectionUtils.isNotEmpty(cruisePointList)) {
             if (skip) {
                 skipPointList(cruisePointList);

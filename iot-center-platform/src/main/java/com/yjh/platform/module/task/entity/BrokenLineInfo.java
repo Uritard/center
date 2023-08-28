@@ -21,27 +21,13 @@ public class BrokenLineInfo implements Serializable {
     private Long deviceMeteId;
     @ApiModelProperty(value = "采集时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date cruiseTime;
-
-    @ApiModelProperty(value = "巡视点名称")
-    private String instanceName;
-
+    private Date endTime;
     @ApiModelProperty(value = "巡视数据")
-    private String resultNum;
-
-    @ApiModelProperty(value = "巡视结果描述")
-    private String resultDesc;
-
+    private String ResultNum;
     @ApiModelProperty(value = "巡视类型")
     private int cruiseType;
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;
-
-    @ApiModelProperty(value = "巡视设备ID")
-    private String cruiseDeviceId;
-
-    @ApiModelProperty(value = "巡视设备名称")
-    private String cruiseDeviceName;
 
     @ApiModelProperty(value = "任务类型")
     private Integer cType;
@@ -54,31 +40,15 @@ public class BrokenLineInfo implements Serializable {
 
     @ApiModelProperty(value = "识别类型")
     private String meteType;
-
     @ApiModelProperty(value = "识别类型--字典表")
     private String meteTypeName;
 
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
-
     @ApiModelProperty(value = "表计类型--字典表")
     private String meterTypeName;
-    @ApiModelProperty(value = "实际结果")
-    private Integer identifyResult;
 
-    @ApiModelProperty(value = "实际结果--字典表")
-    private String identifyResultName;
 
-    @ApiModelProperty(value = "巡视执行结果")
-    private Integer cruiseResult;
 
-    @ApiModelProperty(value = "巡视执行结果--字典表")
-    private String cruiseResultName;
-
-    @ApiModelProperty(value = "巡检分析图片")
-    private String picPath;
-
-    @ApiModelProperty(value = "设备名称")
-    private String deviceName;
 
 }

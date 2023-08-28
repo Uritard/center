@@ -968,8 +968,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		dm.mete_name AS label,
 		dm.device_id AS upId,
 		sd.device_name AS upName,
-		"devicemete" AS infoType,
-		(SELECT GROUP_CONCAT(DISTINCT a.cruise_type) FROM t_cruise_point_instance a WHERE a.device_mete_id = dm.device_mete_id) AS bindType
+		"devicemete" AS infoType
 		FROM
 		t_std_devicemete dm
 		LEFT JOIN t_std_device sd ON sd.device_id = dm.device_id
