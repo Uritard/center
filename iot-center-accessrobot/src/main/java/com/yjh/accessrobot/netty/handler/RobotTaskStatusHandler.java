@@ -106,16 +106,31 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             }
         }
 
+        log.info("The statusList to platform is=={}", statusList);
+
+        try {
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_STATUS_PROCESS, statusList, Result.class);
+        }catch (Exception e){
+            log.error("调用platform出错：{}", e.getMessage());
+        }
+
         Long robotId = robotService.selectRobotIdByCode(xmlBaseModel.getSendCode());
         String robotTaskStatusUp =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"));
 
         if (robotId != null && "true".equals(robotTaskStatusUp)) {
             // 上一级系统无法获取机器人任务进度，需将任务状态数据上报上一级系统
             String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
-            List<Map<String,Object>> upItems = new ArrayList<>(xmlBaseModel.getItems().size());
             Map<String,Object> downItem = xmlBaseModel.getItems().get(0);
             Map<String,Object> upItem = Maps.newHashMap();
-            UPatrolTask uPatrolTask = robotService.selectTaskByTaskCode(downItem.get("task_code") == null ? null:downItem.get("task_code").toString());
+
+            String patrolledId = String.valueOf(downItem.get("task_patrolled_id"));
+            String taskCode = String.valueOf(downItem.get("task_code"));
+
+            // 增加时间判断，避免预先初始化导致数据传入下一个任务
+            String timeStr = StringUtils.substringAfterLast(patrolledId, "_");
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            //根据taskCode找到taskId
+            UPatrolTask uPatrolTask = robotService.selectTaskIdByTaskCode(taskCode, date);
             if (Objects.nonNull(uPatrolTask)) {
                 String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
                 String taskPatrolledId = stationCode+"_"+ uPatrolTask.getTaskCode()+"_"+DateTimeUtil.format(uPatrolTask.getStartTime(), DateTimeUtil.getDateTimePattern3());
@@ -132,23 +147,14 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             upItem.put("description", downItem.get("description") == null ? null:downItem.get("description").toString());
 
             XMLBaseModel upXmlBaseModel = new XMLBaseModel()
-                .setSendCode(Constant.sendCode())
-                .setReceiveCode(recvCode)
-                .setType("411")
-                .setItems(Collections.singletonList(upItem));
+                    .setSendCode(Constant.sendCode())
+                    .setReceiveCode(recvCode)
+                    .setType("411")
+                    .setItems(Collections.singletonList(upItem));
 
             Map<String ,List<XMLBaseModel>> map = Maps.newHashMap();
             map.put("list",Collections.singletonList(upXmlBaseModel));
             Constant.mapToOtherServer(map, Constant.TCP_URL);
-        }
-
-
-        log.info("The statusList to platform is=={}", statusList);
-
-        try {
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_STATUS_PROCESS, statusList, Result.class);
-        }catch (Exception e){
-            log.error("调用platform出错：{}", e.getMessage());
         }
     }
 
