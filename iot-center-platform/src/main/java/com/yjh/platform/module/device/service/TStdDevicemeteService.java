@@ -205,7 +205,7 @@ public class TStdDevicemeteService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TStdDeviceMete selectByPrimaryId(Long deviceMeteId) {
+    public TStdDeviceMeteDetail selectByPrimaryId(Long deviceMeteId) {
         return this.tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
     }
 
