@@ -255,7 +255,7 @@ public class TSysParamService{
         Map<String,String> loginLogoImageMap = redisTemplate.opsForHash().entries("t_sys_param:loginLogoImage");
         result.put("systemName",systemNameMap.get("content"));
         result.put("logoImage",logoImageMap.get("content"));
-        result.put("loginLogoImageMap",loginLogoImageMap.get("content"));
+        result.put("loginLogoImage",loginLogoImageMap.get("content"));
         return result;
     }
 
