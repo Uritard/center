@@ -49,7 +49,7 @@ public class AlarmShield implements Serializable {
     private String meterTypeName;
 
     @ApiModelProperty(value = "是否启用 1-已起用 0-未启用")
-    private Integer enable;
+    private Integer enable = 1;
 
     @ApiModelProperty(value = "创建屏蔽的用户id")
     private Long createUserId;

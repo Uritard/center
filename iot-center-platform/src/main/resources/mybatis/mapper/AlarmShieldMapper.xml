@@ -68,8 +68,9 @@
         left join t_std_device d on c.device_id = d.device_id
         where 1=1
         and a.id in <foreach collection="list" separator="," open="(" close=")" item="id">
-        #{id}
-    </foreach>
+            #{id}
+        </foreach>
+        order by a.create_time desc
     </select>
     <select id="selectByCount" resultType="java.lang.Long">
         select a.id
@@ -80,6 +81,7 @@
         <if test="enable != null "> and a.enable = #{enable}</if>
         <if test="shieldType == 2 "> and a.shield_type = 2</if>
         <if test="shieldType != 2 "> and a.shield_type != 2</if>
+        order by a.create_time desc
     </select>
 
     <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.user.entity.AlarmShield">
@@ -92,7 +94,8 @@
         `create_user_id`,
         `end_time`,
         `shield_type`,
-        `warn_content` )
+        `warn_content`,
+        `create_time`)
         VALUES
             (
             #{shieldId, jdbcType=VARCHAR},
@@ -103,7 +106,8 @@
             #{createUserId, jdbcType=BIGINT},
             #{endTime, jdbcType=TIMESTAMP},
             #{shieldType, jdbcType=INTEGER},
-            #{warnContent, jdbcType=VARCHAR}
+            #{warnContent, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP}
             );
     </insert>
 

@@ -125,6 +125,6 @@ public interface TRobotInfoDao {
     int selectDroneCount();
     int checkDroneByRobotCode(@Param(value = "robotCode") String robotCode);
 
-    @MapKey("robot_id")
-    Map<String, TRobotInfo> selectAll();
+    @MapKey("robotId")
+    Map<Long, TRobotInfo> selectAll();
 }

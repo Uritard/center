@@ -683,7 +683,7 @@
         WHERE a.robot_code = #{robotCode} and drone_type is not null
     </select>
 
-    <select id="selectAll" resultType="java.util.Map">
+    <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from t_robot_info a
