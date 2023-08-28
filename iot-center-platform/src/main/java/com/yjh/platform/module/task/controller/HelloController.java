@@ -31,6 +31,7 @@ import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskResult;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.scheduled.DeviceStaticsToUpSystem;
+import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -109,6 +110,8 @@ public class HelloController {
     private DeviceStaticsToUpSystem deviceStaticsToUpSystem;
     @Autowired
     private IntelAnalysisService intelAnalysisService;
+    @Autowired
+    private AlarmShieldService alarmShieldService;
 
     @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
     private String URL;
@@ -852,5 +855,15 @@ public class HelloController {
         return map;
     }
 
+
+    @GetMapping(value = "/test-alarmShield")
+    @ApiOperation(value = "test-alarmShield")
+    @Logs(title = "test-alarmShield",content = "test-alarmShield",logType = 2)
+    public Result testAlarmShield(@RequestParam(value = "warnContent", required = false) Long stdDeviceMeteId
+    ) throws Exception{
+        Result result = new Result();
+        result.setData(alarmShieldService.isShield(stdDeviceMeteId));
+        return result;
+    }
 
 }

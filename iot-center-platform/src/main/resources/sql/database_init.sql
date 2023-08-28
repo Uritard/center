@@ -2305,6 +2305,8 @@ CREATE TABLE `u_patrol_data_result` (
   `cruise_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡检时间',
   `cruise_status` int(11) DEFAULT '0' COMMENT '状态:0-已执行 1-未执行 2-执行失败 3-未知',
   `cruise_type` int(11) DEFAULT '1' COMMENT '巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
+  `cruise_device_id` varchar(64) DEFAULT '' COMMENT '巡视设备ID',
+  `cruise_device_name` varchar(128) DEFAULT '' COMMENT '巡视设备名称',
   `result_desc` varchar(512) DEFAULT '' COMMENT '巡检结果文字描述（暂时没用）',
   `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
   `modify_num` varchar(100) DEFAULT '' COMMENT '审核结果数值',
@@ -2558,18 +2560,6 @@ CREATE TABLE `common_menu` (
     `sort` int DEFAULT NULL COMMENT '顺序 小于4为常用默认',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='常用功能配置表';
-
-DROP TABLE IF EXISTS `alarm_shield`;
-CREATE TABLE `alarm_shield` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
-    `shield_id` bigint DEFAULT NULL COMMENT '屏蔽的设备id',
-    `create_user_id` bigint DEFAULT NULL COMMENT '创建屏蔽的用户id',
-    `end_time` datetime DEFAULT NULL COMMENT '屏蔽结束时间',
-    `shield_type` int DEFAULT NULL COMMENT '屏蔽类型：1-巡视设备，2-测点',
-    `warn_content` varchar(258) DEFAULT NULL COMMENT '屏蔽的告警内容',
-    `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
 -- Table structure for t_wiring_config
 -- ----------------------------
 DROP TABLE IF EXISTS `t_wiring_config`;
@@ -2604,4 +2594,22 @@ CREATE TABLE `t_wiring_diagram` (
 `delete_flag` tinyint DEFAULT '0' COMMENT '删除标记，1-是0-否',
 PRIMARY KEY (`wiring_diagram_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb3;
+-- ----------------------------
+-- Table structure for alarm_shield
+-- ----------------------------
+DROP TABLE IF EXISTS `alarm_shield`;
+CREATE TABLE `alarm_shield` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`shield_id` text COMMENT '屏蔽的设备id(巡视设备id，或者测点id)',
+`shield_name` varchar(258) DEFAULT NULL COMMENT '名称',
+`mete_type` int DEFAULT NULL COMMENT '屏蔽的测点类型',
+`meter_type` int DEFAULT NULL COMMENT '屏蔽的测点子类型',
+`enable` int DEFAULT NULL COMMENT '是否启用 1-已起用 0-未启用',
+`create_user_id` bigint DEFAULT NULL COMMENT '创建屏蔽的用户id',
+`end_time` datetime DEFAULT NULL COMMENT '屏蔽结束时间',
+`shield_type` int DEFAULT NULL COMMENT '屏蔽类型：1-测点,2-巡视设备,3-巡视类型',
+`warn_content` varchar(258) DEFAULT NULL COMMENT '屏蔽的告警内容',
+`create_time` datetime DEFAULT NULL COMMENT '创建时间',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
 
