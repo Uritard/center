@@ -26,7 +26,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private Long cameraId;
     private String meteType;
     private String devicePointId;
-    private Integer upRegionId;
+    private Integer UpRegionId;
     /**
      * 是否温差测试
      */
@@ -34,8 +34,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String unit;
 
     private String customId;
+
     private String customName;
 
-    private String cruiseDeviceId;
-    private String cruiseDeviceName;
 }

@@ -4,10 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
-import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
@@ -187,7 +185,7 @@ public class UPatrolDataResultController {
     // @Logs(title = "巡检点结果列表",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList2(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                                 @RequestParam(value = "cType", required = false) Integer cType,
-                                                @RequestParam(value = "deviceMeteIds") String deviceMeteIds,
+                                                @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                                                 @RequestParam(value = "meteType", required = false) String meteType,
                                                 @RequestParam(value = "meterType", required = false) Integer meterType,
                                                 @RequestParam(value = "endTime", required = false) String endTime,
@@ -209,14 +207,11 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            uPatrolDataResultService.checkDate(startTime, endTime);
-            List<CruiseResultAnalyzeInfo>  list = uPatrolDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteIds, meteType,meterType,endTime, startTime);
+            List<CruiseResultAnalyzeInfo>  list = uPatrolDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (BusinessException b) {
-            result.setCode(b.getCode(), b.getMessage());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
@@ -228,7 +223,7 @@ public class UPatrolDataResultController {
     @Logs(title = "获取折线图元素信息",content = "根据用户传递的参数获取折线图信息",logType = 1,authority = "1235")
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
-                                   @RequestParam(value = "deviceMeteIds") String deviceMeteIds,
+                                   @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                                    @RequestParam(value = "meteType", required = false) String meteType,
                                    @RequestParam(value = "meterType", required = false) Integer meterType,
                                    @RequestParam(value = "endTime", required = false) String endTime,
@@ -241,10 +236,7 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            uPatrolDataResultService.checkDate(startTime, endTime);
-            result.setData(uPatrolDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteIds, startTime, endTime,meteType,meterType));
-        } catch (BusinessException b) {
-            result.setCode(b.getCode(), b.getMessage());
+            result.setData(uPatrolDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("获取折线图元素信息失败描述：", e);
@@ -276,34 +268,6 @@ public class UPatrolDataResultController {
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("cameraId查询：", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "巡视结果分析--报表导出")
-    @GetMapping(value = "/cruiseDataReport")
-    @Logs(title = "导出", content = "巡视结果分析导出", logType = 9)
-    public Result cruiseDataReport(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
-        @RequestParam(value = "cType", required = false) Integer cType, @RequestParam(value = "deviceMeteIds") String deviceMeteIds,
-        @RequestParam(value = "meteType", required = false) String meteType,
-        @RequestParam(value = "meterType", required = false) Integer meterType,
-        @RequestParam(value = "endTime", required = false) String endTime,
-        @RequestParam(value = "startTime", required = false) String startTime, HttpServletRequest request) {
-        Result result = new Result();
-        try {
-
-            if (Objects.isNull(startTime) || "".equals(startTime)) {
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)) {
-                endTime = null;
-            }
-            String userId = request.getHeader("userId") + "_" + request.getHeader("token");
-            uPatrolDataResultService.cruiseDataReport(cruiseType, cType, deviceMeteIds, meteType, meterType, endTime, startTime, userId);
-
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
         return result;
     }

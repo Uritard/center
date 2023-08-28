@@ -94,8 +94,6 @@
             cruise_time,
             cruise_status,
             cruise_type,
-            cruise_device_id,
-            cruise_device_name,
             result_desc,
             result_num,
             modify_num,
@@ -139,8 +137,6 @@
                 #{cruiseTime, jdbcType=TIMESTAMP},
                 #{cruiseStatus, jdbcType=INTEGER},
                 #{cruiseType, jdbcType=INTEGER},
-                #{uPatrolDataResult.cruiseDeviceId, jdbcType=VARCHAR},
-                #{uPatrolDataResult.cruiseDeviceName, jdbcType=VARCHAR},
                 #{resultDesc, jdbcType=VARCHAR},
                 #{resultNum, jdbcType=VARCHAR},
                 #{modifyNum, jdbcType=VARCHAR},
@@ -435,8 +431,6 @@
             cruise_time,
             cruise_status,
             cruise_type,
-            cruise_device_id,
-            cruise_device_name,
             result_desc,
             result_num,
             modify_num,
@@ -482,8 +476,6 @@
                 #{UPatrolDataResult.cruiseTime, jdbcType=TIMESTAMP},
                 #{UPatrolDataResult.cruiseStatus, jdbcType=INTEGER},
                 #{UPatrolDataResult.cruiseType, jdbcType=INTEGER},
-                #{uPatrolDataResult.cruiseDeviceId, jdbcType=VARCHAR},
-                #{uPatrolDataResult.cruiseDeviceName, jdbcType=VARCHAR},
                 #{UPatrolDataResult.resultDesc, jdbcType=VARCHAR},
                 #{UPatrolDataResult.resultNum, jdbcType=VARCHAR},
                 #{UPatrolDataResult.modifyNum, jdbcType=VARCHAR},
@@ -523,7 +515,7 @@
             )
     </delete>
 
-    <select id="selectCruiseDataResultByList" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
+    <select id="selectCruiseDataResultByList2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
         SELECT
         f.task_id,
         f.cruise_data_id,
@@ -531,6 +523,7 @@
         f.cruise_time,
         f.cruise_type,
         f.instance_name,
+        g.task_type,
         f.person_check,
         f.modify_num,
         f.result_num,
@@ -542,12 +535,11 @@
         a.meter_type
         FROM u_patrol_data_result f
         LEFT JOIN t_std_devicemete a on a.device_mete_id = f.device_mete_id
-        WHERE  a.device_mete_id in (
-        <foreach collection="deviceMeteIds" item="deviceMeteId" separator=",">
-            #{deviceMeteId, jdbcType=BIGINT}
-        </foreach>
-        )
+        LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
+        WHERE 1=1
+        <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' and endTime != null and endTime !=''" >and f.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if>
+        <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
         <if test="cruiseType != -1 ">and f.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
         <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
@@ -644,31 +636,22 @@
     </select>
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
         SELECT
-        f.cruise_time,
+        f.cruise_time as end_time,
         if(f.modify_num is null,f.result_num,f.modify_num) resultNum,
-        if(f.modify_num is null,f.result_desc,f.person_check) resultDesc,
-        f.instance_name,
         f.cruise_type,
-        f.cruise_device_id,
-        f.cruise_device_name,
+        g.task_type,
         a.mete_name,
         a.mete_type,
         a.meter_type,
-        a.device_mete_id,
-        f.identify_result,
-        f.cruise_result,
-        f.picpath AS picPath,
-        f.origpic,
-        f.device_name
+        a.device_mete_id
         FROM u_patrol_data_result f
         LEFT JOIN t_std_devicemete a on a.device_mete_id = f.device_mete_id
-        WHERE a.device_mete_id in (
-        <foreach collection="deviceMeteIds" item="deviceMeteId" separator=",">
-            #{deviceMeteId, jdbcType=BIGINT}
-        </foreach>
-        )
+        LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
+        WHERE 1=1
+        <if test="deviceMeteId != null " > and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' and endTime != null and endTime !=''" >and f.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if>
         <if test="cruiseType != -1 " >and f.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>
+        <if test="cType != -1 ">and g.task_type = #{cType, jdbcType=INTEGER}</if>
         <if test="meterType != -1" >and a.meter_type=#{meterType,jdbcType=INTEGER}</if>
         <if test="meteType != null and meteType != -1" >and a.mete_type=#{meteType,jdbcType=VARCHAR}</if>
         ORDER BY f.cruise_time ASC
@@ -713,8 +696,6 @@
         cruise_time,
         cruise_status,
         cruise_type,
-        cruise_device_id,
-        cruise_device_name,
         result_desc,
         result_num,
         modify_num,
@@ -760,8 +741,6 @@
             #{uPatrolDataResult.cruiseTime, jdbcType=TIMESTAMP},
             #{uPatrolDataResult.cruiseStatus, jdbcType=INTEGER},
             #{uPatrolDataResult.cruiseType, jdbcType=INTEGER},
-            #{uPatrolDataResult.cruiseDeviceId, jdbcType=VARCHAR},
-            #{uPatrolDataResult.cruiseDeviceName, jdbcType=VARCHAR},
             #{uPatrolDataResult.resultDesc, jdbcType=VARCHAR},
             #{uPatrolDataResult.resultNum, jdbcType=VARCHAR},
             #{uPatrolDataResult.modifyNum, jdbcType=VARCHAR},

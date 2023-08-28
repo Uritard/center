@@ -295,16 +295,14 @@
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         select
         a.device_mete_id,
         a.device_id,
         a.device_point_id,
         a.custom_id,
-        a.custom_Name,
         a.mete_id,
         a.mete_kind,
-        a.mete_type,
         a.meter_type,
         a.mete_name,
         a.appearance_type,
@@ -331,14 +329,12 @@
         a.mete_type,
         a.modulus,
         a.remark,
-        a.state_zero,
-        a.state_one,
-        a.alarm_state,
+        state_zero,
+        state_one,
+        alarm_state,
         a.is_temdif,
-        a.redundant_type,
-        b.device_name
+        a.redundant_type
         from t_std_devicemete a
-        left join t_std_device b on a.device_id = b.device_id
         where 1 = 1
             and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
         limit 1

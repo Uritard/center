@@ -28,7 +28,6 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
@@ -109,8 +108,6 @@ public class IntelAnalysisService {
     @Lazy
     @Autowired
     private HttpAnalyticsServiceImpl analyticsService;
-    @Autowired
-    private AlarmShieldService alarmShieldService;
 
     /**
      * 巡视主机请求图像分析--功能
@@ -1069,24 +1066,19 @@ public class IntelAnalysisService {
 
                 list.add(tWarnInfo);
 
-                if (!alarmShieldService.isShield(tWarnInfo.getStdMeteId())){
-                    //webSocket通知前端调用查询告警弹框的接口
-                    Long warnId = analyseDataOperateDao.selectCurrentWarn();
-                    Map<String, Object> jasonMaps = new HashMap<>(16);
-                    jasonMaps.put("type", "alarmPopUp");
-                    jasonMaps.put("warnId", warnId);
-                    jasonMaps.put("defectModel", 450);
-                    jasonMaps.put("warnLevel", tWarnInfo.getWarnLevel());
-                    jasonMaps.put("warnType", "1");
-                    String json = JSON.toJSONString(jasonMaps);
-                    log.info("发送给前端的消息：{}", json);
-                    if (!Constant.isUpSystem()){
-                        postUrl(Constant.WEBSOCKET_URL, json);
-                    }
-                } else {
-                log.info("此告警被屏蔽了，不弹窗！");
+                //webSocket通知前端调用查询告警弹框的接口
+                Long warnId = analyseDataOperateDao.selectCurrentWarn();
+                Map<String, Object> jasonMaps = new HashMap<>(16);
+                jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", 450);
+                jasonMaps.put("warnLevel", tWarnInfo.getWarnLevel());
+                jasonMaps.put("warnType", "1");
+                String json = JSON.toJSONString(jasonMaps);
+                log.info("发送给前端的消息：{}", json);
+                if (!Constant.isUpSystem()){
+                    postUrl(Constant.WEBSOCKET_URL, json);
                 }
-
             }
             return list;
         } catch (Exception e) {

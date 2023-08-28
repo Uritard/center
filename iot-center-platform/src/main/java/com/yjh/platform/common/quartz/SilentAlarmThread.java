@@ -13,7 +13,6 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
-import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import org.apache.commons.io.FileUtils;
@@ -68,7 +67,6 @@ public class SilentAlarmThread implements Runnable {
     private RedisTemplate redisTemplate;
     private TCameraPresetService tCameraPresetService;
     private ApplicationProperties applicationProperties;
-    private AlarmShieldService alarmShieldService;
 
     private TWarnInfoService tWarnInfoDao;
 
@@ -84,8 +82,7 @@ public class SilentAlarmThread implements Runnable {
     }
 
     public SilentAlarmThread(String ip, String port, String presetId, String cameraId, RedisTemplate redisTemplate,
-                             TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties,
-                             String syncWebsocketUrl,TWarnInfoService tWarnInfoDao,AlarmShieldService alarmShieldService) {
+                             TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties, String syncWebsocketUrl,TWarnInfoService tWarnInfoDao) {
         this.ip = ip;
         this.port = port;
         this.presetId = presetId;
@@ -95,7 +92,6 @@ public class SilentAlarmThread implements Runnable {
         this.applicationProperties = applicationProperties;
         this.syncWebsocketUrl = syncWebsocketUrl;
         this.tWarnInfoDao=tWarnInfoDao;
-        this.alarmShieldService = alarmShieldService;
     }
 
     @Override
@@ -470,24 +466,19 @@ public class SilentAlarmThread implements Runnable {
                     .setAlarmSource(689) // 静默监视
                     .setImagePath(defectResultRealImg);
             tWarnInfoDao.insert(tWarnInfo);
-            if (!alarmShieldService.isShield(tWarnInfo.getStdMeteId())){
-                //webSocket通知前端调用查询告警弹框的接口
-                Map<String, String> jasonMaps = new HashMap<>(16);
-                jasonMaps.put("type", "alarmPopUp");
-                jasonMaps.put("warnType", "1");
-                jasonMaps.put("warnLevel", alarmLevel);
-                jasonMaps.put("warnId", ValueUtil.toString(tWarnInfo.getWarnId(),"1"));
-                jasonMaps.put("defectModel", "450");
-                String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
-                log.info("发送给前端的消息: {}", json);
-                if (!Constant.isUpSystem()){
+            //webSocket通知前端调用查询告警弹框的接口
+            Map<String, String> jasonMaps = new HashMap<>(16);
+            jasonMaps.put("type", "alarmPopUp");
+            jasonMaps.put("warnType", "1");
+            jasonMaps.put("warnLevel", alarmLevel);
+            jasonMaps.put("warnId", ValueUtil.toString(tWarnInfo.getWarnId(),"1"));
+            jasonMaps.put("defectModel", "450");
+            String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
+            log.info("发送给前端的消息: {}", json);
+            if (!Constant.isUpSystem()){
 //                restTemplatePost(syncWebsocketUrl, json);
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
-                }
-            } else {
-                log.info("此告警被屏蔽了，不弹窗！");
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
             }
-
             return tWarnInfo;
         } catch (Exception e) {
             log.error("组装并存储告警信息出错: ", e);

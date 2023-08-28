@@ -5,7 +5,6 @@ import com.yjh.platform.common.quartz.SilentAlarmThread;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
-import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +40,6 @@ public class SecondLevelSilentTaskScheduled {
     private String syncWebsocketUrl;
     @Autowired
     private TWarnInfoService tWarnInfoDao;
-    @Autowired
-    private AlarmShieldService alarmShieldService;
 
     @Scheduled(cron = "${seconds.silent.task.cron}")
     public void startAlarmGuard() {
@@ -84,7 +81,7 @@ public class SecondLevelSilentTaskScheduled {
 
             log.info("静默数据 ---------------- " + ip + ":" + port);
             HttpAysncClientUtil.HttpAysncInit(user, password);
-            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, applicationProperties, syncWebsocketUrl, tWarnInfoDao,alarmShieldService);
+            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, applicationProperties, syncWebsocketUrl, tWarnInfoDao);
             Thread thread = new Thread(silentAlarmThread);
             thread.setDaemon(true);
             thread.start();

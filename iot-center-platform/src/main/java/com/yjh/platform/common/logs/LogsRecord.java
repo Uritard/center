@@ -1,10 +1,7 @@
 package com.yjh.platform.common.logs;
 
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.utils.CommonUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,7 +17,7 @@ public class LogsRecord {
     private  RedisTemplate redisTemplate;
 
     public void LogsSend(HttpServletRequest request,String type,String title,String content){
-        Long userIds = ValueUtil.toLong(request.getHeader("userId"));
+        Long userIds = Long.valueOf(request.getHeader("userId"));
 //        Long userIds = 10011L;
 
 //        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));

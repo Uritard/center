@@ -525,60 +525,17 @@ public class TCruisePointInstanceService{
         return this.uPatrolResultDao.selectCruiseCountByType(taskId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfo> selectCameraByDeviceMeteId(Long deviceMeteId) {
+    public Map<Object,Object> selectCameraByDeviceMeteId(Long deviceMeteId){
         TStdDeviceMete devicemete = tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
-        if (devicemete == null) {
+        if (devicemete == null){
             throw new BusinessException("测点已不存在！");
         }
-        List<AreaInfo> areaInfos = tCruisePointInstanceDao.selectDeviceByDeviceMeteId(deviceMeteId);
-        String camera = "camera";
-        String robot = "robot";
-        String drone = "drone";
-        if (areaInfos.stream().anyMatch(areaInfo -> camera.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(1L).setLabel("摄像机").setInfoType("camera");
-            areaInfos.add(areaInfo);
-        }
-        if (areaInfos.stream().anyMatch(areaInfo -> robot.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(2L).setLabel("机器人").setInfoType("robot");
-            areaInfos.add(areaInfo);
-        }
-        if (areaInfos.stream().anyMatch(areaInfo -> drone.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(3L).setLabel("无人机").setInfoType("drone");
-            areaInfos.add(areaInfo);
-        }
-        return assembleTrees(areaInfos);
-    }
-
-    public List<AreaInfo> assembleTrees(Collection<AreaInfo> trees) {
-        if (CollectionUtils.isEmpty(trees)) {
-            return Collections.emptyList();
-        }
-
-        // 构建树主键/实例映射表，并初始化树的子节点集合
-        Map<?, AreaInfo> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
-                .collect(Collectors.toMap(AreaInfo::getId, t -> t, (o, n) -> n));
-
-        // 查找并关联树节点，返回所有没有父节点的树
-        return trees.stream().filter(tree -> {
-            AreaInfo parent = ifNull(tree.getUpId(), mapping::get);
-            if (parent != null) {
-                parent.getChildren().add(tree);
-            }
-            return Objects.isNull(parent);
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）
-     *
-     * @param object   目标对象
-     * @param function 目标对象方法
-     * @param <T>      目标对象类型泛型
-     * @param <R>      返回对象类型泛型
-     * @return 返回对象
-     */
-    public static <T, R> R ifNull(T object, Function<T, R> function) {
-        return object == null || function == null ? null : function.apply(object);
+        List<Map<Object,Object>> cameraList = tCruisePointInstanceDao.selectCameraByDeviceMeteId(deviceMeteId);
+        Map<Object,Object> reMap = new HashMap<>();
+        reMap.put("cameraType",cameraList);
+        List<Map<Object,Object>> robotList = tCruisePointInstanceDao.selectRobotByDeviceMeteId(deviceMeteId);
+        reMap.put("robotType",robotList);
+        return reMap;
     }
 
 }
