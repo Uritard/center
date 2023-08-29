@@ -1,4 +1,4 @@
-package com.yjh.platform.module.video;
+package com.yjh.platform.file;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
