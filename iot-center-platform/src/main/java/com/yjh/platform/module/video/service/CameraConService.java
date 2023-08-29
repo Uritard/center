@@ -514,7 +514,15 @@ public class CameraConService {
         }
     }
 
-    public boolean moveToPreset(Long presetId, Long cameraId) throws IOException {
+    /**
+     * 预置位操作
+     * @param presetId
+     * @param cameraId
+     * @param presetCmd
+     * @return
+     * @throws IOException
+     */
+    public boolean presetAction(Long presetId, Long cameraId, PresetCmd presetCmd) throws IOException {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
         if (cameraConInfo == null) {
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
@@ -528,10 +536,18 @@ public class CameraConService {
                 .setPresetId(String.valueOf(presetId))
                 .setDeviceId(cameraConInfo.getDeviceChannel())
                 .setChannelId(cameraConInfo.getCameraChannelId())
-                .setPresetCmd(PresetCmd.PRESET_ACTION)
+                .setPresetCmd(presetCmd)
                 .build();
         Result result = ptzService.presetCommand(presetEntity);
         return result.getCode() == 200;
+    }
+
+    public String getCameraPTZ(Long presetId, Long cameraId) {
+        return null;
+    }
+
+    public String getPresetBasePath() {
+        return (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
     }
 
 
