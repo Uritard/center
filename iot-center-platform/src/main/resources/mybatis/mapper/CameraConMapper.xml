@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.control.dao.CameraConDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.control.entity.CameraConInfo">
+        <id column="camera_id" jdbcType="BIGINT" property="cameraId"/>
+        <result column="channel_num" jdbcType="INTEGER" property="channelNum"/>
+        <result column="preset_id" jdbcType="BIGINT" property="presetId"/>
+        <result column="preset_num" jdbcType="INTEGER" property="presetNum"/>
+        <result column="record_id" jdbcType="BIGINT" property="recordId"/>
+        <result column="record_ip" jdbcType="VARCHAR" property="recordIp"/>
+        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager"/>
+        <result column="identity_code" jdbcType="VARCHAR" property="identityCode"/>
+        <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort"/>
+        <result column="infread_port" jdbcType="INTEGER" property="infreadPort"/>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        camera_id
+        , channel_num, preset_id, preset_num, record_id, record_ip, identity_manager, identity_code, rtsp_port
+    </sql>
+
+    <sql id="Record_File_Column_List">
+        camera_id
+        , up_region_id, file_name, file_path, absolute_file_path, start_time, end_time
+    </sql>
+
+    <select id="selectConInfo" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.control.entity.CameraConInfo">
+        SELECT
+        a.camera_id,
+        a.channel_num,
+        a.camera_type,
+        b.preset_id,
+        b.preset_num,
+        c.record_id,
+        c.record_ip,
+        c.identity_manager,
+        c.identity_code,
+        c.rtsp_port,
+        c.recorder_type,
+        a.camera_ip,
+        a.port,
+        a.infread_port,
+        a.camera_manager,
+        a.camera_code,
+        a.camera_num,
+        a.up_region_id,
+        a.camera_channel_id,
+        c.device_channel
+        FROM t_camera_info a
+        LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
+        WHERE 1 = 1
+        <if test="cameraId != null and cameraId != ''">and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
+        <if test="presetId != null and presetId != ''">and b.preset_id = #{presetId, jdbcType=BIGINT}</if>
+        limit 1
+    </select>
+
+    <select id="batchSelectConInfo" resultType="com.yjh.platform.module.control.entity.CameraConInfo">
+        SELECT
+        a.camera_id,
+        a.channel_num,
+        a.camera_type,
+        c.record_id,
+        c.record_ip,
+        c.identity_manager,
+        c.identity_code,
+        c.rtsp_port,
+        a.camera_ip,
+        a.port,
+        a.infread_port,
+        a.camera_manager,
+        a.camera_code,
+        a.camera_num,
+        a.camera_channel_id,
+        c.device_channel
+        FROM t_camera_info a
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
+        WHERE 1 = 1 and a.camera_id IN
+        <foreach collection="list" open="(" close=")" separator="," item="cameraId">
+            #{cameraId, jdbcType=BIGINT}
+        </foreach>
+    </select>
+
+    <select id="selectRobotConInfo" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.control.entity.RobotConInfo">
+        select a.robot_id,
+               a.robot_code,
+               a.robot_name,
+               a.robot_status,
+               a.robot_type,
+               a.robot_ip,
+               a.robot_port,
+               a.light_ip,
+               a.light_port,
+               a.identity_manager,
+               a.identity_code,
+               a.lnferad_IP,
+               a.Inferad_Port,
+               a.Inferad_username,
+               a.Inferad_password,
+               a.phote_path,
+               a.create_by,
+               a.create_date,
+               a.update_by,
+               a.update_date,
+               a.robot_factory,
+               a.is_use,
+               a.commission_date,
+               a.up_region_id,
+               a.robot_position,
+               a.remarks,
+               a.record_id,
+               a.channel_num_light   as numLight,
+               a.channel_num_inferad as numInferad,
+               a.channel_num_light,
+               a.channel_num_inferad
+        from t_robot_info a
+        where 1 = 1
+          and a.robot_id = #{robotId, jdbcType=BIGINT} limit 1
+    </select>
+
+    <select id="selectDroneConInfo" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.control.entity.RobotConInfo">
+        select a.robot_id,
+               a.robot_code,
+               a.robot_name,
+               a.robot_status,
+               a.robot_type,
+               a.robot_ip,
+               a.robot_port,
+               a.light_ip,
+               a.light_port,
+               a.identity_manager,
+               a.identity_code,
+               a.lnferad_IP,
+               a.Inferad_Port,
+               a.Inferad_username,
+               a.Inferad_password,
+               a.phote_path,
+               a.create_by,
+               a.create_date,
+               a.update_by,
+               a.update_date,
+               a.robot_factory,
+               a.is_use,
+               a.commission_date,
+               a.up_region_id,
+               a.robot_position,
+               a.remarks,
+               a.record_id,
+               a.channel_num_light   as numLight,
+               a.channel_num_inferad as numInferad,
+               a.nest_name,
+               a.nest_code,
+               a.drone_type,
+               a.drone_position
+        from t_robot_info a
+        where 1 = 1
+          and a.robot_id = #{robotId, jdbcType=BIGINT} limit 1
+    </select>
+
+    <select id="selectByRecordId" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.control.entity.RecorderConInfo">
+        select a.record_id,
+               a.record_name,
+               a.record_ip,
+               a.protocol,
+               a.http_port,
+               a.trans_port,
+               a.rtsp_port,
+               a.identity_manager,
+               a.identity_code,
+               a.max_channel,
+               a.device_channel
+        from t_camera_recorder a
+        where 1 = 1
+          and a.record_id = #{recordId, jdbcType=BIGINT} limit 1
+    </select>
+
+</mapper>
