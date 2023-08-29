@@ -319,6 +319,11 @@
         <artifactId>thumbnailator</artifactId>
         <version>0.4.17</version>
         </dependency>
+        <dependency>
+            <groupId>com.yjh</groupId>
+            <artifactId>IotVideoApi</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
