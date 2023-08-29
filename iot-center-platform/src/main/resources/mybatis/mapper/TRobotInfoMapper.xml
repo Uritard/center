@@ -598,8 +598,7 @@
         left join t_dict_business b on a.robot_factory = b.dict_code
         left join t_dict_business c on a.robot_type = c.dict_code
         left join t_dict_business d on a.robot_position = d.dict_code
-        where a.is_use = 166
-        <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR}</if>
+        where a.is_use = 166 and a.robot_position != ''
     </select>
     <select id="selectDictCode" resultType="java.lang.String">
         select

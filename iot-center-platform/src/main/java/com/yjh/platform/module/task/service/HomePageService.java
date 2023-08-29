@@ -149,10 +149,10 @@ public class HomePageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<RobotInfoForHomePage> robotInfoForHomePage(String robotPosition) throws Exception {
+    public List<Map<String, List<RobotInfoForHomePage>>> robotInfoForHomePage() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DecimalFormat df = new DecimalFormat("#0");
-        List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo(robotPosition);
+        List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo();
         for (RobotInfoForHomePage item : robotList) {
             //计算机器人投运时间
             if (item.getCommissionDate() == null) {
@@ -250,7 +250,8 @@ public class HomePageService {
                 item.setRobotStates("");//机器人状态
             }
         }
-        return robotList;
+        Map<String, List<RobotInfoForHomePage>> resultMap = robotList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(RobotInfoForHomePage::getPositionName));
+        return Collections.singletonList(resultMap);
     }
 
     @Transactional(rollbackFor = Exception.class)
