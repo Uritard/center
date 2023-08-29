@@ -25,6 +25,7 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -149,7 +151,7 @@ public class HomePageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, List<RobotInfoForHomePage>>> robotInfoForHomePage() throws Exception {
+    public List<Map<String, Object>> robotInfoForHomePage() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DecimalFormat df = new DecimalFormat("#0");
         List<RobotInfoForHomePage> robotList = tRobotInfoDao.selectRobotInfo();
@@ -250,8 +252,27 @@ public class HomePageService {
                 item.setRobotStates("");//机器人状态
             }
         }
+        List<Map<String, Object>> resultList = Lists.newArrayList();
         Map<String, List<RobotInfoForHomePage>> resultMap = robotList.stream().filter(Objects::nonNull).collect(Collectors.groupingBy(RobotInfoForHomePage::getPositionName));
-        return Collections.singletonList(resultMap);
+        resultMap.forEach((k, v) -> {
+            Map<String, Object> map = new HashMap<>(3);
+            map.put("name", k);
+            map.put("value", getRobotPositionValue(k));
+            map.put("list", v);
+            resultList.add(map);
+        });
+        return resultList;
+    }
+
+    private String getRobotPositionValue(String positionName) {
+        switch (positionName) {
+            case "室内轮式":
+                return "tab_indoor";
+            case "室外轮式":
+                return "tab_outdoor";
+            default:
+                return "tab_tunnel";
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

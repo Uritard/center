@@ -1,14 +1,26 @@
 package com.yjh.platform.module.video.dao;
 
+import com.yjh.platform.module.video.entity.CameraConInfo;
+import com.yjh.platform.module.video.entity.RecorderConInfo;
+import com.yjh.platform.module.video.entity.RobotConInfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
- * <功能描述>
- *
- * @author YIJIAHE
- * @date 2023/8/29
- * @since [产品/模块版本] （可选）
+ * @author tt
+ * @since 2020-08-20
  */
 @Repository
 public interface CameraConDao {
+
+    CameraConInfo selectConInfo(@Param(value = "cameraId") Long cameraId, @Param(value = "presetId") Long presetId);
+
+    List<CameraConInfo> batchSelectConInfo(@Param("list") List<Long> list);
+
+    RobotConInfo selectRobotConInfo(@Param("robotId") Long robotId);
+
+    RecorderConInfo selectByRecordId(@Param(value = "recordId") Long recordId);
+
 }

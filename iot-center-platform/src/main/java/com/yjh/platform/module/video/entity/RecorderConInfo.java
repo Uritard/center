@@ -1,4 +1,4 @@
-package com.yjh.platform.module.control.entity;
+package com.yjh.platform.module.video.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

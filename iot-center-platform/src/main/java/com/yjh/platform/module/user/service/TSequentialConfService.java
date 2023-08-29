@@ -16,7 +16,7 @@ import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
-import com.yjh.platform.file.FileUtil;
+import com.yjh.platform.module.file.FileUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

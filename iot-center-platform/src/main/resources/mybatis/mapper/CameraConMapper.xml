@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.control.dao.CameraConDao">
+<mapper namespace="com.yjh.platform.module.video.dao.CameraConDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yjh.platform.module.control.entity.CameraConInfo">
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.video.entity.CameraConInfo">
         <id column="camera_id" jdbcType="BIGINT" property="cameraId"/>
         <result column="channel_num" jdbcType="INTEGER" property="channelNum"/>
         <result column="preset_id" jdbcType="BIGINT" property="presetId"/>
@@ -29,7 +29,7 @@
     </sql>
 
     <select id="selectConInfo" parameterType="java.lang.Long"
-            resultType="com.yjh.platform.module.control.entity.CameraConInfo">
+            resultType="com.yjh.platform.module.video.entity.CameraConInfo">
         SELECT
         a.camera_id,
         a.channel_num,
@@ -60,7 +60,7 @@
         limit 1
     </select>
 
-    <select id="batchSelectConInfo" resultType="com.yjh.platform.module.control.entity.CameraConInfo">
+    <select id="batchSelectConInfo" resultType="com.yjh.platform.module.video.entity.CameraConInfo">
         SELECT
         a.camera_id,
         a.channel_num,
@@ -87,7 +87,7 @@
     </select>
 
     <select id="selectRobotConInfo" parameterType="java.lang.Long"
-            resultType="com.yjh.platform.module.control.entity.RobotConInfo">
+            resultType="com.yjh.platform.module.video.entity.RobotConInfo">
         select a.robot_id,
                a.robot_code,
                a.robot_name,
@@ -125,7 +125,7 @@
     </select>
 
     <select id="selectDroneConInfo" parameterType="java.lang.Long"
-            resultType="com.yjh.platform.module.control.entity.RobotConInfo">
+            resultType="com.yjh.platform.module.video.entity.RobotConInfo">
         select a.robot_id,
                a.robot_code,
                a.robot_name,
@@ -165,7 +165,7 @@
     </select>
 
     <select id="selectByRecordId" parameterType="java.lang.Long"
-            resultType="com.yjh.platform.module.control.entity.RecorderConInfo">
+            resultType="com.yjh.platform.module.video.entity.RecorderConInfo">
         select a.record_id,
                a.record_name,
                a.record_ip,
