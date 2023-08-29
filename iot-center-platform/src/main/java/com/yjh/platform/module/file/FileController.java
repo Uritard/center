@@ -1,4 +1,4 @@
-package com.yjh.platform.file;
+package com.yjh.platform.module.file;
 
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;

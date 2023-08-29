@@ -1,4 +1,4 @@
-package com.yjh.platform.module.control.entity;
+package com.yjh.platform.module.video.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
