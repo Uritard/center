@@ -102,7 +102,7 @@ public interface TRobotInfoDao {
     //通过巡视点ID查询绑定的机器人
     Long selectRobotScreen(@Param(value = "instanceId")Long instanceId);
 
-    List<RobotInfoForHomePage>selectRobotInfo(@Param(value = "robotPosition")String robotPosition);
+    List<RobotInfoForHomePage>selectRobotInfo();
 
     String selectDictCode(@Param(value = "colName")String colName,
                           @Param(value = "dictNote")String dictNote);
