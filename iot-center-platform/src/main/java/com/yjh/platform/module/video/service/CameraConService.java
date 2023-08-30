@@ -539,11 +539,41 @@ public class CameraConService {
                 .setPresetCmd(presetCmd)
                 .build();
         Result result = ptzService.presetCommand(presetEntity);
-        return result.getCode() == 200;
+        boolean ret = result.getCode() == 200;
+        if (ret && presetCmd.equals(PresetCmd.PRESET_DELETE)) {
+            String capturePresetPath = getPresetBasePath();
+            String delPresetPic = "rm -rf " + capturePresetPath + "/" + presetId;
+            try {
+                Runtime.getRuntime().exec(delPresetPic);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return ret;
     }
 
-    public String getCameraPTZ(Long presetId, Long cameraId) {
-        return null;
+    /**
+     * 获取相机PTZ信息
+     * @param presetId
+     * @param cameraId
+     * @return
+     * @throws IOException
+     */
+    public String getCameraPTZ(Long presetId, Long cameraId) throws IOException {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+        if (cameraConInfo == null) {
+            throw new BusinessException("无此摄像机或摄像机预置位不正确");
+        }
+        //调用海康IsApi接口
+        IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.HIK, IPtzService.class);
+        PresetEntity presetEntity = new PresetEntity.Builder()
+                .setIp(cameraConInfo.getCameraIp())
+                .setPort(80)
+                .setUserName(cameraConInfo.getCameraManager())
+                .setPassword(cameraConInfo.getCameraCode())
+                .build();
+        Result result = ptzService.getCameraPtz(presetEntity);
+        return String.valueOf(result.getData());
     }
 
     public String getPresetBasePath() {
