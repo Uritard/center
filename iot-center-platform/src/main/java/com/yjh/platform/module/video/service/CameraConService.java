@@ -236,8 +236,8 @@ public class CameraConService {
                         Result result = iPlayService.videoPlayByWvp(playEntity);
                         Map data = (Map) result.getData();
                         Map<String, Object> infraredMap = new HashMap<>();
-                        infraredMap.put("light", infraredCameraId);
-                        infraredMap.put("rtmpUrl", data.get("rtmp"));
+                        infraredMap.put("inferad", infraredCameraId);
+                        infraredMap.put("rtmpUrlInferad", data.get("rtmp"));
                         webRtcUrl((String) data.get("rtc"), infraredMap, 1);
                         returnMapList.add(infraredMap);
                     }
