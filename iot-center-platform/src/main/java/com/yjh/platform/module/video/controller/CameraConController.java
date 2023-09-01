@@ -335,4 +335,20 @@ public class CameraConController {
         }
         return result;
     }
+
+    @ApiOperation(value = "开启语音广播")
+    @GetMapping(value = "/startVoiceTrans")
+    public Result startVoiceTrans(@RequestParam(value = "deviceId") Long deviceId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.startVoiceTrans(deviceId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("开启语音对讲失败描述:", e);
+        }
+        return result;
+    }
+
 }
