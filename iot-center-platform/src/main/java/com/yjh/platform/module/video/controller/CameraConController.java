@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -91,22 +92,6 @@ public class CameraConController {
         return result;
     }
 
-    @ApiOperation(value = "机器人相机播放")
-    @RequestMapping(value = "/robotStartRealPlay", method = RequestMethod.GET)
-//    @Logs(title = "机器人相机播放",content = "根据用户传递的参数控制机器人相机播放",logType = 5, authority = "1234,1235")
-    public Result robotStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
-        Result result = new Result();
-        try {
-            result.setData(cameraConService.robotStartRealPlay(robotId));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("机器人相机播放失败:", e);
-        }
-        return result;
-    }
-
     @ApiOperation(value = "相机批量停止播放")
     @RequestMapping(value = "/batchStopRealPlay", method = RequestMethod.POST)
     public Result batchStopRealPlay(@RequestBody List<Map<String, String>> list) {
@@ -127,6 +112,52 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "机器人相机播放")
+    @RequestMapping(value = "/robotStartRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "机器人相机播放",content = "根据用户传递的参数控制机器人相机播放",logType = 5, authority = "1234,1235")
+    public Result robotStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.robotStartRealPlay(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人相机播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "机器人相机停止播放")
+    @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
+    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.robotStopRealPlay(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人相机停止播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "结束推流")
+    @RequestMapping(value = "/stopStream", method = RequestMethod.GET)
+    public Result stopStream(@RequestParam(value = "cameraId") String cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.stopStream(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机停止播放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "视频回放")
     @RequestMapping(value = "/startPlayBack", method = RequestMethod.GET)
 //    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
@@ -136,6 +167,27 @@ public class CameraConController {
         Result result = new Result();
         try {
             result.setData(cameraConService.startPlayBack(cameraId, startTime, stopTime));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("视频回放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "视频回放")
+    @RequestMapping(value = "/startVideoBack", method = RequestMethod.GET)
+//    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
+    public Result startVideoBack(HttpServletRequest request,
+                                 @RequestParam(value = "cameraId") Long cameraId,
+                                 @RequestParam(value = "startTime") String startTime,
+                                 @RequestParam(value = "stopTime") String stopTime) {
+        Result result = new Result();
+        try {
+            String token = request.getHeader("token");
+            log.info("token:{}",token);
+            result.setData(cameraConService.startVideoBack(token, cameraId, startTime, stopTime));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
