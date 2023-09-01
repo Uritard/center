@@ -19,15 +19,12 @@ import com.yjh.video.api.service.IPlayService;
 import com.yjh.video.api.service.IPlaybackService;
 import com.yjh.video.api.service.IPtzService;
 import com.yjh.video.api.service.VideoServiceFactory;
-import com.yjh.video.api.service.impl.IPlayServiceImpl;
-import com.yjh.video.api.service.impl.IPtzServiceImpl;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -561,13 +558,9 @@ public class CameraConService {
         if (cameraConInfo == null) {
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
         }
-        String wvpServerIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerIp"));
-        Integer wvpServerPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerPort")));
         IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
         PresetEntity presetEntity = PresetEntity.builder()
-                .setIp(wvpServerIp)
-                .setPort(wvpServerPort)
-                .setPresetId(String.valueOf(presetId))
+                .setPresetId(String.valueOf(cameraConInfo.getPresetNum()))
                 .setDeviceId(cameraConInfo.getDeviceChannel())
                 .setChannelId(cameraConInfo.getCameraChannelId())
                 .setPresetCmd(presetCmd)
@@ -602,12 +595,38 @@ public class CameraConService {
         IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.HIK, IPtzService.class);
         PresetEntity presetEntity = PresetEntity.builder()
                 .setIp(cameraConInfo.getCameraIp())
-                .setPort(80)
+                .setPort(cameraConInfo.getPort())
                 .setUserName(cameraConInfo.getCameraManager())
                 .setPassword(cameraConInfo.getCameraCode())
                 .build();
         Result result = ptzService.getCameraPtz(presetEntity);
         return String.valueOf(result.getData());
+    }
+
+
+    /**
+     * 语音广播 目前只支持GB28181-2016版本
+     * @param deviceId  机器人id(获取机器人的可见光视频通道编码) 或者 相机id
+     */
+    public Object startVoiceTrans(Long deviceId) {
+        String channelId;
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(deviceId, null);
+        if (cameraConInfo == null) {
+            RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(deviceId);
+            if (robotConInfo == null) {
+                throw new BusinessException("无此设备信息");
+            } else {
+                channelId = robotConInfo.getLightChannelId();
+            }
+        } else {
+            channelId = cameraConInfo.getCameraChannelId();
+        }
+        if (StringUtils.isBlank(channelId)) {
+            throw new BusinessException("此设备未配置通道ID");
+        }
+        IPlayService playService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        PlayEntity playEntity = PlayEntity.builder().setChannelId(channelId).build();
+        return playService.broadcastPlay(playEntity).getData();
     }
 
     public String getPresetBasePath() {
