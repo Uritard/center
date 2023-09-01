@@ -520,4 +520,16 @@ public class CommonUtils {
         }
         return CommonUtils.percentFormat((float)size, "#.##") + units[i];
     }
+
+    public static String replaceIpAndPort(String url, String newIp, String newPort) {
+        Pattern pattern = Pattern.compile("//\\d+\\.\\d+\\.\\d+\\.\\d+(:\\d+)?");
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) {
+            String matchedString = matcher.group();
+            String replacedString = matchedString.replaceAll("\\d+\\.\\d+\\.\\d+\\.\\d+", newIp)
+                    .replaceAll(":\\d+", ":" + newPort);
+            return url.replace(matchedString, replacedString);
+        }
+        return url;
+    }
 }

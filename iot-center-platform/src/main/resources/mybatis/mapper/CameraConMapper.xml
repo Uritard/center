@@ -118,7 +118,9 @@
                a.channel_num_light   as numLight,
                a.channel_num_inferad as numInferad,
                a.channel_num_light,
-               a.channel_num_inferad
+               a.channel_num_inferad,
+               a.light_channel_id,
+               a.infrared_channel_id
         from t_robot_info a
         where 1 = 1
           and a.robot_id = #{robotId, jdbcType=BIGINT} limit 1

@@ -2,17 +2,21 @@ package com.yjh.platform.module.video.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.video.dao.CameraConDao;
 import com.yjh.platform.module.video.entity.CameraConInfo;
 import com.yjh.platform.module.video.entity.RecorderConInfo;
 import com.yjh.platform.module.video.entity.RobotConInfo;
 import com.yjh.video.api.CameraVendor;
+import com.yjh.video.api.entity.PlayBackEntity;
 import com.yjh.video.api.entity.PlayEntity;
 import com.yjh.video.api.entity.PtzControlEntity;
 import com.yjh.video.api.entity.preset.PresetCmd;
 import com.yjh.video.api.entity.preset.PresetEntity;
 import com.yjh.video.api.result.Result;
+import com.yjh.video.api.service.IPlayService;
+import com.yjh.video.api.service.IPlaybackService;
 import com.yjh.video.api.service.IPtzService;
 import com.yjh.video.api.service.VideoServiceFactory;
 import com.yjh.video.api.service.impl.IPlayServiceImpl;
@@ -25,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
@@ -37,6 +42,7 @@ import java.util.*;
  * @author zhangyuyi
  * @create 2023-08-28
  */
+@Service
 public class CameraConService {
     private final static Logger log = LoggerFactory.getLogger(CameraConService.class);
     @Autowired
@@ -44,9 +50,6 @@ public class CameraConService {
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
-
-    @Value("${spring.redis.host}")
-    private String hostIp;
 
     /**
      * 流媒体服务器 ZLMediaKit
@@ -119,13 +122,10 @@ public class CameraConService {
             PlayEntity playEntity = new PlayEntity.Builder()
                     .setDeviceId(cameraConInfo.getDeviceChannel())
                     .setChannelId(cameraConInfo.getCameraChannelId()).build();
-            IPlayServiceImpl iPlayService = new IPlayServiceImpl();
+            IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
             Result result = iPlayService.videoPlayByWvp(playEntity);
             Map data = (Map) result.getData();
-            returnMap.put("rtmpUrl", data.get("rtmp"));
-            String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-            isHttps(videoHttps, String.valueOf(cameraId), returnMap);
-            webRtcUrl(cameraId, returnMap);
+            webRtcUrl((String) data.get("rtc"), returnMap, 1);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -139,9 +139,11 @@ public class CameraConService {
         //回放视频流可停止
         if (StringUtils.isNotBlank(rtmpUrl) && rtmpUrl.contains("history")) {
             cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
-            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+//            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             // 调用停止播放API
-
+            PlayEntity playEntity = PlayEntity.builder().setDeviceId(String.valueOf(cameraId)).build();
+            IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+            iPlayService.stopRealPlay(playEntity);
         }
         return "stop " + cameraId + " preview success!";
     }
@@ -169,9 +171,12 @@ public class CameraConService {
             PlayEntity.Builder builder = new PlayEntity.Builder();
             builder.setDeviceId(cameraConInfo.getDeviceChannel());
             builder.setChannelId(cameraConInfo.getCameraChannelId());
-            PlayEntity playEntity = new PlayEntity(builder);
+            PlayEntity playEntity = PlayEntity.builder().
+                    setDeviceId(cameraConInfo.getDeviceChannel())
+                    .setChannelId(cameraConInfo.getCameraChannelId())
+                    .build();
             Result result = new Result();
-            IPlayServiceImpl iPlayService = new IPlayServiceImpl();
+            IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
             try {
                 result = iPlayService.videoPlayByWvp(playEntity);
             } catch (Exception e) {
@@ -180,10 +185,7 @@ public class CameraConService {
             Map data = (Map) result.getData();
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
-            returnMap.put("rtmpUrl", data.get("rtmp"));
-            String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-            isHttps(videoHttps, String.valueOf(cameraId), returnMap);
-            webRtcUrl(cameraId, returnMap);
+            webRtcUrl((String) data.get("rtc"), returnMap, 1);
             returnMapList.add(returnMap);
         });
 
@@ -210,38 +212,41 @@ public class CameraConService {
         String lightCameraId = robotId + "9901";
         String infraredCameraId = robotId + "9902";
         RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-        IPlayServiceImpl iPlayService = new IPlayServiceImpl();
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         // 当配置了nvr的通道就走nvr的，并且recordID != null and recordID > 0L and recorderConInfo != null and recorderConInfo.getRecordIp() != null ,反之走原先的
         if (Objects.nonNull(robotConInfo.getRecordId()) && robotConInfo.getRecordId() > 0L) {
             RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
             if (Objects.nonNull(recorderConInfo) && StringUtils.isNotEmpty(recorderConInfo.getRecordIp())) {
                 try {
                     PlayEntity playEntity;
-                    if (robotConInfo.getChannelNumLight() != null) {
-                        playEntity = new PlayEntity.Builder().setDeviceId(recorderConInfo.getDeviceChannel())
-                                .setChannelId(String.valueOf(robotConInfo.getChannelNumLight())).build();
+                    if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId())) {
+                        playEntity = PlayEntity.builder().setDeviceId(recorderConInfo.getDeviceChannel())
+                                .setChannelId(String.valueOf(robotConInfo.getLightChannelId())).build();
                         Result result = iPlayService.videoPlayByWvp(playEntity);
                         Map data = (Map) result.getData();
-                        Map<String, Object> returnMap = new HashMap<>();
-                        returnMap.put("light", lightCameraId);
-                        returnMap.put("rtmpUrl", data.get("rtmp"));
-                        returnMapList.add(returnMap);
+                        Map<String, Object> lightMap = new HashMap<>();
+                        lightMap.put("light", lightCameraId);
+                        lightMap.put("rtmpUrl", data.get("rtmp"));
+                        webRtcUrl((String) data.get("rtc"), lightMap, 1);
+                        returnMapList.add(lightMap);
                     }
-                    if (robotConInfo.getChannelNumInferad() != null) {
-                        playEntity = new PlayEntity.Builder().setDeviceId(recorderConInfo.getDeviceChannel())
-                                .setChannelId(String.valueOf(robotConInfo.getChannelNumInferad())).build();
+                    if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId())) {
+                        playEntity = PlayEntity.builder().setDeviceId(recorderConInfo.getDeviceChannel())
+                                .setChannelId(String.valueOf(robotConInfo.getInfraredChannelId())).build();
                         Result result = iPlayService.videoPlayByWvp(playEntity);
                         Map data = (Map) result.getData();
-                        Map<String, Object> returnMap = new HashMap<>();
-                        returnMap.put("light", infraredCameraId);
-                        returnMap.put("rtmpUrl", data.get("rtmp"));
-                        returnMapList.add(returnMap);
+                        Map<String, Object> infraredMap = new HashMap<>();
+                        infraredMap.put("light", infraredCameraId);
+                        infraredMap.put("rtmpUrl", data.get("rtmp"));
+                        webRtcUrl((String) data.get("rtc"), infraredMap, 1);
+                        returnMapList.add(infraredMap);
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }
         } else {
+            // 拉流
             try {
                 Map<String, Object> returnLightMap = getRobotStream(robotConInfo, lightCameraId);
 
@@ -263,7 +268,7 @@ public class CameraConService {
                 }
                 transUrlinferad = sign(transUrlinferad, infraredCameraId);
 //                VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(infraredCameraId);
-                PlayEntity playEntity = new PlayEntity.Builder().setDeviceId(infraredCameraId)
+                PlayEntity playEntity = PlayEntity.builder().setDeviceId(infraredCameraId)
                         .setCommand(transUrlinferad)
                         .build();
                 iPlayService.videoPlayByFFM(playEntity);
@@ -275,8 +280,6 @@ public class CameraConService {
                 Map<String, Object> returnInferadMap = new HashMap<>();
                 returnInferadMap.put("inferad", infraredCameraId);
                 returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
-                String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-                isHttps(videoHttps, infraredCameraId, returnInferadMap);
                 webRtcUrl(infraredCameraId, returnInferadMap);
                 returnMapList.add(returnLightMap);
                 returnMapList.add(returnInferadMap);
@@ -289,11 +292,19 @@ public class CameraConService {
 
     public Map<String, Object> getRobotStream(RobotConInfo robotConInfo, String robotCameraId) {
         Map<String, Object> returnLightMap = new HashMap<>();
-        IPlayServiceImpl iPlayService = new IPlayServiceImpl();
+        String wvpServerIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerIp"));
+        Integer wvpServerPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerPort")));
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         try {
-            if (robotConInfo.getChannelNumLight() != null && robotConInfo.getChannelNumInferad() == null) {
-
-
+            if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId()) && Objects.nonNull(robotConInfo.getRecordId())
+                    && robotConInfo.getRecordId() > 0L) {
+                RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
+                PlayEntity playEntity = new PlayEntity.Builder()
+                        .setDeviceId(recorderConInfo.getDeviceChannel())
+                        .setChannelId(robotConInfo.getLightChannelId()).build();
+                Result result = iPlayService.videoPlayByWvp(playEntity);
+                Map data = (Map) result.getData();
+                webRtcUrl((String) data.get("rtc"), returnLightMap, 1);
             } else {
                 String lightIp = robotConInfo.getLightIp();
                 String lightPort = robotConInfo.getLightPort();
@@ -302,28 +313,32 @@ public class CameraConService {
                 String robotLightVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotLightVideo"));
                 String transUrlLight = String.format(robotLightVideo, lightUsername, lightPassword, lightIp, lightPort, 1, robotCameraId);
                 transUrlLight = sign(transUrlLight, robotCameraId);
-//                VideoInfo videoInfo = new VideoInfo().setCommand(transUrlLight).setId(robotCameraId);
-                PlayEntity playEntity = new PlayEntity.Builder().setCommand(transUrlLight).setDeviceId(robotCameraId).build();
-                Result result = iPlayService.videoPlayByFFM(playEntity);
+                PlayEntity playEntity = new PlayEntity.Builder()
+                        .setCommand(transUrlLight).setDeviceId(robotCameraId).build();
+                iPlayService.videoPlayByFFM(playEntity);
                 log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword,
                         lightIp, lightPort, robotCameraId, transUrlLight);
-                String[] rtmpUrls = transUrlLight.split("rtmp");
-                String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
-
                 returnLightMap.put("light", robotCameraId);
-                returnLightMap.put("rtmpUrl", rtmpUrl);
+                webRtcUrl(robotCameraId, returnLightMap);
             }
-
-            webRtcUrl(robotCameraId, returnLightMap);
-            String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-            isHttps(videoHttps, robotCameraId, returnLightMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
         return returnLightMap;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String robotStopRealPlay(Long robotId) {
+        return "stop " + robotId + " preview success!";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String stopStream(String cameraId) {
+        PlayEntity playEntity = PlayEntity.builder().setDeviceId(String.valueOf(cameraId)).build();
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        iPlayService.stopRealPlay(playEntity);
+        return "stop " + cameraId + " preview success!";
+    }
 
     public String sign(String transUrl, Long cameraId) {
         String cameraStr = cameraId == null ? null : String.valueOf(cameraId);
@@ -379,8 +394,6 @@ public class CameraConService {
             } else {
                 cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             }
-
-            IPlayServiceImpl iPlayService = new IPlayServiceImpl();
             Long id = System.currentTimeMillis();
             if (cameraConInfo.getCameraChannelId() == null) {
                 String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
@@ -403,24 +416,48 @@ public class CameraConService {
                                 "historyPath:{}, historyTransUrl: {}"
                         , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
 //                VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id.toString());
-                PlayEntity playEntity = new PlayEntity.Builder().setDeviceId(id.toString())
+                PlayEntity playEntity = PlayEntity.builder().setDeviceId(id.toString())
                         .setCommand(transUrl).build();
+                IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
                 iPlayService.videoPlayByFFM(playEntity);
-
-                String[] rtmpUrls = transUrl.split("rtmp");
-                String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
-                returnMap.put("rtmpUrl", rtmpUrl);
+                webRtcUrl(id, returnMap, true);
             } else {
-                PlayEntity playEntity = new PlayEntity.Builder().setDeviceId(cameraConInfo.getDeviceChannel())
-                        .setChannelId(cameraConInfo.getCameraChannelId()).build();
-                Result result = iPlayService.videoPlayByWvp(playEntity);
+                String starttime = startTime.replace(" ", "%20");
+                String endtime = stopTime.replace(" ", "%20");
+                PlayBackEntity playBackEntity = PlayBackEntity.builder().setDeviceId(cameraConInfo.getDeviceChannel())
+                        .setChannelId(cameraConInfo.getCameraChannelId())
+                        .setStartTime(starttime)
+                        .setEndTime(endtime).build();
+                IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
+                Result result = iPlaybackService.playBackStart(playBackEntity);
                 Map resultMap = (Map) result.getData();
-                returnMap.put("rtmpUrl", resultMap.get("rtmp"));
+                webRtcUrl((String) resultMap.get("rtc"), returnMap, 1);
             }
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
-            webRtcUrl(id, returnMap, true);
-            String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
-            isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return returnMap;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> startVideoBack(String token,
+                                              Long cameraId, String startTime, String stopTime) {
+        Map<String, Object> returnMap = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            String starttime = startTime.replace(" ", "%20");
+            String endtime = stopTime.replace(" ", "%20");
+            PlayBackEntity playBackEntity = PlayBackEntity.builder()
+                    .setDeviceId(cameraConInfo.getDeviceChannel())
+                    .setChannelId(cameraConInfo.getCameraChannelId())
+                    .setStartTime(starttime)
+                    .setEndTime(endtime).build();
+            IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
+            Result result = iPlaybackService.playBackStart(playBackEntity);
+            Map resultMap = (Map) result.getData();
+            webRtcUrl((String) resultMap.get("rtc"), returnMap, 1);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -430,8 +467,6 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        //修改为直接调用控制sdk NET_DVR_PTZControlWithSpeed_Other
-        int iChanNum = cameraConInfo.getChannelNum() + 32;
         String command;
         Integer horizonSpeed = 0;
         Integer verticalSpeed = 0;
@@ -495,9 +530,8 @@ public class CameraConService {
                     break;
             }
         }
-
-        IPtzServiceImpl iPtzService = new IPtzServiceImpl();
-        PtzControlEntity ptzControlEntity = new PtzControlEntity.Builder()
+        IPtzService iPtzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
+        PtzControlEntity ptzControlEntity = PtzControlEntity.builder()
                 .setDeviceId(cameraConInfo.getDeviceChannel())
                 .setChannelId(cameraConInfo.getCameraChannelId())
                 .setCommand(command)
@@ -530,7 +564,7 @@ public class CameraConService {
         String wvpServerIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerIp"));
         Integer wvpServerPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerPort")));
         IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
-        PresetEntity presetEntity = new PresetEntity.Builder()
+        PresetEntity presetEntity = PresetEntity.builder()
                 .setIp(wvpServerIp)
                 .setPort(wvpServerPort)
                 .setPresetId(String.valueOf(presetId))
@@ -566,7 +600,7 @@ public class CameraConService {
         }
         //调用海康IsApi接口
         IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.HIK, IPtzService.class);
-        PresetEntity presetEntity = new PresetEntity.Builder()
+        PresetEntity presetEntity = PresetEntity.builder()
                 .setIp(cameraConInfo.getCameraIp())
                 .setPort(80)
                 .setUserName(cameraConInfo.getCameraManager())
@@ -580,27 +614,19 @@ public class CameraConService {
         return (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
     }
 
-
-    /**
-     * 历史视频是否为https
-     */
-    private void isHttpsHistory(String videoHttps, String id, Map<String, Object> returnMap) {
-        String flvsUrl = "";
-        String flvUrl = "";
-        if ("1".equals(videoHttps)) {
-            flvsUrl = "https://" + hostIp + ":8088/history/" + id + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            flvUrl = "http://" + hostIp + ":10080/history/" + id + ".flv";
-            returnMap.put("flvUrl", flvUrl);
-        }
-    }
-
     /**
      * 组装webRtc播放路径，SRS和ZLMediaKit播放路径不同
      */
     private void webRtcUrl(Long id, Map<String, Object> returnMap) {
         webRtcUrl(String.valueOf(id), returnMap, false);
+    }
+
+    private void webRtcUrl(String url, Map<String, Object> returnMap, Integer isWebRtcUrl) {
+        Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
+        String hostIp = hostIpMap.get("content");
+        String[] split = hostIp.split(":");
+        String newUrl = CommonUtils.replaceIpAndPort(url, split[0], split[1]);
+        returnMap.put("webRtcUrl", newUrl);
     }
 
     private void webRtcUrl(String id, Map<String, Object> returnMap) {
@@ -614,6 +640,8 @@ public class CameraConService {
     private void webRtcUrl(String id, Map<String, Object> returnMap, boolean isHistory) {
         String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
         String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
+        Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
+        String hostIp = hostIpMap.get("content");
         String webRtcUrl;
         if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
@@ -627,16 +655,4 @@ public class CameraConService {
         returnMap.put("webRtcUrl", webRtcUrl);
     }
 
-    /**
-     * 实时视频是否为https
-     */
-    private void isHttps(String videoHttps, String id, Map<String, Object> returnMap) {
-        if ("1".equals(videoHttps)) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + id + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + id + ".flv";
-            returnMap.put("flvUrl", flvUrl);
-        }
-    }
 }
