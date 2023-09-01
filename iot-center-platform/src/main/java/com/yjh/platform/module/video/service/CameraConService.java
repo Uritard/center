@@ -1,6 +1,7 @@
 package com.yjh.platform.module.video.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -608,7 +609,7 @@ public class CameraConService {
      * 语音广播 目前只支持GB28181-2016版本
      * @param deviceId  机器人id(获取机器人的可见光视频通道编码) 或者 相机id
      */
-    public Object startVoiceTrans(Long deviceId) {
+    public String startVoiceTrans(Long deviceId) {
         String channelId;
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(deviceId, null);
         if (cameraConInfo == null) {
@@ -626,7 +627,11 @@ public class CameraConService {
         }
         IPlayService playService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         PlayEntity playEntity = PlayEntity.builder().setChannelId(channelId).build();
-        return playService.broadcastPlay(playEntity).getData();
+        Result result = playService.broadcastPlay(playEntity);
+        if (result.getCode() != 200) {
+            throw new RuntimeException(result.getMessage());
+        }
+        return channelId;
     }
 
     public String getPresetBasePath() {
