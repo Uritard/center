@@ -38,8 +38,11 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "录像机ID")
     private Long recordId;
 
-    @ApiModelProperty(value = "服务器地址")
+    @ApiModelProperty(value = "NVR IP地址")
     private String recordIp;
+
+    @ApiModelProperty(value = "NVR通信端口")
+    private int recordPort;
 
     @ApiModelProperty(value = "NVR用户名")
     private String identityManager;
@@ -47,11 +50,14 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "NVR密码")
     private String identityCode;
 
-    @ApiModelProperty(value = "控制端口")
+    @ApiModelProperty(value = "播流端口")
     private Integer rtspPort;
 
     @ApiModelProperty(value = "NVR类型")
     private String recorderType;
+
+    @ApiModelProperty(value = "NVR厂家")
+    private String recordVendor;
 
     @ApiModelProperty(value = "相机用户名")
     private String cameraManager;
@@ -61,9 +67,6 @@ public class CameraConInfo implements Serializable {
 
     @ApiModelProperty(value = "相机IP")
     private String cameraIp;
-
-//    @ApiModelProperty(value = "相机本身通道号")
-//    private Integer cameraNum;
 
     @ApiModelProperty(value = "相机控制端口")
     private Integer port;
@@ -79,4 +82,7 @@ public class CameraConInfo implements Serializable {
 
     @ApiModelProperty(value = "设备ID")
     private String deviceChannel;
+
+    @ApiModelProperty(value = "相机厂家ID")
+    private String vendorId;
 }

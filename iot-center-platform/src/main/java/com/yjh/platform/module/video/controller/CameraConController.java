@@ -230,29 +230,14 @@ public class CameraConController {
         @RequestParam(value = "meteName", required = false) String meteName,
         @RequestParam(value = "parentPath", required = false) String parentPath) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
         try {
             cameraConService.isCameraControlled(cameraId);
-            int max=9999,min=1;
-            int ran = (int) (Math.random()*(max-min)+min);
-            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-            String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
-            String filePathTem = "/" + parent + formatter.format(new Date())+ ran + ".jpg";
-            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
-            String filePath = captureResultPath + filePathTem;
-            log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
-            String urlPath = capturePath + filePathTem;
-            resultMap.put("urlPath", urlPath);
-            resultMap.put("absPath", filePath);
-            String url = "chmod 777 "+ filePath;
-            Runtime.getRuntime().exec(url);
+
+            Map<String, String> resultMap = cameraConService.capturePicture(parentPath, null, cameraId, meteName);
             result.setData(resultMap);
-            result.setMessage(message);
-            cameraConService.pushCtrlTime(cameraId);
+
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("相机抓图失败:", e);
@@ -265,26 +250,11 @@ public class CameraConController {
     public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
         @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
-        Map<String, String> resultMap = new HashMap<>();
         try {
-            int max=9999,min=1;
-            int ran = (int) (Math.random()*(max-min)+min);
-            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
-            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
-            String filePath = captureResultPath + filePathTem;
-            log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
-            String urlPath = capturePath+filePathTem;
-            resultMap.put("urlPath", urlPath);
-            resultMap.put("absPath", filePath);
-            resultMap.put("resultNum", "已拍照");
-            String url = "chmod 777 "+ filePath;
-            Runtime.getRuntime().exec(url);
+
+            Map<String, String> resultMap = cameraConService.capturePicture("", null, cameraId, meteName);
             result.setData(resultMap);
-            result.setMessage(message);
-            cameraConService.pushCtrlTime(cameraId);
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -301,10 +271,8 @@ public class CameraConController {
         @RequestParam(value = "meteName", required = false) String meteName,
         @RequestParam(value = "edgeCode", required = false) String edgeCode) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
         try {
             String capturePresetPath = cameraConService.getPresetBasePath();
-            String capturePathPreset = cameraConService.getPresetUrlPath();
 
             cameraConService.isCameraControlled(cameraId);
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
@@ -314,23 +282,13 @@ public class CameraConController {
 
             String filePath = capturePresetPath + filePathTem;
             log.info("预置位抓图 filePathTem: {},  filePath: {}, edgeCode: {}", filePathTem, filePath, edgeCode);
-            String mkdir = "mkdir "+capturePresetPath+"/"+presetId;
-            if (StringUtils.isNotEmpty(edgeCode)) {
-                mkdir = String.format("mkdir -p %s/%s/%s", capturePresetPath, edgeCode, presetId);
-            }
 
-            log.info("mkdir: "+mkdir);
-            Runtime.getRuntime().exec(mkdir);
             Thread.sleep(2000);
-            log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
-            String urlPath = capturePathPreset+filePathTem;
-            resultMap.put("urlPath", urlPath);
-            String url = "chmod 777 "+ filePath;
-            Runtime.getRuntime().exec(url);
+            log.info("filePath: {}", filePath);
+
+            Map<String, String> resultMap = cameraConService.capturePicture(null, filePath, cameraId, meteName);
             result.setData(resultMap);
-            result.setMessage(message);
-            cameraConService.pushCtrlTime(cameraId);
+
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
