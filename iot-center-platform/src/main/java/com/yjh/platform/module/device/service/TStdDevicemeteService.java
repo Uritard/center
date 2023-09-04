@@ -655,7 +655,7 @@ public class TStdDevicemeteService{
                 }
                 String resData = cameraConService.setPreset(cameraPreset.getPresetId(), cameraPreset.getCameraId());
                 if (StringUtils.isNotEmpty(resData)) {
-                    Map<String, Object> resPicMap = cameraConService.capturePicture(cameraPreset.getEdgeCode(), cameraPreset.getCameraId(), cameraPreset.getPresetName());
+                    Map<String, String> resPicMap = cameraConService.capturePresetPicture(cameraPreset.getPresetId(), cameraPreset.getCameraId(), cameraPreset.getPresetName(), cameraPreset.getEdgeCode());
                     if (resPicMap != null) {
                         log.info("重置预置位相机抓图结果：{}", resPicMap);
                         String urlPath = String.valueOf(resPicMap.get("urlPath"));

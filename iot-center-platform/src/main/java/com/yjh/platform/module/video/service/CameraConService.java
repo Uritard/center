@@ -597,11 +597,10 @@ public class CameraConService {
         String ptzStr = this.getCameraPTZ(presetId, cameraId);
         resultMap.put("cameraPtz", ptzStr);
         // 抓图
-//        Result resultPic = this.capturePicture(cameraId, presetName, "presetCheckImg");
-//        if (resultPic.getData() != null) {
-//            Map<String, Object> picMap = (Map<String, Object>) resultPic.getData();
-//            resultMap.putAll(picMap);
-//        }
+        Map<String, String> picMap = this.capturePresetPicture(presetId, cameraId, presetName, "presetCheckImg");
+        if (picMap != null) {
+            resultMap.putAll(picMap);
+        }
         return resultMap;
     }
 
