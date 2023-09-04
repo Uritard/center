@@ -885,8 +885,8 @@ public class CameraConService {
         IPlayService playService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         PlayEntity playEntity = PlayEntity.builder().channelId(channelId).build();
         Result result = playService.broadcastPlay(playEntity);
-        if (result.getCode() != 200) {
-            throw new RuntimeException(result.getMsg());
+        if (!result.isSuccess()) {
+            throw new BusinessException(result.getMsg());
         }
         return channelId;
     }

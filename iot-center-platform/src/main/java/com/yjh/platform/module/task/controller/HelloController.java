@@ -615,7 +615,7 @@ public class HelloController {
         try {
             TCameraPreset tCameraPreset = new TCameraPreset()
                     .setCameraId(123L);
-            tCameraPresetService.insert(tCameraPreset);
+            tCameraPresetService.insert(tCameraPreset, 0);
             log.info("id==={}", tCameraPreset.getPresetId());
 
         } catch (Exception e) {
