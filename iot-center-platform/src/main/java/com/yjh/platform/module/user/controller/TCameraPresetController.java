@@ -17,6 +17,7 @@ import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,22 +83,16 @@ public class TCameraPresetController {
     @Logs(title = "删除新增预置位信息",content = "根据用户传递的参数删除预置位信息",logType = 4,authority = "1234,1235")
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
-        Map<String, Object> mapResult = new HashMap<>();
         try {
             TCameraPreset tCameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
-            int resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
-            if(resultNum == -1){
-                result.setCode(209,"此预置位已被配置到巡视点");
-            }else {
-                //操作预置位
+            List<Long> list = tCameraPresetService.selectInstanceIdList(tCameraPreset.getPresetId());
+            if (CollectionUtils.isNotEmpty(list)) {
+                result.setCode(209, "预置位已配置到巡视点");
+                return result;
+            } else {
                 tCameraPresetService.cancelPreset(tCameraPreset.getCameraId(), tCameraPreset.getPresetId());
-                if (1 == resultNum){
-                    mapResult.put("code", 200);
-                }else {
-                    mapResult.put("code", 209);
-                }
-                mapResult.put("data", resultNum);
-                result.setData(mapResult);
+                int resultNum = tCameraPresetService.deleteByPrimaryId(tCameraPreset.getPresetId());
+                result.setData(resultNum);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -126,26 +121,20 @@ public class TCameraPresetController {
     public Result deleteSelectedPreset(@RequestParam(value = "presetIds") String presetIds) {
         Result result = new Result();
         try {
-            String presetIdArray[] = presetIds.split(",");
+            String[] presetIdArray = presetIds.split(",");
             Long pr1 = Long.valueOf(presetIdArray[0]);
             TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(pr1);
-            String capturePresetPath = tCameraPresetService.getPresetBasePath();
-            for (int i = 0;i<presetIdArray.length;i++){
-                tCameraPresetService.cancelPreset(tCameraPreset.getCameraId(), Long.valueOf(presetIdArray[i]));
-                String delPresetPic = "rm -rf "+capturePresetPath + "/"+Long.valueOf(presetIdArray[i]);
-                try { Runtime.getRuntime().exec(delPresetPic); } catch (Exception e) { e.getMessage(); }
-                //操作数据库
-                int resultNum = 0;
-                //if (response.getData().equals(true)) {
-                resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(presetIdArray[i]));
-                //}
-                if(resultNum == -1){
-                    result.setCode(209,"预置位已配置到巡视点");
+            for (String s : presetIdArray) {
+                List<Long> list = tCameraPresetService.selectInstanceIdList(Long.valueOf(s));
+                if (CollectionUtils.isNotEmpty(list)) {
+                    result.setCode(209, "预置位已配置到巡视点");
                     return result;
+                } else {
+                    tCameraPresetService.cancelPreset(tCameraPreset.getCameraId(), Long.valueOf(s));
+                    int resultNum = tCameraPresetService.deleteByPrimaryId(Long.valueOf(s));
+                    result.setData(resultNum);
                 }
-                result.setData(resultNum);
             }
-
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
