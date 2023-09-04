@@ -1,5 +1,6 @@
 package com.yjh.platform.module.video.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -163,4 +164,10 @@ public class RobotConInfo implements Serializable {
 
     @ApiModelProperty(value = "设备ID")
     private String deviceChannel;
+
+    @ApiModelProperty(value = "机器人可见光相机厂家")
+    private String lightVendor;
+
+    @ApiModelProperty(value = "机器人红外相机厂家")
+    private String infraredVendor;
 }

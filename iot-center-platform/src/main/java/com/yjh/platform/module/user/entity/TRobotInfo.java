@@ -240,18 +240,18 @@ public class TRobotInfo implements Serializable {
 
 
     @ApiModelProperty(value = "上次登录时间(毫秒数)")
-    @TableField(value = "last_online_time",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "last_online_time", updateStrategy = FieldStrategy.IGNORED)
     private Long lastOnlineTime;
 
     @ApiModelProperty(value = "在线时长累积(毫秒)")
-    @TableField(value = "duration",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "duration", updateStrategy = FieldStrategy.IGNORED)
     private Long duration;
 
     @ApiModelProperty(value = "离线次数")
-    @TableField(value = "off_line_count",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "off_line_count", updateStrategy = FieldStrategy.IGNORED)
     private Long offLineCount;
 
-    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    @ApiModelProperty(value = "秘钥标识符", hidden = true)
     private String identifier;
 
     @ApiModelProperty(value = "机器人/无人机编号编码")
@@ -279,4 +279,20 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "机器人地图图片尺寸")
     @TableField(value = "image_size", updateStrategy = FieldStrategy.IGNORED)
     private String imageSize;
+
+    @ApiModelProperty(value = "可见光厂家")
+    @TableField(value = "light_vendor", updateStrategy = FieldStrategy.IGNORED)
+    private String lightVendor;
+
+    @ApiModelProperty(value = "红外厂家")
+    @TableField(value = "infrared_vendor", updateStrategy = FieldStrategy.IGNORED)
+    private String infraredVendor;
+
+    @ApiModelProperty(value = "可见光设备通道号")
+    @TableField(value = "light_channel_id", updateStrategy = FieldStrategy.IGNORED)
+    private String lightChannelId;
+
+    @ApiModelProperty(value = "红外设备通道号")
+    @TableField(value = "infrared_channel_id", updateStrategy = FieldStrategy.IGNORED)
+    private String infraredChannelId;
 }

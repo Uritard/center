@@ -115,4 +115,6 @@ public class TCameraInfoByDict implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @TableField(value = "commission_date")
     private Date commissionDate;
+    @ApiModelProperty(value = "相机通道号")
+    private String cameraChannelId;
 }
