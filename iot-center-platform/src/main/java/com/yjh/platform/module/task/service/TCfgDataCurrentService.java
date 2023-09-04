@@ -12,6 +12,7 @@ import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,8 @@ public class TCfgDataCurrentService {
     @Autowired
     private TCfgDeviceService tCfgDeviceService;
 
-    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
+    @Autowired
+    private CameraConService cameraConService;
 
     public static String meteValues(String commintValue){
         if("返回".equals(commintValue)){
@@ -284,10 +286,7 @@ public class TCfgDataCurrentService {
                                 String str = "camera_info:" + rule.getCameraId();
                                 Map<String, String> map = redisTemplate.opsForHash().entries(str);
                                 if ("0".equals(map.get("state"))) {
-                                    HashMap<String, Object> moveMap = new HashMap<>();
-                                    moveMap.put("presetId", rule.getPresetId());
-                                    moveMap.put("cameraId", rule.getCameraId());
-                                    move(moveMap);
+                                    cameraConService.moveToPresetForTask(rule.getPresetId(), rule.getCameraId());
                                     map.put("lastTime",DateTimeUtil.format(new Date()));
                                     redisTemplate.opsForHash().putAll(str,map);
                                 }
@@ -373,23 +372,6 @@ public class TCfgDataCurrentService {
         }
         log.info("【联动任务】:{}", tCruiseTasks);
         return tCruiseTasks;
-    }
-
-
-    /**
-     * 相机转到预置位
-     * @param map 参数
-     * @return void
-     */
-    private void move(HashMap<String, Object> map) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.getForObject(MOVE_URL, String.class, map);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
     }
 }
 
