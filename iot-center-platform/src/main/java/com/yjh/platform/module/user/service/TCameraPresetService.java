@@ -101,7 +101,7 @@ public class TCameraPresetService {
         if (resultNum != 0) {
             String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
             if (StringUtils.isNotEmpty(resData) || isMicro == 0) {
-                Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(),tCameraPreset.getPresetName());
+                Map<String, String> resPicMap = cameraConService.capturePresetPicture(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(),tCameraPreset.getPresetName(), tCameraPreset.getEdgeCode());
                 if (resPicMap != null) {
                     tCameraPreset.setPresetImg(String.valueOf(resPicMap.get("urlPath")));
                 }
@@ -1094,7 +1094,7 @@ public class TCameraPresetService {
     public int reset(TCameraPreset tCameraPreset) {
         String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
         if (StringUtils.isNotEmpty(resData)) {
-            Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName());
+            Map<String, String> resPicMap = cameraConService.capturePresetPicture(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName(), tCameraPreset.getEdgeCode());
             if (resPicMap != null) {
                 String urlPath = String.valueOf(resPicMap.get("urlPath"));
                 String remotePath = this.saveImgToFtpsToCoverOriImg(urlPath, tCameraPreset.getPresetImg());
