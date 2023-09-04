@@ -135,22 +135,16 @@ public class TCameraPresetService {
         }
         return -1;
     }
+    /**
+     *  检查此预置位是否被配成巡检点
+     */
+    public List<Long> selectInstanceIdList(Long presetId) {
+        return tCameraPresetDao.selectInstanceIdList(presetId);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long presetId) {
-        List<Long> instanceIdList = tCameraPresetDao.selectInstanceIdList(presetId);
-        {//检查此预置位是否被配成巡检点
-            if(instanceIdList != null && instanceIdList.size()>0){
-                return -1;
-            }
-        }
-        if(instanceIdList != null && instanceIdList.size() >0){
-            tCameraPresetDao.deleteInstance(instanceIdList);//tcpi
-            tCameraPresetDao.deletePlanInstance(instanceIdList);//tcplan
-            tCameraPresetDao.deletePointInstance(instanceIdList);//tcpattr
-            tAlgorithmConfDao.deleteByPrimaryId(presetId);//tac
-        }
-        return this.tCameraPresetDao.deleteByPrimaryId(presetId);
+        return tCameraPresetDao.deleteByPrimaryId(presetId);
     }
 
     public boolean cancelPreset(Long cameraId, Long presetId) throws IOException {
