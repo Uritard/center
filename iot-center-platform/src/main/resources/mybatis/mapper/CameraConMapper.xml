@@ -132,7 +132,9 @@
                c.recorder_type,
                c.http_port as recordPort,
                c.vendor_id recordVendor,
-               c.device_channel
+               c.device_channel,
+               a.light_vendor,
+               a.infrared_vendor
         from t_robot_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
         where 1 = 1

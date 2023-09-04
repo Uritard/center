@@ -16,6 +16,7 @@ import com.yjh.video.api.CameraVendor;
 import com.yjh.video.api.entity.*;
 import com.yjh.video.api.result.Result;
 import com.yjh.video.api.service.*;
+import com.yjh.video.api.util.PathVariableUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -232,32 +233,33 @@ public class CameraConService {
         } else {
             // 拉流
             try {
+                // 可见光相机拉流
                 Map<String, Object> returnLightMap = getRobotStream(robotConInfo, lightCameraId);
-
+                // 红外相机拉流
                 String inferadIp = robotConInfo.getLnferadIp();
                 Integer inferadPort = robotConInfo.getInferadPort();
-                String transUrlinferad;
-                if (robotConInfo.getRobotType() == 161) {
-                    String inferadUsername = robotConInfo.getInferadUsername();
-                    String inferadPassword = robotConInfo.getInferadPassword();
-                    String robotLightVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotLightVideo"));
-                    transUrlinferad = String.format(robotLightVideo, inferadUsername, inferadPassword, inferadIp,
-                            inferadPort, 1, infraredCameraId);
-                } else if (robotConInfo.getRobotType() == 157) {
-                    String robotA200InfraredVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotA200InfraredVideo"));
-                    transUrlinferad = String.format(robotA200InfraredVideo, inferadIp, inferadPort, infraredCameraId);
-                } else {
-                    String robotInfraredVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotInfraredVideo"));
-                    transUrlinferad = String.format(robotInfraredVideo, inferadIp, inferadPort, infraredCameraId);
-                }
-                transUrlinferad = sign(transUrlinferad, infraredCameraId);
+                String inferadUsername = robotConInfo.getInferadUsername();
+                String inferadPassword = robotConInfo.getInferadPassword();
+                String robotInfraredVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getInfraredVendor()));
+                Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
+                String hostIp = hostIpMap.get("content");
+                Map params = new HashMap();
+                params.put("username", inferadUsername);
+                params.put("password", inferadPassword);
+                params.put("ip", inferadIp);
+                params.put("port", inferadPort);
+                params.put("channelId", 1);
+                params.put("hostIp", hostIp);
+                params.put("name", infraredCameraId);
+                String transUrlInfrared = PathVariableUtil.variableParse(robotInfraredVideo, params);
+                transUrlInfrared = sign(transUrlInfrared, infraredCameraId);
                 PlayEntity playEntity = PlayEntity.builder().deviceId(infraredCameraId)
-                        .command(transUrlinferad)
+                        .command(transUrlInfrared)
                         .build();
                 iPlayService.videoPlayByFFM(playEntity);
                 log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort,
-                        infraredCameraId, transUrlinferad);
-                String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
+                        infraredCameraId, transUrlInfrared);
+                String[] rtmpUrlsInferad = transUrlInfrared.split("rtmp");
                 String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 
                 Map<String, Object> returnInferadMap = new HashMap<>();
@@ -275,8 +277,6 @@ public class CameraConService {
 
     public Map<String, Object> getRobotStream(RobotConInfo robotConInfo, String robotCameraId) {
         Map<String, Object> returnLightMap = new HashMap<>();
-        String wvpServerIp = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerIp"));
-        Integer wvpServerPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "wvpServerPort")));
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         try {
             if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId()) && Objects.nonNull(robotConInfo.getRecordId())
@@ -293,8 +293,18 @@ public class CameraConService {
                 String lightPort = robotConInfo.getLightPort();
                 String lightUsername = robotConInfo.getIdentityManager();
                 String lightPassword = robotConInfo.getIdentityCode();
-                String robotLightVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "robotLightVideo"));
-                String transUrlLight = String.format(robotLightVideo, lightUsername, lightPassword, lightIp, lightPort, 1, robotCameraId);
+                String robotLightVideo = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getLightVendor()));
+                Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
+                String hostIp = hostIpMap.get("content");
+                Map params = new HashMap();
+                params.put("username", lightUsername);
+                params.put("password", lightPassword);
+                params.put("ip", lightIp);
+                params.put("port", lightPort);
+                params.put("channelId", 1);
+                params.put("hostIp", hostIp);
+                params.put("name", robotCameraId);
+                String transUrlLight = PathVariableUtil.variableParse(robotLightVideo, params);
                 transUrlLight = sign(transUrlLight, robotCameraId);
                 PlayEntity playEntity = new PlayEntity.Builder()
                         .command(transUrlLight).deviceId(robotCameraId).build();
@@ -389,18 +399,28 @@ public class CameraConService {
                 String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
                 String starttime = startTimeTem.replace(" ", "Z");
                 String endtime = stopTimeTem.replace(" ", "Z");
-
-
                 String nvrRtmpBack = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "nvrRtmpBack"));
-                String transUrl = String.format(nvrRtmpBack, userName, password, cameraIp, cameraPort, iChanNum, 1,
-                        starttime, endtime, id);
+                Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
+                String hostIp = hostIpMap.get("content");
+                Map params = new HashMap();
+                params.put("username", userName);
+                params.put("password", password);
+                params.put("ip", cameraIp);
+                params.put("port", cameraPort);
+                params.put("channelId", iChanNum);
+                params.put("starttime", starttime);
+                params.put("endtime", endtime);
+                params.put("hostIp", hostIp);
+                params.put("name", id);
+                String transUrl = PathVariableUtil.variableParse(nvrRtmpBack, params);
                 transUrl = sign(transUrl, id);
                 log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                                 "historyPath:{}, historyTransUrl: {}"
                         , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-//                VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id.toString());
-                PlayEntity playEntity = PlayEntity.builder().deviceId(id.toString())
-                        .command(transUrl).build();
+                PlayEntity playEntity = PlayEntity.builder()
+                        .deviceId(id.toString())
+                        .command(transUrl)
+                        .build();
                 IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
                 iPlayService.videoPlayByFFM(playEntity);
                 webRtcUrl(id, returnMap, true);

@@ -53,6 +53,10 @@
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
         <result property="imageSize" column="image_size" jdbcType="VARCHAR"/>
+        <result property="lightVendor" column="light_vendor" jdbcType="VARCHAR"/>
+        <result property="infraredVendor" column="infrared_vendor" jdbcType="VARCHAR"/>
+        <result property="lightChannelId" column="light_channel_id" jdbcType="VARCHAR"/>
+        <result property="infraredChannelId" column="infrared_channel_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -72,7 +76,9 @@
         defect_record,repair_record,exit_putInto_record,
         remarks,record_id,channel_num_light,
         channel_num_inferad,last_online_time,duration,
-        off_line_count,edge_code,origin_id,image_size
+        off_line_count,edge_code,origin_id,image_size,
+        light_channel_id,infrared_channel_id,
+        light_vendor,infrared_vendor
     </sql>
 
 
@@ -94,6 +100,8 @@
         ,remarks,record_id,channel_num_light
         ,channel_num_inferad,last_online_time,duration
         ,off_line_count,edge_code,origin_id,image_size
+        ,light_channel_id,infrared_channel_id
+        ,light_vendor,infrared_vendor
         )
         values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
                ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
@@ -111,6 +119,8 @@
                ,#{remarks,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},#{channelNumLight,jdbcType=INTEGER}
                ,#{channelNumInferad,jdbcType=INTEGER},#{lastOnlineTime,jdbcType=BIGINT},#{duration,jdbcType=BIGINT}
                ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{imageSize,jdbcType=VARCHAR}
+               ,#{lightChannelId,jdbcType=VARCHAR},#{infraredChannelId,jdbcType=VARCHAR}
+               ,#{lightVendor,jdbcType=VARCHAR},#{infraredVendor,jdbcType=VARCHAR}
                )
     </insert>
 
@@ -191,6 +201,10 @@
         <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
         <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
         <if test="imageSize != null ">a.image_size = #{imageSize},</if>
+        <if test="lightChannelId != null ">a.light_channel_id = #{lightChannelId},</if>
+        <if test="infraredChannelId != null ">a.infrared_channel_id = #{infraredChannelId},</if>
+        <if test="lightVendor != null ">a.light_vendor = #{lightVendor},</if>
+        <if test="infraredVendor != null ">a.infrared_vendor = #{infraredVendor},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -249,7 +263,11 @@
         a.record_id,
         a.channel_num_light,
         a.channel_num_inferad,
-        a.image_size
+        a.image_size,
+        a.light_channel_id,
+        a.infrared_channel_id,
+        a.light_vendor,
+        a.infrared_vendor
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -341,7 +359,11 @@
         a.channel_num_light,
         a.channel_num_inferad,
         a.image_size,
-        g.record_name
+        g.record_name,
+        a.light_channel_id,
+        a.infrared_channel_id,
+        a.light_vendor,
+        a.infrared_vendor
         from t_robot_info a
         JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
@@ -408,7 +430,11 @@
         a.record_id,
         a.channel_num_light,
         a.channel_num_inferad,
-        a.image_size
+        a.image_size,
+        a.light_channel_id,
+        a.infrared_channel_id,
+        a.light_vendor,
+        a.infrared_vendor
         from t_robot_info a
         where 1 = 1
         <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -474,7 +500,11 @@
         a.channel_num_light,
         a.channel_num_inferad,
         a.image_size,
-        g.record_name
+        g.record_name,
+        a.light_channel_id,
+        a.infrared_channel_id,
+        a.light_vendor,
+        a.infrared_vendor
         from t_robot_info a
         JOIN t_dict_business d ON a.drone_type=d.dict_code and d.col_name = 'drone_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
@@ -518,6 +548,8 @@
         ,remarks,record_id,channel_num_light
         ,channel_num_inferad,last_online_time,duration
         ,off_line_count,edge_code,origin_id,image_size
+        ,light_channel_id,infrared_channel_id
+        ,light_vendor,infrared_vendor
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
             values (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=VARCHAR}
@@ -536,6 +568,8 @@
             ,#{TRobotInfo.remarks,jdbcType=VARCHAR},#{TRobotInfo.recordId,jdbcType=BIGINT},#{TRobotInfo.channelNumLight,jdbcType=INTEGER}
             ,#{TRobotInfo.channelNumInferad,jdbcType=INTEGER},#{TRobotInfo.lastOnlineTime,jdbcType=BIGINT},#{TRobotInfo.duration,jdbcType=BIGINT}
             ,#{TRobotInfo.offLineCount,jdbcType=BIGINT},#{TRobotInfo.edgeCode,jdbcType=VARCHAR},#{TRobotInfo.originId,jdbcType=VARCHAR},#{TRobotInfo.imageSize,jdbcType=VARCHAR}
+            ,#{lightChannelId,jdbcType=VARCHAR},#{infraredChannelId,jdbcType=VARCHAR}
+            ,#{lightVendor,jdbcType=VARCHAR},#{infraredVendor,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
