@@ -6,6 +6,7 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,9 +27,6 @@ import java.util.Map;
 @Slf4j
 public class KeepWatchJob implements Runnable {
 
-    //相机转到预置位
-    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
-
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -38,24 +36,15 @@ public class KeepWatchJob implements Runnable {
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
 
+    @Autowired
+    private CameraConService cameraConService;
+
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public KeepWatchJob(RedisTemplate redisTemplate, TCameraInfoDao tCameraInfoDao, TCameraPresetDao tCameraPresetDao) {
         this.tCameraInfoDao = tCameraInfoDao;
         this.redisTemplate = redisTemplate;
         this.tCameraPresetDao = tCameraPresetDao;
-    }
-
-    //相机转到预置位
-    private static void move(HashMap<String, Object> map) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.getForObject(MOVE_URL, String.class, map);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
     }
 
     @Override
@@ -90,7 +79,7 @@ public class KeepWatchJob implements Runnable {
                                         moveMap.put("cameraId", preset.getCameraId());
                                         log.info("守望时间："+new Date());
                                         new Thread(()->{
-                                            move(moveMap);
+                                            cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId());
                                         }).start();
                                         map.put("lastTime",simpleDateFormat.format(new Date()));
                                         redisTemplate.opsForHash().putAll(str,map);
