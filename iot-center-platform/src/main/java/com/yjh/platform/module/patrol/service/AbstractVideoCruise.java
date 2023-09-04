@@ -5,7 +5,6 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -17,6 +16,7 @@ import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -45,16 +44,6 @@ import static com.yjh.platform.module.patrol.CruiseConstant.AnalyticsEnum.TCP;
 public abstract class AbstractVideoCruise {
     Logger log = LoggerFactory.getLogger(AbstractVideoCruise.class);
 
-    /**
-     * 相机抓图
-     */
-    public static final String PICTURE_URL =
-        "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}&meteName={meteName}";
-    /**
-     * 相机转到预置位
-     */
-    public static final String MOVE_URL =
-        "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
     /**
      * 算法接口
      */
@@ -75,7 +64,7 @@ public abstract class AbstractVideoCruise {
         "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
-    protected final RestTemplate serviceRestTemplate;
+    protected final CameraConService cameraConService;
     protected final PatrolResultHandler patrolResultHandler;
     private final HashOperations<String, String, String> hashOperations;
 
@@ -86,10 +75,10 @@ public abstract class AbstractVideoCruise {
     private static String presetImgPath;
 
     protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate,
-        RestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
+        CameraConService cameraConService, PatrolResultHandler patrolResultHandler) {
         this.tAlgorithmInfoDao = tAlgorithmInfoDao;
         this.redisTemplate = redisTemplate;
-        this.serviceRestTemplate = serviceRestTemplate;
+        this.cameraConService = cameraConService;
         this.patrolResultHandler = patrolResultHandler;
         this.hashOperations = redisTemplate.opsForHash();
 
@@ -122,19 +111,13 @@ public abstract class AbstractVideoCruise {
 
         if (presetId > 0 && StringUtils.isNotEmpty(cameraId)) {
 
-            Result re = null;
+            Map<String, String> re = null;
             boolean waitFlag = waitCamera2(taskId, cameraId, presetName);
             if (waitFlag) {
                 try {
                     //1.转到预置位
-                    Map<String, Object> moveMap = new HashMap<>();
-                    moveMap.put("presetId", presetId);
-                    moveMap.put("cameraId", cameraId);
-                    if (Constant.logUpLv1()) {
-                        log.info("params for preset: {}", JSON.toJSONString(moveMap));
-                    }
                     // 移动相机
-                    moveWait(moveMap);
+                    moveWait(presetId, NumberUtils.toLong(cameraId));
 
                     String instanceName = inspectionMap.get("instanceName");
 
@@ -143,7 +126,7 @@ public abstract class AbstractVideoCruise {
                     captureMap.put("cameraId", cameraId);
                     captureMap.put("meteName", instanceName);
                     //2.抓图
-                    re = capture(captureMap);
+                    re = capture(taskId, presetId, NumberUtils.toLong(cameraId), instanceName);
                 } catch (Exception e) {
                     log.error("设置摄像机状态出错", e);
                 } finally {
@@ -156,8 +139,7 @@ public abstract class AbstractVideoCruise {
             try {
                 boolean isEnded = true;
                 // 抓图失败处理
-                boolean picError = re == null || !"success".equals(re.getMessage());
-                JSONObject jsonForRe = null;
+                boolean picError = re == null || StringUtils.isEmpty(re.get("absPath"));
                 String resultNum = "已拍照";
 
                 if (picError) {
@@ -173,11 +155,10 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                     inspectionMap.put("cruiseTime", nowTime);
                 } else {
-                    jsonForRe = (JSONObject)JSONObject.toJSON(re.getData());
-                    String urlPath = jsonForRe.getString("urlPath");
-                    String absPath = jsonForRe.getString("absPath");
-                    if (StringUtils.isNotEmpty(jsonForRe.getString("resultNum"))) {
-                        resultNum = jsonForRe.getString("resultNum");
+                    String urlPath = re.get("urlPath");
+                    String absPath = re.get("absPath");
+                    if (StringUtils.isNotEmpty(re.get("resultNum"))) {
+                        resultNum = re.get("resultNum");
                     }
 
                     // 拍照结果处理
@@ -202,7 +183,7 @@ public abstract class AbstractVideoCruise {
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
-                        isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, jsonForRe, algorithm);
+                        isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
                         inspectionMap.put("resultNum", resultNum);
@@ -243,14 +224,14 @@ public abstract class AbstractVideoCruise {
     /**
      * 算法分析
      */
-    public boolean algorithmAnalysis(Map<String, String> inspectionMap, String presetId, String taskId, JSONObject jsonForRe,
+    public boolean algorithmAnalysis(Map<String, String> inspectionMap, String presetId, String taskId, Map<String, String> ret,
         TAlgorithmMeteInfo algorithm) {
 
         try {
             Analysis analysis = new Analysis();
             analysis.setTaskId(taskId);
             analysis.setInstanceId(MapUtils.getLong(inspectionMap, "instanceId"));
-            analysis.setPicPath(jsonForRe.getString("absPath"));
+            analysis.setPicPath(ret.get("absPath"));
 
             analysis.setPicModelPath(picModelPath + "/" + presetId);
             // 判别该点为本级系统的点还是下级系统的
@@ -286,7 +267,7 @@ public abstract class AbstractVideoCruise {
                 result = defect(analysisList);
             } else {
                 // 算法额外参数设置，红外
-                analysisExt(analysis, jsonForRe);
+                analysisExt(analysis, ret);
                 result = analysis(analysisList);
             }
             log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
@@ -408,27 +389,31 @@ public abstract class AbstractVideoCruise {
 
 
     /**
-     * 相机转到预置位
-     *
-     * @param map 相机参数
+     * 相机转到预置位，可见光相机需要等待几秒，让相机到达预置位
      */
-    protected abstract void moveWait(Map<String, Object> map);
+    protected void moveWait(Long presetId, Long cameraId) {
+        try {
+            cameraConService.moveToPreset(presetId, cameraId);
+            Thread.sleep(waitTime);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
     /**
      * 相机抓图
      *
-     * @param map 抓图参数
      * @return 抓图结果
      */
-    protected abstract Result capture(Map<String, Object> map);
+    protected abstract Map<String, String> capture(String parentPath, Long presetId, Long cameraId, String meteName);
 
     /**
      * 算法分析额外信息处理
      *
      * @param analysis      调用算法信息
-     * @param captureResult 抓图返回结果
+     * @param ret 抓图返回结果
      */
-    protected abstract void analysisExt(Analysis analysis, JSONObject captureResult);
+    protected abstract void analysisExt(Analysis analysis, Map<String, String> ret);
 
     protected abstract Map<String, String> resultRecognition(Map<String, String> inspectionMap);
 
