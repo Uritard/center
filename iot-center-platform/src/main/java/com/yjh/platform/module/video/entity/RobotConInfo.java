@@ -160,4 +160,7 @@ public class RobotConInfo implements Serializable {
     @TableField("infrared_channel_id")
     @ApiModelProperty(value = "红外设备通道号")
     private String infraredChannelId;
+
+    @ApiModelProperty(value = "设备ID")
+    private String deviceChannel;
 }
