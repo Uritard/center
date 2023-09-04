@@ -27,6 +27,7 @@ import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -80,6 +81,8 @@ public class TStdDevicemeteService{
     private TCameraPresetService tCameraPresetService  ;
     @Autowired
     private TCruisePointInstanceService tCruisePointInstanceService;
+    @Autowired
+    private CameraConService cameraConService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -656,20 +659,18 @@ public class TStdDevicemeteService{
                 params.put("meteName", cameraPreset.getPresetName());
                 params.put("edgeCode", cameraPreset.getEdgeCode());
 
-                Result response1 = sendPostRequest(Constant.SET_PRESET_URL, params);//设置预置点
-                if (!org.springframework.util.StringUtils.isEmpty(response1.getData().toString())) {
-                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                    JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
-                    log.info("重置预置位相机抓图结果：{}", response2.getData());
-
-                    String urlPath = (String)json.get("urlPath");
-                    String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
-
-                    String presetPtz = response1.getData().toString();
-                    cameraPreset.setPresetPtz(presetPtz);
+                String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
+                if (StringUtils.isNotEmpty(resData)) {
+                    Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName());
+                    if (resPicMap != null) {
+                        tCameraPreset.setPresetImg(String.valueOf(resPicMap.get("urlPath")));
+                        log.info("重置预置位相机抓图结果：{}", resPicMap);
+                        String urlPath = String.valueOf(resPicMap.get("urlPath"));
+                        String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
+                        cameraPreset.setPresetImg(remotePath);
+                    }
+                    cameraPreset.setPresetPtz(resData);
                     tCameraPresetService.update(cameraPreset); // 更新PTZ信息
-
-                    cameraPreset.setPresetImg(remotePath);
                     tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
                     result.setData(1);
                 } else {

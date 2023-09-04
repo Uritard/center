@@ -11,7 +11,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
@@ -21,7 +20,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,10 +38,6 @@ public class TCameraPresetController {
 
     @Autowired
     private final TCameraPresetService tCameraPresetService;
-    @Autowired
-    private  TCameraPresetDao tCameraPresetDao;
-    @Autowired
-    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetController.class);
 
@@ -57,7 +51,7 @@ public class TCameraPresetController {
     public Result insert( @Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
-            int resultNum = 0;
+            int resultNum;
             //判断该预置位是否已被设置
             if(tCameraPresetService.judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
@@ -69,40 +63,10 @@ public class TCameraPresetController {
                     return result;
                 }
                 //操作数据库
-                resultNum = tCameraPresetService.insert(tCameraPreset);
-
-                if (resultNum != 0) {
-                    //操作预置位
-//                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
-
-                    HashMap<String, Object> params = new HashMap<>();
-                    params.put("cameraId",tCameraPreset.getCameraId());
-                    params.put("presetId",tCameraPreset.getPresetId());
-                    params.put("meteName",tCameraPreset.getPresetName());
-                    params.put("edgeCode",tCameraPreset.getEdgeCode());
-
-                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-                    String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
-                    if (!StringUtils.isEmpty(resData) || isMicro == 0) {
-                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
-                        tCameraPreset.setPresetPtz(resData);
-                        tCameraPresetService.update(tCameraPreset);//存图
-                        result.setData(resultNum);
-                        if (Objects.nonNull(tCameraPreset.getDeviceMeteId())) {
-                            //绑定关系
-                            int a = tCameraPresetService.updateInstance(tCameraPreset);
-                            if (a > 0) {
-                                log.info("{} 和 {} 绑定关系成功", tCameraPreset.getCameraId(), tCameraPreset.getDeviceMeteId());
-                            }
-                        }
-                    } else {
-                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
-                        resultNum = 0;
-                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-                        result.setData(resultNum);
-                    }
+                resultNum = tCameraPresetService.insert(tCameraPreset, isMicro);
+                if (resultNum == 0) {
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                    result.setData(resultNum);
                 }
             }
         } catch (BusinessException b) {
@@ -126,18 +90,7 @@ public class TCameraPresetController {
                 result.setCode(209,"此预置位已被配置到巡视点");
             }else {
                 //操作预置位
-                HashMap<String, Object> params = new HashMap<>();
-
-                params.put("cameraId", tCameraPreset.getCameraId());
-                params.put("presetId", tCameraPreset.getPresetId());
-                Result response = sendPostRequest(Constant.CANCEL_PRESET_URL, params);
-
-                //int resultNum = 0;
-                //操作数据库
-//                if (response.getData().equals(true)) {
-//                    log.info("nvr删除预置位成功");
-//                }
-                //resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
+                tCameraPresetService.cancelPreset(tCameraPreset.getCameraId(), tCameraPreset.getPresetId());
                 if (1 == resultNum){
                     mapResult.put("code", 200);
                 }else {
@@ -178,10 +131,7 @@ public class TCameraPresetController {
             TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(pr1);
             String capturePresetPath = tCameraPresetService.getPresetBasePath();
             for (int i = 0;i<presetIdArray.length;i++){
-                HashMap<String, Object> params = new HashMap<>();
-                params.put("cameraId",tCameraPreset.getCameraId());
-                params.put("presetId",Long.valueOf(presetIdArray[i]));
-                Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);
+                tCameraPresetService.cancelPreset(tCameraPreset.getCameraId(), Long.valueOf(presetIdArray[i]));
                 String delPresetPic = "rm -rf "+capturePresetPath + "/"+Long.valueOf(presetIdArray[i]);
                 try { Runtime.getRuntime().exec(delPresetPic); } catch (Exception e) { e.getMessage(); }
                 //操作数据库
@@ -491,31 +441,10 @@ public class TCameraPresetController {
                 result.setData(0);
                 return result;
             }
-            HashMap<String, Object> params = new HashMap<>();
-            params.put("cameraId", cameraPreset.getCameraId());
-            params.put("presetId", cameraPreset.getPresetId());
-            params.put("meteName", cameraPreset.getPresetName());
-            params.put("edgeCode", "");
-
-            Result response1 = sendPostRequest(Constant.SET_PRESET_URL, params);//设置预置点
-            if (!StringUtils.isEmpty(response1.getData().toString())) {
-                Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
-                log.info("重置预置位相机抓图结果：{}", response2.getData());
-
-                String urlPath = (String)json.get("urlPath");
-                String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
-
-                String presetPtz = response1.getData().toString();
-                cameraPreset.setPresetPtz(presetPtz);
-                tCameraPresetService.update(cameraPreset); // 更新PTZ信息
-
-                cameraPreset.setPresetImg(remotePath);
-                tCameraPresetService.SycPresetToEdge(cameraPreset); // 向边缘节点同步预置位图片和ptz信息
-                result.setData(1);
-            } else {
+            int resultNum = tCameraPresetService.reset(tCameraPreset);
+            if (resultNum == 0) {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-                result.setData(0);
+                result.setData(resultNum);
             }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

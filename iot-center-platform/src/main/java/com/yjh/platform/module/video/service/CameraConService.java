@@ -542,14 +542,104 @@ public class CameraConService {
     }
 
     /**
-     * 预置位操作
-     * @param presetId
-     * @param cameraId
-     * @param presetCmd
+     * 转动预置位
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
+     * @return 结果
+     */
+    public boolean moveToPreset(Long presetId, Long cameraId) {
+        boolean flag;
+        this.isCameraControlled(cameraId);
+        flag = this.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION);
+        this.pushCtrlTime(cameraId);
+        return flag;
+    }
+
+    /**
+     * 任务中转到预置点
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
+     * @return 结果
+     */
+    public boolean moveToPresetForTask(Long presetId, Long cameraId) {
+        boolean flag;
+        flag = this.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION);
+        this.pushCtrlTime(cameraId);
+        return flag;
+    }
+
+    /**
+     * 设置预置点
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
+     * @return Ptz信息
+     */
+    public String setPreset(Long presetId, Long cameraId) {
+        this.isCameraControlled(cameraId);
+        this.presetAction(presetId, cameraId, PresetCmd.PRESET_ADD);
+        return this.getCameraPTZ(presetId, cameraId);
+    }
+
+    /**
+     *获取相机预置点的PTZ值，并抓图
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
+     * @param presetName 预置位名称
+     * @return
+     */
+    public Map<String, Object> getPresetPtzAndPic(Long presetId, Long cameraId, String presetName) throws InterruptedException {
+        Map<String, Object> resultMap = new HashMap<>(2);
+        // 确认相机可控
+        this.isCameraControlled(cameraId);
+        //相机移动到预置位，并更新相机的操作时间
+        this.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION);
+        // 更新相机操作时间
+        this.pushCtrlTime(cameraId);
+        // 等10秒钟，确保相机镜头调整到位
+        Thread.sleep(10000);
+        // 再次确认相机可控
+        this.isCameraControlled(cameraId);
+        // 获取预置位的PTZ数据
+        String ptzStr = this.getCameraPTZ(presetId, cameraId);
+        resultMap.put("cameraPtz", ptzStr);
+        // 抓图
+//        Result resultPic = this.capturePicture(cameraId, presetName, "presetCheckImg");
+//        if (resultPic.getData() != null) {
+//            Map<String, Object> picMap = (Map<String, Object>) resultPic.getData();
+//            resultMap.putAll(picMap);
+//        }
+        return resultMap;
+    }
+
+    /**
+     * 删除预置位
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
      * @return
      * @throws IOException
      */
-    public boolean presetAction(Long presetId, Long cameraId, PresetCmd presetCmd) throws IOException {
+    public boolean cancelPreset(Long presetId, Long cameraId) throws IOException {
+        String capturePresetPath = this.getPresetBasePath();
+        this.isCameraControlled(cameraId);
+        String cmd = "rm -rf " + capturePresetPath + "/" + presetId;
+        log.info("删除语句" + cmd);
+        Runtime.getRuntime().exec(cmd);
+        return this.presetAction(presetId, cameraId, PresetCmd.PRESET_DELETE);
+    }
+    /**
+     * 预置位操作
+     *
+     * @param presetId 预置位id
+     * @param cameraId 相机id
+     * @param presetCmd 预置位名称
+     * @return 结果
+     */
+    public boolean presetAction(Long presetId, Long cameraId, PresetCmd presetCmd) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
         if (cameraConInfo == null) {
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
@@ -580,9 +670,8 @@ public class CameraConService {
      * @param presetId
      * @param cameraId
      * @return
-     * @throws IOException
      */
-    public String getCameraPTZ(Long presetId, Long cameraId) throws IOException {
+    public String getCameraPTZ(Long presetId, Long cameraId) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
         if (cameraConInfo == null) {
             throw new BusinessException("无此摄像机或摄像机预置位不正确");

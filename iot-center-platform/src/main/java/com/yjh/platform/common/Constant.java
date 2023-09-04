@@ -34,12 +34,12 @@ import java.util.concurrent.TimeUnit;
 public class Constant {
     public static final String account_lock_times = "account_lock_times:userAccountID";
 
-    public static final String SET_PRESET_URL = "http://iot-center-accessvideo/camera/v1/setPreset?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
-    public static final String GET_PRESET_PTZ_AND_PIC_URL = "http://iot-center-accessvideo/camera/v1/getPresetPTZAndPic?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
-
-    public static final String CANCEL_PRESET_URL = "http://iot-center-accessvideo/camera/v1/cancelPreset?cameraId={cameraId}&presetId={presetId}";
-
-    public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}&meteName={meteName}&edgeCode={edgeCode}";
+//    public static final String SET_PRESET_URL = "http://iot-center-accessvideo/camera/v1/setPreset?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
+//    public static final String GET_PRESET_PTZ_AND_PIC_URL = "http://iot-center-accessvideo/camera/v1/getPresetPTZAndPic?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
+//
+//    public static final String CANCEL_PRESET_URL = "http://iot-center-accessvideo/camera/v1/cancelPreset?cameraId={cameraId}&presetId={presetId}";
+//
+//    public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}&meteName={meteName}&edgeCode={edgeCode}";
     public static final String T_SYS_PARAM = "t_sys_param:";
     /**
      * 边缘节点

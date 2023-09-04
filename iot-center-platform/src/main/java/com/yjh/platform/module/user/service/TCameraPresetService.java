@@ -23,6 +23,7 @@ import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +79,9 @@ public class TCameraPresetService {
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
 
+    @Resource
+    private CameraConService cameraConService;
+
 
     private static final Long LOCK_REDIS_TIMEOUT = 10L;
 
@@ -88,11 +93,33 @@ public class TCameraPresetService {
     private Logger log = LoggerFactory.getLogger(TCameraPresetService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public int insert(TCameraPreset tCameraPreset) {
+    public int insert(TCameraPreset tCameraPreset, Integer isMicro) {
         if (tCameraPreset.getPresetType() == null || tCameraPreset.getPresetType() == 0) {
             tCameraPreset.setPresetType(1);
         }
-        return this.tCameraPresetDao.insert(tCameraPreset);
+        int resultNum = this.tCameraPresetDao.insert(tCameraPreset);
+        if (resultNum != 0) {
+            String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
+            if (StringUtils.isNotEmpty(resData) || isMicro == 0) {
+                Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(),tCameraPreset.getPresetName());
+                if (resPicMap != null) {
+                    tCameraPreset.setPresetImg(String.valueOf(resPicMap.get("urlPath")));
+                }
+                tCameraPreset.setPresetPtz(resData);
+                this.update(tCameraPreset);//存图
+                if (Objects.nonNull(tCameraPreset.getDeviceMeteId())) {
+                    //绑定关系
+                    int a = this.updateInstance(tCameraPreset);
+                    if (a > 0) {
+                        log.info("{} 和 {} 绑定关系成功", tCameraPreset.getCameraId(), tCameraPreset.getDeviceMeteId());
+                    }
+                }
+            } else {
+                tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+                resultNum = 0;
+            }
+        }
+        return resultNum;
     }
 
     /**
@@ -124,6 +151,10 @@ public class TCameraPresetService {
             tAlgorithmConfDao.deleteByPrimaryId(presetId);//tac
         }
         return this.tCameraPresetDao.deleteByPrimaryId(presetId);
+    }
+
+    public boolean cancelPreset(Long cameraId, Long presetId) throws IOException {
+        return cameraConService.cancelPreset(presetId, cameraId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -814,17 +845,8 @@ public class TCameraPresetService {
      * @param tCameraPreset tCameraPreset
      * @return result
      */
-    private Map<String, Object> getPTZAndPicOnLine(TCameraPreset tCameraPreset) {
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("cameraId",tCameraPreset.getCameraId());
-        params.put("presetId",tCameraPreset.getPresetId());
-        params.put("meteName",tCameraPreset.getPresetName());
-        Result response = sendPostRequest(Constant.GET_PRESET_PTZ_AND_PIC_URL,params);
-        if (response != null && !org.springframework.util.StringUtils.isEmpty(response.getData())) {
-            return (Map<String, Object>) response.getData();
-        }
-
-        return null;
+    private Map<String, Object> getPTZAndPicOnLine(TCameraPreset tCameraPreset) throws InterruptedException {
+        return cameraConService.getPresetPtzAndPic(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName());
     }
 
     /**
@@ -1012,33 +1034,10 @@ public class TCameraPresetService {
                 return result;
             }
             //操作数据库
-            resultNum = insert(tCameraPreset);
-
-            if (resultNum != 0) {
-                //操作预置位
-                //                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
-
-                HashMap<String, Object> params = new HashMap<>();
-                params.put("cameraId",tCameraPreset.getCameraId());
-                params.put("presetId",tCameraPreset.getPresetId());
-                params.put("meteName",tCameraPreset.getPresetName());
-                params.put("edgeCode",tCameraPreset.getEdgeCode());
-
-                Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-                String resData = Optional.ofNullable(response1.getData()).orElse("").toString();
-                if (!org.springframework.util.StringUtils.isEmpty(resData) || isMicro == 0) {
-                    Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                    JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-                    tCameraPreset.setPresetImg((String) json.get("urlPath"));
-                    tCameraPreset.setPresetPtz(resData);
-                    update(tCameraPreset);//存图
-                    result.setData(resultNum);
-                } else {
-                    tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
-                    resultNum = 0;
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-                    result.setData(resultNum);
-                }
+            resultNum = insert(tCameraPreset, isMicro);
+            if (resultNum == 0) {
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                result.setData(resultNum);
             }
         }
         return result;
@@ -1090,6 +1089,24 @@ public class TCameraPresetService {
         instance.setStationId(tStdRegion.getStationId());
         instance.setStationName(tStdRegion.getStationName());
         return tCruisePointInstanceDao.insert(instance);
+    }
+
+    public int reset(TCameraPreset tCameraPreset) {
+        String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
+        if (StringUtils.isNotEmpty(resData)) {
+            Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName());
+            if (resPicMap != null) {
+                String urlPath = String.valueOf(resPicMap.get("urlPath"));
+                String remotePath = this.saveImgToFtpsToCoverOriImg(urlPath, tCameraPreset.getPresetImg());
+                tCameraPreset.setPresetImg(remotePath);
+            }
+            tCameraPreset.setPresetPtz(resData);
+            this.update(tCameraPreset); // 更新PTZ信息
+            this.SycPresetToEdge(tCameraPreset); // 向边缘节点同步预置位图片和ptz信息
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
