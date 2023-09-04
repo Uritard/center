@@ -46,7 +46,7 @@ public class CameraConController {
                 cameraConService.isCameraControlled(cameraId);
                 cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION);
                 cameraConService.pushCtrlTime(cameraId);
-            } catch (BusinessException | IOException b) {
+            } catch (BusinessException b) {
                 result.setMessage(b.getMessage());
             }
         }
@@ -346,9 +346,7 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            cameraConService.isCameraControlled(cameraId);
-            result.setData(cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION));
-            cameraConService.pushCtrlTime(cameraId);
+            result.setData(cameraConService.moveToPreset(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -364,8 +362,7 @@ public class CameraConController {
                                       @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION));
-            cameraConService.pushCtrlTime(cameraId);
+            result.setData(cameraConService.moveToPresetForTask(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -381,9 +378,7 @@ public class CameraConController {
                             @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            cameraConService.isCameraControlled(cameraId);
-            cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_ADD);
-            result.setData(cameraConService.getCameraPTZ(presetId, cameraId));
+            result.setData(cameraConService.setPreset(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -394,36 +389,13 @@ public class CameraConController {
     }
 
     @ApiOperation(value = "获取相机预置点的PTZ值，并抓图")
-    @RequestMapping(value = "/getPresetPTZAndPic", method = RequestMethod.GET)
-    public Result getPresetPTZAndPic(@RequestParam(value = "presetId") Long presetId,
+    @RequestMapping(value = "/getPresetPtzAndPic", method = RequestMethod.GET)
+    public Result getPresetPtzAndPic(@RequestParam(value = "presetId") Long presetId,
                                      @RequestParam(value = "cameraId") Long cameraId,
                                      @RequestParam(value = "presetName", required = false) String presetName) {
         Result result = new Result();
         try {
-            Map<String, Object> resultMap = new HashMap<>();
-            // 确认相机可控
-            cameraConService.isCameraControlled(cameraId);
-            //相机移动到预置位，并更新相机的操作时间
-            cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_ACTION);
-            // 更新相机操作时间
-            cameraConService.pushCtrlTime(cameraId);
-            // 等10秒钟，确保相机镜头调整到位
-            Thread.sleep(10000);
-
-            // 再次确认相机可控
-            cameraConService.isCameraControlled(cameraId);
-            // 获取预置位的PTZ数据
-            String ptzStr = cameraConService.getCameraPTZ(presetId, cameraId);
-            resultMap.put("cameraPtz", ptzStr);
-
-            // 抓图
-//            Result resultPic = capturePicture(cameraId, presetName, "presetCheckImg");
-//            if (result != null && resultPic.getData() != null) {
-//                Map<String, Object> picMap = (Map<String, Object>) resultPic.getData();
-//                resultMap.putAll(picMap);
-//            }
-
-            result.setData(resultMap);
+            result.setData(cameraConService.getPresetPtzAndPic(presetId, cameraId, presetName));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -439,14 +411,7 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            String capturePresetPath = cameraConService.getPresetBasePath();
-            cameraConService.isCameraControlled(cameraId);
-//            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
-//            String filePath = capturePresetPath + filePathTem;
-            String cmd = "rm -rf "+capturePresetPath+"/"+presetId;
-            log.info("删除语句"+cmd);
-            Runtime.getRuntime().exec(cmd);
-            result.setData(cameraConService.presetAction(presetId, cameraId, PresetCmd.PRESET_DELETE));
+            result.setData(cameraConService.cancelPreset(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
