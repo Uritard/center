@@ -653,17 +653,10 @@ public class TStdDevicemeteService{
                     result.setData(0);
                     return result;
                 }
-                HashMap<String, Object> params = new HashMap<>();
-                params.put("cameraId", cameraPreset.getCameraId());
-                params.put("presetId", cameraPreset.getPresetId());
-                params.put("meteName", cameraPreset.getPresetName());
-                params.put("edgeCode", cameraPreset.getEdgeCode());
-
-                String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
+                String resData = cameraConService.setPreset(cameraPreset.getPresetId(), cameraPreset.getCameraId());
                 if (StringUtils.isNotEmpty(resData)) {
-                    Map<String, Object> resPicMap = cameraConService.capturePicture(tCameraPreset.getEdgeCode(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName());
+                    Map<String, Object> resPicMap = cameraConService.capturePicture(cameraPreset.getEdgeCode(), cameraPreset.getCameraId(), cameraPreset.getPresetName());
                     if (resPicMap != null) {
-                        tCameraPreset.setPresetImg(String.valueOf(resPicMap.get("urlPath")));
                         log.info("重置预置位相机抓图结果：{}", resPicMap);
                         String urlPath = String.valueOf(resPicMap.get("urlPath"));
                         String remotePath = tCameraPresetService.saveImgToFtpsToCoverOriImg(urlPath, cameraPreset.getPresetImg());
