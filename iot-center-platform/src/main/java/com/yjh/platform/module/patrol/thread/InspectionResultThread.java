@@ -330,7 +330,7 @@ public class InspectionResultThread implements Runnable{
                     algorithm, cruiseType, fileFound, sysLevel, isInterrupt);
             // 调用算法的条件:配置了算法 + 非声纹的点 + resultImg能找到文件 + 巡视主机 + 正常的点
             if (algorithm != null && TypeEnum.VOICE.getCode() != cruiseType && fileFound && "2".equals(sysLevel) && !isInterrupt) {
-                JSONObject jsonForRe = new JSONObject();
+                Map<String, String> jsonForRe = new HashMap<>();
                 jsonForRe.put("absPath", resultImagePath);
                 String preset = analyseDataOperateDao.selectPresetIdByInstanceId(instanceId);
                 if (preset == null){

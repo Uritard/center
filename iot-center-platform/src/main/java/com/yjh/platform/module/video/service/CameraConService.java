@@ -722,6 +722,12 @@ public class CameraConService {
         return capturePicture(null, filePath, cameraId, meteName);
     }
 
+    public Map<String, String> capturePictureWithControlled(String parentPath, String absolutePath, Long cameraId, String meteName) {
+        isCameraControlled(cameraId);
+
+        return capturePicture(parentPath, absolutePath, cameraId, meteName);
+    }
+
     /**
      * 抓图接口
      * @param parentPath 父路径，如果抓图不想全部存在一个目录下，可以传入父路径，默认在 /home/yjh_iot_center/iot-picture/resultImg/ 下创建传入的路径
@@ -779,10 +785,12 @@ public class CameraConService {
         }
         String ip = hasNvr ? cameraConInfo.getRecordIp() : cameraConInfo.getCameraIp();
         int port = hasNvr ? cameraConInfo.getRecordPort() : cameraConInfo.getPort();
+        String userName = hasNvr ? cameraConInfo.getIdentityManager() : cameraConInfo.getCameraManager();
+        String pwd = hasNvr ? cameraConInfo.getIdentityCode() : cameraConInfo.getCameraCode();
 
         SnapEntity entity =
             SnapEntity.builder().ip(ip).port(port).channelNum(cameraConInfo.getChannelNum()).deviceId(cameraConInfo.getDeviceChannel())
-                .channelId(cameraConInfo.getCameraChannelId()).imgPath(filePath).build();
+                .channelId(cameraConInfo.getCameraChannelId()).userName(userName).password(pwd).imgPath(filePath).build();
 
         ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(vendor), ISnapService.class);
         Result<String> result = iPlayService.snap(entity);

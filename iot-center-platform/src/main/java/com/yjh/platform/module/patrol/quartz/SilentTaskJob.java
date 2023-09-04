@@ -1,14 +1,8 @@
 package com.yjh.platform.module.patrol.quartz;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
@@ -16,22 +10,16 @@ import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.JobExecutionContext;
-import org.quartz.PersistJobDataAfterExecution;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: lqh
@@ -55,13 +43,15 @@ public class SilentTaskJob implements Runnable {
 
     private Integer waitTime;
 
+    private CameraConService cameraConService;
+
     public SilentTaskJob(TCameraPresetDao tCameraPresetDao,
                          RedisTemplate redisTemplate,
                          IntelAnalysisService intelAnalysisService,
                          Integer presetType,
                          ApplicationProperties applicationProperties,
                          String stationCode,
-                         Integer waitTime){
+                         Integer waitTime, CameraConService cameraConService){
         this.tCameraPresetDao = tCameraPresetDao;
         this.redisTemplate = redisTemplate;
         this.intelAnalysisService = intelAnalysisService;
@@ -69,15 +59,8 @@ public class SilentTaskJob implements Runnable {
         this.applicationProperties = applicationProperties;
         this.stationCode = stationCode;
         this.waitTime = waitTime;
+        this.cameraConService = cameraConService;
     }
-    /**
-     * 调用相机转到预置位接口
-     */
-    private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
-    /**
-     * 调用相机抓图接口
-     */
-    private static final String CAPTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}&meteName={meteName}";
 
     private static final String MSG = "success";
     private static final String FLAG = "false";
@@ -104,9 +87,9 @@ public class SilentTaskJob implements Runnable {
     }
 
     private void process(TCameraPreset preset) {
-        String cameraId = String.valueOf(preset.getCameraId());
-        String presetId = String.valueOf(preset.getPresetId());
-        String presetName = String.valueOf(preset.getPresetName());
+        long cameraId = preset.getCameraId();
+        long presetId = preset.getPresetId();
+        String presetName = preset.getPresetName();
 
         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
         String state = redisInfoMap.get("state");
@@ -118,7 +101,7 @@ public class SilentTaskJob implements Runnable {
             log.error("该相机被使用 cameraId:{}",cameraId);
             return;
         }
-        int count=tCameraPresetDao.selectCameraPresetInTask(presetId);
+        int count=tCameraPresetDao.selectCameraPresetInTask(String.valueOf(presetId));
         if(count>0){
             log.error("该摄像机正在任务中 cameraId:{} presetId:{}",cameraId,presetId);
             return;
@@ -129,30 +112,25 @@ public class SilentTaskJob implements Runnable {
         if ((now.getTime() - lastDate.getTime()) >= (waitTime*1000) ){
             log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
             try {
-                HashMap<String, Object> moveMap = new HashMap<>(5);
-                moveMap.put("cameraId", cameraId);
-                moveMap.put("presetId", presetId);
-                moveToPreset(moveMap);
+                cameraConService.moveToPreset(presetId, cameraId);
                 // 静默不等待摄像头转到预置位
-                HashMap<String, Object> captureMap = new HashMap<>(3);
-                captureMap.put("cameraId", cameraId);
-                captureMap.put("meteName", presetName);
                 // 拍照
-                Result result = capturePicture(captureMap);
-                if (result == null || !MSG.equals(result.getMessage())) {
+                Map<String, String> result = cameraConService.capturePicture("silent", null, cameraId, presetName);
+                if (MapUtils.isEmpty(result)) {
                     log.info("抓图失败 result:{}", result);
                     return;
                 }
+                String absPath = result.get("absPath");
                 String edgeLevel = Constant.getLevelEdge();
                 log.info("edgeLevel:{}",edgeLevel);
                 //如果是边缘节点 上传巡视主机
                 String resultImgPath;
                 if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
-                    resultImgPath = uploadPicture(result, cameraId, presetId, presetName);
+                    resultImgPath = uploadPicture(absPath, String.valueOf(cameraId), String.valueOf(presetId), presetName);
                     //否则调用算法分析
                 } else {
                     // 分析
-                    resultImgPath = analysePicture(result, Long.valueOf(presetId));
+                    resultImgPath = analysePicture(absPath, presetId);
                 }
                 if (StringUtils.isNotEmpty(resultImgPath)) {
                     Files.delete(Paths.get(resultImgPath));
@@ -168,16 +146,13 @@ public class SilentTaskJob implements Runnable {
     /**
      * 拿到相机拍照结果，边缘节点将图片上传至巡检主机
      *
-     * @param result   相机抓图返回结果
+     * @param absPath   相机抓图返回结果
      * @param cameraId 相机id  充当巡检设备编码
      * @param presetId 预置位id  充当巡视点ID
      */
-    private String uploadPicture(Result result, String cameraId, String presetId, String presetName) {
-        String absPath = "";
+    private String uploadPicture(String absPath, String cameraId, String presetId, String presetName) {
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-            absPath = String.valueOf(jsonForRe.get("absPath"));
 
             //静默数据上送
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -220,12 +195,10 @@ public class SilentTaskJob implements Runnable {
     /**
      * 根据相机拍照结果发送算法进行分析
      *
-     * @param result   相机抓图返回结果
+     * @param absPath   相机抓图返回结果
      * @param presetId 预置位id  充当巡视点ID
      */
-    private String analysePicture(Result result, Long presetId) {
-        JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-        String absPath = String.valueOf(jsonForRe.get("absPath"));
+    private String analysePicture(String absPath, Long presetId) {
         // 调用算法接口分析结果
         List<Analysis> analysisList = new ArrayList<>();
         Analysis analysis = new Analysis()
@@ -240,40 +213,4 @@ public class SilentTaskJob implements Runnable {
         return absPath;
     }
 
-    /**
-     * 相机转到预置位
-     *
-     * @param map 相机id与预置位id
-     * @return Boolean
-     */
-    private Boolean moveToPreset(HashMap<String, Object> map) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.getForObject(MOVE_URL, String.class, map);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return true;
-    }
-
-    /**
-     * 相机抓图
-     *
-     * @param map 相机id
-     * @return void
-     */
-    private Result capturePicture(HashMap<String, Object> map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.getForObject(CAPTURE_URL, Result.class, map);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return re;
-    }
 }

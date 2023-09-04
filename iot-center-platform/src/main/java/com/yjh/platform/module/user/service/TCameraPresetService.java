@@ -577,7 +577,7 @@ public class TCameraPresetService {
 
         SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
                 silentConf.getPresetType(),applicationProperties,applicationProperties.getOtherConfig().getStationCode()
-                ,silentConf.getChillTime());
+                ,silentConf.getChillTime(), cameraConService);
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }

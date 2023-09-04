@@ -17,8 +17,10 @@ import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TSequentialConfDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
 import com.yjh.platform.module.file.FileUtil;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +43,8 @@ public class TSequentialConfService{
 
     @Autowired
     private ApplicationProperties applicationProperties;
-    @Value("${sequential.cameraCapture}")
-    private String cameraCapture;
+    @Autowired
+    private CameraConService cameraConService;
 
     @Value("${sequential.startRecordVideo}")
     private String startRecordVideo;
@@ -307,11 +309,9 @@ public class TSequentialConfService{
             //收到变位信号抓图
             try {
                 Thread.sleep(1000);
-                String services = HttpClientUtils.getInstance().getUrl(cameraCapture + "?cameraId=" + list.get(0).get("cameraId").toString(), null);
-                JSONObject jsonObject = JSONObject.parseObject(services);
-                Map<String, Object> re = (Map<String, Object>) jsonObject.get("data");
-                if (!Objects.isNull(re.get("absPath"))) {
-                    param.put("picPath", re.get("absPath").toString());
+                Map<String, String> re = cameraConService.capturePicture("sequence", null, NumberUtils.toLong(String.valueOf(list.get(0).get("cameraId"))), null);
+                if (StringUtils.isEmpty(re.get("absPath"))) {
+                    param.put("picPath", re.get("absPath"));
                     param.put("fileType", "2");
                 } else {
                     throw new BusinessException("一键顺控-变位信号-抓图地址为空");

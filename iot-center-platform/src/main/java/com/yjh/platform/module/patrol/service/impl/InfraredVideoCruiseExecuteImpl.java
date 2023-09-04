@@ -5,8 +5,6 @@
 package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.ResultConvertUtil;
@@ -17,6 +15,7 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +34,8 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,
-        ServiceRestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
-        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate, patrolResultHandler);
+        CameraConService cameraConService, PatrolResultHandler patrolResultHandler) {
+        super(tAlgorithmInfoDao, redisTemplate, cameraConService, patrolResultHandler);
     }
 
     @Override
@@ -46,11 +45,9 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
 
     /**
      * 红外相机转到预置位，红外相机抓图时进行了处理，不需要转动预置位
-     *
-     * @param map 预置位信息
      */
     @Override
-    protected void moveWait(Map<String, Object> map) {
+    protected void moveWait(Long presetId, Long cameraId) {
         // noting to do.
     }
 
@@ -58,26 +55,26 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
      * 红外抓图，转到预置位抓图两步合一
      */
     @Override
-    protected Result capture(Map<String, Object> map) {
+    protected Map<String, String> capture(String parentPath, Long presetId, Long cameraId, String meteName) {
         Result re = null;
         try {
             log.info("红外抓图： {}", RED_MOVE_URL);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
-            }
+            // if (null != serviceRestTemplate) {
+            //     re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
+            // }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return re;
+        return cameraConService.capturePicture(parentPath, null, cameraId, meteName);
     }
 
     @Override
-    protected void analysisExt(Analysis analysis, JSONObject captureResult) {
+    protected void analysisExt(Analysis analysis, Map<String, String> ret) {
         /*String picPath = captureResult.getString("picPath");
         String csvPath = captureResult.getString("csvPath");
         String dataPath = captureResult.getString("dataPath");*/
 
-        String picPath = captureResult.getString("absPath");
+        String picPath = ret.get("absPath");
 
         analysis.setPicPath(picPath);
         /*analysis.setCsvPath(csvPath);
