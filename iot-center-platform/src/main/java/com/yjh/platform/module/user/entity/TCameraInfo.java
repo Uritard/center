@@ -167,4 +167,9 @@ public class TCameraInfo implements Serializable {
      */
     private String originId;
 
+    /**
+     * 相机通道id*
+     */
+    private String cameraChannelId;
+
 }

@@ -108,9 +108,7 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     @SuppressWarnings("unchecked")
     public Map<String, Object> startRealPlay(Long cameraId) {
-
         Map<String, Object> returnMap = new HashMap<>();
-
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             if (Objects.isNull(cameraConInfo)) {
@@ -118,10 +116,7 @@ public class CameraConService {
                 returnMap.put("webRtcUrl", "");
                 return returnMap;
             }
-            PlayEntity.Builder builder = new PlayEntity.Builder();
-            builder.deviceId(cameraConInfo.getDeviceChannel());
-            builder.channelId(cameraConInfo.getCameraChannelId());
-            PlayEntity playEntity = new PlayEntity.Builder()
+            PlayEntity playEntity = PlayEntity.builder()
                     .deviceId(cameraConInfo.getDeviceChannel())
                     .channelId(cameraConInfo.getCameraChannelId()).build();
             IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
@@ -170,11 +165,8 @@ public class CameraConService {
         log.info("list: {}， robotList: {}", JSON.toJSONString(list), JSON.toJSONString(robotList));
         list.forEach(cameraId -> {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            PlayEntity.Builder builder = new PlayEntity.Builder();
-            builder.deviceId(cameraConInfo.getDeviceChannel());
-            builder.channelId(cameraConInfo.getCameraChannelId());
-            PlayEntity playEntity = PlayEntity.builder().
-                    deviceId(cameraConInfo.getDeviceChannel())
+            PlayEntity playEntity = PlayEntity.builder()
+                    .deviceId(cameraConInfo.getDeviceChannel())
                     .channelId(cameraConInfo.getCameraChannelId())
                     .build();
             Result result = new Result();
@@ -269,7 +261,6 @@ public class CameraConService {
                     transUrlinferad = String.format(robotInfraredVideo, inferadIp, inferadPort, infraredCameraId);
                 }
                 transUrlinferad = sign(transUrlinferad, infraredCameraId);
-//                VideoInfo videoInfo2 = new VideoInfo().command(transUrlinferad).setId(infraredCameraId);
                 PlayEntity playEntity = PlayEntity.builder().deviceId(infraredCameraId)
                         .command(transUrlinferad)
                         .build();
@@ -417,7 +408,7 @@ public class CameraConService {
                 log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
                                 "historyPath:{}, historyTransUrl: {}"
                         , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-//                VideoInfo videoInfo = new VideoInfo().command(transUrl).setId(id.toString());
+//                VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id.toString());
                 PlayEntity playEntity = PlayEntity.builder().deviceId(id.toString())
                         .command(transUrl).build();
                 IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
@@ -767,9 +758,11 @@ public class CameraConService {
 
     private void webRtcUrl(String url, Map<String, Object> returnMap, Integer isWebRtcUrl) {
         Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
+        String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
         String hostIp = hostIpMap.get("content");
-        String[] split = hostIp.split(":");
-        String newUrl = CommonUtils.replaceIpAndPort(url, split[0], split[1]);
+        String subUrl = url.substring(url.indexOf("/", url.lastIndexOf(":")));
+        String schema = "1".equals(videoHttps) ? "https://" : "http://";
+        String newUrl = schema + hostIp + "/ZLM" + subUrl;
         returnMap.put("webRtcUrl", newUrl);
     }
 
