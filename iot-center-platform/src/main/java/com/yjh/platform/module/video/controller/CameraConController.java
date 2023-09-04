@@ -4,9 +4,10 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.video.service.CameraConService;
-import com.yjh.video.api.entity.preset.PresetCmd;
+import com.yjh.video.api.entity.PresetCmd;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -23,7 +25,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/camera/v1")
-@Api(value = "/cameraControl", description = "相机接口")
+@Api(value = "/cameraControl", tags = {"相机接口 - video 服务迁移"})
 public class CameraConController {
 
     private Logger log = LoggerFactory.getLogger(CameraConController.class);
@@ -216,6 +218,124 @@ public class CameraConController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("云台控制错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "相机抓图")
+    @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
+    //    @Logs(title = "相机抓图",content = "根据用户传递的参数控制相机抓图",logType = 5, authority = "1234,1235")
+    public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId,
+        @RequestParam(value = "meteName", required = false) String meteName,
+        @RequestParam(value = "parentPath", required = false) String parentPath) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            cameraConService.isCameraControlled(cameraId);
+            int max=9999,min=1;
+            int ran = (int) (Math.random()*(max-min)+min);
+            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
+            String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
+            String filePathTem = "/" + parent + formatter.format(new Date())+ ran + ".jpg";
+            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String filePath = captureResultPath + filePathTem;
+            log.info("filePath: "+filePath);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
+            String urlPath = capturePath + filePathTem;
+            resultMap.put("urlPath", urlPath);
+            resultMap.put("absPath", filePath);
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
+            result.setData(resultMap);
+            result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机抓图失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务中相机抓图")
+    @RequestMapping(value = "/capturePictureForTask", method = RequestMethod.GET)
+    public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
+        @RequestParam(value = "meteName", required = false) String meteName) {
+        Result result = new Result();
+        Map<String, String> resultMap = new HashMap<>();
+        try {
+            int max=9999,min=1;
+            int ran = (int) (Math.random()*(max-min)+min);
+            SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
+            String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
+            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String filePath = captureResultPath + filePathTem;
+            log.info("filePath: "+filePath);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
+            String urlPath = capturePath+filePathTem;
+            resultMap.put("urlPath", urlPath);
+            resultMap.put("absPath", filePath);
+            resultMap.put("resultNum", "已拍照");
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
+            result.setData(resultMap);
+            result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务中相机抓图失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "预置位抓图")
+    @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
+    public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
+        @RequestParam(value = "cameraId") Long cameraId,
+        @RequestParam(value = "meteName", required = false) String meteName,
+        @RequestParam(value = "edgeCode", required = false) String edgeCode) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            String capturePresetPath = cameraConService.getPresetBasePath();
+            String capturePathPreset = cameraConService.getPresetUrlPath();
+
+            cameraConService.isCameraControlled(cameraId);
+            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
+            if (StringUtils.isNotEmpty(edgeCode)) {
+                filePathTem = String.format("/%s%s", edgeCode, filePathTem);
+            }
+
+            String filePath = capturePresetPath + filePathTem;
+            log.info("预置位抓图 filePathTem: {},  filePath: {}, edgeCode: {}", filePathTem, filePath, edgeCode);
+            String mkdir = "mkdir "+capturePresetPath+"/"+presetId;
+            if (StringUtils.isNotEmpty(edgeCode)) {
+                mkdir = String.format("mkdir -p %s/%s/%s", capturePresetPath, edgeCode, presetId);
+            }
+
+            log.info("mkdir: "+mkdir);
+            Runtime.getRuntime().exec(mkdir);
+            Thread.sleep(2000);
+            log.info("filePath: "+filePath);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
+            String urlPath = capturePathPreset+filePathTem;
+            resultMap.put("urlPath", urlPath);
+            String url = "chmod 777 "+ filePath;
+            Runtime.getRuntime().exec(url);
+            result.setData(resultMap);
+            result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机抓图失败:", e);
         }
         return result;
     }

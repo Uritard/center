@@ -120,8 +120,16 @@
                a.channel_num_light,
                a.channel_num_inferad,
                a.light_channel_id,
-               a.infrared_channel_id
+               a.infrared_channel_id,
+               c.record_id,
+               c.record_ip,
+               c.identity_manager,
+               c.identity_code,
+               c.rtsp_port,
+               c.recorder_type,
+               c.device_channel
         from t_robot_info a
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
         where 1 = 1
           and a.robot_id = #{robotId, jdbcType=BIGINT} limit 1
     </select>
