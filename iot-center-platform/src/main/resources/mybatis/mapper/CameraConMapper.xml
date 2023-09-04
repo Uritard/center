@@ -38,10 +38,12 @@
         b.preset_num,
         c.record_id,
         c.record_ip,
+        c.http_port as recordPort,
         c.identity_manager,
         c.identity_code,
         c.rtsp_port,
         c.recorder_type,
+        c.vendor_id recordVendor,
         a.camera_ip,
         a.port,
         a.infread_port,
@@ -50,6 +52,7 @@
         a.camera_num,
         a.up_region_id,
         a.camera_channel_id,
+        a.vendor_id,
         c.device_channel
         FROM t_camera_info a
         LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
@@ -127,6 +130,8 @@
                c.identity_code,
                c.rtsp_port,
                c.recorder_type,
+               c.http_port as recordPort,
+               c.vendor_id recordVendor,
                c.device_channel
         from t_robot_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id

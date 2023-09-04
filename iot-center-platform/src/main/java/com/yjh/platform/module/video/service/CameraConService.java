@@ -1,10 +1,10 @@
 package com.yjh.platform.module.video.service;
 
-import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
-import com.sun.jna.NativeLong;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -33,12 +33,11 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author zhangyuyi
@@ -58,10 +57,7 @@ public class CameraConService {
      */
     private static final String MEDIA_ZLK = "ZLMediaKit";
 
-    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
-    @Transactional(rollbackFor = Exception.class)
     @SuppressWarnings("unchecked")
     public void isCameraControlled(Long cameraId) {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
@@ -91,22 +87,16 @@ public class CameraConService {
     public void pushCtrlTime(Long cameraId) {
         try {
             String str = "camera_info:" + cameraId;
-            Map<String, String> map = redisTemplate.opsForHash().entries(str);
-            if (map.size() > 0) {
-                map.put("lastTime", format.format(new Date()));
-            } else {
-                map = new HashMap<>();
-                map.put("cameraId", String.valueOf(cameraId));
-                map.put("lastTime", format.format(new Date()));
-            }
+            Map<String, String> map = new HashMap<>();
+            map.put("cameraId", String.valueOf(cameraId));
+            map.put("lastTime", DateTimeUtil.getDateTimeString());
             redisTemplate.opsForHash().putAll(str, map);
         } catch (Exception e) {
-            log.info("更新相机最后操作时间出错：" + e);
+            log.info("更新相机最后操作时间出错：", e);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @SuppressWarnings("unchecked")
     public Map<String, Object> startRealPlay(Long cameraId) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
@@ -688,10 +678,60 @@ public class CameraConService {
         return String.valueOf(result.getData());
     }
 
+    /**
+     * 预置位抓图
+     */
+    public Map<String, String> capturePresetPicture(Long presetId, Long cameraId, String meteName, String edgeCode) {
+        isCameraControlled(cameraId);
 
-    //@Logs(title = "相机抓图", code = "capturePicture")
-    @Transactional(rollbackFor = Exception.class)
-    public String capturePicture(String filePath, Long cameraId, String meteName) {
+        String capturePresetPath = getPresetBasePath();
+
+        isCameraControlled(cameraId);
+        String filePathTem = "/" + presetId + "/" + presetId + ".jpg";
+        if (StringUtils.isNotEmpty(edgeCode)) {
+            filePathTem = String.format("/%s%s", edgeCode, filePathTem);
+        }
+
+        String filePath = capturePresetPath + filePathTem;
+        log.info("预置位抓图 filePathTem: {},  filePath: {}, edgeCode: {}", filePathTem, filePath, edgeCode);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        }
+        return capturePicture(null, filePath, cameraId, meteName);
+    }
+
+    /**
+     * 抓图接口
+     * @param parentPath 父路径，如果抓图不想全部存在一个目录下，可以传入父路径，默认在 /home/yjh_iot_center/iot-picture/resultImg/ 下创建传入的路径
+     * @param absolutePath 绝对路径，与 parentPath 互斥，若未传，则抓图默认存在 resultImg 路径，若传入，则以 absolutePath 为准，路径必须在 /home/yjh_iot_center/iot-picture 下
+     * @param cameraId 相机ID
+     * @param meteName 测点名称，若传入，则会在图片添加测点名称水印
+     * @return
+     */
+    public Map<String, String> capturePicture(String parentPath, String absolutePath, Long cameraId, String meteName) {
+        String filePath = absolutePath;
+        String urlPath;
+        if (StringUtils.isEmpty(absolutePath)) {
+            int ran = RandomUtil.randomInt(1000, 10000);
+            String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
+            String filePathTem = "/" + parent + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMAT) + ran + ".jpg";
+            String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            filePath = captureResultPath + filePathTem;
+            urlPath = capturePath + filePathTem;
+        } else {
+            // 图片物理路径前缀
+            String absPrePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content"));
+            // 图片网络路径前缀
+            String urlPrePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content"));
+            urlPath = StringUtils.replace(absolutePath, absPrePath, urlPrePath);
+        }
+        log.info("filePath: {}, urlPath: {}", filePath, urlPath);
+        FileUtil.mkParentDirs(filePath);
+
         CameraConInfo cameraConInfo = new CameraConInfo();
         String cameraStr = String.valueOf(cameraId);
         if (cameraStr.contains("9901") || cameraStr.contains("9902")) {
@@ -708,20 +748,42 @@ public class CameraConService {
                 cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumInferad()));
                 cameraConInfo.setDeviceChannel(robotConInfo.getInfraredChannelId());
             }
-            cameraConInfo.setCameraType(205); //机器人
-
+            //机器人
+            cameraConInfo.setCameraType(205);
         } else {
             cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
         }
+        boolean hasNvr = cameraConInfo.getRecordId() != null && cameraConInfo.getRecordId() > 0;
+        String vendor = hasNvr ? cameraConInfo.getRecordVendor() : cameraConInfo.getVendorId();
+        if (!hasNvr) {
+            cameraConInfo.setDeviceChannel(cameraConInfo.getCameraChannelId());
+        }
+        String ip = hasNvr ? cameraConInfo.getRecordIp() : cameraConInfo.getCameraIp();
+        int port = hasNvr ? cameraConInfo.getRecordPort() : cameraConInfo.getPort();
 
-        SnapEntity entity = SnapEntity.builder().deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId()).build();
+        SnapEntity entity =
+            SnapEntity.builder().ip(ip).port(port).channelNum(cameraConInfo.getChannelNum()).deviceId(cameraConInfo.getDeviceChannel())
+                .channelId(cameraConInfo.getCameraChannelId()).imgPath(filePath).build();
 
-        ISnapService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, ISnapService.class);
+        ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(vendor), ISnapService.class);
         Result<String> result = iPlayService.snap(entity);
 
-        pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+        if (result.isSuccess() && StringUtils.isNotEmpty(meteName)) {
+            pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+        }
+        if (!result.isSuccess()) {
+            throw new BusinessException(result.getCode(), result.getMsg());
+        }
 
-        return result.getData();
+        // 更新相机最后操作时间
+        pushCtrlTime(cameraId);
+
+        Map<String, String> resultMap = new HashMap<>();
+        resultMap.put("urlPath", urlPath);
+        resultMap.put("absPath", filePath);
+        resultMap.put("resultNum", "已拍照");
+
+        return resultMap;
     }
 
     /**
@@ -881,4 +943,33 @@ public class CameraConService {
         returnMap.put("webRtcUrl", webRtcUrl);
     }
 
+    private CameraVendor cameraVendor(int vendorId) {
+        return cameraVendor(String.valueOf(vendorId));
+    }
+    private CameraVendor cameraVendor(String vendorId) {
+        CameraVendor cameraVendor;
+        switch (vendorId) {
+            case "207":
+                // 海康
+                cameraVendor = CameraVendor.HIK;
+                break;
+            case "208":
+                // 大华
+                cameraVendor = CameraVendor.DH;
+                break;
+            case "209":
+                // 雄迈
+                cameraVendor = CameraVendor.XM;
+                break;
+            case "210":
+                // 高德红外
+                cameraVendor = CameraVendor.GD;
+                break;
+            default:
+                // 其他
+                cameraVendor = CameraVendor.DEF;
+                break;
+        }
+        return cameraVendor;
+    }
 }
