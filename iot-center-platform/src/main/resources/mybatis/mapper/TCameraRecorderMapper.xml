@@ -25,6 +25,7 @@
             <result property="unit" column="unit" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="deviceChannel" column="device_channel" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -36,7 +37,7 @@
         identity_manager,identity_code,protocol_url,
         max_channel,hdd_size,buffer_day,
         time_long,unit,edge_code,
-        origin_id
+        origin_id,device_channel
             </sql>
     <sql id="TongYong">
         a.record_id,
@@ -64,7 +65,8 @@
         a.time_long,
         unit,
         edge_code,
-        origin_id
+        origin_id,
+        a.device_channel
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
@@ -75,7 +77,7 @@
         ,http_port,trans_port,rtsp_port
         ,identity_manager,identity_code,protocol_url
         ,max_channel,hdd_size,buffer_day
-        ,time_long,unit,edge_code,origin_id)
+        ,time_long,unit,edge_code,origin_id, device_channel)
         values (#{recordName,jdbcType=VARCHAR},#{recorderModel,jdbcType=INTEGER}
         ,#{recorderType,jdbcType=VARCHAR},#{vendorId,jdbcType=INTEGER},#{pmsId,jdbcType=VARCHAR}
         ,#{aliasName,jdbcType=VARCHAR},#{recordIp,jdbcType=VARCHAR},#{protocol,jdbcType=VARCHAR}
@@ -83,7 +85,7 @@
         ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
         ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
         ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR})
+        ,#{originId,jdbcType=VARCHAR}, #{deviceChannel,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -134,6 +136,7 @@
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
         <if test="identityCode != null and identityCode != '••••••'">a.identity_code = #{identityCode},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
+        <if test="deviceChannel != null ">a.device_channel = #{deviceChannel},</if>
         a.max_channel = #{maxChannel, jdbcType=INTEGER},
         a.hdd_size = #{hddSize, jdbcType=INTEGER},
         a.buffer_day = #{bufferDay, jdbcType=INTEGER},
@@ -202,7 +205,7 @@
         ,http_port,trans_port,rtsp_port
         ,identity_manager,identity_code,protocol_url
         ,max_channel,hdd_size,buffer_day
-        ,time_long,unit,edge_code,origin_id
+        ,time_long,unit,edge_code,origin_id, device_channel
         )values
         <foreach collection="list" item="tCameraRecorder" separator=",">
             (
@@ -213,7 +216,7 @@
             ,#{tCameraRecorder.identityManager,jdbcType=VARCHAR},#{tCameraRecorder.identityCode,jdbcType=VARCHAR},#{tCameraRecorder.protocolUrl,jdbcType=VARCHAR}
             ,#{tCameraRecorder.maxChannel,jdbcType=INTEGER},#{tCameraRecorder.hddSize,jdbcType=INTEGER},#{tCameraRecorder.bufferDay,jdbcType=INTEGER}
             ,#{tCameraRecorder.timeLong,jdbcType=INTEGER},#{tCameraRecorder.unit,jdbcType=VARCHAR},#{tCameraRecorder.edgeCode,jdbcType=VARCHAR}
-            ,#{tCameraRecorder.originId,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.originId,jdbcType=VARCHAR},#{deviceChannel,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
