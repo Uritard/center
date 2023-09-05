@@ -393,7 +393,7 @@ public abstract class AbstractVideoCruise {
      */
     protected void moveWait(Long presetId, Long cameraId) {
         try {
-            cameraConService.moveToPreset(presetId, cameraId);
+            cameraConService.moveToPresetForTask(presetId, cameraId);
             Thread.sleep(waitTime);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
