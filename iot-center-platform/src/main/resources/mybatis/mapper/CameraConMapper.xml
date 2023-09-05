@@ -193,6 +193,7 @@
                a.identity_manager,
                a.identity_code,
                a.max_channel,
+               a.vendor_id,
                a.device_channel
         from t_camera_recorder a
         where 1 = 1
@@ -227,7 +228,22 @@
         where 1=1
         <if test="cameraName != null and cameraName != ''"> and b.camera_name like CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         )
+    </select>
 
+    <select id="SelectRecords" resultType="com.yjh.platform.module.video.entity.RecorderConInfo">
+        SELECT
+        a.record_id,
+        a.record_name,
+        a.record_ip,
+        a.protocol,
+        a.http_port,
+        a.trans_port,
+        a.rtsp_port,
+        a.identity_manager,
+        a.identity_code,
+        a.max_channel,
+        a.recorder_type
+        FROM t_camera_recorder a
     </select>
 
 </mapper>

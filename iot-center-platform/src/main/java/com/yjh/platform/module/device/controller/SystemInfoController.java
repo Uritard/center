@@ -203,10 +203,10 @@ public class SystemInfoController {
     @ApiOperation(value = "获取NVR信息")
     @RequestMapping(value = "/getNVRInfo", method = RequestMethod.GET)
     @Logs(title = "查询NVR信息",content = "根据用户传递的参数查询NVR信息",logType = 1,authority = "1234")
-    public Result getNVRInfo() {
+    public Result getNVRInfo(@RequestParam(value = "force", defaultValue = "false") boolean force) {
         Result result = new Result();
         try {
-            List<Map<String,String>> list = systemInfoService.getNVRInfo();
+            List<Map<String, Object>> list = systemInfoService.getNVRInfo(force);
             result.setData(list);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

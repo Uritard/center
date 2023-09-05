@@ -57,6 +57,9 @@ public class RecorderConInfo implements Serializable {
     @ApiModelProperty(value = "录像机类型")
     private String recorderType;
 
+    @ApiModelProperty(value = "录像机厂家")
+    private String vendorId;
+
     @ApiModelProperty(value = "设备ID")
     private String deviceChannel;
 
