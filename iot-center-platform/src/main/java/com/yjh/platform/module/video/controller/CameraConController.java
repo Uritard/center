@@ -3,7 +3,9 @@ package com.yjh.platform.module.video.controller;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.video.entity.CameraConfigBatchReq;
 import com.yjh.platform.module.video.service.CameraConService;
+import com.yjh.platform.module.video.service.DroneCameraConService;
 import com.yjh.video.api.entity.PresetCmd;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -32,6 +34,9 @@ public class CameraConController {
 
     @Resource
     private CameraConService cameraConService;
+
+    @Resource
+    private DroneCameraConService droneCameraConService;
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
@@ -227,8 +232,8 @@ public class CameraConController {
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
     //    @Logs(title = "相机抓图",content = "根据用户传递的参数控制相机抓图",logType = 5, authority = "1234,1235")
     public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId,
-        @RequestParam(value = "meteName", required = false) String meteName,
-        @RequestParam(value = "parentPath", required = false) String parentPath) {
+                                 @RequestParam(value = "meteName", required = false) String meteName,
+                                 @RequestParam(value = "parentPath", required = false) String parentPath) {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
@@ -248,7 +253,7 @@ public class CameraConController {
     @ApiOperation(value = "任务中相机抓图")
     @RequestMapping(value = "/capturePictureForTask", method = RequestMethod.GET)
     public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
-        @RequestParam(value = "meteName", required = false) String meteName) {
+                                        @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
         try {
 
@@ -267,9 +272,9 @@ public class CameraConController {
     @ApiOperation(value = "预置位抓图")
     @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
     public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
-        @RequestParam(value = "cameraId") Long cameraId,
-        @RequestParam(value = "meteName", required = false) String meteName,
-        @RequestParam(value = "edgeCode", required = false) String edgeCode) {
+                                       @RequestParam(value = "cameraId") Long cameraId,
+                                       @RequestParam(value = "meteName", required = false) String meteName,
+                                       @RequestParam(value = "edgeCode", required = false) String edgeCode) {
         Result result = new Result();
         try {
             String capturePresetPath = cameraConService.getPresetBasePath();
@@ -390,6 +395,131 @@ public class CameraConController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("开启语音对讲失败描述:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取红外文件_dlt664")
+    @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
+    public Result givePicFir(@RequestParam(value = "presetId", required = false) Long presetId,
+                             @RequestParam(value = "cameraId", required = false) Long cameraId,
+                             @RequestParam(value = "meteName", required = false) String meteName) {
+        Result result = new Result();
+        Map<String, String> map = cameraConService.givePicFir(cameraId, presetId, meteName);
+        if (map.size() > 0) {
+            result.setData(map);
+            result.setMessage("success");
+        } else {
+            result.setData("获取文件失败");
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "区域对焦")
+    @RequestMapping(value = "/regionFocus", method = RequestMethod.GET)
+    public Result regionFocus(@RequestParam(value = "nStartX") int nStartX,
+                              @RequestParam(value = "nStartY") int nStartY,
+                              @RequestParam(value = "nEndX") int nEndX,
+                              @RequestParam(value = "nEndY") int nEndY,
+                              @RequestParam(value = "cameraId") long cameraId) {
+        Result result = new Result();
+        Map<String, String> map = cameraConService.regionFocus(nStartX, nStartY, nEndX, nEndY, cameraId);
+        result.setData(map);
+        result.setMessage("success");
+        return result;
+    }
+
+    @ApiOperation(value = "无人机相机播放")
+    @RequestMapping(value = "/droneStartRealPlay", method = RequestMethod.GET)
+    public Result droneStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
+        Result result = new Result();
+        try {
+            result.setData(droneCameraConService.droneStartRealPlayNew(robotId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("无人机相机播放失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "相机配置信息导出")
+    @RequestMapping(value = "/exportCameraConfig", method = RequestMethod.GET)
+    public Result exportCameraConfig(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.exportCameraConfig(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息导出失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "批量备份相机配置")
+    @PostMapping("/exportCameraConfigBatch")
+    public Result exportCameraConfigBatch(@RequestBody CameraConfigBatchReq cameraConfigBatchReq) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.exportCameraConfigBatch(cameraConfigBatchReq.getCameraIds()));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息导出失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "相机配置信息恢复")
+    @RequestMapping(value = "/importCameraConfig", method = RequestMethod.GET)
+    public Result importCameraConfig(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.importCameraConfig(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机配置信息恢复失败:", e);
+        }
+
+        return result;
+    }
+
+    @ApiOperation(value = "获取相机状态")
+    @RequestMapping(value = "/getCameraStatus", method = RequestMethod.GET)
+    public Result getCameraStatus(@RequestParam(value = "recordId") Long recordId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getCameraStatus(recordId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取相机状态失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取NVR下挂相机树状态")
+    @RequestMapping(value = "/getCameraTreeStatus", method = RequestMethod.GET)
+    public Result getCameraTreeStatus(@RequestParam(value = "cameraName", required = false) String cameraName,
+                                      @RequestParam(value = "flag", required = false) Integer flag) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getCameraStatusTree(cameraName, flag));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取NVR下挂相机树失败:", e);
         }
         return result;
     }

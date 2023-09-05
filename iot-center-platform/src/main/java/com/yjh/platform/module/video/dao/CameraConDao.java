@@ -1,8 +1,6 @@
 package com.yjh.platform.module.video.dao;
 
-import com.yjh.platform.module.video.entity.CameraConInfo;
-import com.yjh.platform.module.video.entity.RecorderConInfo;
-import com.yjh.platform.module.video.entity.RobotConInfo;
+import com.yjh.platform.module.video.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +20,11 @@ public interface CameraConDao {
     RobotConInfo selectRobotConInfo(@Param("robotId") Long robotId);
 
     RecorderConInfo selectByRecordId(@Param(value = "recordId") Long recordId);
+
+    RobotConInfo selectDroneConInfo(@Param("robotId") Long robotId);
+
+    List<CameraStatusInfo> cameraInfoByNVR(@Param("recordId") Long recordId);
+
+    List<CameraAreaInfo> selectCameraTree(@Param("cameraName") String cameraName);
 
 }

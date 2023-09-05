@@ -5,18 +5,18 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.video.dao.CameraConDao;
-import com.yjh.platform.module.video.entity.CameraConInfo;
-import com.yjh.platform.module.video.entity.RecorderConInfo;
-import com.yjh.platform.module.video.entity.RobotConInfo;
+import com.yjh.platform.module.video.entity.*;
 import com.yjh.video.api.CameraVendor;
 import com.yjh.video.api.entity.*;
 import com.yjh.video.api.result.Result;
 import com.yjh.video.api.service.*;
 import com.yjh.video.api.util.PathVariableUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +24,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +35,11 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhangyuyi
@@ -57,6 +58,11 @@ public class CameraConService {
      * 流媒体服务器 ZLMediaKit
      */
     private static final String MEDIA_ZLK = "ZLMediaKit";
+
+    public static Map<String, String> maps = new ConcurrentHashMap<>();
+
+    @Value("${spring.redis.host}")
+    private String hostIp;
 
 
     @SuppressWarnings("unchecked")
@@ -789,8 +795,8 @@ public class CameraConService {
         String pwd = hasNvr ? cameraConInfo.getIdentityCode() : cameraConInfo.getCameraCode();
 
         SnapEntity entity =
-            SnapEntity.builder().ip(ip).port(port).channelNum(cameraConInfo.getChannelNum()).deviceId(cameraConInfo.getDeviceChannel())
-                .channelId(cameraConInfo.getCameraChannelId()).userName(userName).password(pwd).imgPath(filePath).build();
+                SnapEntity.builder().ip(ip).port(port).channelNum(cameraConInfo.getChannelNum()).deviceId(cameraConInfo.getDeviceChannel())
+                        .channelId(cameraConInfo.getCameraChannelId()).userName(userName).password(pwd).imgPath(filePath).build();
 
         ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(vendor), ISnapService.class);
         Result<String> result = iPlayService.snap(entity);
@@ -999,4 +1005,443 @@ public class CameraConService {
         }
         return cameraVendor;
     }
+
+    /**
+     * dlt664红外抓图
+     *
+     * @param cameraId
+     * @param presetId
+     * @return
+     */
+    public HashMap<String, String> givePicFir(long cameraId, Long presetId, String meteName) {
+        HashMap<String, String> map = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            log.info("通道号：" + cameraConInfo.getChannelNum());
+            log.info("getRecordId:" + cameraConInfo.getRecordId());
+            String userName = cameraConInfo.getCameraManager();
+            log.info("userName" + userName);
+            String password = cameraConInfo.getCameraCode();
+            log.info("password" + password);
+            String cameraIp = cameraConInfo.getCameraIp();
+            log.info("cameraIp" + cameraIp);
+            String port = cameraConInfo.getInfreadPort().toString();
+            log.info("port:>>>" + port);
+
+            //转到预置点
+            IPtzService iPtzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
+            PresetEntity presetEntity = PresetEntity.builder()
+                    .deviceId(cameraConInfo.getDeviceChannel())
+                    .channelId(cameraConInfo.getCameraChannelId())
+                    .presetId(presetId.toString()).build();
+            Result presetCommand = iPtzService.presetCommand(presetEntity);
+            if (presetCommand.getCode() == 200) {
+                log.info("转到预置点成功：Preset->" + presetCommand.getData());
+            } else {
+                log.info("转到预置点失败->" + presetCommand.getData());
+            }
+
+            try {
+                Long waitTime =
+                        Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
+                log.info("waitTime:----------" + waitTime);
+                Thread.sleep(waitTime);
+            } catch (Exception e) {
+                log.error("error----" + e);
+            }
+
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+            String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
+            String hotPicShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
+            String hotFirShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content"));
+            Boolean flag = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared", "content").toString());
+            Boolean infraredAnalysis = Boolean.valueOf(redisTemplate.opsForHash().get("t_sys_param:isInfraredAnalysis", "content").toString());
+            PicPlayEntity build = PicPlayEntity.builder()
+                    .ip(cameraIp)
+                    .port(cameraConInfo.getPort())
+                    .password(password)
+                    .userName(userName)
+                    .hotPic(hotPic)
+                    .hotPicShow(hotPicShow)
+                    .hotFirShow(hotFirShow)
+                    .hotFir(hotFir)
+                    .meteName(meteName)
+                    .flag(flag)
+                    .infraredAnalysis(infraredAnalysis).build();
+            Result<HashMap<String, String>> hashMapResult = iRecordService.givePicFir(build);
+            if (hashMapResult.getCode() == 200) {
+                return hashMapResult.getData();
+            } else {
+                map.put("error", "获取红外文件_dlt664失败");
+                return map;
+            }
+        } catch (Exception e) {
+            log.error("红外图片抓取异常" + e);
+        }
+        return map;
+    }
+
+    /**
+     * @param nStartX  参数范围 0~255
+     * @param nStartY  参数范围 0~255
+     * @param nEndX    参数范围 0~255
+     * @param nEndY    参数范围 0~255
+     * @param cameraId 相机编码
+     * @return
+     */
+    public Map<String, String> regionFocus(int nStartX, int nStartY, int nEndX, int nEndY, long cameraId) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            if (205 == cameraConInfo.getCameraType()) {
+                String userName = cameraConInfo.getCameraManager();
+                String password = cameraConInfo.getCameraCode();
+                String cameraIp = cameraConInfo.getCameraIp();
+
+                IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+                PositionPlayEntity playEntity = PositionPlayEntity.builder()
+                        .ip(cameraIp)
+                        .port(cameraConInfo.getPort())
+                        .userName(userName)
+                        .password(password)
+                        .nEndX(nEndX)
+                        .nEndY(nEndY)
+                        .nStartX(nStartX)
+                        .nStartY(nStartY)
+                        .build();
+                Result result = iRecordService.regionFocus(playEntity);
+                if (result.getCode() != 200) {
+                    log.info("请求结果" + result);
+                }
+                if (result.getData() != null) {
+                    Map<String, String> resultMap = (Map<String, String>) result.getData();
+                    if ("OK".equals(resultMap.get("statusString"))) {
+                        map.put("result", "ok");
+                    } else {
+                        map.put("result", resultMap.get("subStatusCode"));
+                    }
+                } else {
+                    map.put("result", "error");
+                }
+            } else {
+                map.put("result", "camera type is not allowed!");
+            }
+        } catch (Exception e) {
+            log.error("区域对焦失败", e);
+        }
+        return map;
+    }
+
+    /**
+     * 导出相机设备参数
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    public boolean exportCameraConfig(Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        log.info("exportCameraConfig 参数，cameraConInfo：{}", JSONUtil.toJSONString(cameraConInfo));
+        String userName = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+
+        try {
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+            PlayEntity playEntity = PlayEntity.builder()
+                    .ip(cameraIp)
+                    .port(cameraConInfo.getPort())
+                    .userName(userName)
+                    .password(password).build();
+            Result<byte[]> result = iRecordService.exportCameraConfig(playEntity);
+            String filePath = getConfigFileDir();
+            String fileName = getConfigFileName(cameraId.toString());
+            log.info("相机 {} 配置文件路径：{}{}", cameraId, filePath, fileName);
+            bytesToFile(result.getData(), filePath, fileName);
+        } catch (Exception e) {
+            log.info("exportCameraConfig err: {}", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 获取相机设备参数的文件名存储路径
+     *
+     * @return result
+     */
+    private String getConfigFileDir() {
+        return String.valueOf(redisTemplate.opsForHash().get("t_sys_param:cameraConfigPath", "content"));
+    }
+
+    /**
+     * 生成相机设备参数的文件名
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    private String getConfigFileName(String cameraId) {
+        return String.format("configurationData_%s.data", cameraId);
+    }
+
+
+    /**
+     * 将Byte数组转换成文件
+     *
+     * @param bytes    byte数组
+     * @param filePath 文件路径  如 D://test/ 最后“/”结尾
+     * @param fileName 文件名
+     */
+    public static void bytesToFile(byte[] bytes, String filePath, String fileName) {
+        BufferedOutputStream bos = null;
+        FileOutputStream fos = null;
+        File file = null;
+        try {
+            file = new File(filePath + fileName);
+            if (!file.getParentFile().exists()) {
+                //文件夹不存在 生成
+                file.getParentFile().mkdirs();
+            }
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
+            bos.write(bytes);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            IOUtils.closeQuietly(bos);
+            IOUtils.closeQuietly(fos);
+        }
+    }
+
+
+    /**
+     * 批量配分相机设备参数
+     *
+     * @param cameraIds cameraIds
+     * @return result
+     */
+    public boolean exportCameraConfigBatch(List<Long> cameraIds) {
+        if (CollectionUtils.isEmpty(cameraIds)) {
+            log.info("exportCameraConfigBatch 入参cameraIds为空！");
+            return false;
+        }
+
+        log.info("exportCameraConfigBatch 入参cameraIds: {}", JSONUtil.toJSONString(cameraIds));
+        cameraIds.forEach(cameraId -> {
+            try {
+                exportCameraConfig(cameraId);
+            } catch (Exception e) {
+                log.info("相机{}备份失败，errMsg:{}", cameraId, e.getMessage());
+            }
+        });
+
+        return true;
+    }
+
+
+    /**
+     * 恢复相机配置信息
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    public boolean importCameraConfig(Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        log.info("exportCameraConfig 参数，cameraConInfo：{}", JSONUtil.toJSONString(cameraConInfo));
+        // 导入配置文件
+        boolean processResult = uploadConfigFile(cameraConInfo);
+        if (processResult) {
+            log.info("相机：{} 导入配置文件成功，即将重启", cameraId);
+            // 重启相机
+            processResult = reboot(cameraConInfo);
+            log.info("相机：{} 重启相机结果：{}", cameraId, processResult);
+        } else {
+            throw new BusinessException("相机配置信息导入失败！");
+        }
+
+        log.info("相机：{} 恢复相机配置信息结果：{}", cameraId, processResult);
+        return processResult;
+    }
+
+
+    /**
+     * put请求导入相机设备参数配置文件
+     *
+     * @param cameraConInfo cameraConInfo
+     * @return result
+     */
+    private boolean uploadConfigFile(CameraConInfo cameraConInfo) {
+        log.info("uploadConfigFile入参，cameraConInfo： {}", JSONUtil.toJSONString(cameraConInfo));
+
+        if (cameraConInfo == null) {
+            throw new BusinessException("相机不存在！");
+        }
+        String username = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+        String cameraId = cameraConInfo.getCameraId().toString();
+
+        File backFile = new File(getConfigFileDir() + getConfigFileName(cameraId));
+        if (!backFile.exists() || !backFile.isFile()) {
+            throw new BusinessException("相机配置信息不存在，请先备份！");
+        }
+        try {
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+            FilePlayEntity playEntity = FilePlayEntity.builder()
+                    .ip(cameraIp)
+                    .port(cameraConInfo.getPort())
+                    .userName(username)
+                    .password(password)
+                    .body(getBytesByFile(backFile)).build();
+            Result<Map<String, String>> result = iRecordService.uploadConfigFile(playEntity);
+            if (result.getCode() != 200) {
+                log.info(result.getMsg());
+                return false;
+            }
+        } catch (Exception e) {
+            log.info("err", e);
+            return false;
+        }
+        return true;
+    }
+
+    public static byte[] getBytesByFile(File file) {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8192);
+            byte[] b = new byte[8192];
+            int n;
+            while ((n = fis.read(b)) != -1) {
+                bos.write(b, 0, n);
+            }
+            fis.close();
+            byte[] data = bos.toByteArray();
+            bos.close();
+            return data;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * 重启相机
+     *
+     * @param cameraConInfo cameraConInfo
+     * @return result
+     */
+    private boolean reboot(CameraConInfo cameraConInfo) {
+        String userName = cameraConInfo.getCameraManager();
+        String password = cameraConInfo.getCameraCode();
+        String cameraIp = cameraConInfo.getCameraIp();
+
+        try {
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+            PlayEntity playEntity = PlayEntity.builder()
+                    .ip(cameraIp)
+                    .port(cameraConInfo.getPort())
+                    .userName(userName)
+                    .password(password).build();
+            Result reboot = iRecordService.reboot(playEntity);
+            log.info("reboot result is, putResult: {}", reboot);
+        } catch (Exception e) {
+            log.info("camera reboot err: {}", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    //@Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, String> getCameraStatus(Long recordId) {
+        List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
+//        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        Map<String, String> channleStatusMap = new HashMap<>();
+        for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
+            if (!maps.containsKey(cameraStatusInfo.getDeviceChannel())) {
+                IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraStatusInfo.getVendorId()), IRecordService.class);
+                PlayEntity playEntity = PlayEntity.builder()
+                        .deviceId(cameraStatusInfo.getDeviceChannel()).build();
+                Result result = iRecordService.getCameraStatus(playEntity);
+                JSONObject data = (JSONObject) result.getData();
+                String online = (String) data.get("Online");
+                if (StringUtils.isNotEmpty(online)) {
+                    if (online.equals("ONLINE")) {
+                        maps.put(cameraStatusInfo.getDeviceChannel(), "1");
+                    } else {
+                        maps.put(cameraStatusInfo.getDeviceChannel(), "0");
+                    }
+                } else {
+                    maps.put(cameraStatusInfo.getDeviceChannel(), "-1"); // 未知
+                }
+            }
+            channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), maps.get(cameraStatusInfo.getDeviceChannel()));
+        }
+        log.info("channelStatusMap: " + channleStatusMap);
+        return channleStatusMap;
+    }
+
+    //@Logs(title = "获取相机树状态", code = "getCameraStatusTree", content = "获取NVR下挂相机树状态")
+    @Transactional(rollbackFor = Exception.class)
+    public List<CameraAreaInfo> getCameraStatusTree(String cameraName, Integer flag) {
+        //if (Objects.nonNull(cameraName)) {}
+        List<CameraAreaInfo> tree = new ArrayList<>();
+        Map<String, String> state = new HashMap<>();
+        List<CameraAreaInfo> listTree = this.cameraConDao.selectCameraTree(cameraName);
+        for (CameraAreaInfo areaInfoMap : listTree) {
+            if (areaInfoMap.getUpId() == -1) {
+                CameraAreaInfo areaInfoCountry = new CameraAreaInfo();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setUpId(areaInfoMap.getUpId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountry.setStatusInfo("1");
+                tree.add(areaInfoCountry);
+                state.putAll(getCameraStatus(areaInfoMap.getId()));
+                //log.info("nvr map：  ",state);
+            }
+        }
+        //log.info("状态map：  ",state);
+        diGui(tree, listTree, state, flag);
+        return tree;
+
+    }
+
+    private void diGui(List<CameraAreaInfo> areaInfoList, List<CameraAreaInfo> listTree, Map<String, String> state,
+                       Integer flag) {
+        for (CameraAreaInfo areaInfo : areaInfoList) {
+            List<CameraAreaInfo> childrenList = new ArrayList<>();
+            for (CameraAreaInfo areaInfoMap : listTree) {
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                    CameraAreaInfo areaInfoTem = new CameraAreaInfo();
+                    areaInfoTem.setId(areaInfoMap.getId());
+                    areaInfoTem.setUpId(areaInfoMap.getUpId());
+                    areaInfoTem.setLabel(areaInfoMap.getLabel());
+                    areaInfoTem.setInfoType(areaInfoMap.getInfoType());
+                    areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    areaInfoTem.setChannelNum(areaInfoMap.getChannelNum());
+                    areaInfoTem.setStatusInfo(state.get(areaInfoMap.getId().toString()));
+                    if (flag != null && flag == 1) {
+                        if ("1".equals(state.get(areaInfoMap.getId().toString()))) {
+                            //在线
+                            childrenList.add(areaInfoTem);
+                        }
+                    } else {
+                        childrenList.add(areaInfoTem);
+                    }
+
+                }
+            }
+            if (childrenList.size() > 0) {
+                areaInfo.setChildren(childrenList);
+                diGui(childrenList, listTree, state, flag);
+            }
+        }
+    }
+
 }
