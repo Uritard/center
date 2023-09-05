@@ -264,7 +264,7 @@ public class TCameraInfoController {
         try {
             List<TCameraInfo> list = tCameraInfoService.select(cameraId, cameraName, cameraModel, pmsId, aliasName, recordId, upRegionId, streamType, protocolType,
                     cameraIp, url, cameraType, isControl);
-                    result.setData(list);
+            result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -276,7 +276,7 @@ public class TCameraInfoController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
 //    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
-                                @RequestParam(value = "unit", required = false) String unit,
+                               @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "address", required = false) String address,
                                @RequestParam(value = "cameraVendor", required = false) String cameraVendor,
                                @RequestParam(value = "cameraType", required = false) Integer cameraType,
@@ -329,12 +329,12 @@ public class TCameraInfoController {
     @Logs(title = "查询一个任务下的摄像头信息",content = "根据用户传递的参数任务下的相机信息",logType = 1)
     public Result selectCameraByTaskId(@RequestParam(value = "taskId")Long taskId){
         Result result=new Result();
-     try{
-         result.setData(tCameraInfoService.selectCameraByTaskId(taskId));
-     }catch (Exception e){
-         result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
-         log.error("失败描述",e);
-     }
+        try{
+            result.setData(tCameraInfoService.selectCameraByTaskId(taskId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述",e);
+        }
         return  result;
     }
 
@@ -372,7 +372,7 @@ public class TCameraInfoController {
                                             @RequestParam(value = "type", required = false) Integer type) {
         Result result = new Result();
         try {
-                result.setData(this.tCameraInfoService.selectByCameraIdOrRobotId(cameraId,type));
+            result.setData(this.tCameraInfoService.selectByCameraIdOrRobotId(cameraId,type));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
