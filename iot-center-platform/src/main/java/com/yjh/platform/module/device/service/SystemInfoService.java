@@ -1,18 +1,19 @@
 package com.yjh.platform.module.device.service;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
-import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.SystemInfoUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
+import com.yjh.platform.module.video.service.CameraConService;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 
 /**
  * @author lqh
@@ -48,6 +48,11 @@ public class SystemInfoService {
 
     @Autowired
     private TSysParamDao sysParamDao;
+    @Autowired
+    private CameraConService cameraConService;
+
+    private final static Cache<String, List<Map<String, Object>>> RECORDER_INFO_CACHE = CacheUtil.newTimedCache(5*60*1000);
+    private final static String RECORDER_KEY = "RECORDER_INFO";
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
@@ -196,54 +201,62 @@ public class SystemInfoService {
     }
 
     //获取NVR容量
-    @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,String>> getNVRInfo() {
-        String nvrFreeMin=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:nvrFreeMin","content"));
-        List<TCameraRecorderDetail> list = tCameraRecorderDao.selectIdAndName();
-        List<Map<String,String>> reList = new ArrayList<>();
-        for (TCameraRecorderDetail item:list) {
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recorderId",item.getRecordId() );
-            Result re = getNVRInfo(item.getRecordId());
+    public synchronized List<Map<String, Object>> getNVRInfo(boolean force) {
 
-            if(re == null){
-                continue;
+        List<Map<String, Object>> cache = RECORDER_INFO_CACHE.get(RECORDER_KEY);
+        if (!force && cache != null) {
+            return cache;
+        }
+
+        List<TCameraRecorderDetail> list = tCameraRecorderDao.selectIdAndName();
+        List<Map<String, Object>> reList = recordInfoList(list, !force);
+
+        if (!force) {
+            ThreadPoolUtil.COMMON_POOL.addThread(() -> {
+                recordInfoList(list, false);
+            });
+        }
+
+        return reList;
+    }
+
+    private List<Map<String, Object>> recordInfoList(List<TCameraRecorderDetail> list, boolean needCache) {
+        String nvrFreeMin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:nvrFreeMin", "content"));
+        List<Map<String, Object>>  reList = new ArrayList<>();
+        for (TCameraRecorderDetail item : list) {
+            Map<String, Object> map = null;
+            if (needCache) {
+                String jsonStr = (String)redisTemplate.opsForValue().get("recorderInfo:" + item.getRecordId());
+                if (StringUtils.isNotEmpty(jsonStr)) {
+                    map = JSON.parseObject(jsonStr);
+                }
             }
-            Map<String,String> map = (Map<String,String>)re.getData();
-            if(map.get("freeTotal") != null && map.get("capacityTotal")!= null){
-                Integer use = Integer.valueOf(map.get("freeTotal"));
-                Integer all = Integer.valueOf(map.get("capacityTotal"));
-                Integer other = all - use;
-                map.put("use",other.toString());
-                map.put("recorderName",item.getRecordName());
-                map.put("nvrFreeMin",nvrFreeMin);
-            }else {
-                map.put("nvrFreeMin",nvrFreeMin);
-                map.put("recorderId",item.getRecordId().toString());
-                map.put("recorderName",item.getRecordName());
-                map.put("freeTotal","0");
-                map.put("capacityTotal","0");
-                map.put("use","0");
+            if (map == null) {
+                map = cameraConService.getNVRStoreAndChanle(item.getRecordId());
+            }
+
+            if (map.get("freeTotal") != null && map.get("capacityTotal") != null) {
+                Long use = MapUtils.getLong(map, "freeTotal");
+                Long all = MapUtils.getLong(map, "capacityTotal");
+                long other = all - use;
+                map.put("use", other);
+                map.put("recorderName", item.getRecordName());
+                map.put("nvrFreeMin", nvrFreeMin);
+            } else {
+                map.put("nvrFreeMin", nvrFreeMin);
+                map.put("recorderId", item.getRecordId().toString());
+                map.put("recorderName", item.getRecordName());
+                map.put("freeTotal", "0");
+                map.put("capacityTotal", "0");
+                map.put("use", "0");
             }
 
             reList.add(map);
         }
+
+        RECORDER_INFO_CACHE.put(RECORDER_KEY, reList);
         return reList;
     }
-    private static Result getNVRInfo(Long recordId) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class,recordId);
-            }
-//            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.NVR_URL, map, Result.class);
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        return re;
-    }
-
 
     public Object getLogsStorageInfo(HttpServletRequest request, Long userId) {
         Map<String,Integer> storageInfo = new HashMap<>();

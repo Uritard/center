@@ -1,5 +1,6 @@
 package com.yjh.platform.module.video.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -380,6 +381,23 @@ public class CameraConController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("清除预置点失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取NVR存储状态和通道信息")
+    @RequestMapping(value = "/getNVRStoreInfo", method = RequestMethod.GET)
+    public Result getNVRStoreInfo(@RequestParam(value = "recordId") Long recordId) {
+        Result result = new Result();
+        try {
+            Map<String, Object> nvrStoreAndChannel = cameraConService.getNVRStoreAndChanle(recordId);
+            redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(nvrStoreAndChannel));
+            result.setData(nvrStoreAndChannel);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取NVR存储状态和通道信息失败:", e);
         }
         return result;
     }
