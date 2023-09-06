@@ -98,5 +98,5 @@ public interface TCruisePointInstanceDao {
 
     TCruisePointInstance selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
 
-    List<AreaInfo> selectDeviceByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    List<AreaInfoDeviceId> selectDeviceByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
 }

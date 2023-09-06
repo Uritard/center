@@ -4,6 +4,9 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -17,6 +20,7 @@ import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -71,6 +75,9 @@ public class TCruisePointInstanceService{
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
+
+    @Autowired
+    private TCameraScreenDao tCameraScreenDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -525,42 +532,75 @@ public class TCruisePointInstanceService{
         return this.uPatrolResultDao.selectCruiseCountByType(taskId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfo> selectCameraByDeviceMeteId(Long deviceMeteId) {
+    public List<AreaInfoDeviceId> selectCameraByDeviceMeteId(Long deviceMeteId) {
         TStdDeviceMete devicemete = tStdDevicemeteDao.selectByPrimaryId(deviceMeteId);
         if (devicemete == null) {
             throw new BusinessException("测点已不存在！");
         }
-        List<AreaInfo> areaInfos = tCruisePointInstanceDao.selectDeviceByDeviceMeteId(deviceMeteId);
+        List<AreaInfoDeviceId> areaInfos = tCruisePointInstanceDao.selectDeviceByDeviceMeteId(deviceMeteId);
         String camera = "camera";
         String robot = "robot";
         String drone = "drone";
         if (areaInfos.stream().anyMatch(areaInfo -> camera.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(1L).setLabel("摄像机").setInfoType("camera");
+            Map<String, String> map = new HashMap<>();
+            List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+            for (Long recordId : recordIdList) {
+                HashMap<String, Object> recordIdMap = new HashMap<>();
+                recordIdMap.put("recordId", recordId);
+                Result re = cameraStates(recordIdMap);
+                if (re == null) {
+                    continue;
+                }
+                map.putAll((Map<String, String>) re.getData());
+            }
+            areaInfos.forEach(areaInfo -> {
+                if ("camera".equals(areaInfo.getInfoType())) {
+                    if (map.get(areaInfo.getId().toString()) != null) {
+                        areaInfo.setState(Integer.valueOf(map.get(areaInfo.getId().toString())));
+                    } else {
+                        areaInfo.setState(0);
+                    }
+                }
+            });
+            AreaInfoDeviceId areaInfo = new AreaInfoDeviceId().setId(1L).setLabel("摄像机").setInfoType("camera");
             areaInfos.add(areaInfo);
         }
         if (areaInfos.stream().anyMatch(areaInfo -> robot.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(2L).setLabel("机器人").setInfoType("robot");
+            AreaInfoDeviceId areaInfo = new AreaInfoDeviceId().setId(2L).setLabel("机器人").setInfoType("robot");
             areaInfos.add(areaInfo);
         }
         if (areaInfos.stream().anyMatch(areaInfo -> drone.equals(areaInfo.getInfoType()))) {
-            AreaInfo areaInfo = new AreaInfo().setId(3L).setLabel("无人机").setInfoType("drone");
+            AreaInfoDeviceId areaInfo = new AreaInfoDeviceId().setId(3L).setLabel("无人机").setInfoType("drone");
             areaInfos.add(areaInfo);
         }
         return assembleTrees(areaInfos);
     }
 
-    public List<AreaInfo> assembleTrees(Collection<AreaInfo> trees) {
+    static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
+    }
+
+    public List<AreaInfoDeviceId> assembleTrees(Collection<AreaInfoDeviceId> trees) {
         if (CollectionUtils.isEmpty(trees)) {
             return Collections.emptyList();
         }
 
         // 构建树主键/实例映射表，并初始化树的子节点集合
-        Map<?, AreaInfo> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
-                .collect(Collectors.toMap(AreaInfo::getId, t -> t, (o, n) -> n));
+        Map<?, AreaInfoDeviceId> mapping = trees.stream().peek(tree -> tree.setChildren(new LinkedList<>()))
+                .collect(Collectors.toMap(AreaInfoDeviceId::getId, t -> t, (o, n) -> n));
 
         // 查找并关联树节点，返回所有没有父节点的树
         return trees.stream().filter(tree -> {
-            AreaInfo parent = ifNull(tree.getUpId(), mapping::get);
+            AreaInfoDeviceId parent = ifNull(tree.getUpId(), mapping::get);
             if (parent != null) {
                 parent.getChildren().add(tree);
             }

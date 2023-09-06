@@ -814,7 +814,7 @@
         from t_cruise_point_instance
         where  edge_code = #{edgeCode} and origin_id=#{originId}
     </select>
-    <select id="selectDeviceByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+    <select id="selectDeviceByDeviceMeteId" resultType="com.yjh.platform.module.device.entity.AreaInfoDeviceId">
         SELECT DISTINCT
             '1' AS upId,
             '摄像机' AS upName,
@@ -822,6 +822,7 @@
             c.camera_id AS id,
             d.camera_name AS label,
             ''as deviceTypeId,
+            1 as state,
             (SELECT DISTINCT
                  f.preset_id as presetId
              FROM
@@ -845,6 +846,7 @@
             d.robot_id AS id,
             d.robot_name AS label,
             d.robot_code as deviceTypeId,
+            IF(d.robot_status = '在线', 1, 0) as state,
             (SELECT DISTINCT
                  f.inspection_code as presetId
              FROM
@@ -869,6 +871,7 @@
             d.robot_id AS id,
             d.robot_name AS label,
             d.robot_code as deviceTypeId,
+            IF(d.robot_status = '在线', 1, 0) as state,
             (SELECT DISTINCT
                  f.inspection_code as presetId
              FROM
