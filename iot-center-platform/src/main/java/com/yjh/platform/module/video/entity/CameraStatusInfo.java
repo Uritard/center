@@ -30,6 +30,6 @@ public class CameraStatusInfo implements Serializable {
     private String deviceChannel;
 
     @ApiModelProperty(value = "相机厂家ID")
-    private String vendorId;
+    private String vendorId = "0";
 
 }

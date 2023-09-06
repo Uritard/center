@@ -240,7 +240,7 @@ public class DeviceStaticsToUpSystem {
                     Integer NormalDays = uPatrolDeviceStaticsDao.selectNormalDays(device.get("patrolDeviceCode").toString());
                     if (NormalDays == null ) {
                         Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
-                        NormalDays = (Integer) result.get("commission_days");
+                        NormalDays = Integer.valueOf((String) result.get("commission_days"));
                     }
                     infoMap.put("value", NormalDays == null ? 0 : NormalDays);
                     infoMap.put("value_unit", "1");
