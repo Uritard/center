@@ -12,6 +12,7 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -59,6 +60,8 @@ public class TCameraInfoService {
     private SysUserDevicePermissionDao sysUserDevicePermissionDao;
     @Resource
     private TStdRegionDao tStdRegionDao;
+    @Resource
+    private CameraConService cameraConService;
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
@@ -573,8 +576,9 @@ public class TCameraInfoService {
     @Transactional(rollbackFor = Exception.class)
     public void stopStream(Long cameraId) {
         try {
-            Result result=Constant.otherServerGet(String.valueOf(cameraId), Constant.CAMERA_STREAM_STOP);
-            log.info((String) result.getData());
+            String result = cameraConService.stopStream(String.valueOf(cameraId));
+//            Result result=Constant.otherServerGet(String.valueOf(cameraId), Constant.CAMERA_STREAM_STOP);
+            log.info(result);
         } catch (Exception e) {
             log.info("cameraId: {} stopStream failed", cameraId);
         }

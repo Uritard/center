@@ -27,6 +27,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -45,6 +46,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -85,6 +87,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+
+    @Resource
+    private CameraConService cameraConService;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -289,8 +294,9 @@ public class TCruiseTaskResultService {
                 log.info("switch (videoInfo.get(\"videoCameraType\")), 参数：{}", JSONUtil.toJSONString(videoInfo));
                 switch (videoInfo.get("videoCameraType")) {
                     case "1":
-
-                        Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                        List<Map<String, Object>> data = cameraConService.robotStartRealPlay(Long.valueOf(resultMap.get("robotId")));
+                        Result result = new Result();
+                        result.setData(data);
                         List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>)result.getData();
                         if (CollectionUtils.isNotEmpty(robotVideoInfo)) {
                             videoInfo.putAll(robotVideoInfo.get(0));
@@ -303,7 +309,9 @@ public class TCruiseTaskResultService {
                         inspectResult.setVideoInfo(videoInfo);
                         break;
                     case "2":
-                        Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                        List<Map<String, Object>> data2 = cameraConService.robotStartRealPlay(Long.valueOf(resultMap.get("robotId")));
+                        Result result2 = new Result();
+                        result2.setData(data2);
                         List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>)result2.getData();
                         if (CollectionUtils.isNotEmpty(robotInfraredVideoInfo)) {
                             videoInfo.putAll(robotInfraredVideoInfo.get(1));
@@ -355,7 +363,10 @@ public class TCruiseTaskResultService {
                 }
                 HashMap<String, Long> cameraId = new HashMap<>();
                 cameraId.put("cameraId", Long.valueOf(camera));
-                Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
+//                Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
+                Result result = new Result();
+                Map<String, Object> data = cameraConService.startRealPlay(Long.valueOf(camera));
+                result.setData(data);
                 Map<String, String> cameraVideoInfo = (Map<String, String>)result.getData();
                 if (MapUtils.isNotEmpty(cameraVideoInfo)) {
                     videoInfo.putAll(cameraVideoInfo);
@@ -400,11 +411,12 @@ public class TCruiseTaskResultService {
         for (String cruiseVideo : cruiseVideos) {
             Map<String, Object> videoInfo = redisTemplate.opsForHash().entries(cruiseVideo);
 
-            HashMap<String, Object> camera = new HashMap<>();
-            camera.put("cameraId", Long.valueOf(videoInfo.get("cameraId").toString()));
-            camera.put("rtmpUrl", videoInfo.get("rtmpUrl").toString());
-            Result result = sendStopRequest(Constant.STOP_CAMERA_URL, camera);
-            stopResult = result.getData().toString();
+//            HashMap<String, Object> camera = new HashMap<>();
+//            camera.put("cameraId", Long.valueOf(videoInfo.get("cameraId").toString()));
+//            camera.put("rtmpUrl", videoInfo.get("rtmpUrl").toString());
+//            Result result = sendStopRequest(Constant.STOP_CAMERA_URL, camera);
+            stopResult = cameraConService.stopRealPlay(Long.valueOf(videoInfo.get("cameraId").toString()), videoInfo.get("rtmpUrl").toString());
+//            stopResult = result.getData().toString();
         }
         return stopResult;
     }
