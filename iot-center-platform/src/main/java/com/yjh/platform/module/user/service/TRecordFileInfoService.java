@@ -5,6 +5,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.user.dao.TRecordFileInfoDao;
 import com.yjh.platform.module.user.entity.TRecordFileInfo;
+import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class TRecordFileInfoService {
     @Resource
     private TRecordFileInfoDao tRecordFileInfoDao;
 
+    @Resource
+    private CameraConService cameraConService;
+
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long id) {
         TRecordFileInfo tRecordFileInfo = tRecordFileInfoDao.selectByPrimaryId(id);
@@ -41,8 +45,9 @@ public class TRecordFileInfoService {
         return tRecordFileInfoDao.selectByPage(cameraId, startTime, endTime);
     }
 
-    public Result getFileList(Long cameraId,String startTime, String endTime) {
-        Result result = Constant.videoServer(null,Constant.PLAY_BACK_FILE_LIST_URL,cameraId,startTime,endTime);
+    public Result getFileList(Long cameraId, String startTime, String endTime) {
+        Result result = new Result();
+        result.setData(cameraConService.getRecordFiles(cameraId, startTime, endTime));
         return result;
     }
 }

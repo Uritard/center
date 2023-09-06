@@ -8,7 +8,9 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.video.dao.CameraConDao;
@@ -925,7 +927,10 @@ public class CameraConService {
             Result<List<RecordInfo>> listResult = recordService.recordAllFiles(entity);
 
             if (listResult.isSuccess()) {
-                Result<RecordSpace> space = recordService.recordSpace();
+                BaseEntity baseEntity =
+                    BaseEntity.builder().ip(conInfo.getRecordIp()).port(conInfo.getHttpPort()).deviceId(conInfo.getDeviceChannel())
+                        .userName(conInfo.getIdentityManager()).password(conInfo.getIdentityCode()).build();
+                Result<RecordSpace> space = recordService.recordSpace(baseEntity);
                 RecordSpace rs = space.getData();
                 channleStatusMap.put("recorderId", conInfo.getRecordId());
                 channleStatusMap.put("capacityTotal", rs.getCapacity());
@@ -1058,6 +1063,47 @@ public class CameraConService {
             sTemp += iTemp + "m";
         }
         return sTemp;
+    }
+
+    public List<Map<String, String>> getRecordFiles(long cameraId, String startTime, String stopTime) {
+        CameraConInfo conInfo = cameraConDao.selectConInfo(cameraId, null);
+
+        List<Map<String, String>> recordFileList = new ArrayList<>();
+        RecordFileEntity entity =
+            RecordFileEntity.builder().ip(conInfo.getRecordIp()).port(conInfo.getRecordPort()).deviceId(conInfo.getDeviceChannel()).channelId(conInfo.getCameraChannelId())
+                .startTime(startTime).endTime(stopTime).channelNum(conInfo.getChannelNum()).userName(conInfo.getIdentityManager()).password(conInfo.getIdentityCode()).build();
+
+        IRecordService recordService = VideoServiceFactory.loadSnapService(cameraVendor(conInfo.getRecordVendor()), IRecordService.class);
+        try {
+            Result<RecordInfo> recordInfo = recordService.recordFiles(entity);
+
+            if (recordInfo.isSuccess()) {
+
+                // 查询通道信息
+                List<RecordItem> chanInfoList = recordInfo.getData().getRecordList();
+                for (RecordItem item : chanInfoList) {
+                    Map<String, String> map = Maps.newHashMap();
+                    map.put("fileName", item.getFilePath());
+                    map.put("startTime", item.getStartTime());
+                    map.put("endTime", item.getEndTime());
+                    String size = item.getFileSize();
+                    if (StringUtils.isEmpty(size)) {
+                        size = "1013M";
+                    } else if(NumberUtils.isCreatable(size)){
+                        size = CommonUtils.fileSpace(NumberUtils.toLong(size));
+                    }
+                    map.put("fileSize", size);
+                    recordFileList.add(map);
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(recordFileList)) {
+                Collections.reverse(recordFileList);
+            }
+        } catch (Exception e) {
+            log.error("获取NVR文件失败：{}", entity, e);
+        }
+        return recordFileList;
     }
 
     /**
