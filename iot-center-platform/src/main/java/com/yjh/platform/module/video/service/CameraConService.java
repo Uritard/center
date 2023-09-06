@@ -68,8 +68,6 @@ public class CameraConService {
      */
     private static final String MEDIA_ZLK = "ZLMediaKit";
 
-    public static Map<String, String> maps = new ConcurrentHashMap<>();
-
     @SuppressWarnings("unchecked")
     public void isCameraControlled(Long cameraId) {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
@@ -1493,27 +1491,23 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getCameraStatus(Long recordId) {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
-//        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
         Map<String, String> channleStatusMap = new HashMap<>();
         for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
-            if (!maps.containsKey(cameraStatusInfo.getDeviceChannel())) {
-                IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraStatusInfo.getVendorId()), IRecordService.class);
-                PlayEntity playEntity = PlayEntity.builder()
-                        .deviceId(cameraStatusInfo.getDeviceChannel()).build();
-                Result result = iRecordService.getCameraStatus(playEntity);
-                JSONObject data = (JSONObject) result.getData();
-                String online = (String) data.get("Online");
-                if (StringUtils.isNotEmpty(online)) {
-                    if (online.equals("ONLINE")) {
-                        maps.put(cameraStatusInfo.getDeviceChannel(), "1");
-                    } else {
-                        maps.put(cameraStatusInfo.getDeviceChannel(), "0");
-                    }
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraStatusInfo.getVendorId()), IRecordService.class);
+            PlayEntity playEntity = PlayEntity.builder()
+                    .deviceId(cameraStatusInfo.getDeviceChannel()).build();
+            Result result = iRecordService.getCameraStatus(playEntity);
+            JSONObject data = (JSONObject) result.getData();
+            String online = (String) data.get("Online");
+            if (StringUtils.isNotEmpty(online)) {
+                if (online.equals("ONLINE")) {
+                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
                 } else {
-                    maps.put(cameraStatusInfo.getDeviceChannel(), "-1"); // 未知
+                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
                 }
+            } else {
+                channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1");
             }
-            channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), maps.get(cameraStatusInfo.getDeviceChannel()));
         }
         log.info("channelStatusMap: " + channleStatusMap);
         return channleStatusMap;
