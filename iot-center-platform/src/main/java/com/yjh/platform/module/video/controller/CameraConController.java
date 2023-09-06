@@ -403,6 +403,22 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "获取到视频文件列表")
+    @RequestMapping(value = "/getFileList", method = RequestMethod.GET)
+    public Result getFileList(@RequestParam(value = "cameraId") Long cameraId, @RequestParam(value = "startTime") String startTime,
+        @RequestParam(value = "endTime") String endTime) {
+        Result result = new Result();
+        try {
+            List<Map<String, String>> list = cameraConService.getRecordFiles(cameraId, startTime, endTime);
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.info(e.getMessage());
+        }
+        return result;
+
+    }
+
     @ApiOperation(value = "开启语音广播")
     @GetMapping(value = "/startVoiceTrans")
     public Result startVoiceTrans(@RequestParam(value = "deviceId") Long deviceId) {
