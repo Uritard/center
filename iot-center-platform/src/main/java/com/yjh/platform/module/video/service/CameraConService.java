@@ -5,6 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.io.Files;
+import com.yjh.commons.ValueUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -16,6 +18,7 @@ import com.yjh.video.api.entity.*;
 import com.yjh.video.api.entity.response.RecordInfo;
 import com.yjh.video.api.entity.response.RecordItem;
 import com.yjh.video.api.entity.response.RecordSpace;
+import com.yjh.video.api.entity.response.RecordResultInfo;
 import com.yjh.video.api.result.Result;
 import com.yjh.video.api.service.*;
 import com.yjh.video.api.util.PathVariableUtil;
@@ -40,6 +43,8 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -962,7 +967,7 @@ public class CameraConService {
             if (CollectionUtils.isEmpty(itemList)) {
                 continue;
             }
-            
+
             int[] intact = new int[3];
             Date[] recordSpan = new Date[2];
             // 单个通道完整性校验
@@ -970,7 +975,7 @@ public class CameraConService {
 
             String[] recordSpanStr = new String[]{DateTimeUtil.format(recordSpan[0]), DateTimeUtil.format(recordSpan[1])};
             chanInfoMap.put("recordSpan", recordSpanStr);
-            
+
             if (intact[0] > 0) {
                 intact[2] = (intact[0] * 10000) / (intact[0] + intact[1]);
             }
@@ -1570,6 +1575,101 @@ public class CameraConService {
                 diGui(childrenList, listTree, state, flag);
             }
         }
+    }
+
+
+    /**
+     * 获取行列区域画面最高温度
+     *
+     * @param cameraId 摄像头id
+     */
+    public String getLineTemperature(long cameraId, String points) throws Exception{
+        Integer x1 = null;
+        Integer y1 = null;
+        Integer x2 = null;
+        Integer y2 = null;
+        String[] pointList = points.split(",");
+        x1 = ValueUtil.toInteger(pointList[0],0);
+        y1 = ValueUtil.toInteger(pointList[1],0);
+        if (pointList.length == 4){
+            x2 = ValueUtil.toInteger(pointList[2],1);
+            y2 = ValueUtil.toInteger(pointList[3],1);
+        }
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        ThermometerEntity entity = ThermometerEntity.builder()
+                .ip(cameraConInfo.getCameraIp())
+                .port(cameraConInfo.getPort())
+                .userName(cameraConInfo.getCameraManager())
+                .password(cameraConInfo.getCameraCode())
+                .x1(x1)
+                .y1(y1)
+                .x2(x2)
+                .y2(y2)
+                .build();
+        IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IInfraredService.class);
+        Result result = iInfraredService.getTemperature(entity);
+        if (result.getCode() != 200) {
+            throw new RuntimeException(result.getMsg());
+        }
+        return result.getData().toString();
+    }
+
+    /**
+     * 开始录像
+     *
+     * @param cameraId 摄像头id
+     */
+    public void startRecord(long cameraId) throws Exception{
+        //保存文件地址
+        String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        RecordCtrlEntity entity = RecordCtrlEntity.builder()
+                .deviceId(cameraConInfo.getDeviceChannel())
+                .channelId(cameraConInfo.getCameraChannelId())
+                .customizedPath(videoPath)
+                .build();
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        Result result = iRecordService.startRecord(entity);
+        if (result.getCode() != 200) {
+            throw new RuntimeException(result.getMsg());
+        }
+    }
+
+    /**
+     * 结束录像
+     *
+     * @param cameraId 摄像头id
+     */
+    public String stopRecord(long cameraId) throws Exception{
+        String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
+        String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        RecordCtrlEntity entity = RecordCtrlEntity.builder()
+                .deviceId(cameraConInfo.getDeviceChannel())
+                .channelId(cameraConInfo.getCameraChannelId())
+                .build();
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        Result<RecordResultInfo> result = iRecordService.stopRecord(entity);
+        if (result.getCode() != 200) {
+            throw new RuntimeException(result.getMsg());
+        }
+        if (!result.getData().getFileUrl().contains(videoPath)){
+            RecordResultInfo recordResultInfo = result.getData();
+            int index = recordResultInfo.getRecordUrl().lastIndexOf("/");
+            String dirPath = videoPath+recordResultInfo.getRecordUrl().substring(0,index);
+            //需要移动文件
+            File dir = new File(dirPath);
+            if (!dir.exists()){
+                dir.mkdirs();
+            }
+            String newFileUrl = videoPath+result.getData().getRecordUrl();
+            File sourceFile = new File(result.getData().getFileUrl());
+            File destinationFile  = new File(newFileUrl);
+            Files.move(sourceFile,destinationFile);
+
+        }
+
+        return videoRealPath+result.getData().getRecordUrl();
     }
 
 }

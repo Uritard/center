@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -43,13 +44,9 @@ public class TSequentialConfService{
 
     @Autowired
     private ApplicationProperties applicationProperties;
+
     @Autowired
     private CameraConService cameraConService;
-
-    @Value("${sequential.startRecordVideo}")
-    private String startRecordVideo;
-    @Value("${sequential.endRecordVideo}")
-    private String endRecordVideo;
 
 
     @Autowired
@@ -262,9 +259,7 @@ public class TSequentialConfService{
         if (StringUtils.equals("true", flag)){
             // 收到聚焦信号开始录视频
             try {
-                String services = HttpClientUtils.getInstance().getUrl(startRecordVideo+ "?cameraId=" +  map.get("cameraId").toString(), null);
-                JSONObject jsonObject =JSONObject.parseObject(services);
-                Constant.filePath = String.valueOf(jsonObject.get("data"));
+                cameraConService.startRecord(ValueUtil.toLong(map.get("cameraId")));
             }catch (Exception e){
                 log.error(e.getMessage(), e);
             }
@@ -286,21 +281,16 @@ public class TSequentialConfService{
         if (StringUtils.equals("true", flag)) {
             // 收到变位信号停止录视频
             try {
-                String filePath = Constant.filePath;
+                String filePath;
                 //等3s再停止录像
                 Thread.sleep(3000);
+                filePath = cameraConService.stopRecord(ValueUtil.toLong(list.get(0).get("cameraId")));
+                log.info("视频结果: {}", filePath);
                 if (StringUtils.isNotEmpty(filePath)) {
-                    String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
-                    String services = HttpClientUtils.getInstance().getUrl(endRecordVideo + "?fileName=" + fileName, null);
-                    log.info("视频结果: {}", services);
-                    filePath = filePath.replace(".h264", ".mp4");
-                    if (StringUtils.isNotEmpty(filePath)) {
-                        param.put("picPath", filePath);
-                        param.put("fileName", fileName);
-                        param.put("fileType", "4");
-                    } else {
-                        throw new BusinessException("一键顺控-变位信号-录像地址为空");
-                    }
+                    param.put("picPath", filePath);
+                    param.put("fileType", "4");
+                } else {
+                    throw new BusinessException("一键顺控-变位信号-录像地址为空");
                 }
             } catch (Exception e) {
                 log.error("一键顺控-变位信号-录像失败", e);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.video.entity.TemperatureInfo;
 import com.yjh.platform.module.video.entity.CameraConfigBatchReq;
 import com.yjh.platform.module.video.service.CameraConService;
 import com.yjh.platform.module.video.service.DroneCameraConService;
@@ -542,4 +543,49 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "根据坐标获取温度")
+    @RequestMapping(value = "/PointTemperature", method = RequestMethod.POST)
+    public Result  PointTemperature ( @RequestBody TemperatureInfo temperatureInfo)
+    {
+        log.info(temperatureInfo.toString());
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getLineTemperature(temperatureInfo.getCameraId(), temperatureInfo.getPoints()));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("根据坐标获取温度失败描述:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "开始录制视频")
+    @RequestMapping(value = "/startDvrToPlace", method = RequestMethod.GET)
+    public Result startDvrToPlace(@RequestParam(value = "cameraId") Long cameraId)  {
+        Result result = new Result();
+        try {
+            cameraConService.startRecord(cameraId);
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "结束录制视频")
+    @RequestMapping(value = "/stopDvrToPlace", method = RequestMethod.GET)
+    public Result stopDvrToPlace(HttpServletRequest request, @RequestParam(value = "cameraId") Long cameraId)  {
+        Result result = new Result();
+        try {
+            String userId = request.getHeader("userId");
+            String path = cameraConService.stopRecord(cameraId);
+            log.info("service返回值："+path + ";" + userId);
+            if(null!=path) {
+                result.setData(path);
+            } else { result.setData("结束录制失败"); }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
 }
