@@ -94,9 +94,9 @@ public class Constant {
 
     public static final String DIAGNOSE_CHANNEL_DELETE="http://iot-center-accessvqd/channelOperate/v1/deleteChannel?channelId={channelId}";
 
-    public static final String CAMERA_STREAM_STOP="http://iot-center-accessvideo/camera/v1/stopStream?cameraId={cameraId}";
+//    public static final String CAMERA_STREAM_STOP="http://iot-center-accessvideo/camera/v1/stopStream?cameraId={cameraId}";
 
-    public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
+//    public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
 
     public static final String DRONE_VIDEO="http://iot-center-accessvideo/camera/v1/droneStartRealPlay?robotId={robotId}";
 
@@ -135,9 +135,9 @@ public class Constant {
     }
 
     public static Map<String,String> userInfo= new HashMap<>();
-    public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
-    public static final String STOP_CAMERA_URL= "http://iot-center-accessvideo/camera/v1/stopRealPlay?cameraId={cameraId}&rtmpUrl={rtmpUrl}";
-    public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
+//    public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
+//    public static final String STOP_CAMERA_URL= "http://iot-center-accessvideo/camera/v1/stopRealPlay?cameraId={cameraId}&rtmpUrl={rtmpUrl}";
+//    public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
     public static final String PLAY_BACK_FILE_LIST_URL = "http://iot-center-accessvideo/camera/v1/getFileList?cameraId={cameraId}&startTime={startTime}&endTime={endTime}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
