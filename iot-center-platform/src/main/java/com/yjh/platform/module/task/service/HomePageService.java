@@ -79,7 +79,7 @@ public class HomePageService {
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
-    private CameraConController cameraConController;
+    private CameraConService cameraConService;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -324,12 +324,10 @@ public class HomePageService {
         //获取相机的状态
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for (Long recordId : recordIdList) {
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId", recordId);
-            Result re = cameraConController.getCameraStatus(recordId);
-            log.info("re.getData()==========={}", re.getData());
-            // 前提是video有非空返回值
-            map.putAll((Map<String, String>)re.getData());
+            Map<String,String> reMap = cameraConService.getCameraStatus(recordId);
+            if (reMap != null){
+                map.putAll(reMap);
+            }
         }
         List<String> re = new ArrayList<>();
         List<Long> cameraIdList = tCameraGroupDao.selectCameraIdInfo();
@@ -371,14 +369,11 @@ public class HomePageService {
         //获取相机的状态
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for (Long recordId : recordIdList) {
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId", recordId);
-            Result re = cameraConController.getCameraStatus(recordId);
-//            Result re = cameraStates(recordIdMap);
-            if (re == null) {
-                continue;
+            Map<String,String> reMap = cameraConService.getCameraStatus(recordId);
+            if (reMap != null){
+                map.putAll(reMap);
             }
-            map.putAll((Map<String, String>) re.getData());
+
         }
         List<String> re = new ArrayList<>();
         String[] cameraIdList = tCameraGroupDao.selectCameraIdInfoForGroup(groupId).split(",");

@@ -17,6 +17,7 @@ import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
 import com.yjh.platform.module.video.controller.CameraConController;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -50,7 +51,7 @@ public class TCameraRecorderService {
     @Autowired
     private TCameraInfoService tCameraInfoService;
     @Autowired
-    private CameraConController cameraConController;
+    private CameraConService cameraConService;
 
     private Logger log = LoggerFactory.getLogger(TCameraRecorderService.class);
 
@@ -110,13 +111,11 @@ public class TCameraRecorderService {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
 
         for(TCameraRecorderByDict res : tCameraRecorderByDictList) {
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId", res.getRecordId());
-            Result re = cameraConController.getCameraStatus(res.getRecordId());
-            log.info("re---"+re);
-            if (Objects.nonNull(re)){
-                Map<String,Object> mapRes = JSONObject.parseObject(JSON.toJSONString(re.getData()));
-                if ("200".equals(mapRes.get("errorCode: ").toString())){
+            Map<String, String> recordIdMap = cameraConService.getCameraStatus(res.getRecordId());
+            log.info("re---"+recordIdMap);
+            if (Objects.nonNull(recordIdMap)){
+                Map<String,String> mapRes = recordIdMap;
+                if ("200".equals(mapRes.get("errorCode: "))){
                     res.setRecorderStatus("在线");
                 }else {
                     res.setRecorderStatus("离线");
