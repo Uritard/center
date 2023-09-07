@@ -28,6 +28,7 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.video.service.CameraConService;
+import com.yjh.platform.module.video.service.DroneCameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -90,6 +91,9 @@ public class TCruiseTaskResultService {
 
     @Resource
     private CameraConService cameraConService;
+
+    @Resource
+    private DroneCameraConService droneCameraConService;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -385,9 +389,12 @@ public class TCruiseTaskResultService {
 
     private Map<String, String> getDroneVideoInfo(String robotId) {
         try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            Result re = serviceRestTemplate.getForObject(Constant.DRONE_VIDEO, Result.class, robotId);
-            return ((List<Map<String, String>>)re.getData()).get(0);
+            List<Map<String, Object>> maps = droneCameraConService.droneStartRealPlayNew(Long.valueOf(robotId));
+            Map<String, String> data = new HashMap<>();
+            for (Map.Entry<String, Object> entry : maps.get(0).entrySet()) {
+                data.put(entry.getKey(), entry.getValue().toString());
+            }
+            return data;
         } catch (Exception e) {
             log.error("getDroneVideoInfo err, ", e);
             return null;
