@@ -499,11 +499,11 @@ public class CameraConService {
                     horizonSpeed = speed;
                     break;
                 case 11:
-                    command = "zoomout";
+                    command = "zoomin";
                     zoomSpeed = speed;
                     break;
                 case 12:
-                    command = "zoomin";
+                    command = "zoomout";
                     zoomSpeed = speed;
                     break;
                 case 25:
@@ -537,7 +537,8 @@ public class CameraConService {
         IPtzService iPtzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
         PtzControlEntity ptzControlEntity =
             PtzControlEntity.builder().deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId())
-                .command(command).horizonSpeed(horizonSpeed).verticalSpeed(verticalSpeed).zoomSpeed(zoomSpeed).build();
+                .command(command).horizonSpeed(horizonSpeed*10).verticalSpeed(verticalSpeed*10).zoomSpeed(zoomSpeed*10).build();
+        // 国标需要将速度乘以10，否则太慢
         try {
             iPtzService.ptzControl(ptzControlEntity);
             return "success";
