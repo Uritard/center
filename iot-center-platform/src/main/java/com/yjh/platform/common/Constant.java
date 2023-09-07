@@ -95,7 +95,7 @@ public class Constant {
 
 //    public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
 
-    public static final String DRONE_VIDEO="http://iot-center-accessvideo/camera/v1/droneStartRealPlay?robotId={robotId}";
+    public static final String DRONE_VIDEO="http://iot-center-platform/camera/v1/droneStartRealPlay?robotId={robotId}";
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
