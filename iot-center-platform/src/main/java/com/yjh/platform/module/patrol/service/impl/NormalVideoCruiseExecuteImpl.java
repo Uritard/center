@@ -44,7 +44,7 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
      * 可见光相机抓图
      */
     @Override
-    protected Map<String, String> capture(String parentPath, Long presetId, Long cameraId, String meteName) {
+    protected Map<String, String> capture(String parentPath, Long cameraId, String meteName) {
         return cameraConService.capturePicture(parentPath, null, cameraId, meteName);
     }
 

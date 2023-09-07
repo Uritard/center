@@ -44,28 +44,11 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     }
 
     /**
-     * 红外相机转到预置位，红外相机抓图时进行了处理，不需要转动预置位
-     */
-    @Override
-    protected void moveWait(Long presetId, Long cameraId) {
-        // noting to do.
-    }
-
-    /**
      * 红外抓图，转到预置位抓图两步合一
      */
     @Override
-    protected Map<String, String> capture(String parentPath, Long presetId, Long cameraId, String meteName) {
-        Result re = null;
-        try {
-            log.info("红外抓图： {}", RED_MOVE_URL);
-            // if (null != serviceRestTemplate) {
-            //     re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
-            // }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return cameraConService.capturePicture(parentPath, null, cameraId, meteName);
+    protected Map<String, String> capture(String parentPath, Long cameraId, String meteName) {
+        return cameraConService.givePicFir(parentPath, cameraId, meteName);
     }
 
     @Override

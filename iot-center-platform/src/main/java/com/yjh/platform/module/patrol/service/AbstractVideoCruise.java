@@ -57,11 +57,6 @@ public abstract class AbstractVideoCruise {
      */
     public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
-    /**
-     * 红外相机拍图
-     */
-    public static final String RED_MOVE_URL =
-        "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
     protected final CameraConService cameraConService;
@@ -126,7 +121,7 @@ public abstract class AbstractVideoCruise {
                     captureMap.put("cameraId", cameraId);
                     captureMap.put("meteName", instanceName);
                     //2.抓图
-                    re = capture(taskId, presetId, NumberUtils.toLong(cameraId), instanceName);
+                    re = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
                 } catch (Exception e) {
                     log.error("设置摄像机状态出错", e);
                 } finally {
@@ -405,7 +400,7 @@ public abstract class AbstractVideoCruise {
      *
      * @return 抓图结果
      */
-    protected abstract Map<String, String> capture(String parentPath, Long presetId, Long cameraId, String meteName);
+    protected abstract Map<String, String> capture(String parentPath, Long cameraId, String meteName);
 
     /**
      * 算法分析额外信息处理

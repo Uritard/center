@@ -1185,15 +1185,15 @@ public class CameraConService {
 
     /**
      * dlt664红外抓图
-     *
-     * @param cameraId
-     * @param presetId
-     * @return
+     * @param parentDir 父文件夹，会在抓图目录下创建一个额外的文件夹，不可以以 /开头
+     * @param cameraId 相机ID
+     * @param meteName 测点名称
+     * @return 抓图结果
      */
-    public HashMap<String, String> givePicFir(long cameraId, Long presetId, String meteName) {
+    public HashMap<String, String> givePicFir(String parentDir, long cameraId, String meteName) {
         HashMap<String, String> map = new HashMap<>();
         try {
-            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
             log.info("通道号：" + cameraConInfo.getChannelNum());
             log.info("getRecordId:" + cameraConInfo.getRecordId());
@@ -1206,29 +1206,8 @@ public class CameraConService {
             String port = cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>" + port);
 
-            //转到预置点
-            IPtzService iPtzService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPtzService.class);
-            PresetEntity presetEntity = PresetEntity.builder()
-                    .deviceId(cameraConInfo.getDeviceChannel())
-                    .channelId(cameraConInfo.getCameraChannelId())
-                    .presetId(presetId.toString()).build();
-            Result presetCommand = iPtzService.presetCommand(presetEntity);
-            if (presetCommand.getCode() == 200) {
-                log.info("转到预置点成功：Preset->" + presetCommand.getData());
-            } else {
-                log.info("转到预置点失败->" + presetCommand.getData());
-            }
-
-            try {
-                Long waitTime =
-                        Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
-                log.info("waitTime:----------" + waitTime);
-                Thread.sleep(waitTime);
-            } catch (Exception e) {
-                log.error("error----" + e);
-            }
-
-            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+            String parentPath = StringUtils.defaultString(parentDir);
+            IInfraredService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
             String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
             String hotPicShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
@@ -1240,10 +1219,10 @@ public class CameraConService {
                     .port(cameraConInfo.getPort())
                     .password(password)
                     .userName(userName)
-                    .hotPic(hotPic)
-                    .hotPicShow(hotPicShow)
-                    .hotFirShow(hotFirShow)
-                    .hotFir(hotFir)
+                    .hotPic(FilenameUtils.concat(hotPic, parentPath))
+                    .hotPicShow(FilenameUtils.concat(hotPicShow, parentPath))
+                    .hotFirShow(FilenameUtils.concat(hotFirShow, parentPath))
+                    .hotFir(FilenameUtils.concat(hotFir, parentPath))
                     .meteName(meteName)
                     .flag(flag)
                     .infraredAnalysis(infraredAnalysis).build();
@@ -1255,7 +1234,7 @@ public class CameraConService {
                 return map;
             }
         } catch (Exception e) {
-            log.error("红外图片抓取异常" + e);
+            log.error("红外图片抓取异常", e);
         }
         return map;
     }

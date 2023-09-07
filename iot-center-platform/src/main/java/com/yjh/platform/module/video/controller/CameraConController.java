@@ -255,11 +255,12 @@ public class CameraConController {
     @ApiOperation(value = "任务中相机抓图")
     @RequestMapping(value = "/capturePictureForTask", method = RequestMethod.GET)
     public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
-                                        @RequestParam(value = "meteName", required = false) String meteName) {
+                                        @RequestParam(value = "meteName", required = false) String meteName,
+                                        @RequestParam(value = "parentPath", required = false) String parentPath) {
         Result result = new Result();
         try {
 
-            Map<String, String> resultMap = cameraConService.capturePicture("", null, cameraId, meteName);
+            Map<String, String> resultMap = cameraConService.capturePicture(parentPath, null, cameraId, meteName);
             result.setData(resultMap);
 
         } catch (BusinessException b) {
@@ -436,11 +437,11 @@ public class CameraConController {
 
     @ApiOperation(value = "获取红外文件_dlt664")
     @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
-    public Result givePicFir(@RequestParam(value = "presetId", required = false) Long presetId,
-                             @RequestParam(value = "cameraId", required = false) Long cameraId,
+    public Result givePicFir(@RequestParam(value = "parentPath", required = false) String parentPath,
+                             @RequestParam(value = "cameraId") Long cameraId,
                              @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
-        Map<String, String> map = cameraConService.givePicFir(cameraId, presetId, meteName);
+        Map<String, String> map = cameraConService.givePicFir(parentPath, cameraId, meteName);
         if (map.size() > 0) {
             result.setData(map);
             result.setMessage("success");
