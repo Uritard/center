@@ -1208,7 +1208,7 @@ public class CameraConService {
             log.info("port:>>>" + port);
 
             String parentPath = StringUtils.defaultString(parentDir);
-            IInfraredService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
+            IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
             String hotPic = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
             String hotPicShow = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             String hotFir = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
@@ -1227,9 +1227,15 @@ public class CameraConService {
                     .meteName(meteName)
                     .flag(flag)
                     .infraredAnalysis(infraredAnalysis).build();
-            Result<HashMap<String, String>> hashMapResult = iRecordService.givePicFir(build);
+            Result<HashMap<String, String>> hashMapResult = iInfraredService.givePicFir(build);
             if (hashMapResult.getCode() == 200) {
-                return hashMapResult.getData();
+                HashMap<String, String> data = hashMapResult.getData();
+                String waterMarkContent = data.get("waterMarkContent");
+                String filePath = data.get("filePath");
+                if (StringUtils.isNotEmpty(waterMarkContent) && StringUtils.isNotEmpty(filePath) ) {
+                    pictureWaterMark(filePath, waterMarkContent);
+                }
+                return data;
             } else {
                 map.put("error", "获取红外文件_dlt664失败");
                 return map;
