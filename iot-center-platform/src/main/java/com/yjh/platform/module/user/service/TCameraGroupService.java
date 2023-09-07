@@ -13,6 +13,7 @@ import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import java.util.*;
 
 import com.yjh.platform.module.video.controller.CameraConController;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -32,7 +33,7 @@ public class TCameraGroupService{
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
     @Autowired
-    private CameraConController cameraConController;
+    private CameraConService cameraConService;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraGroup tCameraGroup) {
@@ -62,13 +63,11 @@ public class TCameraGroupService{
         Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",recordId );
-            Result re = cameraConController.getCameraStatus(recordId);
-            if(re == null){
+            Map<String, String> recordIdMap = cameraConService.getCameraStatus(recordId);
+            if(recordIdMap == null){
                 continue;
             }
-            map.putAll((Map<String,String>)re.getData());
+            map.putAll(recordIdMap);
         }
         if(tCameraGroup.getCameraIds() != null && !"".equals(tCameraGroup.getCameraIds())) {
             String[] cameraList = tCameraGroup.getCameraIds().split(",");

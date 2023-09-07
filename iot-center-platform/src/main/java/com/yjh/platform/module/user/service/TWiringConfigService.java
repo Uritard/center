@@ -9,6 +9,7 @@ import com.yjh.platform.module.user.dao.TWiringConfigDao;
 import com.yjh.platform.module.user.entity.TWiringConfig;
 import com.yjh.platform.module.user.entity.TWiringConfigVo;
 import com.yjh.platform.module.video.controller.CameraConController;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,15 +32,15 @@ public class TWiringConfigService {
     private final TStdRegionDao tStdRegionDao;
     private final RedisTemplate<String, ?> redisTemplate;
     private final TCameraScreenDao tCameraScreenDao;
-    private final CameraConController cameraConController;
+    private final CameraConService cameraConService;
 
     public TWiringConfigService(TWiringConfigDao tWiringConfigDao, TStdRegionDao tStdRegionDao, RedisTemplate<String, ?> redisTemplate,
-                                TCameraScreenDao tCameraScreenDao, CameraConController cameraConController) {
+                                TCameraScreenDao tCameraScreenDao, CameraConService cameraConService) {
         this.tWiringConfigDao = tWiringConfigDao;
         this.tStdRegionDao = tStdRegionDao;
         this.redisTemplate = redisTemplate;
         this.tCameraScreenDao = tCameraScreenDao;
-        this.cameraConController = cameraConController;
+        this.cameraConService = cameraConService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -84,13 +85,11 @@ public class TWiringConfigService {
         Map<String,String> statusMap = new HashMap<>(8);
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
-            HashMap<String, Object> recordIdMap = new HashMap<>(2);
-            recordIdMap.put("recordId",recordId );
-            Result re = cameraConController.getCameraStatus(recordId);
-            if(re == null){
+            Map<String, String> recordIdMap = cameraConService.getCameraStatus(recordId);
+            if(recordIdMap == null){
                 continue;
             }
-            statusMap.putAll((Map<String,String>)re.getData());
+            statusMap.putAll(recordIdMap);
         }
 
         tWiringConfigVos.forEach(tWiringConfigVo ->

@@ -21,6 +21,7 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import com.yjh.platform.module.video.controller.CameraConController;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,19 +48,19 @@ public class TStdDeviceTreeService {
     private final TRobotInfoDao tRobotInfoDao;
     private final TStdDeviceDao tStdDeviceDao;
     private final TStdDeviceTreeDao stdDeviceTreeDao;
-    private final CameraConController cameraConController;
+    private final CameraConService cameraConService;
     private static final Logger log = LoggerFactory.getLogger(TStdDeviceTreeService.class);
 
     public TStdDeviceTreeService(SysUserDao sysUserDao, TCameraScreenDao tCameraScreenDao, TCameraInfoDao tCameraInfoDao,
                                  TRobotInfoDao tRobotInfoDao, TStdDeviceDao tStdDeviceDao, TStdDeviceTreeDao stdDeviceTreeDao,
-                                 CameraConController cameraConController) {
+                                 CameraConService cameraConService) {
         this.sysUserDao = sysUserDao;
         this.tCameraScreenDao = tCameraScreenDao;
         this.tCameraInfoDao = tCameraInfoDao;
         this.tRobotInfoDao = tRobotInfoDao;
         this.tStdDeviceDao = tStdDeviceDao;
         this.stdDeviceTreeDao = stdDeviceTreeDao;
-        this.cameraConController = cameraConController;
+        this.cameraConService = cameraConService;
     }
 
     public List<SynthesisTreeAreaInfo> selectDevSynthesisTree(DevSynthesisTreeCondition condition, Long userId) {
@@ -316,13 +317,11 @@ public class TStdDeviceTreeService {
         try {
             List<Long> recordIdList = tCameraScreenDao.selectRecordId();
             for(Long recordId:recordIdList){
-                HashMap<String, Object> recordIdMap = new HashMap<>(4);
-                recordIdMap.put("recordId",recordId );
-                Result re = cameraConController.getCameraStatus(recordId);
-                if(re == null){
+                Map<String, String> recordIdMap = cameraConService.getCameraStatus(recordId);
+                if(recordIdMap == null){
                     continue;
                 }
-                map.putAll((Map<String, String>)re.getData());
+                map.putAll(recordIdMap);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

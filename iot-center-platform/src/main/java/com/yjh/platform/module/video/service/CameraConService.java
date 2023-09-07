@@ -1634,7 +1634,7 @@ public class CameraConService {
                 .x2(x2)
                 .y2(y2)
                 .build();
-        IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IInfraredService.class);
+        IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
         Result result = iInfraredService.getTemperature(entity);
         if (result.getCode() != 200) {
             throw new RuntimeException(result.getMsg());
@@ -1656,7 +1656,7 @@ public class CameraConService {
                 .channelId(cameraConInfo.getCameraChannelId())
                 .customizedPath(videoPath)
                 .build();
-        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
         Result result = iRecordService.startRecord(entity);
         if (result.getCode() != 200) {
             throw new RuntimeException(result.getMsg());
@@ -1676,7 +1676,7 @@ public class CameraConService {
                 .deviceId(cameraConInfo.getDeviceChannel())
                 .channelId(cameraConInfo.getCameraChannelId())
                 .build();
-        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
         Result<RecordResultInfo> result = iRecordService.stopRecord(entity);
         if (result.getCode() != 200) {
             throw new RuntimeException(result.getMsg());
