@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -108,6 +109,16 @@ public class TRobotInfoController {
                 result.setMessage(209, "该设备编码已存在，不可重复");
                 return result;
             }
+
+            // 校验机器人红外、可见光相机编码是否正确配置
+            if (StringUtils.hasLength(tRobotInfo.getLightChannelId()) &&
+                    (tRobotInfo.getLightChannelId().length() <= 14 || tRobotInfo.getLightChannelId().length() != 20)) {
+                tRobotInfo.setLightChannelId(null);
+            }
+            if (StringUtils.hasLength(tRobotInfo.getInfraredChannelId()) &&
+                    (tRobotInfo.getInfraredChannelId().length() <= 14 || tRobotInfo.getInfraredChannelId().length() != 20)) {
+                tRobotInfo.setInfraredChannelId(null);
+            }
             result.setData(tRobotInfoService.insert(tRobotInfo,userId));
             //有变动 同步模型
             if (Constant.updateSyncModel()) {
@@ -184,6 +195,16 @@ public class TRobotInfoController {
             //设置为-1,用于清空前端传null值
             if(tRobotInfo.getRecordId() == null) {
                 tRobotInfo.setRecordId(-1L);
+            }
+
+            // 校验机器人红外、可见光相机编码是否正确配置
+            if (StringUtils.hasLength(tRobotInfo.getLightChannelId()) &&
+                    (tRobotInfo.getLightChannelId().length() <= 14 || tRobotInfo.getLightChannelId().length() != 20)) {
+                tRobotInfo.setLightChannelId(null);
+            }
+            if (StringUtils.hasLength(tRobotInfo.getInfraredChannelId()) &&
+                    (tRobotInfo.getInfraredChannelId().length() <= 14 || tRobotInfo.getInfraredChannelId().length() != 20)) {
+                tRobotInfo.setInfraredChannelId(null);
             }
 
             result.setData(tRobotInfoService.update(tRobotInfo,userId));
