@@ -39,12 +39,6 @@ public class DroneCameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
-    @Value("${spring.redis.host}")
-    private String hostIp;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
 
     /**
      * 获取无人机的三路视频流（无人机、机巢内、机巢外）
@@ -87,6 +81,8 @@ public class DroneCameraConService {
                     .deviceId(robotConInfo.getNestCode() + nestInner)
                     .build();
             iPlayService.videoPlayByFFM(playEntity);
+            Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
+            String hostIp = hostIpMap.get("content");
             String webRtc = "webrtc://" + hostIp + "/live/" + robotConInfo.getNestCode() + nestInner;
             returnInferadMap.put("cameraType", nestInner);
             returnInferadMap.put("webRtcUrl", webRtc);
