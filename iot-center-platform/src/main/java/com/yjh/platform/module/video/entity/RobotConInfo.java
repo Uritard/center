@@ -170,4 +170,19 @@ public class RobotConInfo implements Serializable {
 
     @ApiModelProperty(value = "机器人红外相机厂家")
     private String infraredVendor;
+
+    @ApiModelProperty(value = "NVR IP地址")
+    private String recordIp;
+
+    @ApiModelProperty(value = "NVR通信端口")
+    private int recordPort;
+
+    @ApiModelProperty(value = "NVR用户名")
+    private String recordManager;
+
+    @ApiModelProperty(value = "NVR密码")
+    private String recordCode;
+
+    @ApiModelProperty(value = "NVR厂家")
+    private String recordVendor;
 }

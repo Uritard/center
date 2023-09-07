@@ -739,8 +739,8 @@ public class CameraConService {
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
             String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             filePathTem = StringUtils.stripStart(filePathTem, "/\\");
-            filePath = FilenameUtils.concat(captureResultPath, filePathTem);
-            urlPath = FilenameUtils.concat(capturePath, filePathTem);
+            filePath = CommonUtils.concatPath(captureResultPath, filePathTem);
+            urlPath = CommonUtils.concatPath(capturePath, filePathTem);
         } else {
             // 图片物理路径前缀
             String absPrePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content"));
@@ -760,10 +760,26 @@ public class CameraConService {
             cameraConInfo.setCameraId(cameraId);
             cameraConInfo.setRecordId(robotConInfo.getRecordId());
             cameraConInfo.setDeviceChannel(robotConInfo.getDeviceChannel());
+            cameraConInfo.setPort(robotConInfo.getRobotPort());
+
+            cameraConInfo.setRecordIp(robotConInfo.getRecordIp());
+            cameraConInfo.setRecordPort(robotConInfo.getRecordPort());
+            cameraConInfo.setIdentityManager(robotConInfo.getRecordManager());
+            cameraConInfo.setIdentityCode(robotConInfo.getRecordCode());
+            cameraConInfo.setRecordVendor(robotConInfo.getRecordVendor());
+
             if (cameraStr.contains("9901")) {
+                cameraConInfo.setCameraIp(robotConInfo.getLightIp());
+                cameraConInfo.setCameraManager(robotConInfo.getIdentityManager());
+                cameraConInfo.setCameraCode(robotConInfo.getIdentityCode());
+                cameraConInfo.setVendorId(robotConInfo.getLightVendor());
                 cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumLight()));
                 cameraConInfo.setDeviceChannel(robotConInfo.getLightChannelId());
             } else {
+                cameraConInfo.setCameraIp(robotConInfo.getLnferadIp());
+                cameraConInfo.setCameraManager(robotConInfo.getInferadUsername());
+                cameraConInfo.setCameraCode(robotConInfo.getInferadPassword());
+                cameraConInfo.setVendorId(robotConInfo.getInfraredVendor());
                 cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumInferad()));
                 cameraConInfo.setDeviceChannel(robotConInfo.getInfraredChannelId());
             }
@@ -778,7 +794,7 @@ public class CameraConService {
             cameraConInfo.setDeviceChannel(cameraConInfo.getCameraChannelId());
         }
         String ip = hasNvr ? cameraConInfo.getRecordIp() : cameraConInfo.getCameraIp();
-        int port = hasNvr ? cameraConInfo.getRecordPort() : cameraConInfo.getPort();
+        Integer port = hasNvr ? cameraConInfo.getRecordPort() : cameraConInfo.getPort();
         String userName = hasNvr ? cameraConInfo.getIdentityManager() : cameraConInfo.getCameraManager();
         String pwd = hasNvr ? cameraConInfo.getIdentityCode() : cameraConInfo.getCameraCode();
 
@@ -1220,10 +1236,10 @@ public class CameraConService {
                     .port(cameraConInfo.getPort())
                     .password(password)
                     .userName(userName)
-                    .hotPic(FilenameUtils.concat(hotPic, parentPath))
-                    .hotPicShow(FilenameUtils.concat(hotPicShow, parentPath))
-                    .hotFirShow(FilenameUtils.concat(hotFirShow, parentPath))
-                    .hotFir(FilenameUtils.concat(hotFir, parentPath))
+                    .hotPic(CommonUtils.concatPath(hotPic, parentPath))
+                    .hotPicShow(CommonUtils.concatPath(hotPicShow, parentPath))
+                    .hotFirShow(CommonUtils.concatPath(hotFirShow, parentPath))
+                    .hotFir(CommonUtils.concatPath(hotFir, parentPath))
                     .meteName(meteName)
                     .flag(flag)
                     .infraredAnalysis(infraredAnalysis).build();
