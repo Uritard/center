@@ -3,7 +3,6 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -15,9 +14,11 @@ import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
+import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,15 +41,18 @@ public class StatisticsService {
     private final StatisticsDao statisticsDao;
     private final UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CameraConService cameraConService;
 
     public static final String ROBOT = "robot";
     public static final String DRONE = "drone";
     public static final String CAMERA = "CAMERA";
 
-    public StatisticsService(StatisticsDao statisticsDao, UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao, RedisTemplate<String, Object> redisTemplate) {
+    public StatisticsService(StatisticsDao statisticsDao, UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao,
+        RedisTemplate<String, Object> redisTemplate, CameraConService cameraConService) {
         this.statisticsDao = statisticsDao;
         this.uPatrolDeviceStaticsDao = uPatrolDeviceStaticsDao;
         this.redisTemplate = redisTemplate;
+        this.cameraConService = cameraConService;
     }
 
     private Result getNVRInfo(Object recordId) {
@@ -60,11 +64,8 @@ public class StatisticsService {
                 return re;
             }
             log.info("缓存中未获取到数据");
-            ServiceRestTemplate serviceRestTemplate =
-                    SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.getForObject(Constant.NVR_URL, Result.class, recordId);
-            }
+            Map<String, Object> mapData = cameraConService.getNVRStoreAndChanle(NumberUtils.toLong(String.valueOf(recordId)));
+            re.setData(mapData);
         } catch (Exception e) {
             log.error("获取录像机数据发生异常{}", e.getMessage());
         }
