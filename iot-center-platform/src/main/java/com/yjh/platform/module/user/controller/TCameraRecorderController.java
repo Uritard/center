@@ -72,7 +72,7 @@ public class TCameraRecorderController {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
-                sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
+                // sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
                 if (Constant.updateSyncModel()) {
                     Constant.modelUpload("1002");
                 }
@@ -150,7 +150,7 @@ public class TCameraRecorderController {
             } else {
                 log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
-                sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
+                // sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
                 if (Constant.updateSyncModel()) {
                     Constant.modelUpload("1002");
                 }
@@ -305,12 +305,12 @@ public class TCameraRecorderController {
             List<TCameraRecorderExcel> excelEntities = modelExcelListener.getExcelEntities();
             List<String> errorExcelList = modelExcelListener.getErrorExcelEntities();
 
-            if (CollectionUtils.isNotEmpty(excelEntities)) {
+            /*if (CollectionUtils.isNotEmpty(excelEntities)) {
                 List<TCameraRecorder> tCameraRecorders = tCameraRecorderService.importCameraRecorder(excelEntities);
                 tCameraRecorders.forEach(t -> {
                     sendPostRequest(Constant.NVR_REGISTER_URL,t.getRecordId());
                 });
-            }
+            }*/
             if (CollectionUtils.isNotEmpty(errorExcelList)) {
                 result.setData(ExcelReadListener.prettyErrors(errorExcelList));
             }

@@ -61,7 +61,7 @@ public class Constant {
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 
     public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
-    public static final String Recorder_STATES = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
+    // public static final String Recorder_STATES = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
 
     public static Map<String, Object> confirmImmediatelyMap = new HashMap<>();
 
@@ -73,11 +73,11 @@ public class Constant {
 
     public static final String CAMERA_PRESET_UPDATE_URL = "http://iot-center-accessrobot/robot/v1/sycPresetInfo";
 
-    public static final String ALGORITHM_URL ="http://iot-center-accessvideo/analysis/v1/algorithm";
+    // public static final String ALGORITHM_URL ="http://iot-center-accessvideo/analysis/v1/algorithm";
 
-    public static final String NVR_URL = "http://iot-center-accessvideo/camera/v2/getNVRStoreInfo?recordId={recordId}";
+    // public static final String NVR_URL = "http://iot-center-accessvideo/camera/v2/getNVRStoreInfo?recordId={recordId}";
 
-    public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
+    // public static final String NVR_REGISTER_URL = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
 
     public static Map<String,Object> weatherInfo = new HashMap<>();
 
@@ -88,11 +88,11 @@ public class Constant {
 
     public static final String WARN_JUDGE = "http://iot-center-platform/analysis/v1/warnInfo?value={value}&valueDesc={valueDesc}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
-    public static final String DIAGNOSE_CHANNEL_OPERATE="http://iot-center-accessvqd/channelOperate/v1/updateChannel";
+    // public static final String DIAGNOSE_CHANNEL_OPERATE="http://iot-center-accessvqd/channelOperate/v1/updateChannel";
 
-    public static final String DIAGNOSE_CHANNEL_GET="http://iot-center-accessvqd/channelOperate/v1/getChannel?channelId={channelId}";
+    // public static final String DIAGNOSE_CHANNEL_GET="http://iot-center-accessvqd/channelOperate/v1/getChannel?channelId={channelId}";
 
-    public static final String DIAGNOSE_CHANNEL_DELETE="http://iot-center-accessvqd/channelOperate/v1/deleteChannel?channelId={channelId}";
+    // public static final String DIAGNOSE_CHANNEL_DELETE="http://iot-center-accessvqd/channelOperate/v1/deleteChannel?channelId={channelId}";
 
 //    public static final String CAMERA_STREAM_STOP="http://iot-center-accessvideo/camera/v1/stopStream?cameraId={cameraId}";
 
@@ -138,7 +138,7 @@ public class Constant {
 //    public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
 //    public static final String STOP_CAMERA_URL= "http://iot-center-accessvideo/camera/v1/stopRealPlay?cameraId={cameraId}&rtmpUrl={rtmpUrl}";
 //    public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
-    public static final String PLAY_BACK_FILE_LIST_URL = "http://iot-center-accessvideo/camera/v1/getFileList?cameraId={cameraId}&startTime={startTime}&endTime={endTime}";
+//     public static final String PLAY_BACK_FILE_LIST_URL = "http://iot-center-accessvideo/camera/v1/getFileList?cameraId={cameraId}&startTime={startTime}&endTime={endTime}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
     public static final String LINKAGE_FILE_TRANSFER = "http://iot-center-accessrobot/robot/v1/linkageFileTransfer";
@@ -480,7 +480,7 @@ public class Constant {
      */
     public static final int STATE_SUB = 0;
 
-    public static final String VIDEO_DOWNLOAD_FILE = "http://iot-center-accessvideo/intel-analysis/downloadPicture";
+    // public static final String VIDEO_DOWNLOAD_FILE = "http://iot-center-accessvideo/intel-analysis/downloadPicture";
 
 
     public static final int TASK_CHECK = 1;
