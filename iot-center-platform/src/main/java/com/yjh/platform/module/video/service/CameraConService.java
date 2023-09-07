@@ -1529,16 +1529,18 @@ public class CameraConService {
             PlayEntity playEntity = PlayEntity.builder()
                     .deviceId(cameraStatusInfo.getDeviceChannel()).build();
             Result result = iRecordService.getCameraStatus(playEntity);
-            JSONObject data = (JSONObject) result.getData();
-            String online = (String) data.get("Online");
-            if (StringUtils.isNotEmpty(online)) {
-                if (online.equals("ONLINE")) {
-                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
+            if (result.isSuccess()) {
+                JSONObject data = (JSONObject)result.getData();
+                String online = data == null ? "" : data.getString("Online");
+                if (StringUtils.isNotEmpty(online)) {
+                    if (online.equals("ONLINE")) {
+                        channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
+                    } else {
+                        channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
+                    }
                 } else {
-                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
+                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1");
                 }
-            } else {
-                channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1");
             }
         }
         log.info("channelStatusMap: " + channleStatusMap);
