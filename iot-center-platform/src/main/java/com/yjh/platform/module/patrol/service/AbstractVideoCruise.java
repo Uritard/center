@@ -234,7 +234,7 @@ public abstract class AbstractVideoCruise {
             if (StringUtils.isNotEmpty(edgeCode)) {
                 String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + edgeCode).get("stationId"));
                 analysis.setReferenceImage(presetImgPath + "/" + stationId + "/" + presetId + "/" + presetId + ".jpg");
-            }else {
+            } else {
                 analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
             }
 
@@ -343,8 +343,8 @@ public abstract class AbstractVideoCruise {
                     Thread.currentThread().interrupt();
                     break;
                 }
-                log.info("任务：【{}】 在 【{}】 时已经等待了 【{}】 预置位,摄像机Id 【{}】 【{}】s", taskId, DateTimeUtil.getDateTimeString(), presetName,
-                    cameraId, ((waitCount + 1) * waitTime + 1000) / 1000);
+                log.info("任务：【{}】 在 【{}】 时已经等待了 【{}】 预置位,摄像机Id 【{}】 【{}】s", taskId, DateTimeUtil.getDateTimeString(), presetName, cameraId,
+                    ((waitCount + 1) * waitTime + 1000) / 1000);
                 cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
                 cameraState = cameraState == null ? -1 : cameraState;
 
@@ -382,7 +382,6 @@ public abstract class AbstractVideoCruise {
         return isHttp ? HTTP : TCP;
     }
 
-
     /**
      * 相机转到预置位，可见光相机需要等待几秒，让相机到达预置位
      */
@@ -405,17 +404,18 @@ public abstract class AbstractVideoCruise {
     /**
      * 算法分析额外信息处理
      *
-     * @param analysis      调用算法信息
-     * @param ret 抓图返回结果
+     * @param analysis 调用算法信息
+     * @param ret      抓图返回结果
      */
     protected abstract void analysisExt(Analysis analysis, Map<String, String> ret);
 
     protected abstract Map<String, String> resultRecognition(Map<String, String> inspectionMap);
 
     public static class AnalyticsFactory {
-        private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new EnumMap<>(CruiseConstant.AnalyticsEnum.class);
+        private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP =
+            new EnumMap<>(CruiseConstant.AnalyticsEnum.class);
 
-        private AnalyticsFactory(){
+        private AnalyticsFactory() {
             // nothing
         }
 
@@ -430,13 +430,13 @@ public abstract class AbstractVideoCruise {
     }
 
     public static class Factory {
-        private Factory(){
+        private Factory() {
             // nothing
         }
 
         public static AbstractVideoCruise getVideoCruise(CruiseConstant.TypeEnum cruiseType) {
             AbstractVideoCruise videoCruise;
-            switch (cruiseType){
+            switch (cruiseType) {
                 case VIDEO:
                     videoCruise = StaticContextAccessor.getBean(NormalVideoCruiseExecuteImpl.class);
                     break;

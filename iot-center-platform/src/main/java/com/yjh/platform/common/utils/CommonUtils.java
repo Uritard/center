@@ -532,4 +532,10 @@ public class CommonUtils {
         }
         return url;
     }
+
+    public static String concatPath(String basePath, String pathToAdd) {
+        String filePathTem = StringUtils.stripStart(pathToAdd, "/\\");
+        String baseTem = StringUtils.endsWithAny(basePath, "/", "\\") ? basePath : basePath + "/";
+        return baseTem + filePathTem;
+    }
 }
