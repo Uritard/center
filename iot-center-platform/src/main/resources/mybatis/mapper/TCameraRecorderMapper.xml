@@ -136,7 +136,7 @@
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
         <if test="identityCode != null and identityCode != '••••••'">a.identity_code = #{identityCode},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
-        <if test="deviceChannel != null ">a.device_channel = #{deviceChannel},</if>
+        <if test="deviceChannel != null and deviceChannel != ''">a.device_channel = #{deviceChannel},</if>
         a.max_channel = #{maxChannel, jdbcType=INTEGER},
         a.hdd_size = #{hddSize, jdbcType=INTEGER},
         a.buffer_day = #{bufferDay, jdbcType=INTEGER},

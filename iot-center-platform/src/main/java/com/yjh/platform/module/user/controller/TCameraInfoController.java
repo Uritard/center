@@ -75,6 +75,12 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                String cameraChannelId = tCameraInfo.getCameraChannelId();
+                if (StringUtils.hasLength(cameraChannelId)) {
+                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
+                        tCameraInfo.setCameraChannelId("");
+                    }
+                }
                 tCameraInfo.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeCode", "content"));
                 int state = tCameraInfoService.insert(tCameraInfo);
                 if (state == 0) {
@@ -165,6 +171,12 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && !tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                String cameraChannelId = tCameraInfo.getCameraChannelId();
+                if (StringUtils.hasLength(cameraChannelId)) {
+                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
+                        tCameraInfo.setCameraChannelId(null);
+                    }
+                }
                 int state = tCameraInfoService.update(tCameraInfo);
                 if (state == 0) {
                     result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -91,9 +91,9 @@ public class Constant {
 
     // public static final String DIAGNOSE_CHANNEL_DELETE="http://iot-center-accessvqd/channelOperate/v1/deleteChannel?channelId={channelId}";
 
-//    public static final String CAMERA_STREAM_STOP="http://iot-center-accessvideo/camera/v1/stopStream?cameraId={cameraId}";
+    // public static final String CAMERA_STREAM_STOP="http://iot-center-accessvideo/camera/v1/stopStream?cameraId={cameraId}";
 
-//    public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
+    // public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
 
     public static final String DRONE_VIDEO="http://iot-center-platform/camera/v1/droneStartRealPlay?robotId={robotId}";
 

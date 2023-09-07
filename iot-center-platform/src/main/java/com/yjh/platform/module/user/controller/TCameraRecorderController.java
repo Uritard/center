@@ -71,6 +71,12 @@ public class TCameraRecorderController {
             if (StringUtils.hasLength(tCameraRecorder.getPmsId()) &&  selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                String deviceChannel = tCameraRecorder.getDeviceChannel();
+                if (StringUtils.hasLength(deviceChannel)) {
+                    if (deviceChannel.length() <= 14 || deviceChannel.length() != 20) {
+                        tCameraRecorder.setDeviceChannel("");
+                    }
+                }
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
                 // sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
                 if (Constant.updateSyncModel()) {
@@ -148,6 +154,12 @@ public class TCameraRecorderController {
             if (StringUtils.hasLength(tCameraRecorder.getPmsId()) && !tCameraRecorder.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                String deviceChannel = tCameraRecorder.getDeviceChannel();
+                if (StringUtils.hasLength(deviceChannel)) {
+                    if (deviceChannel.length() <= 14 || deviceChannel.length() != 20) {
+                        tCameraRecorder.setDeviceChannel("");
+                    }
+                }
                 log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
                 // sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
