@@ -12,6 +12,7 @@ import com.yjh.platform.module.user.dao.TCameraGroupDao;
 
 import java.util.*;
 
+import com.yjh.platform.module.video.controller.CameraConController;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -30,6 +31,8 @@ public class TCameraGroupService{
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+    @Autowired
+    private CameraConController cameraConController;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraGroup tCameraGroup) {
@@ -61,7 +64,7 @@ public class TCameraGroupService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re == null){
                 continue;
             }
@@ -101,18 +104,6 @@ public class TCameraGroupService{
             tCameraGroupDao.update(tCameraGroup);
         }
         return tCameraGroupDetail;
-    }
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-
-        }
-        return re;
     }
 
     @Transactional(rollbackFor = Exception.class)

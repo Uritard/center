@@ -25,6 +25,8 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.video.controller.CameraConController;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -76,6 +78,8 @@ public class HomePageService {
     private TVoiceDeviceDao tVoiceDeviceDao;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
+    @Autowired
+    private CameraConController cameraConController;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -322,7 +326,7 @@ public class HomePageService {
         for (Long recordId : recordIdList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId", recordId);
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             log.info("re.getData()==========={}", re.getData());
             // 前提是video有非空返回值
             map.putAll((Map<String, String>)re.getData());
@@ -369,7 +373,8 @@ public class HomePageService {
         for (Long recordId : recordIdList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId", recordId);
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
+//            Result re = cameraStates(recordIdMap);
             if (re == null) {
                 continue;
             }
@@ -386,18 +391,6 @@ public class HomePageService {
         return re;
     }
 
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re = serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class, map);
-            }
-        } catch (Exception e) {
-
-        }
-        return re;
-    }
 
     /**
      * 环境告警数据查询

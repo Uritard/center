@@ -20,6 +20,7 @@ import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import com.yjh.platform.module.video.controller.CameraConController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,16 +47,19 @@ public class TStdDeviceTreeService {
     private final TRobotInfoDao tRobotInfoDao;
     private final TStdDeviceDao tStdDeviceDao;
     private final TStdDeviceTreeDao stdDeviceTreeDao;
+    private final CameraConController cameraConController;
     private static final Logger log = LoggerFactory.getLogger(TStdDeviceTreeService.class);
 
     public TStdDeviceTreeService(SysUserDao sysUserDao, TCameraScreenDao tCameraScreenDao, TCameraInfoDao tCameraInfoDao,
-                                 TRobotInfoDao tRobotInfoDao, TStdDeviceDao tStdDeviceDao, TStdDeviceTreeDao stdDeviceTreeDao) {
+                                 TRobotInfoDao tRobotInfoDao, TStdDeviceDao tStdDeviceDao, TStdDeviceTreeDao stdDeviceTreeDao,
+                                 CameraConController cameraConController) {
         this.sysUserDao = sysUserDao;
         this.tCameraScreenDao = tCameraScreenDao;
         this.tCameraInfoDao = tCameraInfoDao;
         this.tRobotInfoDao = tRobotInfoDao;
         this.tStdDeviceDao = tStdDeviceDao;
         this.stdDeviceTreeDao = stdDeviceTreeDao;
+        this.cameraConController = cameraConController;
     }
 
     public List<SynthesisTreeAreaInfo> selectDevSynthesisTree(DevSynthesisTreeCondition condition, Long userId) {
@@ -314,7 +318,7 @@ public class TStdDeviceTreeService {
             for(Long recordId:recordIdList){
                 HashMap<String, Object> recordIdMap = new HashMap<>(4);
                 recordIdMap.put("recordId",recordId );
-                Result re = cameraStates(recordIdMap);
+                Result re = cameraConController.getCameraStatus(recordId);
                 if(re == null){
                     continue;
                 }
@@ -326,18 +330,6 @@ public class TStdDeviceTreeService {
         return map;
     }
 
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return re;
-    }
 
     private List<SynthesisTreeAreaInfo> devSynthesisTreeByName(DevSynthesisTreeCondition condition, Long userId) {
         String name = condition.getName();

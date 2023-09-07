@@ -11,6 +11,7 @@ import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import com.yjh.platform.module.video.controller.CameraConController;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ public class TCameraScreenService{
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private CameraConController cameraConController;
 
 
     @Autowired
@@ -167,7 +170,8 @@ public class TCameraScreenService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
+
             if(re == null){
                 continue;
             }
@@ -225,18 +229,7 @@ public class TCameraScreenService{
             }
         }
     }
-    static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
 
-        }
-        return re;
-    }
 
     /**
      * 获取当前用户所属的所有巡视点
@@ -351,7 +344,7 @@ public class TCameraScreenService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re != null && re.getData() != null){
                 cameraStatusMap.putAll((Map<String,String>)re.getData());
             }
@@ -429,7 +422,7 @@ public class TCameraScreenService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re == null){
                 continue;
             }
@@ -464,7 +457,7 @@ public class TCameraScreenService{
         for (Long recordId : recordIdList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId", recordId);
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if (re == null) {
                 continue;
             }
@@ -645,7 +638,7 @@ public class TCameraScreenService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re == null){
                 continue;
             }
@@ -835,7 +828,7 @@ public class TCameraScreenService{
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re == null){
                 continue;
             }

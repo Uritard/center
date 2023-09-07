@@ -9,6 +9,7 @@ import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -1687,7 +1688,10 @@ public class CameraConService {
             Files.move(sourceFile,destinationFile);
 
         }
-
+        Map<String, String> jasonMap = new HashMap<>(3);
+        jasonMap.put("type", "recordFilePath");
+        jasonMap.put("filePath", videoRealPath+result.getData().getRecordUrl());
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
         return videoRealPath+result.getData().getRecordUrl();
     }
 

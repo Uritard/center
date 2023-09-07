@@ -253,12 +253,7 @@ public class TCameraInfoService {
         Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
-            if (Objects.nonNull(re)){
-                map.putAll((Map<String,String>)re.getData());
-            }
+            map.putAll(cameraConService.getCameraStatus(recordId));
         }
         for (TCameraInfoByDict xi : tCameraInfoByDict){
             if (map.containsKey(xi.getCameraId().toString())){
@@ -273,18 +268,7 @@ public class TCameraInfoService {
         }
         return tCameraInfoByDict;
     }
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return re;
-    }
+
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String pmsId) throws DocumentException {
         Long cameraId = tCameraInfoDao.selectCameraIdByPmsId(pmsId);
@@ -633,12 +617,7 @@ public class TCameraInfoService {
         Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId:recordIdList){
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
-            if (Objects.nonNull(re)){
-                map.putAll((Map<String,String>)re.getData());
-            }
+           map.putAll(cameraConService.getCameraStatus(recordId));
         }
         if (map.containsKey(cameraId.toString())){
             if ("0".equals(map.get(cameraId.toString()))){

@@ -16,6 +16,7 @@ import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
+import com.yjh.platform.module.video.controller.CameraConController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -48,6 +49,8 @@ public class TCameraRecorderService {
     private RedisTemplate redisTemplate;
     @Autowired
     private TCameraInfoService tCameraInfoService;
+    @Autowired
+    private CameraConController cameraConController;
 
     private Logger log = LoggerFactory.getLogger(TCameraRecorderService.class);
 
@@ -109,7 +112,7 @@ public class TCameraRecorderService {
         for(TCameraRecorderByDict res : tCameraRecorderByDictList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId", res.getRecordId());
-            Result re = recorderStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(res.getRecordId());
             log.info("re---"+re);
             if (Objects.nonNull(re)){
                 Map<String,Object> mapRes = JSONObject.parseObject(JSON.toJSONString(re.getData()));
@@ -126,18 +129,7 @@ public class TCameraRecorderService {
         return tCameraRecorderByDictList;
     }
 
-    private static Result recorderStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
 
-        }
-        return re;
-    }
     @Transactional(rollbackFor = Exception.class)
     public boolean synchronizeFromPMS(String pmsId) throws Exception{
         Long recorderId = tCameraRecorderDao.selectRecorderIdByPmsId(pmsId);

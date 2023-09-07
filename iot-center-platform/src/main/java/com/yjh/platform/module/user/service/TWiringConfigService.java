@@ -8,6 +8,7 @@ import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TWiringConfigDao;
 import com.yjh.platform.module.user.entity.TWiringConfig;
 import com.yjh.platform.module.user.entity.TWiringConfigVo;
+import com.yjh.platform.module.video.controller.CameraConController;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.yjh.platform.module.user.service.TCameraScreenService.cameraStates;
 
 /**
  * @author 丫C
@@ -31,13 +31,15 @@ public class TWiringConfigService {
     private final TStdRegionDao tStdRegionDao;
     private final RedisTemplate<String, ?> redisTemplate;
     private final TCameraScreenDao tCameraScreenDao;
+    private final CameraConController cameraConController;
 
     public TWiringConfigService(TWiringConfigDao tWiringConfigDao, TStdRegionDao tStdRegionDao, RedisTemplate<String, ?> redisTemplate,
-                                TCameraScreenDao tCameraScreenDao) {
+                                TCameraScreenDao tCameraScreenDao, CameraConController cameraConController) {
         this.tWiringConfigDao = tWiringConfigDao;
         this.tStdRegionDao = tStdRegionDao;
         this.redisTemplate = redisTemplate;
         this.tCameraScreenDao = tCameraScreenDao;
+        this.cameraConController = cameraConController;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -84,7 +86,7 @@ public class TWiringConfigService {
         for(Long recordId:recordIdList){
             HashMap<String, Object> recordIdMap = new HashMap<>(2);
             recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
+            Result re = cameraConController.getCameraStatus(recordId);
             if(re == null){
                 continue;
             }

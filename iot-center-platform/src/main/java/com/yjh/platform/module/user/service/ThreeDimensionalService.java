@@ -125,18 +125,7 @@ public class ThreeDimensionalService {
 //        }
       return threeDimensionalDao.selectCameraDeviceByName(cameraName, modelName);
     }
-    private static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return re;
-    }
+
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalTools> statisticsAlarmInfo(){
         return threeDimensionalDao.statisticsAlarmInfo();
