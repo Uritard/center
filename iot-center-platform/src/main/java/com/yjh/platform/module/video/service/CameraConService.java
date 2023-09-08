@@ -18,10 +18,7 @@ import com.yjh.platform.module.video.dao.CameraConDao;
 import com.yjh.platform.module.video.entity.*;
 import com.yjh.video.api.CameraVendor;
 import com.yjh.video.api.entity.*;
-import com.yjh.video.api.entity.response.RecordInfo;
-import com.yjh.video.api.entity.response.RecordItem;
-import com.yjh.video.api.entity.response.RecordSpace;
-import com.yjh.video.api.entity.response.RecordResultInfo;
+import com.yjh.video.api.entity.response.*;
 import com.yjh.video.api.result.Result;
 import com.yjh.video.api.service.*;
 import com.yjh.video.api.util.PathVariableUtil;
@@ -1334,11 +1331,12 @@ public class CameraConService {
                     .port(cameraConInfo.getPort())
                     .userName(userName)
                     .password(password).build();
-            Result<byte[]> result = iRecordService.exportCameraConfig(playEntity);
+            Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
+            CameraConfigResp cameraConfigResp = result.getData();
             String filePath = getConfigFileDir();
             String fileName = getConfigFileName(cameraId.toString());
             log.info("相机 {} 配置文件路径：{}{}", cameraId, filePath, fileName);
-            bytesToFile(result.getData(), filePath, fileName);
+            bytesToFile(cameraConfigResp.getData(), filePath, fileName);
         } catch (Exception e) {
             log.info("exportCameraConfig err: {}", e);
             return false;
@@ -1542,13 +1540,16 @@ public class CameraConService {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
         Map<String, String> channleStatusMap = new HashMap<>();
         for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
+            if (StringUtils.isEmpty(cameraStatusInfo.getDeviceChannel())) {
+                continue;
+            }
             IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraStatusInfo.getVendorId()), IRecordService.class);
             PlayEntity playEntity = PlayEntity.builder()
                     .deviceId(cameraStatusInfo.getDeviceChannel()).build();
-            Result result = iRecordService.getCameraStatus(playEntity);
+            Result<CameraStatusResp> result = iRecordService.getCameraStatus(playEntity);
             if (result.isSuccess()) {
-                JSONObject data = (JSONObject)result.getData();
-                String online = data == null ? "" : data.getString("Online");
+                CameraStatusResp cameraStatusResp = result.getData();
+                String online = cameraStatusResp.getOnLine() == null ? "" : cameraStatusResp.getOnLine();
                 if (StringUtils.isNotEmpty(online)) {
                     if (online.equals("ONLINE")) {
                         channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
