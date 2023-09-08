@@ -613,6 +613,7 @@ CREATE TABLE `t_camera_info` (
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
+  `camera_channel_id` VARCHAR (50)  DEFAULT NULL COMMENT '相机通道id',
   PRIMARY KEY (`camera_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='摄像头信息表';
@@ -669,6 +670,7 @@ CREATE TABLE `t_camera_recorder` (
   `buffer_day` int(11) DEFAULT '1' COMMENT '缓存天数',
   `time_long` int(32) DEFAULT '1' COMMENT '录制文件时长 单位秒',
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
+  `device_channel` VARCHAR (50)  DEFAULT NULL COMMENT '设备id',
   PRIMARY KEY (`record_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='录像服务器表';
@@ -1659,6 +1661,10 @@ CREATE TABLE `t_robot_info` (
   `duration` bigint(20) DEFAULT NULL COMMENT '在线时长累积(毫秒)',
   `off_line_count` int(10) DEFAULT NULL COMMENT '离线次数',
   `image_size` varchar(20) DEFAULT '' COMMENT '机器人地图图片尺寸',
+  `light_channel_id` varchar(50) DEFAULT NULL COMMENT '可见光设备通道号',
+  `infrared_channel_id` varchar(50) DEFAULT NULL COMMENT '红外设备通道号',
+  `light_vendor` varchar(64) DEFAULT NULL COMMENT '可见光厂家',
+  `infrared_vendor` varchar(64) DEFAULT NULL COMMENT '红外厂家',
   PRIMARY KEY (`robot_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='机器人表';
@@ -2613,3 +2619,10 @@ CREATE TABLE `alarm_shield` (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
 
+DROP TABLE IF EXISTS `dict_area`;
+CREATE TABLE `dict_area` (
+`id` int NOT NULL,
+`name` varchar(48) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '' COMMENT '名称',
+`parent_id` int DEFAULT NULL COMMENT '父节点',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='区县行政编码字典表';
