@@ -5,10 +5,9 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
-import com.alibaba.fastjson2.JSONObject;
-import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -24,7 +23,6 @@ import com.yjh.video.api.service.*;
 import com.yjh.video.api.util.PathVariableUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -43,11 +41,8 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -166,18 +161,19 @@ public class CameraConService {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             PlayEntity playEntity =
                 PlayEntity.builder().deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId()).build();
-            Result result = new Result();
             IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
             try {
-                result = iPlayService.videoPlayByWvp(playEntity);
+                Result result = iPlayService.videoPlayByWvp(playEntity);
+                Map data = (Map)result.getData();
+                Map<String, Object> returnMap = new HashMap<>();
+                returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
+                if (result.isSuccess() && MapUtils.isNotEmpty(data)) {
+                    webRtcUrl((String)data.get("rtc"), returnMap, 1);
+                    returnMapList.add(returnMap);
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
-            Map data = (Map)result.getData();
-            Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
-            webRtcUrl((String)data.get("rtc"), returnMap, 1);
-            returnMapList.add(returnMap);
         });
 
         robotList.forEach(robotCameraId -> {
@@ -188,7 +184,9 @@ public class CameraConService {
                 return;
             }
             Map<String, Object> returnLightMap = getRobotStream(robotConInfo, robotCameraId);
-            returnMapList.add(returnLightMap);
+            if (MapUtils.isNotEmpty(returnLightMap)) {
+                returnMapList.add(returnLightMap);
+            }
         });
 
         log.info("realReturnMapList: {}", JSON.toJSONString(returnMapList));
