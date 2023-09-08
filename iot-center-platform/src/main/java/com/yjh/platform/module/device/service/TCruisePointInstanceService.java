@@ -4,9 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -18,11 +15,12 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
-import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,6 +77,8 @@ public class TCruisePointInstanceService{
 
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+    @Resource
+    private CameraConService cameraConService;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -547,11 +548,11 @@ public class TCruisePointInstanceService{
             for (Long recordId : recordIdList) {
                 HashMap<String, Object> recordIdMap = new HashMap<>();
                 recordIdMap.put("recordId", recordId);
-                Result re = cameraStates(recordIdMap);
-                if (re == null) {
+                Map<String, String> reMap = cameraConService.getCameraStatus(recordId);
+                if (MapUtils.isEmpty(reMap)) {
                     continue;
                 }
-                map.putAll((Map<String, String>) re.getData());
+                map.putAll(reMap);
             }
             areaInfos.forEach(areaInfo -> {
                 if ("camera".equals(areaInfo.getInfoType())) {
@@ -574,19 +575,6 @@ public class TCruisePointInstanceService{
             areaInfos.add(areaInfo);
         }
         return assembleTrees(areaInfos);
-    }
-
-    static Result cameraStates(HashMap map) {
-        Result re = null;
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
-            }
-        } catch (Exception e) {
-
-        }
-        return re;
     }
 
     public List<AreaInfoDeviceId> assembleTrees(Collection<AreaInfoDeviceId> trees) {
