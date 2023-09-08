@@ -1535,8 +1535,28 @@ public class CameraConService {
     //@Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> getCameraStatus(Long recordId) {
-        List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
         Map<String, String> channleStatusMap = new HashMap<>();
+        if (Objects.isNull(recordId)) {
+            channleStatusMap.put("errorMessage: ", "recordId is null");
+            channleStatusMap.put("errorCode: ", "403");
+            return channleStatusMap;
+        }
+
+        RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
+        if (StringUtils.isNotEmpty(recorderConInfo.getDeviceChannel())) {
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(recorderConInfo.getVendorId()), IRecordService.class);
+            PlayEntity playEntity = PlayEntity.builder()
+                    .deviceId(recorderConInfo.getDeviceChannel()).build();
+            Result<CameraStatusResp> cameraStatusRespResult = iRecordService.queryNVRStatus(playEntity);
+            CameraStatusResp cameraStatusResp = cameraStatusRespResult.getData();
+            if (!cameraStatusResp.getOnLine().equals("true")) {
+                channleStatusMap.put("get camera status fail, error code: ", String.valueOf(cameraStatusRespResult.getCode()));
+                channleStatusMap.put("errorCode: ", "401");
+                return channleStatusMap;
+            }
+        }
+
+        List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
         for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
             if (StringUtils.isEmpty(cameraStatusInfo.getDeviceChannel())) {
                 continue;
@@ -1560,6 +1580,7 @@ public class CameraConService {
             }
         }
         log.info("channelStatusMap: " + channleStatusMap);
+        channleStatusMap.put("errorCode: ", "200");
         return channleStatusMap;
     }
 
