@@ -682,7 +682,7 @@ public class CameraConService {
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
         }
         //调用海康IsApi接口
-        IPtzService ptzService = VideoServiceFactory.loadSnapService(CameraVendor.HIK, IPtzService.class);
+        IPtzService ptzService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IPtzService.class);
         PresetEntity presetEntity =
             PresetEntity.builder().ip(cameraConInfo.getCameraIp()).port(cameraConInfo.getPort()).userName(cameraConInfo.getCameraManager())
                 .password(cameraConInfo.getCameraCode()).build();
@@ -1189,7 +1189,7 @@ public class CameraConService {
                 // 雄迈
                 cameraVendor = CameraVendor.XM;
                 break;
-            case "210":
+            case "819":
                 // 高德红外
                 cameraVendor = CameraVendor.GD;
                 break;
