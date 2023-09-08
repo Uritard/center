@@ -1543,7 +1543,8 @@ public class CameraConService {
         }
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        if (StringUtils.isNotEmpty(recorderConInfo.getDeviceChannel())) {
+        if (StringUtils.isNotEmpty(recorderConInfo.getDeviceChannel()) &&
+                (!recorderConInfo.getDeviceChannel().equals("NULL") || !recorderConInfo.getDeviceChannel().equals("null"))){
             IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(recorderConInfo.getVendorId()), IRecordService.class);
             PlayEntity playEntity = PlayEntity.builder()
                     .deviceId(recorderConInfo.getDeviceChannel()).build();
@@ -1554,6 +1555,10 @@ public class CameraConService {
                 channleStatusMap.put("errorCode: ", "401");
                 return channleStatusMap;
             }
+        } else {
+            channleStatusMap.put("get camera status fail, error code: ", "401");
+            channleStatusMap.put("errorCode: ", "401");
+            return channleStatusMap;
         }
 
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
