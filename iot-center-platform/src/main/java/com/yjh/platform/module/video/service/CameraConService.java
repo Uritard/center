@@ -1550,7 +1550,7 @@ public class CameraConService {
                     .deviceId(recorderConInfo.getDeviceChannel()).build();
             Result<CameraStatusResp> cameraStatusRespResult = iRecordService.queryNVRStatus(playEntity);
             CameraStatusResp cameraStatusResp = cameraStatusRespResult.getData();
-            if (!cameraStatusResp.getOnLine().equals("true")) {
+            if (!cameraStatusRespResult.isSuccess() || !cameraStatusResp.getOnLine().equals("true")) {
                 channleStatusMap.put("get camera status fail, error code: ", String.valueOf(cameraStatusRespResult.getCode()));
                 channleStatusMap.put("errorCode: ", "401");
                 return channleStatusMap;
