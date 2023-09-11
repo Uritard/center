@@ -61,7 +61,7 @@ public class CameraConService {
     /**
      * 流媒体服务器 ZLMediaKit
      */
-    private static final String MEDIA_ZLK = "ZLMediaKit";
+    public static final String MEDIA_ZLK = "ZLMediaKit";
 
     @SuppressWarnings("unchecked")
     public void isCameraControlled(Long cameraId) {
