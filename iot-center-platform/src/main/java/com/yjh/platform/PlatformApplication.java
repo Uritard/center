@@ -11,6 +11,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.service.*;
 import com.yjh.platform.netty.client.NettyClient;
+import com.yjh.video.api.VideoConfig;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +75,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private NettyClient nettyClient = new NettyClient();
     @Value("${spring.websocket.send.url}")
     private String url;
+    @Value("${wvp.host}")
+    private String wvpHost;
     @Autowired
     private TCameraPresetService tCameraPresetService;
 
@@ -85,6 +88,7 @@ public class PlatformApplication  implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         redisTemplate.delete("AllRobotCode");
         DictConvertUtil.DICT.loadDict(dictBusinessService);
+        VideoConfig.custom(wvpHost);
         sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis(true);
         tCameraInfoService.intoRedis();

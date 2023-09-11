@@ -131,7 +131,7 @@ public class DroneCameraConService {
         Map<String, Object> returnInferadMap = new HashMap<>();
         try {
             String transUrlinferad = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "droneVideo"));
-            transUrlinferad = String.format(transUrlinferad, robotConInfo.getRobotIp(), robotConInfo.getNestCode() + nestInner, robotConInfo.getNestCode() + nestInner);
+            transUrlinferad = String.format(transUrlinferad, robotConInfo.getRobotIp(), robotConInfo.getRobotPort(), robotConInfo.getNestCode() + nestInner, robotConInfo.getNestCode() + nestInner);
             log.info("transUrlinferad: {}" , transUrlinferad);
             VideoInfo videoInfoNestInner = new VideoInfo().setCommand(transUrlinferad).setId(robotConInfo.getNestCode() + nestInner);
             manager.run(videoInfoNestInner);
