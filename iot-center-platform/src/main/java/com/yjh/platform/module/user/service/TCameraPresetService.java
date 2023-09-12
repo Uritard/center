@@ -1101,5 +1101,19 @@ public class TCameraPresetService {
         }
         return 0;
     }
+
+    public int resetCapture(TCameraPreset tCameraPreset) {
+        Map<String, String> resPicMap =
+            cameraConService.capturePresetPicture(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName(),
+                tCameraPreset.getEdgeCode());
+        if (MapUtils.isNotEmpty(resPicMap)) {
+            String urlPath = String.valueOf(resPicMap.get("urlPath"));
+            String remotePath = this.saveImgToFtpsToCoverOriImg(urlPath, tCameraPreset.getPresetImg());
+            tCameraPreset.setPresetImg(remotePath);
+            this.SycPresetToEdge(tCameraPreset); // 向边缘节点同步预置位图片和ptz信息
+            return 1;
+        }
+        return 0;
+    }
 }
 
