@@ -805,6 +805,7 @@ public class CameraConService {
             pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
         }
         if (!result.isSuccess()) {
+            log.error("抓图失败： {} - {} --- {}", cameraId, JSON.toJSONString(result), JSON.toJSONString(cameraConInfo));
             throw new BusinessException(result.getCode(), result.getMsg());
         }
 
