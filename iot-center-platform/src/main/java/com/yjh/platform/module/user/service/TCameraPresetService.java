@@ -8,10 +8,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.common.utils.JSONUtil;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -24,6 +21,7 @@ import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.video.service.CameraConService;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -1087,20 +1085,21 @@ public class TCameraPresetService {
 
     public int reset(TCameraPreset tCameraPreset) {
         String resData = cameraConService.setPreset(tCameraPreset.getPresetId(), tCameraPreset.getCameraId());
-        if (StringUtils.isNotEmpty(resData)) {
-            Map<String, String> resPicMap = cameraConService.capturePresetPicture(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName(), tCameraPreset.getEdgeCode());
-            if (resPicMap != null) {
-                String urlPath = String.valueOf(resPicMap.get("urlPath"));
-                String remotePath = this.saveImgToFtpsToCoverOriImg(urlPath, tCameraPreset.getPresetImg());
-                tCameraPreset.setPresetImg(remotePath);
-            }
+        if (CommonUtils.isEmptyOrNullstr(resData)) {
             tCameraPreset.setPresetPtz(resData);
+        }
+        Map<String, String> resPicMap =
+            cameraConService.capturePresetPicture(tCameraPreset.getPresetId(), tCameraPreset.getCameraId(), tCameraPreset.getPresetName(),
+                tCameraPreset.getEdgeCode());
+        if (MapUtils.isNotEmpty(resPicMap)) {
+            String urlPath = String.valueOf(resPicMap.get("urlPath"));
+            String remotePath = this.saveImgToFtpsToCoverOriImg(urlPath, tCameraPreset.getPresetImg());
             this.update(tCameraPreset); // 更新PTZ信息
+            tCameraPreset.setPresetImg(remotePath);
             this.SycPresetToEdge(tCameraPreset); // 向边缘节点同步预置位图片和ptz信息
             return 1;
-        } else {
-            return 0;
         }
+        return 0;
     }
 }
 
