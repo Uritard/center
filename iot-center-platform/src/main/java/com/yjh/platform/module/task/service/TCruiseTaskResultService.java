@@ -375,9 +375,9 @@ public class TCruiseTaskResultService {
                 if (MapUtils.isNotEmpty(cameraVideoInfo)) {
                     videoInfo.putAll(cameraVideoInfo);
                 } else {
-                    videoInfo.put("flvUrl", null);
-                    videoInfo.put("rtmpUrl", null);
-                    videoInfo.put("webRtcUrl", null);
+                    videoInfo.put("flvUrl", "");
+                    videoInfo.put("rtmpUrl", "");
+                    videoInfo.put("webRtcUrl", "");
                 }
                 inspectResult.setVideoInfo(videoInfo);
 

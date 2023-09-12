@@ -44,4 +44,5 @@ public class ReportData {
      */
     List<NonhomologousInfo> nonList;
 
+    boolean downResultPic = false;
 }
