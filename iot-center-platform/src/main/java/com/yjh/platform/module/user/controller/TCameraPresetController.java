@@ -443,4 +443,31 @@ public class TCameraPresetController {
         }
         return result;
     }
+
+    @ApiOperation(value = "预置位重新抓图")
+    @GetMapping(value = "/resetCapture")
+    @Logs(title = "预置位重新抓图",content = "根据用户传递的参数更新预置位角度",logType = 3,authority = "1234,1235")
+    public Result resetCapture( @RequestParam(value = "presetId") Long presetId) {
+        Result result = new Result();
+        try {
+
+            TCameraPreset cameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
+            if (cameraPreset == null) {
+                result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), "预置位信息有误，请检查预置位信息或联系管理员");
+                result.setData(0);
+                return result;
+            }
+            int resultNum = tCameraPresetService.resetCapture(cameraPreset);
+            if (resultNum == 0) {
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                result.setData(resultNum);
+            }
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加预置位信息错误:", e);
+        }
+        return result;
+    }
 }
