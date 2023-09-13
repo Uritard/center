@@ -1283,6 +1283,7 @@ public class CameraConService {
                         .port(cameraConInfo.getPort())
                         .userName(userName)
                         .password(password)
+                        .channelNum(cameraConInfo.getChannelNum())
                         .nEndX(nEndX)
                         .nEndY(nEndY)
                         .nStartX(nStartX)
@@ -1545,12 +1546,26 @@ public class CameraConService {
         }
 
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
-        List<String> channelIdList = cameraConInfoMap.stream().map(CameraStatusInfo::getCameraChannelId)
-                .filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
         IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
-        CameraEntity entity = CameraEntity.builder().channelIdList(channelIdList).build();
-        Result<List<CameraStatusResp>> cameraStatusResult = iRecordService.getCameraStatus(entity);
+
+        Map<String, List<CameraStatusInfo>> deviceIdMap = cameraConInfoMap.stream().filter(cameraStatusInfo -> StringUtils.isNotEmpty(cameraStatusInfo.getDeviceChannel()))
+                .collect(Collectors.groupingBy(CameraStatusInfo::getDeviceChannel));
+
+        ArrayList<CameraEntity> cameraEntityArrayList = new ArrayList<>();
+        for (Map.Entry<String, List<CameraStatusInfo>> entry : deviceIdMap.entrySet()) {
+            String deviceId = entry.getKey();
+            List<String> channelIdList = entry.getValue().stream().map(CameraStatusInfo::getCameraChannelId)
+                    .filter(Objects::nonNull).distinct().collect(Collectors.toList());
+
+            CameraEntity entity = CameraEntity.builder()
+                    .channelIdList(channelIdList)
+                    .deviceId(deviceId).build();
+
+            cameraEntityArrayList.add(entity);
+        }
+
+        Result<List<CameraStatusResp>> cameraStatusResult = iRecordService.getCameraStatus(cameraEntityArrayList);
         log.info("获取相机状态列表" + cameraStatusResult);
 
         if (cameraStatusResult.isSuccess()) {
