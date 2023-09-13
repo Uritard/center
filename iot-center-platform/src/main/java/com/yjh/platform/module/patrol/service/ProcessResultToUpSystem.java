@@ -400,7 +400,7 @@ public class ProcessResultToUpSystem {
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
                 valid = "0";
             } else if("1".equals(MapUtils.getString(cruiseResultMap,"isWarn"))){
-                valid = "2";
+                valid = "1";
             }
             xmlItem.put("valid", valid);
             xmlItem.put("abnormal_type", cruiseResultMap.get("cruiseAbnormal"));

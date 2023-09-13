@@ -17,6 +17,7 @@ import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
+import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.accesstcp.netty.server.NettyClient;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import com.yjh.accesstcp.thread.ReContentManager;
@@ -518,7 +519,7 @@ public class SendToUpSystemServices {
             jsonObject.put("uav_pos","");
             if (item.get("cruise_type").equals(228)){// 机器人
                 item.put("save_type_list","jpg");
-                item.put("data_type","01");
+                item.put("data_type","2");
                 jsonObject.put("robot_code", item.get("robot_num"));
                 jsonObject.put("robot_pos",item.get("inspection_id"));
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
@@ -528,12 +529,12 @@ public class SendToUpSystemServices {
                 jsonObject.put("device_pos",item.get("preset_id"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
-                item.put("data_type","0001");
+                item.put("data_type","6");
                 jsonObject.put("voice_code",item.get("voice_id"));
                 jsonObject.put("voice_pos",item.get("voice_id"));
             }else if (item.get("cruise_type").equals(524)){// 无人机
                 item.put("save_type_list","jpg");
-                item.put("data_type","001");
+                item.put("data_type","4");
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
             }
@@ -1670,5 +1671,48 @@ public class SendToUpSystemServices {
             }
 
         }
+    }
+
+    public void saveAInterfaceTaskInfo(List<Map<String,Object>> items){
+        try{
+            List<AInterfaceTaskInfo> list = new ArrayList<>();
+            for (Map<String,Object> item: items) {
+                AInterfaceTaskInfo aInterfaceTaskInfo = new AInterfaceTaskInfo();
+                aInterfaceTaskInfo.setType(ValueUtil.Object2String(item.get("type"),""));
+                aInterfaceTaskInfo.setTaskCode(ValueUtil.Object2String(item.get("task_code"),""));
+                aInterfaceTaskInfo.setTaskName(ValueUtil.Object2String(item.get("task_name"),""));
+                aInterfaceTaskInfo.setPriority(ValueUtil.Object2String(item.get("priority"),""));
+                aInterfaceTaskInfo.setDeviceLevel(ValueUtil.Object2String(item.get("device_level"),""));
+                aInterfaceTaskInfo.setDeviceList(ValueUtil.Object2String(item.get("device_list"),""));
+                aInterfaceTaskInfo.setFixedStartTime(ValueUtil.Object2String(item.get("fixed_start_time"),""));
+                aInterfaceTaskInfo.setCycleMonth(ValueUtil.Object2String(item.get("cycle_month"),""));
+                aInterfaceTaskInfo.setCycleWeek(ValueUtil.Object2String(item.get("cycle_week"),""));
+                aInterfaceTaskInfo.setCycleExecuteTime(ValueUtil.Object2String(item.get("cycle_execute_time"),""));
+                aInterfaceTaskInfo.setCycleStartTime(ValueUtil.Object2String(item.get("cycle_start_time"),""));
+                aInterfaceTaskInfo.setCycleEndTime(ValueUtil.Object2String(item.get("cycle_end_time"),""));
+                aInterfaceTaskInfo.setIntervalNumber(ValueUtil.Object2String(item.get("interval_number"),""));
+                aInterfaceTaskInfo.setIntervalType(ValueUtil.Object2String(item.get("interval_type"),""));
+                aInterfaceTaskInfo.setIntervalExecuteTime(ValueUtil.Object2String(item.get("interval_execute_time"),""));
+                aInterfaceTaskInfo.setIntervalStartTime(ValueUtil.Object2String(item.get("interval_start_time"),""));
+                aInterfaceTaskInfo.setIntervalEndTime(ValueUtil.Object2String(item.get("interval_end_time"),""));
+                aInterfaceTaskInfo.setInvalidStartTime(ValueUtil.Object2String(item.get("invalid_start_time"),""));
+                aInterfaceTaskInfo.setInvalidEndTime(ValueUtil.Object2String(item.get("invalid_end_time"),""));
+                aInterfaceTaskInfo.setIsenable(ValueUtil.Object2String(item.get("isenable"),""));
+                aInterfaceTaskInfo.setCreator(ValueUtil.Object2String(item.get("creator"),""));
+                aInterfaceTaskInfo.setCreateTime(ValueUtil.Object2String(item.get("create_time"),""));
+                if (StringUtils.isNotEmpty(aInterfaceTaskInfo.getIsenable()) && !"0".equals(aInterfaceTaskInfo.getIsenable())){
+                    //删除操作
+                    patrolTaskDao.deleteAInterfaceTask(aInterfaceTaskInfo.getTaskCode());
+                } else {
+                    list.add(aInterfaceTaskInfo);
+                }
+            }
+            if (!list.isEmpty()){
+                patrolTaskDao.batchAddAInterfaceTask(list);
+            }
+        }catch (Exception e){
+            log.info("存储A接口任务出错：{}",items);
+        }
+
     }
 }
