@@ -264,6 +264,8 @@ public class MessageThread {
             if ("1".equals(xmlBaseModel.getCommand())) {
                 log.info("--响应任务 任务下发--");
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
+                //存储A接口任务信息
+                sendToUpSystemServices.saveAInterfaceTaskInfo(list);
                 // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
                 String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                 boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
@@ -284,7 +286,16 @@ public class MessageThread {
                     List<TCruiseTaskAdd> taskList = new ArrayList<>();
                     taskList.add(tCruiseTaskAdd);
                     map.put("list", taskList);
-                    Result re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
+                    Result re;
+                    if ("0".equals(tCruiseTaskAdd.getIsenable())){
+                        re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
+                    } else {
+                        Map<String,Object> param = new HashMap<>(2);
+                        param.put("taskId",tCruiseTaskAdd.getTaskId());
+                        param.put("startTime","-1");
+                        param.put("source","");
+                        re = Constant.otherServerPost(param, Constant.TASK_DELETE_URL);
+                    }
 
                     if (re == null) {
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
@@ -501,6 +512,7 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalType(item.getOrDefault("interval_type", "").toString());
         tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
+        tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("isenable", "").toString());
 
         String priority = item.getOrDefault("priority", "").toString();
 

@@ -4,11 +4,7 @@
 
 package com.yjh.platform.module.patrol.dao;
 
-import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
-import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
-import com.yjh.platform.module.patrol.entity.UPatrolResult;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.task.entity.TCruiseTaskCount;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
@@ -167,4 +163,6 @@ public interface UPatrolTaskDao {
 
     String selectTaskName(@Param(value = "taskId") String taskId);
     List<String> selectDroneCodeByTaskCode(@Param(value = "taskCode") String taskCode);
+    AInterfaceTaskInfo selectAInterfaceTaskByTaskCode(@Param(value = "taskCode") String taskCode);
+    List<String> selectForTaskInstanceId(@Param(value = "devicePointId") String devicePointId);
 }

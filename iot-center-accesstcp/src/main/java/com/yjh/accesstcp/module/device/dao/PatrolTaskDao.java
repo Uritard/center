@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.dao;
 
+import com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo;
 import com.yjh.accesstcp.module.device.entity.SysLogs;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -25,5 +26,7 @@ public interface PatrolTaskDao {
     HashMap<String,Object> countResultCheck(@Param(value = "startTime")String startTime,
                                             @Param(value = "endTime")String endTime );
 
-
+    int batchAddAInterfaceTask(List<AInterfaceTaskInfo> list);
+    int updateAInterfaceTask(AInterfaceTaskInfo aInterfaceTaskInfo);
+    int deleteAInterfaceTask(@Param(value = "taskCode") String taskCode);
 }
