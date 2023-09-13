@@ -678,7 +678,7 @@ public class UPatrolTaskService {
             if (robotEnd) {
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
-                ScheduledMapConfig.schedule(15, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
+                ScheduledMapConfig.schedule(45, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
             }
 
             if (robotId != null){
@@ -2144,9 +2144,8 @@ public class UPatrolTaskService {
             log.error("cruiseResultList is empty.");
             return;
         }
-        int size = cruiseResultList.size();
         String taskId = cruiseResultList.get(0).get("taskId");
-        int abnormalCounts = patrolTaskResult(taskId, cruiseResult, size);
+        long abnormalCounts = patrolTaskResult(taskId, cruiseResult, cruiseResultList);
 
         try {
             // 压测模式减少非必要消息传输
@@ -2193,46 +2192,53 @@ public class UPatrolTaskService {
         }
     }
 
-    private int patrolTaskResult(String taskId, int cruiseResult, int size) {
+    private long patrolTaskResult(String taskId, int cruiseResult, List<Map<String, String>> cruiseResultList) {
         // 获取当前redis正常异常点位个数并更新
-        int abnormalCounts;
-        int normalCounts;
-        int allCounts;
+        long abnormalCounts;
+        long normalCounts;
+        long allCounts;
         boolean endOnece = false;
-        synchronized (LOCK_FLAG) {
-            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-            Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            abnormalCounts = NumberUtils.toInt(resultCountsMap.get("abnormal"));
-            normalCounts = NumberUtils.toInt(resultCountsMap.get("normal"));
-            allCounts = NumberUtils.toInt(resultCountsMap.get("all"));
-            boolean ended = Boolean.parseBoolean(resultCountsMap.getOrDefault("ended", "false"));
-            log.info("From redis---task:{}, all:{}, abnormalCounts:{}, normalCounts:{}", taskId, allCounts, abnormalCounts, normalCounts);
 
-            if (CRUISE_RESULT_NORMAL == cruiseResult) {
-                normalCounts += size;
-            } else {
-                abnormalCounts += size;
-            }
-            String progress;
-            if(allCounts != 0){
-                float progressF = (float)(normalCounts + abnormalCounts)/allCounts;
-                progress = CommonUtils.percentFormat(Math.min(progressF, 1.0F), "#.####");
-                // 如果 all==0，则表示这不是本机创建的任务，任务进度不由本级计算，不更新进度值
-                resultCountsMap.put("taskProgress", progress);
-            }
-            log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
-            resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
-            resultCountsMap.put("normal", String.valueOf(normalCounts));
-            resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
+        String[] insIds = cruiseResultList.stream().map(m -> MapUtils.getString(m, "instanceId")).distinct().toArray(String[]::new);
 
+        String strForCountAll = PATROL_SUMMARY_PREFIX + taskId;
+        Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAll);
 
-            if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
-                endOnece = true;
-            }
+        int normal = CRUISE_RESULT_NORMAL == cruiseResult ? CRUISE_RESULT_NORMAL : CRUISE_RESULT_ABNORMAL;
+        String countAbnormal = strForCountAll + "--" + normal;
 
-            redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
-            redisTemplate.expire(strForCountAbnormal, 3, TimeUnit.DAYS);
+        // 存储执行完成的instanceId
+        redisTemplate.opsForSet().add(countAbnormal, insIds);
+        redisTemplate.expire(countAbnormal, 3, TimeUnit.DAYS);
+
+        abnormalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL);
+        normalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_NORMAL);
+        allCounts = NumberUtils.toLong(resultCountsMap.get("all"));
+        boolean ended = Boolean.parseBoolean(resultCountsMap.getOrDefault("ended", "false"));
+        log.info("From redis---task:{}, all:{}, abnormalCounts:{}, normalCounts:{}", taskId, allCounts, abnormalCounts, normalCounts);
+
+        String progress;
+        if (allCounts != 0) {
+            float progressF = (float)(normalCounts + abnormalCounts) / allCounts;
+            progress = CommonUtils.percentFormat(Math.min(progressF, 1.0F), "#.####");
+            // 如果 all==0，则表示这不是本机创建的任务，任务进度不由本级计算，不更新进度值
+            resultCountsMap.put("taskProgress", progress);
         }
+        log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
+        resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
+        resultCountsMap.put("normal", String.valueOf(normalCounts));
+        resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
+
+        Set inter = redisTemplate.opsForSet().intersect(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL, strForCountAll + "--" + CRUISE_RESULT_NORMAL);
+        if (CollectionUtils.isNotEmpty(inter)) {
+            log.error("执行完成点位重复：【{}】", JSON.toJSONString(inter));
+        }
+        if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
+            endOnece = true;
+        }
+
+        redisTemplate.opsForHash().putAll(strForCountAll, resultCountsMap);
+        redisTemplate.expire(strForCountAll, 3, TimeUnit.DAYS);
 
         // 判断任务是否结束
         if (endOnece) {

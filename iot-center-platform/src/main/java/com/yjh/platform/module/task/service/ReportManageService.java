@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
@@ -181,15 +182,17 @@ public class ReportManageService {
 
         String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
         String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+        boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
+        recordData.setDownResultPic(downResultPic);
         List<String>  originalImgList = new ArrayList<>();
         // 相对路径替换绝对路径
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
             detail.setPicPath(resultPath);
-            if (Objects.isNull(detail.getOriImg())) {
-                originalImgList.add(null);
-            } else {
-                originalImgList.add(detail.getOriImg());
+
+            String dowmPic = downResultPic ? resultPath : detail.getOriImg();
+            if (!CommonUtils.isEmptyOrNullstr(dowmPic)) {
+                originalImgList.add(dowmPic);
             }
         });
         recordData.setTCDRDList(tCruiseDataResultDetailList);

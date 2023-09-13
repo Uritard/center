@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
@@ -305,11 +306,11 @@ public class ReportDataModel {
 
             Map<String, Integer> rowCountw = new HashMap<>();
             if (i == 0){
-                rowCountw = getRowCount(elements, rowIndex, rowCount, abnormalList);
+                rowCountw = getRowCount(elements, rowIndex, rowCount, abnormalList, param.isDownResultPic());
             }else if (i == 1){
-                rowCountw = getRowCount(elements, rowIndex, rowCount, unReviewList);
+                rowCountw = getRowCount(elements, rowIndex, rowCount, unReviewList, param.isDownResultPic());
             }else  if (i == 2){
-                rowCountw = getRowCount(elements, rowIndex, rowCount, normalList);
+                rowCountw = getRowCount(elements, rowIndex, rowCount, normalList, param.isDownResultPic());
             }
 
             rowIndex = rowCountw.get("rowIndex");
@@ -339,9 +340,10 @@ public class ReportDataModel {
     }
 
 
-    private static Map<String, Integer> getRowCount(List<TableCellElement> elements, int rowIndex, int rowCount, List<TCruiseDataResultDetail> tCDRDList) {
+    private static Map<String, Integer> getRowCount(List<TableCellElement> elements, int rowIndex, int rowCount, List<TCruiseDataResultDetail> tCDRDList, boolean downResultPic) {
         Map<String, Integer> map = new HashMap<>(16);
         int index = 0;
+
         for (TCruiseDataResultDetail detail : tCDRDList) {
             int colorIndex = IndexedColors.BLACK.index;
             boolean bold = false;
@@ -386,7 +388,8 @@ public class ReportDataModel {
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
             // 巡视图像
             String file = StringUtils.isEmpty(detail.getPicPath()) ? "" : detail.getPicPath();
-            String oriFile = StringUtils.isEmpty(detail.getOriImg()) ? "" : detail.getOriImg();
+            String oriFile = downResultPic ? detail.getPicPath() : detail.getOriImg();
+            oriFile = CommonUtils.isEmptyOrNullstr(oriFile) ? "" : oriFile;
             elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{FileUtil.picCompression(file), oriFile},
                     TableCellElement.TYPE_PICTURE));
 
