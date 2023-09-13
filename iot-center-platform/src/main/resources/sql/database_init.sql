@@ -2626,3 +2626,28 @@ CREATE TABLE `dict_area` (
 `parent_id` int DEFAULT NULL COMMENT '父节点',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='区县行政编码字典表';
+
+CREATE TABLE `a_interface_task_info` (
+`type` varchar(5) DEFAULT NULL COMMENT ' 巡检类型 <1>: = 全面巡视 <2>: = 例行巡视\r\n<3>: = 专项巡视<4>: = 特殊巡视',
+`task_code` varchar(256) NOT NULL COMMENT '任务编码',
+`task_name` varchar(256) DEFAULT NULL COMMENT '任务名称',
+`priority` varchar(5) DEFAULT NULL COMMENT '优先级 <1>: = 优先级1，优先级最低<2>: = 优先级2 <3>: = 优先级3<4>: = 优先级4，优先级最高',
+`device_level` varchar(5) DEFAULT NULL COMMENT '设备层级 <1>: = 间隔 <2>: = 主设备 <3>: = 设备点位',
+`device_list` text DEFAULT NULL COMMENT '设备列表',
+`fixed_start_time` varchar(32) DEFAULT NULL COMMENT '定期开始时间',
+`cycle_month` varchar(128) DEFAULT NULL COMMENT '周期（月）',
+`cycle_week` varchar(128) DEFAULT NULL COMMENT '周期（周）',
+`cycle_execute_time` varchar(32) DEFAULT NULL COMMENT '周期（执行时间）',
+`cycle_start_time` varchar(32) DEFAULT NULL COMMENT '周期开始时间',
+`cycle_end_time` varchar(32) DEFAULT NULL COMMENT '周期结束时间',
+`interval_number` varchar(5) DEFAULT NULL COMMENT '间隔（数量）',
+`interval_type` varchar(5) DEFAULT NULL COMMENT '间隔（类型）  <1>: = 小时<2>: = 天',
+`interval_execute_time` varchar(32) DEFAULT NULL COMMENT '间隔（执行时间）  格式：HH:mm:ss',
+`interval_start_time` varchar(32) DEFAULT NULL COMMENT '间隔开始时间',
+`interval_end_time` varchar(32) DEFAULT NULL COMMENT '间隔结束时间',
+`invalid_start_time` varchar(32) DEFAULT NULL COMMENT '不可用开始时间',
+`invalid_end_time` varchar(32) DEFAULT NULL COMMENT '不可用结束时间',
+`isenable` varchar(5) DEFAULT NULL COMMENT '是否可用 <0>: = 可用<1>: = 不可用 2 删除',
+`creator` varchar(32) DEFAULT NULL COMMENT '编制人',
+`create_time` varchar(32) DEFAULT NULL COMMENT '编制时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A接口任务信息';

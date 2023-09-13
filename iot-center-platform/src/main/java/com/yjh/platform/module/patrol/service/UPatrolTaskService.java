@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -1704,7 +1705,7 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setTaskId(newTaskId);
             tCruiseTaskAdd.setTaskCode(uPatrolTask.getTaskCode());
             tCruiseTaskAdd.setIfRun(173);
-            tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "任务启动" + DateTimeUtil.format3(new Date()));
+            tCruiseTaskAdd.setTaskName(uPatrolTask.getTaskName() + "_任务启动" + DateTimeUtil.format3(new Date()));
             tCruiseTaskAdd.setType(uPatrolTask.getTaskType());
             tCruiseTaskAdd.setTaskLevel(uPatrolTask.getTaskLevel());
             tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
@@ -3287,11 +3288,12 @@ public class UPatrolTaskService {
     public String upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception {
         String com = xmlBaseModel.getCommand();
         String code = xmlBaseModel.getCode();
+        String sendCode = xmlBaseModel.getSendCode();
         String taskId = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
         log.info("taskId : {} control", taskId);
         switch (com) {
             case "1":
-                return this.taskStart(taskId, null);
+                return this.taskStart(taskId, sendCode);
             case "2":
                 return String.valueOf(this.taskPause(taskId, null));
             case "3":
@@ -3302,6 +3304,64 @@ public class UPatrolTaskService {
             default:
                 return "-1";
         }
+    }
+
+    /**
+     * 上级系统下发的任务 进行立即启动
+     * @param taskCode 任务编码
+     * @return taskId
+     */
+    public String taskStart(String taskCode,String sendCode){
+        //1.根据 task_code找到A接口任务信息
+        AInterfaceTaskInfo aInterfaceTaskInfo;
+        try {
+            aInterfaceTaskInfo = uPatrolTaskDao.selectAInterfaceTaskByTaskCode(taskCode);
+        }catch (Exception e){
+            log.error("根据task_code查询A接口任务出错：",e);
+            return "";
+        }
+        //2.组装立即任务信息
+        TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+        tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
+        tCruiseTaskAdd.setTaskId(null);
+        tCruiseTaskAdd.setTaskName(aInterfaceTaskInfo.getTaskName()+ "_任务启动" + DateTimeUtil.format3(new Date()));
+        tCruiseTaskAdd.setCreateTime(new Date());
+        tCruiseTaskAdd.setType(ValueUtil.toInteger(aInterfaceTaskInfo.getType(),1));
+        tCruiseTaskAdd.setCycleExecuteTime(aInterfaceTaskInfo.getCycleExecuteTime());
+        tCruiseTaskAdd.setCycleMonth(aInterfaceTaskInfo.getCycleMonth());
+        tCruiseTaskAdd.setCycleWeek(aInterfaceTaskInfo.getCycleWeek());
+        tCruiseTaskAdd.setCycleEndTime(aInterfaceTaskInfo.getCycleEndTime());
+        tCruiseTaskAdd.setCycleStartTime(aInterfaceTaskInfo.getCycleStartTime());
+        tCruiseTaskAdd.setIntervalExecuteTime(aInterfaceTaskInfo.getIntervalExecuteTime());
+        tCruiseTaskAdd.setIntervalNumber(aInterfaceTaskInfo.getIntervalNumber());
+        tCruiseTaskAdd.setIntervalType(aInterfaceTaskInfo.getIntervalType());
+        tCruiseTaskAdd.setIntervalStartTime(aInterfaceTaskInfo.getIntervalStartTime());
+        tCruiseTaskAdd.setIntervalEndTime(aInterfaceTaskInfo.getIntervalEndTime());
+        tCruiseTaskAdd.setTaskLevel(ValueUtil.toInteger(aInterfaceTaskInfo.getPriority(),2));
+        tCruiseTaskAdd.setIfRun(173);
+        tCruiseTaskAdd.setStartTime(new Date());
+        boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+        if (standardPoints) {
+            List<String> instanceIds = uPatrolTaskDao.selectForTaskInstanceId(aInterfaceTaskInfo.getDeviceList());
+            tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
+        }else {
+            tCruiseTaskAdd.setDeviceList(aInterfaceTaskInfo.getDeviceList());
+        }
+        tCruiseTaskAdd.setAreaId(sendCode);
+
+        Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
+        String taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
+        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskCode);
+        log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
+        robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(robotCodeList)) {
+            Map<String, Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId", taskCode);
+            robotTaskStatesMap.put("commandValue", 1);
+            robotTaskStatesMap.put("robotCodeList", robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
+        return taskPatrolledId;
     }
 
     /**

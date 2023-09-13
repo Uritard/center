@@ -136,4 +136,7 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "间隔（结束时间） ")
     private String intervalEndTime;
 
+    @ApiModelProperty(value = "是否可用")
+    private String isenable;
+
 }

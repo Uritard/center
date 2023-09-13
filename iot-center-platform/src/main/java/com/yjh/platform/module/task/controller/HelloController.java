@@ -886,4 +886,20 @@ public class HelloController {
 
         return result;
     }
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
+    @GetMapping(value = "/test-taskStart")
+    @ApiOperation(value = "test-taskStart")
+    public Result testTaskStart(@RequestParam(value = "taskCode", required = false) String taskCode,
+                                @RequestParam(value = "sendCode", required = false) String sendCode) throws Exception{
+        Result result = new Result();
+        try {
+            uPatrolTaskService.taskStart(taskCode,sendCode);
+        } catch (Exception e) {
+            log.error("获取机器人信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
 }
