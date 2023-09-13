@@ -201,8 +201,8 @@
         <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
         <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
         <if test="imageSize != null ">a.image_size = #{imageSize},</if>
-        <if test="lightChannelId != null and lightChannelId != ''">a.light_channel_id = #{lightChannelId},</if>
-        <if test="infraredChannelId != null  and infraredChannelId != ''">a.infrared_channel_id = #{infraredChannelId},</if>
+        <if test="lightChannelId != null">a.light_channel_id = #{lightChannelId},</if>
+        <if test="infraredChannelId != null">a.infrared_channel_id = #{infraredChannelId},</if>
         <if test="lightVendor != null ">a.light_vendor = #{lightVendor},</if>
         <if test="infraredVendor != null ">a.infrared_vendor = #{infraredVendor},</if>
     </set>
