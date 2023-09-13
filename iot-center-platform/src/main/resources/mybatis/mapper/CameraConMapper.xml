@@ -205,7 +205,7 @@
         a.channel_num,
         a.camera_id,
         a.vendor_id,
-        c.device_channel
+        a.camera_channel_id
         FROM t_camera_info a
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id
         WHERE 1 = 1
