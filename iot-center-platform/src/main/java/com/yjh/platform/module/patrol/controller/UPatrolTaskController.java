@@ -189,6 +189,25 @@ public class UPatrolTaskController {
         return result;
     }
 
+    @ApiOperation(value = "上级系统删除")
+    @RequestMapping(value = "/upSystemDelete", method = RequestMethod.GET)
+    public Result upSystemDelete(HttpServletRequest request,
+                         @RequestParam(value = "taskId", required = true) String taskId,
+                         @RequestParam(value = "startTime", required = false) String startTime,
+                         @RequestParam(value = "source", required = false) String source) {
+        Result result = new Result();
+        try {
+            result = this.delete(request,taskId,startTime,source);
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("上级系统删除任务异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("上级系统删除错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "删除过期周期任务的Job")
     @PostMapping(value = "/deleteJob")
     public Result deleteJob( @RequestParam(value = "taskId") String taskId) {

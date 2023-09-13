@@ -51,4 +51,89 @@
         WHERE result.cruise_time BETWEEN #{startTime} and #{endTime}
     </select>
 
+    <insert id="batchAddAInterfaceTask">
+        insert into a_interface_task_info(
+            type,
+            task_code,
+            task_name,
+            priority,
+            device_level,
+            device_list,
+            fixed_start_time,
+            cycle_month,
+            cycle_week,
+            cycle_execute_time,
+            cycle_start_time,
+            cycle_end_time,
+            interval_number,
+            interval_type,
+            interval_execute_time,
+            interval_start_time,
+            interval_end_time,
+            invalid_start_time,
+            invalid_end_time,
+            isenable,
+            creator,
+            create_time
+        ) values
+        <foreach collection="list" item="AInterfaceTask" separator=",">
+            (
+            #{AInterfaceTask.type, jdbcType=VARCHAR},
+            #{AInterfaceTask.taskCode, jdbcType=VARCHAR},
+            #{AInterfaceTask.taskName, jdbcType=VARCHAR},
+            #{AInterfaceTask.priority, jdbcType=VARCHAR},
+            #{AInterfaceTask.deviceLevel, jdbcType=VARCHAR},
+            #{AInterfaceTask.deviceList, jdbcType=VARCHAR},
+            #{AInterfaceTask.fixedStartTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.cycleMonth, jdbcType=VARCHAR},
+            #{AInterfaceTask.cycleWeek, jdbcType=VARCHAR},
+            #{AInterfaceTask.cycleExecuteTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.cycleStartTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.cycleEndTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.intervalNumber, jdbcType=VARCHAR},
+            #{AInterfaceTask.intervalType, jdbcType=VARCHAR},
+            #{AInterfaceTask.intervalExecuteTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.intervalStartTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.intervalEndTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.invalidStartTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.invalidEndTime, jdbcType=VARCHAR},
+            #{AInterfaceTask.isenable, jdbcType=VARCHAR},
+            #{AInterfaceTask.creator, jdbcType=VARCHAR},
+            #{AInterfaceTask.createTime, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateAInterfaceTask" parameterType="com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo">
+        update a_interface_task_info a <set>
+        <if test="type != null and type != ''">a.type = #{type},</if>
+        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode},</if>
+        <if test="taskName != null and taskName != ''">a.task_name = #{taskName},</if>
+        <if test="priority != null and priority != ''">a.priority = #{priority},</if>
+        <if test="deviceLevel != null and deviceLevel != ''">a.device_level = #{deviceLevel},</if>
+        <if test="deviceList != null and deviceList != ''">a.device_list = #{deviceList},</if>
+        <if test="fixedStartTime != null and fixedStartTime != ''">a.fixed_start_time = #{fixedStartTime},</if>
+        <if test="cycleMonth != null and cycleMonth != ''">a.cycle_month = #{cycleMonth},</if>
+        <if test="cycleWeek != null and cycleWeek != ''">a.cycle_week = #{cycleWeek},</if>
+        <if test="cycleExecuteTime != null and cycleExecuteTime != ''">a.cycle_execute_time = #{cycleExecuteTime},</if>
+        <if test="cycleStartTime != null and cycleStartTime != ''">a.cycle_start_time = #{cycleStartTime},</if>
+        <if test="cycleEndTime != null and cycleEndTime != ''">a.cycle_end_time = #{cycleEndTime},</if>
+        <if test="intervalNumber != null and intervalNumber != ''">a.interval_number = #{intervalNumber},</if>
+        <if test="intervalType != null and intervalType != ''">a.interval_type = #{intervalType},</if>
+        <if test="intervalExecuteTime != null and intervalExecuteTime != ''">a.interval_execute_time = #{intervalExecuteTime},</if>
+        <if test="intervalStartTime != null and intervalStartTime != ''">a.interval_start_time = #{intervalStartTime},</if>
+        <if test="intervalEndTime != null and intervalEndTime != ''">a.interval_end_time = #{intervalEndTime},</if>
+        <if test="invalidStartTime != null and invalidStartTime != ''">a.invalid_start_time = #{invalidStartTime},</if>
+        <if test="invalidEndTime != null and invalidEndTime != ''">a.invalid_end_time = #{invalidEndTime},</if>
+        <if test="isenable != null and isenable != ''">a.isenable = #{isenable},</if>
+        <if test="creator != null and creator != ''">a.creator = #{creator},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime},</if>
+    </set>
+            where a.task_code = #{taskCode}
+    </update>
+
+    <delete id="deleteAInterfaceTask">
+        delete from a_interface_task_info where task_code = #{taskCode}
+    </delete>
+
 </mapper>

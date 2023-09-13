@@ -104,6 +104,18 @@ public class SendToUpSystemController {
         }
         return result;
     }
+    @ApiOperation(value = "模型同步")
+    @RequestMapping(value = "/creatFile22", method = RequestMethod.GET)
+    public Result creatFile22(@RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+            result.setData(sendToUpSystemService.creatModelList(type));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
 
     @ApiOperation(value = "巡视结果查询")
     @RequestMapping(value = "/testCount", method = RequestMethod.GET)

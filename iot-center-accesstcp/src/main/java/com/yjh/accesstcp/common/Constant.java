@@ -105,12 +105,24 @@ public class Constant {
         return re;
     }
 
+    public static<T> Result otherServerPost(Map<String,Object> map, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class ,map);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
+    }
+
     //任务状态控制
     public static final String TASK_STATE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemCtrl";
 
     public static  final Map<String, Long> getParamMap = new ConcurrentHashMap<>();
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
+    //任务删除
+    public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&source={source}";
     public static  XMLBaseModel weatherXmlModel = null;
 
     public static RedisTemplate redisTemplate;

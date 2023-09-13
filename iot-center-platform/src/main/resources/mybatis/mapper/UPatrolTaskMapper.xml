@@ -949,4 +949,18 @@
         WHERE d.task_id = #{taskCode,jdbcType=VARCHAR}
         and a.drone_type is not null
     </select>
+
+    <select id="selectAInterfaceTaskByTaskCode" resultType="com.yjh.platform.module.patrol.entity.AInterfaceTaskInfo">
+        select * from a_interface_task_info where task_code = #{taskCode}
+    </select>
+
+    <select id="selectForTaskInstanceId" resultType="java.lang.String">
+        SELECT
+            a.instance_id
+        FROM
+            t_cruise_point_instance a
+                LEFT JOIN t_std_devicemete b on b.device_mete_id = a.device_mete_id
+        WHERE
+            FIND_IN_SET(b.device_point_id,#{devicePointId, jdbcType = VARCHAR})
+    </select>
 </mapper>
