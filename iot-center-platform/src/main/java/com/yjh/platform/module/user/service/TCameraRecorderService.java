@@ -1,13 +1,5 @@
 package com.yjh.platform.module.user.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
@@ -16,8 +8,13 @@ import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import com.yjh.platform.module.user.entity.TCameraRecorderExcel;
-import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
+import com.yjh.video.api.CameraVendor;
+import com.yjh.video.api.entity.RecordEntity;
+import com.yjh.video.api.entity.response.DeviceStatusResp;
+import com.yjh.video.api.result.Result;
+import com.yjh.video.api.service.IRecordService;
+import com.yjh.video.api.service.VideoServiceFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -32,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 * @author yc
@@ -110,21 +108,48 @@ public class TCameraRecorderService {
     public List<TCameraRecorderByDict> selectByPage(Integer recordType,String aliasName,String unit,Integer vendorId, Integer recorderModel,String recordName) {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
 
-        for(TCameraRecorderByDict res : tCameraRecorderByDictList) {
-            Map<String, String> recordIdMap = cameraConService.getCameraStatus(res.getRecordId());
-            log.info("re---"+recordIdMap);
-            if (Objects.nonNull(recordIdMap)){
-                Map<String,String> mapRes = recordIdMap;
-                if ("200".equals(mapRes.get("errorCode: "))){
-                    res.setRecorderStatus("在线");
-                }else {
-                    res.setRecorderStatus("离线");
-                }
-            }else {
-                res.setRecorderStatus("未知");
-            }
-        }
+        log.info("nvr列表" + tCameraRecorderByDictList);
+        // nvr的ID列表
+        List<String> deviceIdList = tCameraRecorderByDictList.stream()
+                .filter(tCameraRecorderByDict -> tCameraRecorderByDict.getRecordId() != null && tCameraRecorderByDict.getDeviceChannel() != null)
+                .map(TCameraRecorderByDict::getDeviceChannel).distinct().collect(Collectors.toList());
 
+        // nvr id存在则进行nvr状态查询， 反之直接设置nvr状态为未知
+        if (deviceIdList.size() > 0) {
+            IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+            RecordEntity build = RecordEntity.builder().deviceIdList(deviceIdList).build();
+            Result<List<DeviceStatusResp>> deviceStatusRespResult = iRecordService.queryNVRStatus(build);
+
+            //接口调用成功进行状态设置，反之设为未知
+            if (deviceStatusRespResult.isSuccess()) {
+                List<DeviceStatusResp> deviceStatusRespList = deviceStatusRespResult.getData();
+                Map<String, DeviceStatusResp> deviceStatusRespMap = deviceStatusRespList.stream()
+                        .collect(Collectors.toMap(DeviceStatusResp::getDeviceId, deviceStatusResp -> deviceStatusResp));
+
+                // 循环遍历数组进行nvr状态设置
+                for (TCameraRecorderByDict tCameraRecorderByDict : tCameraRecorderByDictList) {
+                    if (tCameraRecorderByDict.getDeviceChannel() == null) {
+                        tCameraRecorderByDict.setRecorderStatus("未知");
+                        continue;
+                    }
+                    DeviceStatusResp deviceStatusResp = deviceStatusRespMap.get(tCameraRecorderByDict.getDeviceChannel());
+                    if (deviceStatusResp != null) {
+                        if (deviceStatusResp.getOnLine()) {
+                            tCameraRecorderByDict.setRecorderStatus("在线");
+                        } else {
+                            tCameraRecorderByDict.setRecorderStatus("离线");
+                        }
+                    } else {
+                        tCameraRecorderByDict.setRecorderStatus("未知");
+                    }
+                }
+            } else {
+                tCameraRecorderByDictList.forEach(tCameraRecorderByDict -> tCameraRecorderByDict.setRecorderStatus("未知"));
+            }
+        } else {
+            tCameraRecorderByDictList.forEach(tCameraRecorderByDict -> tCameraRecorderByDict.setRecorderStatus("未知"));
+        }
+        log.info("nvr状态列表" + tCameraRecorderByDictList);
         return tCameraRecorderByDictList;
     }
 

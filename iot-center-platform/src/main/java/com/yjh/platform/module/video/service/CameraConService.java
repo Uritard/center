@@ -44,6 +44,7 @@ import java.io.*;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author zhangyuyi
@@ -1543,39 +1544,29 @@ public class CameraConService {
             return channleStatusMap;
         }
 
-        RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        if (StringUtils.isNotEmpty(recorderConInfo.getDeviceChannel()) &&
-                (!recorderConInfo.getDeviceChannel().equals("NULL") || !recorderConInfo.getDeviceChannel().equals("null"))){
-            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(recorderConInfo.getVendorId()), IRecordService.class);
-            PlayEntity playEntity = PlayEntity.builder()
-                    .deviceId(recorderConInfo.getDeviceChannel()).build();
-            Result<CameraStatusResp> cameraStatusRespResult = iRecordService.queryNVRStatus(playEntity);
-            CameraStatusResp cameraStatusResp = cameraStatusRespResult.getData();
-            if (!cameraStatusRespResult.isSuccess() || !cameraStatusResp.getOnLine().equals("true")) {
-                channleStatusMap.put("get camera status fail, error code: ", String.valueOf(cameraStatusRespResult.getCode()));
-                channleStatusMap.put("errorCode: ", "401");
-                return channleStatusMap;
-            }
-        } else {
-            channleStatusMap.put("get camera status fail, error code: ", "401");
-            channleStatusMap.put("errorCode: ", "401");
-            return channleStatusMap;
-        }
-
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
-        for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
-            if (StringUtils.isEmpty(cameraStatusInfo.getDeviceChannel())) {
-                continue;
-            }
-            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraStatusInfo.getVendorId()), IRecordService.class);
-            PlayEntity playEntity = PlayEntity.builder()
-                    .deviceId(cameraStatusInfo.getDeviceChannel()).build();
-            Result<CameraStatusResp> result = iRecordService.getCameraStatus(playEntity);
-            if (result.isSuccess()) {
-                CameraStatusResp cameraStatusResp = result.getData();
-                String online = cameraStatusResp.getOnLine() == null ? "" : cameraStatusResp.getOnLine();
-                if (StringUtils.isNotEmpty(online)) {
-                    if (online.equals("ONLINE")) {
+        List<String> channelIdList = cameraConInfoMap.stream().map(CameraStatusInfo::getCameraChannelId)
+                .filter(Objects::nonNull).distinct().collect(Collectors.toList());
+
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        CameraEntity entity = CameraEntity.builder().channelIdList(channelIdList).build();
+        Result<List<CameraStatusResp>> cameraStatusResult = iRecordService.getCameraStatus(entity);
+        log.info("获取相机状态列表" + cameraStatusResult);
+
+        if (cameraStatusResult.isSuccess()) {
+            List<CameraStatusResp> cameraStatusRespList = cameraStatusResult.getData();
+            Map<String, CameraStatusResp> cameraStatusRespMap = cameraStatusRespList.stream()
+                    .collect(Collectors.toMap(CameraStatusResp::getChannelId, cameraStatusResp -> cameraStatusResp));
+
+            // 遍历相机列表设置对应的相机的状态
+            for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
+                if (StringUtils.isEmpty(cameraStatusInfo.getCameraChannelId())) {
+                    channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1");
+                    continue;
+                }
+                CameraStatusResp cameraStatusResp = cameraStatusRespMap.get(cameraStatusInfo.getCameraChannelId());
+                if (cameraStatusResp != null) {
+                    if (cameraStatusResp.getStatus()) {
                         channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
                     } else {
                         channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
@@ -1584,9 +1575,12 @@ public class CameraConService {
                     channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1");
                 }
             }
+        } else {
+            // 发送请求失败相机状态置为空
+            cameraConInfoMap.stream().map(cameraStatusInfo -> channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "-1"));
         }
-        log.info("channelStatusMap: " + channleStatusMap);
-        channleStatusMap.put("errorCode: ", "200");
+
+        log.info("返回相机状态列表" + channleStatusMap);
         return channleStatusMap;
     }
 
