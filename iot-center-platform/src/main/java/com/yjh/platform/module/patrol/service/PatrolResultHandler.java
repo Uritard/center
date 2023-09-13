@@ -422,17 +422,11 @@ public class PatrolResultHandler {
 
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            CommonUtils.removeEmptyValue(cruiseResultMap);
             log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
 
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
             log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
-
-            /*StringJoiner str = new StringJoiner(",");
-            for (AnalysePatrolTaskResult patrolTaskResult : resultList) {
-                str.add(patrolTaskResult.getResultValue());
-            }
-            String resultValue = str.toString();
-            log.info("resultValue=={}", resultValue);*/
 
             String msgId = String.valueOf(UUID.randomUUID());
             if (StringUtils.equals("11", analyseType)) {
