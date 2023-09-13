@@ -256,7 +256,7 @@ public class TCameraInfoService {
             map.putAll(cameraConService.getCameraStatus(recordId));
         }
         for (TCameraInfoByDict xi : tCameraInfoByDict){
-            if (map.containsKey(xi.getCameraId().toString())){
+            if (map.containsKey(xi.getCameraId().toString()) && !"-1".equals(map.get(xi.getCameraId().toString()))){
                 if ("0".equals(map.get(xi.getCameraId().toString()))){
                     xi.setCameraStatus("离线");
                 }else{
@@ -619,7 +619,7 @@ public class TCameraInfoService {
         for(Long recordId:recordIdList){
            map.putAll(cameraConService.getCameraStatus(recordId));
         }
-        if (map.containsKey(cameraId.toString())){
+        if (map.containsKey(cameraId.toString()) && !"-1".equals(map.get(cameraId.toString()))){
             if ("0".equals(map.get(cameraId.toString()))){
                 return "离线";
             }else{
