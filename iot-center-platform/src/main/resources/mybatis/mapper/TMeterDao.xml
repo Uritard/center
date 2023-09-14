@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TMeterDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TMeter">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="ip" column="ip" jdbcType="VARCHAR"/>
+        <result property="port" column="port" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>
+        <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>
+        <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
+        <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,up_region_id,name,
+        ip,port,address,total_positive_power,
+        total_positive_reactive_power,total_negative_positive_power,
+        collect_power_time,create_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_meter
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_meter
+    </select>
+    <select id="selectByUpRegionId" resultMap="BaseResultMap">
+        select id,
+        ( select b.region_name from t_std_region b where b.region_id=a.up_region_id limit 1)region_name ,
+        up_region_id,
+        name,
+        ip,
+        port,
+        address,
+        total_positive_power,
+        total_positive_reactive_power,
+        total_negative_positive_power,
+        collect_power_time,
+        create_time
+        from t_meter a
+        <if test="list!=null and list.size() > 0" >
+            where a.up_region_id in
+            <foreach collection="list" item="regionId" separator=","  open="(" close=")">
+                #{regionId}
+            </foreach>
+        </if>
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from t_meter
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yjh.platform.module.device.entity.TMeter"
+            useGeneratedKeys="true">
+        insert into t_meter
+            (up_region_id, name, ip, port)
+        values (#{upRegionId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.yjh.platform.module.device.entity.TMeter">
+        update t_meter
+        set
+            total_positive_power = #{totalPositivePower,jdbcType=VARCHAR},
+            total_positive_reactive_power =  #{totalPositiveReactivePower,jdbcType=VARCHAR},
+            total_negative_positive_power =  #{totalNegativeReactivePower,jdbcType=VARCHAR},
+            collect_power_time= now()
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>
