@@ -29,6 +29,8 @@ public interface TRobotInfoDao {
     int deleteInstance(Long robotId);
 
     int update(TRobotInfo tRobotInfo);
+    int updateEntrance(@Param(value = "robotId") Long robotId,
+                       @Param(value = "entrance") Integer entrance);
     TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
     List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
                             @Param(value = "robotCode") String robotCode,
@@ -127,4 +129,6 @@ public interface TRobotInfoDao {
 
     @MapKey("robotId")
     Map<Long, TRobotInfo> selectAll();
+
+    Integer selectEntrance(@Param(value = "robotId")Long robotId);
 }

@@ -209,6 +209,10 @@
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
 
+    <update id="updateEntrance">
+        update t_robot_info set entrance = #{entrance, jdbcType=INTEGER} where robot_id = #{robotId, jdbcType=BIGINT}
+    </update>
+
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         <include refid="Base_Column_List" />
@@ -720,5 +724,8 @@
         select
         <include refid="Base_Column_List"/>
         from t_robot_info a
+    </select>
+    <select id="selectEntrance" resultType="java.lang.Integer">
+        select entrance from t_robot_info where robot_id = #{robotId,jdbcType=BIGINT}
     </select>
 </mapper>
