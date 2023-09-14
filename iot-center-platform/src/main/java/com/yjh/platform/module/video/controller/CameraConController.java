@@ -393,7 +393,6 @@ public class CameraConController {
         Result result = new Result();
         try {
             Map<String, Object> nvrStoreAndChannel = cameraConService.getNVRStoreAndChanle(recordId);
-            redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(nvrStoreAndChannel));
             result.setData(nvrStoreAndChannel);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

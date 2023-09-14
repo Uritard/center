@@ -1,8 +1,8 @@
 package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +18,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -537,5 +534,18 @@ public class CommonUtils {
         String filePathTem = StringUtils.stripStart(pathToAdd, "/\\");
         String baseTem = StringUtils.endsWithAny(basePath, "/", "\\") ? basePath : basePath + "/";
         return baseTem + filePathTem;
+    }
+
+    public static void removeEmptyValue(Map<?, ?> map) {
+        if (MapUtils.isNotEmpty(map)) {
+            Iterator<? extends Map.Entry<?, ?>> iter = map.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<?, ?> entry = iter.next();
+                Object v = entry.getValue();
+                if (v == null || isEmptyOrNullstr(String.valueOf(v))) {
+                    iter.remove();
+                }
+            }
+        }
     }
 }

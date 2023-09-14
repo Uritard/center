@@ -918,8 +918,7 @@ public class CameraConService {
     public void refreshRecordsOnSchedule() {
         List<RecorderConInfo> recordersInfo = cameraConDao.SelectRecords();
         recordersInfo.stream().map(RecorderConInfo::getRecordId).forEach(recordId -> {
-            redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(getNVRStoreAndChanle(recordId)));
-            redisTemplate.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
+            getNVRStoreAndChanle(recordId);
         });
     }
 
@@ -954,7 +953,14 @@ public class CameraConService {
                 List<Map<String, Object>> chanInfo = recordChannelInfo(listResult.getData());
                 channleStatusMap.put("channel", chanInfo);
                 channleStatusMap.put("status", "在线");
+
+                // 存入缓存
+                redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(channleStatusMap));
+                redisTemplate.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
+
                 return channleStatusMap;
+            } else {
+                log.error("获取存储文件失败: {}", JSON.toJSONString(listResult));
             }
         } catch (Exception e) {
             log.error("获取NVR信息失败：{}", entity, e);
