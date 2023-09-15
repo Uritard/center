@@ -182,6 +182,10 @@ public class TStdRegionService{
         return tStdRegionDao.selectDownId(regionId);
     }
 
+    public List<TStdRegion> queryAll() {
+        return tStdRegionDao.queryAll();
+    }
+
     public int loadRegionIntoRedis() {
         List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, 1, null);
         Set<String> keys = redisTemplate.keys("region:*");
