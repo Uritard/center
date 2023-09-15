@@ -3322,8 +3322,9 @@ public class UPatrolTaskService {
         }
         //2.组装立即任务信息
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
-        tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
-        tCruiseTaskAdd.setTaskId(null);
+        tCruiseTaskAdd.setTaskCode(taskCode);
+        String taskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+        tCruiseTaskAdd.setTaskId(taskId);
         tCruiseTaskAdd.setTaskName(aInterfaceTaskInfo.getTaskName()+ "_任务启动" + DateTimeUtil.format3(new Date()));
         tCruiseTaskAdd.setCreateTime(new Date());
         tCruiseTaskAdd.setType(ValueUtil.toInteger(aInterfaceTaskInfo.getType(),1));
@@ -3351,7 +3352,7 @@ public class UPatrolTaskService {
 
         Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
         String taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
-        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskCode);
+        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
         log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
         robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
