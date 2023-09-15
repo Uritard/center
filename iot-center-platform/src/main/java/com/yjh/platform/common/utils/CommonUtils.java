@@ -40,6 +40,8 @@ public class CommonUtils {
     public static final Pattern PATTERN_CHINESE = Pattern.compile("[\u4e00-\u9fa5]");
     public static final Pattern PATTERN_NUMBER = Pattern.compile("\\d+(\\.\\d+)?");
 
+    private static String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
     /**
      * 获取payLoad 数据
      *
@@ -149,6 +151,11 @@ public class CommonUtils {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         String dateNowStr = sdf.format(date);
         return dateNowStr;
+    }
+
+    public static String formatDate(Date date){
+        String formatDate = new SimpleDateFormat(DATE_PATTERN).format(date);
+        return formatDate;
     }
 
     /**

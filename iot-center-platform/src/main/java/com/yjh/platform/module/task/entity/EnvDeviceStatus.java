@@ -38,4 +38,6 @@ public class EnvDeviceStatus {
     private String type;
 
     private String robotCode;
+
+    private String createTime;
 }

@@ -692,6 +692,12 @@
         a.instance_id = #{instanceId,jdbcType=BIGINT}
     AND b.robot_id = #{robotId,jdbcType=BIGINT}
     </select>
+    <select id="selectAllEnvRegionId" resultType="java.lang.Long">
+        select
+        a.env_region_id
+        FROM t_robot_info a
+        WHERE a.env_region_id IS NOT null
+    </select>
 
     <select id="selectMapPathByCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select a.phote_path,a.image_size

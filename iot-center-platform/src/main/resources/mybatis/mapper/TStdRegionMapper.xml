@@ -422,4 +422,9 @@
         ORDER BY
             LEVEL,region_id
     </select>
+
+    <select id="queryAll" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        SELECT <include refid="Base_Column_List"></include> FROM t_std_region
+        WHERE 1 = 1
+    </select>
 </mapper>

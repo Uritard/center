@@ -28,4 +28,6 @@ public interface CameraConDao {
     List<CameraAreaInfo> selectCameraTree(@Param("cameraName") String cameraName);
 
     List<RecorderConInfo> SelectRecords();
+
+    List<RobotConInfo> selectAllRobotConInfo();
 }
