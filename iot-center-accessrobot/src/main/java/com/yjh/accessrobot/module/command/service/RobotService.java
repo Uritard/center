@@ -1112,34 +1112,14 @@ public class RobotService {
                 // 机器人-任务下发
                 boolean robotStatus = checkRobotStatus(item);
                 if (robotStatus) {
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                feignRobotTask(item);
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
-                        }
-                    };
-                    TaskExecutePool.getInstance().execute(runnable);
+                    feignRobotTask(item);
                 }
             }
             if (StringUtils.isNotEmpty(item.getEdgeCode())){
                 // 边缘节点-任务下发
                 boolean edgeStatus = checkEdgeStatus(item.getEdgeCode());
                 if (edgeStatus) {
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                feignEdgeTask(item);
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
-                            }
-                        }
-                    };
-                    TaskExecutePool.getInstance().execute(runnable);
+                    feignEdgeTask(item);
                 }
             }
         }
