@@ -553,9 +553,13 @@ public class MessageThread {
                 }
                 tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(item.get("fixed_start_time").toString()));
             } else {
-                tCruiseTaskAdd.setIfRun(172);
-                String startTime = StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime()) ? tCruiseTaskAdd.getCycleStartTime() : tCruiseTaskAdd.getIntervalStartTime();
-                tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(startTime));
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getCycleStartTime()));
+                } else if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getIntervalStartTime()));
+                }
             }
         }
 

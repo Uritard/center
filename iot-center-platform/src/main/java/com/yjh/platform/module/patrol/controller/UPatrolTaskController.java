@@ -378,9 +378,14 @@ public class UPatrolTaskController {
         try {
             TCruiseTaskAdd tCruiseTaskAdd = map.get("list").get(0);
             log.info("--站端任务下发--"+tCruiseTaskAdd);
-            tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
-            tCruiseTaskAdd.setTaskId(null);
-            result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
+            if (tCruiseTaskAdd.getIfRun() == null || tCruiseTaskAdd.getStartTime() == null) {
+                //没有启动时间的任务
+                result.setData(uPatrolTaskService.transmitTask(tCruiseTaskAdd));
+            } else {
+                tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
+                tCruiseTaskAdd.setTaskId(null);
+                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
+            }
         } catch (BusinessException e) {
             result.setMessage(e.getCode(), e.getMessage());
             log.error("站端任务下发异常: {}", e.getMessage());
