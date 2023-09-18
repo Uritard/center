@@ -186,7 +186,7 @@ public class TCruiseTaskResultService {
                         inspectResult.setTaskId(taskId);
                         inspectResult.setCruiseResultName("--");
                         inspectResult.setEndTime(null);
-                        getDataFromRedis(inspectResult, resultMap);
+                        // getDataFromRedis(inspectResult, resultMap);
                         inspectPageResults.add(inspectResult);
                     }
                     //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
@@ -210,7 +210,7 @@ public class TCruiseTaskResultService {
                 String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
                 if (resultMap.size() > 0) {
-                    getDataFromRedis(cruiseInspectResult, resultMap);
+                    // getDataFromRedis(cruiseInspectResult, resultMap);
                     inspectPageResults.add(cruiseInspectResult);
                 }
                 //最新的巡视点在之前List的位置(查询发生产生结果点地索引)

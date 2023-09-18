@@ -287,6 +287,7 @@ public class MessageThread {
                     taskList.add(tCruiseTaskAdd);
                     map.put("list", taskList);
                     Result re;
+                    log.info("是否删除任务 isenable:{}","0".equals(tCruiseTaskAdd.getIsenable()));
                     if ("0".equals(tCruiseTaskAdd.getIsenable())){
                         re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
                     } else {
@@ -512,7 +513,7 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalType(item.getOrDefault("interval_type", "").toString());
         tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
-        tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("isenable", "").toString());
+        tCruiseTaskAdd.setIsenable(item.getOrDefault("isenable", "").toString());
 
         String priority = item.getOrDefault("priority", "").toString();
 
@@ -552,9 +553,13 @@ public class MessageThread {
                 }
                 tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(item.get("fixed_start_time").toString()));
             } else {
-                tCruiseTaskAdd.setIfRun(172);
-                String startTime = StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime()) ? tCruiseTaskAdd.getCycleStartTime() : tCruiseTaskAdd.getIntervalStartTime();
-                tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(startTime));
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getCycleStartTime()));
+                } else if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getIntervalStartTime()));
+                }
             }
         }
 

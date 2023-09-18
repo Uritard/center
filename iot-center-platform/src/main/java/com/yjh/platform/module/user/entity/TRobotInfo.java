@@ -251,7 +251,14 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "off_line_count", updateStrategy = FieldStrategy.IGNORED)
     private Long offLineCount;
 
-    @ApiModelProperty(value = "秘钥标识符", hidden = true)
+    @ApiModelProperty(value = "环控数据所属区域ID")
+    @TableField(value = "env_region_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long envRegionId;
+
+    @ApiModelProperty(value = "环控数据所属区域名称")
+    private String envRegionName;
+
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
     private String identifier;
 
     @ApiModelProperty(value = "机器人/无人机编号编码")

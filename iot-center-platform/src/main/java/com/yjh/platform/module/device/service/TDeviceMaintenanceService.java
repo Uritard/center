@@ -186,16 +186,16 @@ public class TDeviceMaintenanceService{
      * 参数校验
      */
     private void checkParam(TDeviceMaintenance maintenance){
-        if(StringUtils.isAnyEmpty(maintenance.getCoordinatePixel(), maintenance.getDeviceLevel())){
+        if(StringUtils.isAnyEmpty(/*maintenance.getCoordinatePixel(),*/ maintenance.getDeviceLevel())){
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级或坐标不可为空");
         }
         int level = NumberUtils.toInt(maintenance.getDeviceLevel());
         if (level < 1 || level > 4) {
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级错误(1-4)");
         }
-        if (!PATTERN.matcher(maintenance.getCoordinatePixel()).matches()) {
-            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "坐标格式错误(x1,y1,z1;x2,y2,z2;x3,y3,z3;x4,y4,z4)，单个坐标最长5位");
-        }
+//        if (!PATTERN.matcher(maintenance.getCoordinatePixel()).matches()) {
+//            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "坐标格式错误(x1,y1,z1;x2,y2,z2;x3,y3,z3;x4,y4,z4)，单个坐标最长5位");
+//        }
         if (CollectionUtils.isEmpty(maintenance.getDeviceAndInstanceList())){
             throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "巡视点不能为空");
         }
