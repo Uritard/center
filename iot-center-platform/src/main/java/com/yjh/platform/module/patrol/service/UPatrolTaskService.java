@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.RateLimiter;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
@@ -98,6 +99,10 @@ public class UPatrolTaskService {
     public static final String TASK_RETRY_SUFFIX = "_遗漏点位重试任务";
     public static final String TASK_RETRY_PREFIX = "taskRetry:";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
+    /**
+     / 限流 10s一次
+     */
+    private static final RateLimiter rateLimiter = RateLimiter.create(1.0 / 10.0);
 
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;
@@ -2153,15 +2158,6 @@ public class UPatrolTaskService {
         try {
             // 压测模式减少非必要消息传输
             if (!Constant.fastTurbo()) {
-                // webSocket通知前端调用巡视监控的接口
-                Map<String, String> jasonMap = new HashMap<>(3);
-                jasonMap.put("type", "finishedOneInstance");
-                jasonMap.put("taskId", taskId);
-                if (Constant.logUpLv2()) {
-                    log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
-                }
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
                 // 巡视结果上报上一级系统
                 processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
                 //任务状态上报站端
@@ -2243,11 +2239,37 @@ public class UPatrolTaskService {
         redisTemplate.opsForHash().putAll(strForCountAll, resultCountsMap);
         redisTemplate.expire(strForCountAll, 3, TimeUnit.DAYS);
 
+        // 压测模式减少非必要消息传输
+        if (!Constant.fastTurbo()) {
+            //限流
+            if (allCounts > 500) {
+                if (rateLimiter.tryAcquire()) {
+                    sendWebSocket(taskId);
+                }
+            } else {
+                sendWebSocket(taskId);
+            }
+        }
         // 判断任务是否结束
         if (endOnece) {
             return abnormalCounts;
         }
         return -1;
+    }
+
+    /**
+     * 向前端发送websocket消息
+     * @param taskId 任务ID
+     */
+    private void sendWebSocket(String taskId){
+        // webSocket通知前端调用巡视监控的接口
+        Map<String, String> jasonMap = new HashMap<>(3);
+        jasonMap.put("type", "finishedOneInstance");
+        jasonMap.put("taskId", taskId);
+        if (Constant.logUpLv2()) {
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+        }
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
     }
 
     /**
