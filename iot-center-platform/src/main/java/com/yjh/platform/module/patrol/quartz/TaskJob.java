@@ -16,6 +16,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.RobotTaskInstanceInfo;
 import com.yjh.platform.module.task.entity.TCruiseTaskDel;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -170,7 +171,9 @@ public class TaskJob extends QuartzJobBean {
                 robotTaskStatesMap.put("taskId", task.getTaskId());
                 robotTaskStatesMap.put("commandValue", 1);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
+                // 3s 后下发任务启动指令给无人机，避免41报文比101报文更先抵达无人机
+                ScheduledMapConfig.schedule(2, robotTaskStatesMap, t -> uPatrolTaskService.robotTaskStates(t));
+                // uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
                 // 初始化无人机坐标
                 initDroneCoordinate(robotCode);
             } catch (Exception e) {

@@ -11,6 +11,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -77,14 +78,14 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         for(Map<String,Object > res :xmlBaseModel.getItems()) {
             Map<String, String> weatherMap = new HashMap<>(16);
             // 2022过检 robot_name -> patroldevice_name
-            weatherMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
-            weatherMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
+            weatherMap.put("patrolDeviceName", MapUtils.getString(res,"patroldevice_name"));
+            weatherMap.put("patrolDeviceCode", MapUtils.getString(res,"patroldevice_code"));
             weatherMap.put("robotCode", robotCode);
-            weatherMap.put("time", res.get("time").toString());
-            weatherMap.put("type", res.get("type").toString());
-            weatherMap.put("unit", res.get("unit").toString());
-            weatherMap.put("value", res.get("value").toString());
-            weatherMap.put("valueUnit", res.get("value_unit").toString());
+            weatherMap.put("time", MapUtils.getString(res,"time"));
+            weatherMap.put("type", MapUtils.getString(res,"type"));
+            weatherMap.put("unit", MapUtils.getString(res,"unit"));
+            weatherMap.put("value", MapUtils.getString(res,"value"));
+            weatherMap.put("valueUnit", MapUtils.getString(res,"value_unit"));
 
             weatherList.add(weatherMap);
             // 2022过检 环境类型修改
@@ -94,7 +95,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 if (!unitCheck(weatherMap)) {
                     return;
                 }
-                info.put("temperature", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
+                info.put("temperature", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("temperatureUnit", "℃");
                 info.put("temperatureUnit",weatherMap.get("unit"));
             }
@@ -102,7 +103,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 if (!unitCheck(weatherMap)) {
                     return;
                 }
-                info.put("humidity", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
+                info.put("humidity", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("humidityUnit", "%");
                 info.put("humidityUnit", weatherMap.get("unit"));
             }
@@ -110,7 +111,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 if (!unitCheck(weatherMap)) {
                     return;
                 }
-                info.put("windSpeed", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
+                info.put("windSpeed", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("windSpeedUnit", "m/s");
                 info.put("windSpeedUnit", weatherMap.get("unit"));
             }
@@ -118,7 +119,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 if (!unitCheck(weatherMap)) {
                     return;
                 }
-                info.put("precipitation", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
+                info.put("precipitation", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("precipitationUnit", "mm");
                 info.put("precipitationUnit", weatherMap.get("unit"));
             }
@@ -137,7 +138,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 if (!unitCheck(weatherMap)) {
                     return;
                 }
-                info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
+                info.put("airPressure", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("airPressureUnit", "kPa");
                 info.put("airPressureUnit", weatherMap.get("unit"));
             }
@@ -158,29 +159,29 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             }
 
             //环控数据组装
-            String value = String.valueOf(res.get("value"));
+            String value = MapUtils.getString(res,"value");
             if (res.containsKey("value_type")) {
                 EnvDeviceStatus env = new EnvDeviceStatus();
                 env.setRobotCode(robotCode);
-                env.setUnit(res.get("unit").toString());
-                env.setDeviceName(res.get("device_name").toString());
-                env.setDeviceId(res.get("type_device_num").toString());
-                env.setShowType(res.get("value_type").toString());
-                env.setType(res.get("type").toString());
+                env.setUnit(MapUtils.getString(res,"unit"));
+                env.setDeviceName(MapUtils.getString(res,"device_name"));
+                env.setDeviceId(MapUtils.getString(res,"type_device_num"));
+                env.setShowType(MapUtils.getString(res,"value_type"));
+                env.setType(MapUtils.getString(res,"type"));
                 //1.状态型 2.数值型 3.控制型 (0开 1关)
-                if ("1".equals(res.get("value_type").toString())) {
-                    env.setStatus(Integer.parseInt(value));
+                if ("1".equals(MapUtils.getString(res,"value_type"))) {
+                    env.setStatus(NumberUtils.toInt(value));
                     if ("0".equals(value)) {
                         env.setDeviceValue("正常");
                     } else {
                         env.setDeviceValue("异常");
                     }
-                } else if ("2".equals(res.get("value_type").toString())) {
+                } else if ("2".equals(MapUtils.getString(res,"value_type"))) {
                     env.setStatus(0);
                     env.setDeviceValue(value);
                 } else {
                     //空调  value="1,2"  开关，制冷制热
-                    if ("7".equals(res.get("type").toString())) {
+                    if ("7".equals(MapUtils.getString(res,"type"))) {
                         String[] strings = value.split(",");
                         if ("0".equals(strings[0])) {  //空调开启
                             if (strings.length > 1 && "1".equals(strings[1])) { //制冷制热
@@ -191,14 +192,14 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                         } else {
                             env.setDeviceValue("关闭");
                         }
-                        env.setStatus(Integer.parseInt(strings[0]));//空调的开关
+                        env.setStatus(NumberUtils.toInt(strings[0]));//空调的开关
                     } else {
                         if ("0".equals(value)) {
                             env.setDeviceValue("开启");
                         } else {
                             env.setDeviceValue("关闭");
                         }
-                        env.setStatus(Integer.parseInt(value));
+                        env.setStatus(NumberUtils.toInt(value));
                     }
                 }
                 envDeviceStatusList.add(env);
