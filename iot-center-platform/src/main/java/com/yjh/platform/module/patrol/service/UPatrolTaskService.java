@@ -1296,11 +1296,13 @@ public class UPatrolTaskService {
 
                     String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
 
-                    if (StringUtils.isNotEmpty(cycleExecuteTime)){
-                        if (Integer.parseInt(tCruiseTaskAdd.getCycleExecuteTime()) < 10) {
-                            cycleExecuteTime = "0" + tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
-                        } else {
-                            cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
+                    if (StringUtils.isNotEmpty(cycleExecuteTime)) {
+                        if (!tCruiseTaskAdd.getCycleExecuteTime().contains(":")) {
+                            if (Integer.parseInt(tCruiseTaskAdd.getCycleExecuteTime()) < 10) {
+                                cycleExecuteTime = "0" + tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
+                            } else {
+                                cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
+                            }
                         }
                     }
                     taskInfo.setCycleExecuteTime(cycleExecuteTime);
