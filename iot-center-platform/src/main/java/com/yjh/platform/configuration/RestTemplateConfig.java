@@ -30,9 +30,9 @@ public class RestTemplateConfig {
     public HttpClientConnectionManager poolingConnectionManager() {
         PoolingHttpClientConnectionManager poolingConnectionManager = new PoolingHttpClientConnectionManager();
         // 连接池最大连接数
-        poolingConnectionManager.setMaxTotal(100);
+        poolingConnectionManager.setMaxTotal(300);
         // 每个主机的并发
-        poolingConnectionManager.setDefaultMaxPerRoute(30);
+        poolingConnectionManager.setDefaultMaxPerRoute(100);
         return poolingConnectionManager;
     }
 

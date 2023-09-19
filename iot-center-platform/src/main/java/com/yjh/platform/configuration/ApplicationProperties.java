@@ -236,7 +236,7 @@ public class ApplicationProperties {
                 .setMqttSectionIp(redisMap.get("mqttSectionIp"))
                 .setMqttNodeId(redisMap.get("mqttNodeId"))
                 .setVoltLevel(ValueUtil.toInteger(redisMap.get("mqttNodeId"),220))
-                .setManagerServerFtpsRemotePath(redisMap.get("mqttHost"));
+                .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"));
         this.managerMqttConfig = managerMqttConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"sequentialConfig");
