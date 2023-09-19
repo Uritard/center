@@ -218,4 +218,11 @@ public interface UPatrolResultDao {
     Map<String,Object> selectMeteInfoByInstanceId(@Param("instanceId")Long instanceId);
 
     List<NonhomologousInfo> selectWarnByTaskId(@Param(value = "taskId")String taskId);
+
+    List<OperationTaskRecord> queryOperationTask(List<Long> deviceIdList,
+                                                 @Param(value = "operationType") String operationType,
+                                                 @Param(value = "startTime") String startTime,
+                                                 @Param(value = "endTime") String endTime);
+
+    List<OperationTaskRecordResult> queryOperationResult(@Param(value = "taskId")String taskId);
 }

@@ -3,6 +3,9 @@ package com.yjh.platform.module.patrol.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -16,6 +19,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ResultConvertUtil;
+import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -41,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
+import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getOperationTaskDetailModel;
 
 /**
  * @Author: lqh
@@ -594,5 +601,39 @@ public class UPatrolResultService {
             System.out.println("发送websocket出错");
         }
 
+    }
+
+    /**
+     * 操作任务记录查询
+     */
+    public List<OperationTaskRecord> queryOperationTask(List<Long> deviceIdList , String operationType, String startTime, String endTime) {
+        return uPatrolResultDao.queryOperationTask(deviceIdList ,operationType,startTime,endTime);
+    }
+
+    /**
+     * 查询操作任务详情
+     */
+    public List<OperationTaskRecordResult> queryOperationResult(String taskId) {
+        return uPatrolResultDao.queryOperationResult(taskId);
+    }
+
+    public String downLoadOperationDetailReport(String taskId) {
+        String reportName = taskId + ".xlsx";
+        Map<String, String> tempReflectMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String reportPath = tempReflectMap.get("content");
+        log.info("reportPath:" + reportPath);
+        //创建文件夹
+        FileUtil.createDirectory(reportPath);
+        //获取需要导出的数据
+        List<OperationTaskRecordResult> list = this.queryOperationResult(taskId);
+        String fileNamePath = reportPath + "/" + reportName;
+        ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
+        WriteSheet writeSheet = EasyExcel.writerSheet(0, "操作记录详情").includeColumnFiledNames(getOperationTaskDetailModel())
+                .head(OperationTaskRecordResult.class).registerWriteHandler(getCellStyle()).build();
+        excelWriter.write(list, writeSheet);
+        //关闭写excel
+        excelWriter.finish();
+        Map<String, String> meteModelPathMap = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        return meteModelPathMap.get("content") + "/" + reportName;
     }
 }

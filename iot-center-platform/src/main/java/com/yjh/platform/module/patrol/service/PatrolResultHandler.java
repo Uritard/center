@@ -334,20 +334,29 @@ public class PatrolResultHandler {
         boolean isAlarm = false;
         String descFilePath = "";
         String descRelativeUrl = "";
+        String descConfirmFilePath = "";
+        String descConfirmRelativeUrl = "";
 
         try {
             // 文件路径
             String filePath = robotPatrolTaskResult.getFilePath();
+            //待确认文件名称
+            String confirmFilePath = robotPatrolTaskResult.getConfirmFilePath();
             if (StringUtils.isEmpty(filePath)){
                 infoMap.put("relativePath", descRelativeUrl);
                 infoMap.put("absolutePath", descFilePath);
+                infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+                infoMap.put("confirmAbsolutePath", descConfirmFilePath);
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);
                 return isAlarmMap;
             }
             String temporaryFilePath = ftpsFilePath + "/" + filePath;
+            String confirmTemporaryFilePath = ftpsFilePath + "/" + confirmFilePath;
             log.info("temporaryFilePath==={}", temporaryFilePath);
+            log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
             String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+            String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
 
             // 1.红外 2.可见光 3.音频 4.视频
             String fileType = robotPatrolTaskResult.getFileType();
@@ -365,6 +374,8 @@ public class PatrolResultHandler {
                 case "5":
                     descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
                     descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
+                    descConfirmFilePath = developAbsoluteUrl + "/CCD/" + confirmFileName;
+                    descConfirmRelativeUrl = developRelativeUrl + "/CCD/" + confirmFileName;
                     isAlarm = true;
                     break;
                 case "3":
@@ -392,8 +403,11 @@ public class PatrolResultHandler {
             }
 
             FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
+            FileUtil.copyFileUsingStream(temporaryFilePath, descConfirmFilePath);
             infoMap.put("relativePath", descRelativeUrl);
             infoMap.put("absolutePath", descFilePath);
+            infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+            infoMap.put("confirmAbsolutePath", descConfirmFilePath);
             if (isAlarm) {
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);

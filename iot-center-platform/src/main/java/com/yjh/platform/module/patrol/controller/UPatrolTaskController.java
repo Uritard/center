@@ -297,6 +297,59 @@ public class UPatrolTaskController {
         return result;
     }
 
+    @ApiOperation(value = "发送确认消息")
+    @RequestMapping(value = "/sendConfirmMsg", method = RequestMethod.POST)
+    @Logs(title = "确认消息发送",content = "确认消息发送",logType = 13,authority = "1235")
+    public Result sendConfirmMsg(@RequestBody Map<String,Object> confirmMessageMap) {
+        Result result = new Result();
+        try {
+            return uPatrolTaskService.sendConfirmMsg(confirmMessageMap);
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("确认消息发送异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("确认消息发送错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询确认消息")
+    @RequestMapping(value = "/queryConfirmMsg", method = RequestMethod.GET)
+    @Logs(title = "确认消息",content = "确认消息",logType = 13,authority = "1235")
+    public Result queryConfirmMsg(@RequestParam(value = "taskId") String taskId,
+                                  @RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.queryConfirmMsg(taskId,robotCode));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("确认消息查询异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("确认消息查询错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询步骤消息")
+    @RequestMapping(value = "/queryOperationSteps", method = RequestMethod.GET)
+    @Logs(title = "步骤消息",content = "步骤消息",logType = 13,authority = "1235")
+    public Result queryOperationSteps(@RequestParam(value = "taskId") String taskId,
+                                      @RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.queryOperationSteps(taskId,robotCode));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("步骤消息查询异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("步骤消息查询错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
     @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1,authority = "1235")

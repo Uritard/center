@@ -69,6 +69,12 @@ public class RobotPatrolTaskResult implements Serializable {
     @ApiModelProperty(value = "文件名称")
     private String filePath;
 
+    @ApiModelProperty(value = "待确认文件名称")
+    private String confirmFilePath;
+
+    @ApiModelProperty(value = "操作类型")
+    private String operationType;
+
     @ApiModelProperty(value = "巡视任务执行ID")
     private String taskPatrolledId;
 

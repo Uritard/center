@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -2357,6 +2358,8 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setCreatetime(new Date());
                 uPatrolDataResult.setIsWarn(NumberUtils.toInt(redisInfoMap.get("isWarn")));
                 uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
+                uPatrolDataResult.setConfirmPicPath(redisInfoMap.get("confirmPicPath"));
+                uPatrolDataResult.setOrigConfirmPicPath(redisInfoMap.get("origConfirmPicPath"));
 
                 uPatrolDataResultList.add(uPatrolDataResult);
                 if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()) {
@@ -3587,5 +3590,50 @@ public class UPatrolTaskService {
         Result result = robotTask(robotTaskInfoMap);
 
         return "";
+    }
+
+    /**
+     * 查询机器人操作任务当前确认消息
+     * @param taskId
+     * @param robotCode
+     * @return
+     */
+    public Map<String, Object> queryConfirmMsg(String taskId, String robotCode) {
+        Map<String, Object> confirmMsgMap = redisTemplate.opsForHash().entries("RobotConfirmMsg:" + robotCode + ":" + taskId);
+        if (Objects.nonNull(confirmMsgMap.get("confirmMapList"))){
+            String confirmMapJsonStringList = confirmMsgMap.get("confirmMapList").toString();
+            confirmMsgMap.put("confirmMapList", JSONArray.parseArray(confirmMapJsonStringList));
+        }
+        return confirmMsgMap;
+    }
+
+    /**
+     * 查询机器人操作任务当步骤消息
+     * @param taskId
+     * @param robotCode
+     * @return
+     */
+    public Map<String, Object> queryOperationSteps(String taskId, String robotCode) {
+        Map<String, Object> operationStepsMap = redisTemplate.opsForHash().entries("RobotOperationSteps:" + robotCode + ":" + taskId);
+        if (Objects.nonNull(operationStepsMap.get("cameraUrlList"))){
+            String cameraUrlStringList = operationStepsMap.get("cameraUrlList").toString();
+            operationStepsMap.put("cameraUrlList", stringRedisToList(cameraUrlStringList));
+        }
+        if (Objects.nonNull(operationStepsMap.get("stepName"))){
+            String stepNameStringList = operationStepsMap.get("stepName").toString();
+            operationStepsMap.put("stepName", stringRedisToList(stepNameStringList));
+        }
+        return operationStepsMap;
+    }
+
+    private List<String> stringRedisToList(String stringList){
+        stringList = stringList.replaceAll("\\[", "").replaceAll("]", "");
+        String[] listArray = stringList.split(", ");
+        return new ArrayList<>(Arrays.asList(listArray));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Result sendConfirmMsg(Map<String, Object> confirmMessageMap) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ROBOT_CONFIRM_MSG_URL, confirmMessageMap, Result.class);
     }
 }
