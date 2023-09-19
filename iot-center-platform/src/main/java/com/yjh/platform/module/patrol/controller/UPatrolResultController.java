@@ -383,4 +383,17 @@ public class UPatrolResultController {
         return result;
     }
 
+    @ApiOperation(value = "data.txt文件读取")
+    @RequestMapping(value = "/dataTxtFileToList",method = RequestMethod.GET)
+    public Result dataTxtFileToList (@RequestParam(value = "filePath",required = false) String filePath){
+        Result result = new Result();
+        try {
+            result.setData(uPatrolResultService.dataTxtFileToList(filePath));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("data.txt文件读取失败描述",e);
+        }
+        return result;
+    }
 }
