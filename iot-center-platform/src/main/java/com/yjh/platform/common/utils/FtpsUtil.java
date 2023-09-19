@@ -1,5 +1,7 @@
 package com.yjh.platform.common.utils;
 
+import cn.hutool.core.io.FileUtil;
+import com.yjh.platform.common.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPFile;
@@ -50,93 +52,123 @@ public class FtpsUtil {
         return tm[0];
     }
 
-    public static void putFile(String filepath,
-                               String remoteFilename,String host,int port,String username,String password) throws NoSuchAlgorithmException {
+    public static void putFile(String filepath, String remoteFilename, String host, int port, String username, String password) {
+        log.info("------------------------文件上传开始 filepath:{},remoteFilename:{},host:{},port:{},key_pw:{},username:{},password:{}", filepath,
+            remoteFilename, host, port, key_pw, username, password);
+        fileUpload(filepath, remoteFilename, host, port, username, password, 0);
+    }
 
-            log.info("------------------------文件上传开始 filepath:{},remoteFilename:{},host:{},port:{},key_pw:{},username:{},password:{}",
-                    filepath,remoteFilename,host,port,key_pw,username,password);
-            File file = new File(filepath);
-            try {
-                FileInputStream fis = new FileInputStream(file);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-                byte[] b = new byte[1000];
-                int n;
-                while ((n = fis.read(b)) != -1) {
-                    bos.write(b, 0, n);
+    private static void fileUpload(String filepath, String remoteFilename, String host, int port, String username, String password,
+        int retry) {
+        if (retry >= 3) {
+            String ftpsPath = CommonUtils.concatPath(Constant.getFtpsFilePath(), remoteFilename);
+            log.error("文件上传失败，重试无效 retryCount：{}, copyto：{}", retry, ftpsPath);
+            FileUtil.copyFile(filepath, ftpsPath);
+            return;
+        }
+
+        retry++;
+        boolean upflag = false;
+        FTPSClient ftpClient = null;
+        try {
+            ftpClient = loginFtps(host, port, username, password);
+
+            // Store file on host
+            String fileName = remoteFilename;
+            // 上传文件名编码转换
+            fileName = new String(remoteFilename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
+
+            String[] dirs = fileName.split("/");
+            String fianlName = dirs[dirs.length - 1];
+            for (int i = 0; i < dirs.length - 1; i++) {
+                ftpClient.mkd(dirs[i]);
+                ftpClient.changeWorkingDirectory(dirs[i]);
+            }
+
+            try (FileInputStream fis = new FileInputStream(filepath)) {
+                if (ftpClient.storeFile(fianlName, fis)) {
+                    upflag = true;
+                    log.info("图片上传成功: {}", remoteFilename);
+                } else {
+                    log.info("Could not store file, retry: {}, code: {}, message: {}", retry, ftpClient.getReplyCode(),
+                        ftpClient.getReplyString());
                 }
-                fis.close();
-                byte[] data = bos.toByteArray();
-                bos.close();
+            } catch (Exception e) {
+                log.error("文件上传失败，filepath：{}", filepath, e);
+            }
 
-                FTPSClient ftpClient = new FTPSClient("TLS",true);
-                ftpClient.setAuthValue("TLS");
-                ftpClient.connect(host, port);
-                // Connect to host
-                int reply = ftpClient.getReplyCode();
-
-                if (FTPReply.isPositiveCompletion(reply)) {
-
-                    // Login
-                    if (ftpClient.login(username, password)) {
-                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {
-                            // 开启服务器对UTF-8的支持，
-                            LOCAL_CHARSET = "UTF-8";
-                        }
-
-                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                        ftpClient.setControlEncoding(LOCAL_CHARSET);
-                        if(key_pw.equals("1")){
-                            // Set protection buffer size
-                            ftpClient.execPBSZ(0);
-                            // Set data channel protection to private
-                            ftpClient.execPROT("P");
-                            // Enter local passive mode
-                            ftpClient.enterLocalPassiveMode();
-                        }else if(key_pw.equals("2")){
-                            // Set protection buffer size
-                            ftpClient.execPBSZ(0);
-                            // Set data channel protection to private
-                            ftpClient.execPROT("P");
-                            ftpClient.enterLocalActiveMode();
-                        }
-                        ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
-                        // Store file on host
-                        String fileName = remoteFilename;
-                        // 上传文件名编码转换
-                        fileName = new String(remoteFilename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
-                        InputStream is = new ByteArrayInputStream(data);
-                        String[] dirs = fileName.split("/");
-                        String fianlName = dirs[dirs.length - 1];
-                        for (int i = 0; i < dirs.length - 1; i++) {
-                            ftpClient.mkd(dirs[i]);
-                            ftpClient.changeWorkingDirectory(dirs[i]);
-                        }
-                        if (ftpClient.storeFile(fianlName, is)) {
-                            log.info(username + "," + remoteFilename);
-                        } else {
-                            log.info("code :"+ftpClient.getReplyCode());
-                            log.info("message :"+ftpClient.getReplyString());
-                            log.info("Could not store file");
-                        }
-                        is.close();
-
-                        // Logout
-                        ftpClient.logout();
-                    } else {
-                        log.info("FTP login failed---登录失败 {}, {}, {}", host, port, filepath);
-                    }
-
+        } catch (IOException ioe) {
+            retry++;
+            log.error("FTPS上传文件失败  {}, {}, {}", host, port, filepath, ioe);
+        } catch (Exception e) {
+            retry++;
+            log.error("FTPS上传文件错误 {}, {}, {}", host, port, filepath, e);
+        } finally {
+            try {
+                // Logout
+                if (ftpClient != null) {
+                    ftpClient.logout();
+                }
+            } catch (Exception e) {
+                // 忽略错误信息
+            }
+            try {
+                // Logout
+                if (ftpClient != null) {
                     // Disconnect
                     ftpClient.disconnect();
-                } else {
-                    log.info("FTP connect to host failed---连接失败 {}, {}, {}", host, port, filepath);
                 }
-            } catch (IOException ioe) {
-                log.error("FTPS上传文件失败  {}, {}, {}", host, port, filepath, ioe);
             } catch (Exception e) {
-                log.error("FTPS上传文件错误 {}, {}, {}", host, port, filepath, e);
+                // 忽略错误信息
             }
+        }
+        if (!upflag) {
+            log.error("文件上传失败，重试 retry：{}, filepath: {}", retry, filepath);
+            fileUpload(filepath, remoteFilename, host, port, username, password, retry);
+        }
+    }
+
+    private static FTPSClient loginFtps(String host, int port, String username, String password) throws IOException {
+        FTPSClient ftpClient = new FTPSClient("TLS", true);
+        ftpClient.setAuthValue("TLS");
+        ftpClient.connect(host, port);
+        // Connect to host
+        int reply = ftpClient.getReplyCode();
+
+        if (FTPReply.isPositiveCompletion(reply)) {
+
+            // Login
+            if (ftpClient.login(username, password)) {
+                if (FTPReply.isPositiveCompletion(ftpClient.sendCommand("OPTS UTF8", "ON"))) {
+                    // 开启服务器对UTF-8的支持，
+                    LOCAL_CHARSET = "UTF-8";
+                }
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                ftpClient.setControlEncoding(LOCAL_CHARSET);
+                if (key_pw.equals("1")) {
+                    // Set protection buffer size
+                    ftpClient.execPBSZ(0);
+                    // Set data channel protection to private
+                    ftpClient.execPROT("P");
+                    // Enter local passive mode
+                    ftpClient.enterLocalPassiveMode();
+                } else if (key_pw.equals("2")) {
+                    // Set protection buffer size
+                    ftpClient.execPBSZ(0);
+                    // Set data channel protection to private
+                    ftpClient.execPROT("P");
+                    ftpClient.enterLocalActiveMode();
+                }
+                ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
+            } else {
+                log.info("FTP login failed---登录失败 {}, {}", host, port);
+            }
+        } else {
+            log.info("FTP connect to host failed---连接失败 {}, {}", host, port);
+        }
+
+        return ftpClient;
     }
 
     public static boolean isFTPFileExist(String filePath,String host,int port,String username,String password) {

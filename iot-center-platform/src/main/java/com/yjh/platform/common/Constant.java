@@ -192,6 +192,8 @@ public class Constant {
      */
     private static int endWaitTimes;
 
+    private static String ftpsFilePath;
+
 
     public static String websocketSendMsg(String url, Map<String, String> map) {
         String result = null;
@@ -346,6 +348,17 @@ public class Constant {
         return endWaitTimes;
     }
 
+    public static String getFtpsFilePath() {
+        if (StringUtils.isEmpty(ftpsFilePath)) {
+            try {
+                ftpsFilePath = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
+            } catch (Exception e) {
+                ftpsFilePath = "";
+            }
+        }
+        return ftpsFilePath;
+    }
+
     public static void refreshSwitchCach() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
@@ -354,6 +367,7 @@ public class Constant {
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
         endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
         logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
+        ftpsFilePath = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
     }
 
     /**
