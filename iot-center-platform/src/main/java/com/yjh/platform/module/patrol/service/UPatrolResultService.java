@@ -44,7 +44,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getOperationTaskDetailModel;
@@ -635,5 +640,21 @@ public class UPatrolResultService {
         excelWriter.finish();
         Map<String, String> meteModelPathMap = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         return meteModelPathMap.get("content") + "/" + reportName;
+    }
+
+    public List dataTxtFileToList(String filePath) {
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        String fileAbsolutePath = filePath.replace(String.valueOf(relativeImgMap.get("content")), String.valueOf(absoluteImgMap.get("content")));
+        File file = new File(fileAbsolutePath);
+        List resList = new ArrayList<>();
+        if (file.exists()) {
+            try (BufferedReader br = Files.newBufferedReader(file.toPath())) {
+                resList = br.lines().map(s -> s.split(",")).collect(Collectors.toList());
+            } catch (IOException e) {
+                log.error("readFileList error", e);
+            }
+        }
+        return resList;
     }
 }
