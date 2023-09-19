@@ -19,6 +19,8 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
+import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -895,6 +897,27 @@ public class HelloController {
         Result result = new Result();
         try {
             uPatrolTaskService.taskStart(taskCode,sendCode);
+        } catch (Exception e) {
+            log.error("获取机器人信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
+
+    @Autowired
+    UPatrolTaskDao uPatrolTaskDao;
+    @GetMapping(value = "/test-taskAdd")
+    @ApiOperation(value = "test-taskAdd")
+    public Result taskAdd(@RequestParam(value = "time", required = false) String time,
+                          @RequestParam(value = "taskID", required = false) String taskID) throws Exception{
+        Result result = new Result();
+        try {
+            UPatrolTask uPatrolTask = new UPatrolTask();
+            uPatrolTask.setTaskId(taskID);
+            Date date = DateTimeUtil.getDate(time,true);
+            uPatrolTask.setStartTime(date);
+            uPatrolTaskDao.add(uPatrolTask);
         } catch (Exception e) {
             log.error("获取机器人信息异常", e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

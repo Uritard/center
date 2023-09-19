@@ -142,6 +142,8 @@ public interface UPatrolTaskDao {
 
     List<String> selectRobotIsRunning(@Param(value = "taskId") String taskId);
 
+    List<String> selectRobotCodeByTaskId(@Param(value = "taskId") String taskId);
+
     List<String> selectEdgeIsRunning(@Param(value = "taskId") String taskId);
 
     List<String> selectRobotTaskInstanceList(@Param(value = "taskId") String taskId);

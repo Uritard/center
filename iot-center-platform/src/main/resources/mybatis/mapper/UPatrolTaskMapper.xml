@@ -883,6 +883,18 @@
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
+    <select id="selectRobotCodeByTaskId" resultType="java.lang.String">
+        SELECT DISTINCT
+        IF(c.origin_id IS NOT NULL, c.edge_code, e.robot_code) AS robot_code
+        FROM
+        u_patrol_task_attr b
+        LEFT JOIN t_cruise_point_instance c ON b.instance_id = c.instance_id
+        LEFT JOIN t_robot_inspection d ON c.cruise_id = d.inspection_id
+        LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
 
     <select id="selectEdgeIsRunning" resultType="java.lang.String">
         SELECT DISTINCT
