@@ -477,7 +477,9 @@ public class PatrolResultHandler {
 
             if(StringUtils.contains(analyseResultImg, METER)){
                 resultImage = processResultToUpSystem.replaceResultImgPath(analyseResultImg, true);
-                cruiseResultMap.put("picpath", resultImage);
+                if (!CommonUtils.isEmptyOrNullstr(resultImage)) {
+                    cruiseResultMap.put("picpath", resultImage);
+                }
             }
             String resultDesc = analyseDataOperateService.resolveDefectResult(resultList);
             resultValue = analyseDataOperateService.resolveDefectResultValue(resultList,resultValue);
@@ -947,7 +949,9 @@ public class PatrolResultHandler {
 
             long resultNum = resultList.stream().filter(taskResult -> !"0".equals(taskResult.getResultValue())).count();
             cruiseResultMap.put("resultDesc", resultDesc);
-            cruiseResultMap.put("picpath", resultImage);
+            if (!CommonUtils.isEmptyOrNullstr(resultImage)) {
+                cruiseResultMap.put("picpath", resultImage);
+            }
             boolean abnormal = "-1".equals(resultValue);
             if (abnormal) {
                 resultNum = -1;
@@ -1158,7 +1162,9 @@ public class PatrolResultHandler {
 
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("resultDesc", resultDesc);
-            cruiseResultMap.put("picpath", resultImage);
+            if (!CommonUtils.isEmptyOrNullstr(resultImage)) {
+                cruiseResultMap.put("picpath", resultImage);
+            }
             boolean abnormal = "-1".equals(resultValue);
             cruiseResultMap.put("cruiseResult", String.valueOf(abnormal ? CRUISE_RESULT_ABNORMAL : CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", abnormal ? String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED) : "0");

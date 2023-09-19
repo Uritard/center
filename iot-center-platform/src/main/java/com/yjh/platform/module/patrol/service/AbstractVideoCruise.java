@@ -29,6 +29,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.CruiseConstant.AnalyticsEnum.HTTP;
@@ -105,25 +106,27 @@ public abstract class AbstractVideoCruise {
         inspectionMap.put("cruiseTime", dateTime);
 
         if (presetId > 0 && StringUtils.isNotEmpty(cameraId)) {
-
+            String instanceName = inspectionMap.get("instanceName");
             Map<String, String> re = null;
             boolean waitFlag = waitCamera2(taskId, cameraId, presetName);
+            long cameraLong = NumberUtils.toLong(cameraId);
             if (waitFlag) {
                 try {
                     //1.转到预置位
                     // 移动相机
-                    moveWait(presetId, NumberUtils.toLong(cameraId));
-
-                    String instanceName = inspectionMap.get("instanceName");
-
-                    HashMap<String, Object> captureMap = new HashMap<>();
-                    captureMap.put("presetId", presetId);
-                    captureMap.put("cameraId", cameraId);
-                    captureMap.put("meteName", instanceName);
+                    moveWait(presetId, cameraLong);
                     //2.抓图
-                    re = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
+                    re = capture(taskId, cameraLong, instanceName);
                 } catch (Exception e) {
-                    log.error("设置摄像机状态出错", e);
+                    log.error("抓图失败，重试一次", e);
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500);
+                        re = capture(taskId, cameraLong, instanceName);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }  catch (Exception ex) {
+                        log.error("抓图重试依旧失败", e);
+                    }
                 } finally {
                     redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
                 }

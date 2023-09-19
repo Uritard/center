@@ -805,13 +805,13 @@ public class CameraConService {
         if (result.isSuccess() && StringUtils.isNotEmpty(meteName)) {
             pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
         }
+
+        // 更新相机最后操作时间
+        pushCtrlTime(cameraId);
         if (!result.isSuccess()) {
             log.error("抓图失败： {} - {} --- {}", cameraId, JSON.toJSONString(result), JSON.toJSONString(cameraConInfo));
             throw new BusinessException(result.getCode(), result.getMsg());
         }
-
-        // 更新相机最后操作时间
-        pushCtrlTime(cameraId);
 
         Map<String, String> resultMap = new HashMap<>();
         resultMap.put("urlPath", urlPath);
