@@ -41,6 +41,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
+    public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -132,8 +133,8 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             //根据taskCode找到taskId
             UPatrolTask uPatrolTask = robotService.selectTaskIdByTaskCode(taskCode, date);
             if (Objects.nonNull(uPatrolTask)) {
-                String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-                String taskPatrolledId = stationCode+"_"+ uPatrolTask.getTaskCode()+"_"+DateTimeUtil.format(uPatrolTask.getStartTime(), DateTimeUtil.getDateTimePattern3());
+                String key = PATROL_SUMMARY_PREFIX+uPatrolTask.getTaskId();
+                String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
                 upItem.put("taskPatrolledId",taskPatrolledId);
             }
             upItem.put("taskName", downItem.get("task_name") == null ? null:downItem.get("task_name").toString());

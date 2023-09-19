@@ -190,6 +190,10 @@ public class UPatrolTaskService {
         String taskPatrolledId = stationCode + "_" + uPatrolTask.getTaskCode() + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
         taskMap.put("taskId", uPatrolTask.getTaskId());
         taskMap.put("taskPatrolledId", taskPatrolledId);
+
+        String key = PATROL_SUMMARY_PREFIX+uPatrolTask.getTaskId();
+        redisTemplate.opsForHash().put(key,"task_patrolled_id",taskPatrolledId);
+
         return taskMap;
     }
 
@@ -1396,8 +1400,9 @@ public class UPatrolTaskService {
             if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
                 taskPatrolledIdTemp = task.getTaskCode();
             }*/
-
-            item.put("task_patrolled_id", stationCode + "_" +taskPatrolledIdTemp + "_" + DateTimeUtil.format3(task.getStartTime()));
+            String key = PATROL_SUMMARY_PREFIX+task.getTaskId();
+            String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            item.put("task_patrolled_id", taskPatrolledId);
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
@@ -3376,7 +3381,7 @@ public class UPatrolTaskService {
 
         Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
         String taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
-        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+        List<String> robotCodeList = uPatrolTaskDao.selectRobotCodeByTaskId(taskId);
         log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
         robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(robotCodeList)) {
@@ -3515,6 +3520,25 @@ public class UPatrolTaskService {
      */
     public String transmitTask(TCruiseTaskAdd tCruiseTaskAdd) {
         List<Long> instanceList = new ArrayList<>();
+        //处理报文中taskType字段为系统字典表中的字段
+        Integer taskType;
+        switch (tCruiseTaskAdd.getType()) {
+            case 1:
+                //例行巡视
+                taskType = 214;
+                break;
+            case 2:
+                //特殊巡视
+                taskType = 216;
+                break;
+            case 3:
+                //专项巡视
+                taskType = 217;
+                break;
+            default:
+                //自定义巡视
+                taskType = 218;
+        }
         String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
         for (String item : deviceInstancesFromUpperSystem) {
             instanceList.add(Long.valueOf(item));
@@ -3537,7 +3561,7 @@ public class UPatrolTaskService {
                 List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
                 listMap.forEach((edgeCode, edgeInstanceList) -> {
                     RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
-                    taskInfo.setCruiseType(tCruiseTaskAdd.getTaskType());
+                    taskInfo.setCruiseType(taskType);
                     taskInfo.setTaskId(tCruiseTaskAdd.getTaskId());
                     taskInfo.setPriority(String.valueOf(tCruiseTaskAdd.getTaskLevel()));
                     taskInfo.setTaskName(tCruiseTaskAdd.getTaskName());
@@ -3582,7 +3606,7 @@ public class UPatrolTaskService {
                 return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
             }
             RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-            robotTaskInfo.setCruiseType(tCruiseTaskAdd.getTaskType());
+            robotTaskInfo.setCruiseType(taskType);
             robotTaskInfo.setTaskId(tCruiseTaskAdd.getTaskId());
             // 从巡视主机下发至机器人的任务等级都暂定3级
             robotTaskInfo.setPriority(String.valueOf(tCruiseTaskAdd.getTaskLevel()));

@@ -19,6 +19,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
@@ -1657,7 +1658,9 @@ public class TCruiseTaskService {
         Map<String, Object> item = new HashMap<>();
         xmlBaseModel.setType("41");
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-        item.put("task_patrolled_id",tCruiseTask.getTaskId()+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
+        String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+tCruiseTask.getTaskId();
+        String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+        item.put("task_patrolled_id", taskPatrolledId);
         item.put("task_name",tCruiseTask.getTaskName());
         item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);

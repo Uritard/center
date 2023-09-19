@@ -743,7 +743,9 @@ public class NonhomologousWarnThread implements Runnable{
             xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
             xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
             xmlItem.put("task_code", taskCode);
-            xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime()));
+            String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
+            String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            xmlItem.put("task_patrolled_id", taskPatrolledId);
 
             dealImg(xmlItem,insList,taskId);
 

@@ -153,7 +153,10 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
-                xmlItem.put("task_patrolled_id", stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime()));
+
+                String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
+                String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+                xmlItem.put("task_patrolled_id", taskPatrolledId);
                 xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");

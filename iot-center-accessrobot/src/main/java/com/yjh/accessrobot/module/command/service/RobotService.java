@@ -1148,7 +1148,7 @@ public class RobotService {
 //                String controlRes = robotModeSwitch(item.getRobotCode(), "1", "6", "");
 //                if ("200".equals(controlRes)) {
                 //操作任务直接下发（前端切换操作模式）
-                if (item.getCruiseType() == 456 || item.getCruiseType() == 508 || item.getCruiseType() == 509) {
+                if (item.getCruiseType() != null && (item.getCruiseType() == 456 || item.getCruiseType() == 508 || item.getCruiseType() == 509)) {
                     return true;
                 } else {
                     // 任务模式
