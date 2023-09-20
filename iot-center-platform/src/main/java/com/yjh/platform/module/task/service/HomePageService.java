@@ -427,8 +427,12 @@ public class HomePageService {
         return stationCounts;
     }
 
-    public RegionPath queryRegionPath(Long regionId) {
-        return tCruiseTaskDao.queryRegion(regionId);
+    public List<RegionPath> queryRegionList() {
+        return tCruiseTaskDao.queryRegionList();
+    }
+
+    public String queryRegionName() {
+        return tCruiseTaskDao.queryRegionName();
     }
 
     /**

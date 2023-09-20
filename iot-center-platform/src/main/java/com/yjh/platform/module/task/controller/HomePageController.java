@@ -333,17 +333,18 @@ public class HomePageController {
     }
 
     /**
-    * 站所概况统计
-    * @date 2022/3/1
-    */
+     * 站所概况统计
+     *
+     * @date 2022/3/1
+     */
     @ApiOperation(value = "站所概况统计")
-    @RequestMapping(value = "/queryStations",method = RequestMethod.GET)
-    public Result queryStations(@RequestParam(value = "regionId",required = false)Long regionId){
+    @RequestMapping(value = "/queryStations", method = RequestMethod.GET)
+    public Result queryStations(@RequestParam(value = "regionId", required = false) Long regionId) {
         Result result = new Result();
         try {
             result.setData(homePageService.queryStations(regionId));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站所概况统计信息错误:", e);
         }
@@ -352,18 +353,22 @@ public class HomePageController {
 
 
     @ApiOperation(value = "站所地图查询")
-    @RequestMapping(value = "/queryRegionPath",method = RequestMethod.GET)
-    public Result queryRegionPath(@RequestParam(value = "regionId",required = false)Long regionId){
+    @RequestMapping(value = "/queryRegionPath", method = RequestMethod.GET)
+    public Result queryRegionPath() {
         Result result = new Result();
         try {
-            RegionPath regionPath = homePageService.queryRegionPath(regionId);
-            result.setData(regionPath);
+            Map<String, Object> map = new HashMap<>(2);
+            List<RegionPath> regionPathList = homePageService.queryRegionList();
+            String regionName = homePageService.queryRegionName();
+            map.put("list", regionPathList);
+            map.put("regionName", regionName);
+            result.setData(map);
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站所地图查询错误:", e);
         }
-       return result;
+        return result;
     }
 
 

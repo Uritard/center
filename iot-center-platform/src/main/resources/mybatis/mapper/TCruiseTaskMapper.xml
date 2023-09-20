@@ -789,6 +789,25 @@ select *from (
         and t.region_path IS NOT NULL
     </select>
 
+    <select id="queryRegionList" resultType="com.yjh.platform.module.task.entity.RegionPath">
+        SELECT
+            t.region_id AS regionId,
+            t.region_name AS regionName,
+            t.region_path AS regionPath
+        FROM t_std_region t
+        WHERE 1=1
+          and t.region_path IS NOT NULL
+    </select>
+    <select id="queryRegionName" resultType="java.lang.String">
+        SELECT
+            t.region_name AS regionName
+        FROM
+            t_std_region t
+        WHERE
+            1 = 1
+          AND t.up_region_id = -1
+    </select>
+
     <select id="selectCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">
         select
             a.task_id,
