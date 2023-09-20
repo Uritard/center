@@ -165,4 +165,18 @@ public interface UPatrolTaskDao {
     List<String> selectDroneCodeByTaskCode(@Param(value = "taskCode") String taskCode);
     AInterfaceTaskInfo selectAInterfaceTaskByTaskCode(@Param(value = "taskCode") String taskCode);
     List<String> selectForTaskInstanceId(@Param(value = "devicePointId") String devicePointId);
+
+    List<UPatrolPlanAttr> selectAllCruisePlanAttr();
+
+    List<UPatrolResult> selectAllCruiseResult();
+
+    List<UPatrolTask> selectAllCruiseTask();
+
+    List<UPatrolTaskAttr> selectAllTaskAttr();
+
+    int deletePlanAttrInfo();
+    int deleteResultInfo();
+    int deleteTaskInfo();
+    int deleteTaskAttrInfo();
+
 }
