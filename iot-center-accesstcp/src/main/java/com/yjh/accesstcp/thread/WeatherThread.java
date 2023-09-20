@@ -3,6 +3,7 @@ package com.yjh.accesstcp.thread;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -112,9 +113,9 @@ public class WeatherThread implements Runnable{
         map.put("patroldevice_code", patrolDeviceCode);
         map.put("time", now);
         map.put("type", type);
-        map.put("value", Optional.ofNullable(mapForRedis.get("value")).orElse("0"));
-        map.put("unit", Optional.ofNullable(mapForRedis.get("unit")).orElse(""));
-        map.put("value_unit", Optional.ofNullable(mapForRedis.get("valueUnit")).orElse(""));
+        map.put("value", ValueUtil.Object2String(mapForRedis.get("value"),"--"));
+        map.put("unit", ValueUtil.Object2String(mapForRedis.get("unit"),""));
+        map.put("value_unit", ValueUtil.Object2String(mapForRedis.get("valueUnit"),"--"));
         return map;
     }
 }

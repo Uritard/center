@@ -17,7 +17,8 @@ public class ValueUtil {
     public static String Object2String(Object obj, String def) {
         if (obj == null)
             return def;
-
+        if ("".equals(obj))
+            return def;
         return obj.toString();
     }
     /**
