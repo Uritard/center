@@ -157,7 +157,10 @@ public class InspectionResultThread implements Runnable{
             switch (valid) {
                 case "1":
                 case "2":
-
+                    //局放 异常
+                    if ("50".equals(robotPatrolTaskResult.getFilePath())){
+                        cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_DISCHARGE);
+                    }
                     break;
                 case "0":
                 default:
