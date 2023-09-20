@@ -16,7 +16,7 @@ public enum EdgeEnum {
     /**
      * 上级系统
      */
-    UP_SYSTEM_NODE("2", "上级系统");
+    UP_SYSTEM_NODE("3", "上级系统");
     /**
      * 状态值
      */

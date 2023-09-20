@@ -1699,7 +1699,7 @@ public class RobotService {
         TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByRobotNum(xmlBaseModel.getCode(), "");
         String receiveCode = tRobotInfo.getEdgeCode();
         //到边缘节点 receiveCode 为巡视设备的唯一标识
-        if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
+        if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel) || tRobotInfo.getOriginId() == null) {
             receiveCode = tRobotInfo.getRobotCode();
         }
 
