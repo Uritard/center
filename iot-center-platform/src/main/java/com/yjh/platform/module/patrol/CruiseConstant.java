@@ -90,6 +90,11 @@ public interface CruiseConstant {
     int CRUISE_ABNORMAL_INTERRUPT = 412;
 
     /**
+     * 异常原因，任务终止
+     */
+    int CRUISE_ABNORMAL_DISCHARGE = 5700;
+
+    /**
      * 巡检数据状态，已执行
      */
     int CRUISE_STATE_DONE = 252;

@@ -358,7 +358,7 @@ public class PatrolResultHandler {
             String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
             String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
 
-            // 1.红外 2.可见光 3.音频 4.视频
+            // 1.红外 2.可见光 3.音频 4.视频 50.局放
             String fileType = robotPatrolTaskResult.getFileType();
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
@@ -395,6 +395,10 @@ public class PatrolResultHandler {
                 case "4":
                     descFilePath = developAbsoluteUrl + "/Video/" + fileName;
                     descRelativeUrl = developRelativeUrl + "/Video/" + fileName;
+                    break;
+                case "50":
+                    descFilePath = developAbsoluteUrl + "/Txt/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/Txt/" + fileName;
                     break;
                 default:
                     descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
