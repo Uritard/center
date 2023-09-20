@@ -963,4 +963,98 @@
         WHERE
             FIND_IN_SET(b.device_point_id,#{devicePointId, jdbcType = VARCHAR})
     </select>
+
+    <select id="selectAllCruisePlanAttr" resultType="com.yjh.platform.module.patrol.entity.UPatrolPlanAttr">
+        SELECT
+            a.plan_id,
+            d.device_id,
+            d.device_name,
+            c.device_mete_id,
+            c.mete_name as device_mete_name,
+            a.instance_id,
+            b.cruise_name as instance_name,
+            e.inspection_id as position_id,
+            e.inspection_name as position_name,
+            if(e.robot_id is null,f.preset_id,e.robot_id) as robot_id,
+            a.point_type,
+            a.create_time,
+            a.update_time
+        FROM
+            `t_cruise_plan_attr` a
+                left join t_cruise_point_instance b on a.instance_id = b.instance_id
+                left join t_std_devicemete c on b.device_mete_id = c.device_mete_id
+                left join t_std_device d on b.device_id = d.device_id
+                left join t_robot_inspection e on b.cruise_id = e.inspection_id
+                left join t_camera_preset f on b.cruise_id = f.preset_id
+        where c.device_mete_id is not null
+    </select>
+
+    <select id="selectAllCruiseResult" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        SELECT
+            a.task_id,
+            if(a.task_code is null,a.task_id,a.task_code) as task_code,
+            a.task_name,
+            b.type as task_type,
+            b.if_run as execute_type,
+            b.robot_id,
+            b.task_level,
+            a.c_state as task_state,
+            a.modify_state,
+            a.task_count,
+            a.task_wait,
+            a.check_user,
+            a.check_date,
+            a.create_time,
+            b.end_time as end_time,
+            a.execute_time,
+            c.task_abnormal,
+            c.cruise_result
+        FROM
+            t_cruise_result a
+                left join t_cruise_task b on a.task_id = b.task_id
+                left join t_cruise_task_result c on c.task_result_id = a.task_result_id
+    </select>
+
+    <select id="selectAllCruiseTask" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
+        SELECT
+            a.task_id,
+            a.task_code,
+            a.task_name,
+            a.plan_id,
+            a.area_id,
+            a.type as task_type,
+            a.if_run as execute_type,
+            a.robot_id,
+            a.date_type,
+            a.task_type as task_source,
+            a.task_level,
+            a.start_time,
+            a.create_time,
+            a.end_time,
+            a.create_user_id
+        from t_cruise_task a WHERE a.date_type is null
+    </select>
+
+    <select id="selectAllTaskAttr" resultType="com.yjh.platform.module.patrol.entity.UPatrolTaskAttr">
+        SELECT
+            a.task_id,
+            a.instance_id,
+            a.device_mete_id,
+            a.device_id,
+            a.custom_id,
+            a.point_task_id,
+            d.cruise_type as point_type,
+            c.device_type,
+            b.mete_type,
+            c.up_region_id as region_id
+        from t_cruise_task_attr a
+                 left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
+                 left join t_std_device c on a.device_id = c.device_id
+                 left join t_cruise_point_instance d on a.instance_id = d.instance_id
+    </select>
+
+    <delete id="deletePlanAttrInfo"> delete from u_patrol_plan_attr</delete>
+    <delete id="deleteResultInfo">delete from u_patrol_result</delete>
+    <delete id="deleteTaskInfo">delete from u_patrol_task</delete>
+    <delete id="deleteTaskAttrInfo">delete from u_patrol_task_attr</delete>
 </mapper>
