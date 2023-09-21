@@ -67,7 +67,7 @@ public class ResultConvertUtil {
      * @param unit 单位
      */
     public static String convertDesc(String value, String unit) {
-        if (StringUtils.isEmpty(value)) {
+        if (CommonUtils.isEmptyOrNullstr(value)) {
             return "";
         }
         if (CommonUtils.containsChinese(value)) {

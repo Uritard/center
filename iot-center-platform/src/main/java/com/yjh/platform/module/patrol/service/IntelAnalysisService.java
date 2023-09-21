@@ -13,6 +13,7 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
@@ -158,8 +159,7 @@ public class IntelAnalysisService {
     }
 
     private boolean checkAnalyseNeedPlanBYjsk() {
-        String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
-        return StringUtils.equals("true", sequentialFlag);
+        return Boolean.parseBoolean(SysParamConfig.getSysContent("sequentialFlag"));
     }
 
     private List<Response> processAnalysePlanB(List<Analysis> analysisList) {
@@ -381,8 +381,8 @@ public class IntelAnalysisService {
                     }
                     taskResult.setAnalyseResultImg(originPicPath);
                     // 拿图并复制
-                    String falseDataPicPath = (String) redisTemplate.opsForHash().get("t_sys_param:falseDataPicPath", "content");
-                    String resultImagePath = (String) redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content");
+                    String falseDataPicPath = SysParamConfig.getSysContent("falseDataPicPath");
+                    String resultImagePath = SysParamConfig.getSysContent("resultImgPath");
                     File folder = new File(falseDataPicPath);
                     File[] listFiles = folder.listFiles();
                     for (File direFile : listFiles) {
@@ -607,16 +607,16 @@ public class IntelAnalysisService {
 
             //基准图
             String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(Long.valueOf(response.getResultsList().get(0).getObjectId()));
-            String basePath = imageNormalUrlPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content")),
-                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")))
+            String basePath = imageNormalUrlPath.replaceAll(SysParamConfig.getSysContent("presetRealImgPath"),
+                    SysParamConfig.getSysContent("presetImgPath"))
                     .replace("//","/");
             log.info("判别基准："+basePath);
             Alarm alarmDetail=new Alarm();
 
             try {
                 String defectResultRealImg = resImageUrl.replaceAll(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
-                        redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")+"/");
+                    SysParamConfig.getSysContent("judgeResultImg"),
+                    SysParamConfig.getSysContent("judgeResultRealImg") + "/");
                 Map<String, Object> jasonMaps = new HashMap<>(16);
                 jasonMaps.put("type", "algorithmTest");
                 jasonMaps.put("path", defectResultRealImg);
@@ -675,8 +675,8 @@ public class IntelAnalysisService {
             Alarm alarmDetail=new Alarm();
 
             try {
-                String defectResultRealImg = resImageUrl.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content"))+"/",
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
+                String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("defectResultImg")+"/",
+                    SysParamConfig.getSysContent("defectResultRealImg"));
                 Map<String, Object> jasonMaps = new HashMap<>(16);
                 jasonMaps.put("type", "algorithmTest");
                 jasonMaps.put("path", defectResultRealImg);
@@ -806,8 +806,8 @@ public class IntelAnalysisService {
                 String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
 
                 String targetPath = copyFileFromFtps(type, resImageUrl);
-                String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
+                String defectResultRealImg = targetPath.replaceAll(SysParamConfig.getSysContent("defectResultImg"),
+                    SysParamConfig.getSysContent("defectResultRealImg"));
                 resultImg.add(defectResultRealImg);
             }
 
@@ -1170,12 +1170,10 @@ public class IntelAnalysisService {
                 }
                 // 目前都是识别图片 所以是5
                 xmlItem.put("file_type", "5");
-                String imgPath = tWarnInfo.getImagePath().replaceAll(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
-                String targetNamePath = imgPath.replace(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
-                String edgeId = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+                String imgPath = tWarnInfo.getImagePath().replaceAll(SysParamConfig.getSysContent("defectResultRealImg"),
+                    SysParamConfig.getSysContent("defectResultImg"));
+                String targetNamePath = imgPath.replace(SysParamConfig.getSysContent("defectResultImg"), "").substring(1);
+                String edgeId = SysParamConfig.getSysContent("edgeId");
                 targetNamePath = edgeId + "/jm/" + targetNamePath;
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 uploadFileToUpFtps(imgPath, targetNamePath, applicationProperties.getUpSystemFtps());
@@ -1245,19 +1243,19 @@ public class IntelAnalysisService {
             String targetPath;
             if (Objects.isNull(type) || Objects.equals("tx_pb",type)){
                 // 判别
-                targetPath = redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content") + "/" + sourcePath;
+                targetPath = SysParamConfig.getSysContent("judgeResultImg") + "/" + sourcePath;
             }else {
                 List<String> analyseType = analyseDataOperateDao.selectAlgorithmType();
                 if (analyseType.contains(type)){
                     // 表计识别(设备状态识别)
-                    targetPath = redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content") + "/" +sourcePath;
+                    targetPath = SysParamConfig.getSysContent("meterResultImg") + "/" +sourcePath;
                 }else {
                     // 缺陷
-                    targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") + "/" +sourcePath;
+                    targetPath = SysParamConfig.getSysContent("defectResultImg") + "/" +sourcePath;
                 }
             }
             // 图片在ftps上的全路径
-            String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/" +sourcePath;
+            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
             FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
             return targetPath;
         }catch (Exception e){

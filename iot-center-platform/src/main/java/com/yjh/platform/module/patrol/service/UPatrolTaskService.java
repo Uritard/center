@@ -987,7 +987,7 @@ public class UPatrolTaskService {
             String instanceKey = cruiseResultKey + instanceId;
             redisTemplate.opsForHash().putAll(instanceKey, result);
 
-            patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+            patrolTaskResultHandler(result);
         } else if (2 == check) {
             result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//执行遗漏
             result.put("resultNum", "-1");
@@ -1000,7 +1000,7 @@ public class UPatrolTaskService {
             String instanceKey = cruiseResultKey + instanceId;
             redisTemplate.opsForHash().putAll(instanceKey, result);
 
-            patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+            patrolTaskResultHandler(result);
         }
 
         return check;

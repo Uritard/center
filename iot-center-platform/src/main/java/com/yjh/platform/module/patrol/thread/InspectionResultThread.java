@@ -1,9 +1,9 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -290,7 +290,7 @@ public class InspectionResultThread implements Runnable{
         try {
             // 复制图片到算法分析指定的路径
             String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
-            String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
+            String resultImagePath = SysParamConfig.getSysContent("resultImgPath") + ftpFileName;
             FileUtil.copyFileUsingStream(originPath, resultImagePath);
 
             // 复制原图到算法分析指定的路径
@@ -315,7 +315,7 @@ public class InspectionResultThread implements Runnable{
             if (TypeEnum.VOICE.getCode() != cruiseType) {
                 tCruiseTaskResultMap.put("origpic", resultImagePath);
                 String picPath =
-                    resultImagePath.replace(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                    resultImagePath.replace(SysParamConfig.getSysContent("resultImgPath"), SysParamConfig.getSysContent("resultImgRealPath"));
                 tCruiseTaskResultMap.put("picpath", picPath);
             }
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
@@ -370,7 +370,7 @@ public class InspectionResultThread implements Runnable{
                 // 如果是红外，且没有配置算法，并且结果是已拍照，则num为-1，因为他需要调用算法获取结果或者直接得到结果
                 tCruiseTaskResultMap.put("resultNum", "-1");
             }
-            String resultValue = tCruiseTaskResultMap.get("resultNum");
+            String resultValue = CommonUtils.defaultEmpty(tCruiseTaskResultMap.get("resultNum"));
 
             if (fileFound){
                 if (TypeEnum.VOICE.getCode() != cruiseType) {
@@ -382,7 +382,7 @@ public class InspectionResultThread implements Runnable{
             }
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
-            uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
+            uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -392,7 +392,7 @@ public class InspectionResultThread implements Runnable{
      * 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
      */
     public boolean ftpsTurbo() {
-        boolean ftpsTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:ftpsTurbo", "content"));
+        boolean ftpsTurbo = Boolean.parseBoolean(SysParamConfig.getSysContent("ftpsTurbo"));
         log.warn("ftpsTurbo is {}", ftpsTurbo);
         return ftpsTurbo;
     }

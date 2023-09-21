@@ -12,6 +12,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
@@ -26,7 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -94,8 +94,8 @@ public class ProcessResultToUpSystem {
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         List<Map<String, String>> cruiseResultNewList = new ArrayList<>();
         try {
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
+            String edgeCode = SysParamConfig.getSysContent("edgeCode");
+            String stationCode = SysParamConfig.getSysContent("edgeId");
             for(Map<String, String> cruiseResultMap : cruiseResultList) {
                 if (Constant.logUpLv2()) {
                     log.info("cruiseResultMap=={}", cruiseResultMap);
@@ -509,7 +509,7 @@ public class ProcessResultToUpSystem {
             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
             // 获取巡视点位id
             String cruiseId=String.valueOf(tCruisePointInstance.getCruiseid());
-            String judgeBaseImagepath= (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content");
+            String judgeBaseImagepath= SysParamConfig.getSysContent("presetImgPath");
             //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
             judgeBaseImagepath=judgeBaseImagepath+"/"+cruiseId+"/"+cruiseId+".jpg";
             //拼接算法管理平台分析告警结果图片地址
@@ -672,12 +672,10 @@ public class ProcessResultToUpSystem {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 
-        String robotTaskStatusUp =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"));
+        String robotTaskStatusUp =SysParamConfig.getSysContent("robotTaskStatusUp");
 
         if ("true".equals(robotTaskStatusUp)) {
             try {
-
-                String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
                 for (CruiseManualReview cruiseResultMap : cruiseResultList) {
                     log.info("cruiseResultMap=={}", cruiseResultMap);
                     Map<String, Object> xmlItem = new HashMap<>(16);
@@ -758,16 +756,13 @@ public class ProcessResultToUpSystem {
         }
         String resultImage = analyseResultImg;
         try {
-            HashOperations<String, String, String> operations = redisTemplate.opsForHash();
-            Map<String,String> map = operations.entries("t_sys_param:prefixAbsolutePath");
-            String absPath = map.get("content");
-            Map<String,String> entries = operations.entries("t_sys_param:prefixRelativePath");
-            String relPath = entries.get("content");
+            String absPath = SysParamConfig.getSysContent("prefixAbsolutePath");
+            String relPath = SysParamConfig.getSysContent("prefixRelativePath");
             if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
                 resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
             } else {
-                String filePath = operations.get("t_sys_param:fileAbsPath", "content");
-                String fileUrl = operations.get("t_sys_param:fileRealPath", "content");
+                String filePath = SysParamConfig.getSysContent("fileAbsPath");
+                String fileUrl = SysParamConfig.getSysContent("fileRealPath");
                 assert fileUrl != null; assert filePath != null;
                 resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
             }

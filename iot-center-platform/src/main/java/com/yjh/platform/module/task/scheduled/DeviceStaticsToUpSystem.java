@@ -9,6 +9,7 @@ import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.service.StatisticsService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,9 +241,9 @@ public class DeviceStaticsToUpSystem {
                     Integer NormalDays = uPatrolDeviceStaticsDao.selectNormalDays(device.get("patrolDeviceCode").toString());
                     if (NormalDays == null ) {
                         Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
-                        NormalDays = Integer.valueOf((String) result.get("commission_days"));
+                        NormalDays = NumberUtils.toInt((String) result.get("commission_days"));
                     }
-                    infoMap.put("value", NormalDays == null ? 0 : NormalDays);
+                    infoMap.put("value", NormalDays);
                     infoMap.put("value_unit", "1");
                     infoMap.put("unit", "天");
                     dealFuncInfo(device, reportDate, type, infoMap);

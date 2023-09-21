@@ -133,8 +133,8 @@ public class PatrolResultHandler {
         }
 
         // 将重复的deviceId挑出来
-        List<Map.Entry<String, Long>> entryList = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
-            .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toList());
+        Map<String, Long> entryMap = resultList.stream().collect(Collectors.groupingBy(RobotPatrolTaskResult::getDeviceId, Collectors.counting()))
+            .entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         HashMap<String, List<RobotPatrolTaskResult>> multipleValuesResultMap = new HashMap<>();
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
@@ -197,6 +197,21 @@ public class PatrolResultHandler {
                     log.info("文件处理 isAlarmMap: {}", JSONUtil.toJSONString(isAlarmMap));
                 }
 
+                boolean isJFRepeat = entryMap.containsKey(robotPatrolTaskResult.getDeviceId());
+                // 测点类型判断
+                TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
+                log.info("测点类型判断, isJFRepeat: {}, stdDeviceMete: {}", isJFRepeat, JSONUtil.toJSONString(stdDeviceMete));
+                // 如果是无人机测点，且无人机一次上传了两条相同的测点结果
+                if (TypeEnum.UAV.getCode() == instance.getCruiseType() && isJFRepeat) {
+                    // 测点类型是红外但采集图片不是红外
+                    boolean infrared = "222".equals(stdDeviceMete.getMeteType()) && !"2".equals(robotPatrolTaskResult.getFileType());
+                    // 测点类型不是红外但采集图片是红外
+                    boolean normal = !"222".equals(stdDeviceMete.getMeteType()) && "2".equals(robotPatrolTaskResult.getFileType());
+                    if(infrared || normal) {
+                        continue;
+                    }
+                }
+
                 // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
                 if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
                     log.info("No alarms need to be handled...");
@@ -228,18 +243,6 @@ public class PatrolResultHandler {
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
-
-                boolean isJFRepeat = false;
-                for (Map.Entry<String, Long> entry : entryList) {
-                    if (StringUtils.equals(entry.getKey(), robotPatrolTaskResult.getDeviceId())){
-                        isJFRepeat = true;
-                        break;
-                    }
-                }
-
-                // 巡视结果处理
-                TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(instanceId));
-                log.info("巡视结果处理 stdDeviceMete: {}", JSONUtil.toJSONString(stdDeviceMete));
 
                 if (ArrayUtils.contains(new String[]{"690", "691", "692"}, stdDeviceMete.getMeteType()) && isJFRepeat) {
                     List<RobotPatrolTaskResult> list = multipleValuesResultMap.computeIfAbsent(robotPatrolTaskResult.getDeviceId(), v -> new ArrayList<>());
@@ -448,7 +451,7 @@ public class PatrolResultHandler {
             log.info("cruiseResultMap==={}", cruiseResultMap);
             redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
 
-            uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+            uPatrolTaskService.patrolTaskResultHandler(cruiseResultMap);
 
             // 缺陷和判别上报算法管理平台
             processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
@@ -520,7 +523,7 @@ public class PatrolResultHandler {
             String[] resultStrings = resultValue.split(",");
             String resultStringValue = resultStrings[0];
             log.info("resultStringValue=={}, resultValue=={}", resultStringValue, resultValue);
-            String resultDesc = cruiseResultMap.get("resultDesc");
+            String resultDesc = CommonUtils.defaultEmpty(cruiseResultMap.get("resultDesc"));
             StringBuilder retDesc = new StringBuilder(resultDesc);
             if (CommonUtils.isEmptyOrNullstr(resultDesc)) {
                 retDesc.append(ResultConvertUtil.convertDesc(resultValue, tStdDevicemete.getUnit()));
