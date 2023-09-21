@@ -173,6 +173,20 @@ public class UPatrolTaskService {
      * @return 任务执行ID
      */
     public Map<String,Object> addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
+        if ((tCruiseTaskAdd.getRobotId() != null || tCruiseTaskAdd.getRobotId().equals(0L)) &&
+                (tCruiseTaskAdd.getTaskType().equals(508) || tCruiseTaskAdd.getTaskType().equals(509) ||tCruiseTaskAdd.getTaskType().equals(456))) {
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(tCruiseTaskAdd.getRobotId());
+            Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":41");
+            if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
+                String value = String.valueOf(mapForRobotState.get("value"));
+                if (StringUtils.equals("2", value)) {
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("error", "当前设备正在操作任务中，不可下发巡视任务");
+                    return map;
+                }
+            }
+        }
+
         // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
         UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
         assert proxy != null;
@@ -396,12 +410,25 @@ public class UPatrolTaskService {
                     //专项巡视
                     taskType = 217;
                     break;
+                case 508:
+                    //单设备操作任务
+                    taskType = 508;
+                    break;
+                case 509:
+                    //紧急分合闸操作任务
+                    taskType = 509;
+                    break;
+                case 456:
+                    //操作票操作任务
+                    taskType = 456;
+                    break;
                 default:
                     //自定义巡视
                     taskType = 218;
             }
             uPatrolTask.setTaskType(taskType);
-            String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
+            String[] deviceInstancesFromUpperSystem = StringUtils.isEmpty(tCruiseTaskAdd.getDeviceList())
+                    ? new String[0] : tCruiseTaskAdd.getDeviceList().split(",");
             for (String item : deviceInstancesFromUpperSystem) {
                 instanceList.add(Long.valueOf(item));
             }
@@ -441,7 +468,9 @@ public class UPatrolTaskService {
 
 
     public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task)  {
-        List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
+
+        List<TCruisePointInstanceNameDetail> detailList =
+                instanceList.size() == 0 ? new ArrayList<>() : tCruisePointInstanceDao.selectForTask(instanceList);
 
         UPatrolResult uPatrolResult = new UPatrolResult();
         Date now = new Date();

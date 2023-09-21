@@ -193,7 +193,11 @@ public class UPatrolResultService {
 
         }
 
-        return novelTaskList;
+        List<TaskSimpleInfo> res = novelTaskList.stream()
+                .filter(taskSimpleInfo -> !taskSimpleInfo.getType().equals(508) || !taskSimpleInfo.getType().equals(509) || !taskSimpleInfo.getType().equals(456))
+                .collect(Collectors.toList());
+
+        return res;
     }
 
     @Transactional(rollbackFor = Exception.class)
