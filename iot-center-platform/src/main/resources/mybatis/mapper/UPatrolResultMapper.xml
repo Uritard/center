@@ -608,6 +608,7 @@
         left JOIN t_dict_business e ON d.task_type = e.dict_code AND e.col_name = 'plan_type'
         LEFT JOIN t_dict_business b ON d.task_state = b.dict_code AND b.col_name = 'task_state'
         WHERE d.task_state in (239, 241)
+        AND task_type not in (456,508,509)
         ORDER BY d.create_time DESC
     </select>
 
