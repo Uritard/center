@@ -4,7 +4,6 @@
 
 package com.yjh.platform.configuration;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,7 @@ public class ThreadPoolConfig {
     /**
      * 空闲线程存活时间
      */
-    private static long keepAliveTime = 30;
+    private static long keepAliveTime = 300;
 
     /**
      * 核心线程数
@@ -48,7 +47,7 @@ public class ThreadPoolConfig {
     /**
      * 线程队列大小
      */
-    private static int patrolQueueSize = 16;
+    private static int patrolQueueSize = 100000;
     /**
      * 定时任务线程数
      */
