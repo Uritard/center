@@ -22,6 +22,7 @@ import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +129,14 @@ public class UPatrolTaskController {
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd, request);
             if (i == 1) {
-                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
+                Map<String, Object> addTask = uPatrolTaskService.addTask(tCruiseTaskAdd, true);
+                if (addTask.get("error") != null) {
+                    result.setMessage("" + addTask.get("error"));
+                    result.setCode(ResultCodeEnum.CODE2.getCode());
+                    log.info("" + addTask.get("error"));
+                } else {
+                    result.setData(addTask);
+                }
             } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
