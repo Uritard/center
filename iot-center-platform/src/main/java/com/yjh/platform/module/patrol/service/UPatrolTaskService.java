@@ -519,6 +519,7 @@ public class UPatrolTaskService {
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
+            map.put("presetAttribute", item.getPresetAttribute());
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 String rbtId = String.valueOf(item.getRobotId());

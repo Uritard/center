@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -442,6 +443,44 @@ public class PatrolResultHandler {
             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             CommonUtils.removeEmptyValue(cruiseResultMap);
             log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
+            //判断是不是三相的点
+            String presetAttribute = cruiseResultMap.get("presetAttribute");
+            boolean isThreePhase = "123".contains(presetAttribute);
+            if (isThreePhase){
+                synchronized (Constant.threePhaseCountMap){
+                    int count;
+                    if (Constant.threePhaseCountMap.get(instanceId) == null){
+                        count = 1;
+                    } else {
+                      count =   Constant.threePhaseCountMap.get(instanceId)+1;
+                    }
+                    Constant.threePhaseCountMap.put(instanceId,count);
+                }
+                Integer cruiseStatus = ValueUtil.toInteger(cruiseResultMap.get("cruiseStatus"),-1);
+                if (!(CRUISE_STATE_UN == cruiseStatus)){
+                    //这点已经执行过了
+                    return;
+                }
+                String resultValue = resultList.get(0).getResultValue();
+                //检查相 是否对应  算法返回结果示例：A$36.0
+                String resultPhase = resultValue.substring(0,1);
+                String presetAttributeToPhase = String.valueOf((char)((int)presetAttribute.charAt(0)+16));
+                if (presetAttributeToPhase.equals(resultPhase)){
+                    resultValue = resultValue.substring(2);
+                    resultList.get(0).setResultValue(resultValue);
+                } else {
+                    //相 不匹配 本次结果不处理
+                    synchronized (Constant.threePhaseCountMap){
+                        if (Constant.threePhaseCountMap.get(instanceId) == Constant.threePhaseMap.get(instanceId)){
+                            //最后一个点 还不匹配 识别失败
+                            resultList.get(0).setResultValue("-1");
+                        } else {
+                            return;
+                        }
+                    }
+
+                }
+            }
 
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
             log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));

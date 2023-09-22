@@ -106,6 +106,9 @@ public class TCameraPreset implements Serializable {
 
     private String cruiseType;
 
+    @ApiModelProperty(value = "预置位属性(1-A相 2-B相  3-C相  0-无 )")
+    private  Integer presetAttribute;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
