@@ -1052,6 +1052,27 @@
                  left join t_std_device c on a.device_id = c.device_id
                  left join t_cruise_point_instance d on a.instance_id = d.instance_id
     </select>
+    <select id="selectRobotTaskOnStartByRobotId" resultType="java.lang.String">
+        SELECT DISTINCT
+            d.task_id
+        FROM
+            t_robot_inspection a,
+            t_cruise_point_instance b,
+            u_patrol_task_attr c,
+            u_patrol_result d
+        WHERE
+            a.robot_id = #{robotId,jdbcType=BIGINT}
+          AND a.inspection_id = b.cruise_id
+          AND b.instance_id = c.instance_id
+          AND c.task_id = d.task_id
+          AND (
+                d.task_state = 239
+                OR d.task_state = 241
+            )
+          AND d.task_type = 508 AND d.task_type = 509 AND d.task_type = 456
+        ORDER BY d.create_time DESC
+            LIMIT 1
+    </select>
 
     <delete id="deletePlanAttrInfo"> delete from u_patrol_plan_attr</delete>
     <delete id="deleteResultInfo">delete from u_patrol_result</delete>

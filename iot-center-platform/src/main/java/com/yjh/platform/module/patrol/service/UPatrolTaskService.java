@@ -173,17 +173,17 @@ public class UPatrolTaskService {
      * @return 任务执行ID
      */
     public Map<String,Object> addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
-        if ((tCruiseTaskAdd.getRobotId() != null || tCruiseTaskAdd.getRobotId().equals(0L)) &&
-                (tCruiseTaskAdd.getTaskType().equals(508) || tCruiseTaskAdd.getTaskType().equals(509) ||tCruiseTaskAdd.getTaskType().equals(456))) {
-            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(tCruiseTaskAdd.getRobotId());
-            Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":41");
-            if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
-                String value = String.valueOf(mapForRobotState.get("value"));
-                if (StringUtils.equals("2", value)) {
-                    HashMap<String, Object> map = new HashMap<>();
+        if ((tCruiseTaskAdd.getRobotId() != null || !tCruiseTaskAdd.getRobotId().equals(0L)) && tCruiseTaskAdd.getType() != null &&
+                (tCruiseTaskAdd.getType().equals(508) || tCruiseTaskAdd.getType().equals(509) ||tCruiseTaskAdd.getType().equals(456))) {
+            HashMap<String, Object> map = new HashMap<>();
+            if (Objects.nonNull(tCruiseTaskAdd.getRobotId())) {
+                String taskOnStartByRobotId = uPatrolTaskDao.selectRobotTaskOnStartByRobotId(tCruiseTaskAdd.getRobotId());
+                if (StringUtils.isNotEmpty(taskOnStartByRobotId)) {
                     map.put("error", "当前设备正在操作任务中，不可下发巡视任务");
                     return map;
                 }
+            } else {
+                log.info("robotId为空");
             }
         }
 
