@@ -530,5 +530,8 @@ public class Constant {
     public static boolean logUpLv3() {
         return Constant.logLevel() >= Constant.LOG_LV_TRI;
     }
+
+    public final static Map<String,Integer> threePhaseMap = new ConcurrentHashMap();
+    public final static Map<String,Integer> threePhaseCountMap = new ConcurrentHashMap();
 }
 

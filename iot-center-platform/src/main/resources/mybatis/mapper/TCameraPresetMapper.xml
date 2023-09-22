@@ -18,14 +18,15 @@
         <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
         <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
         <result column="preset_ptz" jdbcType="VARCHAR" property="presetPtz" />
+        <result column="preset_attribute" jdbcType="VARCHAR" property="presetAttribute" />
         <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
-        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="remark" jdbcType="INTEGER" property="remark" />
 
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        preset_id, camera_id, preset_num, preset_name, preset_type, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
+        preset_id, camera_id, preset_num, preset_name, preset_type, creator_user, creator_time, is_use, preset_img,preset_attribute, inspection_postion, collect_status, calibration_status,remark
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -42,7 +43,8 @@
             inspection_postion,
             collect_status,
             calibration_status,
-            remark
+            remark,
+            preset_attribute
         )values(
                 #{presetId, jdbcType=BIGINT},
                 #{cameraId, jdbcType=BIGINT},
@@ -56,7 +58,8 @@
                 #{inspectionPostion, jdbcType=INTEGER},
                 #{collectStatus, jdbcType=INTEGER},
                 #{calibrationStatus, jdbcType=INTEGER},
-                #{remark, jdbcType=VARCHAR}
+                #{remark, jdbcType=VARCHAR},
+                #{presetAttribute, jdbcType=INTEGER}
 
         )
     </insert>
@@ -97,6 +100,7 @@
         <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
         <if test="presetPtz != null ">a.preset_ptz = #{presetPtz, jdbcType=VARCHAR},</if>
         <if test="remark != null ">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="presetAttribute != null ">a.preset_attribute = #{presetAttribute},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
     </update>
@@ -117,7 +121,8 @@
         a.inspection_postion,
         a.collect_status,
         a.preset_ptz,
-        a.calibration_status
+        a.calibration_status,
+        a.preset_attribute
         from t_camera_preset a
         where 1 = 1
             and a.preset_id = #{presetId, jdbcType=BIGINT}
@@ -151,7 +156,8 @@
         a.preset_img,
         a.inspection_postion,
         a.collect_status,
-        a.calibration_status
+        a.calibration_status,
+        a.preset_attribute
         from t_camera_preset a
         where 1=1
         <if test="presetName != null and presetName != ''"> and a.preset_name like concat('%',#{presetName, jdbcType=VARCHAR},'%')</if>
@@ -172,7 +178,8 @@
         a.inspection_postion,
         a.collect_status,
         a.calibration_status,
-        a.preset_ptz
+        a.preset_ptz,
+        a.preset_attribute
         from t_camera_preset a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
@@ -204,7 +211,8 @@
         a.preset_img,
         a.inspection_postion,
         a.collect_status,
-        a.calibration_status
+        a.calibration_status,
+        a.preset_attribute
         from t_camera_preset a
         where 1 = 1
         <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
@@ -235,7 +243,8 @@
         a.inspection_postion,
         a.collect_status,
         a.calibration_status,
-        a.remark
+        a.remark,
+        a.preset_attribute
         from t_camera_preset a,t_camera_info b
         where 1 = 1
         <if test="presetId != null and presetId != ''"> and a.preset_id = #{presetId, jdbcType=BIGINT}</if>
@@ -268,7 +277,8 @@
             inspection_postion,
             collect_status,
             calibration_status,
-            remark
+            remark,
+            preset_attribute
         )values
         <foreach collection="list" item="TCameraPreset" separator=",">
             (
@@ -284,6 +294,7 @@
                 #{TCameraPreset.inspectionPostion, jdbcType=INTEGER},
                 #{TCameraPreset.collectStatus, jdbcType=INTEGER},
                 #{TCameraPreset.remark, jdbcType=VARCHAR},
+                #{TCameraPreset.presetAttribute, jdbcType=INTEGER},
 
             )
         </foreach>
