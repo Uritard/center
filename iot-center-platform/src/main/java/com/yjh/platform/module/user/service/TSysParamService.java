@@ -209,6 +209,7 @@ public class TSysParamService{
             log.info("load secure param to redis...");
             sysParamConfig.putToRedis();
         }
+        sysParamConfig.initParamCache();
         return 1;
     }
 

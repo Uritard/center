@@ -99,6 +99,10 @@ public class CommonUtils {
         return StringUtils.isEmpty(str) || "null".equalsIgnoreCase(str);
     }
 
+    public static String defaultEmpty(String str) {
+        return (str == null || "null".equalsIgnoreCase(str)) ? "" : str;
+    }
+
     /**
      * @param json String
      * @return true/false

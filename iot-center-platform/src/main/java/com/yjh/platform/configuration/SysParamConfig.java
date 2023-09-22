@@ -7,17 +7,17 @@ package com.yjh.platform.configuration;
 import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * 安全配置从数据库迁移至 application.properties
@@ -44,6 +44,10 @@ public class SysParamConfig {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    private final static Map<String, String> SYS_PARAM_CACHE_MAP = new HashMap<>(256);
+
+    public static final String SYS_PREFIX = "t_sys_param:";
+
     private Set<String> dirs = new HashSet<>();
 
     public void putToRedis() {
@@ -65,7 +69,7 @@ public class SysParamConfig {
             contents.put("paramCode", key);
             contents.put("paramName", key);
             contents.put("content", value);
-            String str = "t_sys_param:" + key;
+            String str = SYS_PREFIX + key;
             log.info("paramKey: {}, value: {}", key, value);
             redisTemplate.opsForHash().putAll(str, contents);
         }
@@ -87,7 +91,7 @@ public class SysParamConfig {
             contents.put("paramCode", "edgeNode");
             contents.put("paramName", "edgeNode");
             contents.put("content", "false");
-            redisTemplate.opsForHash().putAll("t_sys_param:edgeNode", contents);
+            redisTemplate.opsForHash().putAll(SYS_PREFIX + "edgeNode", contents);
             return;
         }
 
@@ -97,7 +101,7 @@ public class SysParamConfig {
             contents.put("paramCode", key);
             contents.put("paramName", key);
             contents.put("content", value);
-            String str = "t_sys_param:" + key;
+            String str = SYS_PREFIX + key;
             log.info("paramKey: {}, value: {}", key, value);
             redisTemplate.opsForHash().putAll(str, contents);
         }
@@ -112,5 +116,28 @@ public class SysParamConfig {
         for (String dir : dirs) {
             FileUtil.mkdir(dir);
         }
+    }
+
+    /**
+     * 将Redis中保存的配置信息缓存到内存中，减少对Redis使用
+     */
+    public void initParamCache() {
+        Set<String> tasKeys = redisTemplate.keys(SYS_PREFIX + "*");
+        if (CollectionUtils.isEmpty(tasKeys)) {
+            log.error("未查询到配置数据: {}", SYS_PREFIX);
+        }
+
+        List<Map<String, String>> sysParamList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
+            tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+            return null;
+        });
+
+        for (Map<String, String> sys : sysParamList) {
+            SYS_PARAM_CACHE_MAP.put(sys.get("paramCode"), sys.get("content"));
+        }
+    }
+
+    public static String getSysContent(String paramCode) {
+        return SYS_PARAM_CACHE_MAP.get(paramCode);
     }
 }
