@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.TStdWeatherLogDao">
+    <select id="list" parameterType="com.yjh.platform.module.task.dal.TStdWeatherLogDO" resultType="com.yjh.platform.module.task.dal.TStdWeatherLogDO">
+        SELECT device_id as deviceId,
+               device_name as deviceName,
+               device_value as deviceValue,
+               unit,
+               robot_code as robotCode,
+               create_time as createTime
+        FROM t_std_weather_log
+        WHERE device_id = #{deviceId, jdbcType=INTEGER}
+        AND robot_code = #{robotCode, jdbcType=VARCHAR}
+        <if test="startTime != null and startTime != ''">
+            AND create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND create_time &lt;= #{endTime}
+        </if>
+        order by create_time
+    </select>
+
+    <insert id="batchInsert">
+        insert into t_std_weather_log(
+        device_id,
+        device_name,
+        device_value,
+        unit,
+        type,
+        show_type,
+        robot_code,
+        status,
+        create_time,
+        update_time,
+        create_person,
+        update_person
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.deviceId, jdbcType=INTEGER},
+            #{item.deviceName, jdbcType=VARCHAR},
+            #{item.deviceValue, jdbcType=VARCHAR},
+            #{item.unit, jdbcType=VARCHAR},
+            #{item.type, jdbcType=INTEGER},
+            #{item.showType, jdbcType=VARCHAR},
+            #{item.robotCode, jdbcType=VARCHAR},
+            #{item.status, jdbcType=INTEGER},
+            now(),
+            now(),
+            0,
+            0
+            )
+        </foreach>
+    </insert>
+</mapper>
