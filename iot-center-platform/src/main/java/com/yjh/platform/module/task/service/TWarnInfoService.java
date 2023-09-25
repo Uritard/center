@@ -139,7 +139,9 @@ public class TWarnInfoService{
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
-        return tWarnInfoDao.selectRobotAlarm(map);
+        List<TWarnInfoDetail> tWarnInfoDetails = tWarnInfoDao.selectRobotAlarm(map);
+        DictConvertUtil.optional("alarmLevel").covertToDict(tWarnInfoDetails);
+        return tWarnInfoDetails;
     }
 
     public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName,Integer alarmSource) {
