@@ -586,11 +586,12 @@
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
+        LEFT JOIN u_patrol_task c ON a.task_id = c.task_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
-        AND (a.warn_type != '507' OR a.warn_type IS NULL)
+        AND (a.warn_type != '507' OR a.warn_type IS NULL)  AND c.task_type not in (508,509,456)
         <if test="deviceName != null and deviceName != ''">and a.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''">and a.device_mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         )

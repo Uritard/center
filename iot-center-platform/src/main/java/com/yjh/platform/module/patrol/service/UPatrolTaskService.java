@@ -1099,10 +1099,13 @@ public class UPatrolTaskService {
 
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             log.info("robotCode : {}", robotCode);
-            String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
-            if (cycleExecuteTimeArray.length > 1){
+            String[] cycleExecuteTimeArray = new String[0];
+            if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleExecuteTime())) {
+                cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
+            }
+            if (cycleExecuteTimeArray.length > 1) {
                 log.info("这种格式的周期任务走上层任务调度");
-            }else {
+            } else {
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 for (String item : robotCode) {
                     String taskId = uPatrolTaskDao.selectRobotTaskOnStartByRobotCode(item);
