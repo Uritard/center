@@ -2029,7 +2029,7 @@ public class UPatrolTaskService {
             }
 
             // 操作任务中不可下发巡视任务判断
-            if (!skipFlag && StringUtils.isNotEmpty(operateTaskRobotId) && StringUtils.equals("null", operateTaskRobotId)) {
+            if (!skipFlag && StringUtils.isNotEmpty(operateTaskRobotId) && !StringUtils.equals("null", operateTaskRobotId)) {
                 if (StringUtils.equals(operateTaskRobotId, m.get("robotId"))) {
                     m.put("resultNum", "-1");
                     m.put("resultDesc", AbnormalResDescEnum.EQUIPMENT_MAINTENANCE.getDesc());
