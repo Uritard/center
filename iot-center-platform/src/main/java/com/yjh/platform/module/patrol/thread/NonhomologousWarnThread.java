@@ -498,6 +498,11 @@ public class NonhomologousWarnThread implements Runnable{
                     fruit = max - min;
                     triphaseName = "三相温差";
                     break;
+                case 4:
+                    fruit = (max - 0F > 0.01D) ? (max - min) * 100 / min : 0.0F;
+                    triphaseName = "三相阈值";
+                    unit = "%";
+                    break;
                 case 3:
                 default:
                     fruit = warnThreshold;
