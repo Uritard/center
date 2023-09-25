@@ -173,20 +173,6 @@ public class UPatrolTaskService {
      * @return 任务执行ID
      */
     public Map<String,Object> addTask(TCruiseTaskAdd tCruiseTaskAdd, Boolean issueFlag){
-        if ((tCruiseTaskAdd.getRobotId() != null || !tCruiseTaskAdd.getRobotId().equals(0L)) && tCruiseTaskAdd.getType() != null &&
-                (tCruiseTaskAdd.getType().equals(508) || tCruiseTaskAdd.getType().equals(509) ||tCruiseTaskAdd.getType().equals(456))) {
-            HashMap<String, Object> map = new HashMap<>();
-            if (Objects.nonNull(tCruiseTaskAdd.getRobotId())) {
-                String taskOnStartByRobotId = uPatrolTaskDao.selectRobotTaskOnStartByRobotId(tCruiseTaskAdd.getRobotId());
-                if (StringUtils.isNotEmpty(taskOnStartByRobotId)) {
-                    map.put("error", "当前设备正在操作任务中，不可下发巡视任务");
-                    return map;
-                }
-            } else {
-                log.info("robotId为空");
-            }
-        }
-
         // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
         UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
         assert proxy != null;
@@ -515,11 +501,11 @@ public class UPatrolTaskService {
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
             map.put("edgeCode", edgeCode);
-            map.put("devicePointId", item.getDevicePointId());
+            map.put("devicePointId", String.valueOf(item.getDevicePointId()));
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
-            map.put("presetAttribute", item.getPresetAttribute());
+            map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 String rbtId = String.valueOf(item.getRobotId());
@@ -1119,12 +1105,11 @@ public class UPatrolTaskService {
             }else {
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 for (String item : robotCode) {
-                    Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
-                    Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
-                    String robotTaskStatus = robotTaskStatusMap.get("value");
-                    String robotPattern = robotStatusMap.get("value");
-                    if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
-                        return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                    String taskId = uPatrolTaskDao.selectRobotTaskOnStartByRobotCode(item);
+                    if (StringUtils.isNotEmpty(taskId)) {
+                        Long robotId = tRobotInfoDao.selectRobotIdByCode(item);
+                        redisTemplate.opsForHash().put(PATROL_SUMMARY_PREFIX + taskId, "operateTaskRobotId", String.valueOf(robotId));
+                        continue;
                     }
                     RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                     robotTaskInfo.setCruiseType(task.getTaskType());
@@ -1145,6 +1130,8 @@ public class UPatrolTaskService {
 
                     robotTaskInfoList.add(robotTaskInfo);
                 }
+
+
 
                 Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
                 robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
@@ -1981,6 +1968,7 @@ public class UPatrolTaskService {
      */
     public void localTaskStart(String taskId) {
         Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
+        String operateTaskRobotId = (String) redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "operateTaskRobotId");
         if (CollectionUtils.isEmpty(tasKeys)) {
             log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
             throw new BusinessException("任务未正确初始化");
@@ -2039,6 +2027,20 @@ public class UPatrolTaskService {
                 m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
                 skipFlag = true;
             }
+
+            // 操作任务中不可下发巡视任务判断
+            if (!skipFlag && StringUtils.isNotEmpty(operateTaskRobotId) && StringUtils.equals("null", operateTaskRobotId)) {
+                if (StringUtils.equals(operateTaskRobotId, m.get("robotId"))) {
+                    m.put("resultNum", "-1");
+                    m.put("resultDesc", AbnormalResDescEnum.EQUIPMENT_MAINTENANCE.getDesc());
+                    // 操作任务中不可下发巡视任务
+                    m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OPERATE));
+                    // 巡检数据状态，忽略
+                    m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
+                    skipFlag = true;
+                }
+            }
+
             // 机器人离线判断
             if (!skipFlag && (TypeEnum.ROBOT.getCode() == cruiseType || TypeEnum.UAV.getCode() == cruiseType)) {
                 long robotId = MapUtils.getLongValue(m, "robotId");

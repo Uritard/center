@@ -88,6 +88,10 @@ public interface CruiseConstant {
      * 异常原因，任务终止
      */
     int CRUISE_ABNORMAL_INTERRUPT = 412;
+    /**
+     * 异常原因，操作任务不可下发巡视任务
+     */
+    int CRUISE_ABNORMAL_OPERATE = 821;
 
     /**
      * 异常原因，任务终止
