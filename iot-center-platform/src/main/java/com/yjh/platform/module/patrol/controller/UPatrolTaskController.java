@@ -129,14 +129,7 @@ public class UPatrolTaskController {
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd, request);
             if (i == 1) {
-                Map<String, Object> addTask = uPatrolTaskService.addTask(tCruiseTaskAdd, true);
-                if (addTask.get("error") != null) {
-                    result.setMessage("" + addTask.get("error"));
-                    result.setCode(ResultCodeEnum.CODE2.getCode());
-                    log.info("" + addTask.get("error"));
-                } else {
-                    result.setData(addTask);
-                }
+                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd, true));
             } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
