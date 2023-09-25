@@ -81,6 +81,13 @@ public enum ThreadPoolUtil {
     }
 
     /**
+     * 线程池当前线程数
+     */
+    public int getPoolSize() {
+        return threadPools.getPoolSize();
+    }
+
+    /**
      * 线程池已完成任务数(或线程数)
      */
     public long getCompletedTaskCount() {
@@ -106,8 +113,9 @@ public enum ThreadPoolUtil {
      */
     public String getMessage() {
         StringBuilder message = new StringBuilder(256);
-        message.append("当前工作线程数:").append(getActiveCount()).append(',').append("已添加线程数:").append(getTaskCount()).append(',')
-            .append("已完成线程数:").append(getCompletedTaskCount()).append(',').append("阻塞队列缓存线程数:").append(getQueueSize()).append(',');
+        message.append("当前线程数:").append(getPoolSize()).append(',').append("当前工作线程数:").append(getActiveCount()).append(',')
+            .append("已添加线程数:").append(getTaskCount()).append(',').append("已完成线程数:").append(getCompletedTaskCount()).append(',')
+            .append("阻塞队列缓存线程数:").append(getQueueSize()).append(',');
         return message.toString();
     }
 }

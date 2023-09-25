@@ -925,4 +925,21 @@ public class HelloController {
 
         return result;
     }
+
+    @GetMapping(value = "/threadPoolInfo")
+    @ApiOperation(value = "线程池使用概况")
+    public Result threadPool() throws Exception{
+        Result result = new Result();
+        try {
+            Map<String, String> map = new LinkedHashMap<>(4);
+            map.put("COMMON_POOL", ThreadPoolUtil.COMMON_POOL.getMessage());
+            map.put("PATROL_POOL", ThreadPoolUtil.PATROL_POOL.getMessage());
+            result.setData(map);
+        } catch (Exception e) {
+            log.error("获取机器人信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
 }
