@@ -72,7 +72,7 @@ public class TCruiseTriphaseRule implements Serializable {
     @ApiModelProperty(value = "点位识别子类型(若选取表计读数再细分)： 1.油位表、2.避雷器动作次数表、3.泄漏电流表、4.档位表、5.SF6压力表、6.油温表、7.开关动作次数表、8.气压表、9液压表")
     private Integer identifySonType;
 
-    @ApiModelProperty(value = "三相告警类型 1：三相不平衡 2：三相温差")
+    @ApiModelProperty(value = "三相告警类型 1：三相不平衡 2：三相温差 4：三相阈值")
     private Integer triphaseType;
 
     @ApiModelProperty(value = "告警阈值")
