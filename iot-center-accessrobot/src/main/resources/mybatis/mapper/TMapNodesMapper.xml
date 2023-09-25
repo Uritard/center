@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotMapNodeDao">
+
+
+    <insert id="batchInsertTMapNodes">
+        insert into t_robot_map_node(
+        id,
+        robot_id,
+        node_id,
+        node_name
+        )values
+        <foreach collection="list" item="TRobotMapNode" separator=",">
+            (
+            #{TRobotMapNode.id, jdbcType=BIGINT},
+            #{TRobotMapNode.robotId, jdbcType=BIGINT},
+            #{TRobotMapNode.nodeId, jdbcType=VARCHAR},
+            #{TRobotMapNode.nodeName, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <delete id="deleteByRobotId"  parameterType="java.lang.Long">
+        delete from t_robot_map_node
+                where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectByRobotId" resultType="com.yjh.accessrobot.module.command.entity.TRobotMapNode">
+        select
+        a.id,
+        a.robot_id as robotId,
+        a.node_id as nodeId,
+        a.node_name as nodeName
+        from t_robot_map_node a
+        where 1 = 1
+        <if test="robotId != null">
+            and a.robot_id = #{robotId}
+        </if>
+    </select>
+
+</mapper>

@@ -122,6 +122,9 @@ public class RobotService {
     @Autowired
     private PlatformProxy platformProxy;
 
+    @Autowired
+    private TRobotMapNodeService tRobotMapNodeService;
+
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
         return tRobotInfoDao.updateAllRobotStatus("离线");
@@ -606,9 +609,14 @@ public class RobotService {
                                 addRobotModel(mapList, robotId);
                             }
                             break;
+
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
+                            break;
+                        case "map_node_file_path":
+                            // Map Nodes 地图信息添加
+                            addMapNodes(mapList, robotId);
                             break;
                         case "region_file_path":
                             dealRegionFile(filePath, nodeCode);
@@ -737,6 +745,21 @@ public class RobotService {
         }
     }
 
+    public void addMapNodes(List<Map<String, Object>> maoNodeMapList, Long robotId) {
+        if (CollectionUtils.isNotEmpty(maoNodeMapList)){
+            List<TRobotMapNode> mapNodesList = new ArrayList<>();
+            for (Map<String, Object> maoNodeMap : maoNodeMapList){
+                TRobotMapNode tMapNodes = new TRobotMapNode()
+                        .setRobotId(robotId)
+                        .setNodeId(maoNodeMap.get("node_id").toString())
+                        .setNodeName(maoNodeMap.get("node_name").toString());
+                mapNodesList.add(tMapNodes);
+            }
+            //删除该机器人的地图信息表
+            tRobotMapNodeService.deleteByRobotId(robotId);
+            tRobotMapNodeService.batchInsert(mapNodesList);
+        }
+    }
     /**
      * 更新机器人测点信息
      *
