@@ -592,6 +592,7 @@ public class RobotService {
                     }
                     switch (k){
                         case "device_file_path":
+                        case "operation_device_file_path":
                             if (isEdge){
                                 syncModelUpdate("1", v.toString(), nodeCode);
                             }else {
@@ -609,7 +610,6 @@ public class RobotService {
                                 addRobotModel(mapList, robotId);
                             }
                             break;
-
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);

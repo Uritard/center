@@ -819,37 +819,8 @@ public class TStdDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectOperationDevTree(Long regionId) {
-        List<AreaInfo> listTreeAll = this.tStdDeviceDao.selectDevTreeDevice(null);
-        List<AreaInfo> listTree = new ArrayList<>();
-        List<AreaInfo> listTreeById = this.tStdDeviceDao.selectDevTreeDevice(regionId);
-
-        for (AreaInfo areaInfo : listTreeById) {
-            listTree.add(areaInfo);
-            if (areaInfo.getUpId() != -1 && areaInfo.getUpId() != null) {
-                Long areaInfoRegionCodeUpId = areaInfo.getUpId();
-                System.out.println("areaInfoRegionCodeUpId: " + areaInfoRegionCodeUpId);
-                for (AreaInfo areaInfoAll : listTreeAll) {
-                    if (Objects.equals(areaInfoAll.getId(), areaInfoRegionCodeUpId)) {
-                        listTree.add(areaInfoAll);
-                        diGuiMoHu(areaInfoAll, listTreeAll, listTree);
-                    }
-                }
-            }
-        }
-        listTree = listTree.stream().distinct().collect(Collectors.toList());
-        System.out.println("listTree: " + listTree);
-        List<AreaInfo> areaInfoCountryList = new ArrayList<>();
-        for (AreaInfo areaInfoMap : listTree) {
-            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId() == -1) {
-                AreaInfo areaInfoCountry = new AreaInfo();
-                areaInfoCountry.setId(areaInfoMap.getId());
-                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
-                areaInfoCountry.setLabel(areaInfoMap.getLabel());
-                areaInfoCountryList.add(areaInfoCountry);
-            }
-        }
-        diGui(areaInfoCountryList, listTree);
-        return areaInfoCountryList;
+        List<AreaInfo> listTree = this.tStdDeviceDao.selectDevTreeDevice(regionId);
+        return assembleTrees(listTree);
     }
 
 

@@ -514,7 +514,29 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		FROM t_std_region a
 		LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
 		where 1 = 1
-		<if test="regionId != null">and a.region_id =#{regionId, jdbcType=BIGINT}</if>
+		<if test="regionId != null">
+			and a.region_id in(SELECT
+			_id
+			FROM
+			(
+			SELECT
+			@r AS _id,
+			(
+			SELECT
+			@r := up_region_id
+			FROM
+			t_std_region
+			WHERE
+			region_id = _id
+			) AS upRegionId
+			FROM
+			(SELECT @r := #{regionId, jdbcType=BIGINT}, @l := 0) vars,
+			t_std_region h
+			WHERE
+			@r != - 1
+			AND up_region_id > 0
+			) AS temp)
+		</if>
 		UNION ALL (
 		SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType, b.device_type AS deviceTypeId
 		FROM t_std_device b
