@@ -204,9 +204,9 @@ public class PatrolResultHandler {
                 // 如果是无人机测点，且无人机一次上传了两条相同的测点结果
                 if (TypeEnum.UAV.getCode() == instance.getCruiseType() && isJFRepeat) {
                     // 测点类型是红外但采集图片不是红外
-                    boolean infrared = "222".equals(stdDeviceMete.getMeteType()) && !"2".equals(robotPatrolTaskResult.getFileType());
+                    boolean infrared = "222".equals(stdDeviceMete.getMeteType()) && !"1".equals(robotPatrolTaskResult.getFileType());
                     // 测点类型不是红外但采集图片是红外
-                    boolean normal = !"222".equals(stdDeviceMete.getMeteType()) && "2".equals(robotPatrolTaskResult.getFileType());
+                    boolean normal = !"222".equals(stdDeviceMete.getMeteType()) && "1".equals(robotPatrolTaskResult.getFileType());
                     if(infrared || normal) {
                         continue;
                     }

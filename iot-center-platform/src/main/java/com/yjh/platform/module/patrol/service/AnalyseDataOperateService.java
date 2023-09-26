@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 算法结果分析功能集
@@ -765,6 +766,8 @@ public class AnalyseDataOperateService {
             }
             FtpsUtil.putFile(sourcePath, targetPathName, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
                     applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
+
+            TimeUnit.MILLISECONDS.sleep(600);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }

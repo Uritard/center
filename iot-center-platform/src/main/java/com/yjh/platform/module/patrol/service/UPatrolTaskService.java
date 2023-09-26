@@ -2084,7 +2084,7 @@ public class UPatrolTaskService {
         }
         ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
-            ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));
+            ThreadPoolUtil.LOCAL_TASK_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));
         }
 
     }
@@ -3313,7 +3313,6 @@ public class UPatrolTaskService {
         return "";
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public String upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception {
         String com = xmlBaseModel.getCommand();
         String code = xmlBaseModel.getCode();

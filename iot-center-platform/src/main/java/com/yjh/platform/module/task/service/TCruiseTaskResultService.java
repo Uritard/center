@@ -389,11 +389,11 @@ public class TCruiseTaskResultService {
 
     private Map<String, String> getDroneVideoInfo(String robotId) {
         try {
-            List<Map<String, Object>> maps = droneCameraConService.droneStartRealPlayNew(Long.valueOf(robotId));
+            // List<Map<String, Object>> maps = droneCameraConService.droneStartRealPlayNew(Long.valueOf(robotId));
             Map<String, String> data = new HashMap<>();
-            for (Map.Entry<String, Object> entry : maps.get(0).entrySet()) {
-                data.put(entry.getKey(), entry.getValue().toString());
-            }
+            // for (Map.Entry<String, Object> entry : maps.get(0).entrySet()) {
+            //     data.put(entry.getKey(), entry.getValue().toString());
+            // }
             return data;
         } catch (Exception e) {
             log.error("getDroneVideoInfo err, ", e);
