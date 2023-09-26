@@ -2268,13 +2268,13 @@ public class UPatrolTaskService {
      */
     private void sendWebSocket(String taskId){
         // webSocket通知前端调用巡视监控的接口
-        Map<String, String> jasonMap = new HashMap<>(3);
+        /*Map<String, String> jasonMap = new HashMap<>(3);
         jasonMap.put("type", "finishedOneInstance");
         jasonMap.put("taskId", taskId);
         if (Constant.logUpLv2()) {
             log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
         }
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);*/
     }
 
     /**
@@ -3318,9 +3318,13 @@ public class UPatrolTaskService {
         String code = xmlBaseModel.getCode();
         String sendCode = xmlBaseModel.getSendCode();
         String taskCode = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
-        UPatrolTask task = uPatrolTaskDao.selectTaskByTaskCode(taskCode);
-        String taskId = task.getTaskId();
-        log.info("taskId : {} control", taskId);
+
+        // 增加时间判断，避免预先初始化导致数据传入下一个任务
+        String timeStr = StringUtils.substringAfterLast(code, "_");
+        Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+        String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+
+        log.info("patrolledId: {}, taskId: {}, taskCode: {} control", code, taskId, taskCode);
         switch (com) {
             case "1":
                 return this.taskStart(taskCode, sendCode);

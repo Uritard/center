@@ -132,11 +132,11 @@ public class InspectionResultThread implements Runnable{
         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + instanceId, tCruiseTaskResultMap);
 
         // 做完一个点给前端推一次webSocket
-        Map<String, Object> jasonMap = new HashMap<>(2);
+        /*Map<String, Object> jasonMap = new HashMap<>(2);
         jasonMap.put("type", "finishedOneInstance");
         jasonMap.put("taskId", taskId);
         String json = JSON.toJSONString(jasonMap);
-        Constant.postUrl(webSocketUrl, json);
+        Constant.postUrl(webSocketUrl, json);*/
 
         // 获取机器人本体任务的状态并更新
         Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
@@ -244,12 +244,12 @@ public class InspectionResultThread implements Runnable{
                 log.info("taskId为{}巡视点instanceId为{}的点位已更新redis",taskId,instanceId);
 
                 /*reanalysisResult(instanceId,tCruiseTaskResultMap,taskId,inspectionCode);*/
-                Map<String, Object> jasonMap = new HashMap<>(2);
+                /*Map<String, Object> jasonMap = new HashMap<>(2);
                 jasonMap.put("type", "finishedOneInstance");
                 jasonMap.put("taskId", taskId);
                 String json = JSON.toJSONString(jasonMap);
                 log.info("做完一个点-前端推送：" + json);
-                Constant.postUrl(webSocketUrl, json);
+                Constant.postUrl(webSocketUrl, json);*/
 
                 Integer flag = StaticContextAccessor.getBean(RobotService.class).selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0){

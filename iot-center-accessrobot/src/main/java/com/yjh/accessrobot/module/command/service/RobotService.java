@@ -29,6 +29,7 @@ import com.yjh.accessrobot.module.command.proxy.PlatformProxy;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
+import com.yjh.accessrobot.threadpool.ThreadPoolUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -1108,20 +1109,26 @@ public class RobotService {
         log.info("robotTaskInfoList是==={}", robotTaskInfoList);
 
         for (RobotTaskInstanceInfo item : robotTaskInfoList) {
-            if (StringUtils.isNotEmpty(item.getRobotCode())) {
-                // 机器人-任务下发
-                boolean robotStatus = checkRobotStatus(item);
-                if (robotStatus) {
-                    feignRobotTask(item);
+            ThreadPoolUtil.COMMON_POOL.addThread(() -> {
+                try {
+                    if (StringUtils.isNotEmpty(item.getRobotCode())) {
+                        // 机器人-任务下发
+                        boolean robotStatus = checkRobotStatus(item);
+                        if (robotStatus) {
+                            feignRobotTask(item);
+                        }
+                    }
+                    if (StringUtils.isNotEmpty(item.getEdgeCode())){
+                        // 边缘节点-任务下发
+                        boolean edgeStatus = checkEdgeStatus(item.getEdgeCode());
+                        if (edgeStatus) {
+                            feignEdgeTask(item);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    log.error("线程休眠异常", e);
                 }
-            }
-            if (StringUtils.isNotEmpty(item.getEdgeCode())){
-                // 边缘节点-任务下发
-                boolean edgeStatus = checkEdgeStatus(item.getEdgeCode());
-                if (edgeStatus) {
-                    feignEdgeTask(item);
-                }
-            }
+            });
         }
     }
 
