@@ -3318,11 +3318,13 @@ public class UPatrolTaskService {
         String com = xmlBaseModel.getCommand();
         String code = xmlBaseModel.getCode();
         String sendCode = xmlBaseModel.getSendCode();
-        String taskId = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
+        String taskCode = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
+        UPatrolTask task = uPatrolTaskDao.selectTaskByTaskCode(taskCode);
+        String taskId = task.getTaskId();
         log.info("taskId : {} control", taskId);
         switch (com) {
             case "1":
-                return this.taskStart(taskId, sendCode);
+                return this.taskStart(taskCode, sendCode);
             case "2":
                 return String.valueOf(this.taskPause(taskId, null));
             case "3":
