@@ -34,7 +34,7 @@ public class ThreadPoolConfig {
     /**
      * 空闲线程存活时间
      */
-    private static long keepAliveTime = 300;
+    private static long keepAliveTime = 30;
 
     /**
      * 核心线程数
@@ -43,7 +43,17 @@ public class ThreadPoolConfig {
     /**
      * 最大线程数
      */
-    private static int patrolMaxPoolSize = 400;
+    private static int patrolMaxPoolSize = 200;
+
+    /**
+     * 本地任务执行核心线程数
+     */
+    private static int taskCorePoolSize = 20;
+    /**
+     * 本地任务执行最大线程数
+     */
+    private static int taskMaxPoolSize = 50;
+
     /**
      * 线程队列大小
      */
@@ -101,11 +111,27 @@ public class ThreadPoolConfig {
         ThreadPoolConfig.patrolMaxPoolSize = patrolMaxPoolSize;
     }
 
+    public static int getTaskCorePoolSize() {
+        return taskCorePoolSize;
+    }
+
+    public void setTaskCorePoolSize(int taskCorePoolSize) {
+        ThreadPoolConfig.taskCorePoolSize = taskCorePoolSize;
+    }
+
+    public static int getTaskMaxPoolSize() {
+        return taskMaxPoolSize;
+    }
+
+    public void setTaskMaxPoolSize(int taskMaxPoolSize) {
+        ThreadPoolConfig.taskMaxPoolSize = taskMaxPoolSize;
+    }
+
     public static int getPatrolQueueSize() {
         return patrolQueueSize;
     }
 
-    public void setPatrolQueueSizeDefault(int patrolQueueSize) {
+    public void setPatrolQueueSize(int patrolQueueSize) {
         ThreadPoolConfig.patrolQueueSize = patrolQueueSize;
     }
 

@@ -495,6 +495,7 @@ public class ProcessResultToUpSystem {
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
+
             // 先取出算法平台返回的resultinfo中的结果图片路径
             String resultImage;
             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);

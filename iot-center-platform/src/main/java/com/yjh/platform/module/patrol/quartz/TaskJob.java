@@ -172,7 +172,7 @@ public class TaskJob extends QuartzJobBean {
                 robotTaskStatesMap.put("commandValue", 1);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 // 3s 后下发任务启动指令给无人机，避免41报文比101报文更先抵达无人机
-                ScheduledMapConfig.schedule(2, robotTaskStatesMap, t -> uPatrolTaskService.robotTaskStates(t));
+                ScheduledMapConfig.schedule(6, robotTaskStatesMap, t -> uPatrolTaskService.robotTaskStates(t));
                 // uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
                 // 初始化无人机坐标
                 initDroneCoordinate(robotCode);

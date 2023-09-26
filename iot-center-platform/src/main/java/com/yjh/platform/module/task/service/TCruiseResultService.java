@@ -373,22 +373,25 @@ public class TCruiseResultService{
 //        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
         List<TaskSimpleInfo> novelTaskList=uPatrolResultDao.selectTaskIsRunning();
         for(TaskSimpleInfo temTask:novelTaskList){
-            String systemLevel = "3";
-//            String systemLevel = Constant.getLevelEdge();
+           String systemLevel = Constant.getLevelEdge();
             log.info("systemLevel:{}",systemLevel);
             if ("3".equals(systemLevel)) {
                 getTaskCountByCache(temTask);
             } else {
-                List<Long> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
-                if (CollectionUtil.isEmpty(counts)) {
+                Map<String, Map<String, Object>> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
+                long all = Optional.ofNullable(counts.get("all")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
+                if (all == 0) {
                     getTaskCountByCache(temTask);
                 }
                 else {
-                    temTask.setDeviceMeteCount(counts.get(0));
-                    temTask.setCameraCount(counts.get(1));
-                    temTask.setRobotPointsCount(counts.get(2));
-                    temTask.setVoicePointsCount(counts.get(3));
-                    temTask.setDronePointsCount(counts.get(4));
+
+                    temTask.setDeviceMeteCount(all);
+                    long c229 = Optional.ofNullable(counts.get("229")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
+                    long c230 = Optional.ofNullable(counts.get("230")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
+                    temTask.setCameraCount(c229 + c230);
+                    temTask.setRobotPointsCount( Optional.ofNullable(counts.get("228")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
+                    temTask.setVoicePointsCount( Optional.ofNullable(counts.get("232")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
+                    temTask.setDronePointsCount( Optional.ofNullable(counts.get("524")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
                 }
             }
 

@@ -28,7 +28,11 @@ public enum ThreadPoolUtil {
     /**
      * 任务线程池
      */
-    PATROL_POOL("Patrol-pool-thread", ThreadPoolConfig.getPatrolCorePoolSize(), ThreadPoolConfig.getPatrolMaxPoolSize(), false);
+    PATROL_POOL("Patrol-pool-thread", ThreadPoolConfig.getPatrolCorePoolSize(), ThreadPoolConfig.getPatrolMaxPoolSize(), false),
+    /**
+     * 本地任务执行线程，仅相机和录音任务可用
+     */
+    LOCAL_TASK_POOL("Local_task-pool-thread", ThreadPoolConfig.getTaskCorePoolSize(), ThreadPoolConfig.getTaskMaxPoolSize(), false);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadPoolUtil.class);
     /**

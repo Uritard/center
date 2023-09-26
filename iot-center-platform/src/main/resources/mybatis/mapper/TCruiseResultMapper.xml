@@ -802,68 +802,24 @@
 	        WHERE a.device_mete_id = #{deviceMeteId, jdbcType = BIGINT}
     </select>
 
-    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
-        SELECT
-            count(*)
-        FROM
-            t_std_devicemete
-        WHERE
-                device_mete_id IN (
-                SELECT DISTINCT
-                    a.device_mete_id
-                FROM
-                    u_patrol_task_attr a
-                WHERE
-                    a.task_id = #{taskId,jdbcType=VARCHAR}
-            )
-        UNION ALL
-        SELECT
-            count(*)
-        FROM
-            u_patrol_task_attr a
-                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
-        WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
-          AND c.cruise_type in (229,230)
-        UNION ALL
-        SELECT
-            count(*)
-        FROM
-            u_patrol_task_attr a
-                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
-        WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
-          AND c.cruise_type = 228
-        UNION ALL
-        SELECT
-            count(*)
-        FROM
-            u_patrol_task_attr a
-        WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
-
-        UNION ALL
-        SELECT
-            count(*)
-        FROM
-            u_patrol_plan_attr a
-                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
-                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
-        WHERE
-            b.task_id = #{taskId,jdbcType=VARCHAR}
-
-          AND c.cruise_type = 232
-        UNION ALL
-        SELECT
-            count(*)
-        FROM
-            u_patrol_plan_attr a
-                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
-                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
-        WHERE
-            b.task_id = #{taskId,jdbcType=VARCHAR}
-
-          AND c.cruise_type = 524
+    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.util.Map">
+        select
+        count(*) as count,
+        "all" as point_type
+        from
+        u_patrol_task_attr a
+        where
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        union all
+        select
+        count(*) as count,
+        a.point_type
+        from
+        u_patrol_task_attr a
+        where
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        group by
+        a.point_type
     </select>
 
 

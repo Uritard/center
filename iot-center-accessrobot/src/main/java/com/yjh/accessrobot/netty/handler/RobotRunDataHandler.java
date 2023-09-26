@@ -110,34 +110,34 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             switch (type) {
                 //水平速度
                 case "1":
-                    return "m/s".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "m/s", "cm/s", "米/秒", "厘米/秒") && valueUnit.equals(value + unit);
                 //行驶里程
                 case "2":
-                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "m", "cm", "米", "厘米") && valueUnit.equals(value + unit);
                 //电池电量
                 case "3":
                     return "%".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
                 //垂直速度
                 case "4":
-                    return "m/s".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "m/s", "cm/s", "米/秒", "厘米/秒") && valueUnit.equals(value + unit);
                 //飞行距离
                 case "5":
-                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "km", "m", "cm", "千米", "米", "厘米") && valueUnit.equals(value + unit);
                 //飞行高度
                 case "6":
-                    return "m".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "m", "cm", "米", "厘米") && valueUnit.equals(value + unit);
                 //飞行时长
                 case "7":
-                    return ("分钟".equalsIgnoreCase(unit) || "min".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "h", "m", "min", "小时", "分钟") && valueUnit.equals(value + unit);
                 //云台俯仰角
                 case "8":
-                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
                 //云台俯仰角
                 case "9":
-                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
                 //云台俯仰角
                 case "10":
-                    return ("°".equalsIgnoreCase(unit) || "度".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
                 //云台俯仰角
                 case "11":
                     return "A".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
