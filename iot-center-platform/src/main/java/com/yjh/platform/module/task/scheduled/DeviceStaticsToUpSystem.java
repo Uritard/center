@@ -70,7 +70,7 @@ public class DeviceStaticsToUpSystem {
         List<Map<String, Object>> droneList = statisticsDao.selectDrone();
         // 加载进入redis缓存
         statisticsService.selectStatisticsRobot(null, "robot");
-        statisticsService.selectStatisticsRobot(null, "");
+        // statisticsService.selectStatisticsRobot(null, "");
         statisticsService.countCamera(null);
         robotList.addAll(cameraList);
         robotList.addAll(droneList);

@@ -514,48 +514,50 @@ public class StatisticsService {
                 });
             }*/
             return list;
-        }
-        // 摄像机处理
-        List<Map<String, Object>> deviceStaticsInfoList = statisticsDao.selectCameraStaticsInfoByOptimize(id);
+        } else if(CAMERA.equals(key)) {
+            // 摄像机处理
+            List<Map<String, Object>> deviceStaticsInfoList = statisticsDao.selectCameraStaticsInfoByOptimize(id);
 
-        List<Object> recordIdList = deviceStaticsInfoList.stream().map(map -> map.get("recordId")).distinct().collect(Collectors.toList());
+            List<Object> recordIdList =
+                deviceStaticsInfoList.stream().map(map -> map.get("recordId")).distinct().collect(Collectors.toList());
 
-        // 计算完整率
-        Map<Integer, String> percentMap = new HashMap<>(8);
-        for (Object recordId : recordIdList) {
-            Result re = getNVRInfo(recordId);
-            if (re == null || re.getData() == null) {
-                continue;
-            }
-            Map<String, Object> mapData = (Map<String, Object>) re.getData();
+            // 计算完整率
+            Map<Integer, String> percentMap = new HashMap<>(8);
+            for (Object recordId : recordIdList) {
+                Result re = getNVRInfo(recordId);
+                if (re == null || re.getData() == null) {
+                    continue;
+                }
+                Map<String, Object> mapData = (Map<String, Object>)re.getData();
 
-            if (mapData.get("channel") != null) {
-                List<Map<String, Object>> chanInfo = (List<Map<String, Object>>) mapData.get("channel");
-                for (Map<String, Object> mapChannel : chanInfo) {
-                    int intactTime = (int) mapChannel.get("intactTime");
-                    int ipChanNum = (int) mapChannel.get("ipChanNum");
-                    if (intactTime != 0) {
-                        String intactPercent = String.format("%.3f", intactTime / 100d);
-                        percentMap.put(ipChanNum, intactPercent + "%");
+                if (mapData.get("channel") != null) {
+                    List<Map<String, Object>> chanInfo = (List<Map<String, Object>>)mapData.get("channel");
+                    for (Map<String, Object> mapChannel : chanInfo) {
+                        int intactTime = MapUtils.getIntValue(mapChannel, "intactTime");
+                        int ipChanNum = MapUtils.getIntValue(mapChannel, "ipChanNum");
+                        if (intactTime != 0) {
+                            String intactPercent = String.format("%.3f", intactTime / 100d);
+                            percentMap.put(ipChanNum, intactPercent + "%");
+                        }
                     }
                 }
             }
-        }
-        deviceStaticsInfoList.stream().filter(map -> MapUtils.isNotEmpty(percentMap)).forEach(map -> {
-            int ipChanNum = (int) map.get("channelNum");
-            map.put("intactPercent", percentMap.getOrDefault(ipChanNum, "0.000%"));
-        });
+            deviceStaticsInfoList.stream().filter(map -> MapUtils.isNotEmpty(percentMap)).forEach(map -> {
+                int ipChanNum = (int)map.get("channelNum");
+                map.put("intactPercent", percentMap.getOrDefault(ipChanNum, "0.000%"));
+            });
 
-        // 将List<Map<String, Object>>转为List<Map<String, String>>
-        List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
-                .map(map -> map.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry :: getKey, entry -> String.valueOf(entry.getValue()))))
+            // 将List<Map<String, Object>>转为List<Map<String, String>>
+            List<Map<String, String>> deviceStaticsInfoTempList = deviceStaticsInfoList.stream()
+                .map(map -> map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> String.valueOf(entry.getValue()))))
                 .collect(Collectors.toList());
-        // 批量插入redis
-        pipelinePutStaticsInfo(deviceStaticsInfoTempList,"cameraId");
+            // 批量插入redis
+            pipelinePutStaticsInfo(deviceStaticsInfoTempList, "cameraId");
 
-        log.info("相机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
-        return deviceStaticsInfoList;
+            log.info("相机处理结束时间：{},{}", DateTimeUtil.format(new Date()), System.currentTimeMillis());
+            list.addAll(deviceStaticsInfoList);
+        }
+        return list;
     }
 
     private Map<String, Object> packageInfoForPage(String key, Long id, Page page) {

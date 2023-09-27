@@ -163,7 +163,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
         boolean isTemDif = Boolean.parseBoolean(initInfo.get("isTemDif"));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
-            String cruiseType = (String)redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseType");
+            Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            String cruiseType = cruiseMap.get("cruiseType");
 
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
@@ -194,7 +195,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 
             // 将告警信息放入redis
-            Map<String, String> warnMap = putWarnToRedis(taskId, warnInfo);
+            Map<String, String> warnMap = putWarnToRedis(taskId, warnInfo, cruiseMap);
 
             // 告警推送
             Map<String, String> infoMap = new HashMap<>(5);
@@ -275,7 +276,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param warnInfo 告警信息
      * @return Map<String, String>
      */
-    private Map<String, String> putWarnToRedis(String taskId, TWarnInfo warnInfo) {
+    private Map<String, String> putWarnToRedis(String taskId, TWarnInfo warnInfo, Map<String, String> cruiseMap) {
         String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
         Map<String, String> warnMap = new HashMap<>(16);
         try {
@@ -294,6 +295,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
             warnMap.put("outRange", Objects.nonNull(warnInfo.getOutRange()) ? warnInfo.getOutRange() : "");
+
+            warnMap.put("deviceName", cruiseMap.get("deviceName"));
+            warnMap.put("instanceName", cruiseMap.get("instanceName"));
+            warnMap.put("cruiseType", cruiseMap.get("cruiseType"));
+            warnMap.put("cruiseTime", threadMap.get("time"));
             log.info("warnMap==={}", warnMap);
             redisTemplate.opsForHash().putAll(warnName, warnMap);
         } catch (Exception e) {

@@ -48,6 +48,8 @@ public class RobotInspectionWarnThread implements Runnable{
     private final TRobotInspectionDao tRobotInspectionDao;
     private final TCruisePointInstanceDao tCruisePointInstanceDao;
 
+    private Map<String, String> tCruiseTaskResultMap = Collections.EMPTY_MAP;
+
     private final Object waiter = new Object();
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
@@ -199,7 +201,6 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
             warnInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
             warnInfo.setWarnLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
-
         }catch (Exception e){
             log.error("组装告警信息异常：", e);
         }
@@ -226,6 +227,11 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("warnTime", Objects.nonNull(warnInfo.getWarnTime()) ?
                     DateTimeUtil.format(warnInfo.getWarnTime()) : DateTimeUtil.format(new Date()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
+
+            warnMap.put("deviceName", tCruiseTaskResultMap.get("deviceName"));
+            warnMap.put("instanceName", tCruiseTaskResultMap.get("instanceName"));
+            warnMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
+            warnMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
         }catch (Exception e){
             log.error("组装告警map异常：", e);
         }
@@ -235,7 +241,7 @@ public class RobotInspectionWarnThread implements Runnable{
 
     private void putDefectMapRedis(String taskId, TDefectInfo tDefectInfo) {
         String defectName = "defectInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
-        Map<String, String> defectMap = new HashMap<>(16);
+        Map<String, String> defectMap = new HashMap<>(32);
         try {
             defectMap.put("defectLevel", String.valueOf(tDefectInfo.getDefectLevel()));
             defectMap.put("defectContent", tDefectInfo.getDefectContent());
@@ -247,6 +253,11 @@ public class RobotInspectionWarnThread implements Runnable{
             defectMap.put("alarmSource", String.valueOf(tDefectInfo.getAlarmSource()));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", tDefectInfo.getValue());
+
+            defectMap.put("deviceName", tCruiseTaskResultMap.get("deviceName"));
+            defectMap.put("instanceName", tCruiseTaskResultMap.get("instanceName"));
+            defectMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
+            defectMap.put("cruiseTime", tCruiseTaskResultMap.get("cruiseTime"));
         }catch (Exception e){
             log.error("组装缺陷map异常：" , e);
         }
@@ -256,10 +267,10 @@ public class RobotInspectionWarnThread implements Runnable{
     }
 
     private Map<String, String> getWarnOrDefectInfo(String taskId, Long instanceId){
-        HashMap<String, String> map = new HashMap<>(4);
+        HashMap<String, String> map = new HashMap<>(16);
         try {
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-            Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             log.info("taskId是：{}，instanceId是：{}的 tCruiseTaskResultMap：{}", taskId, instanceId, tCruiseTaskResultMap);
             if (Objects.nonNull(tCruiseTaskResultMap.get("picpath"))) {
                 map.put("imagePath", tCruiseTaskResultMap.get("picpath"));

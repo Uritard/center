@@ -48,6 +48,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -428,57 +429,55 @@ public class TCruiseTaskResultService {
         return stopResult;
     }
 
-
-    @Transactional(rollbackFor = Exception.class)
     public List<RealTimeWarn> realTimeWarnInfo(String taskId) throws ParseException {
         List<RealTimeWarn> realTimeWarns = new ArrayList<>();
 
         Set<String> warnKeys = redisScan("warnInfo:" + taskId);
         Set<String> defectKeys = redisScan("defectInfo:" + taskId);
+
+        List<Map<String, String>> warnMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+            warnKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+            return null;
+        });
         //表计告警
-        for (String warnKey : warnKeys) {
-            Map<String, String> warnMap = redisTemplate.opsForHash().entries(warnKey);
+        for (Map<String, String> warnMap : warnMapList) {
             String instanceId = warnMap.get("instanceId");
-            Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-//            log.info("cruiseMap==={}", cruiseMap);
-            if (MapUtils.isEmpty(cruiseMap)) {
-                log.info("realTimeWarnInfo get cruiseMap empty, warnKey: {}", warnKey);
-                break;
-            }
+
             RealTimeWarn realTimeWarn = new RealTimeWarn();
-            realTimeWarn.setDeviceName(cruiseMap.get("deviceName"));
-            realTimeWarn.setInstanceName(cruiseMap.get("instanceName"));
-            realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", cruiseMap.get("cruiseType")));
+            realTimeWarn.setDeviceName(warnMap.get("deviceName"));
+            realTimeWarn.setInstanceName(warnMap.get("instanceName"));
+            realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", warnMap.get("cruiseType")));
             realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", warnMap.get("warnLevel")));
-            String cruiseTime = cruiseMap.get("cruiseTime");
+            String cruiseTime = warnMap.get("cruiseTime");
             if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
                 realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
             }
-            realTimeWarn.setInstanceId(NumberUtils.toLong(cruiseMap.get("instanceId")));
+            realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
             realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
             realTimeWarns.add(realTimeWarn);
         }
 
+        List<Map<String, String>> defectMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+            defectKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+            return null;
+        });
         //缺陷告警
-        for (String defectKey : defectKeys) {
-            Map<String, String> defectMap = redisTemplate.opsForHash().entries(defectKey);
+        for (Map<String, String> defectMap : defectMapList) {
             String instanceId = defectMap.get("instanceId");
-            Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-//            log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
-            realTimeWarn.setDeviceName(cruiseMap.get("deviceName"));
-            realTimeWarn.setInstanceName(cruiseMap.get("instanceName"));
-            realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", cruiseMap.get("cruiseType")));
+            realTimeWarn.setDeviceName(defectMap.get("deviceName"));
+            realTimeWarn.setInstanceName(defectMap.get("instanceName"));
+            realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", defectMap.get("cruiseType")));
             realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", defectMap.get("defectLevel")));
-            String cruiseTime = cruiseMap.get("cruiseTime");
+            String cruiseTime = defectMap.get("cruiseTime");
             if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
                 realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
             }
-            realTimeWarn.setInstanceId(NumberUtils.toLong(cruiseMap.get("instanceId")));
+            realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
             realTimeWarn.setAlarmContent(defectMap.get("defectContent"));
             realTimeWarns.add(realTimeWarn);
         }
@@ -688,18 +687,9 @@ public class TCruiseTaskResultService {
 
         try {
             Set<String> warnKeys = redisScan("warnInfo:" + taskId);
-            //表计告警
-            for (String warnKey : warnKeys) {
-                Map<String, String> warnMap = redisTemplate.opsForHash().entries(warnKey);
-                String instanceId = warnMap.get("instanceId");
-                Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-                if (!MapUtils.isEmpty(cruiseMap)) {
-                    alarmCount++;
-                }
-            }
 
             Set<String> defectKeys = redisScan("defectInfo:" + taskId);
-            alarmCount += defectKeys.size();
+            alarmCount = warnKeys.size() + defectKeys.size();
         } catch (Exception e) {
             log.error("getAlarmCount err: ", e);
         }

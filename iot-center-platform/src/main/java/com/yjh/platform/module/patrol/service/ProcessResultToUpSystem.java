@@ -37,6 +37,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -62,6 +63,9 @@ public class ProcessResultToUpSystem {
     private static final String AUDIO_PATH = "/Audio/";
 
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
+
+    private static final Map<String, List<Map<String, String>>> DEFECT_MAP = new ConcurrentHashMap<>(128);
+    private static final Map<String, List<String>> DISTING_MAP = new ConcurrentHashMap<>(128);
 
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
@@ -423,44 +427,57 @@ public class ProcessResultToUpSystem {
      * @return void
      */
     @Async
-    public void defectAndDistinguishToUpSystem(Map<String, String> cruiseResultMap, Set<String> resultList){
+    public void distinguishToUpSystem(Map<String, String> cruiseResultMap, List<String> resultList){
         log.info("cruiseResultMap=={},resultList=={}", cruiseResultMap, resultList);
         try {
-            for (String key : resultList){
+            for (String value : resultList){
                 // 判别告警等级暂定为一般
                 String alarmLevel = "2";
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                 TWarnInfo tWarnInfo = new TWarnInfo();
                 tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
 
-                String value = redisInfoMap.get("value");
-                if (value.contains("图像有差异")){
-                    // 判别
-                    tWarnInfo.setValue("图像有差异");
-                    tWarnInfo.setWarnContent("图像有差异");
-                }else {
-                    // 缺陷
-                    tWarnInfo.setValue(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
-                    tWarnInfo.setWarnContent(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+                // 判别
+                tWarnInfo.setValue("图像有差异");
+                tWarnInfo.setWarnContent("图像有差异");
 
-                    tWarnInfo.setWarnSubtype(Integer.valueOf(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450")));
-                    String defectLevel = redisInfoMap.get("defectLevel");
-                    switch (defectLevel){
-                        case "130":
-                            alarmLevel = "1";
-                            break;
-                        case "131":
-                            alarmLevel = "2";
-                            break;
-                        case "132":
-                            alarmLevel = "3";
-                            break;
-                        case "133":
-                            alarmLevel = "4";
-                            break;
-                        default:
-                            break;
-                    }
+                alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
+            }
+        }catch (Exception e){
+            log.error("缺陷及判别结果上报站端异常：" , e);
+        }
+    }
+
+    @Async
+    public void defectToUpSystem(Map<String, String> cruiseResultMap, List<Map<String, String>> resultList){
+        log.info("cruiseResultMap=={},resultList=={}", cruiseResultMap, resultList);
+        try {
+            for (Map<String, String> redisInfoMap : resultList){
+                // 判别告警等级暂定为一般
+                String alarmLevel = "2";
+                TWarnInfo tWarnInfo = new TWarnInfo();
+                tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
+
+                // 缺陷
+                tWarnInfo.setValue(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+                tWarnInfo.setWarnContent(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+
+                tWarnInfo.setWarnSubtype(Integer.valueOf(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450")));
+                String defectLevel = redisInfoMap.get("defectLevel");
+                switch (defectLevel){
+                    case "130":
+                        alarmLevel = "1";
+                        break;
+                    case "131":
+                        alarmLevel = "2";
+                        break;
+                    case "132":
+                        alarmLevel = "3";
+                        break;
+                    case "133":
+                        alarmLevel = "4";
+                        break;
+                    default:
+                        break;
                 }
                 alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
             }
@@ -483,13 +500,13 @@ public class ProcessResultToUpSystem {
         }
 
         // msg：判别告警 defect：缺陷告警
-        Set<String> differentList= redisScan( "msg:" + msgId);
-        Set<String> defectList = redisScan("defect:" + msgId);
+        // Set<String> differentList= redisScan( "msg:" + msgId);
+        // Set<String> defectList = redisScan("defect:" + msgId);
         String ftpsRemotePath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath();
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-        if(CollectionUtils.isNotEmpty(differentList)){
+        if(DISTING_MAP.containsKey(msgId)){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -516,17 +533,14 @@ public class ProcessResultToUpSystem {
             //拼接算法管理平台分析告警结果图片地址
             String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
 
-            Iterator it = differentList.iterator();
+            List<String> diffList = DISTING_MAP.remove(msgId);
             List<Different> defectTempList = new ArrayList<>();
             Alarm alarmDetail = new Alarm();
-            while (it.hasNext()){
-                String key = it.next().toString();
-                Map<String, String> differentListMap= redisTemplate.opsForHash().entries(key);
-                String resultValue = differentListMap.get("value");
+            for (String resultValue : diffList) {
                 log.info("判别结果：{}",resultValue);
                 Different different = new Different();
                 String[] re = resultValue.split(",");
-                if(re != null && re.length > 4){
+                if(re.length > 4){
                     different.setX1((int) NumberUtils.toDouble(re[1]));
                     different.setY1((int) NumberUtils.toDouble(re[2]));
                     different.setX2((int) NumberUtils.toDouble(re[3]));
@@ -578,10 +592,10 @@ public class ProcessResultToUpSystem {
             log.info("判别告警发送算法管理平台结束");
 
             // 判别上报上一级系统
-            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+            distinguishToUpSystem(cruiseResultMap, diffList);
         }
 
-        if(CollectionUtils.isNotEmpty(defectList)) {
+        if(DEFECT_MAP.containsKey(msgId)) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -599,14 +613,12 @@ public class ProcessResultToUpSystem {
             //拼接算法管理平台分析告警结果图片地址
             String remotefilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
-            Iterator it = defectList.iterator();
+            List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
             Alarm alarmDetail = new Alarm();
             List<Defect> defectTempList = new ArrayList<>();
-            while (it.hasNext()) {
-                String key = it.next().toString();
-                Map<String, String> differentListMap = redisTemplate.opsForHash().entries(key);
+            for (Map<String, String> defectMap : defectList) {
                 // 获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
-                String resultinfo = differentListMap.get("value");
+                String resultinfo = defectMap.get("value");
                 log.info("缺陷结果：{}", resultinfo);
 
                 // 目前格式："wcaqm,1049.0,216.0,1211.0,389.0,0.8829"
@@ -624,7 +636,7 @@ public class ProcessResultToUpSystem {
                 }
                 defect.setType(arr1[0]);
                 defect.setDesc(
-                    differentListMap.get("defectContent") + "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + ","
+                    defectMap.get("defectContent") + "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + ","
                         + defect.getY2() + ";" + "置信度 " + defect.getConfidence() + "%)");
                 defectTempList.add(defect);
 
@@ -661,7 +673,7 @@ public class ProcessResultToUpSystem {
             log.info("缺陷告警发送算法管理平台结束");
 
             // 缺陷上报上一级系统
-            defectAndDistinguishToUpSystem(cruiseResultMap, defectList);
+            defectToUpSystem(cruiseResultMap, defectList);
         }
     }
 
@@ -792,5 +804,27 @@ public class ProcessResultToUpSystem {
             }
         }
         return str2;
+    }
+
+    public void addDefect(String msgId, Map<String, String> defect) {
+        List<Map<String, String>> list = DEFECT_MAP.computeIfAbsent(msgId, t->new ArrayList<>());
+        list.add(defect);
+    }
+
+    public void addDisting(String msgId, String disting) {
+        List<String> list = DISTING_MAP.computeIfAbsent(msgId, t->new ArrayList<>());
+        list.add(disting);
+    }
+
+    /**
+     * 清理数据，避免内存溢出
+     */
+    public void clearMsg(String msgId) {
+        try {
+            DISTING_MAP.remove(msgId);
+            DEFECT_MAP.remove(msgId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
