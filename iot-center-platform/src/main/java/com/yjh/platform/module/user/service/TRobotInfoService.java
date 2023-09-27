@@ -6,7 +6,9 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.TreesUtil;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.SysUserDevicePermissionDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -36,6 +38,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -668,6 +671,31 @@ public class TRobotInfoService{
             return sb.toString().trim();
         } else {
             return oriInfoStr;
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectAllEnvRegionId() {
+        return tRobotInfoDao.selectAllEnvRegionId();
+    }
+
+    public List<AreaInfo> selectMapNodeTree() {
+        List<AreaInfo> list = tRobotInfoDao.selectMapNodeTree();
+        return TreesUtil.assembleTrees(list);
+    }
+
+    public void filter(List<AreaInfo> areaInfoList, String name, String infoType) {
+        Iterator<AreaInfo> it = areaInfoList.iterator();
+        while (it.hasNext()) {
+            AreaInfo areaInfo = it.next();
+            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(areaInfo.getChildren())) {
+                this.filter(areaInfo.getChildren(), name, infoType);
+            }
+            //根据输入的名称
+            if (infoType.equals(areaInfo.getInfoType())) {
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(name) && !areaInfo.getLabel().contains(name)) {
+                    it.remove();
+                }
+            }
         }
     }
 }

@@ -738,4 +738,37 @@
     <select id="selectEntrance" resultType="java.lang.Integer">
         select entrance from t_robot_info where robot_id = #{robotId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectMapNodeTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT
+            a.id,
+            a.node_name AS label,
+            a.robot_id AS upId,
+            b.robot_name AS upName,
+            'node' as infoType
+        FROM
+            t_robot_map_node a
+                LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
+        UNION ALL
+        (
+            SELECT
+                robot_id AS id,
+                robot_name AS label,
+                '-1' AS upId,
+                '机器人地图点' as upName,
+                'robot' as infoType
+            FROM
+                t_robot_info
+            where robot_type = 161
+        )
+        UNION ALL
+        (
+            SELECT
+                '-1' AS id,
+                '机器人地图点' AS label,
+                0 AS upId,
+                '' as upName,
+                'root' as infoType
+        )
+    </select>
 </mapper>
