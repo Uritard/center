@@ -82,7 +82,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             robotOperationMap.put("valueUnit", res.get("value_unit").toString());
             robotOperationMap.put("unit", res.get("unit").toString());
             if (!unitCheck(robotOperationMap)) {
-                return;
+                break;
             }
             robotOperationList.add(robotOperationMap);
         }
@@ -113,7 +113,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
                     return StringUtils.equalsAnyIgnoreCase(unit, "m/s", "cm/s", "米/秒", "厘米/秒") && valueUnit.equals(value + unit);
                 //行驶里程
                 case "2":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "m", "cm", "米", "厘米") && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "km", "m", "cm", "千米", "米", "厘米") && valueUnit.equals(value + unit);
                 //电池电量
                 case "3":
                     return "%".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);

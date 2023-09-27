@@ -1000,7 +1000,7 @@ public class DataDealThread implements Runnable {
                             String taskId = jsonObjectResultbak.getString("taskId");
 
                             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
-                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+                            // StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
                         }
 
                         if(defectList.size()>0){
@@ -1089,7 +1089,7 @@ public class DataDealThread implements Runnable {
                             String taskId = jsonObjectResultbak.getString("taskId");
 
                             Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
-                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, defectList);
+                            // StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, defectList);
                         }
                     } catch (Exception e) {
                         log.info("与算法管理平台交互失败" + e);

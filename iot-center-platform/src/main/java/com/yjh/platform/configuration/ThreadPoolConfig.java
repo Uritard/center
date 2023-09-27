@@ -52,7 +52,7 @@ public class ThreadPoolConfig {
     /**
      * 本地任务执行最大线程数
      */
-    private static int taskMaxPoolSize = 50;
+    private static int taskMaxPoolSize = 100;
 
     /**
      * 线程队列大小
