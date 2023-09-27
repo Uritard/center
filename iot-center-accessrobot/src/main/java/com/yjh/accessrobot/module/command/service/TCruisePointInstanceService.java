@@ -213,7 +213,7 @@ Integer cruiseType = linkAutoMapper.selectCruiseTypeByRobotId(robotId);
                     tStdDeviceMete.setDevicePointId(String.valueOf(tRobotInspection.getInspectionId()));
                     tStdDeviceMete.setDeviceType(deviceType);
                     tStdDeviceMete.setCustomId(CustomTypeEnum.CUSTOM_TYPE_700.getDictCode());
-                    tStdDeviceMete.setInspectionType(1);
+                    tStdDeviceMete.setInspectionType(tRobotInspection.getInspectionType());
                     tStdDeviceMete.setCustomName(CustomTypeEnum.CUSTOM_TYPE_700.getDictNote());
                     tStdDeviceMete.setMeterType(MeterTypeEnum.getDictCodeByUpDict(tRobotInspection.getMeterType()));
                     if (cruiseType == 524) {
