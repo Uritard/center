@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TRobotInfoService;
@@ -100,8 +101,13 @@ public class TRobotInfoController {
                 }
             }
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
+            List<Long> allEnvRegionIdList = tRobotInfoService.selectAllEnvRegionId();
             if (allRobotCodeList.contains(tRobotInfo.getRobotCode())){
                 result.setMessage(209, "该实物ID已存在，不可重复");
+                return result;
+            }
+            if (allEnvRegionIdList.contains(tRobotInfo.getEnvRegionId())){
+                result.setMessage(209, "环控数据所属区域已绑定，请重新选择");
                 return result;
             }
             List<String> allRobotNumList = tRobotInfoService.selectAllRobotNum();
@@ -432,6 +438,23 @@ public class TRobotInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("发生错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation("查询机器人地图信息")
+    @GetMapping("selectMapNodeTree")
+    public Result selectMapNodeTree(@RequestParam(value = "name", required = false) String name){
+        Result result = new Result();
+        try {
+            List<AreaInfo> list = tRobotInfoService.selectMapNodeTree();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(name)){
+                tRobotInfoService.filter(list, name, "node");
+            }
+            result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
         }
         return result;
     }

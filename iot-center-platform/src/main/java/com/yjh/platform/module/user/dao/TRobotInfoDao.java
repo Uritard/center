@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -119,6 +120,8 @@ public interface TRobotInfoDao {
     String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
 
     List<Long> selectAllEnvRegionId();
+
+    List<AreaInfo> selectMapNodeTree();
 
     TRobotInfo selectMapPathByCode(@Param(value = "robotCode") String robotCode);
 
