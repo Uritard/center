@@ -582,20 +582,27 @@ public class RobotService {
         }
         try {
             log.info("map=={}", map);
-            map.forEach((k,v)->{
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                String k = entry.getKey();
+                Object v = entry.getValue();
                 String filePath = filePathPrefix + File.separator + v;
                 try {
                     List<Map<String, Object>> mapList = new ArrayList<>();
-                    if(!k.equals("map_file_path") && !k.equals("source_file_path")) {
+                    if (!"map_file_path".equals(k) && !"source_file_path".equals(k)) {
                         XMLBaseModel model = getXmlMessage(filePath);
                         mapList = model.getItems();
                     }
-                    switch (k){
+                    switch (k) {
                         case "device_file_path":
-                        case "operation_device_file_path":
-                            if (isEdge){
+                            if (isEdge) {
                                 syncModelUpdate("1", v.toString(), nodeCode);
-                            }else {
+                            } else {
+                                //包含操作点
+                                if (map.containsKey("operation_device_file_path")) {
+                                    String operationFilePath = filePathPrefix + File.separator + map.get("operation_device_file_path");
+                                    XMLBaseModel operationModel = getXmlMessage(operationFilePath);
+                                    mapList.addAll(operationModel.getItems());
+                                }
                                 // Device Point Info
                                 addDevicePoint(mapList, robotId);
                                 // Device Point Region Info
@@ -604,9 +611,9 @@ public class RobotService {
                             break;
                         case "robot_file_path":
                             // Robot Model Info
-                            if (isEdge){
+                            if (isEdge) {
                                 dealRobotFile(filePath, nodeCode, Constant.ROBOT);
-                            }else {
+                            } else {
                                 addRobotModel(mapList, robotId);
                             }
                             break;
@@ -652,7 +659,7 @@ public class RobotService {
                 } catch (DocumentException e) {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
                 }
-            });
+            }
         }catch (Exception e){
             log.error("处理机器人返回的模型文件异常: ", e);
         }
