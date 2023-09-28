@@ -2,8 +2,6 @@ package com.yjh.platform.module.task.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
@@ -16,7 +14,6 @@ import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnDO;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
@@ -54,7 +51,6 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
@@ -89,9 +85,6 @@ public class HelloController {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    @Qualifier( "redisTemplateForThree" )
-    private RedisTemplate redisTemplateForThree;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
@@ -624,32 +617,11 @@ public class HelloController {
         return result;
     }
 
-    public static void main(String[] args) {
-       String filePathTemp = "变电/dd站编码/年/月/日/巡视任务编码/CCD";
-        filePathTemp = filePathTemp.substring(0, filePathTemp.indexOf("/"));
-        System.out.println(filePathTemp);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("shabi", "123");
-        System.out.println(JSON.toJSONString(jsonObject.getString("123")));
-    }
-
     @GetMapping(value = "/resultToUpSystem")
     @ApiOperation(value = "resultToUpSystem")
     @Logs(title = "resultToUpSystem",content = "resultToUpSystem",logType = 2)
     public void resultToUpSystem() {
         deviceStaticsToUpSystem.resultToUpSystem();
-    }
-
-
-    @GetMapping(value = "/testRedis")
-    @ApiOperation(value = "testRedis")
-    @Logs(title = "testRedis",content = "testRedis",logType = 2)
-    public void testRedis() {
-        Map<String,String> map = Maps.newHashMap();
-        map.put("content","bababab");
-        redisTemplateForThree.opsForHash().putAll("judge:"+"instance_id:",map);
-        Map mmm = redisTemplateForThree.opsForHash().entries("judge:"+"123123:");
     }
 
     @GetMapping(value = "/qh-test")
@@ -931,9 +903,10 @@ public class HelloController {
     public Result threadPool() throws Exception{
         Result result = new Result();
         try {
-            Map<String, String> map = new LinkedHashMap<>(4);
+            Map<String, String> map = new LinkedHashMap<>(8);
             map.put("COMMON_POOL", ThreadPoolUtil.COMMON_POOL.getMessage());
             map.put("PATROL_POOL", ThreadPoolUtil.PATROL_POOL.getMessage());
+            map.put("LOCAL_TASK_POOL", ThreadPoolUtil.LOCAL_TASK_POOL.getMessage());
             result.setData(map);
         } catch (Exception e) {
             log.error("获取机器人信息异常", e);

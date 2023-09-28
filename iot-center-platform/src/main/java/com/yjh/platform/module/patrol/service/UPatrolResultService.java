@@ -2,10 +2,8 @@ package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -22,7 +20,6 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
-import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
