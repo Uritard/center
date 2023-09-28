@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -429,7 +430,8 @@ public class TCruiseTaskResultService {
         return stopResult;
     }
 
-    public List<RealTimeWarn> realTimeWarnInfo(String taskId) throws ParseException {
+    @Cacheable("EMEC15")
+    public List<RealTimeWarn> realTimeWarnInfo(String taskId) {
         List<RealTimeWarn> realTimeWarns = new ArrayList<>();
 
         Set<String> warnKeys = redisScan("warnInfo:" + taskId);

@@ -15,6 +15,8 @@ public class RedisConn {
     private String password;
     private int database;
 
+    private int cacheDb = 5;
+
     @Value("${spring.datasource.platform.publicKey}")
     private String publicKey;
 
@@ -55,6 +57,15 @@ public class RedisConn {
 
     public void setDatabase(int database) {
         this.database = database;
+    }
+
+    public int getCacheDb() {
+        return cacheDb;
+    }
+
+    public RedisConn setCacheDb(int cacheDb) {
+        this.cacheDb = cacheDb;
+        return this;
     }
 }
 
