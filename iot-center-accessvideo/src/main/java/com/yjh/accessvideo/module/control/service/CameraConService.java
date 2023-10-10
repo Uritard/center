@@ -108,9 +108,6 @@ public class CameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
-    @Value("${spring.redis.host}")
-    private String hostIp;
-
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
     private PlatFromFtpsConfig platFromFtpsConfig;
@@ -612,6 +609,7 @@ public class CameraConService {
     private void webRtcUrl(String id, Map<String, Object> returnMap, boolean isHistory) {
         String mediaServer = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaServer"));
         String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
+        String hostIp = (String)redisTemplate.opsForHash().get("t_sys_param:hostIp", "content");
         String webRtcUrl;
         if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
@@ -629,6 +627,7 @@ public class CameraConService {
      * 实时视频是否为https
      */
     private void isHttps(String videoHttps, String id, Map<String, Object> returnMap) {
+        String hostIp = (String)redisTemplate.opsForHash().get("t_sys_param:hostIp", "content");
         if ("1".equals(videoHttps)) {
             String flvsUrl = "https://" + hostIp + ":8088/live/" + id + ".flv";
             returnMap.put("flvUrl", flvsUrl);
@@ -642,6 +641,7 @@ public class CameraConService {
      * 历史视频是否为https
      */
     private void isHttpsHistory(String videoHttps, String id, Map<String, Object> returnMap) {
+        String hostIp = (String)redisTemplate.opsForHash().get("t_sys_param:hostIp", "content");
         String flvsUrl = "";
         String flvUrl = "";
         if ("1".equals(videoHttps)) {
