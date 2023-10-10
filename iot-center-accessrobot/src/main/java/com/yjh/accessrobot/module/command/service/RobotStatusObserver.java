@@ -44,14 +44,15 @@ public class RobotStatusObserver {
         robotStatusMap.put("patroldevice_code", patrolDeviceCode);
         robotStatusMap.put("time", DateTimeUtil.format(new Date()));
         robotStatusMap.put("type", "2");
-        robotStatusMap.put("value", "离线".equals(status) ? "1" : "0");
-        robotStatusMap.put("value_unit", "");
+        String value = "离线".equals(status) ? "1" : "0";
+        robotStatusMap.put("value", value);
+        robotStatusMap.put("value_unit", value);
         robotStatusMap.put("unit", "");
         xmlItems.add(robotStatusMap);
         xmlBaseModel.setType("1");
         xmlBaseModel.setItems(xmlItems);
         list.add(xmlBaseModel);
-        Map<String, List<XMLBaseModel>> map = new HashMap<>(3);
+        Map<String, List<XMLBaseModel>> map = new HashMap<>(4);
         map.put("list", list);
         log.info("机器人通信状态更新上报 {} ", list);
         Constant.mapToOtherServer(map, Constant.TCP_URL);

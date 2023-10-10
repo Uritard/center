@@ -1,8 +1,11 @@
 package com.yjh.accesstcp.thread;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
@@ -18,6 +21,7 @@ public class NestRunThread implements Runnable{
     private TCPClientHandler tcpClientHandler;
     private volatile boolean isThreadStart;
     private SendToUpSystemServices sendToUpSystemServices;
+    private volatile String nowTime;
 
     public NestRunThread(TCPClientHandler tcpClientHandler, RedisTemplate redisTemplate, boolean isThreadStart, SendToUpSystemServices sendToUpSystemServices) {
         this.isThreadStart = isThreadStart;
@@ -74,6 +78,8 @@ public class NestRunThread implements Runnable{
                     list.add(map10);
 
                     sendToUpSystemServices.sendResponse(0L, "10004","",Constant.stationCode(),list, true);
+
+                    sendStatus(device);
                 }
                 log.info("--机巢信息已发送--");
             } catch (Exception e) {
@@ -82,11 +88,44 @@ public class NestRunThread implements Runnable{
         }
     }
 
-    public static Map<String, Object> createMap(Integer type, Map<String, Object> mapForRedis){
-        Map<String, Object> map = new HashMap<>(7);
+    private void sendStatus(Map<String, Object> device) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        nowTime = DateTimeUtil.getDateTimeString();
+
+        addStateMap(list, device, 1, "1");
+        addStateMap(list, device, 2, "0");
+        addStateMap(list, device, 3, "1");
+        addStateMap(list, device, 4, "0");
+        addStateMap(list, device, 5, "1");
+        sendToUpSystemServices.sendResponse(0L, "20001", "", Constant.stationCode(), list, true);
+    }
+
+    private void addStateMap(List<Map<String, Object>> list, Map<String, Object> device, int type, String valueDef) {
+        Map<String, Object> stateMap = redisTemplate.opsForHash().entries("RobotStatus:" + device.get("robot_code") + ":" + type);
+        if (MapUtils.isEmpty(stateMap)) {
+            stateMap = new HashMap<>(8);
+            stateMap.put("value", valueDef);
+        }
+        stateMap.put("patrolDeviceCode", device.get("robot_num"));
+        stateMap.put("patrolDeviceName", device.get("robot_name"));
+        Map<String, Object> mapUp = createMap(type, stateMap, nowTime);
+        list.add(mapUp);
+    }
+
+    public Map<String, Object> createMap(Integer type, Map<String, Object> mapForRedis){
+        return createMap(type, mapForRedis, null);
+    }
+
+    public Map<String, Object> createMap(Integer type, Map<String, Object> mapForRedis, String nowTime){
+        Map<String, Object> map = new HashMap<>(16);
         map.put("nest_name", Optional.ofNullable(mapForRedis.get("nestName")).orElse(""));
         map.put("nest_code", Optional.ofNullable(mapForRedis.get("nestCode")).orElse(""));
-        map.put("module_no", Optional.ofNullable(mapForRedis.get("moduleNo")).orElse(""));
+        if (StringUtils.isNotEmpty(nowTime)) {
+            map.put("time", nowTime);
+        } else {
+            map.put("module_no", Optional.ofNullable(mapForRedis.get("moduleNo")).orElse(""));
+        }
         map.put("type", type);
         map.put("value", Optional.ofNullable(mapForRedis.get("value")).orElse("0"));
         map.put("unit", Optional.ofNullable(mapForRedis.get("unit")).orElse(""));

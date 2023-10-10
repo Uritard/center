@@ -43,9 +43,6 @@ public class DroneCameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
-    @Value("${spring.redis.host}")
-    private String hostIp;
-
     @Autowired
     private RestTemplate restTemplate;
 
@@ -136,6 +133,7 @@ public class DroneCameraConService {
             VideoInfo videoInfoNestInner = new VideoInfo().setCommand(transUrlinferad).setId(robotConInfo.getNestCode() + nestInner);
             manager.run(videoInfoNestInner);
 
+            String hostIp = (String)redisTemplate.opsForHash().get("t_sys_param:hostIp", "content");
             String webRtc = "webrtc://" + hostIp + "/live/" + robotConInfo.getNestCode() + nestInner;
             returnInferadMap.put("cameraType", nestInner);
             returnInferadMap.put("webRtcUrl", webRtc);
