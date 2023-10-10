@@ -732,7 +732,7 @@ public class CameraConService {
         if (StringUtils.isEmpty(absolutePath)) {
             int ran = RandomUtil.randomInt(1000, 10000);
             String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
-            String filePathTem = parent + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMAT) + ran + ".jpg";
+            String filePathTem = parent + cameraId + "_" + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_MS_FORMAT) + ran + ".jpg";
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
             String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
             filePathTem = StringUtils.stripStart(filePathTem, "/\\");
