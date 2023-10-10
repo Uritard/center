@@ -1,25 +1,30 @@
 package com.yjh.accesstcp.thread;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lqh
  * @since 2021/3/9
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class RunningThread implements Runnable{
 
     private RedisTemplate redisTemplate;
     private TCPClientHandler tcpClientHandler;
     private volatile boolean isThreadStart;
     private SendToUpSystemServices sendToUpSystemServices;
+    private volatile String nowTime;
+    private AtomicInteger counter = new AtomicInteger(1);
 
     public RunningThread(TCPClientHandler tcpClientHandler,RedisTemplate redisTemplate, boolean isThreadStart,SendToUpSystemServices sendToUpSystemServices) {
         this.isThreadStart = isThreadStart;
@@ -99,25 +104,59 @@ public class RunningThread implements Runnable{
                             list.add(map11);
                         }
                         sendToUpSystemServices.sendResponse(0L, "2","",Constant.stationCode(),list, true);
+
+                        // 发送状态信息
+                        sendStatus(device);
                     }
                     log.info("--运行信息已发送--");
                 }
 
+                int count = counter.incrementAndGet();
+                if (count > 3) {
+                    counter.set(count % 3);
+                }
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }
     }
 
-    public static Map<String, Object> createMap(String now, Integer type, Map<String, Object> mapForRedis){
-        Map<String, Object> map = new HashMap<>(7);
+    private void sendStatus(Map<String, Object> device) {
+        if (counter.get() % 3 > 0) {
+            return;
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        nowTime = DateTimeUtil.getDateTimeString();
+
+        addStateMap(list, device, 2, "0");
+        addStateMap(list, device, 41, "1");
+        addStateMap(list, device, 61, "1");
+        sendToUpSystemServices.sendResponse(0L, "1", "", Constant.stationCode(), list, true);
+    }
+
+    private void addStateMap(List<Map<String, Object>> list, Map<String, Object> device, int type, String valueDef) {
+        Map<String, Object> stateMap = redisTemplate.opsForHash().entries("RobotStatus:" + device.get("robot_code") + ":" + type);
+        if (MapUtils.isEmpty(stateMap)) {
+            stateMap = new HashMap<>(8);
+            stateMap.put("value", valueDef);
+        }
+        stateMap.put("patrolDeviceCode", device.get("robot_num"));
+        stateMap.put("patrolDeviceName", device.get("robot_name"));
+        Map<String, Object> mapUp = createMap(nowTime, type, stateMap);
+        list.add(mapUp);
+    }
+
+    public Map<String, Object> createMap(String now, Integer type, Map<String, Object> mapForRedis){
+        Map<String, Object> map = new HashMap<>(16);
         map.put("patroldevice_name", Optional.ofNullable(mapForRedis.get("patrolDeviceName")).orElse(""));
         map.put("patroldevice_code", Optional.ofNullable(mapForRedis.get("patrolDeviceCode")).orElse(""));
         map.put("time", now);
         map.put("type", type);
-        map.put("value", Optional.ofNullable(mapForRedis.get("value")).orElse("0"));
+        String value = (String)Optional.ofNullable(mapForRedis.get("value")).orElse("0");
+        map.put("value", value);
         map.put("unit", Optional.ofNullable(mapForRedis.get("unit")).orElse(""));
-        map.put("value_unit", Optional.ofNullable(mapForRedis.get("valueUnit")).orElse(""));
+        map.put("value_unit", Optional.ofNullable(mapForRedis.get("valueUnit")).orElse(value));
         return map;
     }
 }

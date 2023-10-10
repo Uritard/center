@@ -59,6 +59,7 @@ import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,6 +128,8 @@ public class RobotService {
     public int updateAllRobotStatus() {
         return tRobotInfoDao.updateAllRobotStatus("离线");
     }
+
+    private static final Map<String, TRobotInfo> ROBOT_INFO_MAP = new ConcurrentHashMap<>(16);
 
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
     static {
@@ -3126,6 +3129,11 @@ public class RobotService {
 
     public List<AlarmShield> selectAlarmShield(String warnCount){
         return tRobotInfoDao.selectAlarmShield(warnCount);
+    }
+
+    public String getRobotName(String robotNum) {
+        TRobotInfo robotInfo = ROBOT_INFO_MAP.computeIfAbsent(robotNum, k-> tRobotInfoDao.selectRobotInfoByRobotNum(k, null));
+        return Optional.ofNullable(robotInfo).map(TRobotInfo::getRobotName).orElse("");
     }
 }
 
