@@ -62,4 +62,9 @@ public interface TStdRegionDao {
      * @return
      */
     List<TStdRegion> queryAll();
+
+    /**
+     * 查询所有的站点，即根目录下第一级目录
+     */
+    List<TStdRegion> selectStations();
 }

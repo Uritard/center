@@ -132,6 +132,11 @@ public interface CruiseConstant {
      */
     int EVALUATION_STATE_UN = 257;
 
+    /**
+     * 审核结果正常
+     */
+    int IDENTIFY_RESULT_NORMAL = 261;
+
     String FAILED_VALUE = "-1";
 
     enum TypeEnum {

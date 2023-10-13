@@ -5,8 +5,6 @@ package com.yjh.platform.common.utils;
  * @since 2020/9/27
  */
 
-import com.yjh.commons.ValueUtil;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,15 +48,18 @@ public class Object2Map {
         }
         return map;
     }
-    //将map的数据格式统一为String
-    public static Map toStringMap(Map map){
-        Map<String,Object> stringObjectMap = map;
-        Map<String,Object> map2 = new HashMap<>();
-        for (String key : stringObjectMap.keySet()) {
-            Object s = stringObjectMap.get(key);
-            String s2 = String.valueOf(s);
-            map2.put(key,s2);
+
+    /**
+     * 将map的数据格式统一为String
+     */
+    public static Map<String, String> toStringMap(Map<?, ?> map) {
+        Map<String, String> stringMap = new HashMap<>((int)(map.size() * 1.5));
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            Object k = entry.getKey();
+            Object v = entry.getValue();
+            stringMap.put(String.valueOf(k), String.valueOf(v));
         }
-        return map2;
+        return stringMap;
     }
+
 }

@@ -998,7 +998,7 @@ public class UPatrolTaskService {
 
             patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
         } else if (2 == check) {
-            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//执行遗漏
+            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));//已执行
             result.put("resultNum", "-1");
             result.put("resultDesc", AbnormalResDescEnum.ANALYSE_TIMEOUT.getDesc());
             result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_TIMEOUT));//超时

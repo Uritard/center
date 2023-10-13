@@ -4,12 +4,15 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
-import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,8 @@ public class TStdRegionService{
     private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TStdRegionService.class);
+
+    public final static String LOWER_UP_KEY = "region:lowerUpStation";
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdRegion tStdRegion) {
@@ -200,7 +205,56 @@ public class TStdRegionService{
                 redisTemplate.opsForHash().putAll(str, map);
             }
         }
+        stationDownId();
         return 1;
+    }
+
+    public Map<Long, KeyValue<Long, String>> stationDownId() {
+
+        Map<Long, KeyValue<Long, String>> downToStationMap = redisStation();
+        if (MapUtils.isNotEmpty(downToStationMap)) {
+            return downToStationMap;
+        }
+
+        synchronized (this) {
+            downToStationMap = redisStation();
+            if (MapUtils.isNotEmpty(downToStationMap)) {
+                return downToStationMap;
+            }
+
+            // 查询所有站所，即
+            List<TStdRegion> stationList = tStdRegionDao.selectStations();
+
+            downToStationMap = new HashMap<>(64);
+            for (TStdRegion station : stationList) {
+                Long stationId = station.getRegionId();
+                List<Long> downRegionList = tStdRegionDao.selectDownRegion(String.valueOf(stationId));
+                for (Long downId : downRegionList) {
+                    downToStationMap.put(downId, new LineKeyValue<>(stationId, station.getRegionName()));
+                }
+            }
+            redisTemplate.opsForHash().putAll(LOWER_UP_KEY, Object2Map.toStringMap(downToStationMap));
+            return downToStationMap;
+        }
+    }
+
+    private Map<Long, KeyValue<Long, String>> redisStation() {
+        Map<String, String> downStringMap = redisTemplate.opsForHash().entries(LOWER_UP_KEY);
+        if (MapUtils.isNotEmpty(downStringMap)) {
+            return toLongMap(downStringMap);
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    public static Map<Long, KeyValue<Long, String>> toLongMap(Map<String, String> map) {
+        Map<Long, KeyValue<Long, String>> longMap = new HashMap<>((int)(map.size() * 1.5));
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            longMap.put(NumberUtils.toLong(k), LineKeyValue.parse(v, Long.class, String.class));
+        }
+        return longMap;
     }
 
     public List<TStdRegion> cruiseTree() {
