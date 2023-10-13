@@ -1,8 +1,9 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
 import com.google.common.base.Strings;
+import com.yjh.platform.module.task.entity.ContentData;
 import com.yjh.platform.module.task.entity.TableCellElement;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
@@ -10,7 +11,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -32,8 +32,8 @@ public class ReportHelper {
     private static Logger logger = getLogger(ReportHelper.class);
     private static final IndexedColors DEFAULT_FRONT_COLOR = IndexedColors.BLACK;
     private static final short DEFAULT_BORDER_COLOR_INDEX = IndexedColors.BLACK.getIndex();
-    private static final float EN_CHAR_WEIGHT = 0.76667f;
-    private static final float CH_CHAR_WEIGHT = 2.7477f;
+    private static final float EN_CHAR_WEIGHT = 0.9989f;
+    private static final float CH_CHAR_WEIGHT = 2.0477f;
     private static final float CH_CHAR_BOLD_WEIGHT = 3;
     private static final float CH2EN = CH_CHAR_WEIGHT / EN_CHAR_WEIGHT;
 
@@ -86,8 +86,9 @@ public class ReportHelper {
     ) {
         String key = createCacheKey(fontSize, bold, color, alignment);
         CellStyle style = styleCache.get(key);
-        if (style != null)
+        if (style != null) {
             return style;
+        }
 
         style = wb.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
@@ -134,7 +135,7 @@ public class ReportHelper {
     }
 
     private static int calculateCellWidth(int CHChars, int ENChars, boolean bold) {
-        return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars)) * 256;
+        return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars + 1.89)) * 256;
     }
     public static void appendHyperLink(Workbook wb, Cell cell, String url, String linkText) {
         CellStyle hlink_style = wb.createCellStyle();
@@ -152,20 +153,57 @@ public class ReportHelper {
         cell.setHyperlink(link);
         cell.setCellStyle(hlink_style);
     }
+
+    public static boolean createDocument(List<KeyValue<String, ContentData>> contentDataList, File dest,String taskId) {
+        final SXSSFWorkbook wb = new SXSSFWorkbook();
+        for (KeyValue<String, ContentData> dataKeyValue : contentDataList) {
+            try {
+                ContentData contentData = dataKeyValue.getValue();
+                createDocumentSheet(contentData.getRowCount(), contentData.getColumnCount(), contentData.getElements(), wb, dataKeyValue.getKey(), taskId);
+            } catch (Exception e) {
+                logger.info("create sheet error: ", e);
+            }
+        }
+        try (FileOutputStream fileOut = new FileOutputStream(dest)){
+            wb.write(fileOut);
+            wb.dispose();
+        } catch (Exception e) {
+            logger.info("createDocument: ", e);
+        }
+        return true;
+    }
+
     public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest,String taskId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook(rowNum);
-        final SXSSFSheet sheet = wb.createSheet("巡检报告");
+
+        try {
+            createDocumentSheet(rowNum, columnNum, elements, wb, "巡检报告", taskId);
+        } catch (Exception e) {
+            logger.info("create sheet error: ", e);
+        }
+        try (FileOutputStream fileOut = new FileOutputStream(dest)){
+            wb.write(fileOut);
+            wb.dispose();
+        } catch (Exception e) {
+            logger.info("createDocument: ", e);
+        }
+
+        return true;
+    }
+
+    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId) {
+        final SXSSFSheet sheet = wb.createSheet(sheetName);
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
-        Row row;
-        Cell cell;
+        // Row row;
+        // Cell cell;
 
         Map<String, CellStyle> styleCache = new HashMap<>();
-        for (int i = 0; i < rowNum; ++i) {
+        /*for (int i = 0; i < rowNum; ++i) {
             row = sheet.createRow(i);
             for (int j = 0; j < columnNum; ++j) {
                 row.createCell(j).setCellStyle(defaultCellStyle);
             }
-        }
+        }*/
 
         int[] EnglishChars = new int[columnNum];
         int[] ChineseChars = new int[columnNum];
@@ -179,19 +217,24 @@ public class ReportHelper {
 
         HashMap<Integer, Boolean> imageColumnMap = new HashMap<>();
         for (TableCellElement element : elements) {
-            if (element == null)
+            if (element == null) {
                 continue;
+            }
 
             int rowIndex = element.getRowStart();
             int colStart = element.getColumnStart();
             int cellType = element.getType();
             boolean crossColumn = colStart != element.getColumnEnd();
             boolean crossRow = rowIndex != element.getRowEnd();
-            row = sheet.getRow(rowIndex);
-//            if (isEmptyRow(row)){
-//                continue;
-//            }
-            cell = row.getCell(colStart);
+            Row row = sheet.getRow(rowIndex);
+            if (isEmptyRow(row)){
+                row = sheet.createRow(rowIndex);
+                for (int j = 0; j < columnNum; ++j) {
+                    row.createCell(j).setCellStyle(defaultCellStyle);
+                }
+            }
+
+            Cell cell = row.getCell(colStart);
             if (cellType == TableCellElement.TYPE_TEXT_STRING ||
                     cellType == TableCellElement.TYPE_NUMBER_STRING) {
                 String[] textValues = element.getValue();
@@ -209,8 +252,9 @@ public class ReportHelper {
                 cell.setCellStyle(style);
                 if (cellType == TableCellElement.TYPE_NUMBER_STRING) {
                     cell.setCellValue(text.contains(".") ? Double.parseDouble(text) : Integer.parseInt(text));
-                } else
+                } else {
                     cell.setCellValue(text);
+                }
 
                 if (!crossColumn) {
                     String longestLine = text;
@@ -244,7 +288,9 @@ public class ReportHelper {
                 }
             } else if (cellType == TableCellElement.TYPE_PICTURE) {
                 String[] values = element.getValue();
-                if (values == null || values.length == 0) continue;
+                if (values == null || values.length == 0) {
+                    continue;
+                }
 
                 final int ANCHOR_DX1 = PoiUtils.pixelToEMU(5);
                 final int ANCHOR_DX2 = PoiUtils.pixelToEMU(245);
@@ -265,7 +311,9 @@ public class ReportHelper {
 
                 String imagePath = element.getValue()[0];
 
-                if (Strings.isNullOrEmpty(imagePath) || !FileUtil.fileExists(imagePath)) continue;
+                if (Strings.isNullOrEmpty(imagePath) || !FileUtil.fileExists(imagePath)) {
+                    continue;
+                }
                 try {
                     byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
                     int pictureIdx = wb.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
@@ -292,15 +340,10 @@ public class ReportHelper {
                                 appendHyperLink(wb, cell, taskId+"/"+fileUrl, fileUrl);
                             }
                         }
-
-
                     }
-
-
                 } catch (Exception e) {
                     logger.info("createDocument, error to insert img.", e);
                 }
-
             }
             if (crossColumn || crossRow) {
                 mergeCell(sheet, rowIndex, element.getRowEnd(), colStart, element.getColumnEnd());
@@ -316,6 +359,7 @@ public class ReportHelper {
             if (imageColumnMap.containsKey(i)) {
                 continue;
             }
+/*
             try {
                 sheet.trackColumnForAutoSizing(i);
                 sheet.autoSizeColumn(i, true);
@@ -323,22 +367,14 @@ public class ReportHelper {
             } catch (Exception e) {
                 logger.error("Failed to autoSize for column", e);
             }
+*/
 
             if (maxChars[i] == -1) {
                 continue;
             }
-            sheet.setColumnWidth(i, calculateCellWidth(ChineseChars[i], EnglishChars[i], isBold[i]));
-        }
-
-        FileOutputStream fileOut = null;
-        try {
-            fileOut = new FileOutputStream(dest);
-            wb.write(fileOut);
-            wb.dispose();
-        } catch (Exception e) {
-            logger.info("createDocument: ", e);
-        } finally {
-            IOUtils.closeQuietly(fileOut);
+            int width = calculateCellWidth(ChineseChars[i], EnglishChars[i], isBold[i]);
+            width = i > 0 ? Math.max(width, 13 * 256) : width;
+            sheet.setColumnWidth(i, Math.min(width, 96 * 256));
         }
 
         styleCache.clear();

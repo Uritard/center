@@ -555,4 +555,18 @@ public class CommonUtils {
             }
         }
     }
+
+    public static boolean equals(Object o1, int o2) {
+        if (o1 == null) {
+            return false;
+        }
+        return o1 instanceof Number && ((Number)o1).intValue() == o2;
+    }
+
+    public static boolean equals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) {
+            return true;
+        }
+        return o1 != null && o1.equals(o2);
+    }
 }
