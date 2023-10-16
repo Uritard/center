@@ -60,6 +60,12 @@ public class RobotTaskInstanceInfo implements Serializable {
     private String intervalStartTime;
     @ApiModelProperty(value = "间隔结束时间")
     private String intervalEndTime;
+    @ApiModelProperty(value = "不可用开始时间")
+    private String invalidStartTime;
+    @ApiModelProperty(value = "不可用结束时间")
+    private String invalidEndTime;
+    @ApiModelProperty(value = "是否可用，0: 启用， 1: 禁用")
+    private String isenable;
     @ApiModelProperty(value = "是否为联动任务（1表达联动任务，正常任务为空）")
     private String unionTaskStatus;
     @ApiModelProperty(value = "边缘节点ID")

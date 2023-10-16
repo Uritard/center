@@ -1148,6 +1148,10 @@ public class RobotService {
             log.info("=========={}该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========", item.getRobotCode());
             return false;
         } else {
+            if (!"0".equals(item.getIsenable())) {
+                return true;
+            }
+
             Map<String, String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + item.getRobotCode() + ":41");
             String robotStatus = mapForRobotState.get("value");
             if ("4".equals(robotStatus)) {
@@ -1195,13 +1199,13 @@ public class RobotService {
         StringJoiner str = new StringJoiner(",");
         // 机器人任务临时信息存放至redis
         log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
-        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList());
+        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable());
 
         log.info("packageXMLBaseModel参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         packageXMLBaseModel(item, robotCode, taskId, str);
     }
 
-    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList) {
+    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList, String isenable) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
         try {
             // 将instanceIdList放缓存，以备后续使用
@@ -1223,9 +1227,12 @@ public class RobotService {
                 // redisInfoMap.put("taskId", taskId);
                 redisInfoList.add(redisInfoMap);
             }
-            for (int i = 0; i < redisInfoList.size(); i++) {
-                redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                        + ":" + redisInfoList.get(i).get("inspectionCode"), redisInfoList.get(i));
+            if ("0".equals(isenable)) {
+                for (int i = 0; i < redisInfoList.size(); i++) {
+                    redisTemplate.opsForHash().putAll(
+                        "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode"),
+                        redisInfoList.get(i));
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1263,11 +1270,13 @@ public class RobotService {
         for (String instanceId : item.getInstanceList()) {
             str.add(instanceId);
         }
-        // 边缘节点任务临时信息存放至redis
-        Map<String, Object> instanceListMap = new HashMap<>(5);
-        instanceListMap.put("instanceIdList", String.valueOf(item.getInstanceList()));
-        instanceListMap.put("taskId", taskId);
-        redisTemplate.opsForHash().putAll("RobotTaskStatus:" + edgeCode + ":" + taskId, instanceListMap);
+        if ("0".equals(item.getIsenable())) {
+            // 边缘节点任务临时信息存放至redis
+            Map<String, Object> instanceListMap = new HashMap<>(4);
+            instanceListMap.put("instanceIdList", String.valueOf(item.getInstanceList()));
+            instanceListMap.put("taskId", taskId);
+            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + edgeCode + ":" + taskId, instanceListMap);
+        }
 
         packageXMLBaseModel(item, edgeCode, taskId, str);
     }

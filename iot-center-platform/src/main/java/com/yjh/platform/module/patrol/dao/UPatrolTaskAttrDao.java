@@ -17,7 +17,7 @@ public interface UPatrolTaskAttrDao {
     int add(UPatrolTaskAttr uPatrolTaskAttr);
     int deleteByPrimaryId(@Param(value = "taskId") String taskId);
     int update(UPatrolTaskAttr uPatrolTaskAttr);
-    UPatrolTaskAttr selectByPrimaryId(@Param(value = "taskId") String taskId);
+    List<UPatrolTaskAttr> selectByTaskId(@Param(value = "taskId") String taskId);
     List<UPatrolTaskAttr> select(@Param(value = "taskId") String taskId,
                                 @Param(value = "instanceId") Long instanceId,
                                 @Param(value = "deviceMeteId") Long deviceMeteId,

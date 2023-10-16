@@ -29,7 +29,7 @@
         from u_patrol_task a
         left join sys_user u on a.create_user_id = u.user_id
         left join t_dict_business b on a.task_type = b.dict_code and b.col_name="plan_type"
-        where a.task_id = a.task_code
+        where a.task_id = a.task_code and a.plan_id is not null
     </select>
 
     <select id="selectInstanceId" resultType="java.lang.Long">
