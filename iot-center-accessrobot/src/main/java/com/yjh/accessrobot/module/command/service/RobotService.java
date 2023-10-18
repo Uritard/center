@@ -594,6 +594,7 @@ public class RobotService {
                     }
                     switch (k) {
                         case "device_file_path":
+                        case "operation_device_file_path":
                             if (isEdge) {
                                 syncModelUpdate("1", v.toString(), nodeCode);
                             } else {
