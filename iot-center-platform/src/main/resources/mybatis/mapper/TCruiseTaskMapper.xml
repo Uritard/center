@@ -721,11 +721,14 @@ select *from (
         env.value_unit AS valueUnit,
         env.sn AS deviceId,
         env.value_type AS valueType,
-        date_format(env.alarm_time,'%Y-%c-%d %h:%i:%s') AS alarmTime,
-        env.device_name AS deviceName
+        date_format(env.alarm_time,'%Y-%m-%d %H:%i:%S') AS alarmTime,
+        env.device_name AS deviceName,
+        d.region_name AS regionName
         FROM
         t_env_warning env
         LEFT JOIN t_dict_business a ON env.type = a.dict_code
+        LEFT JOIN t_robot_info c ON c.robot_code = env.robot_code
+        LEFT JOIN t_std_region d ON d.region_id = c.env_region_id
         WHERE
         1=1
         <if test="deviceId !=null and deviceId != '-1'">
@@ -784,6 +787,25 @@ select *from (
             and t.region_id = #{regionId}
         </if>
         and t.region_path IS NOT NULL
+    </select>
+
+    <select id="queryRegionList" resultType="com.yjh.platform.module.task.entity.RegionPath">
+        SELECT
+            t.region_id AS regionId,
+            t.region_name AS regionName,
+            t.region_path AS regionPath
+        FROM t_std_region t
+        WHERE 1=1
+          and t.region_path IS NOT NULL
+    </select>
+    <select id="queryRegionName" resultType="java.lang.String">
+        SELECT
+            t.region_name AS regionName
+        FROM
+            t_std_region t
+        WHERE
+            1 = 1
+          AND t.up_region_id = -1
     </select>
 
     <select id="selectCruiseTask" resultType="com.yjh.platform.module.task.entity.TCruiseTask">

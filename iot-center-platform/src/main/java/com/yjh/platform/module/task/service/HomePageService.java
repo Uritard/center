@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -7,6 +8,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
@@ -17,8 +19,10 @@ import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
+import com.yjh.platform.module.task.dao.TStdWeatherLogDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -29,13 +33,16 @@ import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.util.Asserts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,6 +87,8 @@ public class HomePageService {
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
     private CameraConService cameraConService;
+    @Resource
+    private TStdWeatherLogDao tStdWeatherLogDao;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -394,13 +403,7 @@ public class HomePageService {
      */
     public List<HashMap<String, String>> envWarningQuery(JSONObject jsonObject) {
         log.info("envWarningQuery开始");
-        List<HashMap<String, String>> map = tCruiseTaskDao.envWarningQuery(jsonObject);
-        Long regionId = null;
-        RegionPath regionPath = queryRegionPath(regionId);
-        map.forEach(maps -> {
-            maps.put("regionName", regionPath.getRegionName());
-        });
-        return map;
+        return tCruiseTaskDao.envWarningQuery(jsonObject);
     }
 
 
@@ -414,24 +417,22 @@ public class HomePageService {
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
         StationCount sta = new StationCount();
         sta.setType("环控设备");
+        int staSize;
         //环控数量
-        if (regionId == null) {
-            RegionPath regionPath = tCruiseTaskDao.queryRegion(regionId);
-            regionId = regionPath.getRegionId();
-        }
-        List<EnvDeviceStatus> list = queryWeatherInfo(regionId);
-        if (list != null && list.size() > 0) {
-            sta.setCount(list.size() + "");
-        } else {
-            sta.setCount("0");
-        }
+        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId();
+        staSize = envReginIdList.stream().map(this::queryWeatherInfo).filter(list -> list != null && list.size() > 0).mapToInt(List::size).sum();
+        sta.setCount(String.valueOf(staSize));
         List<StationCount> stationCounts = tCruiseTaskDao.queryStations(regionIdList);
         stationCounts.add(sta);
         return stationCounts;
     }
 
-    public RegionPath queryRegionPath(Long regionId) {
-        return tCruiseTaskDao.queryRegion(regionId);
+    public List<RegionPath> queryRegionList() {
+        return tCruiseTaskDao.queryRegionList();
+    }
+
+    public String queryRegionName() {
+        return tCruiseTaskDao.queryRegionName();
     }
 
     /**
@@ -452,6 +453,51 @@ public class HomePageService {
         }
         return queryEnvDeviceInfo;
     }
+
+    /**
+     * 每10分钟获取信息
+     */
+    @Scheduled(cron = "0 0/10 * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
+    public void getWeatherInfoSchedule() {
+        log.info("开始同步缓存数据");
+        // 获取所有区域
+        List<TStdRegion> regionList = tStdRegionService.queryAll();
+        List<Long> regionIds = regionList.stream().map(TStdRegion::getRegionId).collect(Collectors.toList());
+        List<TStdWeatherLogDO> weatherLogs = new ArrayList<>();
+        for (Long regionId : regionIds) {
+            String envDataJson = (String) redisTemplate.opsForHash().get("Weather", regionId.toString());
+            if (StringUtils.isNotEmpty(envDataJson)) {
+                JSONArray objects = JSONArray.parseArray(envDataJson);
+                weatherLogs.addAll(objects.toJavaList(TStdWeatherLogDO.class));
+            }
+        }
+        if (!CollectionUtils.isEmpty(weatherLogs)) {
+            tStdWeatherLogDao.batchInsert(weatherLogs);
+        }
+    }
+
+    public List<EnvDeviceStatus> queryWeatherLog(QueryWeatherLogReq req) {
+        Asserts.notNull(req.getDeviceId(), "设备参数为空");
+        Asserts.notNull(req.getRobotCode(), "机器人编号为空");
+        TStdWeatherLogDO tStdWeatherLogDO = new TStdWeatherLogDO();
+        tStdWeatherLogDO.setDeviceId(req.getDeviceId());
+        tStdWeatherLogDO.setRobotCode(req.getRobotCode());
+        tStdWeatherLogDO.setStartTime(req.getStartTime());
+        tStdWeatherLogDO.setEndTime(req.getEndTime());
+        List<TStdWeatherLogDO> list = tStdWeatherLogDao.list(tStdWeatherLogDO);
+        if (org.apache.commons.collections.CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        List<EnvDeviceStatus> resultList = list.stream().map((e) -> {
+            EnvDeviceStatus envDeviceStatus = new EnvDeviceStatus();
+            BeanUtil.copyProperties(e, envDeviceStatus);
+            envDeviceStatus.setCreateTime(CommonUtils.formatDate(e.getCreateTime()));
+            return envDeviceStatus;
+        }).collect(Collectors.toList());
+        return resultList;
+    }
+
 
     /**
      * 获取redis集合值

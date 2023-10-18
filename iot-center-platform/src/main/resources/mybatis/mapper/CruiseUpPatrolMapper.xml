@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.patrol.dao.CruiseUpPatrolDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="point_task_id" jdbcType="VARCHAR" property="pointTaskId" />
+        <result column="if_robot" jdbcType="INTEGER" property="ifRobot" />
+        <result column="if_video" jdbcType="INTEGER" property="ifVideo" />
+        <result column="if_inferad" jdbcType="INTEGER" property="ifInferad" />
+        <result column="if_artificial" jdbcType="INTEGER" property="ifArtificial" />
+    </resultMap>
+
+    <select id="selectPatrolCursor" fetchSize="1000" resultType="com.yjh.platform.module.patrol.entity.UPatrolTaskAttr">
+        select
+        a.task_id,
+        a.instance_id,
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.point_task_id,
+        d.cruise_type as point_type,
+        b.device_type,
+        c.mete_type,
+        b.up_region_id as region_id
+        from t_cruise_task_attr a
+        left join t_std_device b on a.device_id = b.device_id
+        left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
+        left join t_cruise_point_instance d on a.instance_id = d.instance_id
+    </select>
+
+    <select id="selectResultCursor" fetchSize="1000" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+          a.task_id,
+          ifnull(a.task_code, a.task_id),
+          a.task_name,
+          a.area_id,
+          a.c_type as task_type,
+          b.run_execute as execute_type,
+          '3' as task_level,
+          a.c_state as task_state,
+          a.modify_state,
+          a.task_count,
+          a.task_wait,
+          a.check_user,
+          a.check_date,
+          a.weather,
+          a.create_time,
+          DATE_ADD(a.execute_time, interval 146 minute) as end_time,
+          a.execute_time,
+          b.task_abnormal,
+          '0' as remark
+        from
+          t_cruise_result a
+          left join t_cruise_task_result b on a.task_result_id = b.task_result_id
+    </select>
+
+    <select id="selectPatrolDetailCursor" fetchSize="1000" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        select
+          c.task_id,
+          a.device_id,
+          a.device_name,
+          d.device_mete_id,
+          d.custom_id,
+          a.instance_id,
+          a.instance_name,
+          d.cruise_id,
+          d.cruise_name,
+          a.cruise_time,
+          a.cruise_status,
+          b.cruise_type,
+          (
+            CASE
+            WHEN b.cruise_type=228
+            THEN b2.robot_id
+            WHEN b.cruise_type=229 or b.cruise_type=230
+            THEN d2.camera_id
+            END
+          ) as cruise_device_id,
+          (
+            CASE
+            WHEN b.cruise_type=228
+            THEN b2.robot_name
+            WHEN b.cruise_type=229 or b.cruise_type=230
+            THEN d2.camera_name
+            END
+          ) as cruise_device_name,
+          b.result_num as result_desc,
+          b.modify_num,
+          d.unit,
+          b.picpath,
+          b.confirm_pic_path,
+          b.pic_path_anl,
+          b.person_check,
+          b.origpic,
+          b.orig_confirm_pic_path,
+          b.orig_pic_anl,
+          b.cruise_abnormal,
+          b.evaluation_state,
+          b.identify_state,
+          b.identify_result,
+          b.createtime,
+          b.remark,
+          b.check_user,
+          b.check_date,
+          b.is_warn,
+          b.cruise_result,
+          b.fir_name,
+          b.fir_date,
+          b.result_pic,
+          b.points,
+          b.voice_path
+        from
+          t_cruise_task_result_detail a
+          left join t_cruise_data_result b on a.cruise_result_id = b.cruise_result_id
+          left join t_cruise_task_result c on a.task_result_id = c.task_result_id
+          left join t_cruise_point_instance d on a.instance_id = d.instance_id
+          left join t_robot_inspection b1 on d.cruise_id=b1.inspection_id and b.cruise_type=228 left join t_robot_info b2 ON b1.robot_id=b2.robot_id
+          left join t_camera_preset d1  on d.cruise_id=d1.preset_id and (b.cruise_type=229 or b.cruise_type=230) left join t_camera_info d2 ON d1.camera_id=d2.camera_id
+    </select>
+</mapper>

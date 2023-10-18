@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TMeterLogDao">
+
+<!--    <resultMap id="BaseResultMap" type="com.yjh.accessmeter.module.device.entity.TMeter">-->
+<!--            <id property="id" column="id" jdbcType="BIGINT"/>-->
+<!--            <result property="name" column="name" jdbcType="VARCHAR"/>-->
+<!--            <result property="ip" column="ip" jdbcType="VARCHAR"/>-->
+<!--            <result property="port" column="port" jdbcType="INTEGER"/>-->
+<!--            <result property="address" column="address" jdbcType="VARCHAR"/>-->
+<!--            <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>-->
+<!--            <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>-->
+<!--            <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>-->
+<!--            <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>-->
+<!--            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>-->
+<!--    </resultMap>-->
+
+
+    <sql id="Base_Column_List">
+        id, meter_id, meter_name,ip,
+        port,address,up_region_id,total_positive_power,
+        total_positive_reactive_power,total_negative_positive_power,
+        create_time, create_person, update_time, update_person, is_deleted
+    </sql>
+    <sql id="Base_Column_List_exclude_id">
+        meter_id, meter_name,ip,
+        port,address,up_region_id,total_positive_power,
+        total_positive_reactive_power,total_negative_positive_power,
+        create_time, create_person, update_time, update_person, is_deleted
+    </sql>
+
+    <select id="list" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM t_meter_log
+        WHERE meter_id = #{id, jdbcType=INTEGER}
+        <if test="startTime != null and startTime != ''">
+            AND create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND create_time &lt;= #{endTime}
+        </if>
+        order by create_time
+    </select>
+
+    <delete id="deleteExpireData">
+        delete from t_meter_log
+        WHERE create_time lt; DATE_SUB(NOW(), INTERVAL 1 MONTH);
+    </delete>
+
+    <insert id="insert" parameterType="com.yjh.platform.module.device.entity.TMeter" useGeneratedKeys="true">
+        insert into t_meter_log
+         (<include refid="Base_Column_List_exclude_id"></include>)
+        values (
+            #{id}, #{name}, #{ip}, #{port}, #{address}, #{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativeReactivePower},
+            now(), '0', now(), '0', 0
+        )
+    </insert>
+</mapper>

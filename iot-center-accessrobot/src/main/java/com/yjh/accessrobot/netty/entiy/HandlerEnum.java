@@ -43,12 +43,14 @@ public enum HandlerEnum {
     SILENT_MONITORING_DATA("64","silentMonitoringData"),
     // 静默监视告警  巡视主机->上级系统
     SILENT_MONITORING_ALARM("63","silentMonitoringAlarm"),
-    //机器操作结果
-    OPERATION_RESULT("64","OperationResult"),
+//    //机器操作结果
+//    OPERATION_RESULT("64","OperationResult"),
+    //巡视设备统计信息
+    PATROL_DEVICE_STATISTICS("81","robotConfirmMsg"),
     //机器人确认消息
-    ROBOT_CONFIRM_MSG("81","robotConfirmMsg"),
+    ROBOT_CONFIRM_MSG("1001","robotConfirmMsg"),
     //操作步骤消息
-    OPERATION_STEPS("82","robotOperationSteps"),
+    OPERATION_STEPS("1002","robotOperationSteps"),
     // 无人机机巢状态数据
     NEST_STATUS("20001","nestStatus"),
     // 无人机机巢运行数据

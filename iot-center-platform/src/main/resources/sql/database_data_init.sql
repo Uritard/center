@@ -1319,6 +1319,7 @@ INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`,
 INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100152', '404', 'zmlHostIp', 'ZMLip', '172.24.39.9:1935', 'ZMLip端口', NULL);
 INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100153', '404', 'gbCode', '国标编码', '3201140049', '国标编码', NULL);
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'downResultPic', '任务报告下载算法分析图', 'false', '任务报告下载的大图下载算法分析后图片还是原图，true是算法分析后图片，false是原图', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false', '任务报告按站所拆分视图，站所为区域根节点下第一层节点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 
 -- ----------------------------
 -- Records of t_version

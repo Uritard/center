@@ -137,6 +137,21 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "所有机器人相机播放")
+    @RequestMapping(value = "/robotStartRealPlayAll", method = RequestMethod.GET)
+    public Result robotStartRealPlayAll() {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.robotStartRealPlayAll());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("所有机器人相机播放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "机器人相机停止播放")
     @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
     public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {

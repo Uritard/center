@@ -45,6 +45,10 @@ public class TCruiseDataResultDetail implements Serializable {
     /**
      * 识别状态
      */
+    private Integer cruiseResult;
+    /**
+     * 识别状态
+     */
     private String cruiseResultName;
     /**
      * 巡视时间
@@ -75,11 +79,19 @@ public class TCruiseDataResultDetail implements Serializable {
     /**
      * 审核状态
      */
+    private Integer evaluationState;
+    /**
+     * 审核状态
+     */
     private String evaluationStateName;
     /**
      * 巡视类型
      */
     private Integer cruiseType;
+    /**
+     * 上级区域ID
+     */
+    private Long regionId;
     /**
      * 区域
      */

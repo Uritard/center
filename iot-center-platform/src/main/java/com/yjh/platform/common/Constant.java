@@ -40,6 +40,8 @@ public class Constant {
 //    public static final String CANCEL_PRESET_URL = "http://iot-center-accessvideo/camera/v1/cancelPreset?cameraId={cameraId}&presetId={presetId}";
 //
 //    public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}&meteName={meteName}&edgeCode={edgeCode}";
+
+    public static final String SEND_METER_URL ="http://iot-center-accessmeter/tMeterCollect/v1" ;
     public static final String T_SYS_PARAM = "t_sys_param:";
     /**
      * 边缘节点
@@ -542,5 +544,8 @@ public class Constant {
     public static boolean logUpLv3() {
         return Constant.logLevel() >= Constant.LOG_LV_TRI;
     }
+
+    public final static Map<String,Integer> threePhaseMap = new ConcurrentHashMap();
+    public final static Map<String,Integer> threePhaseCountMap = new ConcurrentHashMap();
 }
 

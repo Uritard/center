@@ -3,9 +3,9 @@ package com.yjh.platform.common.utils.smUtil.report;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.task.entity.*;
-import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
@@ -91,95 +91,95 @@ public class ReportDataModel {
         TaskVO taskVoInfo = param.getTaskVO();
 
         // 变电站
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[0]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{Optional.ofNullable(taskVoInfo.getStationName()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getStationName()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 电压等级
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 7, new String[]{TASK_INFO[1]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[1]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{Optional.ofNullable(taskVoInfo.getVoltageClasses()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{Optional.ofNullable(taskVoInfo.getVoltageClasses()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视日期
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[2]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[2]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseDate()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{DateTimeUtil.formatYMD(taskVoInfo.getCruiseDate())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{DateTimeUtil.formatYMD(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowCount = rowCount + 2;
         // 变电站类别
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 7, new String[]{TASK_INFO[3]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[3]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{Optional.ofNullable(taskVoInfo.getStationType()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{Optional.ofNullable(taskVoInfo.getStationType()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视任务
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[4]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[4]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{Optional.ofNullable(taskVoInfo.getTaskName()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getTaskName()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 环境信息
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 7, new String[]{TASK_INFO[5]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[5]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{Optional.ofNullable(taskVoInfo.getEnvInfo()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{Optional.ofNullable(taskVoInfo.getEnvInfo()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 审核人
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[6]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[6]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{Optional.ofNullable(taskVoInfo.getReviewer()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getReviewer()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 审核时间
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 7, new String[]{TASK_INFO[7]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[7]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getReviewTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{dataFormat(taskVoInfo.getReviewTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{dataFormat(taskVoInfo.getReviewTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowIndex++;
         // 巡视开始时间
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[8]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[8]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseStartTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{dataFormat(taskVoInfo.getCruiseStartTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{dataFormat(taskVoInfo.getCruiseStartTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowCount = rowCount + 2;
         // 巡视结束时间
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 7, new String[]{TASK_INFO[9]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[9]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseEndTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{dataFormat(taskVoInfo.getCruiseEndTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{dataFormat(taskVoInfo.getCruiseEndTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 8, 10, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 10, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowIndex++;
         // 巡视统计
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO2[0]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO2[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 10, new String[]{Optional.ofNullable(taskVoInfo.getCruiseStatistics()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 10, new String[]{Optional.ofNullable(taskVoInfo.getCruiseStatistics()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视结论
-        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO2[1]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO2[1]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 3, 10, new String[]{Optional.ofNullable(taskVoInfo.getCruiseConclusion()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 10, new String[]{Optional.ofNullable(taskVoInfo.getCruiseConclusion()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         rowCount++;
@@ -205,91 +205,39 @@ public class ReportDataModel {
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
-            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                cbsInspectionResultVo.setIdentifyResultName("异常");
-                abnormalList.add(cbsInspectionResultVo);
-            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                normalList.add(cbsInspectionResultVo);
-            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
-                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-                unReviewList.add(cbsInspectionResultVo);
+            // 正常结果 巡视结果正常 246， 无告警
+            boolean isNormal =  CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0) && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL);
+            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResult())) {
+                if (CommonUtils.equals(cbsInspectionResultVo.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL) && isNormal) {
+                    normalList.add(cbsInspectionResultVo);
+                } else {
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                }
+            } else {
+                if (isNormal) {
+                    // 无告警放入正常
+                    cbsInspectionResultVo.setIdentifyResultName("正常");
+                    normalList.add(cbsInspectionResultVo);
+                } else if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 1)) {
+                    // 告警放入异常
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                } else {
+                    // 巡视结果异常放入待人工确认
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                }
             }
-
         }
         //根据要求 识别出来是异常 放在异常里
         // 点位状态 未执行、执行失败、未知 放在待人工确认里面
         // 正常的挡在正常里面
-//        for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
-//            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-//                // i
-//                if (cbsInspectionResultVo.getCruiseState() == 253 ||
-//                    cbsInspectionResultVo.getCruiseState() == 254 ||
-//                    cbsInspectionResultVo.getCruiseState() == 255 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-//                    cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 352
-//                ){
-//                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-//                    unReviewList.add(cbsInspectionResultVo);
-//                } else {
-//                    cbsInspectionResultVo.setIdentifyResultName("异常");
-//                    abnormalList.add(cbsInspectionResultVo);
-//                }
-//            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-//                if (cbsInspectionResultVo.getCruiseState() == 253 ||
-//                        cbsInspectionResultVo.getCruiseState() == 254 ||
-//                        cbsInspectionResultVo.getCruiseState() == 255 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 352
-//                ){
-//                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-//                    unReviewList.add(cbsInspectionResultVo);
-//                } else {
-//                    normalList.add(cbsInspectionResultVo);
-//                }
-//            } else {
-//                /*if (cbsInspectionResultVo.getCruiseState() == 253 ||
-//                        cbsInspectionResultVo.getCruiseState() == 254 ||
-//                        cbsInspectionResultVo.getCruiseState() == 255 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 248 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 249 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 251 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 410 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 411 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 412 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 350 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 351 ||
-//                        cbsInspectionResultVo.getCruiseAbnormal() == 352
-//                ) {
-//                    if (cbsInspectionResultVo.getIsWarn() == 1) {
-//                        abnormalList.add(cbsInspectionResultVo);
-//                    } else {*/
-//                        cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-//                        unReviewList.add(cbsInspectionResultVo);
-///*                    }
-//                } else {
-//                    normalList.add(cbsInspectionResultVo);
-//                }*/
-//            }
-//        }
 
         List<NonhomologousInfo> nonList = param.getNonList();
-        setCpResultList(abnormalList,nonList);
-        setCpResultList(normalList,nonList);
-        setCpResultList(unReviewList,nonList);
+        setCpResultList(abnormalList, nonList);
+        setCpResultList(normalList, nonList);
+        setCpResultList(unReviewList, nonList);
 
 
         for (int i = 0; i < TASK_TITLE_CONTENT.length; i++) {

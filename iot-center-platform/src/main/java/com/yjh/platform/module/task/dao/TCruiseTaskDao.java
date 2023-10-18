@@ -70,4 +70,8 @@ public interface TCruiseTaskDao {
 
     TCruiseTask selectCruiseTask(@Param(value = "taskId") String taskId,
                                  @Param(value = "taskCode") String taskCode);
+
+    List<RegionPath> queryRegionList();
+
+    String queryRegionName();
 }

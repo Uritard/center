@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
@@ -309,4 +310,90 @@ public class UPatrolResultController {
         return result;
     }
 
+    @ApiOperation(value = "操作任务记录查询")
+    @RequestMapping(value = "/queryOperationTask",method = RequestMethod.POST)
+    @Logs(title = "操作任务记录查询", content = "根据用户传递的参数查询操作任务记录", logType = 1, authority = "1235")
+    public Result queryOperationTask(@RequestBody JSONObject obj){
+
+        Long regionId = obj.getLong("regionId");
+        String operationType = obj.getString("operationType");
+        String startTime= obj.getString("startTime");
+        String endTime = obj.getString("endTime");
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            //递归查询
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                //查询该regionId的子节点
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                //查询该regionId的子节点
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(obj.getIntValue("pageNum"), obj.getIntValue("pageSize"), true, null, true);
+            List<OperationTaskRecord> hashMaps = uPatrolResultService.queryOperationTask(deviceIdList , operationType, startTime, endTime);
+            resultMap.put("count",page.getTotal());
+            resultMap.put("list",hashMaps);
+            result.setData(resultMap);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("操作任务记录查询失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "操作任务详情查询")
+    @RequestMapping(value = "/queryOperationResult",method = RequestMethod.POST)
+    public Result queryOperationResult(@RequestBody HashMap<String,String> map){
+        String taskId = map.get("taskId");
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            List<OperationTaskRecordResult> hashMaps = uPatrolResultService.queryOperationResult(taskId);
+            resultMap.put("count",hashMaps.size());
+            resultMap.put("list",hashMaps);
+            result.setData(resultMap);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("操作任务详情查询失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "操作任务详情导出")
+    @RequestMapping(value = "/operationResultExport",method = RequestMethod.GET)
+    public Result operationResultExport (@RequestParam(value = "taskId",required = false) String taskId){
+        Result result = new Result();
+        try {
+            result.setData(uPatrolResultService.downLoadOperationDetailReport(taskId));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("操作任务详情查询失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "data.txt文件读取")
+    @RequestMapping(value = "/dataTxtFileToList",method = RequestMethod.GET)
+    public Result dataTxtFileToList (@RequestParam(value = "filePath",required = false) String filePath){
+        Result result = new Result();
+        try {
+            result.setData(uPatrolResultService.dataTxtFileToList(filePath));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("data.txt文件读取失败描述",e);
+        }
+        return result;
+    }
 }

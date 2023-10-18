@@ -107,6 +107,10 @@ public abstract class AbstractVideoCruise {
 
         if (presetId > 0 && StringUtils.isNotEmpty(cameraId)) {
             String instanceName = inspectionMap.get("instanceName");
+
+            String presetAttribute =  inspectionMap.get("presetAttribute");
+            boolean isThreePhase = "123".contains(presetAttribute);
+            List<Map<String, String>> captureList = new ArrayList<>();
             Map<String, String> re = null;
             boolean waitFlag = waitCamera2(taskId, cameraId, presetName);
             long cameraLong = NumberUtils.toLong(cameraId);
@@ -114,9 +118,29 @@ public abstract class AbstractVideoCruise {
                 try {
                     //1.转到预置位
                     // 移动相机
-                    moveWait(presetId, cameraLong);
-                    //2.抓图
-                    re = capture(taskId, cameraLong, instanceName);
+                    moveWait(presetId, NumberUtils.toLong(cameraId));
+
+                    HashMap<String, Object> captureMap = new HashMap<>();
+                    captureMap.put("presetId", presetId);
+                    captureMap.put("cameraId", cameraId);
+                    captureMap.put("meteName", instanceName);
+                    if (isThreePhase){
+                        //三相电测点 存储20次拍照结果
+                        for (int i = 0; i < 20; i++) {
+                            Map<String, String> tempResult = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
+                            captureList.add(tempResult);
+                            //失败即终止
+                            if (tempResult == null || StringUtils.isEmpty(tempResult.get("absPath"))) {
+                                break;
+                            } else {
+                                re = tempResult;
+                            }
+                            Thread.sleep(1000);
+                        }
+                    } else {
+                        //2.抓图
+                        re = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
+                    }
                 } catch (Exception e) {
                     log.error("抓图失败，重试一次", e);
                     try {
@@ -180,8 +204,21 @@ public abstract class AbstractVideoCruise {
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
-                        // 算法分析
-                        isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
+                        if (isThreePhase){
+                            //三相电测点
+                            Constant.threePhaseMap.put(inspectionMap.get("instanceId"),captureList.size());
+                            for (Map<String,String> item: captureList){
+                                String urlPath = item.get("urlPath");
+                                String absPath = item.get("absPath");
+                                inspectionMap.put("picpath", urlPath);
+                                inspectionMap.put("origpic", absPath);
+
+                                isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
+                            }
+                        } else {
+                            // 算法分析
+                            isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
+                        }
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
                         inspectionMap.put("resultNum", resultNum);

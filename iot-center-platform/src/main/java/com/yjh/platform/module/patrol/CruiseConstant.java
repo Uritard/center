@@ -88,6 +88,15 @@ public interface CruiseConstant {
      * 异常原因，任务终止
      */
     int CRUISE_ABNORMAL_INTERRUPT = 412;
+    /**
+     * 异常原因，操作任务不可下发巡视任务
+     */
+    int CRUISE_ABNORMAL_OPERATE = 821;
+
+    /**
+     * 异常原因，任务终止
+     */
+    int CRUISE_ABNORMAL_DISCHARGE = 5700;
 
     /**
      * 巡检数据状态，已执行
@@ -122,6 +131,11 @@ public interface CruiseConstant {
      * 审核状态，未审核
      */
     int EVALUATION_STATE_UN = 257;
+
+    /**
+     * 审核结果正常
+     */
+    int IDENTIFY_RESULT_NORMAL = 261;
 
     String FAILED_VALUE = "-1";
 

@@ -2,6 +2,8 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
 import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import org.apache.ibatis.annotations.Param;

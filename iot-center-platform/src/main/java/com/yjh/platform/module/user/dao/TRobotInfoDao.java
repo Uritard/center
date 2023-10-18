@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.task.entity.RobotInfoForHomePage;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -29,6 +30,8 @@ public interface TRobotInfoDao {
     int deleteInstance(Long robotId);
 
     int update(TRobotInfo tRobotInfo);
+    int updateEntrance(@Param(value = "robotId") Long robotId,
+                       @Param(value = "entrance") Integer entrance);
     TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
     List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
                             @Param(value = "robotCode") String robotCode,
@@ -116,6 +119,10 @@ public interface TRobotInfoDao {
     //查询当前机器人执行当前巡视点时使用的有效工作摄像头类型
     String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
 
+    List<Long> selectAllEnvRegionId();
+
+    List<AreaInfo> selectMapNodeTree();
+
     TRobotInfo selectMapPathByCode(@Param(value = "robotCode") String robotCode);
 
     List<String> selectAllRobotNum();
@@ -127,4 +134,6 @@ public interface TRobotInfoDao {
 
     @MapKey("robotId")
     Map<Long, TRobotInfo> selectAll();
+
+    Integer selectEntrance(@Param(value = "robotId")Long robotId);
 }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessmeter.module.dao.TMeterDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessmeter.module.device.entity.TMeter">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="ip" column="ip" jdbcType="VARCHAR"/>
+            <result property="port" column="port" jdbcType="INTEGER"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>
+            <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>
+            <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
+            <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,ip,
+        port,address,up_region_id,total_positive_power,total_positive_power,
+        total_positive_reactive_power,total_negative_positive_power,
+        collect_power_time,create_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_meter
+        where  id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_meter
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_meter
+        where  id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.TMeter" useGeneratedKeys="true">
+        insert into t_meter
+         ( name,ip,port ,address )
+        values (#{name,jdbcType=VARCHAR},#{ip,jdbcType=VARCHAR},#{port,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateData" parameterType="com.yjh.accessmeter.module.device.entity.TMeter">
+        update t_meter
+        <set>
+            <if test="totalPositivePower != null">total_positive_power = #{totalPositivePower,jdbcType=VARCHAR},</if>
+            <if test="totalPositiveReactivePower != null">total_positive_reactive_power = #{totalPositiveReactivePower,jdbcType=VARCHAR},</if>
+            <if test="totalNegativeReactivePower != null">total_negative_positive_power = #{totalNegativeReactivePower,jdbcType=VARCHAR},</if>
+            collect_power_time= now(),
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateAddress" parameterType="com.yjh.accessmeter.module.device.entity.TMeter">
+        update t_meter
+        set
+            address =  #{address,jdbcType=VARCHAR}
+        where   id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

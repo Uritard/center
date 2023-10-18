@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -337,22 +338,31 @@ public class PatrolResultHandler {
         boolean isAlarm = false;
         String descFilePath = "";
         String descRelativeUrl = "";
+        String descConfirmFilePath = "";
+        String descConfirmRelativeUrl = "";
 
         try {
             // 文件路径
             String filePath = robotPatrolTaskResult.getFilePath();
+            //待确认文件名称
+            String confirmFilePath = robotPatrolTaskResult.getConfirmFilePath();
             if (StringUtils.isEmpty(filePath)){
                 infoMap.put("relativePath", descRelativeUrl);
                 infoMap.put("absolutePath", descFilePath);
+                infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+                infoMap.put("confirmAbsolutePath", descConfirmFilePath);
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);
                 return isAlarmMap;
             }
             String temporaryFilePath = ftpsFilePath + "/" + filePath;
+            String confirmTemporaryFilePath = ftpsFilePath + "/" + confirmFilePath;
             log.info("temporaryFilePath==={}", temporaryFilePath);
+            log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
             String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+            String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
 
-            // 1.红外 2.可见光 3.音频 4.视频
+            // 1.红外 2.可见光 3.音频 4.视频 50.局放
             String fileType = robotPatrolTaskResult.getFileType();
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
@@ -368,6 +378,8 @@ public class PatrolResultHandler {
                 case "5":
                     descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
                     descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
+                    descConfirmFilePath = developAbsoluteUrl + "/CCD/" + confirmFileName;
+                    descConfirmRelativeUrl = developRelativeUrl + "/CCD/" + confirmFileName;
                     isAlarm = true;
                     break;
                 case "3":
@@ -388,6 +400,10 @@ public class PatrolResultHandler {
                     descFilePath = developAbsoluteUrl + "/Video/" + fileName;
                     descRelativeUrl = developRelativeUrl + "/Video/" + fileName;
                     break;
+                case "50":
+                    descFilePath = developAbsoluteUrl + "/Txt/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/Txt/" + fileName;
+                    break;
                 default:
                     descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
                     descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
@@ -395,8 +411,11 @@ public class PatrolResultHandler {
             }
 
             FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
+            FileUtil.copyFileUsingStream(temporaryFilePath, descConfirmFilePath);
             infoMap.put("relativePath", descRelativeUrl);
             infoMap.put("absolutePath", descFilePath);
+            infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+            infoMap.put("confirmAbsolutePath", descConfirmFilePath);
             if (isAlarm) {
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);
@@ -428,6 +447,45 @@ public class PatrolResultHandler {
                 Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
                 CommonUtils.removeEmptyValue(cruiseResultMap);
                 log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
+                //判断是不是三相的点
+                String presetAttribute = cruiseResultMap.get("presetAttribute");
+                boolean isThreePhase = "123".contains(presetAttribute);
+                if (isThreePhase){
+                    synchronized (Constant.threePhaseCountMap){
+                        int count;
+                        if (Constant.threePhaseCountMap.get(instanceId) == null){
+                            count = 1;
+                        } else {
+                            count =   Constant.threePhaseCountMap.get(instanceId)+1;
+                        }
+                        Constant.threePhaseCountMap.put(instanceId,count);
+                    }
+                    Integer cruiseStatus = ValueUtil.toInteger(cruiseResultMap.get("cruiseStatus"),-1);
+                    if (CRUISE_STATE_DONE == cruiseStatus){
+                        //这点已经执行过了
+                        return;
+                    }
+                    String resultValue = resultList.get(0).getResultValue();
+                    //检查相 是否对应  算法返回结果示例：A36.0
+                    String resultPhase = resultValue.substring(0,1);
+                    String presetAttributeToPhase = String.valueOf((char)((int)presetAttribute.charAt(0)+16));
+                    if (presetAttributeToPhase.equals(resultPhase)){
+                        resultValue = resultValue.substring(1);
+                        resultList.get(0).setResultValue(resultValue);
+                    } else {
+                        //相 不匹配 本次结果不处理
+                        synchronized (Constant.threePhaseCountMap){
+                            log.info("现在是第几个点：{},总共有：{}",Constant.threePhaseCountMap.get(instanceId),Constant.threePhaseMap.get(instanceId));
+                            if (Constant.threePhaseCountMap.get(instanceId) == Constant.threePhaseMap.get(instanceId)){
+                                //最后一个点 还不匹配 识别失败
+                                resultList.get(0).setResultValue("-1");
+                            } else {
+                                return;
+                            }
+                        }
+
+                    }
+                }
 
                 TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
                 log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));

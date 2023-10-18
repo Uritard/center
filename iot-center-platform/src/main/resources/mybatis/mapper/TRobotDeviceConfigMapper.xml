@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TRobotDeviceConfigDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
+            <id property="deviceConfigId" column="device_config_id" jdbcType="BIGINT"/>
+            <result property="robotId" column="robot_id" jdbcType="SMALLINT"/>
+            <result property="equipmentId" column="equipment_id" jdbcType="BIGINT"/>
+            <result property="equipmentName" column="equipment_name" jdbcType="VARCHAR"/>
+            <result property="equipmentType" column="equipment_type" jdbcType="INTEGER"/>
+            <result property="xCoordinate" column="x_coordinate" jdbcType="INTEGER"/>
+            <result property="yCoordinate" column="y_coordinate" jdbcType="INTEGER"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="updatePerson" column="update_person" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        device_config_id,robot_id,equipment_id,
+        equipment_name,equipment_type,x_coordinate,
+        y_coordinate,update_time,update_person
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_robot_device_config
+        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+    </select>
+    <select id="selectDeviceConfigByRobotId" resultType="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
+        select
+        <include refid="Base_Column_List" />
+        from t_robot_device_config
+        where  robot_id = #{robotId,jdbcType=BIGINT}
+    </select>
+    <select id="selectMapNodeDeviceByRobotId"
+            resultType="com.yjh.platform.module.user.entity.TRobotMapNodeDeviceInfo">
+        SELECT
+            a.device_config_id,
+            a.robot_id,
+            a.equipment_id,
+            a.equipment_name,
+            a.equipment_type,
+            a.x_coordinate,
+            a.y_coordinate,
+            a.update_time,
+            a.update_person,
+            c.node_id,
+            c.node_name
+        FROM
+            t_robot_device_config a
+                LEFT JOIN t_std_device b ON a.equipment_id = b.device_id
+                LEFT JOIN t_robot_map_node c ON b.node_id = c.id
+        WHERE a.robot_id = #{robotId,jdbcType=BIGINT}
+    </select>
+    <select id="selectDeviceTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT
+            a.region_id AS Id,
+            a.region_name AS label,
+            a.up_region_id AS upId,
+            b.region_name AS upName,
+            "region" AS infoType
+        FROM
+            t_std_region a
+                LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL
+        (
+            SELECT DISTINCT
+                b.device_id AS Id,
+                b.alias_name AS label,
+                b.up_region_id AS upId,
+                d.region_name AS upName,
+                "device" AS infoType
+            FROM
+                t_std_device b
+                    LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
+            WHERE
+                b.alias_name != ''
+        );
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_robot_device_config
+        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByRobotId">
+        delete from t_robot_device_config
+        where  robot_id = #{robotId,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="device_config_id" keyProperty="deviceConfigId" parameterType="com.yjh.platform.module.user.entity.TRobotDeviceConfig" useGeneratedKeys="true">
+        insert into t_robot_device_config
+        ( device_config_id,robot_id,equipment_id
+        ,equipment_name,equipment_type,x_coordinate
+        ,y_coordinate,update_time,update_person
+        )
+        values (#{deviceConfigId,jdbcType=BIGINT},#{robotId,jdbcType=SMALLINT},#{equipmentId,jdbcType=BIGINT}
+        ,#{equipmentName,jdbcType=VARCHAR},#{equipmentType,jdbcType=INTEGER},#{xCoordinate,jdbcType=INTEGER}
+        ,#{yCoordinate,jdbcType=INTEGER},#{updateTime,jdbcType=TIMESTAMP},#{updatePerson,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="device_config_id" keyProperty="deviceConfigId" parameterType="com.yjh.platform.module.user.entity.TRobotDeviceConfig" useGeneratedKeys="true">
+        insert into t_robot_device_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="deviceConfigId != null">device_config_id,</if>
+                <if test="robotId != null">robot_id,</if>
+                <if test="equipmentId != null">equipment_id,</if>
+                <if test="equipmentName != null">equipment_name,</if>
+                <if test="equipmentType != null">equipment_type,</if>
+                <if test="xCoordinate != null">x_coordinate,</if>
+                <if test="yCoordinate != null">y_coordinate,</if>
+                <if test="updateTime != null">update_time,</if>
+                <if test="updatePerson != null">update_person,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="deviceConfigId != null">#{deviceConfigId,jdbcType=BIGINT},</if>
+                <if test="robotId != null">#{robotId,jdbcType=SMALLINT},</if>
+                <if test="equipmentId != null">#{equipmentId,jdbcType=BIGINT},</if>
+                <if test="equipmentName != null">#{equipmentName,jdbcType=VARCHAR},</if>
+                <if test="equipmentType != null">#{equipmentType,jdbcType=INTEGER},</if>
+                <if test="xCoordinate != null">#{xCoordinate,jdbcType=INTEGER},</if>
+                <if test="yCoordinate != null">#{yCoordinate,jdbcType=INTEGER},</if>
+                <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+                <if test="updatePerson != null">#{updatePerson,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
+        update t_robot_device_config
+        <set>
+                <if test="robotId != null">
+                    robot_id = #{robotId,jdbcType=SMALLINT},
+                </if>
+                <if test="equipmentId != null">
+                    equipment_id = #{equipmentId,jdbcType=BIGINT},
+                </if>
+                <if test="equipmentName != null">
+                    equipment_name = #{equipmentName,jdbcType=VARCHAR},
+                </if>
+                <if test="equipmentType != null">
+                    equipment_type = #{equipmentType,jdbcType=INTEGER},
+                </if>
+                <if test="xCoordinate != null">
+                    x_coordinate = #{xCoordinate,jdbcType=INTEGER},
+                </if>
+                <if test="yCoordinate != null">
+                    y_coordinate = #{yCoordinate,jdbcType=INTEGER},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="updatePerson != null">
+                    update_person = #{updatePerson,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
+        update t_robot_device_config
+        set 
+            robot_id =  #{robotId,jdbcType=SMALLINT},
+            equipment_id =  #{equipmentId,jdbcType=BIGINT},
+            equipment_name =  #{equipmentName,jdbcType=VARCHAR},
+            equipment_type =  #{equipmentType,jdbcType=INTEGER},
+            x_coordinate =  #{xCoordinate,jdbcType=INTEGER},
+            y_coordinate =  #{yCoordinate,jdbcType=INTEGER},
+            update_time =  #{updateTime,jdbcType=TIMESTAMP},
+            update_person =  #{updatePerson,jdbcType=VARCHAR}
+        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+    </update>
+</mapper>

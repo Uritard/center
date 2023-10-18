@@ -124,6 +124,9 @@ public class RobotService {
     @Autowired
     private PlatformProxy platformProxy;
 
+    @Autowired
+    private TRobotMapNodeService tRobotMapNodeService;
+
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
         return tRobotInfoDao.updateAllRobotStatus("离线");
@@ -583,19 +586,28 @@ public class RobotService {
         }
         try {
             log.info("map=={}", map);
-            map.forEach((k,v)->{
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                String k = entry.getKey();
+                Object v = entry.getValue();
                 String filePath = filePathPrefix + File.separator + v;
                 try {
                     List<Map<String, Object>> mapList = new ArrayList<>();
-                    if(!k.equals("map_file_path") && !k.equals("source_file_path")) {
+                    if (!"map_file_path".equals(k) && !"source_file_path".equals(k)) {
                         XMLBaseModel model = getXmlMessage(filePath);
                         mapList = model.getItems();
                     }
-                    switch (k){
+                    switch (k) {
                         case "device_file_path":
-                            if (isEdge){
+                        case "operation_device_file_path":
+                            if (isEdge) {
                                 syncModelUpdate("1", v.toString(), nodeCode);
-                            }else {
+                            } else {
+                                //包含操作点
+                                if (map.containsKey("operation_device_file_path")) {
+                                    String operationFilePath = filePathPrefix + File.separator + map.get("operation_device_file_path");
+                                    XMLBaseModel operationModel = getXmlMessage(operationFilePath);
+                                    mapList.addAll(operationModel.getItems());
+                                }
                                 // Device Point Info
                                 addDevicePoint(mapList, robotId);
                                 // Device Point Region Info
@@ -604,15 +616,19 @@ public class RobotService {
                             break;
                         case "robot_file_path":
                             // Robot Model Info
-                            if (isEdge){
+                            if (isEdge) {
                                 dealRobotFile(filePath, nodeCode, Constant.ROBOT);
-                            }else {
+                            } else {
                                 addRobotModel(mapList, robotId);
                             }
                             break;
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
+                            break;
+                        case "map_node_file_path":
+                            // Map Nodes 地图信息添加
+                            addMapNodes(mapList, robotId);
                             break;
                         case "region_file_path":
                             dealRegionFile(filePath, nodeCode);
@@ -648,7 +664,7 @@ public class RobotService {
                 } catch (DocumentException e) {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
                 }
-            });
+            }
         }catch (Exception e){
             log.error("处理机器人返回的模型文件异常: ", e);
         }
@@ -741,6 +757,21 @@ public class RobotService {
         }
     }
 
+    public void addMapNodes(List<Map<String, Object>> maoNodeMapList, Long robotId) {
+        if (CollectionUtils.isNotEmpty(maoNodeMapList)){
+            List<TRobotMapNode> mapNodesList = new ArrayList<>();
+            for (Map<String, Object> maoNodeMap : maoNodeMapList){
+                TRobotMapNode tMapNodes = new TRobotMapNode()
+                        .setRobotId(robotId)
+                        .setNodeId(maoNodeMap.get("node_id").toString())
+                        .setNodeName(maoNodeMap.get("node_name").toString());
+                mapNodesList.add(tMapNodes);
+            }
+            //删除该机器人的地图信息表
+            tRobotMapNodeService.deleteByRobotId(robotId);
+            tRobotMapNodeService.batchInsert(mapNodesList);
+        }
+    }
     /**
      * 更新机器人测点信息
      *

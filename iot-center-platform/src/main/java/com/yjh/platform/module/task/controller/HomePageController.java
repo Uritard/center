@@ -9,6 +9,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.task.entity.QueryWeatherLogReq;
 import com.yjh.platform.module.task.entity.RegionPath;
 import com.yjh.platform.module.task.service.HomePageService;
 import io.swagger.annotations.Api;
@@ -313,17 +314,37 @@ public class HomePageController {
     }
 
     /**
-    * 站所概况统计
-    * @date 2022/3/1
-    */
+     * 查詢微气象数据信息
+     * station  站所id
+     */
+    @ApiOperation(value = "统计微气象数据信息")
+    @RequestMapping(value = "/queryWeatherLog", method = RequestMethod.POST)
+    @Logs(title = "统计微气象数据信息", content = "根据用户传递的参数查询微气象数据信息", logType = 1, authority = "1235")
+    public Result queryWeatherLog(@RequestBody QueryWeatherLogReq req) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryWeatherLog(req));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("统计微气象数据信息:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 站所概况统计
+     *
+     * @date 2022/3/1
+     */
     @ApiOperation(value = "站所概况统计")
-    @RequestMapping(value = "/queryStations",method = RequestMethod.GET)
-    public Result queryStations(@RequestParam(value = "regionId",required = false)Long regionId){
+    @RequestMapping(value = "/queryStations", method = RequestMethod.GET)
+    public Result queryStations(@RequestParam(value = "regionId", required = false) Long regionId) {
         Result result = new Result();
         try {
             result.setData(homePageService.queryStations(regionId));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站所概况统计信息错误:", e);
         }
@@ -332,18 +353,22 @@ public class HomePageController {
 
 
     @ApiOperation(value = "站所地图查询")
-    @RequestMapping(value = "/queryRegionPath",method = RequestMethod.GET)
-    public Result queryRegionPath(@RequestParam(value = "regionId",required = false)Long regionId){
+    @RequestMapping(value = "/queryRegionPath", method = RequestMethod.GET)
+    public Result queryRegionPath() {
         Result result = new Result();
         try {
-            RegionPath regionPath = homePageService.queryRegionPath(regionId);
-            result.setData(regionPath);
+            Map<String, Object> map = new HashMap<>(2);
+            List<RegionPath> regionPathList = homePageService.queryRegionList();
+            String regionName = homePageService.queryRegionName();
+            map.put("list", regionPathList);
+            map.put("regionName", regionName);
+            result.setData(map);
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站所地图查询错误:", e);
         }
-       return result;
+        return result;
     }
 
 

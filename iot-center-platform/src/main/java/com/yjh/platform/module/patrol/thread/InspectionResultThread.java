@@ -79,6 +79,8 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
+            tCruiseTaskResultMap.put("confirmPicPath", infoMap.getOrDefault("confirmRelativePath", ""));
+            tCruiseTaskResultMap.put("origConfirmPicPath", infoMap.getOrDefault("confirmAbsolutePath", ""));
             if ("3".equals(robotPatrolTaskResult.getFileType())) {
                 // 声音文件处理
                 tCruiseTaskResultMap.put("voicePath", infoMap.getOrDefault("relativePath", ""));
@@ -155,7 +157,10 @@ public class InspectionResultThread implements Runnable{
             switch (valid) {
                 case "1":
                 case "2":
-
+                    //局放 异常
+                    if ("50".equals(robotPatrolTaskResult.getFilePath())){
+                        cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_DISCHARGE);
+                    }
                     break;
                 case "0":
                 default:

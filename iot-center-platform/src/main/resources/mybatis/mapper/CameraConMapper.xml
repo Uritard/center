@@ -247,4 +247,40 @@
         FROM t_camera_recorder a
     </select>
 
+    <select id="selectAllRobotConInfo" parameterType="java.lang.Long" resultType="com.yjh.platform.module.video.entity.RobotConInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.robot_status,
+        a.robot_type,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.identity_manager,
+        a.identity_code,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        a.robot_factory,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position,
+        a.remarks,
+        a.record_id,
+        a.channel_num_light as numLight,
+        a.channel_num_inferad as numInferad,
+        a.light_channel_id,
+        a.infrared_channel_id
+        from t_robot_info a
+    </select>
+
 </mapper>

@@ -422,4 +422,18 @@
         ORDER BY
             LEVEL,region_id
     </select>
+
+    <select id="queryAll" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        SELECT <include refid="Base_Column_List"></include> FROM t_std_region
+        WHERE 1 = 1
+    </select>
+
+    <select id="selectStations" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        select
+        <include refid="Base_Column_List" />
+        from
+          t_std_region
+        where
+          up_region_id = (select region_id from t_std_region where up_region_id =-1)
+    </select>
 </mapper>

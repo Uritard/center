@@ -1,20 +1,25 @@
 package com.yjh.platform.module.task.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
+import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
-import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,8 @@ public class ReportManageService {
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
+    @Autowired
+    private TStdRegionService stdRegionService;
 
     @Transactional(rollbackFor = Exception.class)
     public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
@@ -60,11 +67,14 @@ public class ReportManageService {
         tCruiseDataResultDetailList.forEach(detail->{
             String resultPath = detail.getPicPath().replace(relPath, absPath);
             detail.setPicPath(resultPath);
+
+            detail.setDataType(DictConvertUtil.DICT.covertToDict("cruiseType", detail.getCruiseType()));
         });
         recordData.setTCDRDList(tCruiseDataResultDetailList);
 
         // 概况
-        TaskVO taskVO = getTaskVoDefined(tCruiseDataResultDetailList);
+        TaskVO taskVO = getTaskVoDefined(null);
+        taskVO.setCruiseStatistics(getTaskVoCount(tCruiseDataResultDetailList));
         recordData.setTaskVO(taskVO);
 
         // 报表名称:站所名称+报告名称+当前时间
@@ -158,46 +168,63 @@ public class ReportManageService {
     }
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
-        ReportData recordData = new ReportData();
-
         // 明细
-        List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
-        UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        String remark = uPatrolResult.getRemark();
+        List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+        List<String>  originalImgList = new ArrayList<>();
+        boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
+        Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = cruiseDataGroup(cruiseDataResultDetailList, originalImgList, downResultPic);
+
+        // UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        // String remark = uPatrolResult.getRemark();
 
         //顺便处理非同源合并问题
         List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
-        // 概况
-        TaskVO taskVO = getTaskVoDefined(tCruiseDataResultDetailList);
-        // 报告名称:站所名称+任务名称+巡视时间
-        TaskVO taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
-        taskVO.setTaskName(taskVOtemp.getTaskName());
-        taskVO.setCruiseDate(taskVOtemp.getCruiseDate());
-        taskVO.setCruiseStartTime(taskVOtemp.getCruiseStartTime());
-        taskVO.setCruiseEndTime(taskVOtemp.getCruiseEndTime());
-        taskVO.setReviewer(taskVOtemp.getReviewer());
-        taskVO.setEnvInfo(taskVOtemp.getEnvInfo());
-        taskVO.setReviewTime(taskVOtemp.getReviewTime());
-        recordData.setTaskVO(taskVO);
 
-        String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
-        String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
-        boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
-        recordData.setDownResultPic(downResultPic);
-        List<String>  originalImgList = new ArrayList<>();
-        // 相对路径替换绝对路径
-        tCruiseDataResultDetailList.forEach(detail->{
-            String resultPath = detail.getPicPath().replace(relPath, absPath);
-            detail.setPicPath(resultPath);
+        List<KeyValue<String, ContentData>> contentDataList = new ArrayList<>();
+        TaskVO taskBaseVO = getTaskVoDefined(taskId);
+        listMap.forEach((k, detailList)->{
+            try {
+                TaskVO taskVO = new TaskVO();
+                BeanUtil.copyProperties(taskBaseVO, taskVO);
+                taskVO.setCruiseStatistics(getTaskVoCount(detailList));
 
-            String dowmPic = downResultPic ? resultPath : detail.getOriImg();
-            if (!CommonUtils.isEmptyOrNullstr(dowmPic)) {
-                originalImgList.add(dowmPic);
+                ReportData recordData = new ReportData();
+                recordData.setTaskVO(taskVO);
+
+                recordData.setDownResultPic(downResultPic);
+
+                recordData.setTCDRDList(detailList);
+                recordData.setNonList(nonList);
+
+                ContentData contentData = ReportDataModel.getData(recordData);
+
+                contentDataList.add(new DefaultKeyValue<>(k.getValue(), contentData));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         });
-        recordData.setTCDRDList(tCruiseDataResultDetailList);
-        recordData.setNonList(nonList);
+        // 概况
 
+        String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
+        File file = reportFile(taskBaseVO);
+        if (!file.exists()) {
+            FileUtil.mkdir(file.getParentFile());
+            log.info("不存在，创建的文件绝对路径是==={}", file.getAbsolutePath());
+        }else {
+            log.info("存在，该文件绝对路径是==={}", file.getAbsolutePath());
+        }
+
+        ReportHelper.createDocument(contentDataList, file, taskId);
+        try {
+            //将任务下的巡视原图图片 打包成一份zip
+            FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
+        }catch (Exception e){
+            log.info("压缩任务下图片失败：",e);
+        }
+        return file.getAbsolutePath();
+    }
+
+    private File reportFile(TaskVO taskVO) {
         // 报告名称:站所名称+任务名称+巡视时间
         String fileNameTemp = taskVO.getStationName() + "-" + taskVO.getTaskName();
         String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
@@ -205,33 +232,8 @@ public class ReportManageService {
         String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
         log.info("reportPath:{}", reportPath);
 
-        File temporaryFile = new File(reportPath);
-        String newReportPath = null;
-        if (!temporaryFile.exists() && !temporaryFile.isDirectory()) {
-            temporaryFile.mkdir();
-            newReportPath = reportPath + "/" + reportName;
-            log.info("不存在，创建的文件绝对路径是==={}", newReportPath);
-            File file = new File(newReportPath);
-            ContentData contentData = ReportDataModel.getData(recordData);
-
-            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                    contentData.getElements(), file,taskId);
-        }else {
-            newReportPath = reportPath + "/" + reportName;
-            log.info("存在，该文件绝对路径是==={}", newReportPath);
-            File file = new File(newReportPath);
-            ContentData contentData = ReportDataModel.getData(recordData);
-
-            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                    contentData.getElements(), file,taskId);
-        }
-        try {
-            //将任务下的巡视原图图片 打包成一份zip
-            FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
-        }catch (Exception e){
-            log.info("压缩任务下图片失败：",e);
-        }
-        return newReportPath;
+        String newReportPath = CommonUtils.concatPath(reportPath, reportName);
+        return new File(newReportPath);
     }
 
     private void delaCount(TaskVO taskVO,List<TCruiseDataResultDetail> detailList){
@@ -349,23 +351,38 @@ public class ReportManageService {
         return taskVO;
     }
 
-    public TaskVO getTaskVoDefined(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
-        TaskVO taskVO = new TaskVO();
+    public TaskVO getTaskVoDefined(String taskId) {
+        // 报告名称:站所名称+任务名称+巡视时间
+        TaskVO taskVOtemp;
+        if (StringUtils.isEmpty(taskId)) {
+            taskVOtemp = new TaskVO();
+            String stationWeather = uPatrolTaskService.getStationWeather();
+            taskVOtemp.setEnvInfo(stationWeather);
+        } else {
+            taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
+        }
+
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
-        taskVO.setStationName(stationName);
-        taskVO.setVoltageClasses(voltageClasses);
-        taskVO.setStationType(stationType);
+        taskVOtemp.setStationName(stationName);
+        taskVOtemp.setVoltageClasses(voltageClasses);
+        taskVOtemp.setStationType(stationType);
+
+        return taskVOtemp;
+    }
+
+    public String getTaskVoCount(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
         //总点数
         long allCount = tCruiseDataResultDetailList.size();
 //        审核结果正常
-        long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> StringUtils.equals("正常", detail.getIdentifyResultName())).count();
+        long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL)).count();
         //未审核
-        long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> StringUtils.equals("未审核", detail.getEvaluationStateName())).count();
+        long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)).count();
         //已检点数
-        long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
-                !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
+        // long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
+        //         !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
+        long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseState(), CruiseConstant.CRUISE_STATE_DONE)).count();
         //未检点数
         long waitCount= allCount - alreadyCount;
         //异常点数
@@ -378,26 +395,26 @@ public class ReportManageService {
         stringJoiner.add("正常点位" + normalCount + "个");
         stringJoiner.add("异常点位" + abnormalCount + "个");
         stringJoiner.add("待人工确认点位" + unReviewCount + "个");
-        taskVO.setCruiseStatistics(stringJoiner.toString());
-        // 当前站内环境信息
-        String stationWeather = uPatrolTaskService.getStationWeather();
-        taskVO.setEnvInfo(stationWeather);
-        return taskVO;
+        return stringJoiner.toString();
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Result  downLoadCruiseReport(String taskId,String remark){
         Result result = new Result();
+        TaskVO taskVO = getTaskVoDefined(taskId);
         if ("0".equals(remark)) {
             //自动生成巡视报告
-            String reportFilePath = cruiseReportGenerate(taskId);
-            log.info("自动生成巡视报告的路径是=={}", reportFilePath);
+            File file = reportFile(taskVO);
+            if (!file.exists()) {
+                String reportFilePath = cruiseReportGenerate(taskId);
+                log.info("自动生成巡视报告的路径是=={}", reportFilePath);
+            } else {
+                log.info("巡视报告已经生成，直接下载=={}", file.getAbsolutePath());
+            }
         }
 
         // 报告名称:站所名称+任务名称+巡视时间
-        TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
-        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
-        String fileNameTemp = stationName + "-" + taskVO.getTaskName();
+        String fileNameTemp = taskVO.getStationName() + "-" + taskVO.getTaskName();
         String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
 
         String fileRelativePathTemp = (String) redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content");
@@ -415,4 +432,39 @@ public class ReportManageService {
         return result;
     }
 
+    private Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> cruiseDataGroup(
+        List<TCruiseDataResultDetail> tCruiseDataResultDetailList, List<String> originalImgList, boolean downResultPic) {
+        Map<Long, KeyValue<Long, String>> stationDownMap = stdRegionService.stationDownId();
+        Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = new TreeMap<>(Comparator.comparing(KeyValue::getKey));
+
+        String absPath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
+        String relPath = (String)redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+
+        Boolean reportGroupByStation = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:reportGroupByStation", "content"));
+        // 相对路径替换绝对路径
+        tCruiseDataResultDetailList.forEach(detail -> {
+            String resultPath = detail.getPicPath().replace(relPath, absPath);
+            detail.setPicPath(resultPath);
+
+            String dowmPic = downResultPic ? resultPath : detail.getOriImg();
+            if (!CommonUtils.isEmptyOrNullstr(dowmPic)) {
+                originalImgList.add(dowmPic);
+            }
+
+            detail.setDataType(DictConvertUtil.DICT.covertToDict("cruiseType", detail.getCruiseType()));
+            Long regionId = detail.getRegionId();
+
+            KeyValue<Long, String> key;
+            if (reportGroupByStation) {
+                key = stationDownMap.getOrDefault(regionId, new LineKeyValue<>(regionId, detail.getRegionName()));
+            } else {
+                key = new LineKeyValue<>(0L, "巡检报告");
+            }
+
+            List<TCruiseDataResultDetail> list = listMap.computeIfAbsent(key, k -> new ArrayList<>());
+            list.add(detail);
+        });
+
+        return listMap;
+    }
 }

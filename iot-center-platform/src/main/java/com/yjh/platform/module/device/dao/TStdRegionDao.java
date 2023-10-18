@@ -56,4 +56,15 @@ public interface TStdRegionDao {
     List<Long> selectAllUpRegion(@Param("regionIdString")String regionIdString);
     List<Long> selectDownRegion(@Param("regionIdString")String regionIdString);
     TStdRegion selectRootRegion();
+
+    /**
+     * 查询所有区域列表*
+     * @return
+     */
+    List<TStdRegion> queryAll();
+
+    /**
+     * 查询所有的站点，即根目录下第一级目录
+     */
+    List<TStdRegion> selectStations();
 }
