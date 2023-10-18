@@ -457,20 +457,21 @@ public class PatrolResultHandler {
                     Constant.threePhaseCountMap.put(instanceId,count);
                 }
                 Integer cruiseStatus = ValueUtil.toInteger(cruiseResultMap.get("cruiseStatus"),-1);
-                if (!(CRUISE_STATE_UN == cruiseStatus)){
+                if (CRUISE_STATE_DONE == cruiseStatus){
                     //这点已经执行过了
                     return;
                 }
                 String resultValue = resultList.get(0).getResultValue();
-                //检查相 是否对应  算法返回结果示例：A$36.0
+                //检查相 是否对应  算法返回结果示例：A36.0
                 String resultPhase = resultValue.substring(0,1);
                 String presetAttributeToPhase = String.valueOf((char)((int)presetAttribute.charAt(0)+16));
                 if (presetAttributeToPhase.equals(resultPhase)){
-                    resultValue = resultValue.substring(2);
+                    resultValue = resultValue.substring(1);
                     resultList.get(0).setResultValue(resultValue);
                 } else {
                     //相 不匹配 本次结果不处理
                     synchronized (Constant.threePhaseCountMap){
+                        log.info("现在是第几个点：{},总共有：{}",Constant.threePhaseCountMap.get(instanceId),Constant.threePhaseMap.get(instanceId));
                         if (Constant.threePhaseCountMap.get(instanceId) == Constant.threePhaseMap.get(instanceId)){
                             //最后一个点 还不匹配 识别失败
                             resultList.get(0).setResultValue("-1");
