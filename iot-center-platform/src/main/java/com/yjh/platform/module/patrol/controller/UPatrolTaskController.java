@@ -17,6 +17,7 @@ import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.patrol.service.UpdatePatrolService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
@@ -59,6 +60,8 @@ public class UPatrolTaskController {
     private LogsRecord logsRecord;
     @Autowired
     private RobotProxy robotProxy;
+    @Autowired
+    private UpdatePatrolService updatePatrolService;
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
@@ -547,5 +550,33 @@ public class UPatrolTaskController {
         }
     }
 
+    @ApiOperation(value = "旧的巡视数据迁移")
+    @PostMapping(value = "/cruiseUptoPatrol")
+    public Result cruiseUptoPatrol() {
+        Result result = new Result();
+        try {
+            result.setData(updatePatrolService.cruiseUptoPatrol());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("旧的巡视数据迁移失败:", e);
+        }
+        return result;
+    }
 
+    @ApiOperation(value = "旧的巡视数据迁移")
+    @PostMapping(value = "/cruiseUpReset")
+    public Result cruiseUpReset() {
+        Result result = new Result();
+        try {
+            result.setData(updatePatrolService.cruiseUpReset());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("数据迁移重置失败:", e);
+        }
+        return result;
+    }
 }

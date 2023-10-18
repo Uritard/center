@@ -481,6 +481,9 @@ public class CommonUtils {
      * 判断字符串是否含有中文
      */
     public static boolean containsChinese(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
         Matcher matcher = PATTERN_CHINESE.matcher(str);
         return matcher.find();
     }
