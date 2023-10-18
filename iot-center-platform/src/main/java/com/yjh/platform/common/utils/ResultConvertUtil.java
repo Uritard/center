@@ -40,6 +40,9 @@ public class ResultConvertUtil {
      * @return resultNum 目标值
      */
     public static String convertResult(String result) {
+        if (StringUtils.isBlank(result)) {
+            return "0";
+        }
         RecogniseStatusEnum statusEnum = RecogniseStatusEnum.getCodeByValue(result);
         RecogniseStatusExEnum statusExEnum = RecogniseStatusExEnum.getCodeByValue(result);
         if (Objects.nonNull(statusEnum)) {
@@ -52,7 +55,7 @@ public class ResultConvertUtil {
             return String.valueOf(StringUtils.split(result,"_ ").length);
         } else if (StringUtils.containsAny(result, "正常", "未见异常")) {
             return "0";
-        } else if (StringUtils.contains(result, "任务异常")) {
+        } else if (StringUtils.containsAny(result, "异常", "超时", "错误", "失败", "未识别")) {
             return "-1";
         } else if (CommonUtils.containsChinese(result)) {
             return String.valueOf(StringUtils.split(result).length);
