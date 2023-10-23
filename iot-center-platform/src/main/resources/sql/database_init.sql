@@ -639,6 +639,7 @@ CREATE TABLE `t_camera_preset` (
   `preset_ptz` varchar(255) DEFAULT NULL COMMENT '相机预置位PTZ值',
   `calibration_status` int(10) DEFAULT '1' COMMENT '标定状态，0-未标定 1-已标定',
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
+  `preset_attribute` int DEFAULT '0' COMMENT '预置位属性(1-A相 2-B相  3-C相  0-无 )',
   PRIMARY KEY (`preset_id`) USING BTREE,
   UNIQUE KEY `idx_camera_num` (`camera_id`,`preset_num`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=21000000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
@@ -1661,6 +1662,8 @@ CREATE TABLE `t_robot_info` (
   `duration` bigint(20) DEFAULT NULL COMMENT '在线时长累积(毫秒)',
   `off_line_count` int(10) DEFAULT NULL COMMENT '离线次数',
   `image_size` varchar(20) DEFAULT '' COMMENT '机器人地图图片尺寸',
+  `env_region_id` bigint DEFAULT NULL COMMENT '环控数据所属区域',
+  `entrance` int DEFAULT NULL COMMENT '入口处',
   `light_channel_id` varchar(50) DEFAULT NULL COMMENT '可见光设备通道号',
   `infrared_channel_id` varchar(50) DEFAULT NULL COMMENT '红外设备通道号',
   `light_vendor` varchar(64) DEFAULT NULL COMMENT '可见光厂家',
@@ -2627,6 +2630,7 @@ CREATE TABLE `dict_area` (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='区县行政编码字典表';
 
+DROP TABLE IF EXISTS `a_interface_task_info`;
 CREATE TABLE `a_interface_task_info` (
 `type` varchar(5) DEFAULT NULL COMMENT ' 巡检类型 <1>: = 全面巡视 <2>: = 例行巡视\r\n<3>: = 专项巡视<4>: = 特殊巡视',
 `task_code` varchar(256) NOT NULL COMMENT '任务编码',
@@ -2651,3 +2655,105 @@ CREATE TABLE `a_interface_task_info` (
 `creator` varchar(32) DEFAULT NULL COMMENT '编制人',
 `create_time` varchar(32) DEFAULT NULL COMMENT '编制时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A接口任务信息';
+
+DROP TABLE IF EXISTS `t_meter`;
+CREATE TABLE `t_meter` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '电表Id',
+`name` varchar(255) DEFAULT '' COMMENT '电表名称',
+`ip` varchar(20) DEFAULT '' COMMENT '电表IP',
+`port` int DEFAULT '1' COMMENT '电表端口号',
+`address` varchar(30) DEFAULT '' COMMENT '电表地址',
+`up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
+`edge_code` varchar(30) DEFAULT null COMMENT '所属区域编码',
+`total_positive_power` varchar(256) DEFAULT NULL COMMENT '正向有功总电量',
+`total_positive_reactive_power` varchar(256) DEFAULT NULL COMMENT '正向无功总电量',
+`total_negative_positive_power` varchar(256) DEFAULT NULL COMMENT '反向无功总电量',
+`collect_power_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '电量采集时间',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='电表信息表';
+
+DROP TABLE IF EXISTS `t_meter_log`;
+CREATE TABLE `t_meter_log` (
+`id` bigint NOT NULL AUTO_INCREMENT,
+`meter_id` bigint NOT NULL COMMENT '电表id',
+`meter_name` varchar(50) NOT NULL COMMENT '电表名称',
+`ip` varchar(20) DEFAULT NULL COMMENT '电表ip',
+`port` int DEFAULT NULL COMMENT '电表端口号',
+`address` varchar(30) DEFAULT NULL COMMENT '电表地址',
+`up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
+`edge_code` varchar(30) DEFAULT null COMMENT '所属区域编码',
+`total_positive_power` varchar(256) DEFAULT NULL COMMENT '正向有功总电量',
+`total_positive_reactive_power` varchar(256) DEFAULT NULL COMMENT '正向无功总电量',
+`total_negative_positive_power` varchar(256) DEFAULT NULL COMMENT '反向无功总电量',
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`create_person` varchar(20) NOT NULL COMMENT '创建人',
+`update_time` datetime NOT NULL COMMENT '更新时间',
+`update_person` varchar(20) NOT NULL COMMENT '更新人',
+`is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='电表历史记录';
+
+DROP TABLE IF EXISTS `t_robot_device_config`;
+CREATE TABLE `t_robot_device_config` (
+`device_config_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+`robot_id` smallint DEFAULT NULL COMMENT '机器人id',
+`equipment_id` bigint DEFAULT NULL COMMENT '关联设备id',
+`equipment_name` varchar(128) DEFAULT '' COMMENT '关联设备名称',
+`equipment_type` int DEFAULT '1' COMMENT '关联设备类型',
+`x_coordinate` int DEFAULT NULL COMMENT '坐标位置x',
+`y_coordinate` int DEFAULT NULL COMMENT '坐标位置y',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+`update_person` varchar(20) DEFAULT '' COMMENT '更新人',
+PRIMARY KEY (`device_config_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='机器人设备机柜绑定表';
+
+DROP TABLE IF EXISTS `t_robot_map_node`;
+CREATE TABLE `t_robot_map_node` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+`robot_id` bigint DEFAULT '1' COMMENT '机器人ID',
+`node_id` varchar(255) DEFAULT '' COMMENT '地图点ID',
+`node_name` varchar(255) DEFAULT '' COMMENT '地图点名称',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=9500 DEFAULT CHARSET=utf8mb3 COMMENT='机器人地图点表';
+
+DROP TABLE IF EXISTS `t_std_weather_log`;
+CREATE TABLE `t_std_weather_log` (
+`id` bigint NOT NULL AUTO_INCREMENT,
+`device_id` varchar(10) NOT NULL COMMENT '设备id',
+`device_name` varchar(30) NOT NULL COMMENT '设备名称',
+`device_value` varchar(10) NOT NULL COMMENT '值',
+`unit` varchar(10) NOT NULL COMMENT '单位',
+`type` int NOT NULL,
+`show_type` varchar(255) NOT NULL,
+`robot_code` varchar(20) DEFAULT NULL COMMENT '机器人编号',
+`status` int DEFAULT NULL,
+`create_time` datetime NOT NULL COMMENT '创建时间',
+`update_time` datetime NOT NULL COMMENT '更新时间',
+`create_person` varchar(20) NOT NULL COMMENT '创建人',
+`update_person` varchar(20) NOT NULL COMMENT '更新人',
+`is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
+PRIMARY KEY (`id`),
+KEY `IDX_DEVICE_ROBOT` (`device_id`,`robot_code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5700 DEFAULT CHARSET=utf8mb3 COMMENT='环控信息';
+
+DROP TABLE IF EXISTS `t_sys_area`;
+CREATE TABLE `t_sys_area` (
+`code` varchar(6) DEFAULT NULL COMMENT '区编码',
+`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '区名',
+`cityCode` varchar(4) DEFAULT NULL COMMENT '市编码',
+`provinceCode` varchar(4) DEFAULT NULL COMMENT '省编码'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `t_sys_city`;
+CREATE TABLE `t_sys_city` (
+`code` varchar(4) DEFAULT NULL COMMENT '城市编码',
+`name` varchar(50) DEFAULT NULL COMMENT '城市名称',
+`provinceCode` varchar(4) DEFAULT NULL COMMENT '省编码'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `t_sys_province`;
+CREATE TABLE `t_sys_province` (
+`code` varchar(4) DEFAULT NULL COMMENT '编码',
+`name` varchar(30) DEFAULT NULL COMMENT '省名'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
