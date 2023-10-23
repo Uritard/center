@@ -2556,7 +2556,7 @@ CREATE TABLE `common_menu_conf` (
    `img` varchar(255) DEFAULT NULL COMMENT '菜单图片',
    `sort` int DEFAULT NULL COMMENT '顺序值 ',
    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='常用菜单配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='常用菜单配置表';
 
 DROP TABLE IF EXISTS `common_menu`;
 CREATE TABLE `common_menu` (
@@ -2568,7 +2568,7 @@ CREATE TABLE `common_menu` (
     `img` varchar(255) DEFAULT NULL COMMENT '菜单图片',
     `sort` int DEFAULT NULL COMMENT '顺序 小于4为常用默认',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='常用功能配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='常用功能配置表';
 -- Table structure for t_wiring_config
 -- ----------------------------
 DROP TABLE IF EXISTS `t_wiring_config`;
@@ -2583,7 +2583,7 @@ CREATE TABLE `t_wiring_config` (
 `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 `update_person` varchar(20) DEFAULT '' COMMENT '更新人',
 PRIMARY KEY (`wiring_config_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for t_wiring_diagram
@@ -2602,7 +2602,7 @@ CREATE TABLE `t_wiring_diagram` (
 `update_person` varchar(20) DEFAULT '' COMMENT '更新人',
 `delete_flag` tinyint DEFAULT '0' COMMENT '删除标记，1-是0-否',
 PRIMARY KEY (`wiring_diagram_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4;
 -- ----------------------------
 -- Table structure for alarm_shield
 -- ----------------------------
@@ -2620,15 +2620,15 @@ CREATE TABLE `alarm_shield` (
 `warn_content` varchar(258) DEFAULT NULL COMMENT '屏蔽的告警内容',
 `create_time` datetime DEFAULT NULL COMMENT '创建时间',
 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='告警屏蔽配置';
 
 DROP TABLE IF EXISTS `dict_area`;
 CREATE TABLE `dict_area` (
 `id` int NOT NULL,
-`name` varchar(48) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '' COMMENT '名称',
+`name` varchar(48) DEFAULT '' COMMENT '名称',
 `parent_id` int DEFAULT NULL COMMENT '父节点',
 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='区县行政编码字典表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='区县行政编码字典表';
 
 DROP TABLE IF EXISTS `a_interface_task_info`;
 CREATE TABLE `a_interface_task_info` (
@@ -2671,7 +2671,7 @@ CREATE TABLE `t_meter` (
 `collect_power_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '电量采集时间',
 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='电表信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='电表信息表';
 
 DROP TABLE IF EXISTS `t_meter_log`;
 CREATE TABLE `t_meter_log` (
@@ -2692,7 +2692,7 @@ CREATE TABLE `t_meter_log` (
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
 `is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
 PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='电表历史记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电表历史记录';
 
 DROP TABLE IF EXISTS `t_robot_device_config`;
 CREATE TABLE `t_robot_device_config` (
@@ -2706,7 +2706,7 @@ CREATE TABLE `t_robot_device_config` (
 `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 `update_person` varchar(20) DEFAULT '' COMMENT '更新人',
 PRIMARY KEY (`device_config_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='机器人设备机柜绑定表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='机器人设备机柜绑定表';
 
 DROP TABLE IF EXISTS `t_robot_map_node`;
 CREATE TABLE `t_robot_map_node` (
@@ -2715,7 +2715,7 @@ CREATE TABLE `t_robot_map_node` (
 `node_id` varchar(255) DEFAULT '' COMMENT '地图点ID',
 `node_name` varchar(255) DEFAULT '' COMMENT '地图点名称',
 PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9500 DEFAULT CHARSET=utf8mb3 COMMENT='机器人地图点表';
+) ENGINE=InnoDB AUTO_INCREMENT=9000 DEFAULT CHARSET=utf8mb4 COMMENT='机器人地图点表';
 
 DROP TABLE IF EXISTS `t_std_weather_log`;
 CREATE TABLE `t_std_weather_log` (
@@ -2735,25 +2735,4 @@ CREATE TABLE `t_std_weather_log` (
 `is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
 PRIMARY KEY (`id`),
 KEY `IDX_DEVICE_ROBOT` (`device_id`,`robot_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5700 DEFAULT CHARSET=utf8mb3 COMMENT='环控信息';
-
-DROP TABLE IF EXISTS `t_sys_area`;
-CREATE TABLE `t_sys_area` (
-`code` varchar(6) DEFAULT NULL COMMENT '区编码',
-`name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '区名',
-`cityCode` varchar(4) DEFAULT NULL COMMENT '市编码',
-`provinceCode` varchar(4) DEFAULT NULL COMMENT '省编码'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `t_sys_city`;
-CREATE TABLE `t_sys_city` (
-`code` varchar(4) DEFAULT NULL COMMENT '城市编码',
-`name` varchar(50) DEFAULT NULL COMMENT '城市名称',
-`provinceCode` varchar(4) DEFAULT NULL COMMENT '省编码'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `t_sys_province`;
-CREATE TABLE `t_sys_province` (
-`code` varchar(4) DEFAULT NULL COMMENT '编码',
-`name` varchar(30) DEFAULT NULL COMMENT '省名'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4 COMMENT='环控信息';
