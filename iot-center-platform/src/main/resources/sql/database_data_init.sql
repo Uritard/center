@@ -725,7 +725,8 @@ INSERT INTO `t_dict_business` VALUES ('300755', '0', 'back_expire', '未备份',
 INSERT INTO `t_dict_business` VALUES ('300756', '1', 'back_expire', '未过期', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '过期删除', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
-
+INSERT INTO `t_dict_business` VALUES ('300759', '818', 'camera_vendor', '巨哥', '0', '厂家类型', 1);
+INSERT INTO `t_dict_business` VALUES ('300760', '819', 'camera_vendor', '高德', '0', '厂家类型', 1);
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1400,11 +1401,11 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('udpServerConfig', 'udp服务的配置', 'springUnionFileSort', 'true', '报文是否有序', '主辅系统发过来的UDP报文的序号是否有序', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'realtimeVideoDefinition', '1', '视频清晰度', '1-高清视频，2-普通视频', '{\"rule\":\"^(1|2)$\",\"msg\":\"只能填 1 或 2\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'videoHttpsEnable', '1', '网络协议', '1-https，2-http', '{\"rule\":\"^(1|2)$\",\"msg\":\"只能填 1 或 2\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-207', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i \'rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/${channelId}01?transportmode=unicast\' -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/$(name)', '海康拉流命令', '无', NULL);
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-209', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i \'rtsp://${ip}:${port}/user=${username}&password=${password}&channel=${channelId}&stream=0.sdp?real_stream\' -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/$(name)', '雄迈拉流命令', '无', NULL);
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-818', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i \'rtsp://${ip}:${port}/camera0\' -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/$(name)', '巨哥拉流命令', '无', NULL);
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-819', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i \'rtsp://${ip}:${port}/video\' -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/$(name)', '高德拉流命令', '无', NULL);
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'nvrRtmpBack', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i \'rtsp://${username}:${password}@${ip}:${port}/Streaming/tracks/${channelId}01?starttime=${starttime}\&endtime=${endtime}\' -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/$(name)', '回放拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-207', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/${channelId}01?transportmode=unicast -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}', '海康拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-209', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://${ip}:${port}/user=${username}&password=${password}&channel=${channelId}&stream=0.sdp?real_stream -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}', '雄迈拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-818', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://${ip}:${port}/camera0 -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}', '巨哥拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'ffmpeg-819', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://${ip}:${port}/video -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}', '高德拉流命令', '无', NULL);
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'nvrRtmpBack', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://${username}:${password}@${ip}:${port}/Streaming/tracks/${channelId}01?starttime=${starttime}\&endtime=${endtime} -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}', '回放拉流命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'nvrDownloadTrans', '/usr/local/bin/ffmpeg -i %s -c copy -an -r 25 %s', '视频转码命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'droneVideo', '/usr/local/bin/ffmpeg -rtsp_transport tcp -i rtsp://%s:%s/live/%s -vcodec copy -fflags nobuffer -an -f flv rtmp://172.16.64.9/live/%s', '无人机拉流命令', '无', NULL);
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('videoServerConfig', 'video服务的配置', 'recordPlan', 'false', '是否开启', '录像计划是否开启', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
@@ -1423,16 +1424,16 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'cameraPresetSecondCheck', 'true', '校验偏移相机', '是否调用调用算法校验相机偏移功能', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'nonhomologousWarn', '分,合,开,关,储能,非储能,远方,就地', '非同源趋势对比支持汉字', '无', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5,]+$\",\"msg\":\"请输入正确汉字\"}');
 
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'renwuguanli.png', 1);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'xunshijieguo.png', 2);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (3, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'xunshibaobiao.png', 3);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'feitongyuangaojing.png', 4);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (5, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'yichangdianwei.png', 5);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (6, NULL, '测点查看', '/monitoring/autoPatrol', 'cedainchakan.png', 6);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'jiqirenjiankong.png', 7);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'wurenjijiankong.png', 8);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'liandongxinhao.png', 9);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '巡视设备告警', '/operation/intelligentAlarm', 'xunshishebeigaojing.png', 10);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'images/renwuguanli.png', 1);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'images/xunshijieguo.png', 2);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (3, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'images/xunshibaobiao.png', 3);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'images/feitongyuangaojing.png', 4);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (5, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'images/yichangdianwei.png', 5);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (6, NULL, '测点查看', '/monitoring/autoPatrol', 'images/cedainchakan.png', 6);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'images/jiqirenjiankong.png', 7);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'images/wurenjijiankong.png', 8);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'images/liandongxinhao.png', 9);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '巡视设备告警', '/operation/intelligentAlarm', 'images/xunshishebeigaojing.png', 10);
 
 INSERT INTO `dict_area` VALUES ('110000', '北京市', '-1');
 INSERT INTO `dict_area` VALUES ('110100', '市辖区', '110000');
