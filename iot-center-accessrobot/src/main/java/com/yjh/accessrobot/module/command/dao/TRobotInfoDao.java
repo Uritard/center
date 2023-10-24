@@ -347,10 +347,10 @@ public interface TRobotInfoDao {
     int insertEnv(Map<String, String> envWarn);
 
     /**
-     * 根据 设备机器人id，查询上级区域
+     * 根据 设备机器人id，查询环控数据区域
      * @date 2022
      */
-    String selectRegionIdByrobotId(@Param(value = "robotCode")String robotCode);
+    String selectEnvRegionIdByRobotId(@Param(value = "robotCode")String robotCode);
 
     int updateTCruiseTask(Map<String, Object> taskMap);
 

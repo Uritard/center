@@ -204,6 +204,7 @@ public class TStdDeviceService{
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
         tStdDevice.setPresetId(tStdDeviceDetail.getPresetId());
         tStdDevice.setCameraId(tStdDeviceDetail.getCameraId());
+        tStdDevice.setNodeId(tStdDeviceDetail.getNodeId());
         this.tStdDeviceDao.add(tStdDevice);
         Long deivceIdUnique=tStdDevice.getDeviceId();
 
@@ -302,6 +303,7 @@ public class TStdDeviceService{
             tStdDevice.setStatus(tStdDeviceDetail.getStatus());
             tStdDevice.setPresetId(tStdDeviceDetail.getPresetId());
             tStdDevice.setCameraId(tStdDeviceDetail.getCameraId());
+            tStdDevice.setNodeId(tStdDeviceDetail.getNodeId());
             tStdDeviceDao.update(tStdDevice);
         }
 //        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tStdDeviceDetail.getDeviceId());

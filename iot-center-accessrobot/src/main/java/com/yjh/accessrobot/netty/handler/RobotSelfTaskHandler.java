@@ -45,7 +45,7 @@ public class RobotSelfTaskHandler implements MessageHandlerStrategy, Initializin
         XMLBaseModel taskModel = getXmlMessage(filePathMap.get("content") + "/" + taskFile);
         List<Map<String, Object>> taskModelMapList = taskModel.getItems();
         log.info("taskModelItemsMap是：" + taskModelMapList);
-        robotService.addRobotSelfTask(taskModelMapList, xmlBaseModel);
+        robotService.addRobotSelfTask(taskModelMapList, xmlBaseModel.getSendCode());
 
         String taskIntoDBXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] taskIntoDBProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskIntoDBXmlString);

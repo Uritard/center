@@ -56,6 +56,7 @@
 		a.create_time ,
 		a.preset_id,
 		a.camera_id,
+		a.node_id,
 		b.device_model,
 		b.used_time,
 		b.pms_type,
@@ -100,7 +101,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		update_time,
 		create_time,
 		preset_id,
-		camera_id
+		camera_id,
+		node_id
 		)values(
 		#{deviceId, jdbcType=BIGINT},
 		#{deviceCode, jdbcType=VARCHAR},
@@ -117,7 +119,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		CURRENT_TIMESTAMP(),
 		CURRENT_TIMESTAMP,
 		#{presetId, jdbcType=BIGINT},
-		#{cameraId, jdbcType=BIGINT}
+		#{cameraId, jdbcType=BIGINT},
+		#{nodeId, jdbcType=BIGINT}
 		)
 	</insert>
 
@@ -147,6 +150,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		<if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
 		a.preset_id = #{presetId},
 		a.camera_id = #{cameraId},
+		a.node_id = #{nodeId},
 		a.update_time = CURRENT_TIMESTAMP(),
 		a.real_code = #{realCode},
 	</set>
@@ -447,7 +451,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		l.pic_real_path,
 		k.region_name as upRegionName,
 		preset.preset_name as presetName,
-		info.camera_name as cameraName
+		info.camera_name as cameraName,
+		node.node_name as nodeName
 		from t_std_device a
 		left join t_std_device_attr b on a.device_id = b.device_id
 		left join t_dict_business e on device_model = e.dict_code
@@ -459,6 +464,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		left join t_device_type_img l on a.device_type = l.type_id
 		left join t_camera_preset preset on a.preset_id = preset.preset_id
 		left join t_camera_info info on a.camera_id = info.camera_id
+		left join t_robot_map_node node on a.node_id = node.id
 		where 1=1
 		<if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
 			and a.up_region_id in
