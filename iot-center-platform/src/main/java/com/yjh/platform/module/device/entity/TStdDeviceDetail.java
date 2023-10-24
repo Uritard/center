@@ -161,4 +161,8 @@ public class TStdDeviceDetail {
     private Long cameraId;
 
     private String cameraName;
+
+    private Long nodeId;
+
+    private String nodeName;
 }

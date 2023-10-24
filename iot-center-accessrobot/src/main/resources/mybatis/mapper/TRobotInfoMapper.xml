@@ -1136,17 +1136,12 @@
     </insert>
 
 
-    <select id="selectRegionIdByrobotId" resultType="java.lang.String">
-           SELECT
-            b.up_region_id
-            FROM
-            t_std_region b
-            WHERE 1=1 AND b.region_id = (
-             SELECT
-            a.up_region_id AS regionId
-            FROM
+    <select id="selectEnvRegionIdByRobotId" resultType="java.lang.String">
+        SELECT
+            a.env_region_id AS regionId
+        FROM
             t_robot_info a
-            WHERE 1=1 and a.robot_code = #{robotCode} )
+        WHERE 1 = 1 and a.robot_code = #{robotCode}
     </select>
     <select id="selectRobotTypeByCode" resultType="java.lang.Integer">
         SELECT

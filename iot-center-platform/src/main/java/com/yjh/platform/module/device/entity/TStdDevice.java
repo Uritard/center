@@ -118,6 +118,8 @@ public class TStdDevice implements Serializable {
 
     private Long cameraId;
 
+    private Long nodeId;
+
     private String mainDeviceId;
 
     private TStdDeviceAttr tStdDeviceAttr;

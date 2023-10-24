@@ -598,7 +598,6 @@ public class RobotService {
                     }
                     switch (k) {
                         case "device_file_path":
-                        case "operation_device_file_path":
                             if (isEdge) {
                                 syncModelUpdate("1", v.toString(), nodeCode);
                             } else {
@@ -625,6 +624,10 @@ public class RobotService {
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
+                            break;
+                        case "operation_ticket_file_path":
+                            //操作票信息
+                            addRobotSelfTask(mapList, nodeCode);
                             break;
                         case "map_node_file_path":
                             // Map Nodes 地图信息添加
@@ -1851,12 +1854,12 @@ public class RobotService {
      * 机器人站端任务信息入库
      *
      * @param taskModelMapList 机器人本体任务相关数据
-     * @param xmlBaseModel     xml格式的内容
+     * @param sendCode   发送唯一标识
      * @return int
      */
-    public void addRobotSelfTask(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
+    public void addRobotSelfTask(List<Map<String, Object>> taskModelMapList, String sendCode) {
         try {
-            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(sendCode);
             Long upRegionId = tRobotInfoDao.selectByPrimaryId(robotId).getUpRegionId();
             List<Map<String, Object>> cruiseSelfTask = taskModelMapList.stream().filter(task -> !"5".equals(task.get("type").toString())).collect(Collectors.toList());
             //1.处理巡检任务模型
@@ -1925,7 +1928,7 @@ public class RobotService {
                         instanceIdList.add(tCruisePointInstance.getInstanceId());
 
                         Map<String, String> redisInfoMap = new HashMap<>();
-                        redisInfoMap.put("robotCode", xmlBaseModel.getSendCode());
+                        redisInfoMap.put("robotCode", sendCode);
                         redisInfoMap.put("instanceId", tCruisePointInstance.getInstanceId() + "");
                         Map<String, Object> map = tRobotRegionDao.selectInspectionId(tCruisePointInstance.getCruiseId());
                         redisInfoMap.put("inspectionCode", map.get("inspection_code").toString());
@@ -1949,7 +1952,7 @@ public class RobotService {
                     Map<String, Object> instanceListMap = new HashMap<>(5);
                     instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
                     instanceListMap.put("taskId", taskId);
-                    redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" + taskId, instanceListMap);
+                    redisTemplate.opsForHash().putAll("RobotTaskStatus:" + sendCode + ":" + taskId, instanceListMap);
 
                     // 构建t_cruise_result
                     TCruiseResult tCruiseResult = new TCruiseResult()
@@ -2590,9 +2593,11 @@ public class RobotService {
             if (Optional.ofNullable(json).isPresent() && json.getJSONArray("envDeviceStatusList").size() > 0) {
                 String robotCode = json.getString("robotCode");
                 //查询区域Id
-                String regionId = tRobotInfoDao.selectRegionIdByrobotId(robotCode);
-                JSONArray envDeviceStatusList = json.getJSONArray("envDeviceStatusList");
-                redisTemplate.opsForHash().put("Weather", regionId, JSONArray.toJSONString(envDeviceStatusList));
+                String regionId = tRobotInfoDao.selectEnvRegionIdByRobotId(robotCode);
+                if (StringUtils.isNotEmpty(regionId)) {
+                    JSONArray envDeviceStatusList = json.getJSONArray("envDeviceStatusList");
+                    redisTemplate.opsForHash().put("Weather", regionId, JSONArray.toJSONString(envDeviceStatusList));
+                }
             }
         } catch (Exception e) {
             log.error("获取天气信息错误:", e);
