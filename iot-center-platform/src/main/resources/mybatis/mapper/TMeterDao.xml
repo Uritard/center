@@ -80,4 +80,25 @@
             collect_power_time= now()
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="countPowerTotalByRegion" resultType="java.util.Map">
+        SELECT
+            SUM(a.total_positive_power) as allTotal,
+            b.region_name
+        FROM
+            `t_meter` a
+                left join t_std_region b on a.up_region_id = b.region_id
+        GROUP BY a.up_region_id
+    </select>
+
+    <select id="countPowerTotalByEdge" resultType="java.util.Map">
+        SELECT
+            SUM(a.total_positive_power) as allTotal,
+            b.region_name
+        FROM
+            `t_meter` a
+                left join t_std_region b on a.edge_code = b.region_code
+        where b.state = 1
+        GROUP BY a.edge_code
+    </select>
 </mapper>

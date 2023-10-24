@@ -94,10 +94,20 @@ public class TStdDeviceModelService {
             deviceModelList.stream().filter(d -> !JSON.parseObject(JSONArray.parseArray(d.get("video_pos").toString()).get(0).toString()).entrySet().isEmpty())
                     .forEach(device -> {
                         //构建 t_std_device
-                        TStdDevice tStdDevice = createStdDevice(edgeCode, device, tStdRegionList, dictMapList);
-                        TStdDeviceAttr tStdDeviceAttr = createStdDeviceAttr(tStdDevice, device);
-                        finalDeviceList.add(tStdDevice);
-                        finalDeviceAttrList.add(tStdDeviceAttr);
+                        TStdDevice tStdDevice = null;
+                        TStdDeviceAttr tStdDeviceAttr = null;
+                        try {
+                            tStdDevice = createStdDevice(edgeCode, device, tStdRegionList, dictMapList);
+                            tStdDeviceAttr = createStdDeviceAttr(tStdDevice, device);
+                        }catch (Exception e){
+                            log.info("device:{} tStdRegionList:{}",device,tStdRegionList);
+                            log.info("构建设备出错！",e);
+                        }
+                        if (tStdDevice != null){
+                            finalDeviceList.add(tStdDevice);
+                            finalDeviceAttrList.add(tStdDeviceAttr);
+                        }
+
                         long cruiseId;
                         int cruiseType;
                         switch (String.valueOf(device.get("data_type"))) {

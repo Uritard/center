@@ -10,6 +10,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.DeviceCountBean;
@@ -89,6 +90,8 @@ public class HomePageService {
     private CameraConService cameraConService;
     @Resource
     private TStdWeatherLogDao tStdWeatherLogDao;
+    @Autowired
+    private TMeterDao tMeterDao;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -541,6 +544,16 @@ public class HomePageService {
         List<TStdRegion> list = tStdRegionDao.selectByState(Constant.STATE_LOCAL);
         list.removeIf(tStdRegion -> tStdRegion.getUpRegionId() == -1);
         return list;
+    }
+
+    public List<Map<String,Float>> countPowerTotal(Integer type){
+        //type 1-根据区域进行统计 2-根绝节点进行统计
+        if (1 == type){
+            return tMeterDao.countPowerTotalByRegion();
+        } else {
+            return tMeterDao.countPowerTotalByEdge();
+        }
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.dao;
 
+import com.yjh.accessrobot.module.command.entity.TMeter;
 import com.yjh.accessrobot.module.command.entity.TStdDevice;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -42,5 +43,8 @@ public interface TStdDeviceMapper {
     TStdDevice selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
 
     Map<String,String> selectInstanceInfo(@Param(value = "originId") Long originId);
+
+    int deleteAllMete(@Param("edgeCode") String edgeCode);
+    int batchInsertMeter(@Param("list") List<TMeter> list);
 
 }

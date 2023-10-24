@@ -55,4 +55,6 @@ public interface TStdRegionDao {
 
     int selectByOriginIds(List<String> list);
 
+    List<Long> selectOriginRegionIdByRegionCode(@Param("edgeCode") String edgeCode);
+
 }

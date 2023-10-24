@@ -264,4 +264,37 @@
     and a.origin_id = #{originId}
     </select>
 
+    <delete id="deleteAllMete">
+        delete from t_meter where edge_code = #{edgeCode}
+    </delete>
+
+    <insert id="batchInsertMeter" keyColumn="id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_meter
+        (name,
+         ip,
+         port,
+         address,
+         up_region_id,
+         edge_code,
+         total_positive_power,
+         total_positive_reactive_power,
+         total_negative_positive_power,
+         collect_power_time
+        )
+        values
+        <foreach collection="list"  item="tMeter" separator=",">
+            (#{tMeter.name,jdbcType=VARCHAR},
+             #{tMeter.ip,jdbcType=VARCHAR},
+             #{tMeter.port,jdbcType=INTEGER},
+             #{tMeter.address,jdbcType=VARCHAR},
+             #{tMeter.upRegionId,jdbcType=BIGINT},
+             #{tMeter.edgeCode,jdbcType=VARCHAR},
+             #{tMeter.totalPositivePower,jdbcType=VARCHAR},
+             #{tMeter.totalPositiveReactivePower,jdbcType=VARCHAR},
+             #{tMeter.totalNegativePositivePower,jdbcType=VARCHAR},
+             #{tMeter.collectPowerTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
 </mapper>

@@ -4,6 +4,7 @@ import com.yjh.platform.module.device.entity.TMeter;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author yanhao
@@ -25,5 +26,8 @@ public interface TMeterDao {
     TMeter selectByPrimaryKey(Long id);
 
     int updateByPrimaryKey(TMeter record);
+
+    List<Map<String,Float>> countPowerTotalByRegion();
+    List<Map<String,Float>> countPowerTotalByEdge();
 
 }
