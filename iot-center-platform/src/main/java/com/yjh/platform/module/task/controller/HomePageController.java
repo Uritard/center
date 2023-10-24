@@ -460,5 +460,18 @@ public class HomePageController {
         }
         return result;
     }
+    @ApiOperation(value = "首页查询用电总量")
+    @RequestMapping(value = "/countPowerTotal", method = RequestMethod.GET)
+    public Result countPowerTotal(@RequestParam(value ="type")Integer type) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countPowerTotal(type));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("首页查询站点列表", e);
+        }
+        return result;
+    }
 
 }

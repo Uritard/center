@@ -14,6 +14,7 @@ import com.yjh.platform.common.utils.*;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.service.MeterInfoUpload;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
@@ -925,6 +926,22 @@ public class HelloController {
         Result result = new Result();
         try {
             result.setData(stdRegionService.stationDownId());
+        } catch (Exception e) {
+            log.error("获取区域信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
+
+    @Autowired
+    private MeterInfoUpload meterInfoUpload;
+    @GetMapping(value = "/meterUpload")
+    @ApiOperation(value = "meterUpload")
+    public Result meterUpload() throws Exception{
+        Result result = new Result();
+        try {
+            meterInfoUpload.uploadMeteInfo();
         } catch (Exception e) {
             log.error("获取区域信息异常", e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
