@@ -14,6 +14,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.video.dao.CameraConDao;
 import com.yjh.platform.module.video.entity.*;
 import com.yjh.video.api.CameraVendor;
@@ -195,7 +196,6 @@ public class CameraConService {
         return returnMapList;
     }
 
-    //@Logs(title = "机器人相机播放", code = "robotPlay", content = "机器人相机播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
@@ -324,6 +324,57 @@ public class CameraConService {
         }
         return returnLightMap;
     }
+
+    /**
+     * 获取机器人流媒体服务器中的视频流
+     * @param robotId 机器人ID
+     * @param streams 视频流， tailusb:livestream,taildepthColorful
+     * @return 视频流地址
+     */
+    public List<Map<String, Object>> robotStartComboPlay(Long robotId, String streams) {
+        RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+        log.info("cameraConDao.selectRobotConInfo(robotId), 查询结果：{}", JSONUtil.toJSONString(robotConInfo));
+        if (robotConInfo == null || StringUtils.isEmpty(streams)) {
+            throw new BusinessException("机器人不存在或相机错误");
+        }
+
+        String[] cameras = StringUtils.split(streams, ",");
+        List<Map<String, Object>> returnMapList = new ArrayList<>();
+
+        // /usr/local/bin/ffmpeg -i rtmp://${ip}:${port}/${app}/${stream} -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}
+        String mediaStreamPush = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaStreamPush"));
+        for (String camera : cameras) {
+            Map<String, Object> returnLightMap = new HashMap<>();
+            returnMapList.add(returnLightMap);
+            String app = camera;
+            String stream = "livestream";
+            if (StringUtils.contains(camera, ":")) {
+                String[] aps = camera.split(":", 2);
+                app = aps[0];
+                stream = aps[1];
+            }
+            String streamId = robotId + "_" + app + "_" + stream;
+            String hostIp = SysParamConfig.getSysContent("zmlHostIp");
+            Map<String, Object> params = new HashMap<>();
+            params.put("ip", robotConInfo.getRobotIp());
+            params.put("port", robotConInfo.getRobotPort());
+            params.put("app", app);
+            params.put("stream", stream);
+            params.put("hostIp", hostIp);
+            params.put("name", streamId);
+            String transMediaStream = PathVariableUtil.variableParse(mediaStreamPush, params);
+            transMediaStream = sign(transMediaStream, streamId);
+            log.info("transMediaStream: {}", transMediaStream);
+            IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+            PlayEntity playEntity = PlayEntity.builder().command(transMediaStream).deviceId(streamId).build();
+            iPlayService.videoPlayByFFM(playEntity);
+
+            webRtcUrl(streamId, returnLightMap);
+        }
+
+        return returnMapList;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public String robotStopRealPlay(Long robotId) {
