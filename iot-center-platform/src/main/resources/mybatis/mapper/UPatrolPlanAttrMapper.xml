@@ -109,8 +109,8 @@
         b.up_region_id,
         b.device_type
         from u_patrol_plan_attr a
-        left join t_std_device b on a.device_id = b.device_id
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
+        left join t_std_device b on c.device_id = b.device_id
         where 1 = 1
         and a.plan_id = #{planId, jdbcType=BIGINT}
     </select>

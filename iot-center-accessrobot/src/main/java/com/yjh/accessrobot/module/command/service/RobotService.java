@@ -2044,6 +2044,7 @@ public class RobotService {
             tCruisePointInstance.setStationName(tStdRegion.getRegionName());
             tCruisePointInstance.setCruiseType(228);
             Map<String, Object> map = tRobotInspectionDao.selectInspection(inspectionCode);
+            tCruisePointInstance.setDeviceMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))));
             tCruisePointInstance.setCruiseId(Long.valueOf(map.get("inspection_id").toString()));
             tCruisePointInstance.setCruiseName(map.get("inspection_name").toString());
             tCruisePointInstance.setIfSy(1);

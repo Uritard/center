@@ -1225,7 +1225,7 @@ public class CameraConService {
             log.info("password" + password);
             String cameraIp = cameraConInfo.getCameraIp();
             log.info("cameraIp" + cameraIp);
-            String port = cameraConInfo.getInfreadPort().toString();
+            String port = cameraConInfo.getPort().toString();
             log.info("port:>>>" + port);
 
             String parentPath = StringUtils.defaultString(parentDir);

@@ -343,13 +343,15 @@
         </foreach>
     </insert>
     <select id="selectInspection" parameterType="java.lang.String" resultType="java.util.Map">
-        SELECT
+        SELECT DISTINCT
             a.inspection_id,
             a.inspection_name,
-            a.property_pic_path
+            a.property_pic_path,
+            b.device_mete_id
         FROM
             t_robot_inspection a
-        WHERE 1 = 1
+        LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
+        WHERE 1 = 1 AND b.device_mete_id IS NOT NULL
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
