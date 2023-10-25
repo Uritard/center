@@ -449,7 +449,7 @@ public class PatrolResultHandler {
                 log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
                 //判断是不是三相的点
                 String presetAttribute = cruiseResultMap.get("presetAttribute");
-                boolean isThreePhase = "123".contains(presetAttribute);
+                boolean isThreePhase = presetAttribute != null && "123".contains(presetAttribute);
                 if (isThreePhase){
                     synchronized (Constant.threePhaseCountMap){
                         int count;
