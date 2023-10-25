@@ -172,6 +172,10 @@ public class TRobotInfoService{
         tCameraInfoService.stopStream(lightCameraId);
         tCameraInfoService.stopStream(infraredCameraId);
 
+        //检查机器人环境设备所属区域是否有变化， 如果有删除现有的环境信息
+        if (!Objects.equals(tRobotInfoPri.getEnvRegionId(), tRobotInfo.getEnvRegionId())){
+            redisTemplate.delete("Weather");
+        }
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
