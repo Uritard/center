@@ -30,7 +30,12 @@ public class TCruisePointInstance implements Serializable {
     private Integer cruiseType;
     @ApiModelProperty(value = "巡视类型名称")
     private String cruiseTypeName;
-
+    @ApiModelProperty(value = "设备类型")
+    private Integer deviceType;
+    @ApiModelProperty(value = "识别类型")
+    private Integer meteType;
+    @ApiModelProperty(value = "设备所属区域")
+    private Integer regionId;
 
 
 }

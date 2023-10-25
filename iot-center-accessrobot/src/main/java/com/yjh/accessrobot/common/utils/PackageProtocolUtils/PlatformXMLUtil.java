@@ -39,7 +39,7 @@ public class PlatformXMLUtil {
             // 获取根节点下所有节点
             List<Element> list = rootElt.elements();
 
-            if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model") || rootElt.getName().equals("Task_Model")
+            if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model") || rootElt.getName().equals("Task_Model") || rootElt.getName().equals("Map_Node_Model")
                     || rootElt.getName().equals("Property_Model") || rootElt.getName().equals("PatrolDevice_Model") || rootElt.getName().equals("Effect_Config")) {
                 for (Element element : list) {
                     if (element.getName().equals("Item")) {

@@ -439,6 +439,10 @@ public class UPatrolTaskService {
                 uPatrolTaskAttr.setDeviceId(tCruisePointInstance.getDeviceId());
                 uPatrolTaskAttr.setCustomId(tCruisePointInstance.getCustomId());
                 uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
+                uPatrolTaskAttr.setPointType(tCruisePointInstance.getCruiseType());
+                uPatrolTaskAttr.setDeviceType(tCruisePointInstance.getDeviceType());
+                uPatrolTaskAttr.setMeteType(tCruisePointInstance.getMeteType());
+                uPatrolTaskAttr.setRegionId(tCruisePointInstance.getRegionId());
                 uPatrolTaskAttrs.add(uPatrolTaskAttr);
                 if (uPatrolTaskAttrs.size() % 2000 == 0) {
                     this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
