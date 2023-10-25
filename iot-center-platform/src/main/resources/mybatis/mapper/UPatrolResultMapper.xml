@@ -749,22 +749,15 @@
     </select>
 
     <select id="cruiseStatisticalByAbnormal" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
-        select
-        dict_code as cruise_abnormal,
-        dict_note as abnormal_type,
-        (
-        (select COUNT(*)
-        from u_patrol_data_result
-        WHERE  cruise_abnormal = dict_code)
-        +
-        (select COUNT(*)
-        from u_patrol_data_result
-        WHERE  remark = dict_code)
-        ) AS "count"
-        from t_dict_business
-        where
-        col_name = 'abnormal_type'
-        ORDER BY dict_code;
+        SELECT DISTINCT
+            cruise_abnormal,
+            COUNT(cruise_abnormal) AS count
+        FROM
+            u_patrol_data_result
+        WHERE
+            cruise_abnormal > 0
+        GROUP BY
+            cruise_abnormal
     </select>
 
     <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">

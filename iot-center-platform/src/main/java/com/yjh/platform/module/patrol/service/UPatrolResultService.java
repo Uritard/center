@@ -148,7 +148,10 @@ public class UPatrolResultService {
     }
 
     public List<CruiseStatistical> cruiseStatisticalByAbnormal() {
-        return uPatrolResultDao.cruiseStatisticalByAbnormal();
+        List<CruiseStatistical> cruiseStatisticalList = uPatrolResultDao.cruiseStatisticalByAbnormal();
+        DictConvertUtil.DictOptional dictOptional = DictConvertUtil.optional("abnormalType","cruiseAbnormal","abnormalType");
+        DictConvertUtil.DICT.covertToDict(cruiseStatisticalList, dictOptional);
+        return cruiseStatisticalList;
     }
 
     public List<CruiseResultDetail> selectAbnormalResult(String taskResultId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
