@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import sun.awt.SunHints;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -231,7 +233,7 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("deviceName", tCruiseTaskResultMap.get("deviceName"));
             warnMap.put("instanceName", tCruiseTaskResultMap.get("instanceName"));
             warnMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
-            warnMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
+            warnMap.put("cruiseTime", ValueUtil.getOrDefault(tCruiseTaskResultMap.get("time"),DateTimeUtil.format(new Date())));
         }catch (Exception e){
             log.error("组装告警map异常：", e);
         }

@@ -411,11 +411,13 @@ public class PatrolResultHandler {
             }
 
             FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
-            FileUtil.copyFileUsingStream(temporaryFilePath, descConfirmFilePath);
+            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getConfirmFilePath())){
+                FileUtil.copyFileUsingStream(temporaryFilePath, descConfirmFilePath);
+                infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+                infoMap.put("confirmAbsolutePath", descConfirmFilePath);
+            }
             infoMap.put("relativePath", descRelativeUrl);
             infoMap.put("absolutePath", descFilePath);
-            infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
-            infoMap.put("confirmAbsolutePath", descConfirmFilePath);
             if (isAlarm) {
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);
