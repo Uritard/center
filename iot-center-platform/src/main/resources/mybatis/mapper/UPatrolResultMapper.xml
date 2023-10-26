@@ -1449,13 +1449,14 @@
         '紧急分合闸操作'
         ELSE '单设备操作'
         END AS operateTypeName,
-        TIMESTAMPDIFF( MINUTE, a.start_time,DATE_ADD(a.end_time,INTERVAL 59 second)) AS duration,
-        a.start_time AS startTime,
-        i.region_name AS regionName,
+        TIMESTAMPDIFF( MINUTE, b.execute_time,DATE_ADD(b.end_time,INTERVAL 59 second)) AS duration,
+        b.execute_time AS startTime,
+        i.region_name AS regionName,    
         u.user_name AS  userName,
         IF(a.task_type = 456, '-', f.dict_note) AS mainOperatioTypeName
         FROM
         u_patrol_task a
+        LEFT JOIN u_patrol_result b ON a.task_id = b.task_id
         LEFT JOIN u_patrol_task_attr c ON a.task_code = c.task_id
         LEFT JOIN t_cruise_point_instance d ON d.instance_id= c.instance_id
         LEFT JOIN t_robot_inspection e ON e.inspection_id = d.cruise_id
