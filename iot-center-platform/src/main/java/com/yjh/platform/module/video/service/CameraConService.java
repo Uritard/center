@@ -343,6 +343,10 @@ public class CameraConService {
 
         // /usr/local/bin/ffmpeg -i rtmp://${ip}:${port}/${app}/${stream} -vcodec copy -fflags nobuffer -an -f flv rtmp://${hostIp}/live/${name}
         String mediaStreamPush = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "mediaStreamPush"));
+
+        // webrtc://${ip}/${app}/${stream}?eip=${ip}&schema=http&port=${port}
+        boolean noPush = !StringUtils.contains(mediaStreamPush, "ffmpeg");
+
         for (String camera : cameras) {
             Map<String, Object> returnLightMap = new HashMap<>();
             returnMapList.add(returnLightMap);
@@ -363,13 +367,19 @@ public class CameraConService {
             params.put("hostIp", hostIp);
             params.put("name", streamId);
             String transMediaStream = PathVariableUtil.variableParse(mediaStreamPush, params);
-            transMediaStream = sign(transMediaStream, streamId);
-            log.info("transMediaStream: {}", transMediaStream);
-            IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
-            PlayEntity playEntity = PlayEntity.builder().command(transMediaStream).deviceId(streamId).build();
-            iPlayService.videoPlayByFFM(playEntity);
 
-            webRtcUrl(streamId, returnLightMap);
+            if (noPush) {
+                log.info("webRtcUrl: {}", transMediaStream);
+                returnLightMap.put("webRtcUrl", transMediaStream);
+            } else {
+                transMediaStream = sign(transMediaStream, streamId);
+                log.info("transMediaStream: {}", transMediaStream);
+                IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+                PlayEntity playEntity = PlayEntity.builder().command(transMediaStream).deviceId(streamId).build();
+                iPlayService.videoPlayByFFM(playEntity);
+
+                webRtcUrl(streamId, returnLightMap);
+            }
         }
 
         return returnMapList;
