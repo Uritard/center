@@ -582,9 +582,9 @@
         Left Join t_std_device tsd on e.device_id = tsd.device_id
         WHERE 1 = 1
         and b.task_type not in (508,509,456)
-        <if test="list != null and list.size() > 0">and e.device_id IN
-            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
-                #{deviceIds,jdbcType=BIGINT}
+        <if test="list != null and list.size() > 0">and tsd.up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
             </foreach>
         </if>
         <if test="startTime != null and startTime != '' ">

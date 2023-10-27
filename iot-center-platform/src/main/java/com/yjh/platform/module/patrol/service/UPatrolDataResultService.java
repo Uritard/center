@@ -88,37 +88,37 @@ public class UPatrolDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> regionIdList, String instanceName, String stationName) {
 
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(deviceIdList)) {
 
-            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
 
-            List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
-            Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
-            for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
-                if (Objects.isNull(cruiseResultAnalyzeInfo.getIdentifyResult())) {
-                    cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getIdentifyResultName());
-                }
-                if (Objects.isNull(cruiseResultAnalyzeInfo.getPersonCheck())) {
-                    cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getPersonCheck());
-                }
+        cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, regionIdList, instanceName, stationName);
 
-                if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
-                    TStdRegion tStdRegion = regionMaps.get(cruiseResultAnalyzeInfo.getRegionId());
-                    Long upRegionId = tStdRegion.getUpRegionId();
-                    TStdRegion up = regionMaps.get(upRegionId);
-                    if (Objects.nonNull(up)){
-                        cruiseResultAnalyzeInfo.setRegionName(up.getRegionName() );
-                    } else {
-                        cruiseResultAnalyzeInfo.setRegionName(tStdRegion.getRegionName());
-                    }
-                }
-                cruiseResultAnalyzeInfo.setEvaluationState("257".equals(cruiseResultAnalyzeInfo.getEvaluationState()) ? "未审核" : "已审核");
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
+        Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
+        for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
+            if (Objects.isNull(cruiseResultAnalyzeInfo.getIdentifyResult())) {
+                cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getIdentifyResultName());
             }
+            if (Objects.isNull(cruiseResultAnalyzeInfo.getPersonCheck())) {
+                cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getPersonCheck());
+            }
+
+            if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
+                TStdRegion tStdRegion = regionMaps.get(cruiseResultAnalyzeInfo.getRegionId());
+                Long upRegionId = tStdRegion.getUpRegionId();
+                TStdRegion up = regionMaps.get(upRegionId);
+                if (Objects.nonNull(up)){
+                    cruiseResultAnalyzeInfo.setRegionName(up.getRegionName() );
+                } else {
+                    cruiseResultAnalyzeInfo.setRegionName(tStdRegion.getRegionName());
+                }
+            }
+            cruiseResultAnalyzeInfo.setEvaluationState("257".equals(cruiseResultAnalyzeInfo.getEvaluationState()) ? "未审核" : "已审核");
         }
+
         DictConvertUtil.DictOptional optional = DictConvertUtil
             .optional("cruiseType")
             .add("planType","taskType","cTypeName")
