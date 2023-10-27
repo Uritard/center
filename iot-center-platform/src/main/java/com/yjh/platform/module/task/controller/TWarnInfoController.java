@@ -366,6 +366,21 @@ public class TWarnInfoController {
         }
         return result;
     }
+
+    @ApiOperation(value = "统计近一月的所有告警和缺陷个数-折线图")
+    @GetMapping(value = "/countWarnAndDefectOnMonth2")
+    @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警和缺陷",logType = 1,authority = "1235")
+    public Result countWarnAndDefectOnMonth2(){
+        Result result = new Result();
+        try {
+            result.setData(tWarnInfoService.countWarnAndDefectOnMonth2());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "根据告警处理状态统计告警个数-近一月")
     @GetMapping(value = "/countWarnConfMode")
     @Logs(title = "根据告警处理状态统计告警个数",content = "根据告警处理状态统计近一个月的告警个数",logType = 1)
