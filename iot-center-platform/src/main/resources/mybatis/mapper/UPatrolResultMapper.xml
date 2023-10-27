@@ -1382,8 +1382,8 @@
         <if test="taskId != null and taskId != ''">and f.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <select id="queryTaskInfo" resultType="com.yjh.platform.module.device.entity.TaskInfoBean">
-        select count(1)                                                  total_count,
-               count(IF(a.cruise_result = 247, a.cruise_result, null))   abnormal_count,
+        select count(IF(a.task_state = 238, null, a.task_state))  total_count,
+               count(IF(a.task_state in (242, 243, 244), a.task_state, null))   abnormal_count,
                count(IF(a.task_state in (239, 241), a.task_state, null)) running_count
         from u_patrol_result a
     </select>

@@ -541,9 +541,7 @@ public class HomePageService {
     }
 
     public List<TStdRegion> queryStationList() {
-        List<TStdRegion> list = tStdRegionDao.selectByState(Constant.STATE_LOCAL);
-        list.removeIf(tStdRegion -> tStdRegion.getUpRegionId() == -1);
-        return list;
+        return tStdRegionDao.selectStations();
     }
 
     public List<Map<String,Float>> countPowerTotal(Integer type){
