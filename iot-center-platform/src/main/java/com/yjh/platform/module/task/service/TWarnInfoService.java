@@ -260,6 +260,32 @@ public class TWarnInfoService{
 //        log.info("最后的list是==="+finalLst);
         return finalLst;
     }
+
+    public String[][] countWarnAndDefectOnMonth2() {
+        // 近一月告警
+        List<WarnStatistical> warnList = tWarnInfoDao.countWarnAndDefectOnMonth1();
+        log.info("WarnList==={}", warnList);
+        // 近一月缺陷
+        List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2();
+        log.info("defectList==={}", defectList);
+        int size = Math.min(warnList.size(), defectList.size());
+
+        String[][] dataSet = new String[3][size +1];
+        String[] products = dataSet[0];
+        String[] warns = dataSet[1];
+        String[] defects = dataSet[2];
+        products[0] = "product";
+        warns[0] = "告警";
+        defects[0] = "缺陷";
+        for (int i = 0; i<size; i++){
+            int idx = i+1;
+            products[idx] = Optional.ofNullable(warnList.get(i)).map(WarnStatistical::getTimeNode).orElse(null);
+            warns[idx] = Optional.ofNullable(warnList.get(i)).map(WarnStatistical::getCount).orElse(0).toString();
+            defects[idx] = Optional.ofNullable(defectList.get(i)).map(WarnStatistical::getCount).orElse(0).toString();
+        }
+        return dataSet;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countAllWarnOnMonth() {
         return tWarnInfoDao.countAllWarnOnMonth();
