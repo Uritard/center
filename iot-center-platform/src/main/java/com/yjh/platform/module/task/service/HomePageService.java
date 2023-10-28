@@ -547,7 +547,7 @@ public class HomePageService {
     }
 
     public List<Map<String,Float>> countPowerTotal(Integer type){
-        //type 1-根据区域进行统计 2-根绝节点进行统计
+        //type 1-根据区域进行统计 2-根据节点进行统计
         if (1 == type){
             return tMeterDao.countPowerTotalByRegion();
         } else {
