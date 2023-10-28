@@ -584,9 +584,13 @@ public class UPatrolTaskService {
         redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
 
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
-        if (!Constant.isHost()) {
+        Boolean robotTaskStatusUp =ValueUtil.toBoolean(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"),false);
+        if (robotTaskStatusUp){
             sendTaskStateToUp(task, 5);
         }
+//        if (!Constant.isHost()) {
+//            sendTaskStateToUp(task, 5);
+//        }
         return detailList;
     }
 
