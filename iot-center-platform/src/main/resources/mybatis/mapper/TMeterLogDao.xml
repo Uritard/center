@@ -33,7 +33,7 @@
 
     <select id="list" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
         SELECT
-        <include refid="Base_Column_List"></include>
+        <include refid="Base_Column_List"/>
         FROM t_meter_log
         WHERE meter_id = #{id, jdbcType=INTEGER}
         <if test="startTime != null and startTime != ''">

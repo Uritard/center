@@ -1426,8 +1426,8 @@
         ELSE '单设备操作'
         END AS operateTypeName,
         TIMESTAMPDIFF( MINUTE, b.execute_time,DATE_ADD(b.end_time,INTERVAL 59 second)) AS duration,
-        b.execute_time AS startTime,
-        i.region_name AS regionName,    
+        date_format( b.execute_time,'%Y-%c-%d %H:%i:%s') AS startTime,
+        i.region_name AS regionName,
         u.user_name AS  userName,
         IF(a.task_type = 456, '-', f.dict_note) AS mainOperatioTypeName
         FROM
@@ -1468,7 +1468,7 @@
         SELECT
             a.cruise_data_id AS resultId,
             h.dict_note AS cruiseName,
-            a.result_num AS resultNum,
+            a.result_desc AS resultNum,
             a.confirm_pic_path AS confirmPicPath,
             a.orig_confirm_pic_path AS origConfirmPicPath,
             a.picpath AS picPath,
@@ -1481,7 +1481,7 @@
             u_patrol_data_result a
                 LEFT JOIN u_patrol_task d ON d.task_id = a.task_id
                 LEFT JOIN sys_user u ON d.create_user_id = u.user_id
-                LEFT JOIN t_cruise_point_instance e ON e.instance_id = a.cruise_id
+                LEFT JOIN t_cruise_point_instance e ON e.instance_id = a.instance_id
                 LEFT JOIN t_robot_inspection f ON f.inspection_id = e.cruise_id
                 LEFT JOIN t_dict_business h ON h.dict_code = f.operation_type
         WHERE

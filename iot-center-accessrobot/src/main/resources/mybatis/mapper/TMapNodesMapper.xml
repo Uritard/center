@@ -19,9 +19,45 @@
             )
         </foreach>
     </insert>
+    <update id="updateByPrimaryKey">
+        update t_robot_map_node
+        set robot_id = #{robotId,jdbcType=BIGINT},
+            node_id = #{nodeId,jdbcType=VARCHAR},
+            node_name = #{nodeName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateTStdDevice">
+        UPDATE t_std_device a,t_robot_map_node b
+        SET a.node_id = NULL
+        WHERE a.node_id = b.id
+          AND b.robot_id = #{robotId, jdbcType=BIGINT} AND b.node_id IN
+        <foreach collection="nodeIdList" item="nodeId" open="(" separator="," close=")">   #{nodeId} </foreach>
+    </update>
     <delete id="deleteByRobotId"  parameterType="java.lang.Long">
         delete from t_robot_map_node
                 where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByRobotIdAndNodeId">
+        delete  from t_robot_map_node where robot_id=#{robotId}  and node_id in
+        <foreach collection="nodeIdList" item="nodeId" open="(" separator="," close=")">   #{nodeId} </foreach>
+    </delete>
+    <delete id="deleteRobotDeviceConfig">
+        DELETE
+        FROM
+            t_robot_device_config
+        WHERE
+            robot_id =  #{robotId, jdbcType=BIGINT}
+          AND equipment_id IN (
+            SELECT
+                device_id
+            FROM
+                t_std_device a
+                    LEFT JOIN t_robot_map_node b ON a.node_id = b.id
+            WHERE
+                b.robot_id = #{robotId, jdbcType=BIGINT}
+              AND b.node_id IN
+        <foreach collection="nodeIdList" item="nodeId" open="(" separator="," close=")">  #{nodeId} </foreach>
+        );
     </delete>
 
     <select id="selectByRobotId" resultType="com.yjh.accessrobot.module.command.entity.TRobotMapNode">

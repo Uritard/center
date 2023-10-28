@@ -67,8 +67,8 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.yjh.platform.module.device.entity.TMeter"
             useGeneratedKeys="true">
         insert into t_meter
-            (up_region_id, name, ip, port)
-        values (#{upRegionId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR})
+            (up_region_id, name, ip, port,address)
+        values (#{upRegionId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR})
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.yjh.platform.module.device.entity.TMeter">

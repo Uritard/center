@@ -181,7 +181,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     env.setDeviceValue(value);
                 } else {
                     //空调  value="1,2"  开关，制冷制热
-                    if ("7".equals(MapUtils.getString(res,"type"))) {
+                    if ("2107".equals(MapUtils.getString(res,"type"))) {
                         String[] strings = value.split(",");
                         if ("0".equals(strings[0])) {  //空调开启
                             if (strings.length > 1 && "1".equals(strings[1])) { //制冷制热
