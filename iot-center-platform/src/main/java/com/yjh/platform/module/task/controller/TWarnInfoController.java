@@ -229,6 +229,7 @@ public class TWarnInfoController {
     @GetMapping(value = "/WarnConfirm")
 //    @Logs(title = "告警确认",content = "根据用户传递的参数进行告警确认",logType = 5)
     public Result WarnConfirm(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
+                              @RequestParam(value = "warnId", required = false) Integer warnId,
                               @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
                               @RequestParam(value = "confMode", required = false) Integer confMode,
                               @RequestParam(value = "startTime", required = false) String startTime,
@@ -247,7 +248,7 @@ public class TWarnInfoController {
                 logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TWarnInfoDetail> list = tWarnInfoService.warnConfirm(warnLevel, confMode,startTime,endTime,deviceName,defectType,meteName,alarmSource);
+            List<TWarnInfoDetail> list = tWarnInfoService.warnConfirm(warnLevel, warnId, confMode,startTime,endTime,deviceName,defectType,meteName,alarmSource);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

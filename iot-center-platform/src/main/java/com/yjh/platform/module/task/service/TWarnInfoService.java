@@ -144,9 +144,10 @@ public class TWarnInfoService{
         return tWarnInfoDetails;
     }
 
-    public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName,Integer alarmSource) {
+    public List<TWarnInfoDetail> warnConfirm(Integer warnLevel, Integer warnId, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName,Integer alarmSource) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("warnLevel", warnLevel);
+        map.put("warnId", warnId);
         map.put("confMode", confMode);
         map.put("defectType", defectType);
         map.put("startTime", startTime);

@@ -35,6 +35,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -61,6 +62,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -760,19 +762,59 @@ public class RobotService {
         }
     }
 
-    public void addMapNodes(List<Map<String, Object>> maoNodeMapList, Long robotId) {
-        if (CollectionUtils.isNotEmpty(maoNodeMapList)){
+    public void addMapNodes(List<Map<String, Object>> mapNodeMapList, Long robotId) {
+        if (CollectionUtils.isNotEmpty(mapNodeMapList)){
             List<TRobotMapNode> mapNodesList = new ArrayList<>();
-            for (Map<String, Object> maoNodeMap : maoNodeMapList){
+            for (Map<String, Object> maoNodeMap : mapNodeMapList){
                 TRobotMapNode tMapNodes = new TRobotMapNode()
                         .setRobotId(robotId)
                         .setNodeId(maoNodeMap.get("node_id").toString())
                         .setNodeName(maoNodeMap.get("node_name").toString());
                 mapNodesList.add(tMapNodes);
             }
-            //删除该机器人的地图信息表
-            tRobotMapNodeService.deleteByRobotId(robotId);
-            tRobotMapNodeService.batchInsert(mapNodesList);
+            List<TRobotMapNode> oldMapNodeMapList = tRobotMapNodeService.selectByRobotId(robotId);
+            if (CollectionUtils.isEmpty(oldMapNodeMapList)){
+                tRobotMapNodeService.batchInsert(mapNodesList);
+            }else {
+                Map<String, TRobotMapNode> oldRobotMapNodeMap = oldMapNodeMapList.stream().collect(Collectors.toMap(TRobotMapNode::getNodeId, Function.identity()));
+                Map<String, TRobotMapNode> newRobotMapNodeMap = mapNodesList.stream().collect(Collectors.toMap(TRobotMapNode::getNodeId, Function.identity()));
+                // 更新的数据
+                SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldRobotMapNodeMap.keySet(), newRobotMapNodeMap.keySet());
+                if (CollectionUtils.isNotEmpty(updateIdSet)){
+                    mapNodesList.stream().filter(tRobotMapNode -> updateIdSet.contains(tRobotMapNode.getNodeId())).forEach(tRobotMapNode -> {
+                        TRobotMapNode oldRobotMapNode = oldRobotMapNodeMap.get(tRobotMapNode.getNodeId());
+                        tRobotMapNode.setId(oldRobotMapNode.getId());
+                        log.info("模型同步需要更新的TRobotMapNode：{}", JSONUtil.toJSONString(tRobotMapNode));
+                        tRobotMapNodeService.updateByPrimaryKey(tRobotMapNode);
+                    });
+                }
+                //删除的数据
+                SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldRobotMapNodeMap.keySet(), newRobotMapNodeMap.keySet());
+                if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+                    //删除机柜地图点绑定关系
+                    tRobotMapNodeService.deleteRobotDeviceConfig(robotId, deleteIdSet);
+                    tRobotMapNodeService.updateTStdDevice(robotId, deleteIdSet);
+                    tRobotMapNodeService.deleteByRobotIdAndNodeId(robotId, deleteIdSet);
+
+                }
+                //新增的数据
+                SetUtils.SetView<String> insertIdSet = SetUtils.difference(newRobotMapNodeMap.keySet(), oldRobotMapNodeMap.keySet());
+                if (CollectionUtils.isNotEmpty(insertIdSet)) {
+                    List<TRobotMapNode> insertTRobotMapNodeList = mapNodesList.stream().filter(tRobotMapNode -> insertIdSet.contains(tRobotMapNode.getNodeId())).collect(Collectors.toList());
+                    log.info("模型同步需要新增的insertTRobotInfoList：{}", JSONUtil.toJSONString(insertTRobotMapNodeList));
+                    tRobotMapNodeService.batchInsert(insertTRobotMapNodeList);
+                }
+            }
+        } else {
+            List<TRobotMapNode> oldMapNodeMapList = tRobotMapNodeService.selectByRobotId(robotId);
+            if (CollectionUtils.isNotEmpty(oldMapNodeMapList)){
+                Map<String, TRobotMapNode> oldRobotMapNodeMap = oldMapNodeMapList.stream().collect(Collectors.toMap(TRobotMapNode::getNodeId, Function.identity()));
+                SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldRobotMapNodeMap.keySet(), SetUtils.newIdentityHashSet());
+                //删除机柜地图点绑定关系
+                tRobotMapNodeService.deleteRobotDeviceConfig(robotId, deleteIdSet);
+                tRobotMapNodeService.updateTStdDevice(robotId, deleteIdSet);
+                tRobotMapNodeService.deleteByRobotId(robotId);
+            }
         }
     }
     /**
