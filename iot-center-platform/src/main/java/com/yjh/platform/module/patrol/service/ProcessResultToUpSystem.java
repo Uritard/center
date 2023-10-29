@@ -142,11 +142,9 @@ public class ProcessResultToUpSystem {
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
 
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
-                String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
+                // String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
                 UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
-                /*if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
-                    taskPatrolledIdTemp = taskCode;
-                }*/
+                String taskCode = uPatrolTask.getTaskCode();
 
                 xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
                 xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
@@ -160,6 +158,10 @@ public class ProcessResultToUpSystem {
 
                 String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
                 String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+                if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+                    taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
+                }
+
                 xmlItem.put("task_patrolled_id", taskPatrolledId);
                 xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
                 // 文件后缀

@@ -125,7 +125,7 @@ public class PatrolResultHandler {
         }
 
         //上级系统处理逻辑，因缺少attr表数据，需将任务信息放入redis
-        if ("3".equals(sysLevel)) {
+        if (Constant.isUpSystem()) {
             for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
                 if (StringUtils.isNotBlank(robotPatrolTaskResult.getPatrolDeviceCode())) {
                     redisTemplate.opsForValue().set("robotTaskUpInfo:" + robotPatrolTaskResult.getPatrolDeviceCode() ,robotPatrolTaskResult.getTaskCode());
@@ -214,9 +214,9 @@ public class PatrolResultHandler {
                 }
 
                 // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
-                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
+                if (Constant.isHost() && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
                     log.info("No alarms need to be handled...");
-                }else if(!Constant.fastTurbo() && !"3".equals(sysLevel)) {
+                }else if(!Constant.fastTurbo() && !Constant.isUpSystem()) {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
                 }
@@ -230,7 +230,7 @@ public class PatrolResultHandler {
                 Integer type = uPatrolTaskService.selectRobotType(robotCode);
                 boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
                 //机器人是有值的处理非同源/模拟机器人需要算法处理不走这里的非同源
-                if ("2".equals(sysLevel) && !isSimulationTool && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()){
+                if (Constant.isHost() && !isSimulationTool && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());

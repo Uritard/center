@@ -26,6 +26,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -186,14 +187,8 @@ public class UPatrolTaskService {
         // 设置定时器，不走事物逻辑，否则会延时
         setQuartzTask(uPatrolTask);
 
-        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-        Map<String,Object> taskMap = new HashMap<>();
-        String taskPatrolledId = stationCode + "_" + uPatrolTask.getTaskCode() + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
-        taskMap.put("taskId", uPatrolTask.getTaskId());
-        taskMap.put("taskPatrolledId", taskPatrolledId);
-
-        String key = PATROL_SUMMARY_PREFIX+uPatrolTask.getTaskId();
-        redisTemplate.opsForHash().put(key,"task_patrolled_id",taskPatrolledId);
+        String key = PATROL_SUMMARY_PREFIX + uPatrolTask.getTaskId();
+        Map<String,Object> taskMap = redisTemplate.opsForHash().entries(key);
 
         return taskMap;
     }
@@ -584,13 +579,8 @@ public class UPatrolTaskService {
         redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
 
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
-        Boolean robotTaskStatusUp =ValueUtil.toBoolean(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"),false);
-        if (robotTaskStatusUp){
-            sendTaskStateToUp(task, 5);
-        }
-//        if (!Constant.isHost()) {
-//            sendTaskStateToUp(task, 5);
-//        }
+
+        sendTaskStateToUp(task, 5);
         return detailList;
     }
 
@@ -637,6 +627,11 @@ public class UPatrolTaskService {
         mapForAbnormal.put("taskStart", DateTimeUtil.format(task.getStartTime()));
         mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
         mapForAbnormal.put("nodes", JSON.toJSONString(nodeSet));
+        mapForAbnormal.put("taskId", task.getTaskId());
+
+        String stationCode = SysParamConfig.getSysContent("edgeId");
+        String taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
+        mapForAbnormal.put("taskPatrolledId", taskPatrolledId);
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
@@ -726,8 +721,9 @@ public class UPatrolTaskService {
     }
 
 
-    private String addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId) {
+    private String addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String patrolledId) {
         try {
+            String taskId = StringUtils.countMatches(patrolledId, "_") > 1 ? StringUtils.substringAfter(patrolledId, "_") : patrolledId;
             // long robotId = tRobotInspectionDao.selectRobotIdByRobotCode(robotPatrolTaskStatus.getRobotCode());
             Date createTime = new Date(System.currentTimeMillis() + 30000);
             Date startTime = format.parse(robotPatrolTaskStatus.getPlanStartTime());
@@ -818,7 +814,7 @@ public class UPatrolTaskService {
             countChangeMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
             if (subCreateTask) {
                 // 下级主动创建任务第一次启动更新任务状态，更新任务进度
-                if (TASK_STATE_NOT_START == MapUtils.getIntValue(countMap, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
+                if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
                     UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
                         .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
                     log.info("TaskResult start, taskId: {}", taskId);
@@ -1431,14 +1427,13 @@ public class UPatrolTaskService {
         xmlBaseModel.setType("41");
         try {
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            String taskPatrolledIdTemp = task.getTaskCode();
-/*
-            UPatrolTask uPatrolTask = selectTaskByTaskCode(task.getTaskCode());
-            if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
-                taskPatrolledIdTemp = task.getTaskCode();
-            }*/
+
             String key = PATROL_SUMMARY_PREFIX+task.getTaskId();
             String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+                taskPatrolledId = stationCode+"_"+task.getTaskCode()+"_"+DateTimeUtil.format(task.getStartTime(), DateTimeUtil.getDateTimePattern3());
+            }
+
             item.put("task_patrolled_id", taskPatrolledId);
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
@@ -2378,7 +2373,7 @@ public class UPatrolTaskService {
      * @param taskId 任务id
      */
     private void completionOfTask(String taskId) {
-        log.info("\n————————————————————\n等待任务执行完毕————————————————————\n");
+        log.info("\n———————————————————— 等待任务执行完毕 ————————————————————\n");
         // 延迟15秒执行
         ScheduledMapConfig.schedule(15, taskId, this::completionOfTaskDone);
     }

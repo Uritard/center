@@ -188,7 +188,7 @@ public class TCruiseTaskResultService {
                         inspectResult.setTaskId(taskId);
                         inspectResult.setCruiseResultName("--");
                         inspectResult.setEndTime(null);
-                        // getDataFromRedis(inspectResult, resultMap);
+                        getDataFromRedis(inspectResult, resultMap);
                         inspectPageResults.add(inspectResult);
                     }
                     //最新的巡视点在之前List的位置(查询发生产生结果点地索引)

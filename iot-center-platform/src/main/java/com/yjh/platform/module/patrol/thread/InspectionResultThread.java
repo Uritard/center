@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -213,9 +214,18 @@ public class InspectionResultThread implements Runnable{
             map.put("deviceId", String.valueOf(insInfo.getDeviceId()));
             map.put("instanceId", instanceId);
             map.put("cruiseName", insInfo.getCruiseName());
-            map.put("deviceName", analyseDataOperateDao.selectPatrolDevice(instanceId).get("deviceName"));
             map.put("cruiseId", String.valueOf(insInfo.getCruiseId()));
             map.put("cruiseType", String.valueOf(insInfo.getCruiseType()));
+
+            HashMap<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
+            map.put("deviceName", MapUtils.getString(patrolDevice, "deviceName"));
+            map.put("cruiseDeviceId", MapUtils.getString(patrolDevice, "patroldevice_code"));
+            map.put("cruiseDeviceName", MapUtils.getString(patrolDevice, "patroldevice_name"));
+            map.put("deviceMeteId", MapUtils.getString(patrolDevice, "deviceMeteId"));
+            map.put("deviceMeteName", MapUtils.getString(patrolDevice, "deviceMeteName"));
+            map.put("customId", MapUtils.getString(patrolDevice, "customId"));
+            map.put("customName", MapUtils.getString(patrolDevice, "customName"));
+            map.put("devicePointId", MapUtils.getString(patrolDevice, "devicePointId", ""));
         }
 
         map.put("instanceName", robotPatrolTaskResult.getDeviceName());
@@ -264,7 +274,7 @@ public class InspectionResultThread implements Runnable{
             // 机器人类型为模拟机器人/模拟无人机 为模拟工具
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果是节点 也走模拟工具的逻辑
-            boolean needAnalysis = type == null && !"3".equals(sysLevel) && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
+            boolean needAnalysis = type == null && !Constant.isUpSystem() && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
             isSimulationTool = isSimulationTool || needAnalysis;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
