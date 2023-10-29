@@ -35,6 +35,7 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
 
     private String customId;
     private String customName;
+    private String deviceMeteName;
 
     private String cruiseDeviceId;
     private String cruiseDeviceName;

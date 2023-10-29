@@ -594,6 +594,7 @@
         b.unit,
         b.custom_id,
         b.custom_name,
+        b.mete_name as device_mete_name,
         d.preset_attribute
         FROM
         t_cruise_point_instance a

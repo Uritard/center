@@ -994,9 +994,15 @@
             tsd.device_id as deviceId,
             tsd.device_code as deviceCode,
             tsd.device_name as deviceName,
+            a.device_mete_id as deviceMeteId,
+            tdm.mete_name as deviceMeteName,
+            tdm.custom_id as customId,
+            tdm.custom_name as customName,
+            tdm.device_point_id as devicePointId,
             if(b.preset_id is null,if(c.inspection_id is null,d.voice_code,e.robot_num),b.camera_id) as patroldevice_code ,
             if(b.preset_id is null,if(c.inspection_id is null,d.voice_device_name,e.robot_name),f.camera_name) as patroldevice_name
         from t_cruise_point_instance a
+        left join t_std_devicemete tdm ON a.device_mete_id = tdm.device_mete_id
         left join t_camera_preset b on a.cruise_id = b.preset_id
         left join t_camera_info f on b.camera_id = f.camera_id
         left join t_robot_inspection c on a.cruise_id = c.inspection_id
