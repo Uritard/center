@@ -715,6 +715,7 @@ public class SendToUpSystemServices {
         //巡视主机模型
 
         String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+        String productionDate = (String)redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content");
 
         List<Map<String, Object>> finalList = new ArrayList<>();
         Map<String, Object> host = new HashMap<>();
@@ -725,7 +726,7 @@ public class SendToUpSystemServices {
         host.put("manufacturer", "亿嘉和");
         host.put("use_unit", "亿嘉和");
         host.put("device_source", "亿嘉和");
-        host.put("production_date", "2020-08-06 12:00:00");
+        host.put("commissioning_time", productionDate);
         host.put("production_code", "001");
         host.put("istransport", "");
         host.put("use_mode", "");
