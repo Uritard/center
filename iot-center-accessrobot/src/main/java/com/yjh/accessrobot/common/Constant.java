@@ -200,6 +200,24 @@ public class Constant {
     }
 
     /**
+     * 是否向上级推送环控设备数据
+     */
+    public static Boolean upEnvDevice;
+
+    /**
+     * 是否向上级推送环控设备数据
+     */
+    public static boolean upEnvDevice() {
+        try {
+            upEnvDevice = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:upEnvDevice", "content"));
+            log.warn("upEnvDevice is {}", upEnvDevice);
+        } catch (Exception e) {
+            upEnvDevice = false;
+        }
+        return upEnvDevice;
+    }
+
+    /**
      * 变电站名称
      */
     public static String stationCode;

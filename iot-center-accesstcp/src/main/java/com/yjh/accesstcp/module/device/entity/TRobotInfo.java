@@ -1,6 +1,9 @@
 package com.yjh.accesstcp.module.device.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -260,6 +263,11 @@ public class TRobotInfo implements Serializable {
      * 机器人地图图片尺寸
      */
     private String imageSize;
+
+    /**
+     * 环控数据所属区域ID
+     */
+    private Long envRegionId;
 
     private static final long serialVersionUID = 1L;
 }
