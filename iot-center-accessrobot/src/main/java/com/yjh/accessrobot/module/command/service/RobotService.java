@@ -2666,34 +2666,34 @@ public class RobotService {
                     case 3:
                         type = "512";
                         break;
-                    case 4:
+                    case 2104:
                         type = "513";
                         break;
-                    case 5:
+                    case 2105:
                         type = "514";
                         break;
-                    case 6:
+                    case 2106:
                         type = "515";
                         break;
-                    case 7:
+                    case 2107:
                         type = "516";
                         break;
-                    case 8:
+                    case 2108:
                         type = "517";
                         break;
-                    case 9:
+                    case 8:
                         type = "518";
                         break;
-                    case 10:
+                    case 2110:
                         type = "519";
                         break;
-                    case 11:
+                    case 2111:
                         type = "520";
                         break;
-                    case 12:
+                    case 2112:
                         type = "521";
                         break;
-                    case 13:
+                    case 2113:
                         type = "522";
                         break;
                     default:
