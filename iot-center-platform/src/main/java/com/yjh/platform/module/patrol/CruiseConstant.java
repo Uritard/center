@@ -137,6 +137,19 @@ public interface CruiseConstant {
      */
     int IDENTIFY_RESULT_NORMAL = 261;
 
+    /**
+     * 巡视类型，操作-操作票
+     */
+    int OPERATION_ORDER_PATROL = 456;
+    /**
+     * 巡视类型，操作-单设备
+     */
+    int SINGLE_DEVICE_PATROL = 508;
+    /**
+     * 巡视类型，操作-紧急分合闸
+     */
+    int EMERGENCY_PATROL = 509;
+
     String FAILED_VALUE = "-1";
 
     enum TypeEnum {

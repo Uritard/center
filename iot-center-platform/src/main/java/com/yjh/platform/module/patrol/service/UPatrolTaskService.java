@@ -704,12 +704,18 @@ public class UPatrolTaskService {
 
             // 如果不是上报的任务结束，则走更新任务状态逻辑
             updateTaskProgress(robotPatrolTaskStatus, taskId, taskState, robotId);
-
+            UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
             // 如果下级上报任务结束，则走任务结束处理逻辑，避免提前更改任务状态
             if (robotEnd) {
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
-                ScheduledMapConfig.schedule(45, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
+                if (task.getTaskType() == SINGLE_DEVICE_PATROL
+                        || task.getTaskType() == OPERATION_ORDER_PATROL || task.getTaskType() == EMERGENCY_PATROL){
+                    //操作任务 直接结束
+                    ScheduledMapConfig.schedule(5, 1, t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
+                } else {
+                    ScheduledMapConfig.schedule(45, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
+                }
             }
 
             if (robotId != null){
