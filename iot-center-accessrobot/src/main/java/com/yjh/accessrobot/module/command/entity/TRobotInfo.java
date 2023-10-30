@@ -202,6 +202,9 @@ public class TRobotInfo implements Serializable {
      */
     private String originId;
 
+    @ApiModelProperty(value = "环控数据所属区域ID")
+    @TableField(value = "env_region_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long envRegionId;
     /**
      * 机器人地图图片尺寸
      */

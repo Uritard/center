@@ -121,6 +121,7 @@ public class TRobotInfoService {
             tRobotInfo.setIsUse(robotModel.getIsUse());
             tRobotInfo.setCommissionDate(robotModel.getCommissionDate());
             tRobotInfo.setUpRegionId(stdRegionMap.get(String.valueOf(robotModel.getUpRegionId())));
+            tRobotInfo.setEnvRegionId(stdRegionMap.get(String.valueOf(robotModel.getEnvRegionId())));
             tRobotInfo.setRobotPosition(robotModel.getRobotPosition());
             tRobotInfo.setRemarks(robotModel.getRemarks());
             tRobotInfo.setNestCode(robotModel.getNestCode());

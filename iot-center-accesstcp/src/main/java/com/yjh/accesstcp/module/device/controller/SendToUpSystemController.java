@@ -67,11 +67,6 @@ public class SendToUpSystemController {
         Result result = new Result();
         try {
             XMLBaseModel xmlBaseModel = robotMap.get("list").get(0);
-            if("21".equals(xmlBaseModel.getType())){
-                Constant.weatherXmlModel = xmlBaseModel;
-                result.setData(1);
-                return result;
-            }
             sendToUpSystemService.sendXML(xmlBaseModel);
             result.setData(1);
         } catch (Exception e) {

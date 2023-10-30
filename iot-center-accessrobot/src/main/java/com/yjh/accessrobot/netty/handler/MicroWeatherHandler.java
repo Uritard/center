@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author YChen
@@ -42,33 +44,32 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++收到下级的微气象数据了+++++++++++++++++");
         // Deal with robot micro climate data
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String robotCodeForRefuse = robotService.selectRobotOrEdgeRobot(xmlBaseModel, robotCode);
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         String onlineStatus = String.valueOf(redisTemplate.opsForValue().get("onlineStatus:"+ robotCode));
-
         if ("1".equals(onlineStatus)) {
             // 给下级响应
-            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(robotCode));
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(sendCode));
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
-            RobotServerHandler.send(statusProtocol, robotCode);
-            log.info("本级系统给下级{}响应了", robotCode);
+            RobotServerHandler.send(statusProtocol, sendCode);
+            log.info("本级系统给下级{}响应了", sendCode);
             return;
         }
 
-        String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
-        RobotServerHandler.send(weatherProtocol, robotCode);
-        log.info("本级系统给下级{}响应了", robotCode);
+        RobotServerHandler.send(weatherProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         List<Map<String, String>> weatherList = new ArrayList<>();
         Map<String, String> info = new HashMap<>();
@@ -209,9 +210,20 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         if (envDeviceStatusList.size() > 0) {
             JSONObject json = new JSONObject();
             json.put("envDeviceStatusList", envDeviceStatusList);
-            json.put("robotCode", xmlBaseModel.getSendCode());
+            json.put("robotCode", robotCode);
             log.info("环境数据上报集控" + json);
             robotService.addWeatherInfo(json);
+
+            if (Constant.upEnvDevice()) {
+                List<Map<String, Object>> item = xmlBaseModel.getItems().stream().filter(t -> t.containsKey("value_type")).collect(Collectors.toList());
+                XMLBaseModel xmlBaseModel1 = new XMLBaseModel()
+                        .setType("21")
+                        .setItems(item);
+                log.info("向上级推送环控数据" + item);
+                Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
+                map.put("list", Collections.singletonList(xmlBaseModel1));
+                Constant.mapToOtherServer(map, Constant.TCP_URL);
+            }
         }
 
 
