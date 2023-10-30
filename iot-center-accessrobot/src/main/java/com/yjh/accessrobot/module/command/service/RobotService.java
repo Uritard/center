@@ -2850,6 +2850,8 @@ public class RobotService {
             Map<String, Object> hostMap = propertyModel.getItems().get(0);
             //放到缓存里
             redisTemplate.opsForHash().putAll("edge:" + nodeCode, hostMap);
+
+            tStdRegionDao.updateCommissioningTimeByRegionCode(nodeCode, (String) hostMap.get("commissioning_time"));
         } catch (Exception e) {
             log.info("解析节点文件失败：", e);
         }
