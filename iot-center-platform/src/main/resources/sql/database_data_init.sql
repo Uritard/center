@@ -108,6 +108,8 @@ INSERT INTO `sys_menu` VALUES ('44', '三维应用', '01001', '43', '', '', '1',
 INSERT INTO `sys_menu` VALUES ('41', '可靠性指标', '0900', '-1', '', '', '1', '1', '', '1', '1', '1', '', '1', '1', null);
 INSERT INTO `sys_menu` VALUES ('42', '可靠性指标', '0901', '41', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 INSERT INTO `sys_menu` VALUES ('45', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('46', '声纹管理', '0106', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('47', '电表监控', '0210', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -591,7 +593,17 @@ INSERT INTO `t_dict_business` VALUES ('300497', '686', 'defect_model', '汇控�
 INSERT INTO `t_dict_business` VALUES ('300498', '687', 'defect_model', '膨胀器冲顶', '0', '缺陷类型', '18');
 INSERT INTO `t_dict_business` VALUES ('300499', '688', 'defect_model', '电容器鼓肚', '0', '缺陷类型', '19');
 INSERT INTO `t_dict_business` VALUES ('300500', '13', 'analyse_type', '声音', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300501', '689', 'alarm_source', '静默监视', '0', '告警来源', '6');
+INSERT INTO `t_dict_business` VALUES ('300501', '689', 'operation_type', '备自投方式切换开关', '32', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300502', '690', 'operation_type', '电压表切换开关', '33', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300503', '691', 'operation_type', '电压并列开关', '34', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300504', '692', 'operation_type', '紧急合闸', '35', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300505', '693', 'operation_type', '手车按钮-进车', '36', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300506', '694', 'operation_type', '手车按钮-退车', '37', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300507', '695', 'operation_type', '地刀按钮-分', '38', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300508', '696', 'operation_type', '地刀按钮-合', '39', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300509', '697', 'operation_type', '断路器按钮-分', '40', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300510', '698', 'operation_type', '断路器按钮-合', '41', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300599', '699', 'mete_type', '局放', '106', '巡视内容', '15');
 INSERT INTO `t_dict_business` VALUES ('300600', '700', 'custom_type', '本体', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300601', '701', 'custom_type', '储油柜', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300602', '702', 'custom_type', '分接开关', '0', '设备部位', '1');
@@ -727,6 +739,16 @@ INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '过期删�
 INSERT INTO `t_dict_business` VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300759', '818', 'camera_vendor', '巨哥', '0', '厂家类型', 1);
 INSERT INTO `t_dict_business` VALUES ('300760', '819', 'camera_vendor', '高德', '0', '厂家类型', 1);
+INSERT INTO `t_dict_business` VALUES ('300761', '821', 'abnormal_type', '操作异常', NULL, '操作任务中不可下发巡视任务', '0');
+INSERT INTO `t_dict_business` VALUES ('300762', '689', 'alarm_source', '静默监视', '0', '告警来源', '6');
+INSERT INTO `t_dict_business` VALUES ('300765', '830', 'operation_type', '双按钮手车-进车', '42', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300766', '831', 'operation_type', '双按钮手车-退车', '43', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300767', '832', 'operation_type', '双按钮地刀-分', '44', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300768', '833', 'operation_type', '双按钮地刀-和', '45', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300769', '834', 'operation_type', '天灵-顺', '46', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300770', '835', 'operation_type', '轨交_紧急分合闸', '47', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300771', '836', 'operation_type', '轨交_接地刀操作开关', '48', '操作类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300772', '837', 'operation_type', '轨交_控制开关', '49', '操作类型', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
