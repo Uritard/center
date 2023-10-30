@@ -246,6 +246,11 @@
         edge_code = #{edgeCode,jdbcType=VARCHAR}
     </update>
 
+    <update id="updateCommissioningTimeByRegionCode">
+        UPDATE T_STD_REGION SET COMMISSIONING_TIME = #{commissioningTime,jdbcType=VARCHAR}
+        WHERE REGION_CODE = #{regionCode,jdbcType=VARCHAR}
+    </update>
+
     <select id="selectOriginRegionIdByRegionCode" resultType="java.lang.Long">
         select origin_region_id from t_std_region where region_code =#{edgeCode}
     </select>

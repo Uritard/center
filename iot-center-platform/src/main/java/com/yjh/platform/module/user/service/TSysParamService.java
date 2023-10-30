@@ -4,10 +4,12 @@ import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.entity.Version;
@@ -210,6 +212,7 @@ public class TSysParamService{
             sysParamConfig.putToRedis();
         }
         sysParamConfig.initParamCache();
+        this.syncCommissioningTimeToUpSystem();
         return 1;
     }
 
@@ -263,6 +266,29 @@ public class TSysParamService{
 
     public List<Version> selectVersion(int type){
         return tSysParamDao.selectVersion(type);
+    }
+
+    public void syncCommissioningTimeToUpSystem() {
+        String commissioningTime = redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content").toString();
+        List<Map<String, Object>> infoMaps = new ArrayList<>();
+        Map<String, Object> info = new HashMap<>();
+        info.put("commissioningTime", commissioningTime);
+        infoMaps.add(info);
+        String stationCode = redisTemplate.opsForHash().get("t_sys_param:edgeId", "content").toString();
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        xmlBaseModel.setType("82");
+        xmlBaseModel.setCode(stationCode);
+        xmlBaseModel.setCommand("");
+        xmlBaseModel.setItems(infoMaps);
+        List<XMLBaseModel> list = new ArrayList<>();
+        list.add(xmlBaseModel);
+        Map<String, List<XMLBaseModel>> map = new HashMap<>();
+        map.put("list", list);
+        try {
+            Constant.otherServer(map, Constant.TCP_URL);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 

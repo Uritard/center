@@ -102,4 +102,11 @@ public class TStdRegion implements Serializable {
 
     private List<TStdRegion> children;
 
+    @TableField(value = "commissioning_time")
+    private String commissioningTime;
+
+    // 投运天数
+    @TableField(exist = false)
+    private Long commissioningDays;
+
 }

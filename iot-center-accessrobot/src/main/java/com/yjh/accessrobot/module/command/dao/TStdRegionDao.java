@@ -55,6 +55,8 @@ public interface TStdRegionDao {
 
     int selectByOriginIds(List<String> list);
 
+    void updateCommissioningTimeByRegionCode(@Param("regionCode") String regionCode,
+                                             @Param("commissioningTime") String commissioningTime);
     List<Long> selectOriginRegionIdByRegionCode(@Param("edgeCode") String edgeCode);
 
 }

@@ -38,6 +38,7 @@
     <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
     <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
     <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+    <result property="commissioningTime" column="commissioning_time" jdbcType="TIMESTAMP"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
     <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     <collection property="children" select="selectCruiseTree" column="{upRegionId=region_id}"/>
@@ -49,7 +50,7 @@
         up_region_id,up_region_ids,region_code,
         origin_region_id,station_id,station_name,
         state,edge_status,region_path,
-        longitude,latitude,voltage_level,
+        longitude,latitude,voltage_level,commissioning_time,
         remark,create_time
     </sql>
 
