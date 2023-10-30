@@ -88,13 +88,13 @@ public class UPatrolDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> regionIdList, String instanceName, String stationName) {
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
 
 
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
 
 
-        cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, regionIdList, instanceName, stationName);
+        cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
 
         List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
         Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
