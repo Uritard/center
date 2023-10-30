@@ -5,6 +5,7 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -180,12 +181,13 @@ public class RobotInspectionWarnThread implements Runnable{
             warnInfo.setInstanceId(instanceId);
             warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
             warnInfo.setConfMode(276);
-            Integer warnFlag = Integer.valueOf(analyseDataOperateService.selectDictCode("defect_model", "其他"));
+            Integer warnFlag = NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("defectModel", "其他"), 450);
             warnInfo.setDefectModel(warnFlag);
             String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
-            int alarmSource = 998;
+            int alarmSource = 279;
             if (StringUtils.isNotEmpty(type)) {
-                alarmSource = NumberUtils.toInt(analyseDataOperateService.selectDictCode("alarm_source", type),998);
+                String cruiseTypeName = DictConvertUtil.DICT.covertToDict("cruiseType", type);
+                alarmSource = NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("alarmSource", cruiseTypeName),279);
             }
             warnInfo.setAlarmOwner(1);
             warnInfo.setAlarmSource(alarmSource);

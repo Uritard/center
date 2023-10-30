@@ -78,4 +78,15 @@ public class RobotPatrolTaskAlarm implements Serializable {
     @ApiModelProperty(value = "可见光原图、红外结果")
     private String originFileResultPath;
 
+    /**
+     * 自家上级系统拓展字段
+     */
+    @ApiModelProperty(value = "非同源告警所有巡视测点")
+    private String deviceIdAll;
+
+    /**
+     * 自家上级系统拓展字段
+     */
+    @ApiModelProperty(value = "非同源告警所有巡视名称")
+    private String patroldeviceAll;
 }

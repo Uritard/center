@@ -106,4 +106,8 @@ public interface TRobotInspectionDao {
     List<TRobotInfo> getTRobotWithInspection();
 
     String selectTypeByInstanceId(Long instanceId);
+
+    List<TCruisePointInstanceNameDetail> selectRealInstanceByDevicePoints(@Param(value = "list") String[] devicePointIds);
+
+    List<TCruisePointInstanceNameDetail> selectRealInstances(@Param(value = "list") String[] deviceId,@Param(value = "edgeCode") String edgeCode);
 }

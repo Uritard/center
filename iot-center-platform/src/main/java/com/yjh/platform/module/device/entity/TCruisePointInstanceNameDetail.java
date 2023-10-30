@@ -40,4 +40,6 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String cruiseDeviceId;
     private String cruiseDeviceName;
     private String presetAttribute;//预置位属性(1-A相 2-B相  3-C相  0-无 )
+
+    private String regionName;
 }
