@@ -2016,10 +2016,12 @@ CREATE TABLE `t_std_region` (
   `longitude` varchar(32) DEFAULT NULL COMMENT '经度',
   `latitude` varchar(32) DEFAULT NULL COMMENT '纬度',
   `voltage_level` varchar(32) DEFAULT NULL COMMENT '电压层级',
+  `commissioning_time` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '投运时间',
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`region_id`) USING BTREE,
-  KEY `region_code` (`region_code`,`origin_region_id`)
+  UNIQUE KEY `idx_region_code` (`region_code`) USING BTREE,
+  KEY `region_code` (`region_code`,`origin_region_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=700002 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
 
 -- ----------------------------

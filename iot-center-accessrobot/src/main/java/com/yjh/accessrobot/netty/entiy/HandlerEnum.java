@@ -61,6 +61,8 @@ public enum HandlerEnum {
     ROBOT_CRUISE_REPORT("63", "robotCruiseReport"),
     // 任务审核结果
     REVIEW_RESULT("611","reviewResult"),
+    // 站所投运时间
+    STATION_COMMISSIONING_TIME("82", "stationCommissioningTime"),
     //电表信息
     METER_INFO("meter","meterInfo")
 

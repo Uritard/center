@@ -88,6 +88,11 @@ public class TStdRegion implements Serializable {
     private String voltageLevel;
 
     /**
+     * 投运时间*
+     */
+    private Date commissioningTime;
+
+    /**
      * 备注
      */
     private String remark;

@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.service;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
 import com.yjh.accessrobot.module.command.entity.TStdRegion;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -114,5 +115,11 @@ public class TStdRegionService {
             stdRegion.setUpRegionId(map.get(stdRegion.getUpRegionId().toString()));
             tStdRegionDao.updateUpRegionId(stdRegion);
         });
+    }
+
+    public void updateCommissioningTime(XMLBaseModel xmlBaseModel) {
+        String commissioningTime = xmlBaseModel.getItems().get(0).get("commissioningTime").toString();
+        String regionCode = xmlBaseModel.getCode();
+        tStdRegionDao.updateCommissioningTimeByRegionCode(regionCode, commissioningTime);
     }
 }

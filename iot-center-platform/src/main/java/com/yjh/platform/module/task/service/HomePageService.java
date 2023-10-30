@@ -47,6 +47,8 @@ import javax.annotation.Resource;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -541,7 +543,19 @@ public class HomePageService {
     }
 
     public List<TStdRegion> queryStationList() {
-        return tStdRegionDao.selectStations();
+        List<TStdRegion> list = tStdRegionDao.selectStations();
+        list.removeIf(tStdRegion -> tStdRegion.getUpRegionId() == -1);
+        list.stream().forEach(e -> {
+            if (e.getCommissioningTime() != null) {
+                LocalDate date = LocalDate.parse(e.getCommissioningTime());
+                // 获取当前时间
+                LocalDate now = LocalDate.now();
+                // 计算当前时间与输入时间之间的天数
+                Long days = now.until(date, ChronoUnit.DAYS);
+                e.setCommissioningDays(Math.abs(days));
+            }
+        });
+        return list;
     }
 
     public List<Map<String,Float>> countPowerTotal(Integer type){
@@ -553,5 +567,4 @@ public class HomePageService {
         }
 
     }
-
 }
