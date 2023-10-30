@@ -111,13 +111,22 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            List<Long> regionIdList = new ArrayList<>();
-            if (regionId != null){
-                regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+            List<Long> deviceIdList = new ArrayList<>();
+            List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+            if (regionId == null){
+                //查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                //查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
             }
 
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime, regionIdList,instanceName, stationName);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime, deviceIdList,instanceName, stationName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
