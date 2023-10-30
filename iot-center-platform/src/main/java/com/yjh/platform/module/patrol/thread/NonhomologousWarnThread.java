@@ -4,12 +4,17 @@ import cn.hutool.core.comparator.IndexedComparator;
 import cn.hutool.core.compiler.CompilerUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.stream.CollectorUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
@@ -60,6 +65,7 @@ public class NonhomologousWarnThread implements Runnable{
     private final RobotPatrolTaskAlarm robotPatrolTaskAlarm;
     private final int isResult;
     private final NonhomologousWarnDao nonhomologousWarnDao;
+    private final TRobotInspectionDao tRobotInspectionDao;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -73,6 +79,7 @@ public class NonhomologousWarnThread implements Runnable{
         this.redisTemplate = redisTemplate;
         this.isResult = isResult;
         this.nonhomologousWarnDao = StaticContextAccessor.getBean(NonhomologousWarnDao.class);
+        this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
     }
 
     @Override
@@ -91,35 +98,12 @@ public class NonhomologousWarnThread implements Runnable{
 
             String warnId = String.valueOf(UUID.randomUUID()).replace("-", "");
             if (0 == isResult){
-                // 三相告警
-                //只处理系统下发任务产生的三相告警
-                if (StringUtils.isNotBlank(robotPatrolTaskAlarm.getTaskCode())) {
-                    Map<String,Object> warnInfo = new HashMap<>(6);
-                    warnInfo.put("warnId", warnId);
-                    warnInfo.put("warnType", 5);
-                    warnInfo.put("instanceId", null);
-                    warnInfo.put("warnContent", "机器人相别告警：" + robotPatrolTaskAlarm.getContent());
-                    List<Map<String, Object>> insResults = new ArrayList<>();
-                    List<Map<String,Object>> mapList = nonhomologousWarnDao.getInstanceIdByDeviceId(robotPatrolTaskAlarm.getDeviceId(), taskCode);
-                    //机器人三相 必须存在三个值再处理
-                    if (CollectionUtils.isNotEmpty(mapList) && mapList.size() > 2){
-                        mapList.forEach(warnMap -> {
-                            warnMap.put("warnId", warnId);
-                            insResults.add(warnMap);
-                        });
-                        warnInfo.put("resultsInfo", insResults);
-                        warnInfo.put("value", robotPatrolTaskAlarm.getValue());
-                        warnInfo.put("deviceMeteId", mapList.get(0).get("deviceMeteId"));
-                        warnInfo.put("one", mapList.get(0).get("inspectionId"));
-                        warnInfo.put("two", mapList.get(1).get("inspectionId"));
-                        warnInfo.put("three", mapList.get(2).get("inspectionId"));
-                        warnInfo.put("oneCruiseDeviceName", mapList.get(0).get("inspectionName"));
-                        warnInfo.put("twoCruiseDeviceName", mapList.get(1).get("inspectionName"));
-                        warnInfo.put("threeCruiseDeviceName", mapList.get(2).get("inspectionName"));
-                        insertNonhomologousWarnInfo(warnInfo, "9");
-                    }
+                // 下级同步的三相告警，机器人和下级巡视系统
+                if (StringUtils.isNotBlank(taskCode)) {
+                    subSystemNonhomologousWarn(taskCode, warnId);
+                } else {
+                    log.warn("taskCode is empty!!!");
                 }
-
             } else {
                 if (!judgeTriphaseWarn(taskCode, robotInsResult, warnId)) {
                     // 需要判断的非同源告警
@@ -128,6 +112,88 @@ public class NonhomologousWarnThread implements Runnable{
             }
         } catch (Exception e) {
             log.error("非同源告警处理异常：", e);
+        }
+    }
+
+    private void subSystemNonhomologousWarn(String taskCode, String warnId) {
+
+        Map<String, Object> warnInfo = new HashMap<>(16);
+        warnInfo.put("warnId", warnId);
+        warnInfo.put("warnType", 5);
+        warnInfo.put("instanceId", null);
+        warnInfo.put("warnContent", robotPatrolTaskAlarm.getContent());
+        warnInfo.put("value", robotPatrolTaskAlarm.getValue());
+        List<Map<String, Object>> insResults = new ArrayList<>();
+        List<Map<String, Object>> mapList = nonhomologousWarnDao.getInstanceIdByDeviceId(robotPatrolTaskAlarm.getDeviceId(), taskCode);
+        //机器人三相 必须存在三个值再处理
+        if (CollectionUtils.isNotEmpty(mapList) && mapList.size() > 2) {
+            warnInfo.putAll(mapList.get(0));
+            mapList.forEach(warnMap -> {
+                warnMap.put("warnId", warnId);
+                insResults.add(warnMap);
+            });
+            warnInfo.put("resultsInfo", insResults);
+            warnInfo.put("deviceMeteId", mapList.get(0).get("deviceMeteId"));
+            warnInfo.put("one", mapList.get(0).get("inspectionId"));
+            warnInfo.put("two", mapList.get(1).get("inspectionId"));
+            warnInfo.put("three", mapList.get(2).get("inspectionId"));
+            warnInfo.put("oneCruiseDeviceName", mapList.get(0).get("inspectionName"));
+            warnInfo.put("twoCruiseDeviceName", mapList.get(1).get("inspectionName"));
+            warnInfo.put("threeCruiseDeviceName", mapList.get(2).get("inspectionName"));
+
+            String deviceType = MapUtils.getString(mapList.get(0), "deviceType");
+            warnInfo.put("deviceTypeName", DictConvertUtil.DICT.covertToDict("deviceType", deviceType));
+            warnInfo.put("instanceId", MapUtils.getString(mapList.get(0), "inspectionId"));
+        } else if (StringUtils.isNotEmpty(robotPatrolTaskAlarm.getDeviceIdAll())) {
+            // 下级系统传入三相
+            String[] deviceAll = StringUtils.split(robotPatrolTaskAlarm.getDeviceIdAll(), ",");
+            String[] patroldeviceAll = StringUtils.split(robotPatrolTaskAlarm.getPatroldeviceAll(), ",");
+            List<TCruisePointInstanceNameDetail> insList;
+            if (Constant.standardPoints()) {
+                insList = tRobotInspectionDao.selectRealInstanceByDevicePoints(deviceAll);
+            } else {
+                insList = tRobotInspectionDao.selectRealInstances(deviceAll, robotPatrolTaskAlarm.getRobotCode());
+            }
+            String deviceId = robotPatrolTaskAlarm.getDeviceId();
+            TCruisePointInstanceNameDetail device = null;
+            for (int i = 0; i < insList.size(); i++) {
+                Map<String, Object> warnMap = new HashMap<>(8);
+                TCruisePointInstanceNameDetail ins = insList.get(i);
+
+                warnMap.put("warnId", warnId);
+                warnMap.put("inspectionId", ins.getInstanceId());
+                warnMap.put("taskId", taskCode);
+                insResults.add(warnMap);
+                if (i == 0) {
+                    warnInfo.put("one", ins.getInstanceId());
+                }
+                if (i == 1) {
+                    warnInfo.put("two", ins.getInstanceId());
+                }
+                if (i == 2) {
+                    warnInfo.put("three", ins.getInstanceId());
+                }
+                if (StringUtils.equals(deviceId, ins.getOriginId())) {
+                    device = ins;
+                }
+            }
+            warnInfo.put("resultsInfo", insResults);
+            warnInfo.put("deviceMeteId", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceMeteId).orElse(null));
+            warnInfo.put("deviceName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceName).orElse(""));
+            Integer deviceType = Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceType).orElse(null);
+            warnInfo.put("deviceTypeName", DictConvertUtil.DICT.covertToDict("deviceType", deviceType));
+            warnInfo.put("deviceMeteName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceMeteName).orElse(null));
+            warnInfo.put("instanceId", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getInstanceId).orElse(null));
+            warnInfo.put("regionName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getRegionName).orElse(null));
+            warnInfo.put("customName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getCustomName).orElse(null));
+
+            warnInfo.put("oneCruiseDeviceName", ArrayUtils.getLength(patroldeviceAll) > 0 ? patroldeviceAll[0] : "");
+            warnInfo.put("twoCruiseDeviceName", ArrayUtils.getLength(patroldeviceAll) > 1 ? patroldeviceAll[1] : "");
+            warnInfo.put("threeCruiseDeviceName", ArrayUtils.getLength(patroldeviceAll) > 2 ? patroldeviceAll[2] : "");
+        }
+
+        if (!insResults.isEmpty()) {
+            insertNonhomologousWarnInfo(warnInfo, robotPatrolTaskAlarm.getAlarmType());
         }
     }
 
@@ -707,7 +773,7 @@ public class NonhomologousWarnThread implements Runnable{
             String warnInstanceId = warn.get("instanceId").toString();
             List<String> insList = new ArrayList<>();
             Map<String,Object> insMap;
-            boolean robot3x = warn.containsKey("one") && warn.containsKey("two") && warn.containsKey("three");
+            boolean robot3x = warn.containsKey("one") && warn.containsKey("two");
             if ("5".equals(warnType)){
                 if (robot3x){
                     insMap = warn;
@@ -736,21 +802,36 @@ public class NonhomologousWarnThread implements Runnable{
             Map<String, String> patrolDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectPatrolDevice(instanceId);
             UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
             HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
-            String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
+            String taskCode = uPatrolTask.getTaskCode();
 
             xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
             xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
             xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
             xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
             xmlItem.put("device_id", robot3x ? robotPatrolTaskAlarm.getDeviceId() : Constant.standardPoints() ? devicePointId : instanceId);
-            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
+            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(simpleDateFormat));
             xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
             xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
             xmlItem.put("task_code", taskCode);
             String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
             String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+                taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
+            }
             xmlItem.put("task_patrolled_id", taskPatrolledId);
+
+            StringJoiner patroldeviceJoiner = new StringJoiner(",");
+            if (StringUtils.isNotEmpty((String) warn.get("oneCruiseDeviceName"))) {
+                patroldeviceJoiner.add((String) warn.get("oneCruiseDeviceName"));
+            }
+            if (StringUtils.isNotEmpty((String) warn.get("twoCruiseDeviceName"))) {
+                patroldeviceJoiner.add((String) warn.get("twoCruiseDeviceName"));
+            }
+            if (StringUtils.isNotEmpty((String) warn.get("threeCruiseDeviceName"))) {
+                patroldeviceJoiner.add((String) warn.get("threeCruiseDeviceName"));
+            }
+            xmlItem.put("patroldevice_all", patroldeviceJoiner.toString());
 
             dealImg(xmlItem,insList,taskId);
 
@@ -787,8 +868,10 @@ public class NonhomologousWarnThread implements Runnable{
         String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
         String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
         String simpleDateFormat = DateTimeUtil.format3(new Date());
+        StringJoiner joiner = new StringJoiner(",");
         for (String instanceId:insList) {
             if (StringUtils.isNotEmpty(instanceId)){
+                joiner.add(instanceId);
                 Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
                 log.info("多张图片 cruiseResultMap=={}", cruiseResultMap);
                 if (StringUtils.isNotEmpty(cruiseResultMap.get("picpath"))){
@@ -811,6 +894,7 @@ public class NonhomologousWarnThread implements Runnable{
                 }
             }
         }
+        xmlItem.put("device_id_all", joiner.toString());
         xmlItem.put("file_path", allTar.toString().replaceFirst(",",""));
         xmlItem.put("file_type", allFileType.toString().replaceFirst(",",""));
     }

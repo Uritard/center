@@ -331,7 +331,7 @@ public class ProcessResultToUpSystem {
             String resultNum = Optional.ofNullable(tWarnInfo.getValue()).orElse("");
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
-            xmlItem.put("defect_type", Optional.ofNullable(String.valueOf(tWarnInfo.getWarnSubtype())).orElse(""));
+            xmlItem.put("defect_type", Optional.ofNullable(tWarnInfo.getWarnSubtype()).map(String::valueOf).orElse(""));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

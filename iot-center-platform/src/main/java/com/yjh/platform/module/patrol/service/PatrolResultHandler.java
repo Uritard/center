@@ -92,7 +92,7 @@ public class PatrolResultHandler {
             taskAlarm.setTaskCode(taskId);
 
             boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
-            if (flag) {
+            if (flag || StringUtils.isNotEmpty(taskAlarm.getDeviceIdAll())) {
                 //非同源告警处理
                 NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm,
                     redisTemplate, 0);

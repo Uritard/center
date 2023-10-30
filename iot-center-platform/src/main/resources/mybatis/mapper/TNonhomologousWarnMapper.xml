@@ -117,13 +117,20 @@
             a.instance_id AS inspectionId,
             b.inspection_name AS inspectionName,
             a.device_mete_id AS deviceMeteId,
+            d.device_name AS deviceName,
+            d.device_type AS deviceType,
+            e.mete_name AS deviceMeteName,
+            d.up_region_name AS regionName,
+            e.custom_name AS customName,
             c.task_id AS taskId
         FROM
             t_cruise_point_instance a
                 LEFT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
                 LEFT JOIN u_patrol_task_attr c ON c.instance_id = a.instance_id
-        WHERE FIND_IN_SET(b.inspection_code, #{deviceId, jdbcType=VARCHAR})
-          and c.task_id = #{taskId, jdbcType=VARCHAR}
+                LEFT JOIN t_std_devicemete e on a.device_mete_id = e.device_mete_id
+                LEFT JOIN t_std_device d ON e.device_id = d.device_id
+            WHERE FIND_IN_SET(b.inspection_code, #{deviceId, jdbcType=VARCHAR})
+            and c.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 
     <select id="getInspectionIdByDeviceId" resultType="java.lang.Long">
