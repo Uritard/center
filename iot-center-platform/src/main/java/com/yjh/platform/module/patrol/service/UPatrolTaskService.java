@@ -712,7 +712,7 @@ public class UPatrolTaskService {
                 if (task.getTaskType() == SINGLE_DEVICE_PATROL
                         || task.getTaskType() == OPERATION_ORDER_PATROL || task.getTaskType() == EMERGENCY_PATROL){
                     //操作任务 直接结束
-                    ScheduledMapConfig.schedule(5, 1, t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
+                    forceCompletionTask(taskId);
                 } else {
                     ScheduledMapConfig.schedule(45, Constant.endWaitTimes(), t-> dealRobotTaskShutDown(taskIdFinal, robotCode, robotId, fanalTaskState, t));
                 }
