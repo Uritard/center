@@ -94,9 +94,9 @@ public interface CruiseConstant {
     int CRUISE_ABNORMAL_OPERATE = 821;
 
     /**
-     * 异常原因，任务终止
+     * 异常原因，放电（D200局放类测点）
      */
-    int CRUISE_ABNORMAL_DISCHARGE = 5700;
+    int CRUISE_ABNORMAL_DISCHARGE = 838;
 
     /**
      * 巡检数据状态，已执行
