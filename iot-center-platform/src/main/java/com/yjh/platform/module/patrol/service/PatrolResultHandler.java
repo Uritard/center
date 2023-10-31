@@ -412,7 +412,7 @@ public class PatrolResultHandler {
 
             FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getConfirmFilePath())){
-                FileUtil.copyFileUsingStream(temporaryFilePath, descConfirmFilePath);
+                FileUtil.copyFileUsingStream(confirmTemporaryFilePath, descConfirmFilePath);
                 infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
                 infoMap.put("confirmAbsolutePath", descConfirmFilePath);
             }
