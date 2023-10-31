@@ -143,7 +143,6 @@ public class NonhomologousWarnThread implements Runnable{
 
             String deviceType = MapUtils.getString(mapList.get(0), "deviceType");
             warnInfo.put("deviceTypeName", DictConvertUtil.DICT.covertToDict("deviceType", deviceType));
-            warnInfo.put("instanceId", MapUtils.getString(mapList.get(0), "inspectionId"));
         } else if (StringUtils.isNotEmpty(robotPatrolTaskAlarm.getDeviceIdAll())) {
             // 下级系统传入三相
             String[] deviceAll = StringUtils.split(robotPatrolTaskAlarm.getDeviceIdAll(), ",");
@@ -155,7 +154,7 @@ public class NonhomologousWarnThread implements Runnable{
                 insList = tRobotInspectionDao.selectRealInstances(deviceAll, robotPatrolTaskAlarm.getRobotCode());
             }
             String deviceId = robotPatrolTaskAlarm.getDeviceId();
-            TCruisePointInstanceNameDetail device = null;
+            TCruisePointInstanceNameDetail device = insList.isEmpty() ? null : insList.get(0);
             for (int i = 0; i < insList.size(); i++) {
                 Map<String, Object> warnMap = new HashMap<>(8);
                 TCruisePointInstanceNameDetail ins = insList.get(i);
@@ -183,7 +182,6 @@ public class NonhomologousWarnThread implements Runnable{
             Integer deviceType = Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceType).orElse(null);
             warnInfo.put("deviceTypeName", DictConvertUtil.DICT.covertToDict("deviceType", deviceType));
             warnInfo.put("deviceMeteName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getDeviceMeteName).orElse(null));
-            warnInfo.put("instanceId", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getInstanceId).orElse(null));
             warnInfo.put("regionName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getRegionName).orElse(null));
             warnInfo.put("customName", Optional.ofNullable(device).map(TCruisePointInstanceNameDetail::getCustomName).orElse(null));
 
