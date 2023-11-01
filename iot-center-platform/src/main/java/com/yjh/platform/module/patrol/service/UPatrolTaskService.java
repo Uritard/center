@@ -1143,6 +1143,7 @@ public class UPatrolTaskService {
                     RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                     robotTaskInfo.setCruiseType(task.getTaskType());
                     robotTaskInfo.setTaskId(task.getTaskId());
+                    robotTaskInfo.setPlanCode(task.getPlanCode());
                     // 从巡视主机下发至机器人的任务等级都暂定3级
                     robotTaskInfo.setPriority(String.valueOf(task.getTaskLevel()));
                     robotTaskInfo.setTaskName(task.getTaskName());
