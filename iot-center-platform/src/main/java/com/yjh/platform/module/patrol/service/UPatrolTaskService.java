@@ -319,6 +319,7 @@ public class UPatrolTaskService {
         }
         uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
                 .setPlanId(tCruiseTaskAdd.getPlanId())
+                .setPlanCode(tCruiseTaskAdd.getPlanCode())
                 .setTaskCode(tCruiseTaskAdd.getTaskCode())
                 .setAreaId(tCruiseTaskAdd.getAreaId())
                 .setTaskType(tCruiseTaskAdd.getType())
@@ -1069,6 +1070,7 @@ public class UPatrolTaskService {
                         RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
                         taskInfo.setCruiseType(task.getTaskType());
                         taskInfo.setTaskId(task.getTaskId());
+                        taskInfo.setPlanCode(task.getPlanCode());
                         // 从巡视主机下发至边缘节点的任务等级为3级
                         taskInfo.setPriority(String.valueOf(task.getTaskLevel()));
                         taskInfo.setTaskName(task.getTaskName());
@@ -3488,6 +3490,11 @@ public class UPatrolTaskService {
         log.info("任务：{}正在发起重试",uPatrolTaskParam);
         if (!Constant.isHost()) {
             log.info("当前任务 \"{}\" 非巡视主机，不执行重试！",uPatrolTaskParam.getTaskName());
+            return null;
+        }
+        if (uPatrolTaskParam.getTaskType() == SINGLE_DEVICE_PATROL
+                || uPatrolTaskParam.getTaskType() == OPERATION_ORDER_PATROL || uPatrolTaskParam.getTaskType() == EMERGENCY_PATROL) {
+            log.info("当前任务 \"{}\" 为操作类任务，不执行重试！", uPatrolTaskParam.getTaskName());
             return null;
         }
         Object retry = redisTemplate.opsForValue().get(TASK_RETRY_PREFIX + uPatrolTaskParam.getTaskId());
