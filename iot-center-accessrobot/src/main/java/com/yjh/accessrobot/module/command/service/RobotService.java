@@ -1504,6 +1504,7 @@ public class RobotService {
                     default:
                         break;
                 }
+                map.put("plan_code", Optional.ofNullable(item.getPlanCode()).orElse(""));
                 map.put("type", Optional.ofNullable(planType).orElse(""));
                 map.put("priority", Optional.ofNullable(item.getPriority()).orElse(""));
                 map.put("device_level", item.getDeviceLevel());
@@ -2600,7 +2601,7 @@ public class RobotService {
                     String deviceId = map.get("deviceId");
                     List<Map<String, Object>> Item = new LinkedList<>();
                     Map<String, Object> maps = new HashMap<>();
-                    if (StringUtils.equals("7", deviceType)) {  //7.空调
+                    if (StringUtils.equals("2107", deviceType)) {  //7.空调
                         maps.put("value", value);
                     }
                     Item.add(maps);
