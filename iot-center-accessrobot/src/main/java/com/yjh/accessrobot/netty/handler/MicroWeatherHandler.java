@@ -161,7 +161,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
 
             //环控数据组装
             String value = MapUtils.getString(res,"value");
-            if (res.containsKey("value_type")) {
+            if (res.containsKey("value_type") && StringUtils.isNotEmpty(String.valueOf(res.get("value_type")))) {
                 EnvDeviceStatus env = new EnvDeviceStatus();
                 env.setRobotCode(robotCode);
                 env.setUnit(MapUtils.getString(res,"unit"));
@@ -184,8 +184,10 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     //空调  value="1,2"  开关，制冷制热
                     if ("2107".equals(MapUtils.getString(res,"type"))) {
                         String[] strings = value.split(",");
-                        if ("0".equals(strings[0])) {  //空调开启
-                            if (strings.length > 1 && "1".equals(strings[1])) { //制冷制热
+                        //空调开启
+                        if ("0".equals(strings[0])) {
+                            //制冷制热
+                            if (strings.length > 1 && "1".equals(strings[1])) {
                                 env.setDeviceValue("制热");
                             } else {
                                 env.setDeviceValue("制冷");
@@ -193,7 +195,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                         } else {
                             env.setDeviceValue("关闭");
                         }
-                        env.setStatus(NumberUtils.toInt(strings[0]));//空调的开关
+                        //空调的开关
+                        env.setStatus(NumberUtils.toInt(strings[0]));
                     } else {
                         if ("0".equals(value)) {
                             env.setDeviceValue("开启");
