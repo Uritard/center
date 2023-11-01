@@ -16,6 +16,7 @@ import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.regexp.RE;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -31,7 +32,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -112,8 +112,11 @@ public class TRobotInfoService{
                 + this.tRobotInfoDao.deleteInstance(robotId)
                 + this.tRobotInfoDao.deleteInspection(robotId)
                 + this.tRobotInfoDao.deleteCruisePlan(robotId);
-        if (res > 0){
-            redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
+        if (res > 0) {
+            redisTemplate.opsForHash().delete("AllRobotCode", tRobotInfo.getRobotId().toString());
+            if (Objects.nonNull(tRobotInfo.getEnvRegionId())) {
+                redisTemplate.opsForHash().delete("Weather", String.valueOf(tRobotInfo.getEnvRegionId()));
+            }
         }
         //判断删除前的robotCode是否存在管道连接(在线),若存在，则断开连接
         if (Objects.equals("在线", tRobotInfo.getRobotStatus())){
@@ -173,8 +176,8 @@ public class TRobotInfoService{
         tCameraInfoService.stopStream(infraredCameraId);
 
         //检查机器人环境设备所属区域是否有变化， 如果有删除现有的环境信息
-        if (!Objects.equals(tRobotInfoPri.getEnvRegionId(), tRobotInfo.getEnvRegionId())){
-            redisTemplate.delete("Weather");
+        if (!Objects.equals(tRobotInfoPri.getEnvRegionId(), tRobotInfo.getEnvRegionId())) {
+            redisTemplate.opsForHash().delete("Weather", String.valueOf(tRobotInfoPri.getEnvRegionId()));
         }
         return res;
     }

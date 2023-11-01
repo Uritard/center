@@ -77,7 +77,7 @@
         remarks,record_id,channel_num_light,
         channel_num_inferad,last_online_time,duration,
         off_line_count,edge_code,origin_id,image_size,
-        light_channel_id,infrared_channel_id,
+        env_region_id,light_channel_id,infrared_channel_id,
         light_vendor,infrared_vendor
     </sql>
 
