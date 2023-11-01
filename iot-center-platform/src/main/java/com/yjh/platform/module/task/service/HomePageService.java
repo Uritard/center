@@ -498,6 +498,11 @@ public class HomePageService {
             EnvDeviceStatus envDeviceStatus = new EnvDeviceStatus();
             BeanUtil.copyProperties(e, envDeviceStatus);
             envDeviceStatus.setCreateTime(CommonUtils.formatDate(e.getCreateTime()));
+            if ("正常".equals(envDeviceStatus.getDeviceValue())) {
+                envDeviceStatus.setDeviceValue("0");
+            } else if ("异常".equals(envDeviceStatus.getDeviceValue())) {
+                envDeviceStatus.setDeviceValue("1");
+            }
             return envDeviceStatus;
         }).collect(Collectors.toList());
         return resultList;
