@@ -30,17 +30,17 @@ public class TaskSimpleInfo implements Serializable {
     @ApiModelProperty(value = "任务状态名称")
     private String taskStateName;
     @ApiModelProperty(value = "测点数量")
-    private Long deviceMeteCount;
+    private Long deviceMeteCount = 0L;
     @ApiModelProperty(value = "视频设备个数")
-    private Long cameraCount;
+    private Long cameraCount = 0L;
     @ApiModelProperty(value = "机器人点位")
-    private Long robotPointsCount;
+    private Long robotPointsCount = 0L;
 
     @ApiModelProperty(value = "无人机点位")
-    private Long dronePointsCount;
+    private Long dronePointsCount = 0L;
 
     @ApiModelProperty(value = "声纹设备点位")
-    private Long voicePointsCount;
+    private Long voicePointsCount = 0L;
 
 
 }
