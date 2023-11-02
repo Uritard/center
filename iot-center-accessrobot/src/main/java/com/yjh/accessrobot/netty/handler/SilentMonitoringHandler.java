@@ -197,6 +197,9 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     }
 
     private void sendUpSystem(String monitorType, TCruisePointInstance tCruisePointInstance, TWarnInfo tWarnInfo) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         String warnTime = DateTimeUtil.format(tWarnInfo.getWarnTime());
         XMLBaseModel xmlBaseModel1 = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();

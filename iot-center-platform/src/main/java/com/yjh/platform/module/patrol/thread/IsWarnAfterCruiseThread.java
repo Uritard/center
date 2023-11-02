@@ -223,6 +223,9 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param warnMap 告警信息
      */
     private void alarmToAmPlatform(Map<String, String> warnMap) {
+        if (!Constant.managerSystemFlag()) {
+            return;
+        }
         try {
             log.info("开始与算法管理平台交互");
             Alarm alarm = new Alarm();

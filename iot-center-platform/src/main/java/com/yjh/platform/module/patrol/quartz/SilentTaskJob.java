@@ -124,7 +124,7 @@ public class SilentTaskJob implements Runnable {
                 String edgeLevel = Constant.getLevelEdge();
                 log.info("edgeLevel:{}",edgeLevel);
                 //如果是边缘节点 上传巡视主机
-                String resultImgPath;
+                String resultImgPath = null;
                 if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
                     resultImgPath = uploadPicture(absPath, String.valueOf(cameraId), String.valueOf(presetId), presetName);
                     //否则调用算法分析

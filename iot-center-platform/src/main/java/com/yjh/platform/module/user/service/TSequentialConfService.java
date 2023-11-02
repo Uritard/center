@@ -1,12 +1,10 @@
 package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
@@ -25,7 +23,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +33,11 @@ import java.util.*;
 import static com.yjh.platform.common.Constant.redisTemplate;
 
 /**
-* @author lqh
-* @since 2021-01-21
-*/
+ * @author lqh
+ * @since 2021-01-21
+ */
 @Service
-public class TSequentialConfService{
+public class TSequentialConfService {
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -62,13 +59,13 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
         List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
-        if(CollectionUtils.isNotEmpty(cameraIdList) && cameraIdList.contains(tSequentialConf.getCameraId())){
+        if (CollectionUtils.isNotEmpty(cameraIdList) && cameraIdList.contains(tSequentialConf.getCameraId())) {
             return -1;
         }
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
-        if(tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId()) != null){
-           return tSequentialConfDao.update(tSequentialConf);
-        }else {
+        if (tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId()) != null) {
+            return tSequentialConfDao.update(tSequentialConf);
+        } else {
             return this.tSequentialConfDao.add(tSequentialConf);
         }
     }
@@ -81,9 +78,9 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TSequentialConf tSequentialConf) {
         TSequentialConf old = tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId());
-        if(!old.getCameraId().equals(tSequentialConf.getCameraId())){
+        if (!old.getCameraId().equals(tSequentialConf.getCameraId())) {
             List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
-            if(cameraIdList != null && cameraIdList.size() >0 && cameraIdList.contains(tSequentialConf.getCameraId())){
+            if (cameraIdList != null && cameraIdList.size() > 0 && cameraIdList.contains(tSequentialConf.getCameraId())) {
                 return -1;
             }
         }
@@ -115,15 +112,15 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String cfgDeviceId) {
-    List<String> list1= Arrays.asList(cfgDeviceId.split(","));
-    return this.tSequentialConfDao.batchDelete(list1);
+        List<String> list1 = Arrays.asList(cfgDeviceId.split(","));
+        return this.tSequentialConfDao.batchDelete(list1);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfo> selectForCfgDeviceTree(String cfgDeviceName){
+    public List<AreaInfo> selectForCfgDeviceTree(String cfgDeviceName) {
         List<AreaInfo> list = new LinkedList<>();
         //遥信
-        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1,cfgDeviceName);
+        List<AreaInfo> listItem1 = this.tSequentialConfDao.selectForTCfgMete(1, cfgDeviceName);
         AreaInfo areaInfoItem1 = new AreaInfo();
         areaInfoItem1.setId(-1L);
         areaInfoItem1.setUpId(null);
@@ -132,7 +129,7 @@ public class TSequentialConfService{
         areaInfoItem1.setInfoType("meteKind");
         list.add(areaInfoItem1);
         //遥测
-        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2,cfgDeviceName);
+        List<AreaInfo> listItem2 = this.tSequentialConfDao.selectForTCfgMete(2, cfgDeviceName);
         AreaInfo areaInfoItem2 = new AreaInfo();
         areaInfoItem2.setId(2L);
         areaInfoItem2.setUpId(-2L);
@@ -141,7 +138,7 @@ public class TSequentialConfService{
         areaInfoItem2.setInfoType("meteKind");
         list.add(areaInfoItem2);
         //遥测
-        List<AreaInfo> listItem3 = this.tSequentialConfDao.selectForTCfgMete(3,cfgDeviceName);
+        List<AreaInfo> listItem3 = this.tSequentialConfDao.selectForTCfgMete(3, cfgDeviceName);
         AreaInfo areaInfoItem3 = new AreaInfo();
         areaInfoItem3.setId(3L);
         areaInfoItem3.setUpId(-1L);
@@ -150,7 +147,7 @@ public class TSequentialConfService{
         areaInfoItem3.setInfoType("meteKind");
         list.add(areaInfoItem3);
         //遥测
-        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4,cfgDeviceName);
+        List<AreaInfo> listItem4 = this.tSequentialConfDao.selectForTCfgMete(4, cfgDeviceName);
         AreaInfo areaInfoItem4 = new AreaInfo();
         areaInfoItem4.setId(4L);
         areaInfoItem4.setUpId(-4L);
@@ -206,11 +203,11 @@ public class TSequentialConfService{
      * @return result
      */
     private String getSilentMonitorType(Integer type) {
-        String silentMonitorAnalyseMapStr = (String)redisTemplate.opsForHash().get("t_sys_param:silentMonitorAnalyseMap", "content");
+        String silentMonitorAnalyseMapStr = (String) redisTemplate.opsForHash().get("t_sys_param:silentMonitorAnalyseMap", "content");
         String[] arr = silentMonitorAnalyseMapStr.split(",");
 
         Map<Integer, String> map = new HashMap<>();
-        for (int i=0; i<arr.length; i++) {
+        for (int i = 0; i < arr.length; i++) {
             String[] subArr = arr[i].split("\\|");
             map.put(Integer.valueOf(subArr[0]), subArr[1]);
         }
@@ -222,29 +219,29 @@ public class TSequentialConfService{
     public String sequential(String meteId) {
         // 获取一键顺控配置
         List<Map<String, Object>> list = sequentialInfo(meteId);
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             log.info("【meteId {} sequential config is empty!】", meteId);
             return "ok";
         }
 
-        Map<String,Object> map = sequentialInfo(meteId).get(0);
+        Map<String, Object> map = sequentialInfo(meteId).get(0);
         Map<String, String> jasonMaps2 = new HashMap<>(8);
         jasonMaps2.put("type", "newSequential");
         jasonMaps2.put("cfgDeviceId", meteId);
         jasonMaps2.put("sort", map.get("sort").toString());
         jasonMaps2.put("state", "进行中");
         log.info("发送给前端的消息:{}", JSON.toJSONString(jasonMaps2));
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps2);
 
-        Constant.sequentialState.put("state", ((Long)map.get("sort")).intValue());
+        Constant.sequentialState.put("state", ((Long) map.get("sort")).intValue());
         Constant.sequentialState.put("cfgDeviceId", meteId);
         // 为了后续的假数据处理
         Constant.sequentialState.put("meteResult", map.get("state"));
         log.info("sequentialState:{}", Constant.sequentialState);
 
-        if(StringUtils.isNotEmpty(meteId)){
+        if (StringUtils.isNotEmpty(meteId)) {
             TSequentialConf sequentialConf = selectByPrimaryId(meteId);
-            if(sequentialConf != null && sequentialConf.getPresetId() != null){
+            if (sequentialConf != null && sequentialConf.getPresetId() != null) {
                 update(sequentialConf);
             }
         }
@@ -255,29 +252,29 @@ public class TSequentialConfService{
             log.error(e.getMessage(), e);
         }
 
-        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
-        if (StringUtils.equals("true", flag)){
+        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
+        if (StringUtils.equals("true", flag)) {
             // 收到聚焦信号开始录视频
             try {
                 cameraConService.startRecord(ValueUtil.toLong(map.get("cameraId")));
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }
-       return "ok";
+        return "ok";
     }
 
     @Transactional(rollbackFor = Exception.class)
     public String sequentialRec(String meteId) {
         // 获取一键顺控配置
-        List<Map<String,Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
-        if (list.isEmpty()){
+        List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId);
+        if (list.isEmpty()) {
             log.info("meteId {} sequentialRec config is empty!", meteId);
             return "fail";
         }
 
-        Map<String , Object> param = new HashMap<>(4);
-        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+        Map<String, Object> param = new HashMap<>(4);
+        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
         if (StringUtils.equals("true", flag)) {
             // 收到变位信号停止录视频
             try {
@@ -316,12 +313,15 @@ public class TSequentialConfService{
         return "ok";
     }
 
-    public void sequentialRecHandler(Map<String , Object> param, String meteId, List<Map<String,Object>> list) {
+    public void sequentialRecHandler(Map<String, Object> param, String meteId, List<Map<String, Object>> list) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         String edgeLevel = Constant.getLevelEdge();
         //边缘节点:发送结果到区域巡视主机   巡视主机:发给算法进行分析
-        if ("1".equals(edgeLevel)){
+        if ("1".equals(edgeLevel)) {
             String stationId = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
-            Map<String ,Object> filePathMap = new HashMap<>();
+            Map<String, Object> filePathMap = new HashMap<>();
             String filePath = String.valueOf(param.get("picPath"));
             String fileName = StringUtils.substringAfterLast(filePath, "/");
             filePathMap.put("filePath", filePath);
@@ -353,7 +353,7 @@ public class TSequentialConfService{
             xmlItem.put("time", "");
             //一键顺控检测 自定义为1001
             xmlItem.put("recognition_type", "1001");
-            xmlItem.put("file_type",  param.get("fileType"));
+            xmlItem.put("file_type", param.get("fileType"));
             xmlItem.put("file_path", stationId + "/videoFile" + "/" + fileName);
             xmlItem.put("rectangle", "");
             xmlItem.put("task_patrolled_id", meteId);
@@ -363,12 +363,12 @@ public class TSequentialConfService{
             xmlBaseModel.setItems(xmlItems);
             List<XMLBaseModel> xmlBaseModelArrayList = new ArrayList<>();
             xmlBaseModelArrayList.add(xmlBaseModel);
-            Map<String,List<XMLBaseModel>> taskStatus = new HashMap<>(2);
+            Map<String, List<XMLBaseModel>> taskStatus = new HashMap<>(2);
             taskStatus.put("list", xmlBaseModelArrayList);
             Constant.otherServer(taskStatus, Constant.TCP_URL);
             return;
         }
-        try{
+        try {
             Analysis analysis = new Analysis();
             analysis.setAnalyseType("6");
             analysis.setInstanceId(Long.valueOf(list.get(0).get("cfgDeviceId").toString()));
@@ -386,13 +386,13 @@ public class TSequentialConfService{
             } catch (Exception e) {
                 log.error("调用智能分析主机进行缺陷分析异常：", e);
             }
-        }catch (Exception e){
-            log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
+        } catch (Exception e) {
+            log.error("一键顺控-变位信号-调用算法识别主机失败:", e);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String sequentialRecBack(Map<String,String> recBack) {
+    public String sequentialRecBack(Map<String, String> recBack) {
         // 获取一键顺控配置
         Map<String, Object> map = sequentialInfo(recBack.get("meteId")).get(0);
         Map<String, String> param = new HashMap<>();
@@ -531,19 +531,29 @@ public class TSequentialConfService{
 
         try {
             String value = "";
-            switch (param){
-                case "1": value = "分位"; break;
-                case "2": value = "合位"; break;
-                case "3": value = "分不到位"; break;
-                case "4": value = "合不到位"; break;
-                default: value = "无效状态"; break;
+            switch (param) {
+                case "1":
+                    value = "分位";
+                    break;
+                case "2":
+                    value = "合位";
+                    break;
+                case "3":
+                    value = "分不到位";
+                    break;
+                case "4":
+                    value = "合不到位";
+                    break;
+                default:
+                    value = "无效状态";
+                    break;
             }
             FileUtil.createDirectory(path);
             log.info("applicationProperties:{}", applicationProperties);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialVideocfmResult().replace("{{date}}", simpleDateFormat2.format(new Date()));
 
-            File txt=new File(devicePath);
-            if(txt.delete()){
+            File txt = new File(devicePath);
+            if (txt.delete()) {
                 txt.delete();
             }
             if (!txt.exists()) {
@@ -552,11 +562,11 @@ public class TSequentialConfService{
             String meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(txt,true), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
-            bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+DateTimeUtil.format(new Date())+"'(文件最新时间)!>\r\n");
+                    new FileOutputStream(txt, true), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
+            bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='" + DateTimeUtil.format(new Date()) + "'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::设备状态>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-            bw.write("#1\t"+1+"\t"+ meteId +"\t"+ map.get("deviceName")+"\t"+ value +"\t"+DateTimeUtil.format(new Date())+"\r\n");
+            bw.write("#1\t" + 1 + "\t" + meteId + "\t" + map.get("deviceName") + "\t" + value + "\t" + DateTimeUtil.format(new Date()) + "\r\n");
             bw.write("</DeviceInfo::设备状态>\r\n");
             bw.flush();
             bw.close();
@@ -577,21 +587,21 @@ public class TSequentialConfService{
                 log.info("Sending file to udp...");
                 Constant.otherServer(mapForSend, Constant.UDP_SEND);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
+    public List<Map<String, Object>> sequentialInfo(String cfgDeviceId) {
         List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
         Integer state = (Integer) Constant.sequentialState.get("state");
-        if(state == -1) {
+        if (state == -1) {
             list.get(0).put("status", "未开始");
             return list;
         }
         Integer status = (Integer) Constant.sequentialState.get("status");
-        if (status != null){
+        if (status != null) {
             list.get(0).put("status", "已完成");
             list.get(0).put("identifyResult", Constant.sequentialState.get("content"));
             return list;
@@ -600,24 +610,25 @@ public class TSequentialConfService{
         list.get(0).put("status", "正在进行中");
         return list;
     }
+
     @Transactional(rollbackFor = Exception.class)
-    public String unionTask(String cfgDeviceId,String order){
+    public String unionTask(String cfgDeviceId, String order) {
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
         log.info("applicationProperties:{}", applicationProperties);
 
-        try{
+        try {
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
 
             Map<String, String> map = redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode());
             String stationId = map.get("stationId");
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
-            String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}", simpleDateFormat2.format(new Date()));
             log.info("unionTask devicePath {}", devicePath);
-            File txt=new File(devicePath);
+            File txt = new File(devicePath);
 
-            if(txt.exists()){
+            if (txt.exists()) {
                 txt.delete();
             }
             if (!txt.exists()) {
@@ -631,10 +642,10 @@ public class TSequentialConfService{
                     new OutputStreamWriter(
                             new FileOutputStream(txt), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
 
-            bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+ DateTimeUtil.format(new Date())+"'(文件最新时间)!>\r\n");
+            bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='" + DateTimeUtil.format(new Date()) + "'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::控制状态信息>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\t联动指令\r\n");
-            bw.write("#1\t"+1+"\t"+cfgDeviceId+"\t"+tCfgDevice.getDeviceName()+"\t"+"遥控"+"\t"+order+"\r\n");
+            bw.write("#1\t" + 1 + "\t" + cfgDeviceId + "\t" + tCfgDevice.getDeviceName() + "\t" + "遥控" + "\t" + order + "\r\n");
             bw.write("</DeviceInfo::控制状态信息>\r\n");
             bw.flush();
             bw.close();
@@ -644,7 +655,7 @@ public class TSequentialConfService{
                 Map<String, Object> mapForSend = new HashMap<>(3);
                 mapForSend.put("edgeCode", tCfgDevice.getEdgeCode());
                 mapForSend.put("command", "3");
-                mapForSend.put("filePath", devicePath.replace(ftpsFilePath,""));
+                mapForSend.put("filePath", devicePath.replace(ftpsFilePath, ""));
                 log.info("Sending file to edge...");
                 Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
             } else {

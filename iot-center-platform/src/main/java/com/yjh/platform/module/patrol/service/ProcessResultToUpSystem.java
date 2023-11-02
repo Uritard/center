@@ -94,6 +94,10 @@ public class ProcessResultToUpSystem {
             // 压测模式，结果不上报上级系统
             return null;
         }
+        if (!Constant.upSystemFlag()) {
+            // 上级系统未启用,不上报
+            return null;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         List<Map<String, String>> cruiseResultNewList = new ArrayList<>();
@@ -508,7 +512,7 @@ public class ProcessResultToUpSystem {
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-        if(DISTING_MAP.containsKey(msgId)){
+        if(DISTING_MAP.containsKey(msgId) && Constant.managerSystemFlag()){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -597,7 +601,7 @@ public class ProcessResultToUpSystem {
             distinguishToUpSystem(cruiseResultMap, diffList);
         }
 
-        if(DEFECT_MAP.containsKey(msgId)) {
+        if(DEFECT_MAP.containsKey(msgId) && Constant.managerSystemFlag()) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -684,6 +688,9 @@ public class ProcessResultToUpSystem {
      */
     @Async
     public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, boolean all){
+        if (!Constant.upSystemFlag()) {
+            return null;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 

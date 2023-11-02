@@ -294,6 +294,9 @@ public class HelloController {
 
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state){
+        if (!Constant.upSystemFlag()) {
+            return null;
+        }
         //任务状态上报站端
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String,Object>> items= new ArrayList<>();
@@ -663,6 +666,9 @@ public class HelloController {
     }
 
     private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         try {
             Map<String, Object> xmlItem = new HashMap<>(16);
             com.yjh.platform.module.patrol.entity.XMLBaseModel xmlBaseModel = new com.yjh.platform.module.patrol.entity.XMLBaseModel();

@@ -764,6 +764,9 @@ public class NonhomologousWarnThread implements Runnable{
 
     private void warnToUpSystem(Map<String,Object> warn, String alarmType, String taskId,
                                 String instanceId){
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         try {
             String warnContent = warn.get("warnContent").toString();
             String warnType = warn.get("warnType").toString();

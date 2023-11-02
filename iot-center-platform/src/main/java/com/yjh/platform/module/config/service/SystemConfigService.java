@@ -146,7 +146,7 @@ public class SystemConfigService {
                         isChange = false;
                         break;
                 }
-                if (isChange){
+                if (isChange && Constant.upSystemFlag()){
                     Constant.getToOtherServer(Constant.UPDATE_TCP_CONTENT);
                 }
             }

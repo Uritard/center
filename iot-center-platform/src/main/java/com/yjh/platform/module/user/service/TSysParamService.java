@@ -269,6 +269,9 @@ public class TSysParamService{
     }
 
     public void syncCommissioningTimeToUpSystem() {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         String commissioningTime = redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content").toString();
         List<Map<String, Object>> infoMaps = new ArrayList<>();
         Map<String, Object> info = new HashMap<>();

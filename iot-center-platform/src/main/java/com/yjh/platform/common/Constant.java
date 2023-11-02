@@ -115,13 +115,15 @@ public class Constant {
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static void modelUpload(String type){
-        try {
-            Map<String, Object> param = new HashMap<>();
-            param.put("type", type);
-            Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
-            log.info("modelUpload result: {}", JSON.toJSONString(re));
-        }catch (Exception e){
-            log.error("模型文件上传失败", e);
+        if (upSystemFlag()) {
+            try {
+                Map<String, Object> param = new HashMap<>();
+                param.put("type", type);
+                Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+                log.info("modelUpload result: {}", JSON.toJSONString(re));
+            }catch (Exception e){
+                log.error("模型文件上传失败", e);
+            }
         }
     }
     public static Result videoServer(String type,String url,Object... objects){
@@ -547,5 +549,40 @@ public class Constant {
 
     public final static Map<String,Integer> threePhaseMap = new ConcurrentHashMap();
     public final static Map<String,Integer> threePhaseCountMap = new ConcurrentHashMap();
+
+
+    public static String upSystemFlag;
+    /**
+     * 上级系统连接开关 1开 0关
+     * @return
+     */
+    public static Boolean upSystemFlag() {
+        if (upSystemFlag == null) {
+            try {
+                upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+                log.info("upSystemFlag is {}", upSystemFlag);
+            } catch (Exception e) {
+                upSystemFlag = "1";
+            }
+        }
+        return "1".equals(upSystemFlag);
+    }
+
+    public static String managerSystemFlag;
+    /**
+     * 算法平台连接开关 1开 0关
+     * @return
+     */
+    public static Boolean managerSystemFlag() {
+        if (managerSystemFlag == null) {
+            try {
+                managerSystemFlag = redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag").toString();
+                log.info("algorithmServerFlag is {}", managerSystemFlag);
+            } catch (Exception e) {
+                managerSystemFlag = "1";
+            }
+        }
+        return "1".equals(managerSystemFlag);
+    }
 }
 

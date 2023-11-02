@@ -36,6 +36,9 @@ public class RobotStatusObserver {
     }
 
     private static void send(String patrolDeviceName, String patrolDeviceCode, String status) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         List<XMLBaseModel> list = new ArrayList<>();
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();

@@ -86,6 +86,9 @@ public class DeviceStaticsToUpSystem {
     }
 
     private void sendInfoToUpSystem(List<Map<String, Object>> infoMaps) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         xmlBaseModel.setType("81");
         xmlBaseModel.setCode("");
