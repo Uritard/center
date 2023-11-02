@@ -825,6 +825,7 @@
             d.camera_name AS label,
             ''as deviceTypeId,
             1 as state,
+            '' as robotType,
             (SELECT DISTINCT
                  f.preset_id as presetId
              FROM
@@ -849,6 +850,7 @@
             d.robot_name AS label,
             d.robot_code as deviceTypeId,
             IF(d.robot_status = '在线', 1, 0) as state,
+            d.robot_type as robotType,
             (SELECT DISTINCT
                  f.inspection_code as presetId
              FROM
@@ -874,6 +876,7 @@
             d.robot_name AS label,
             d.robot_code as deviceTypeId,
             IF(d.robot_status = '在线', 1, 0) as state,
+            d.robot_type as robotType,
             (SELECT DISTINCT
                  f.inspection_code as presetId
              FROM

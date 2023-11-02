@@ -567,7 +567,8 @@ public class TCruisePointInstanceService{
             areaInfos.add(areaInfo);
         }
         if (areaInfos.stream().anyMatch(areaInfo -> robot.equals(areaInfo.getInfoType()))) {
-            AreaInfoDeviceId areaInfo = new AreaInfoDeviceId().setId(2L).setLabel("机器人").setInfoType("robot");
+            AreaInfoDeviceId areaInfo = new AreaInfoDeviceId().setId(2L).setLabel("机器人").setInfoType("robot")
+                    .setRobotType(areaInfos.get(0).getRobotType());
             areaInfos.add(areaInfo);
         }
         if (areaInfos.stream().anyMatch(areaInfo -> drone.equals(areaInfo.getInfoType()))) {
