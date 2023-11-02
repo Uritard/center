@@ -54,4 +54,7 @@ public class AreaInfoDeviceId implements Serializable {
     @ApiModelProperty(value = "绑定类型")
     private String bindType;
 
+    @ApiModelProperty(value = "机器人类型")
+    private Integer robotType;
+
 }
