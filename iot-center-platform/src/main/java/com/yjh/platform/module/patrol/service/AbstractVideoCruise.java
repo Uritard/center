@@ -207,6 +207,7 @@ public abstract class AbstractVideoCruise {
                         if (isThreePhase){
                             //三相电测点
                             Constant.threePhaseMap.put(inspectionMap.get("instanceId"),captureList.size());
+                            Constant.threePhaseCountMap.remove(inspectionMap.get("instanceId"));
                             for (Map<String,String> item: captureList){
                                 String urlPath = item.get("urlPath");
                                 String absPath = item.get("absPath");
