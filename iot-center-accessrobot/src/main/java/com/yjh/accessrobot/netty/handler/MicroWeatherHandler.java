@@ -217,7 +217,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             log.info("环境数据上报集控" + json);
             robotService.addWeatherInfo(json);
 
-            if (Constant.upEnvDevice()) {
+            if (Constant.upEnvDevice() && Constant.upSystemFlag()) {
                 List<Map<String, Object>> item = xmlBaseModel.getItems().stream().filter(t -> t.containsKey("value_type")).collect(Collectors.toList());
                 XMLBaseModel xmlBaseModel1 = new XMLBaseModel()
                         .setType("21")

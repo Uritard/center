@@ -1430,6 +1430,9 @@ public class UPatrolTaskService {
      * @param state 状态
      */
     private void sendTaskStateToUp(UPatrolTask task, Integer state) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> item = new HashMap<>();
@@ -1641,6 +1644,9 @@ public class UPatrolTaskService {
         }
 
         // 只有来源为本级系统的删除命令需要上报上级系统
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         if (!Constant.isUpSystem() && StringUtils.equals(Constant.getLevelEdge(), source)) {
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             List<Map<String, Object>> xmlItems = new ArrayList<>();

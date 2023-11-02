@@ -118,7 +118,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         Long robotId = robotService.selectRobotIdByCode(xmlBaseModel.getSendCode());
         String robotTaskStatusUp =String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotTaskStatusUp","content"));
 
-        if (robotId != null && "true".equals(robotTaskStatusUp)) {
+        if (robotId != null && "true".equals(robotTaskStatusUp) && Constant.upSystemFlag()) {
             // 上一级系统无法获取机器人任务进度，需将任务状态数据上报上一级系统
             String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
             Map<String,Object> downItem = xmlBaseModel.getItems().get(0);

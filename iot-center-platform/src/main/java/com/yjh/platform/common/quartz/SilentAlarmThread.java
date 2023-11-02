@@ -501,6 +501,9 @@ public class SilentAlarmThread implements Runnable {
      *
      */
     private void alarmToUpSystem(Map<String, Object> map, TWarnInfo tWarnInfo, String monitorType) {
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
         if (tWarnInfo != null) {
             String warnTime = DateTimeUtil.format(tWarnInfo.getWarnTime());
 

@@ -286,14 +286,17 @@ public class Constant {
     }
 
     public static void modelUpload(String type){
-        try {
-            Map<String, Object> param = new HashMap<>();
-            param.put("type", type);
-            Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
-            log.info("modelUpload result: {}", JSON.toJSONString(re));
-        }catch (Exception e){
-            log.error("模型文件上传失败", e);
+        if (upSystemFlag()) {
+            try {
+                Map<String, Object> param = new HashMap<>();
+                param.put("type", type);
+                Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+                log.info("modelUpload result: {}", JSON.toJSONString(re));
+            }catch (Exception e){
+                log.error("模型文件上传失败", e);
+            }
         }
+
     }
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
@@ -344,5 +347,22 @@ public class Constant {
             log.error(ex.getMessage(), ex);
         }
         return ip;
+    }
+
+    public static String upSystemFlag;
+    /**
+     * 上级系统连接开关 1开 0关
+     * @return
+     */
+    public static Boolean upSystemFlag() {
+        if (upSystemFlag == null) {
+            try {
+                upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+                log.info("upSystemFlag is {}", upSystemFlag);
+            } catch (Exception e) {
+                upSystemFlag = "1";
+            }
+        }
+        return "1".equals(upSystemFlag);
     }
 }

@@ -67,7 +67,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
 
             String alarmType = String.valueOf(item.get("alarm_type"));
             boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, alarmType);
-            if ("1".equals(sysLevel) && flag) {
+            if ("1".equals(sysLevel) && flag && Constant.upSystemFlag()) {
                 //若在边缘节点，非同源告警直接上报
                 //克隆item
                 Map<String, Object> upItem = SerializationUtils.clone((HashMap<String, Object>)item);
