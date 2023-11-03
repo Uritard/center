@@ -398,6 +398,7 @@ public class InspectionResultThread implements Runnable{
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
             uPatrolTaskService.patrolTaskResultHandler(tCruiseTaskResultMap);
+            //todo 告警处理
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

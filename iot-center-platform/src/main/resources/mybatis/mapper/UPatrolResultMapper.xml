@@ -374,7 +374,9 @@
         a.remark,
         a.weather
         FROM u_patrol_result a
-        LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
+        <if test="(list != null and list.size() > 0) or (deviceType != -1) or (meteType != -1) or (customId != -1 and customId != null)">
+            LEFT JOIN u_patrol_task_attr f ON a.task_id = f.task_id
+        </if>
         where 1 = 1
         <if test="taskName != null and taskName != ''">and a.task_name like
             concat('%',#{taskName, jdbcType=VARCHAR},'%')

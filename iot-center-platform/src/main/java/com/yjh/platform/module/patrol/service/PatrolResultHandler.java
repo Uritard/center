@@ -806,7 +806,7 @@ public class PatrolResultHandler {
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
 
                         // 将产生的告警上送至上一级系统
-                        alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
+                        alarmToUpSystem(tWarnInfo, cruiseResultMap);
                     }
                 }
                 boolean isSimulationTool = false;
@@ -935,7 +935,7 @@ public class PatrolResultHandler {
             pushAlarmInfo(warnMap.get("warnName"), warnMap.get("warnContent"));
 
             // 告警上报上一级系统
-            alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
+            alarmToUpSystem(tWarnInfo, cruiseResultMap);
 
         } catch (Exception e) {
             log.error("声纹告警处理结果异常：", e);
@@ -948,10 +948,9 @@ public class PatrolResultHandler {
      * 将产生的告警上送至上级系统
      *
      * @param warnInfo 告警信息
-     * @param taskId 任务id
-     * @param instanceId 巡视点id
+     * @param cruiseResultMap 处理过的巡视结果
      */
-    public void alarmToUpSystem(TWarnInfo warnInfo, String taskId, Long instanceId){
+    public void alarmToUpSystem(TWarnInfo warnInfo, Map<String, String> cruiseResultMap){
         try{
             String alarmLevel = "";
             switch (warnInfo.getWarnLevel()){
@@ -970,9 +969,6 @@ public class PatrolResultHandler {
                 default:
                     break;
             }
-
-            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
