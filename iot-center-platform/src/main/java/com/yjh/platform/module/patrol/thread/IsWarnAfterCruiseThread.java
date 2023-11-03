@@ -205,8 +205,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
             StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             // 将产生的告警上送至上一级系统
-            patrolResultHandler.alarmToUpSystem(warnInfo, taskId, instanceId);
+            patrolResultHandler.alarmToUpSystem(warnInfo, cruiseResultMap);
 
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
