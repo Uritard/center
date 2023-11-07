@@ -30,4 +30,6 @@ public interface TMeterDao {
     List<Map<String,Float>> countPowerTotalByRegion();
     List<Map<String,Float>> countPowerTotalByEdge();
 
+    List<TMeter> selectMeterByDeviceId();
+
 }

@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.SysParamConfig;
@@ -9,6 +10,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -19,6 +21,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
@@ -47,6 +50,7 @@ public class InspectionResultThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final AnalyseDataOperateDao analyseDataOperateDao;
     private final PatrolResultHandler resultHandler;
+    private final ApplicationEventPublisher eventPublisher;
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
@@ -59,6 +63,7 @@ public class InspectionResultThread implements Runnable{
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
         this.resultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
+        this.eventPublisher = StaticContextAccessor.getBean(ApplicationEventPublisher.class);
     }
 
     @Override
@@ -75,6 +80,12 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap = new HashMap<>(32);
                 upSystemTaskInfoInitialize(tCruiseTaskResultMap, taskId, insInfo);
             }
+
+            InspectionResultEvent event = new InspectionResultEvent();
+            event.setTaskId(taskId);
+            event.setDeviceId(ValueUtil.getOrDefault(tCruiseTaskResultMap.get("deviceId"),null));
+            event.setResult(robotPatrolTaskResult.getValue());
+            eventPublisher.publishEvent(event);
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
 

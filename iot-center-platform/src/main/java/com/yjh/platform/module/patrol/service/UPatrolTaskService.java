@@ -37,6 +37,7 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
@@ -59,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -152,6 +154,8 @@ public class UPatrolTaskService {
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
@@ -708,6 +712,11 @@ public class UPatrolTaskService {
             UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
             // 如果下级上报任务结束，则走任务结束处理逻辑，避免提前更改任务状态
             if (robotEnd) {
+
+                TaskEndEvent event = new TaskEndEvent();
+                event.setTaskId(taskId);
+                eventPublisher.publishEvent(event);
+
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
                 if (task.getTaskType() == SINGLE_DEVICE_PATROL
