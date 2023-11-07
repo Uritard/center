@@ -21,6 +21,8 @@ import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
+import com.yjh.platform.module.patrol.event.InspectionResultEvent;
+import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -54,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -948,6 +951,37 @@ public class HelloController {
         Result result = new Result();
         try {
             meterInfoUpload.uploadMeteInfo();
+        } catch (Exception e) {
+            log.error("获取区域信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+    @GetMapping(value = "/meterInfoTest")
+    @ApiOperation(value = "meterInfoTest")
+    public Result meterInfoTest() throws Exception{
+        Result result = new Result();
+        try {
+            InspectionResultEvent event = new InspectionResultEvent();
+            event.setTaskId("666666");
+            event.setDeviceId("123");
+            event.setResult("正向有功总:2131.17");
+            eventPublisher.publishEvent(event);
+
+            event.setResult("无功IV总:226.88");
+            eventPublisher.publishEvent(event);
+
+            event.setResult("无功I总:16.07");
+            eventPublisher.publishEvent(event);
+
+            TaskEndEvent endEvent = new TaskEndEvent();
+            endEvent.setTaskId("666666");
+            eventPublisher.publishEvent(endEvent);
+
         } catch (Exception e) {
             log.error("获取区域信息异常", e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

@@ -49,6 +49,16 @@ public class TMeter implements Serializable {
     private String address;
 
     /**
+     * 电表类型 1-485获取数据 2-巡视任务获取数据
+     */
+    private Integer type;
+
+    /**
+     * 类型为2时，电表数据通过巡视这个设备获取
+     */
+    private Long deviceId;
+
+    /**
      * 正向有功总电量
      */
     @ApiModelProperty(value = "正向有功总电量")
