@@ -2738,3 +2738,16 @@ CREATE TABLE `t_std_weather_log` (
 PRIMARY KEY (`id`),
 KEY `IDX_DEVICE_ROBOT` (`device_id`,`robot_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4 COMMENT='环控信息';
+
+DROP TABLE IF EXISTS `t_camera_play_log`;
+CREATE TABLE `t_camera_play_log` (
+ `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+ `camera_id` bigint(20) NOT NULL COMMENT '相机id',
+ `user_id` bigint(20) NOT NULL COMMENT '用户id',
+ `start_time` datetime DEFAULT NULL COMMENT '开始播放时间',
+ `stop_time` datetime DEFAULT NULL COMMENT '结束播放时间',
+ `camera_name` varchar(128) DEFAULT NULL COMMENT '相机名称',
+ `user_name` varchar(20) DEFAULT NULL COMMENT '用户名',
+ PRIMARY KEY (`id`),
+ KEY `idx_camera_user` (`camera_id`,`user_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='相机播放记录';
