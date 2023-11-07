@@ -36,6 +36,7 @@
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
         <result property="cameraChannelId" column="camera_channel_id" jdbcType="VARCHAR"/>
+        <result property="useType" column="use_type" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -50,7 +51,7 @@
         camera_type,is_control,latitude,
         longitude,address,unit,
         create_time,commission_date,edge_code,
-        origin_id,camera_channel_id
+        origin_id,camera_channel_id,use_type
     </sql>
 
     <sql id="tongTong">
@@ -87,6 +88,7 @@
         f.region_name as up_region_name,
         a.commission_date,
         a.camera_channel_id
+        a.use_type
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
@@ -101,7 +103,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id, camera_channel_id)
+        ,origin_id, camera_channel_id,use_type)
         values (#{cameraId,jdbcType=BIGINT},#{cameraName,jdbcType=VARCHAR},#{cameraModel,jdbcType=INTEGER}
         ,#{pmsId,jdbcType=VARCHAR},#{aliasName,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT}
         ,#{upRegionId,jdbcType=VARCHAR},#{channelNum,jdbcType=INTEGER},#{cameraNum,jdbcType=INTEGER}
@@ -112,7 +114,7 @@
         ,#{cameraType,jdbcType=INTEGER},#{isControl,jdbcType=INTEGER},#{latitude,jdbcType=VARCHAR}
         ,#{longitude,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
         ,#{createTime,jdbcType=TIMESTAMP},#{commissionDate,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR}, #{cameraChannelId, jdbcType=VARCHAR})
+        ,#{originId,jdbcType=VARCHAR}, #{cameraChannelId, jdbcType=VARCHAR}, #{useType, jdbcType=INTEGER})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -173,6 +175,7 @@
         a.unit = #{unit},
         <if test="commissionDate != null ">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="cameraChannelId != null">a.camera_channel_id = #{cameraChannelId, jdbcType=VARCHAR},</if>
+        <if test="useType != null">a.use_type = #{useType, jdbcType=INTEGER},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
@@ -593,7 +596,7 @@
             and d.camera_type = #{cameraType}
         </if>
         <if test="useType != null">
-            and d.use_type = #{cameraType}
+            and d.use_type = #{useType}
         </if>
     </select>
 

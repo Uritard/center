@@ -83,7 +83,8 @@ public interface TCameraInfoDao {
                                   @Param(value = "userId")Long userId,
                                  @Param(value = "cameraType") Integer cameraType);
 
-    List<TCameraInfo> selectCameraList(Long userId, Integer cameraType, Integer useType);
+    List<TCameraInfo> selectCameraList(@Param(value = "userId") Long userId, @Param(value = "cameraType") Integer cameraType,
+                                       @Param(value = "useType") Integer useType);
 
     List<Long> selectRegionByCameraList(@Param(value = "list")List<TCameraInfo> list);
 

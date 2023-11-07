@@ -437,7 +437,6 @@ public class TCameraScreenService{
                 throw new BusinessException("当前用户角色不可查看");
             }
         }
-        List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
         //获取相机的状态
         Map<String, String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
