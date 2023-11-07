@@ -190,7 +190,7 @@ public class TCameraScreenController {
         try {
               Long userId=Long.valueOf(request.getHeader("userId"));
 //            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
-              result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName,flag, "1",userId,level,id, null));
+              result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName,flag, "1",userId,level,id, null, null));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -221,11 +221,12 @@ public class TCameraScreenController {
                                   @RequestParam(value = "level",required = false) String level,
                                   @RequestParam(value = "id",required = false) Long id,
                                   @RequestParam(value = "cameraType",required = false) Integer cameraType,
+                                  @RequestParam(value = "useType",required = false) Integer useType,
                                             HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName, flag, null, userId, level, id, cameraType));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobotNew(cameraName, flag, null, userId, level, id, cameraType, useType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

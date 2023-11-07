@@ -660,10 +660,11 @@ public class TStdDeviceService{
     }
 
     //设备树查询(level：5-间隔，6-设备，7-部位，8-点位，9巡视点；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人
+    //级别为5时，deviceType为设备类型 电表 meter 传感器 sensor
     public List<AreaInfo> selectDevTreeNew(String level, String deviceShow,String deviceType, String analyseType,Long id,String customId){
         switch (level){
             case "5":
-                return areaTree(deviceShow);
+                return areaTree(deviceShow, deviceType);
             case "6":
                 return deviceTree(id,deviceShow);
             case "7":
@@ -681,7 +682,7 @@ public class TStdDeviceService{
     public List<AreaInfo> selectDevTest(String level, String deviceShow,String deviceType, String analyseType, Long id){
         switch (level){
             case "5":
-                return areaTree(deviceShow);
+                return areaTree(deviceShow, deviceType);
             case "6":
                 return deviceTree(id,deviceShow);
             case "7":
@@ -696,11 +697,25 @@ public class TStdDeviceService{
         }
     }
 
-    private List<AreaInfo> areaTree(String deviceShow){
-        List<AreaInfo> areaTree = tStdDeviceDao.selectDevTreeRegion();
-        areaTree =  assembleTrees(areaTree);
-        if (!StringUtils.isEmpty(deviceShow)){
-            areaTree =  areaAddDeviceTree(areaTree,deviceShow);
+    private List<AreaInfo> areaTree(String deviceShow, String deviceType) {
+        List<AreaInfo> areaTree;
+        if (StringUtils.isNotEmpty(deviceType)) {
+            switch (deviceType) {
+                case "meter":
+                    areaTree = tStdDeviceDao.selectMeterDevTreeRegion();
+                    break;
+                case "sensor":
+                    areaTree = tStdDeviceDao.selectSensorDevTreeRegion();
+                    break;
+                default:
+                    areaTree = tStdDeviceDao.selectDevTreeRegion();
+            }
+        } else {
+            areaTree = tStdDeviceDao.selectDevTreeRegion();
+        }
+        areaTree = assembleTrees(areaTree);
+        if (!StringUtils.isEmpty(deviceShow)) {
+            areaTree = areaAddDeviceTree(areaTree, deviceShow);
         }
         return areaTree;
     }

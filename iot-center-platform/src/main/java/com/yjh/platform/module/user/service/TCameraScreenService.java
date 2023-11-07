@@ -423,7 +423,7 @@ public class TCameraScreenService{
     }
 
     public List<AreaInfoDetail> selectCameraTreeWithRobotNew(String cameraName, Integer flag, String robotFlag, Long userId, String level,
-        Long id, Integer cameraType) {
+        Long id, Integer cameraType, Integer useType) {
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
 
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
@@ -450,7 +450,8 @@ public class TCameraScreenService{
         }
         switch (level) {
             case "5":
-                return areaTree(cameraName, flag, robotFlag, userId, map);
+                return areaCameraTree(flag, userId,  map, cameraType, useType);
+//                return areaTree(cameraName, flag, robotFlag, userId, map);
             case "6":
                 return cameraTree(cameraName, flag, robotFlag, userId, id, map, cameraType);
             case "66":
@@ -596,6 +597,54 @@ public class TCameraScreenService{
         return childrenList;
     }
 
+
+    public List<AreaInfoDetail> areaCameraTree(Integer flag, Long userId, Map<String, String> map, Integer cameraType, Integer useType) {
+
+        List<AreaInfoDetail> areaInfoDetails = new ArrayList<>();
+
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraList(userId, cameraType, useType);
+        if (!CollectionUtils.isEmpty(cameraList)){
+            List<TCameraInfo> finalCameraList = new ArrayList<>();
+            // flag:1-在线 0-离线 2-全部
+            if (flag == 2){
+                finalCameraList = cameraList;
+            } else if (flag == 1) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            } else if (flag == 0) {
+                finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
+            }
+
+            List<Long> regionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
+            // MySQL 8.0
+//            if (!CollectionUtils.isEmpty(finalCameraList)) {
+//                regionList.addAll(tCameraInfoDao.selectRegionByCameraList(finalCameraList));
+//            }
+
+            if (!CollectionUtils.isEmpty(finalCameraList)) {
+                Set<Long> upRegionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toSet());
+                Set<Long> upRegionResult = new HashSet<>(upRegionList);
+                do {
+                    upRegionList.addAll(upRegionResult);
+                    upRegionResult.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+                } while (!upRegionList.containsAll(upRegionResult));
+                regionList.addAll(upRegionResult);
+            }
+
+            if (!CollectionUtils.isEmpty(regionList)){
+                areaInfoDetails = tCameraInfoDao.selectCameraTreeByName(finalCameraList,regionList);
+            }
+        }
+        areaInfoDetails.forEach(treeNode ->{
+            if("camera".equals(treeNode.getInfoType())){
+                if(map.get(treeNode.getId().toString()) != null){
+                    treeNode.setState(Integer.valueOf(map.get(treeNode.getId().toString())));
+                }else {
+                    treeNode.setState(0);
+                }
+            }
+        });
+        return assembleTrees(areaInfoDetails);
+    }
     public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag, Long userId, Integer cameraType){
         if (StringUtils.isEmpty(cameraName)){
             List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
@@ -630,7 +679,6 @@ public class TCameraScreenService{
 
         List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId, cameraType);
         if (!CollectionUtils.isEmpty(cameraList)){
-            List<Long> regionList = cameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
 
             List<TCameraInfo> finalCameraList = new ArrayList<>();
             // flag:1-在线 0-离线 2-全部
@@ -641,6 +689,8 @@ public class TCameraScreenService{
             } else if (flag == 0) {
                 finalCameraList = cameraList.stream().filter(tCameraInfo -> !StringUtils.equals(map.get(tCameraInfo.getCameraId().toString()), "1")).collect(Collectors.toList());
             }
+
+            List<Long> regionList = finalCameraList.stream().map(TCameraInfo::getUpRegionId).collect(Collectors.toList());
 
             // MySQL 8.0
 //            if (!CollectionUtils.isEmpty(finalCameraList)) {
