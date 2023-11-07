@@ -117,4 +117,6 @@ public class TCameraInfoByDict implements Serializable {
     private Date commissionDate;
     @ApiModelProperty(value = "相机通道号")
     private String cameraChannelId;
+    @ApiModelProperty(value = "相机用途 巡视设备:1 监控设备:2")
+    private Integer useType;
 }

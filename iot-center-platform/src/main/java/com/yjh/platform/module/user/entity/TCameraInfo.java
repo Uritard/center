@@ -89,6 +89,10 @@ public class TCameraInfo implements Serializable {
     private Integer cameraType;
 
     @Max(value=999999999)
+    @ApiModelProperty(value = "相机用途 巡视设备:1 监控设备:2")
+    private Integer useType;
+
+    @Max(value=999999999)
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;
 
