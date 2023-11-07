@@ -164,4 +164,9 @@ public interface TStdDeviceDao {
                                                    @Param(value = "regionList") List<Long> regionList);
 
     List<AreaInfo> selectPatrolDeviceTree();
+
+    List<AreaInfo> selectMeterDevTreeRegion();
+
+    List<AreaInfo> selectSensorDevTreeRegion();
+
 }

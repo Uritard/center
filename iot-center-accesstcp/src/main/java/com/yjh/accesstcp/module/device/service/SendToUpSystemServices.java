@@ -529,7 +529,7 @@ public class SendToUpSystemServices {
                 jsonObject.put("device_pos",item.get("preset_id"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
-                item.put("data_type","6");
+                item.put("data_type","8");
                 jsonObject.put("voice_code",item.get("voice_id"));
                 jsonObject.put("voice_pos",item.get("voice_id"));
             }else if (item.get("cruise_type").equals(524)){// 无人机

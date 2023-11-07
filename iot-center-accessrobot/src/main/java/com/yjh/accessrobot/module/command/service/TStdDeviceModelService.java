@@ -122,18 +122,18 @@ public class TStdDeviceModelService {
                                 cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
                                 finalCameraPresetList.add(tCameraPreset);
                                 break;
-                            case "01":
-                            case "001":
+                            case "2":
+                            case "4":
                                 //机器人、无人机
                                 //构建 t_robot_inspection
                                 JSONArray robotArray = JSONArray.parseArray(device.get("video_pos").toString());
-                                String keyPos = "01".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
+                                String keyPos = "2".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
                                 cruiseId = Long.parseLong(JSON.parseObject(robotArray.get(0).toString()).get(keyPos).toString());
-                                cruiseType = "01".equals(device.get("data_type")) ? 228 : 524;
+                                cruiseType = "2".equals(device.get("data_type")) ? 228 : 524;
                                 TRobotInspection tRobotInspection = createRobotInspection(edgeCode, cruiseId, device, tRobotInfoList, robotArray);
                                 finalRobotInspectionList.add(tRobotInspection);
                                 break;
-                            case "0001":
+                            case "8":
                                 //声纹
                                 JSONArray voiceArray = JSONArray.parseArray(device.get("video_pos").toString());
                                 boolean voiceFlag = JSON.parseObject(voiceArray.get(0).toString()).containsKey("voice_pos");
@@ -352,7 +352,7 @@ public class TStdDeviceModelService {
     private TRobotInspection createRobotInspection(String edgeCode, long cruiseId, Map<String, Object> device,
                                                    List<TRobotInfo> tRobotInfoList, JSONArray robotArray) {
         TRobotInspection tRobotInspection = new TRobotInspection();
-        String keyCode = "01".equals(device.get("data_type")) ? "robot_code" : "uav_code";
+        String keyCode = "2".equals(device.get("data_type")) ? "robot_code" : "uav_code";
         tRobotInspection.setEdgeCode(edgeCode);
         tRobotInspection.setOriginId(String.valueOf(cruiseId));
         tRobotInspection.setInspectionCode(String.valueOf(device.getOrDefault("inspection_code", "")));
