@@ -110,7 +110,7 @@
 
     <select id="countPowerTotalByEdge" resultType="java.util.Map">
         SELECT
-            SUM(a.total_positive_power) as allTotal,
+            ROUND(SUM(a.total_positive_power),2) as allTotal,
             b.region_name
         FROM
             `t_meter` a

@@ -36,7 +36,8 @@ public class TMeterController {
     @ApiOperation(value = "查询电表信息")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @Logs(title = "查询电表信息", content = "根据用户传递的参数查询电表信息", logType = 2, authority = "1235")
-    public Result query(@RequestParam("upRegionId") Long upRegionId, @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+    public Result query(@RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                        @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         try {
