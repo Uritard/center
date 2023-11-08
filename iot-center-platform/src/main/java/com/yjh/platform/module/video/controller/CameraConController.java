@@ -596,7 +596,11 @@ public class CameraConController {
         log.info(temperatureInfo.toString());
         Result result = new Result();
         try {
-            result.setData(cameraConService.getLineTemperature(temperatureInfo.getCameraId(), temperatureInfo.getPoints()));
+            if (StringUtils.isNotEmpty(temperatureInfo.getPicPath())){
+                result.setData(cameraConService.getLineTemperature(temperatureInfo.getPoints(),temperatureInfo.getPicPath()));
+            }else {
+                result.setData(cameraConService.getLineTemperature(temperatureInfo.getCameraId(), temperatureInfo.getPoints()));
+            }
         }catch (Exception e){
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("根据坐标获取温度失败描述:", e);

@@ -697,6 +697,22 @@
         ORDER BY a.fir_date DESC
     </select>
 
+    <select id="selectByCameraIdNew"   resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        SELECT
+        a.device_name,
+        a.instance_name,
+        a.picpath,
+        a.origpic,
+        a.cruise_time
+        FROM
+        u_patrol_data_result a
+        WHERE
+        1 = 1 and a.cruise_type = 230
+        <if test="cameraId!=null  and cameraId!=''"> and  a.cruise_device_id =  #{cameraId,jdbcType=BIGINT} </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''" >and a.cruise_time between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if>
+        ORDER BY a.fir_date DESC
+    </select>
+
     <insert id="batchInsertUPatrolDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" keyColumn="cruise_data_id">
         insert into u_patrol_data_result(
         cruise_data_id,

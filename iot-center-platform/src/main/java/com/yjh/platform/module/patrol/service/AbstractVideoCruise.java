@@ -208,14 +208,20 @@ public abstract class AbstractVideoCruise {
                             //三相电测点
                             Constant.threePhaseMap.put(inspectionMap.get("instanceId"),captureList.size());
                             Constant.threePhaseCountMap.remove(inspectionMap.get("instanceId"));
+                            // 调用算法中
+                            inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
+                            inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
+                            inspectionMap.put("cruiseResult", "");
+                            CruiseRedisStorage.offer(inspectionMap);
                             for (Map<String,String> item: captureList){
                                 String urlPath = item.get("urlPath");
                                 String absPath = item.get("absPath");
                                 inspectionMap.put("picpath", urlPath);
                                 inspectionMap.put("origpic", absPath);
 
-                                isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
+                                algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
                             }
+                            return false;
                         } else {
                             // 算法分析
                             isEnded = algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);

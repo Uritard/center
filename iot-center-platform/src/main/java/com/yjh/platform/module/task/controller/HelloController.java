@@ -40,6 +40,7 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
+import com.yjh.platform.module.video.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.MapUtils;
@@ -951,6 +952,24 @@ public class HelloController {
         Result result = new Result();
         try {
             meterInfoUpload.uploadMeteInfo();
+        } catch (Exception e) {
+            log.error("获取区域信息异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
+    @Autowired
+    private CameraConService cameraConService;
+    @GetMapping(value = "/getLineTemperature")
+    @ApiOperation(value = "getLineTemperature")
+    public Result getLineTemperature(
+            @RequestParam(value = "points", required = false) String points,
+            @RequestParam(value = "path", required = false) String path
+    ) throws Exception{
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getLineTemperature(points,path));
         } catch (Exception e) {
             log.error("获取区域信息异常", e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

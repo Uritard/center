@@ -75,9 +75,9 @@
              name,
              ip,
              port,
-             address
+             address,
              type,
-             device_id,)
+             device_id)
         values (
                 #{upRegionId,jdbcType=BIGINT},
                 #{name,jdbcType=VARCHAR},

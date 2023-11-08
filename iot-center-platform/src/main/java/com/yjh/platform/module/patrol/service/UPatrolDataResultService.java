@@ -18,6 +18,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
@@ -391,6 +392,11 @@ public class UPatrolDataResultService {
             }
         }
         return listFir;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<UPatrolDataResult> selectByCameraIdNew(Long cameraId, String startDate, String endDate) {
+        List<UPatrolDataResult> list = uPatrolDataResultDao.selectByCameraIdNew(cameraId, startDate, endDate);
+        return list;
     }
 
     public void updateCruiseAnalyze(String taskId) {

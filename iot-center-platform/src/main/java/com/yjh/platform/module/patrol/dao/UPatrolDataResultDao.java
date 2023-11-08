@@ -102,6 +102,9 @@ public interface UPatrolDataResultDao {
         @Param(value = "startDate")String startDate,
         @Param(value = "endDate")String endDate,
         @Param(value = "firName")String firName);
+    List<UPatrolDataResult> selectByCameraIdNew(@Param(value = "cameraId")Long cameraId,
+        @Param(value = "startDate")String startDate,
+        @Param(value = "endDate")String endDate);
     /**
      * 插入巡视任务结果数据
      * @param list 巡视点结果集
