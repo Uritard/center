@@ -165,7 +165,6 @@ public class TCruiseTaskResultService {
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectCruiseTaskResult(String taskId, int pageNum, int pageSize) throws ParseException {
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
@@ -179,10 +178,13 @@ public class TCruiseTaskResultService {
         List<CruiseInspectResult> inspectPageResults = new ArrayList<>();
         if (CollectionUtils.isEmpty(cruiseInspectResults)){
             Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
-            if (keyResult.size() != 0) {
+            if (!keyResult.isEmpty()) {
                 List<String> pageKeys = keyResult.stream().skip(start).limit(pageSize).collect(Collectors.toList());
-                for (String keys : pageKeys) {
-                    Map<String, String> resultMap = redisTemplate.opsForHash().entries(keys);
+                List<Map<String, String>> resultMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
+                    pageKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                    return null;
+                });
+                for (Map<String, String> resultMap : resultMapList) {
                     CruiseInspectResult inspectResult = new CruiseInspectResult();
                     if (resultMap.size() > 0) {
                         inspectResult.setTaskId(taskId);
@@ -191,37 +193,29 @@ public class TCruiseTaskResultService {
                         getDataFromRedis(inspectResult, resultMap);
                         inspectPageResults.add(inspectResult);
                     }
-                    //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
-                    // int index = cruiseInspectResults.indexOf(inspectResult);
-                    // if (index == -1) {
-                    //     index = 0;
-                    // }
-                    // resultsMap.put("index", index);
-                    // resultsMap.put("list", cruiseInspectResults);
                 }
             }
             resultsMap.put("index", keyResult.size());
         } else {
             List<CruiseInspectResult> pageResults = cruiseInspectResults.stream().skip(start).limit(pageSize).collect(Collectors.toList());
+            List<Map<String, String>> resultMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
+                pageResults.forEach(s -> {
+                    String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + s.getInstanceId();
+                    connection.hGetAll(key.getBytes(StandardCharsets.UTF_8));
+                });
+                return null;
+            });
+            Map<String, Map<String, String>> listMap = resultMapList.stream().collect(Collectors.toMap(s -> s.get("instanceId"), s -> s));
             for (CruiseInspectResult cruiseInspectResult : pageResults) {
                 cruiseInspectResult.setCruiseResultName("--");
                 cruiseInspectResult.setEndTime(null);
                 String instanceId = String.valueOf(cruiseInspectResult.getInstanceId());
-                // 测试数据，正式使用需删除
-//                instanceId = StringUtils.left(instanceId, 3);
-                String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-                Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
+
+                Map<String, String> resultMap = listMap.get(instanceId);
                 if (resultMap.size() > 0) {
                     getDataFromRedis(cruiseInspectResult, resultMap);
                     inspectPageResults.add(cruiseInspectResult);
                 }
-                //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
-                // int index = cruiseInspectResults.indexOf(cruiseInspectResult);
-                // if (index == -1) {
-                //     index = 0;
-                // }
-                // resultsMap.put("index", index);
-                // resultsMap.put("list", cruiseInspectResults);
             }
             resultsMap.put("index", cruiseInspectResults.size());
         }
