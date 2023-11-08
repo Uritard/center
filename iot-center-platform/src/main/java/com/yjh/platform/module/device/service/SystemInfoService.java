@@ -203,7 +203,7 @@ public class SystemInfoService {
     //获取NVR容量
     public synchronized List<Map<String, Object>> getNVRInfo(boolean force) {
 
-        List<Map<String, Object>> cache = RECORDER_INFO_CACHE.get(RECORDER_KEY);
+        List<Map<String, Object>> cache = RECORDER_INFO_CACHE.get(RECORDER_KEY, false);
         if (!force && cache != null) {
             return cache;
         }
