@@ -236,6 +236,60 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "停止视频回放")
+    @RequestMapping(value = "/stopPlayBack", method = RequestMethod.GET)
+    //    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
+    public Result stopPlayBack(HttpServletRequest request, @RequestParam(value = "cameraId") Long cameraId,
+        @RequestParam(value = "streamId") String streamId) {
+
+        Result result = new Result();
+        try {
+            cameraConService.stopPlayBack(cameraId, streamId);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("视频回放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "视频回放暂停和播放")
+    @RequestMapping(value = "/pauseResume", method = RequestMethod.GET)
+    //    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
+    public Result pauseResume(@RequestParam(value = "streamId") String streamId,
+        @RequestParam(value = "type", defaultValue = "resume") String type) {
+
+        Result result = new Result();
+        try {
+            cameraConService.backPauseResume(streamId, type);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("视频回放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "倍速播放和拖动进度条")
+    @RequestMapping(value = "/speedSeek", method = RequestMethod.GET)
+    //    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
+    public Result speedSeek(@RequestParam(value = "streamId") String streamId,
+        @RequestParam(value = "speed", required = false) Double speed, @RequestParam(value = "seek", required = false) Long seek) {
+
+        Result result = new Result();
+        try {
+            cameraConService.backSpeedSeek(streamId, speed, seek);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("视频回放失败:", e);
+        }
+        return result;
+    }
+
     //    TILT_UP 21 云台上仰 TILT_DOWN 22 云台下俯 PAN_LEFT 23 云台左转 PAN_RIGHT 24 云台右转
 //    11 焦距变大(倍率变大) 12 焦距变小(倍率变小) 25 云台上仰和左转 26 云台上仰和右转 27 云台下俯和左转 28 云台下俯和右转 29 云台左右自动扫描
     @ApiOperation(value = "云台控制")

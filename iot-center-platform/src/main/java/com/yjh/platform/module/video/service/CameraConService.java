@@ -1,5 +1,6 @@
 package com.yjh.platform.module.video.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -11,6 +12,7 @@ import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
@@ -127,7 +129,7 @@ public class CameraConService {
             IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
             Result result = iPlayService.videoPlayByWvp(playEntity);
             Map data = (Map)result.getData();
-            webRtcUrl((String)data.get("rtc"), returnMap, 1);
+            webRtcUrl(data, returnMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -179,7 +181,7 @@ public class CameraConService {
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                 if (result.isSuccess() && MapUtils.isNotEmpty(data)) {
-                    webRtcUrl((String)data.get("rtc"), returnMap, 1);
+                    webRtcUrl(data, returnMap);
                     returnMapList.add(returnMap);
                 }
             } catch (Exception e) {
@@ -226,7 +228,7 @@ public class CameraConService {
                         Map<String, Object> lightMap = new HashMap<>();
                         lightMap.put("light", lightCameraId);
                         lightMap.put("rtmpUrl", data.get("rtmp"));
-                        webRtcUrl((String)data.get("rtc"), lightMap, 1);
+                        webRtcUrl(data, lightMap);
                         returnMapList.add(lightMap);
                     }
                     if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId())) {
@@ -237,7 +239,7 @@ public class CameraConService {
                         Map<String, Object> infraredMap = new HashMap<>();
                         infraredMap.put("inferad", infraredCameraId);
                         infraredMap.put("rtmpUrlInferad", data.get("rtmp"));
-                        webRtcUrl((String)data.get("rtc"), infraredMap, 1);
+                        webRtcUrl(data, infraredMap);
                         returnMapList.add(infraredMap);
                     }
                 } catch (Exception e) {
@@ -300,7 +302,7 @@ public class CameraConService {
                         .build();
                 Result result = iPlayService.videoPlayByWvp(playEntity);
                 Map data = (Map)result.getData();
-                webRtcUrl((String)data.get("rtc"), returnLightMap, 1);
+                webRtcUrl(data, returnLightMap);
             } else {
                 String lightIp = robotConInfo.getLightIp();
                 String lightPort = robotConInfo.getLightPort();
@@ -425,47 +427,15 @@ public class CameraConService {
         return StringUtils.contains(checkUrl, "?") ? (transUrl + "\\&sign=" + checkSign) : (transUrl + "?sign=" + checkSign);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @SuppressWarnings("unchecked")
     public Map<String, Object> startPlayBack(Long cameraId, String startTime, String stopTime) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
-            CameraConInfo cameraConInfo = new CameraConInfo();
-            if (String.valueOf(cameraId).contains("9901") || String.valueOf(cameraId).contains("9902")) {
-                long robotId;
-                if (String.valueOf(cameraId).contains("9901")) {
-                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9901", ""));
-                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-                    RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
-                    cameraConInfo.setCameraId(cameraId);
-                    cameraConInfo.setIdentityManager(recorderConInfo.getIdentityManager());
-                    cameraConInfo.setIdentityCode(recorderConInfo.getIdentityCode());
-                    cameraConInfo.setRecordIp(recorderConInfo.getRecordIp());
-                    cameraConInfo.setRtspPort(recorderConInfo.getRtspPort());
-                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumLight()));
-                    cameraConInfo.setDeviceChannel(recorderConInfo.getDeviceChannel());
-                    cameraConInfo.setCameraChannelId(String.valueOf(robotConInfo.getChannelNumLight()));
-                } else {
-                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9902", ""));
-                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-                    RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
-                    cameraConInfo.setCameraId(cameraId);
-                    cameraConInfo.setIdentityManager(recorderConInfo.getIdentityManager());
-                    cameraConInfo.setIdentityCode(recorderConInfo.getIdentityCode());
-                    cameraConInfo.setRecordIp(recorderConInfo.getRecordIp());
-                    cameraConInfo.setRtspPort(recorderConInfo.getRtspPort());
-                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumInferad()));
-                    cameraConInfo.setDeviceChannel(recorderConInfo.getDeviceChannel());
-                    cameraConInfo.setCameraChannelId(String.valueOf(robotConInfo.getChannelNumInferad()));
-                }
-            } else {
-                cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            }
+            CameraControl cameraConInfo = getCameraConInfo(cameraId);
             Long id = System.currentTimeMillis();
             if (cameraConInfo.getCameraChannelId() == null) {
-                String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
+                String userName = cameraConInfo.getUsername(); //nvr 用户名
                 String password = cameraConInfo.getIdentityCode();    //nvr 密码
-                String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
+                String cameraIp = cameraConInfo.getIp();        //nvr ip
                 int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
                 int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
 
@@ -504,7 +474,7 @@ public class CameraConService {
                 IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
                 Result result = iPlaybackService.playBackStart(playBackEntity);
                 Map resultMap = (Map)result.getData();
-                webRtcUrl((String)resultMap.get("rtc"), returnMap, 1);
+                webRtcUrl(resultMap, returnMap);
             }
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
         } catch (Exception e) {
@@ -513,8 +483,66 @@ public class CameraConService {
         return returnMap;
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @SuppressWarnings("unchecked")
+    public CameraControl getCameraConInfo(Long cameraId) {
+        CameraConInfo cameraConInfo = new CameraConInfo();
+        String cameraStr = String.valueOf(cameraId);
+        if (cameraStr.contains("9901") || cameraStr.contains("9902")) {
+            long robotId = NumberUtils.toLong(StringUtils.substring(cameraStr, 0, (cameraStr.length() - 4)));
+            RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+            cameraConInfo.setCameraId(cameraId);
+            cameraConInfo.setRecordId(robotConInfo.getRecordId());
+            cameraConInfo.setDeviceChannel(robotConInfo.getDeviceChannel());
+            cameraConInfo.setPort(robotConInfo.getRobotPort());
+
+            cameraConInfo.setRecordIp(robotConInfo.getRecordIp());
+            cameraConInfo.setRecordPort(robotConInfo.getRecordPort());
+            cameraConInfo.setIdentityManager(robotConInfo.getRecordManager());
+            cameraConInfo.setIdentityCode(robotConInfo.getRecordCode());
+            cameraConInfo.setRecordVendor(robotConInfo.getRecordVendor());
+
+            if (cameraStr.contains("9901")) {
+                cameraConInfo.setCameraIp(robotConInfo.getLightIp());
+                cameraConInfo.setCameraManager(robotConInfo.getIdentityManager());
+                cameraConInfo.setCameraCode(robotConInfo.getIdentityCode());
+                cameraConInfo.setVendorId(robotConInfo.getLightVendor());
+                cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumLight(), 1));
+                cameraConInfo.setDeviceChannel(robotConInfo.getLightChannelId());
+            } else {
+                cameraConInfo.setCameraIp(robotConInfo.getLnferadIp());
+                cameraConInfo.setCameraManager(robotConInfo.getInferadUsername());
+                cameraConInfo.setCameraCode(robotConInfo.getInferadPassword());
+                cameraConInfo.setVendorId(robotConInfo.getInfraredVendor());
+                cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumInferad(), 1));
+                cameraConInfo.setDeviceChannel(robotConInfo.getInfraredChannelId());
+            }
+            //机器人
+            cameraConInfo.setCameraType(205);
+        } else {
+            cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        }
+        return transeControl(cameraConInfo);
+    }
+
+    public CameraControl transeControl(CameraConInfo cameraInfo) {
+        CameraControl cameraControl = new CameraControl();
+        BeanUtil.copyProperties(cameraInfo, cameraControl);
+
+        boolean hasNvr = cameraInfo.getRecordId() != null && cameraInfo.getRecordId() > 0;
+        String vendor = hasNvr ? cameraInfo.getRecordVendor() : cameraInfo.getVendorId();
+        if (!hasNvr) {
+            cameraControl.setDeviceChannel(cameraInfo.getCameraChannelId());
+        }
+        String ip = hasNvr ? cameraInfo.getRecordIp() : cameraInfo.getCameraIp();
+        Integer port = hasNvr ? cameraInfo.getRecordPort() : cameraInfo.getPort();
+        Integer rtspPort = hasNvr ? cameraInfo.getRtspPort() : cameraInfo.getInfreadPort();
+        String userName = hasNvr ? cameraInfo.getIdentityManager() : cameraInfo.getCameraManager();
+        String pwd = hasNvr ? cameraInfo.getIdentityCode() : cameraInfo.getCameraCode();
+
+        cameraControl.setIp(ip).setPort(port).setUsername(userName).setIdentityCode(pwd).setVendor(vendor).setRecord(hasNvr)
+            .setRtspPort(rtspPort);
+        return cameraControl;
+    }
+
     public Map<String, Object> startVideoBack(String token, Long cameraId, String startTime, String stopTime) {
         Map<String, Object> returnMap = new HashMap<>();
         try {
@@ -527,11 +555,73 @@ public class CameraConService {
             IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
             Result result = iPlaybackService.playBackStart(playBackEntity);
             Map resultMap = (Map)result.getData();
-            webRtcUrl((String)resultMap.get("rtc"), returnMap, 1);
+            webRtcUrl(resultMap, returnMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return returnMap;
+    }
+
+    /**
+     * 回放流关闭
+     */
+    public void stopPlayBack(Long cameraId, String streamId) {
+        CameraControl cameraConInfo = getCameraConInfo(cameraId);
+        if (cameraConInfo.getCameraChannelId() == null) {
+            PlayEntity playEntity = PlayEntity.builder().deviceId(streamId).build();
+            IPlayService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendor()), IPlayService.class);
+            iPlayService.stopRealPlay(playEntity);
+        } else {
+            PlayBackControlEntity playBackEntity =
+                PlayBackControlEntity.builder().deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId())
+                    .streamId(streamId).build();
+            IPlaybackService iPlaybackService =
+                VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendor()), IPlaybackService.class);
+            Result<Object> result = iPlaybackService.playBackStop(playBackEntity);
+            if (!result.isSuccess()) {
+                throw new BusinessException(result.getCode(), result.getMsg());
+            }
+        }
+    }
+
+    /**
+     * 回放暂停和继续播放
+     */
+    public void backPauseResume(String streamId, String type) {
+        PlayBackControlEntity playBackEntity =
+            PlayBackControlEntity.builder().streamId(streamId).build();
+        IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
+        Result<Object> result;
+        if ("pause".equals(type)) {
+            result = iPlaybackService.playPause(playBackEntity);
+        } else {
+            result = iPlaybackService.playResume(playBackEntity);
+        }
+        if (!result.isSuccess()) {
+            throw new BusinessException(result.getCode(), result.getMsg());
+        }
+    }
+
+    /**
+     * 回放暂停和继续播放
+     */
+    public void backSpeedSeek(String streamId, Double speed, Long seek) {
+        if ((speed == null || speed == 0D) && (seek == null || seek == 0L)) {
+            throw new BusinessException(ResultCodeEnum.INVALIDREQUEST, "speed 或 seek 必须存在一个");
+        }
+
+        PlayBackControlEntity playBackEntity =
+            PlayBackControlEntity.builder().streamId(streamId).speed(speed).seekTime(seek).build();
+        IPlaybackService iPlaybackService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlaybackService.class);
+        Result<Object> result;
+        if (seek != null && seek > 0) {
+            result = iPlaybackService.playSeek(playBackEntity);
+        } else {
+            result = iPlaybackService.playSpeed(playBackEntity);
+        }
+        if (!result.isSuccess()) {
+            throw new BusinessException(result.getCode(), result.getMsg());
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -818,58 +908,14 @@ public class CameraConService {
         log.info("filePath: {}, urlPath: {}", filePath, urlPath);
         FileUtil.mkParentDirs(filePath);
 
-        CameraConInfo cameraConInfo = new CameraConInfo();
-        String cameraStr = String.valueOf(cameraId);
-        if (cameraStr.contains("9901") || cameraStr.contains("9902")) {
-
-            long robotId = NumberUtils.toLong(StringUtils.substring(cameraStr, 0, (cameraStr.length() - 4)));
-            RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-            cameraConInfo.setCameraId(cameraId);
-            cameraConInfo.setRecordId(robotConInfo.getRecordId());
-            cameraConInfo.setDeviceChannel(robotConInfo.getDeviceChannel());
-            cameraConInfo.setPort(robotConInfo.getRobotPort());
-
-            cameraConInfo.setRecordIp(robotConInfo.getRecordIp());
-            cameraConInfo.setRecordPort(robotConInfo.getRecordPort());
-            cameraConInfo.setIdentityManager(robotConInfo.getRecordManager());
-            cameraConInfo.setIdentityCode(robotConInfo.getRecordCode());
-            cameraConInfo.setRecordVendor(robotConInfo.getRecordVendor());
-
-            if (cameraStr.contains("9901")) {
-                cameraConInfo.setCameraIp(robotConInfo.getLightIp());
-                cameraConInfo.setCameraManager(robotConInfo.getIdentityManager());
-                cameraConInfo.setCameraCode(robotConInfo.getIdentityCode());
-                cameraConInfo.setVendorId(robotConInfo.getLightVendor());
-                cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumLight()));
-                cameraConInfo.setDeviceChannel(robotConInfo.getLightChannelId());
-            } else {
-                cameraConInfo.setCameraIp(robotConInfo.getLnferadIp());
-                cameraConInfo.setCameraManager(robotConInfo.getInferadUsername());
-                cameraConInfo.setCameraCode(robotConInfo.getInferadPassword());
-                cameraConInfo.setVendorId(robotConInfo.getInfraredVendor());
-                cameraConInfo.setChannelNum(NumberUtils.toInt(robotConInfo.getNumInferad()));
-                cameraConInfo.setDeviceChannel(robotConInfo.getInfraredChannelId());
-            }
-            //机器人
-            cameraConInfo.setCameraType(205);
-        } else {
-            cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        }
-        boolean hasNvr = cameraConInfo.getRecordId() != null && cameraConInfo.getRecordId() > 0;
-        String vendor = hasNvr ? cameraConInfo.getRecordVendor() : cameraConInfo.getVendorId();
-        if (!hasNvr) {
-            cameraConInfo.setDeviceChannel(cameraConInfo.getCameraChannelId());
-        }
-        String ip = hasNvr ? cameraConInfo.getRecordIp() : cameraConInfo.getCameraIp();
-        Integer port = hasNvr ? cameraConInfo.getRecordPort() : cameraConInfo.getPort();
-        String userName = hasNvr ? cameraConInfo.getIdentityManager() : cameraConInfo.getCameraManager();
-        String pwd = hasNvr ? cameraConInfo.getIdentityCode() : cameraConInfo.getCameraCode();
+        CameraControl cameraConInfo = getCameraConInfo(cameraId);
 
         SnapEntity entity =
-                SnapEntity.builder().ip(ip).port(port).channelNum(cameraConInfo.getChannelNum()).deviceId(cameraConInfo.getDeviceChannel())
-                        .channelId(cameraConInfo.getCameraChannelId()).userName(userName).password(pwd).imgPath(filePath).build();
+            SnapEntity.builder().ip(cameraConInfo.getIp()).port(cameraConInfo.getPort()).channelNum(cameraConInfo.getChannelNum())
+                .deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId())
+                .userName(cameraConInfo.getUsername()).password(cameraConInfo.getVendor()).imgPath(filePath).build();
 
-        ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(vendor), ISnapService.class);
+        ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendor()), ISnapService.class);
         Result<String> result = iPlayService.snap(entity);
 
         if (result.isSuccess() && StringUtils.isNotEmpty(meteName)) {
@@ -1204,14 +1250,28 @@ public class CameraConService {
         webRtcUrl(String.valueOf(id), returnMap, false);
     }
 
-    private void webRtcUrl(String url, Map<String, Object> returnMap, Integer isWebRtcUrl) {
+    private void webRtcUrl(Map<String, String> resultMap, Map<String, Object> returnMap) {
         Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
         String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
         String hostIp = hostIpMap.get("content");
-        String subUrl = url.substring(url.indexOf("/", url.lastIndexOf(":")));
+
+        String rtcUrl = resultMap.get("rtc");
+        int subIndex = rtcUrl.indexOf("/", Math.max(8, rtcUrl.lastIndexOf(":")));
+        String subUrl = rtcUrl.substring(subIndex);
         String schema = "1".equals(videoHttps) ? "https://" : "http://";
         String newUrl = schema + hostIp + "/ZLM" + subUrl;
         returnMap.put("webRtcUrl", newUrl);
+
+        String flvUrl = resultMap.get("flv");
+        String flvSubUrl = flvUrl.substring(subIndex);
+        String httpSchema = "1".equals(videoHttps) ? "https://" : "http://";
+        String newFlvUrl = httpSchema + hostIp + "/ZLM" + flvSubUrl;
+        returnMap.put("flvUrl", newFlvUrl);
+
+        String wsSchema = "1".equals(videoHttps) ? "wss://" : "ws://";
+        String newWsUrl = wsSchema + hostIp + "/ZLM" + flvSubUrl;
+        returnMap.put("wsFlvUrl", newWsUrl);
+        returnMap.put("streamId", resultMap.get("stream"));
     }
 
     private void webRtcUrl(String id, Map<String, Object> returnMap) {
@@ -1228,16 +1288,27 @@ public class CameraConService {
         Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:hostIp");
         String hostIp = hostIpMap.get("content");
         String webRtcUrl;
+        String file;
+
+        String scheam = "1".equals(videoHttps) ? "https://" : "http://";
+        String wsScheam = "1".equals(videoHttps) ? "wss://" : "ws://";
+        String app = isHistory ? "history" : "live";
         if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
-            String scheam = "1".equals(videoHttps) ? "https://" : "http://";
-            String app = isHistory ? "history" : "live";
             webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=" + app + "&stream=" + id + "&type=play";
+            file = String.format("/%s/%s.live.flv", app, id);
         } else {
             // webrtc://172.24.39.10/live/40001
-            webRtcUrl = "webrtc://" + hostIp + (isHistory ? "/history/" : "/live/") + id;
+            webRtcUrl = "webrtc://" + hostIp + "/" + app + "/" + id;
+            file = String.format("/%s/%s.flv", app, id);
         }
+
+        String flvUrl = scheam + hostIp + file;
+        String wsFlvUrl = wsScheam + hostIp + file;
+
         returnMap.put("webRtcUrl", webRtcUrl);
+        returnMap.put("flvUrl", webRtcUrl);
+        returnMap.put("wsFlvUrl", webRtcUrl);
     }
 
     private CameraVendor cameraVendor(int vendorId) {
@@ -1950,7 +2021,7 @@ public class CameraConService {
                                 Map<String, Object> lightMap = new HashMap<>();
                                 lightMap.put("cameraId", lightCameraId);
                                 lightMap.put("rtmpUrl", data.get("rtmp"));
-                                webRtcUrl((String)data.get("rtc"), lightMap, 1);
+                                webRtcUrl(data, lightMap);
                                 returnMapList.add(lightMap);
                             }
                             if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId())) {
@@ -1961,7 +2032,7 @@ public class CameraConService {
                                 Map<String, Object> infraredMap = new HashMap<>();
                                 infraredMap.put("cameraId", infraredCameraId);
                                 infraredMap.put("rtmpUrl", data.get("rtmp"));
-                                webRtcUrl((String)data.get("rtc"), infraredMap, 1);
+                                webRtcUrl(data, infraredMap);
                                 returnMapList.add(infraredMap);
                             }
                         } catch (Exception e) {
