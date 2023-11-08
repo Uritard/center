@@ -534,13 +534,13 @@ select *from (
         ) a
         LEFT JOIN (
         SELECT
-        DATE(start_time) date,
-        start_time,
-        count( 1 ) AS count
+        DATE(execute_time) date,
+        execute_time,
+        count(IF(task_state = 238, null, task_state)) AS count
         FROM
-        u_patrol_task
+        u_patrol_result
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 7   <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
+        DATEDIFF( now( ), execute_time ) &lt;= 7   <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
         GROUP BY
         date
         ) b ON a.timeNode = b.date
@@ -561,13 +561,13 @@ select *from (
         ) c )a
         LEFT JOIN (
         SELECT
-        DATE(start_time) date,
-        start_time,
-        count( 1 ) AS count
+        DATE(execute_time) date,
+        execute_time,
+        count(IF(task_state = 238, null, task_state)) AS count
         FROM
-        u_patrol_task
+        u_patrol_result
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 31    <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
+        DATEDIFF( now( ), execute_time ) &lt;= 31    <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
         GROUP BY
         date
         ) b ON a.timeNode = b.date
@@ -593,12 +593,12 @@ select *from (
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 11 MONTH), '%Y-%m') AS `month` )a
         LEFT JOIN
         (SELECT
-          DATE_FORMAT(start_time,'%Y-%m') timeNode,
-          count(task_id) as count
+          DATE_FORMAT(execute_time,'%Y-%m') timeNode,
+          count(IF(task_state = 238, null, task_state)) AS count
         FROM
-            u_patrol_task   <if test="regionCode!=null and regionCode!=''  ">where area_id=#{regionCode}</if>
+            u_patrol_result   <if test="regionCode!=null and regionCode!=''  ">where area_id=#{regionCode}</if>
         GROUP BY
-            DATE_FORMAT(start_time,'%Y-%m')) b
+            DATE_FORMAT(execute_time,'%Y-%m')) b
          on a.month = b.timeNode
          order by timeNode
     </select>

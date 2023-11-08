@@ -596,8 +596,10 @@ public class TSequentialConfService {
     public List<Map<String, Object>> sequentialInfo(String cfgDeviceId) {
         List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
         Integer state = (Integer) Constant.sequentialState.get("state");
-        if (state == -1) {
-            list.get(0).put("status", "未开始");
+        if (Objects.isNull(state) || state == -1) {
+            Map<String, Object> map = new HashMap<>(1);
+            map.put("status", "未开始");
+            list.add(map);
             return list;
         }
         Integer status = (Integer) Constant.sequentialState.get("status");
