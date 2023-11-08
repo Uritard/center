@@ -10,10 +10,12 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
 import com.yjh.platform.module.task.entity.FirAndPicInfo;
+import com.yjh.platform.module.task.entity.TCruiseDataResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -259,7 +261,6 @@ public class UPatrolDataResultController {
     @Logs(title = "根据cameraId分页查询",content = "根据cameraId分页查询",logType = 1)
     public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                    @RequestParam(value = "endDate", required = false) String endDate,
-                                   @RequestParam(value = "fileName", required = false) String fileName,
                                    @RequestParam(value = "startDate", required = false) String startDate,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize)
@@ -269,7 +270,7 @@ public class UPatrolDataResultController {
         Map<String, Object> resultMap = new HashMap<>();
         Page page= PageHelper.startPage(pageNum, pageSize,true, null, true); ;
         try {
-            List<FirAndPicInfo> list = uPatrolDataResultService.selectByCameraId(cameraId,startDate,endDate,fileName);
+            List<UPatrolDataResult> list = uPatrolDataResultService.selectByCameraIdNew(cameraId,startDate,endDate);
             if(list!=null) {
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);

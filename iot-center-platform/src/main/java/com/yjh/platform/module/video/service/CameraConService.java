@@ -21,7 +21,9 @@ import com.yjh.video.api.CameraVendor;
 import com.yjh.video.api.entity.*;
 import com.yjh.video.api.entity.response.*;
 import com.yjh.video.api.result.Result;
+import com.yjh.video.api.result.ResultCodeEnum;
 import com.yjh.video.api.service.*;
+import com.yjh.video.api.util.ByteUtil;
 import com.yjh.video.api.util.PathVariableUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -43,6 +45,12 @@ import javax.imageio.stream.FileImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -1760,6 +1768,96 @@ public class CameraConService {
             throw new RuntimeException(result.getMsg());
         }
         return result.getData().toString();
+    }
+
+    /**
+     * 获取行列区域画面最高温度
+     *
+     * @param picPath Dlt图像路径
+     */
+    public String getLineTemperature(String points,String picPath){
+        Integer column = null;
+        Integer row = null;
+        Integer xPlus = null;
+        Integer yPlus = null;
+        String[] pointList = points.split(",");
+        column = ValueUtil.toInteger(pointList[0],0);
+        row = ValueUtil.toInteger(pointList[1],0);
+        if (pointList.length == 4){
+            xPlus = ValueUtil.toInteger(pointList[2],1);
+            yPlus = ValueUtil.toInteger(pointList[3],1);
+        }
+        /**
+         * https://172.24.39.17/imgs/resultImg/376595ad00d14ff0b0759f0c850c7656/20231103093152014.jpg -- picPath
+         * /home/yjh_iot_center/iot-picture/infrared/f0d5b4f048054ec3bc863b2ab33f6849/20231108095522121.csv
+         */
+
+        String csvRedisPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content"));
+        String picRedisPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+
+        String csvPath = picPath.replace(picRedisPath,csvRedisPath).replace("jpg","csv");
+
+//        csvPath = "D://testCdoe/11.csv";
+        String temperature = "0.00";
+        if (xPlus != null) {
+
+            try {
+                InputStream stream = new FileInputStream(new File(csvPath));
+                InputStreamReader reader = new InputStreamReader(stream, "GBK");
+                BufferedReader reade = new BufferedReader(reader);
+                String line = null;
+                int rowIndex = 1;
+                List<Double> arr = new ArrayList<>();
+                while ((line = reade.readLine()) != null) {
+                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                    String[] item = line.split(",");
+                    if (row <= rowIndex && rowIndex <= row + yPlus) {
+                        List<Double> arrColumn = new ArrayList<>();
+                        for (int i = 0; i <= item.length; i++) {
+                            if (column - 1 <= i && i <= column + xPlus) {
+                                arrColumn.add(Double.parseDouble(item[i - 1]));
+                            }
+                        }
+                        arr.add(Collections.max(arrColumn));
+                    } else if (rowIndex > row + yPlus) {
+                        break;
+                    }
+                    rowIndex++;
+                }
+                log.info("arr: " + arr);
+                //转换保留后两位小数
+                temperature = new DecimalFormat("0.00").format(Collections.max(arr));
+                log.info("框测temperature转换保留后两位小数" + temperature);
+            } catch (Exception e) {
+                log.error("解析对应csv文件出错！",e);
+                throw new BusinessException("文件读取错误！");
+            }
+            return temperature;
+        } else {
+            try {
+                InputStream stream = new FileInputStream(new File(csvPath));
+                InputStreamReader reader = new InputStreamReader(stream, "GBK");
+                BufferedReader reade = new BufferedReader(reader);
+                String line = null;
+                int rowIndex = 0;
+                while ((line = reade.readLine()) != null) {
+                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                    String[] item = line.split(",");
+                    if (row == rowIndex) {
+                        temperature = item[column - 1];
+                        break;
+                    }
+                    rowIndex++;
+                }
+                //转换保留后两位小数
+                temperature = new DecimalFormat("0.00").format(Double.parseDouble(temperature));
+                log.info("点测temperature转换保留后两位小数" + temperature);
+            } catch (Exception e) {
+                log.error("解析对应csv文件出错！",e);
+                throw new BusinessException("文件读取错误！");
+            }
+        }
+        return temperature;
     }
 
     /**

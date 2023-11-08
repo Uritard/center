@@ -458,6 +458,7 @@ public class PatrolResultHandler {
                         if (Constant.threePhaseCountMap.get(instanceId) == null){
                             count = 1;
                         } else if (Constant.threePhaseCountMap.get(instanceId) == -1){
+                            log.info("此点已有结果！后续不处理！");
                             return;
                         }else {
                             count =   Constant.threePhaseCountMap.get(instanceId)+1;
@@ -479,6 +480,7 @@ public class PatrolResultHandler {
                             resultList.get(0).setResultValue(resultValue);
                             //相匹配 后续的点不要
                             if (Constant.threePhaseCountMap.get(instanceId) == -1) {
+                                log.info("相已匹配！");
                                 return;
                             } else {
                                 Constant.threePhaseCountMap.put(instanceId, -1);

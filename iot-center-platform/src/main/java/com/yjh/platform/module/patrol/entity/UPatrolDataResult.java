@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -65,6 +66,7 @@ public class UPatrolDataResult implements Serializable {
     private String cruiseName;
 
     @ApiModelProperty(value = "巡检时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseTime;
 
     @ApiModelProperty(value = "状态:0-已执行 1-未执行 2-执行失败 3-未知")
