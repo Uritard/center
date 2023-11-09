@@ -69,7 +69,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             // 2022过检 robot_name -> patroldevice_name
             robotRoadMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotRoadMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-            if (res.containsKey("file_path")) {
+            if (StringUtils.isNotEmpty((String)res.get("file_path"))) {
                 String filePath = String.valueOf(res.get("file_path"));
 //                robotService.uploadFile(filePath, filePath);
                 String[] splitArray = filePath.split("/");

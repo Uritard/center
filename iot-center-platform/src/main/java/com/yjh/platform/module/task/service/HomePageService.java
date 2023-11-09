@@ -33,7 +33,9 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.util.Asserts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +208,7 @@ public class HomePageService {
 
             Map<String, Object> mapForCell = redisTemplate.opsForHash().entries("RobotOperation:" + item.getRobotCode() + ":3");
             if (mapForCell.size() != 0) {
-                Double value = Double.valueOf(mapForCell.get("value").toString());//电池电量
+                Double value = NumberUtils.toDouble(MapUtils.getString(mapForCell,"value"));//电池电量
                 String valueUnit = df.format(value) + "%";
                 item.setBatteryLevel(valueUnit);
             } else {

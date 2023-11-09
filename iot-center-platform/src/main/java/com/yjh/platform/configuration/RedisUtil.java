@@ -1,32 +1,39 @@
 package com.yjh.platform.configuration;
 
-
+import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class RedisUtil {
-    @SuppressWarnings("rawtypes")
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private static RedisTemplate<String, Object> redisTemplate;
 
-    private Logger logger = LoggerFactory.getLogger(RedisUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(RedisUtil.class);
+
+    public static void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+        RedisUtil.redisTemplate = redisTemplate;
+    }
+
     /**
      * 批量删除对应的value
      *
      * @param keys
      */
-    public void remove(final String... keys) {
+    public static void remove(final String... keys) {
         for (String key : keys) {
             remove(key);
         }
@@ -37,11 +44,12 @@ public class RedisUtil {
      *
      * @param pattern
      */
-    @SuppressWarnings("unchecked")
-    public void removePattern(final String pattern) {
-        Set<Serializable> keys = redisTemplate.keys(pattern);
-        if (keys.size() > 0)
+
+    public static void removePattern(final String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (!keys.isEmpty()) {
             redisTemplate.delete(keys);
+        }
     }
 
     /**
@@ -49,8 +57,7 @@ public class RedisUtil {
      *
      * @param key
      */
-    @SuppressWarnings("unchecked")
-    public void remove(final String key) {
+    public static void remove(final String key) {
         if (exists(key)) {
             redisTemplate.delete(key);
         }
@@ -62,8 +69,7 @@ public class RedisUtil {
      * @param key
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public boolean exists(final String key) {
+    public static boolean exists(final String key) {
         return redisTemplate.hasKey(key);
     }
 
@@ -73,10 +79,9 @@ public class RedisUtil {
      * @param key
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public Object get(final String key) {
+    public static Object get(final String key) {
         Object result = null;
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
         return result;
     }
@@ -88,11 +93,10 @@ public class RedisUtil {
      * @param value
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public boolean set(final String key, Object value) {
+    public static boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
             result = true;
         } catch (Exception e) {
@@ -108,11 +112,10 @@ public class RedisUtil {
      * @param value
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public boolean set(final String key, Object value, Long expireTime) {
+    public static boolean set(final String key, Object value, Long expireTime) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
             redisTemplate.expire(key, expireTime, TimeUnit.SECONDS);
             result = true;
@@ -129,18 +132,40 @@ public class RedisUtil {
      * @param key,dataBaseIndex,hashName
      * @return
      */
-    @SuppressWarnings("unchecked")
-    public Object get(final String key,int dataBaseIndex,String hashName) {
-        JedisConnectionFactory connectionFactory =(JedisConnectionFactory) redisTemplate.getConnectionFactory();
-        connectionFactory.setDatabase(dataBaseIndex);
+    public static Object get(final String key,int dataBaseIndex,String hashName) {
+        JedisConnectionFactory connectionFactory =(JedisConnectionFactory) redisTemplate.getRequiredConnectionFactory();
+        connectionFactory.getStandaloneConfiguration().setDatabase(dataBaseIndex);
         String value=(String)redisTemplate.opsForHash().get(hashName,key);
         return value;
     }
 
-    public void set(Map map, int databaseindex, String hashname) {
-        JedisConnectionFactory connectionFactory =(JedisConnectionFactory) redisTemplate.getConnectionFactory();
-        connectionFactory.setDatabase(databaseindex);
-        redisTemplate.opsForHash().putAll(hashname,map);   ;
+    public static void set(Map map, int databaseindex, String hashname) {
+        JedisConnectionFactory connectionFactory =(JedisConnectionFactory) redisTemplate.getRequiredConnectionFactory();
+        connectionFactory.getStandaloneConfiguration().setDatabase(databaseindex);
+        redisTemplate.opsForHash().putAll(hashname,map);
     }
 
+    public static Set<String> redisScan(String key) {
+        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match(key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
+    }
 }

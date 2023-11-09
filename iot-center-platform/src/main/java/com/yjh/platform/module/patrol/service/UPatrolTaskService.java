@@ -26,6 +26,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -916,7 +917,7 @@ public class UPatrolTaskService {
 
         String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
         //处理结果 获取机器人的点
-        Set<String> keys = redisScan(cruiseResultKey);
+        Set<String> keys = RedisUtil.redisScan(cruiseResultKey);
         List<Map<String, String>> resultMap = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
             keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
@@ -1968,7 +1969,7 @@ public class UPatrolTaskService {
         updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {
 
-            Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
+            Set<String> tasKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":*");
             if (CollectionUtils.isEmpty(tasKeys)) {
                 log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
                 log.error("直接更新任务状态，不执行入库操作， {}", taskId);
@@ -2027,7 +2028,7 @@ public class UPatrolTaskService {
      * 本地任务执行
      */
     public void localTaskStart(String taskId) {
-        Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
+        Set<String> tasKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":*");
         String operateTaskRobotId = (String) redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "operateTaskRobotId");
         if (CollectionUtils.isEmpty(tasKeys)) {
             log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
@@ -2433,7 +2434,7 @@ public class UPatrolTaskService {
 
             int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
-            Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId + ":");
+            Set<String> robotInfoKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":");
             List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
@@ -3106,37 +3107,6 @@ public class UPatrolTaskService {
         }
     }
 
-
-    /**
-     * Redis数据库批量查询Key值游标
-     * @param key redis的key
-     * @return Set<String>
-     */
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match(key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
-    }
-
     private void lowTaskGoOn(String taskId){
         String lowTaskKey = TASK_LOWER_REDIS_KEY + taskId;
         Set<String> lowTaskList = redisTemplate.opsForSet().members(lowTaskKey);
@@ -3307,7 +3277,7 @@ public class UPatrolTaskService {
             // String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
             String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
             //处理结果 获取机器人的点
-            Set<String> keys = redisScan(cruiseResultKey);
+            Set<String> keys = RedisUtil.redisScan(cruiseResultKey);
             if (!keys.isEmpty()) {
                 for (String item : keys) {
                     //获取任务数据
