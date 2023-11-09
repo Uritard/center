@@ -110,6 +110,7 @@ INSERT INTO `sys_menu` VALUES ('42', '可靠性指标', '0901', '41', '', '', '1
 INSERT INTO `sys_menu` VALUES ('45', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('46', '声纹管理', '0106', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('47', '电表监控', '0210', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('48', '告警管理', '0107', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', NULL);
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -1395,6 +1396,7 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('managerSystem', '算法管理平台配置', 'mqttNodeId', '1997030609', '变电站id', '消息内容基础配置', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('managerSystem', '算法管理平台配置', 'voltLevel', '500', '变电站电压等级', '消息内容基础配置', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('managerSystem', '算法管理平台配置', 'managerServerFtpsRemotePath', '南京/雨花台区域/500kV变电站', '图片上传至算法管理平台ftps路径', '无', '{\"rule\":\"^\\\\/?([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('managerSystem', '算法管理平台配置', 'managerSystemFlag', '1', '是否开启', '算法平台是否开启 1开启 0关闭', '{\"rule\":\"^(1|0)$\",\"msg\":\"只能填 1 或 0\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('algorithmSystem', '分析主机配置', 'algorithmSystemFtpsIp', '172.24.39.9', 'ftps服务ip', '分析主机ftps服务ip', '{\"rule\":\"^([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])(\\\\.([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])){3}$\",\"msg\":\"请输入正确的ip\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('algorithmSystem', '分析主机配置', 'algorithmSystemFtpsPort', '10012', 'ftps服务端口', '分析主机ftps服务端口', '{\"rule\":\"^([0-9]|[1-9]\\\\d{1,3}|[1-5]\\\\d{4}|6[0-4]\\\\d{4}|65[0-4]\\\\d{2}|655[0-2]\\\\d|6553[0-5])$\",\"msg\":\"请输入正确端口\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('algorithmSystem', '分析主机配置', 'algorithmSystemFtpsUsername', 'Yzzx220', '登录用户名', '分析主机ftps服务登录用户名', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"输入字母数字或_-符号\"}');

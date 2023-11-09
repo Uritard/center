@@ -28,12 +28,12 @@
         select
         <include refid="Base_Column_List" />
         from t_meter
-        where  id = #{id,jdbcType=BIGINT}
+        where  id = #{id,jdbcType=BIGINT} and type = 1
     </select>
     <select id="selectAll"  resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from t_meter
+        from t_meter  where type = 1
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
