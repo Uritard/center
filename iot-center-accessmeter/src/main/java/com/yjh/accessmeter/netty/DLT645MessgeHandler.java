@@ -78,7 +78,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         log.info("msg:{}", msg);
         DLT645Message dlt645Message = (DLT645Message) msg;
