@@ -39,6 +39,7 @@ public class CameraPlayLogServiceImpl extends ServiceImpl<CameraPlayLogDAO, Came
                         .eq(cameraPlayLogDTO.getCameraId() != null, CameraPlayLogDTO::getCameraId, cameraPlayLogDTO.getCameraId())
                         .eq(cameraPlayLogDTO.getUserId() != null, CameraPlayLogDTO::getUserId, cameraPlayLogDTO.getUserId())
                         .like(StringUtils.isNotBlank(cameraPlayLogDTO.getUserName()), CameraPlayLogDTO::getUserName, cameraPlayLogDTO.getUserName())
+                        .isNotNull(CameraPlayLogDTO::getStopTime)
                         .orderByDesc(CameraPlayLogDTO::getStartTime)
                 );
         return dtoList;
