@@ -20,6 +20,7 @@ import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -753,7 +754,7 @@ public class TRobotInspectionService {
         //巡视路径地图路径
         Map<String, Object> mapForCruiseMap = redisTemplate.opsForHash().entries("RobotRoad:" + robotCode);
         if ("2".equals(mapForRobotState.get("value"))) {
-                re.put("cruiseMapPath", mapForCruiseMap.get("relativePath"));
+                re.put("cruiseMapPath", MapUtils.getString(mapForCruiseMap, "relativePath", ""));
         }
         /*if (mapForCruiseMap.size() != 0 && Optional.ofNullable(mapForCruiseMap.get("coordinatePixel")).isPresent()) {
             re.put("cruiseMapPath", mapForCruiseMap.get("relativePath"));

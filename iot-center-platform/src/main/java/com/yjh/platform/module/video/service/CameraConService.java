@@ -906,7 +906,7 @@ public class CameraConService {
         SnapEntity entity =
             SnapEntity.builder().ip(cameraConInfo.getIp()).port(cameraConInfo.getPort()).channelNum(cameraConInfo.getChannelNum())
                 .deviceId(cameraConInfo.getDeviceChannel()).channelId(cameraConInfo.getCameraChannelId())
-                .userName(cameraConInfo.getUsername()).password(cameraConInfo.getVendor()).imgPath(filePath).build();
+                .userName(cameraConInfo.getUsername()).password(cameraConInfo.getIdentityCode()).imgPath(filePath).build();
 
         ISnapService iPlayService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendor()), ISnapService.class);
         Result<String> result = iPlayService.snap(entity);

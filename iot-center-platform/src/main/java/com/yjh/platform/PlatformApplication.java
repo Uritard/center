@@ -3,6 +3,7 @@ package com.yjh.platform;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
@@ -78,6 +79,7 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        RedisUtil.setRedisTemplate(redisTemplate);
         redisTemplate.delete("AllRobotCode");
         DictConvertUtil.DICT.loadDict(dictBusinessService);
         VideoConfig.custom(wvpHost);

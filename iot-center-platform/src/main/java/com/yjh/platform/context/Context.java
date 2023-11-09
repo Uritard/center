@@ -3,6 +3,7 @@ package com.yjh.platform.context;
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.config.entity.SystemConfig;
 import com.yjh.platform.module.config.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,8 @@ public class Context {
     }
 
     private void deleteSecondSilentRedisConf(){
-        String key = Constant.SILENT_SECOND+"**";
-        Set<String> keys = redisTemplate.keys(key);
+        String key = Constant.SILENT_SECOND;
+        Set<String> keys = RedisUtil.redisScan(key);
         if (CollectionUtils.isNotEmpty(keys)) {
             redisTemplate.delete(keys);
         }
