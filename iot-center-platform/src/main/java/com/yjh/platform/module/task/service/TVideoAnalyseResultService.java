@@ -1,8 +1,5 @@
 package com.yjh.platform.module.task.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
 import com.yjh.platform.module.task.entity.TVideoAnalyseResult;
 import com.yjh.platform.module.task.dao.TVideoAnalyseResultDao;
 
@@ -11,7 +8,6 @@ import java.util.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

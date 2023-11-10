@@ -36,6 +36,7 @@
             <result property="commissionDate" column="commission_date" jdbcType="TIMESTAMP"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="useType" column="use_type" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -49,7 +50,7 @@
         camera_type,is_control,latitude,
         longitude,address,unit,
         create_time,commission_date,edge_code,
-        origin_id
+        origin_id,camera_channel_id,use_type
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -75,7 +76,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id)
+        ,origin_id,camera_channel_id,use_type)
         values (#{cameraId,jdbcType=BIGINT},#{cameraName,jdbcType=VARCHAR},#{cameraModel,jdbcType=INTEGER}
         ,#{pmsId,jdbcType=VARCHAR},#{aliasName,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT}
         ,#{upRegionId,jdbcType=VARCHAR},#{channelNum,jdbcType=INTEGER},#{cameraNum,jdbcType=INTEGER}
@@ -86,7 +87,7 @@
         ,#{cameraType,jdbcType=INTEGER},#{isControl,jdbcType=INTEGER},#{latitude,jdbcType=VARCHAR}
         ,#{longitude,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
         ,#{createTime,jdbcType=TIMESTAMP},#{commissionDate,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR})
+        ,#{originId,jdbcType=VARCHAR},#{cameraChannelId,jdbcType=VARCHAR},#{useType,jdbcType=INTEGER})
     </insert>
     <insert id="insertSelective" keyColumn="camera_id" keyProperty="cameraId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo" useGeneratedKeys="true">
         insert into t_camera_info
@@ -122,6 +123,8 @@
                 <if test="commissionDate != null">commission_date,</if>
                 <if test="edgeCode != null">edge_code,</if>
                 <if test="originId != null">origin_id,</if>
+                <if test="cameraChannelId != null">camera_channel_id,</if>
+                <if test="useType != null">use_type,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
@@ -155,6 +158,8 @@
                 <if test="commissionDate != null">#{commissionDate,jdbcType=TIMESTAMP},</if>
                 <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
                 <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+                <if test="cameraChannelId != null">#{cameraChannelId,jdbcType=VARCHAR},</if>
+                <if test="useType != null">#{useType,jdbcType=INTEGER},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo">
@@ -250,8 +255,14 @@
                 <if test="originId != null">
                     origin_id = #{originId,jdbcType=VARCHAR},
                 </if>
+                <if test="cameraChannelId != null">
+                    camera_channel_id = #{cameraChannelId,jdbcType=VARCHAR},
+                </if>
+                <if test="useType != null">
+                    use_type = #{useType,jdbcType=INTEGER},
+                </if>
         </set>
-        where   camera_id = #{cameraId,jdbcType=BIGINT} 
+        where   camera_id = #{cameraId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo">
         update t_camera_info
@@ -285,14 +296,16 @@
             create_time =  #{createTime,jdbcType=TIMESTAMP},
             commission_date =  #{commissionDate,jdbcType=TIMESTAMP},
             edge_code =  #{edgeCode,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=VARCHAR}
+            origin_id =  #{originId,jdbcType=VARCHAR},
+            camera_channel_id =  #{cameraChannelId,jdbcType=VARCHAR},
+            use_type =  #{useType,jdbcType=INTEGER}
         where   camera_id = #{cameraId,jdbcType=BIGINT} 
     </update>
     <select id="selectAll" resultType="com.yjh.accesstcp.module.device.entity.CameraModel">
         select
         <include refid="Base_Column_List" />,
         a.camera_name as patroldevice_name,
-        a.camera_id as patroldevice_code,
+        IFNULL(a.camera_channel_id, a.camera_id) as patroldevice_code,
         b.dict_note as device_model,
         c.dict_note as manufacturer,
         a.unit as use_unit,

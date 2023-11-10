@@ -87,11 +87,11 @@ public class TCameraRecorderService {
     }
 
     private void registerNVR(Long recordId) {
-        try {
+        /*try {
             Result result = serviceRestTemplate.getForObject(Constant.NVR_REGISTER_URL, Result.class, recordId);
             log.info("recordId:{} ,result:{}", recordId,result);
         } catch (Exception e) {
             log.error("录像机注册失败 recordId:{}",recordId,e);
-        }
+        }*/
     }
 }

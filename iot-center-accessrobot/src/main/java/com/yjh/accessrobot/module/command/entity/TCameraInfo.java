@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.command.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Date;
  * @TableName t_camera_info
  */
 @Data
+@EqualsAndHashCode
 public class TCameraInfo implements Serializable {
     /**
      * 主键
@@ -165,6 +167,16 @@ public class TCameraInfo implements Serializable {
      * 原始id(下级同步的id)
      */
     private String originId;
+
+    /**
+     * 国标相机id(下级同步的id)
+     */
+    private String cameraChannelId;
+
+    /**
+     * 相机用途 巡视设备1 监控设备 0
+     */
+    private Integer useType;
 
     private static final long serialVersionUID = 1L;
 }

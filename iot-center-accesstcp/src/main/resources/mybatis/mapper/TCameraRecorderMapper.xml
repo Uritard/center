@@ -37,19 +37,19 @@
         identity_manager,identity_code,protocol_url,
         max_channel,hdd_size,buffer_day,
         time_long,unit,edge_code,
-        origin_id
+        origin_id,device_channel
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from t_camera_recorder
-        where  record_id = #{recordId,jdbcType=BIGINT} 
+        where  record_id = #{recordId,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_camera_recorder
-        where  record_id = #{recordId,jdbcType=BIGINT} 
+        where  record_id = #{recordId,jdbcType=BIGINT}
     </delete>
     <insert id="insert" keyColumn="record_id" keyProperty="recordId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder" useGeneratedKeys="true">
         insert into t_camera_recorder
@@ -59,8 +59,7 @@
         ,http_port,trans_port,rtsp_port
         ,identity_manager,identity_code,protocol_url
         ,max_channel,hdd_size,buffer_day
-        ,time_long,unit,edge_code
-        ,origin_id)
+        ,time_long,unit,edge_code,origin_id,device_channel)
         values (#{recordId,jdbcType=BIGINT},#{recordName,jdbcType=VARCHAR},#{recorderModel,jdbcType=INTEGER}
         ,#{recorderType,jdbcType=VARCHAR},#{vendorId,jdbcType=INTEGER},#{pmsId,jdbcType=VARCHAR}
         ,#{aliasName,jdbcType=VARCHAR},#{recordIp,jdbcType=VARCHAR},#{protocol,jdbcType=VARCHAR}
@@ -68,7 +67,7 @@
         ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
         ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
         ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR})
+        ,#{originId,jdbcType=VARCHAR},#{deviceChannel,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="record_id" keyProperty="recordId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder" useGeneratedKeys="true">
         insert into t_camera_recorder
@@ -95,6 +94,7 @@
                 <if test="unit != null">unit,</if>
                 <if test="edgeCode != null">edge_code,</if>
                 <if test="originId != null">origin_id,</if>
+                <if test="deviceChannel != null">device_channel,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="recordId != null">#{recordId,jdbcType=BIGINT},</if>
@@ -119,6 +119,7 @@
                 <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
                 <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
                 <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+                <if test="deviceChannel != null">#{deviceChannel,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder">
@@ -187,12 +188,15 @@
                 <if test="originId != null">
                     origin_id = #{originId,jdbcType=VARCHAR},
                 </if>
+                <if test="deviceChannel != null">
+                    device_channel = #{deviceChannel,jdbcType=VARCHAR},
+                </if>
         </set>
-        where   record_id = #{recordId,jdbcType=BIGINT} 
+        where   record_id = #{recordId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder">
         update t_camera_recorder
-        set 
+        set
             record_name =  #{recordName,jdbcType=VARCHAR},
             recorder_model =  #{recorderModel,jdbcType=INTEGER},
             recorder_type =  #{recorderType,jdbcType=VARCHAR},
@@ -213,8 +217,9 @@
             time_long =  #{timeLong,jdbcType=INTEGER},
             unit =  #{unit,jdbcType=VARCHAR},
             edge_code =  #{edgeCode,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=VARCHAR}
-        where   record_id = #{recordId,jdbcType=BIGINT} 
+            origin_id =  #{originId,jdbcType=VARCHAR},
+            device_channel =  #{deviceChannel,jdbcType=VARCHAR}
+        where   record_id = #{recordId,jdbcType=BIGINT}
     </update>
 
     <select id="selectAll" resultMap="BaseResultMap">
