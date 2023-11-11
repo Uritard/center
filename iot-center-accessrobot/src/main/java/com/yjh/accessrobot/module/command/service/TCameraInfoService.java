@@ -8,6 +8,7 @@ import com.yjh.accessrobot.module.command.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,50 +49,26 @@ public class TCameraInfoService {
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         Map<String, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
-        Map<String, String> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(tStdRegion -> tStdRegion.getOriginRegionId().toString(), tStdRegion -> tStdRegion.getRegionId().toString()));
-        List<TCameraInfo> tCameraInfoList = cameraModelList.stream().map(cameraModel -> {
-            TCameraInfo tCameraInfo = new CameraModel();
-            tCameraInfo.setCameraId(null);
-            tCameraInfo.setCameraName(cameraModel.getPatroldeviceName());
-            tCameraInfo.setCameraModel(cameraModel.getCameraModel());
-            tCameraInfo.setPmsId(cameraModel.getPmsId());
-            tCameraInfo.setAliasName(cameraModel.getAliasName());
-            tCameraInfo.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId().toString()));
-            tCameraInfo.setUpRegionId(stdRegionMap.get(cameraModel.getUpRegionId()));
-            tCameraInfo.setChannelNum(cameraModel.getChannelNum());
-            tCameraInfo.setCameraNum(cameraModel.getCameraNum());
-            tCameraInfo.setSmsId(cameraModel.getSmsId());
-            tCameraInfo.setRmsId(cameraModel.getRmsId());
-            tCameraInfo.setMonitorId(cameraModel.getMonitorId());
-            tCameraInfo.setVendorId(cameraModel.getVendorId());
-            tCameraInfo.setStreamType(cameraModel.getStreamType());
-            tCameraInfo.setProtocolType(cameraModel.getProtocolType());
-            tCameraInfo.setUrl(cameraModel.getUrl());
-            tCameraInfo.setCameraIp(cameraModel.getCameraIp());
-            tCameraInfo.setPort(cameraModel.getPort());
-            tCameraInfo.setInfreadPort(cameraModel.getInfreadPort());
-            tCameraInfo.setCameraManager(cameraModel.getCameraManager());
-            tCameraInfo.setCameraCode(cameraModel.getCameraCode());
-            tCameraInfo.setCameraType(cameraModel.getCameraType());
-            tCameraInfo.setIsControl(cameraModel.getIsControl());
-            tCameraInfo.setLatitude(cameraModel.getLatitude());
-            tCameraInfo.setLongitude(cameraModel.getLongitude());
-            tCameraInfo.setAddress(cameraModel.getAddress());
-            tCameraInfo.setUnit(cameraModel.getUnit());
-            tCameraInfo.setCreateTime(cameraModel.getCreateTime());
-            tCameraInfo.setCommissionDate(cameraModel.getCommissionDate());
-            tCameraInfo.setEdgeCode(edgeNode);
-            tCameraInfo.setOriginId(cameraModel.getPatroldeviceCode());
-            return tCameraInfo;
+        Map<String, String> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, tStdRegion -> tStdRegion.getRegionId().toString()));
+        List<TCameraInfo> tCameraInfoList = cameraModelList.stream().peek(cameraModel -> {
+            cameraModel.setCameraId(null);
+            cameraModel.setCameraName(cameraModel.getPatroldeviceName());
+            cameraModel.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId().toString()));
+            cameraModel.setUpRegionId(stdRegionMap.get(cameraModel.getUpRegionId()));
+            cameraModel.setEdgeCode(edgeNode);
+            cameraModel.setOriginId(String.valueOf(cameraModel.getCameraId()));
+            if (StringUtils.length(cameraModel.getPatroldeviceCode()) >= 16) {
+                cameraModel.setCameraChannelId(cameraModel.getPatroldeviceCode());
+            }
         }).collect(Collectors.toList());
 
-        List<TCameraInfo> oldTCameraInfoList = tCameraInfoMapper.selectByEdgeCode(edgeNode);
-        if (CollectionUtils.isEmpty(oldTCameraInfoList)) {
+        List<TCameraInfo> oldCameraInfoList = tCameraInfoMapper.selectByEdgeCode(edgeNode);
+        if (CollectionUtils.isEmpty(oldCameraInfoList)) {
             tCameraInfoMapper.insertBatch(tCameraInfoList);
             dealDevicePermission(tCameraInfoList.stream().map(TCameraInfo::getCameraId).collect(Collectors.toList()));
         } else {
-            Map<String, TCameraInfo> oldCameraInfoMap = oldTCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));
-            Map<String, TCameraInfo> newCameraInfoMap = tCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));
+            Map<String, TCameraInfo> oldCameraInfoMap = oldCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity(), (e1, e2) -> e1));
+            Map<String, TCameraInfo> newCameraInfoMap = tCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity(), (e1, e2) -> e1));
             // 更新的数据
             SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldCameraInfoMap.keySet(), newCameraInfoMap.keySet());
             if (CollectionUtils.isNotEmpty(updateIdSet)) {

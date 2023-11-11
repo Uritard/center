@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.command.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * <功能描述>
@@ -10,6 +11,7 @@ import lombok.Data;
  * @since [产品/模块版本] （可选）
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class CameraModel extends TCameraInfo {
     private String patroldeviceName;
     private String patroldeviceCode;

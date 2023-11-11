@@ -16,8 +16,8 @@ import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.regexp.RE;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -694,7 +693,7 @@ public class TRobotInfoService{
         Iterator<AreaInfo> it = areaInfoList.iterator();
         while (it.hasNext()) {
             AreaInfo areaInfo = it.next();
-            if (org.apache.commons.collections.CollectionUtils.isNotEmpty(areaInfo.getChildren())) {
+            if (CollectionUtils.isNotEmpty(areaInfo.getChildren())) {
                 this.filter(areaInfo.getChildren(), name, infoType);
             }
             //根据输入的名称

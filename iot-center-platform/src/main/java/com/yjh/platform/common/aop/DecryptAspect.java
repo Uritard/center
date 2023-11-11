@@ -2,7 +2,6 @@ package com.yjh.platform.common.aop;
 
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import com.yjh.platform.common.utils.LogUtil;
 import com.yjh.platform.common.utils.smUtil.SM2Utils;
 import com.yjh.platform.common.utils.smUtil.Util;
@@ -91,8 +90,8 @@ public class DecryptAspect {
         logger.info("进入aop--------------");
         Object[] paramValues = joinPoint.getArgs();
         Class classes = paramValues[0].getClass();
-        String params = new Gson().toJson(paramValues[0]);
-        Map<String, Object> map = new Gson().fromJson(params, Map.class);
+        String params = JSON.toJSONString(paramValues[0]);
+        Map<String, Object> map = JSON.parseObject(params, Map.class);
         Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, Object> entry = iterator.next();
@@ -119,8 +118,8 @@ public class DecryptAspect {
     public Object aroundMap(ProceedingJoinPoint joinPoint) throws Throwable {
         logger.info("进入aop--------------");
         Object[] paramValues = joinPoint.getArgs();
-        String params = new Gson().toJson(paramValues[0]);
-        Map<String, Object> map = new Gson().fromJson(params, Map.class);
+        String params = JSON.toJSONString(paramValues[0]);
+        Map<String, Object> map = JSON.parseObject(params, Map.class);
         Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, Object> entry = iterator.next();

@@ -120,5 +120,10 @@ public class TCameraRecorder implements Serializable {
      */
     private String originId;
 
+    /**
+     * 国标设备ID
+     */
+    private String deviceChannel;
+
     private static final long serialVersionUID = 1L;
 }

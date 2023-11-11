@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.command.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * @TableName t_camera_recorder
  */
 @Data
+@EqualsAndHashCode
 public class TCameraRecorder implements Serializable {
     /**
      * 录像机ID
@@ -120,5 +122,10 @@ public class TCameraRecorder implements Serializable {
      */
     private String originId;
 
+    /**
+     * 国标设备ID
+     */
+    private String deviceChannel;
+    
     private static final long serialVersionUID = 1L;
 }

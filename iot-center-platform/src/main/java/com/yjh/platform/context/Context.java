@@ -2,10 +2,7 @@ package com.yjh.platform.context;
 
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.RedisUtil;
-import com.yjh.platform.module.config.entity.SystemConfig;
-import com.yjh.platform.module.config.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -14,9 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
