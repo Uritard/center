@@ -337,6 +337,9 @@ public class UPatrolResultController {
                     deviceIdList.add(regionId);
                 }
             }
+            if (deviceIdList.isEmpty()){
+                deviceIdList.add(-1L);
+            }
             Page page = PageHelper.startPage(obj.getIntValue("pageNum"), obj.getIntValue("pageSize"), true, null, true);
             List<OperationTaskRecord> hashMaps = uPatrolResultService.queryOperationTask(deviceIdList , operationType, startTime, endTime);
             resultMap.put("count",page.getTotal());
