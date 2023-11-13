@@ -120,4 +120,9 @@ public class TMeter implements Serializable {
     private String startTime;
 
     private String endTime;
+
+    /**
+     * 所属区域编码
+     */
+    private String edgeCode;
 }

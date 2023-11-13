@@ -5,6 +5,7 @@ import com.yjh.accessmeter.logs.SpringBeanUtils;
 import com.yjh.accessmeter.module.dao.TMeterDao;
 import com.yjh.accessmeter.module.dao.TMeterLogDao;
 import com.yjh.accessmeter.module.device.entity.TMeter;
+import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.module.service.TMeterCollectService;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +13,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +38,12 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
 
     private TMeterLogDao tMeterLogDao;
 
-    public DLT645MessgeHandler(TMeterDao tMeterDao, TMeterLogDao tMeterLogDao) {
+    private PlatformProxy platformProxy;
+
+    public DLT645MessgeHandler(TMeterDao tMeterDao, TMeterLogDao tMeterLogDao,PlatformProxy platformProxy) {
         this.tMeterDao = tMeterDao;
         this.tMeterLogDao = tMeterLogDao;
+        this.platformProxy = platformProxy;
     }
 
     @Override
@@ -125,6 +130,8 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                 tMeterDao.updateData(tMeter);
                 // 记录电表历史
                 tMeterLogDao.insert(tMeter);
+
+                platformProxy.uploadMeterInfo(tMeter);
             } else {
                 log.error("数据类型不是正向有功/正向无功/反向无功总电能, dataType:{}", ByteBufUtil.hexDump(dataType));
             }
