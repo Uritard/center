@@ -681,8 +681,8 @@ public class TRobotInfoService{
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<Long> selectAllEnvRegionId() {
-        return tRobotInfoDao.selectAllEnvRegionId();
+    public List<Long> selectAllEnvRegionId(List<Long> list) {
+        return tRobotInfoDao.selectAllEnvRegionId(list);
     }
 
     public List<AreaInfo> selectMapNodeTree() {

@@ -107,4 +107,6 @@ public interface TStdDevicemeteDao {
     List<Long>selectForPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
     List<Map<String, Object>> selectAllDeviceMeteIdAndCruiseType();
+
+    int selectStdDeviceMeteCount();
 }

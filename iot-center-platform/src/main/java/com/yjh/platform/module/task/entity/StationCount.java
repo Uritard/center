@@ -13,7 +13,7 @@ public class StationCount {
 
     private String type;
 
-    private String count;
+    private Integer count;
 
 
 }

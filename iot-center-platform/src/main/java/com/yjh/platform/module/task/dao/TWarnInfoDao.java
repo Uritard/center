@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.task.entity.TJContentInfoDetail;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.TWarnInfoDetail;
@@ -90,4 +91,6 @@ public interface TWarnInfoDao {
 
     String selectStationNameByDeviceId(@Param(value = "deviceId")Long deviceId);
     String selectStationNameByThis();
+
+    TaskInfoBean selectAllCount();
 }

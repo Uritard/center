@@ -351,6 +351,25 @@ public class HomePageController {
         return result;
     }
 
+    /**
+     * 站所概况统计
+     *
+     * @date 2022/3/1
+     */
+    @ApiOperation(value = "站所概况统计")
+    @RequestMapping(value = "/queryStationDetail", method = RequestMethod.GET)
+    public Result queryStationDetail(@RequestParam(value = "regionId", required = false) Long regionId) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryStationDetail(regionId));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
+        }
+        return result;
+    }
+
 
     @ApiOperation(value = "站所地图查询")
     @RequestMapping(value = "/queryRegionPath", method = RequestMethod.GET)
@@ -432,7 +451,7 @@ public class HomePageController {
         return result;
     }
 
-    @ApiOperation(value = "首页查询任务概览")
+    @ApiOperation(value = "首页查询设备测点任务概览")
     @RequestMapping(value = "/queryTaskInfo", method = RequestMethod.GET)
     public Result queryTaskInfo() {
         Result result = new Result();

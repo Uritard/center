@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.input.RegionVideo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -74,4 +75,6 @@ public interface TCruiseTaskDao {
     List<RegionPath> queryRegionList();
 
     String queryRegionName();
+
+    List<RegionVideo> queryRegionVideoList(List<Long> list);
 }
