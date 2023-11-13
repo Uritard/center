@@ -1006,5 +1006,25 @@
         FROM t_std_region a
         where a.up_region_id = -1
     </select>
+    <select id="selectAllCount" resultType="com.yjh.platform.module.device.entity.TaskInfoBean">
+        SELECT a.curAlarmCount + b.curAlarmCount AS curAlarmCount,
+               a.untreatedAlarmCount + b.untreatedAlarmCount AS untreatedAlarmCount
+        FROM(
+             (
+                 SELECT
+                     count(IF(DATE(warn_time) = CURDATE(),warn_time,null)) AS curAlarmCount,
+                     count(IF (conf_mode = 275,NULL,conf_mode)) AS untreatedAlarmCount
+                 FROM
+                     t_warn_info
+             ) a,
+             (
+             SELECT count(IF (conf_mode = 275,NULL,conf_mode)) AS curAlarmCount,
+                count(IF(DATE(defect_time) = CURDATE(),defect_time,null)) AS untreatedAlarmCount
+
+                FROM
+                t_defect_info
+             )b
+             )
+    </select>
 
 </mapper>

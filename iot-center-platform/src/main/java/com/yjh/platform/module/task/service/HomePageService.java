@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TMeterDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.DeviceCountBean;
@@ -24,7 +25,9 @@ import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TStdWeatherLogDao;
+import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.input.RegionVideo;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
@@ -94,6 +97,10 @@ public class HomePageService {
     private CameraConService cameraConService;
     @Resource
     private TStdWeatherLogDao tStdWeatherLogDao;
+    @Resource
+    private TStdDevicemeteDao tStdDevicemeteDao;
+    @Resource
+    private TWarnInfoDao tWarnInfoDao;
     @Autowired
     private TMeterDao tMeterDao;
 
@@ -426,12 +433,34 @@ public class HomePageService {
         sta.setType("环控设备");
         int staSize;
         //环控数量
-        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId();
+        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
         staSize = envReginIdList.stream().map(this::queryWeatherInfo).filter(list -> list != null && list.size() > 0).mapToInt(List::size).sum();
-        sta.setCount(String.valueOf(staSize));
+        sta.setCount(staSize);
         List<StationCount> stationCounts = tCruiseTaskDao.queryStations(regionIdList);
         stationCounts.add(sta);
         return stationCounts;
+    }
+
+    /**
+     * 查询站所数据详情
+     *
+     * @param regionId 区域ID
+     * @return
+     */
+    public StationDetail queryStationDetail(Long regionId) {
+        StationDetail stationDetail = new StationDetail();
+        stationDetail.setStationCounts(this.queryStations(regionId));
+        List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
+        List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
+        for (Long aLong : envReginIdList) {
+            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong);
+            envDeviceStatusList.addAll(envDeviceStatuses);
+        }
+        stationDetail.setEnvDeviceStatuses(envDeviceStatusList);
+        List<RegionVideo> regionVideoList = tCruiseTaskDao.queryRegionVideoList(regionIdList);
+        stationDetail.setRegionVideos(regionVideoList);
+        return stationDetail;
     }
 
     public List<RegionPath> queryRegionList() {
@@ -546,7 +575,14 @@ public class HomePageService {
     }
 
     public TaskInfoBean queryTaskInfo() {
-        return uPatrolResultDao.queryTaskInfo();
+        TaskInfoBean taskInfoBean = uPatrolResultDao.queryTaskInfo();
+        List<StationCount> list = this.queryStations(null);
+        taskInfoBean.setTotalDeviceCount(list.stream().mapToInt(StationCount::getCount).sum());
+        taskInfoBean.setTotalPointCount(tStdDevicemeteDao.selectStdDeviceMeteCount());
+        TaskInfoBean taskInfoBean2 = tWarnInfoDao.selectAllCount();
+        taskInfoBean.setCurAlarmCount(taskInfoBean2.getCurAlarmCount());
+        taskInfoBean.setUntreatedAlarmCount(taskInfoBean2.getUntreatedAlarmCount());
+        return taskInfoBean;
     }
 
     public List<TStdRegion> queryStationList() {

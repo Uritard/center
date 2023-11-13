@@ -101,7 +101,7 @@ public class TRobotInfoController {
                 }
             }
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
-            List<Long> allEnvRegionIdList = tRobotInfoService.selectAllEnvRegionId();
+            List<Long> allEnvRegionIdList = tRobotInfoService.selectAllEnvRegionId(null);
             if (allRobotCodeList.contains(tRobotInfo.getRobotCode())){
                 result.setMessage(209, "该实物ID已存在，不可重复");
                 return result;

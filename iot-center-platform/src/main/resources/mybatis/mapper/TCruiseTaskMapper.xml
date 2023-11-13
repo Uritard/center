@@ -828,5 +828,18 @@ select *from (
           and a.task_id = #{taskId, jdbcType=VARCHAR}
           and a.task_code = #{taskCode, jdbcType=VARCHAR}
     </select>
+    <select id="queryRegionVideoList" resultType="com.yjh.platform.module.task.entity.input.RegionVideo">
+        SELECT DISTINCT a.camera_id, b.region_name, b.region_id
+        FROM t_camera_info a
+        LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        WHERE 1=1
+        AND a.use_type = 2
+        <if test="list != null and list.size() > 0">AND a.up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        GROUP BY b.region_name
+    </select>
 
 </mapper>
