@@ -5,11 +5,15 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.alibaba.excel.annotation.write.style.ContentRowHeight;
 import com.alibaba.excel.annotation.write.style.HeadRowHeight;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yjh.platform.common.utils.MyUrlImageConverter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
+
 @Data
 @ExcelIgnoreUnannotated //忽视无注解的属性
 @ContentRowHeight(100)
@@ -40,7 +44,8 @@ public class OperationTaskRecordResult {
     private String origPic;
 
     @ExcelProperty(value = "操作时间", index = 4)
-    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
 
     @ExcelProperty(value = "操作人", index = 5)
     private String userName;
