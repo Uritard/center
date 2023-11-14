@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -255,7 +256,9 @@ public class UPatrolResultController {
         String userId = request.getHeader("userId");
         Result result = new Result();
         try {
-            result.setData(uPatrolResultService.manualReview(cruiseManualReview,userId));
+            List<TWarnInfo> tWarnInfoList = uPatrolResultService.manualReview(cruiseManualReview,userId);
+            result.setData(tWarnInfoList.size());
+            uPatrolResultService.reviewAlarm(tWarnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList()));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -301,6 +304,22 @@ public class UPatrolResultController {
         try {
             log.info("The resultList from accessRobot is=={}", resultList);
             uPatrolResultService.manualReviewTask(resultList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理机器人/无人机/边缘节点巡视结果错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "下级系统告警审核")
+    @PostMapping(value = "/robotWarnReview")
+    public Result robotWarnReview(@RequestBody List<TWarnInfo> tWarnInfoList) {
+        Result result = new Result();
+        try {
+            log.info("The tWarnInfoList from accessRobot is=={}", tWarnInfoList);
+            uPatrolResultService.manualReviewWarn(tWarnInfoList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

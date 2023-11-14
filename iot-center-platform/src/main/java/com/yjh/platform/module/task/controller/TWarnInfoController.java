@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
@@ -55,6 +56,8 @@ public class TWarnInfoController {
     private TRobotAlarmDao tRobotAlarmDao;
     @Autowired
     private AlarmShieldDao alarmShieldDao;
+    @Autowired
+    private ProcessResultToUpSystem processResultToUpSystem;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoController.class);
 
@@ -449,6 +452,15 @@ public class TWarnInfoController {
         String userId = request.getHeader("userId");
         try {
             result.setData(tWarnInfoService.alarmAndDefectProcess(alarmAndDefectProcess,userId));
+            Integer defectModel = alarmAndDefectProcess.getDefectModel();
+            Integer warnFlag = Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
+            if (Objects.nonNull(defectModel)) {
+                if (defectModel.equals(warnFlag)) {
+                    processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(alarmAndDefectProcess.getWarnId()), false);
+                } else {
+                    processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(alarmAndDefectProcess.getWarnId()), true);
+                }
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("进行告警处理发生异常:", e);

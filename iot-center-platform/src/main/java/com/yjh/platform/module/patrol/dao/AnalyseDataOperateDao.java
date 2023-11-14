@@ -99,4 +99,10 @@ public interface AnalyseDataOperateDao {
     String selectPresetIdByInstanceId(@Param(value = "instanceId") String instanceId);
 
     int selectRobotCodeIsExist(@Param(value = "robotCode") String robotCode);
+
+
+    List<TDefectInfo> selectDefectListByIds(List<Long> list);
+
+    List<TWarnInfo> selectWarnListByIds(List<Long> list);
+
 }

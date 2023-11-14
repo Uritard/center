@@ -104,6 +104,10 @@ public class Constant {
      */
     public static final String TASK_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotPatrolTaskReview";
     /**
+     * platform接收下级系统的告警审核
+     */
+    public static final String WARN_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotWarnReview";
+    /**
      * platform接收机器人/无人机任务状态接口
      */
     public static final String TASK_STATUS_PROCESS = "http://iot-center-platform/uPatrolTask/v1/robotPatrolTaskStatus";
