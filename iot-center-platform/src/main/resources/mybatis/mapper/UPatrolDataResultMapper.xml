@@ -707,10 +707,10 @@
         FROM
         u_patrol_data_result a
         WHERE
-        1 = 1 and a.cruise_type = 230
+        1 = 1 and a.cruise_type = 230 and identify_result = 246
         <if test="cameraId!=null  and cameraId!=''"> and  a.cruise_device_id =  #{cameraId,jdbcType=BIGINT} </if>
         <if test="startDate != null and startDate != '' and endDate != null and endDate != ''" >and a.cruise_time between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if>
-        ORDER BY a.fir_date DESC
+        ORDER BY a.cruise_time DESC
     </select>
 
     <insert id="batchInsertUPatrolDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" keyColumn="cruise_data_id">

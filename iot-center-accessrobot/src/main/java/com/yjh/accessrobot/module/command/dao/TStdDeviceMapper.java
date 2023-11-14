@@ -45,6 +45,11 @@ public interface TStdDeviceMapper {
     Map<String,String> selectInstanceInfo(@Param(value = "originId") Long originId);
 
     int deleteAllMete(@Param("edgeCode") String edgeCode);
+    int deleteAllMeteByAddress(@Param("edgeCode") String edgeCode,
+                               @Param("list") List<TMeter> list);
     int batchInsertMeter(@Param("list") List<TMeter> list);
+    int batchInsertMeterLog(@Param("list") List<TMeter> list);
+    List<TMeter> selectAllMeterByEdgeCode(@Param("edgeCode") String edgeCode);
+    int updateById(TMeter tMeter);
 
 }

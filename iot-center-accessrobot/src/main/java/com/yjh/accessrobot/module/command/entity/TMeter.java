@@ -31,6 +31,11 @@ public class TMeter implements Serializable {
     private String edgeCode;
 
     /**
+     * 电表类型 1-485获取数据 2-巡视任务获取数据
+     */
+    private Integer type;
+
+    /**
      * 电表名称
      */
     @ApiModelProperty(value = "电表名称")

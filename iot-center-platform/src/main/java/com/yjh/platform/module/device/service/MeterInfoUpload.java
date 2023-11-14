@@ -25,7 +25,7 @@ public class MeterInfoUpload {
     private TMeterDao tMeterDao;
 
     //定时将电表信息上传给上级系统
-    @Scheduled(cron = "0 */30 * * * ?")
+//    @Scheduled(cron = "0 */30 * * * ?")
     public void uploadMeteInfo(){
         if (!Constant.upSystemFlag()) {
             return;

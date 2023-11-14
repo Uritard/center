@@ -60,29 +60,51 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
         RobotServerHandler.send(operationProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
-        List<TMeter> meterList = new ArrayList<>();
+        List<TMeter> meterList = tStdDeviceMapper.selectAllMeterByEdgeCode(sendCode);
+        List<TMeter> updateMeterList = new ArrayList<>();
+        List<TMeter> addMeterList = new ArrayList<>();
+        List<TMeter> meterLogList = new ArrayList<>();
         List<TStdRegion> regionList = tStdRegionDao.selectAll();
         for (Map<String,Object> item: xmlBaseModel.getItems()) {
             Long upRegionId = isContains(regionList,ValueUtil.Object2String(item.get("upRegionId"),"-1"));
             if (upRegionId == null){
                 continue;
             }
-            TMeter tMeter = new TMeter();
-            tMeter.setName(MapUtils.getString(item,"name"));
-            tMeter.setIp(MapUtils.getString(item,"ip"));
-            tMeter.setPort(MapUtils.getInteger(item,"port"));
-            tMeter.setAddress(MapUtils.getString(item,"address"));
-            tMeter.setUpRegionId(upRegionId);
-            tMeter.setEdgeCode(sendCode);
-            tMeter.setTotalPositivePower(MapUtils.getString(item,"totalPositivePower"));
-            tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
-            tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
-            tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
-            meterList.add(tMeter);
+            TMeter tMeter = meterContains(meterList,MapUtils.getString(item,"address"));
+
+            if (tMeter != null){
+                tMeter.setTotalPositivePower(MapUtils.getString(item,"totalPositivePower"));
+                tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
+                tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
+                tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
+                updateMeterList.add(tMeter);
+            } else {
+                tMeter = new TMeter();
+                tMeter.setName(MapUtils.getString(item,"name"));
+                tMeter.setIp(MapUtils.getString(item,"ip"));
+                tMeter.setPort(MapUtils.getInteger(item,"port"));
+                tMeter.setAddress(MapUtils.getString(item,"address"));
+                tMeter.setUpRegionId(upRegionId);
+                tMeter.setEdgeCode(sendCode);
+                tMeter.setType(MapUtils.getInteger(item,"type"));
+                tMeter.setTotalPositivePower(MapUtils.getString(item,"totalPositivePower"));
+                tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
+                tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
+                tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
+                addMeterList.add(tMeter);
+            }
+            meterLogList.add(tMeter);
         }
-        if (!meterList.isEmpty()){
-            tStdDeviceMapper.deleteAllMete(sendCode);
-            tStdDeviceMapper.batchInsertMeter(meterList);
+        if (!addMeterList.isEmpty()){
+            tStdDeviceMapper.batchInsertMeter(addMeterList);
+        }
+        if (!updateMeterList.isEmpty()){
+            updateMeterList.forEach(tMeter -> {
+                tStdDeviceMapper.updateById(tMeter);
+            });
+        }
+        if (!meterLogList.isEmpty()){
+            tStdDeviceMapper.batchInsertMeterLog(meterLogList);
         }
 
     }
@@ -91,6 +113,15 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
         for (TStdRegion region: regionList){
             if (upRegionId.equals(region.getOriginRegionId())){
                 return region.getRegionId();
+            }
+        }
+        return null;
+    }
+
+    private TMeter meterContains(List<TMeter> meterList,String address){
+        for (TMeter meter: meterList){
+            if (meter.getAddress().equals(address)){
+                return meter;
             }
         }
         return null;

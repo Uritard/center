@@ -1,10 +1,13 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.device.service.TMeterService;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -119,5 +126,33 @@ public class TMeterController {
         }
         return result;
 
+    }
+
+    @ApiOperation(value = "电表新上报上级")
+    @RequestMapping(value = "/uploadMeterInfo", method = RequestMethod.POST)
+    public void uploadMeterInfo(@RequestBody TMeter meter) {
+        Map<String, List<XMLBaseModel>> map = new HashMap<>();
+        List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String,Object>> itemList = new ArrayList<>();
+
+        xmlBaseModel.setItems(itemList);
+        xmlBaseModel.setType("meter");
+        xmlBaseModelList.add(xmlBaseModel);
+
+        map.put("list",xmlBaseModelList);
+        Map<String,Object> item = new HashMap<>();
+        item.put("name",meter.getName());
+        item.put("ip",meter.getIp());
+        item.put("port",meter.getPort());
+        item.put("address",meter.getAddress());
+        item.put("upRegionId",meter.getUpRegionId());
+        item.put("totalPositivePower",meter.getTotalPositivePower());
+        item.put("totalPositiveReactivePower",meter.getTotalPositiveReactivePower());
+        item.put("totalNegativePositivePower",meter.getTotalNegativeReactivePower());
+        item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
+        itemList.add(item);
+
+        Constant.otherServer(map, Constant.TCP_URL);
     }
 }

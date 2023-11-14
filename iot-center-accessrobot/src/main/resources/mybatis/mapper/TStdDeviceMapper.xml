@@ -267,6 +267,13 @@
     <delete id="deleteAllMete">
         delete from t_meter where edge_code = #{edgeCode}
     </delete>
+    <delete id="deleteAllMeteByAddress">
+        delete from t_meter where edge_code = #{edgeCode} and address in (
+            <foreach collection="list" item="tMeter" separator=",">
+                #{tMeter.address,jdbcType=VARCHAR}
+            </foreach>
+            )
+    </delete>
 
     <insert id="batchInsertMeter" keyColumn="id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
         insert into t_meter
@@ -297,4 +304,59 @@
         </foreach>
     </insert>
 
+    <insert id="batchInsertMeterLog" keyColumn="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_meter_log
+        (meter_id,
+         meter_name,
+         ip,
+         port,
+         address,
+         type,
+         up_region_id,
+         edge_code,
+         total_positive_power,
+         total_positive_reactive_power,
+         total_negative_positive_power,
+         create_time,
+         create_person,
+         update_time,
+         update_person,
+         is_deleted)
+        values
+        <foreach collection="list"  item="tMeter" separator=",">
+            (#{tMeter.id,jdbcType=VARCHAR},
+            #{tMeter.name,jdbcType=VARCHAR},
+            #{tMeter.ip,jdbcType=VARCHAR},
+            #{tMeter.port,jdbcType=INTEGER},
+            #{tMeter.address,jdbcType=VARCHAR},
+            #{tMeter.type,jdbcType=VARCHAR},
+            #{tMeter.upRegionId,jdbcType=BIGINT},
+            #{tMeter.edgeCode,jdbcType=VARCHAR},
+            #{tMeter.totalPositivePower,jdbcType=VARCHAR},
+            #{tMeter.totalPositiveReactivePower,jdbcType=VARCHAR},
+            #{tMeter.totalNegativePositivePower,jdbcType=VARCHAR},
+            #{tMeter.collectPowerTime,jdbcType=TIMESTAMP},
+            '0',
+            now(),
+            '0',
+            0
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="selectAllMeterByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TMeter">
+        select * from t_meter where edge_code = #{edgeCode}
+    </select>
+
+    <update id="updateById" parameterType="com.yjh.accessrobot.module.command.entity.TMeter">
+        update t_meter
+        <set>
+            <if test="totalPositivePower != null">total_positive_power = #{totalPositivePower,jdbcType=VARCHAR},</if>
+            <if test="totalPositiveReactivePower != null">total_positive_reactive_power = #{totalPositiveReactivePower,jdbcType=VARCHAR},</if>
+            <if test="totalNegativePositivePower != null">total_negative_positive_power = #{totalNegativePositivePower,jdbcType=VARCHAR},</if>
+            collect_power_time= now(),
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
 </mapper>
