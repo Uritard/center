@@ -18,13 +18,14 @@
         <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
         <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,up_region_id,name,
         ip,port,address,type,device_id,total_positive_power,
         total_positive_reactive_power,total_negative_positive_power,
-        collect_power_time,create_time
+        collect_power_time,create_time,magnification_coefficient
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -52,7 +53,8 @@
         total_positive_reactive_power,
         total_negative_positive_power,
         collect_power_time,
-        create_time
+        create_time,
+        magnification_coefficient
         from t_meter a
         <if test="list!=null and list.size() > 0" >
             where a.up_region_id in
@@ -77,7 +79,8 @@
              port,
              address,
              type,
-             device_id)
+             device_id,
+             magnification_coefficient)
         values (
                 #{upRegionId,jdbcType=BIGINT},
                 #{name,jdbcType=VARCHAR},
@@ -85,7 +88,9 @@
                 #{port,jdbcType=VARCHAR},
                 #{address,jdbcType=VARCHAR},
                 #{type,jdbcType=INTEGER},
-                #{deviceId,jdbcType=BIGINT})
+                #{deviceId,jdbcType=BIGINT},
+                #{magnificationCoefficient,jdbcType=BIGINT}
+                )
     </insert>
 
     <update id="updateByPrimaryKey" parameterType="com.yjh.platform.module.device.entity.TMeter">
@@ -110,12 +115,12 @@
 
     <select id="countPowerTotalByEdge" resultType="java.util.Map">
         SELECT
-            ROUND(SUM(a.total_positive_power),2) as allTotal,
+           ROUND(SUM(a.total_positive_power_difference_value * a.magnification_coefficient),2) as allTotal,
             b.region_name
         FROM
-            `t_meter` a
+            `t_meter_log` a
                 left join t_std_region b on a.edge_code = b.region_code
-        where b.state = 1
+        where b.state = 1 and a.create_time between #{startTime} and #{endTime}
         GROUP BY a.edge_code
     </select>
 

@@ -484,11 +484,45 @@ public class HomePageController {
     public Result countPowerTotal(@RequestParam(value ="type")Integer type) {
         Result result = new Result();
         try {
-            result.setData(homePageService.countPowerTotal(type));
+            result.setData(homePageService.countPowerTotalByDay());
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("首页查询站点列表", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "首页查询用电总量-根据区域进行统计")
+    @RequestMapping(value = "/countPowerTotalByDay", method = RequestMethod.GET)
+    public Result countPowerTotalByDay() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countPowerTotalByDay());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("首页查询站点列表", e);
+        }
+        return result;
+    }
+
+    /**
+     * 机器人信息
+     *
+     * @date
+     */
+    @ApiOperation(value = "机器人信息")
+    @RequestMapping(value = "/queryRobotInfo", method = RequestMethod.GET)
+    public Result queryRobotInfo(@RequestParam(value = "edgeCode", required = false) String edgeCode,
+                                 @RequestParam(value = "type", required = false) Integer type) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.deviceInfo(type,edgeCode));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
         }
         return result;
     }

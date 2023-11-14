@@ -777,4 +777,11 @@
                 'root' as infoType
         )
     </select>
+
+    <select id="selectAllRobotByEdgeCodeOrType" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select * from t_robot_info where robot_type is not null and is_use = 166
+        <if test="edgeCode != null and edgeCode != ''">and edge_code = #{edgeCode}</if>
+        <if test="type != null and type == 161">and robot_type = #{type}</if>
+        <if test="type != null and type != 161">and robot_type != 161</if>
+    </select>
 </mapper>

@@ -136,4 +136,8 @@ public interface TRobotInfoDao {
     Map<Long, TRobotInfo> selectAll();
 
     Integer selectEntrance(@Param(value = "robotId")Long robotId);
+
+    List<TRobotInfo> selectAllRobotByEdgeCodeOrType(@Param(value = "edgeCode")String edgeCode,
+                                                    @Param(value = "type")Integer type);
+
 }

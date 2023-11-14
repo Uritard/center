@@ -126,9 +126,18 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     log.info("采集到反向无功电能:{}", powerTotalString);
                     tMeter.setTotalNegativeReactivePower(powerTotalString);
                 }
+                //查询上一次的
+                TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
                 log.info("tMeter {}", tMeter);
                 tMeterDao.updateData(tMeter);
                 // 记录电表历史
+                Float value = 0f;
+                try {
+                    value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
+                }catch (Exception e){
+                    log.info("计算电表差值出错！",e);
+                }
+                tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
                 tMeterLogDao.insert(tMeter);
 
                 platformProxy.uploadMeterInfo(tMeter);

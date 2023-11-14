@@ -286,7 +286,8 @@
          total_positive_power,
          total_positive_reactive_power,
          total_negative_positive_power,
-         collect_power_time
+         collect_power_time,
+        magnification_coefficient
         )
         values
         <foreach collection="list"  item="tMeter" separator=",">
@@ -299,7 +300,8 @@
              #{tMeter.totalPositivePower,jdbcType=VARCHAR},
              #{tMeter.totalPositiveReactivePower,jdbcType=VARCHAR},
              #{tMeter.totalNegativePositivePower,jdbcType=VARCHAR},
-             #{tMeter.collectPowerTime,jdbcType=TIMESTAMP}
+             #{tMeter.collectPowerTime,jdbcType=TIMESTAMP},
+             #{tMeter.magnificationCoefficient,jdbcType=INTEGER}
             )
         </foreach>
     </insert>
@@ -321,7 +323,10 @@
          create_person,
          update_time,
          update_person,
-         is_deleted)
+         is_deleted,
+        total_positive_power_difference_value,
+        magnification_coefficient
+         )
         values
         <foreach collection="list"  item="tMeter" separator=",">
             (#{tMeter.id,jdbcType=VARCHAR},
@@ -339,7 +344,9 @@
             '0',
             now(),
             '0',
-            0
+            0,
+            #{tMeter.totalPositivePowerDifferenceValue,jdbcType=VARCHAR},
+            #{tMeter.magnificationCoefficient,jdbcType=INTEGER}
             )
         </foreach>
     </insert>
@@ -356,6 +363,7 @@
             <if test="totalPositiveReactivePower != null">total_positive_reactive_power = #{totalPositiveReactivePower,jdbcType=VARCHAR},</if>
             <if test="totalNegativePositivePower != null">total_negative_positive_power = #{totalNegativePositivePower,jdbcType=VARCHAR},</if>
             collect_power_time= now(),
+            <if test="magnificationCoefficient != null">magnification_coefficient = #{magnificationCoefficient},</if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
