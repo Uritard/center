@@ -550,6 +550,8 @@ public class SilentAlarmThread implements Runnable {
                 xmlItem.put("file_path", ftpsTarPath);
                 xmlItem.put("time", warnTime);
                 xmlItem.put("content", tWarnInfo.getWarnContent());
+                xmlItem.put("origin_id", tWarnInfo.getWarnId());
+                xmlItem.put("edge_code", edgeCode);
                 xmlItems.add(xmlItem);
                 xmlBaseModel.setItems(xmlItems);
                 List<XMLBaseModel> list = new ArrayList<>();

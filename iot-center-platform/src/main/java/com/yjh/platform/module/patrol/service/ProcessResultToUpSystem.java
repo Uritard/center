@@ -16,6 +16,7 @@ import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.entity.TDefectInfo;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
@@ -25,6 +26,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -185,7 +187,7 @@ public class ProcessResultToUpSystem {
                     if (StringUtils.isNotEmpty(tagPath)){
                         tagPath = "alarm/" + tagPath;
                     }
-                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif);
+                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif, edgeCode);
                 }
                 if (Constant.logUpLv3()) {
                     log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
@@ -284,7 +286,8 @@ public class ProcessResultToUpSystem {
      * @param tagPath
      * @return Map<String, String>
      */
-    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath, String isTemdif) {
+    private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem,
+                                                 String tagPath, String isTemdif, String edgeCode) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
         log.info("imagePath=={}", imagePath);
@@ -336,6 +339,8 @@ public class ProcessResultToUpSystem {
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
             xmlItem.put("defect_type", Optional.ofNullable(tWarnInfo.getWarnSubtype()).map(String::valueOf).orElse(""));
+            xmlItem.put("origin_id", tWarnInfo.getWarnId());
+            xmlItem.put("edge_code", edgeCode);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -733,6 +738,75 @@ public class ProcessResultToUpSystem {
             }
         }
         return xmlBaseModel;
+    }
+
+    /**
+     * 告警审核上报
+     * @param warnIdList
+     * @param defect
+     * @return
+     */
+    @Async
+    public void reviewAlarmToUpSystem(List<Long> warnIdList ,boolean defect){
+        if (!Constant.upSystemFlag()) {
+            return;
+        }
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String, Object>> xmlItems = new ArrayList<>();
+        String robotTaskStatusUp =SysParamConfig.getSysContent("robotTaskStatusUp");
+        if ("true".equals(robotTaskStatusUp) && CollectionUtils.isNotEmpty(warnIdList)) {
+            try {
+                if (defect) {
+                    List<TDefectInfo> tDefectInfoList = analyseDataOperateDao.selectDefectListByIds(warnIdList);
+                    for (TDefectInfo tDefectInfo : tDefectInfoList) {
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getDefectId()), tDefectInfo.getDefectName(),
+                                String.valueOf(tDefectInfo.getDefectLevel()), tDefectInfo.getDefectContent(), tDefectInfo.getDealInfo(),
+                                String.valueOf(tDefectInfo.getDealType()), tDefectInfo.getOutRange(), tDefectInfo.getDealPersonId(),
+                                DateTimeUtil.format(tDefectInfo.getDealTime()), String.valueOf(tDefectInfo.getDefectType())));
+                    }
+                } else {
+                    List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
+                    for (TWarnInfo tWarnInfo : tWarnInfoList) {
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getWarnId()), tWarnInfo.getWarnName(),
+                                String.valueOf(tWarnInfo.getWarnLevel()), tWarnInfo.getWarnContent(), tWarnInfo.getDealInfo(),
+                                String.valueOf(tWarnInfo.getDealType()), tWarnInfo.getOutRange(), tWarnInfo.getDealPersonId(),
+                                DateTimeUtil.format(tWarnInfo.getDealTime()), ""));
+                    }
+                }
+                xmlBaseModel.setItems(xmlItems);
+                xmlBaseModel.setType("711");
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>(1);
+                map.put("list", list);
+                log.info("The review warn to be reported one level up is==={}", map);
+                Constant.otherServer(map, Constant.TCP_URL);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    /**
+     * 告警审核xml整理
+     * @return
+     */
+    public Map<String, Object> getReviewAlarmXml(String warnId, String warnName, String warnLevel, String warnContent,
+                                                 String dealInfo, String dealType, String outRange, String dealPersonId,
+                                                 String dealTime, String dealModel) {
+        Map<String, Object> xmlItem = new HashMap<>(11);
+        xmlItem.put("origin_id", warnId);
+        xmlItem.put("warn_name", warnName);
+        xmlItem.put("warn_level", warnLevel);
+        xmlItem.put("warn_time", warnLevel);
+        xmlItem.put("warn_content", warnContent);
+        xmlItem.put("deal_info", dealInfo);
+        xmlItem.put("deal_type", dealType);
+        xmlItem.put("out_range", outRange);
+        xmlItem.put("deal_person_id", dealPersonId);
+        xmlItem.put("deal_time", dealTime);
+        xmlItem.put("defect_model", dealModel);
+        return xmlItem;
     }
 
     /**

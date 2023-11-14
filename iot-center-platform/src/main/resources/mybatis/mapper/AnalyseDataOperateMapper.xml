@@ -28,6 +28,8 @@
         <result column="value" jdbcType="VARCHAR" property="value" />
         <result column="out_range" jdbcType="VARCHAR" property="outRange" />
         <result column="task_id" jdbcType="VARCHAR" property="taskId"/>
+        <result column="origin_id" jdbcType="VARCHAR" property="originId"/>
+        <result column="edge_code" jdbcType="VARCHAR" property="edgeCode"/>
     </resultMap>
 
     <resultMap id="videoAnalyseResult" type="com.yjh.platform.module.patrol.entity.TVideoAnalyseResult">
@@ -185,6 +187,8 @@
         <result column="VALUE" jdbcType="VARCHAR" property="value" />
         <result column="out_range" jdbcType="VARCHAR" property="outRange" />
         <result column="link_message" jdbcType="VARCHAR" property="linkMessage" />
+        <result column="origin_id" jdbcType="VARCHAR" property="originId"/>
+        <result column="edge_code" jdbcType="VARCHAR" property="edgeCode"/>
     </resultMap>
 
 
@@ -1057,5 +1061,21 @@
             t_robot_info a
         WHERE
             a.robot_code = #{robotCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectDefectListByIds" resultType="com.yjh.platform.module.patrol.entity.TDefectInfo">
+        select * from t_defect_info WHERE defect_id IN(
+        <foreach collection="list" item="defectId" separator=",">
+            #{defectId}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectWarnListByIds" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        select * from t_warn_info WHERE warn_id IN(
+        <foreach collection="list" item="warnId" separator=",">
+            #{warnId}
+        </foreach>
+        )
     </select>
 </mapper>

@@ -93,4 +93,8 @@ public interface TWarnInfoDao {
     String selectStationNameByThis();
 
     TaskInfoBean selectAllCount();
+
+    int updateByEdgeCodeOriginIds(TWarnInfo tWarnInfo);
+
+    List<Long> selectWarnIdByTaskId(@Param(value = "taskId") String taskId);
 }

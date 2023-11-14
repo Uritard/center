@@ -148,5 +148,9 @@ public class TWarnInfo implements Serializable {
      */
     private String taskId;
 
+    private String originId;
+
+    private String edgeCode;
+
     private static final long serialVersionUID = 1L;
 }

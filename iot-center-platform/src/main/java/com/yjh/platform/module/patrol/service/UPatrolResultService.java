@@ -26,6 +26,8 @@ import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
+import com.yjh.platform.module.task.entity.TDefectInfo;
+import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
@@ -73,6 +75,8 @@ public class UPatrolResultService {
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private TDefectInfoDao tDefectInfoDao;
     @Autowired
     private TWarnInfoService tWarnInfoService;
     @Autowired
@@ -201,7 +205,7 @@ public class UPatrolResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
+    public List<TWarnInfo> manualReview(CruiseManualReview cruiseManualReview, String userId) {
         String thisPointType = "表计";
         Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
         if (Objects.nonNull(result)){
@@ -247,7 +251,7 @@ public class UPatrolResultService {
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
-        afterManualReviewInfo(afterManualReviewInfo, userId, date);
+        List<TWarnInfo> warnInfoList = afterManualReviewInfo(afterManualReviewInfo, userId, date);
 
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
@@ -267,7 +271,15 @@ public class UPatrolResultService {
                 tStdDeviceDao.update(tStdDevice);
             }
         }
-        return result1 + result2;
+        return warnInfoList;
+    }
+
+    /**
+     * 结果审核的告警统一上报
+     * @param warnIdList
+     */
+    public void reviewAlarm(List<Long> warnIdList) {
+        processResultToUpSystem.reviewAlarmToUpSystem(warnIdList, false);
     }
 
     /**
@@ -305,16 +317,16 @@ public class UPatrolResultService {
     /**
      * 对审核后的任务进行处理，判断告警
      */
-    private void afterManualReviewInfo(AfterManualReviewInfo afterManualReviewInfo, String userId, Date date) {
+    private List<TWarnInfo> afterManualReviewInfo(AfterManualReviewInfo afterManualReviewInfo, String userId, Date date) {
         String taskId = afterManualReviewInfo.getTaskId();
         Long instanceId = afterManualReviewInfo.getInstanceId();
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = uPatrolResultDao.selectDeviceMeteInfo(instanceId);
         log.info("tStdDeviceMete===" + tStdDevicemete);
-
+        List<TWarnInfo> tWarnInfoList = new ArrayList<>();
         // 该巡视点无了,找不到对应
         if (Objects.isNull(tStdDevicemete)){
-            return;
+            return tWarnInfoList;
         }
         String personCheck = afterManualReviewInfo.getModifyNum().split(",")[0];
         String checkDesc = afterManualReviewInfo.getPersonCheck();
@@ -402,12 +414,11 @@ public class UPatrolResultService {
             //声纹测点 声纹告警规则
             map = voiceIsWarn(afterManualReviewInfo.getModifyNum(),tStdDevicemete.getDBValue(),
                     tStdDevicemete.getFValue(),tStdDevicemete.getMeteName());
-            reviewVoiceWarn(afterManualReviewInfo,map,userId,date,warnInfo,taskId,instanceId);
+            return  reviewVoiceWarn(afterManualReviewInfo,map,userId,date,warnInfo,taskId,instanceId);
         }else {
             if (afterManualReviewInfo.getIsWarn() >= 1) {
-                List<TWarnInfo> warnIdList =
-                        uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
-                for (TWarnInfo tWarnInfo : warnIdList) {
+                tWarnInfoList = uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+                for (TWarnInfo tWarnInfo : tWarnInfoList) {
                     if ((tWarnInfo.getAlarmOwner() != null && 1 == tWarnInfo.getAlarmOwner())) {
                         log.info("下级的不做处理" + tWarnInfo);
                         continue;
@@ -441,13 +452,14 @@ public class UPatrolResultService {
                     tWarnInfoService.insert(warnInfo);
                     sendWebSocket(warnInfo.getWarnId());
                     uPatrolResultDao.updateIsWarn(taskId, instanceId);
+                    tWarnInfoList.add(warnInfo);
                 }
             }
+            return tWarnInfoList;
         }
-
     }
 
-    public void reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userId, Date date,
+    public List<TWarnInfo> reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userId, Date date,
                                 TWarnInfo warnInfo,String taskId,Long instanceId){
         List<TWarnInfo> warnIdList =
                 uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
@@ -483,6 +495,7 @@ public class UPatrolResultService {
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
             uPatrolResultDao.updateIsWarn(taskId, instanceId);
+            warnIdList.add(warnInfo);
         }
         if (ValueUtil.toBoolean(map.get("isFWarn"),false)){
             warnInfo.setWarnId(null);
@@ -496,7 +509,9 @@ public class UPatrolResultService {
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
             uPatrolResultDao.updateIsWarn(taskId, instanceId);
+            warnIdList.add(warnInfo);
         }
+        return warnIdList;
     }
 
     public Map<String, Object> voiceIsWarn(String personCheck,int warnDbVal, int warnfVal,String meteName){
@@ -551,6 +566,8 @@ public class UPatrolResultService {
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(reviewList, true);
 
+        List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
+        processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是==" + reportFilePath);
@@ -582,6 +599,36 @@ public class UPatrolResultService {
         // 校验父级是否需要审核并生成巡视报告
         int result = patrolTaskReview(resultList.get(0).getTaskId());
         return result + resultList.size();
+    }
+
+    /**
+     * 下级系统告警审核信息同步
+     */
+    public int manualReviewWarn(List<TWarnInfo> tWarnInfoList) {
+        int result = 0;
+        for (TWarnInfo tWarnInfo : tWarnInfoList) {
+            if (tWarnInfo.getDefectModel() == 0) {
+                tWarnInfo.setDefectModel(Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他")));
+                tWarnInfo.setConfMode(275);
+                result = tWarnInfoDao.updateByEdgeCodeOriginIds(tWarnInfo);
+            } else {
+                TDefectInfo tDefectInfo = new TDefectInfo();
+                tDefectInfo.setConfMode(275);
+                tDefectInfo.setOriginId(tWarnInfo.getOriginId());
+                tDefectInfo.setDefectName(tWarnInfo.getWarnName());
+                tDefectInfo.setDefectLevel(tWarnInfo.getWarnLevel());
+                tDefectInfo.setDefectContent(tWarnInfo.getWarnContent());
+                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
+                tDefectInfo.setDealType(tWarnInfo.getDealType());
+                tDefectInfo.setOutRange(tWarnInfo.getOutRange());
+                tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
+                tDefectInfo.setDealTime(tWarnInfo.getDealTime());
+                tDefectInfo.setDefectType(tWarnInfo.getDefectModel());
+                tDefectInfo.setEdgeCode(tWarnInfo.getEdgeCode());
+                result = tDefectInfoDao.updateByEdgeCodeOriginIds(tDefectInfo);
+            }
+        }
+        return result + tWarnInfoList.size();
     }
 
     public Result sendPostRequest(String url, Map<String, Object> params) {

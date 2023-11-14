@@ -66,4 +66,6 @@ public interface TDefectInfoDao {
     List<WarnInforForHomePages> selectDeviceWarnInfo(@Param(value = "state")String state);
 
     TWarnInfoDetail selectRobotWarn(@Param(value = "warnId") Long warnId);
+
+    int updateByEdgeCodeOriginIds(TDefectInfo tDefectInfo);
 }

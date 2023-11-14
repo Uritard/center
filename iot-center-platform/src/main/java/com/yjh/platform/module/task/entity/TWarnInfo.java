@@ -154,4 +154,8 @@ public class TWarnInfo implements Serializable {
 
     @ApiModelProperty(value = "告警是用谁的告警规则产生的 1-是下级产生的")
     private Integer alarmOwner;
+
+    private String originId;
+
+    private String edgeCode;
 }
