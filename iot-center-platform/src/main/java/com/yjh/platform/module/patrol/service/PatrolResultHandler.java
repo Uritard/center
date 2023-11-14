@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -49,13 +51,15 @@ public class PatrolResultHandler {
     private final TVoiceDeviceService tVoiceDeviceService;
     private final TCruisePointInstanceDao tCruisePointInstanceDao;
     private final AlarmShieldService alarmShieldService;
+    private final ApplicationEventPublisher eventPublisher;
 
     private static final String METER = "meter";
 
     private static final Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
-        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao,AlarmShieldService alarmShieldServic) {
+        UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao,AlarmShieldService alarmShieldServic,
+                               ApplicationEventPublisher eventPublisher) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -64,6 +68,7 @@ public class PatrolResultHandler {
         this.tVoiceDeviceService = tVoiceDeviceService;
         this.tCruisePointInstanceDao = tCruisePointInstanceDao;
         this.alarmShieldService = alarmShieldServic;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -251,7 +256,8 @@ public class PatrolResultHandler {
                     continue;
                 }
                 InspectionResultThread cruiseResultDealThread =
-                    new InspectionResultThread(robotPatrolTaskResult, infoMap, instance, redisTemplate, true);
+                    new InspectionResultThread(robotPatrolTaskResult, infoMap, instance,
+                            redisTemplate, true,eventPublisher);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
             } catch (Exception e) {

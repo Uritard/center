@@ -54,7 +54,8 @@ public class InspectionResultThread implements Runnable{
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
-                                  RedisTemplate redisTemplate, boolean changeTaskStatus){
+                                  RedisTemplate redisTemplate, boolean changeTaskStatus,
+                                  ApplicationEventPublisher eventPublisher){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
         this.infoMap = infoMap;
         this.insInfo = insInfo;
@@ -63,7 +64,7 @@ public class InspectionResultThread implements Runnable{
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
         this.resultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
-        this.eventPublisher = StaticContextAccessor.getBean(ApplicationEventPublisher.class);
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
