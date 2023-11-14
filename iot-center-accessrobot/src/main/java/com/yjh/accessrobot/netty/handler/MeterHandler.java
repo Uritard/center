@@ -73,10 +73,13 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
             TMeter tMeter = meterContains(meterList,MapUtils.getString(item,"address"));
 
             if (tMeter != null){
+                //计算差值
                 tMeter.setTotalPositivePower(MapUtils.getString(item,"totalPositivePower"));
                 tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
+                tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
+                tMeter.setMagnificationCoefficient(MapUtils.getString(item,"magnificationCoefficient"));
                 updateMeterList.add(tMeter);
             } else {
                 tMeter = new TMeter();
@@ -91,6 +94,7 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
+                tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
                 addMeterList.add(tMeter);
             }
             meterLogList.add(tMeter);

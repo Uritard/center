@@ -2676,6 +2676,7 @@ CREATE TABLE `t_meter` (
 `total_negative_positive_power` varchar(256) DEFAULT NULL COMMENT '反向无功总电量',
 `collect_power_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '电量采集时间',
 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`magnification_coefficient` int DEFAULT '1' COMMENT '电表耗电量计算系数',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='电表信息表';
 
@@ -2698,6 +2699,8 @@ CREATE TABLE `t_meter_log` (
 `update_time` datetime NOT NULL COMMENT '更新时间',
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
 `is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
+`total_positive_power_difference_value` varchar(256) DEFAULT '0' COMMENT '正向有功总电量与上一次的差值',
+`magnification_coefficient` int DEFAULT '1' COMMENT '电表耗电量计算系数',
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电表历史记录';
 

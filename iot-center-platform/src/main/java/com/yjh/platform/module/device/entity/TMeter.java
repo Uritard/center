@@ -125,4 +125,13 @@ public class TMeter implements Serializable {
      * 所属区域编码
      */
     private String edgeCode;
+    /**
+     * 电表耗电量计算系数
+     */
+    private String magnificationCoefficient;
+    /**
+     * 正向有功总电量与上一次的差值
+     */
+    private String totalPositivePowerDifferenceValue;
+
 }

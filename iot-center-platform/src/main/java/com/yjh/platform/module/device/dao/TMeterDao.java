@@ -1,8 +1,10 @@
 package com.yjh.platform.module.device.dao;
 
 import com.yjh.platform.module.device.entity.TMeter;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,8 @@ public interface TMeterDao {
     int updateByPrimaryKey(TMeter record);
 
     List<Map<String,Float>> countPowerTotalByRegion();
-    List<Map<String,Float>> countPowerTotalByEdge();
+    List<Map<String,String>> countPowerTotalByEdge(@Param(value = "startTime")LocalDateTime startTime,
+                                                  @Param(value = "endTime")LocalDateTime endTime);
 
     List<TMeter> selectMeterByDeviceId();
 

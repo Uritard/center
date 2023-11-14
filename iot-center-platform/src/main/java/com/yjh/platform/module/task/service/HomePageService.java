@@ -9,15 +9,13 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
-import com.yjh.platform.module.device.entity.DeviceCountBean;
-import com.yjh.platform.module.device.entity.StationVoltageData;
-import com.yjh.platform.module.device.entity.TStdRegion;
-import com.yjh.platform.module.device.entity.TaskInfoBean;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
@@ -53,6 +51,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
@@ -601,13 +601,74 @@ public class HomePageService {
         return list;
     }
 
-    public List<Map<String,Float>> countPowerTotal(Integer type){
-        //type 1-根据区域进行统计 2-根据节点进行统计
-        if (1 == type){
-            return tMeterDao.countPowerTotalByRegion();
-        } else {
-            return tMeterDao.countPowerTotalByEdge();
+//    public List<Map<String,Float>> countPowerTotal(Integer type){
+//        //type 1-根据区域进行统计 2-根据节点进行统计
+////        if (1 == type){
+////            return tMeterDao.countPowerTotalByRegion();
+//////        } else {
+//////            return tMeterDao.countPowerTotalByEdge();
+//////        }
+//
+//    }
+
+    public Map<String,List<Map<String,String>>> countPowerTotalByDay(){
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime todayTime = LocalDateTime.now();
+
+        // 获取昨天的日期
+        LocalDate yesterday = today.minusDays(1);
+
+        // 昨天的开始时间，即00:00:00
+        LocalDateTime yesterdayStart = LocalDateTime.of(yesterday, LocalTime.MIN);
+
+        // 昨天的结束时间，即23:59:59.999999999
+        LocalDateTime yesterdayEnd = LocalDateTime.of(yesterday, LocalTime.MAX);
+
+        List<Map<String,String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart,yesterdayEnd);
+
+        List<Map<String,String>> todayList = tMeterDao.countPowerTotalByEdge(yesterdayEnd,todayTime);
+        Map<String,List<Map<String,String>>> reMap = new HashMap<>(2);
+        reMap.put("昨天",yesterdayList);
+        reMap.put("今天",todayList);
+
+        return  reMap;
+    }
+
+    public List<HomeDeviceInfo> deviceInfo(Integer type,String edgeCode){
+        List<TRobotInfo> robotInfoList = tRobotInfoDao.selectAllRobotByEdgeCodeOrType(edgeCode,type);
+        List<HomeDeviceInfo> homeDeviceInfoList = new ArrayList<>();
+        for (TRobotInfo robotInfo : robotInfoList) {
+            HomeDeviceInfo homeDeviceInfo = new HomeDeviceInfo();
+            homeDeviceInfo.setRobotName(robotInfo.getRobotName());
+            //<41>: = 运行状态 <1>: = 空闲状态 <2>: = 巡视状态 <3>: = 充电状态 <4>: = 检修状态
+            Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotInfo.getRobotCode() + ":41");
+            String robotState = "未知";
+            if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
+                String value = String.valueOf(mapForRobotState.get("value"));
+                switch (value) {
+                    case "1":
+                        robotState = "空闲状态";
+                        break;
+                    case "2":
+                        robotState = "巡视状态";
+                        break;
+                    case "3":
+                        robotState = "充电状态";
+                        break;
+                    case "4":
+                        robotState = "检修状态";
+                        break;
+                    default:
+                        robotState = "未知";
+                        break;
+                }
+            }
+            homeDeviceInfo.setState(robotState);
+
+            homeDeviceInfoList.add(homeDeviceInfo);
         }
 
+        return homeDeviceInfoList;
     }
 }

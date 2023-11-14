@@ -68,6 +68,13 @@ public class MeterInfoHandler {
         for (TMeter meter : meterList) {
             Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + meter.getDeviceId());
             if (meterInfo.size() == 3) {
+                Float value = 0F;
+                try {
+                    value = Float.parseFloat(meterInfo.get("totalPositivePower")) - Float.parseFloat(meter.getTotalPositivePower());
+                }catch (Exception e){
+                    log.info("计算电表差值出错！",e);
+                }
+                meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
                 tMeterLogDao.insert(meter);
                 meter.setTotalPositivePower(meterInfo.get("totalPositivePower"));
                 meter.setTotalPositiveReactivePower(meterInfo.get("totalPositiveReactivePower"));
@@ -97,28 +104,34 @@ public class MeterInfoHandler {
     }
 
     private void meterInfoUpload(TMeter meter){
-        Map<String, List<XMLBaseModel>> map = new HashMap<>();
-        List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
-        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-        List<Map<String,Object>> itemList = new ArrayList<>();
+        try {
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> itemList = new ArrayList<>();
 
-        xmlBaseModel.setItems(itemList);
-        xmlBaseModel.setType("meter");
-        xmlBaseModelList.add(xmlBaseModel);
+            xmlBaseModel.setItems(itemList);
+            xmlBaseModel.setType("meter");
+            xmlBaseModelList.add(xmlBaseModel);
 
-        map.put("list",xmlBaseModelList);
-        Map<String,Object> item = new HashMap<>();
-        item.put("name",meter.getName());
-        item.put("ip",meter.getIp());
-        item.put("port",meter.getPort());
-        item.put("address",meter.getAddress());
-        item.put("upRegionId",meter.getUpRegionId());
-        item.put("totalPositivePower",meter.getTotalPositivePower());
-        item.put("totalPositiveReactivePower",meter.getTotalPositiveReactivePower());
-        item.put("totalNegativePositivePower",meter.getTotalNegativePositivePower());
-        item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
-        itemList.add(item);
+            map.put("list", xmlBaseModelList);
+            Map<String, Object> item = new HashMap<>();
+            item.put("name", meter.getName());
+            item.put("ip", meter.getIp());
+            item.put("port", meter.getPort());
+            item.put("address", meter.getAddress());
+            item.put("upRegionId", meter.getUpRegionId());
+            item.put("totalPositivePower", meter.getTotalPositivePower());
+            item.put("totalPositiveReactivePower", meter.getTotalPositiveReactivePower());
+            item.put("totalNegativePositivePower", meter.getTotalNegativePositivePower());
+            item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
+            item.put("totalPositivePowerDifferenceValue", meter.getTotalPositivePowerDifferenceValue());
+            item.put("magnificationCoefficient", meter.getMagnificationCoefficient());
+            itemList.add(item);
 
-        Constant.otherServer(map, Constant.TCP_URL);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.info("上报电表数出错！",e);
+        }
     }
 }

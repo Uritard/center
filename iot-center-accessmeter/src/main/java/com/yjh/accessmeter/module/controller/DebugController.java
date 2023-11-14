@@ -48,6 +48,7 @@ public class DebugController {
             tMeter.setTotalPositivePower(totalPositivePower);
             tMeter.setTotalPositiveReactivePower(totalPositiveReactivePower);
             tMeter.setTotalNegativeReactivePower(totalNegativeReactivePower);
+            tMeter.setTotalPositivePowerDifferenceValue("120");
             platformProxy.uploadMeterInfo(tMeter);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
