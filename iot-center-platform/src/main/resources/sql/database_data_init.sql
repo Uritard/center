@@ -110,7 +110,7 @@ INSERT INTO `sys_menu` VALUES ('42', '可靠性指标', '0901', '41', '', '', '1
 INSERT INTO `sys_menu` VALUES ('45', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('46', '声纹管理', '0106', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('47', '电表监控', '0210', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
-INSERT INTO `sys_menu` VALUES ('48', '告警管理', '0107', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', NULL);
+INSERT INTO `sys_menu` VALUES ('48', '告警管理', '0107', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -229,6 +229,7 @@ INSERT INTO `t_algorithm_info` VALUES ('1000055', '汇控柜凝露', 'hkgnl', ''
 INSERT INTO `t_algorithm_info` VALUES ('1000056', '膨胀器冲顶', 'pzqcd', '', '', '398', '0', '687', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
+INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '389', '0', '839', '132');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------
@@ -751,6 +752,7 @@ INSERT INTO `t_dict_business` VALUES ('300770', '835', 'operation_type', '轨交
 INSERT INTO `t_dict_business` VALUES ('300771', '836', 'operation_type', '轨交_接地刀操作开关', '48', '操作类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300772', '837', 'operation_type', '轨交_控制开关', '49', '操作类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300773', '838', 'abnormal_type', '放电', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business` VALUES ('300774', '839', 'defect_model', '人员闯入', '0', '缺陷类型', '45');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
