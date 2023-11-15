@@ -60,7 +60,6 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
 
 
         String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
-        String edgeCode = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content");
         // 处理数据
         List<RobotPatrolTaskAlarm> alarmList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
@@ -109,6 +108,8 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
             robotPatrolTaskAlarm.setDefectType(String.valueOf(item.get("defect_type")));
             robotPatrolTaskAlarm.setDeviceIdAll((String)item.get("device_id_all"));
             robotPatrolTaskAlarm.setPatroldeviceAll((String)item.get("patroldevice_all"));
+            robotPatrolTaskAlarm.setOriginId(String.valueOf(item.get("origin_id")));
+            robotPatrolTaskAlarm.setEdgeCode(robotCode);
             alarmList.add(robotPatrolTaskAlarm);
         }
 

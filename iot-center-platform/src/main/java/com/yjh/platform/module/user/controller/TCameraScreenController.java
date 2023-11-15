@@ -240,11 +240,12 @@ public class TCameraScreenController {
     public Result selectCameraTreeWithRobotByName(@RequestParam(value = "name",required = false) String name,
                                   @RequestParam(value = "flag",required = false) Integer flag,
                                   @RequestParam(value = "cameraType",required = false) Integer cameraType,
+                                  @RequestParam(value = "useType",required = false) Integer useType,
                                             HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId=Long.valueOf(request.getHeader("userId"));
-            result.setData(tCameraScreenService.selectCameraTreeWithRobotByName(name,flag, null,userId, cameraType));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobotByName(name,flag, null,userId, cameraType, useType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

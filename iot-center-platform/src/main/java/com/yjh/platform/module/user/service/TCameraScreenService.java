@@ -644,11 +644,12 @@ public class TCameraScreenService{
         });
         return assembleTrees(areaInfoDetails);
     }
-    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag, Long userId, Integer cameraType){
-        if (StringUtils.isEmpty(cameraName)){
-            List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
-            return assembleTrees(areaTree);
-        }
+    public List<AreaInfoDetail> selectCameraTreeWithRobotByName(String cameraName, Integer flag, String robotFlag,
+                                                                Long userId, Integer cameraType, Integer useType){
+//        if (StringUtils.isEmpty(cameraName)){
+//            List<AreaInfoDetail> areaTree = tCameraInfoDao.selectCameraTreeRegion();
+//            return assembleTrees(areaTree);
+//        }
 
         SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
         if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
@@ -676,7 +677,7 @@ public class TCameraScreenService{
             map.putAll(recordIdMap);
         }
 
-        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId, cameraType);
+        List<TCameraInfo> cameraList = tCameraInfoDao.selectCameraByName(cameraName,robotFlag,userId, cameraType, useType);
         if (!CollectionUtils.isEmpty(cameraList)){
 
             List<TCameraInfo> finalCameraList = new ArrayList<>();

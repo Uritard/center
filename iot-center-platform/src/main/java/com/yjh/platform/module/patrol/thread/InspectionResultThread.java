@@ -55,7 +55,7 @@ public class InspectionResultThread implements Runnable{
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
                                   RedisTemplate redisTemplate, boolean changeTaskStatus,
-                                  ApplicationEventPublisher eventPublisher){
+                                  ApplicationEventPublisher eventPublisher, PatrolResultHandler resultHandler){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
         this.infoMap = infoMap;
         this.insInfo = insInfo;
@@ -63,7 +63,7 @@ public class InspectionResultThread implements Runnable{
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
-        this.resultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
+        this.resultHandler = resultHandler;
         this.eventPublisher = eventPublisher;
     }
 
@@ -108,6 +108,8 @@ public class InspectionResultThread implements Runnable{
             }
             // 巡视结果、异常原因、执行状态处理
             setCruiseResult(tCruiseTaskResultMap, instanceId);
+
+            log.info("tCruiseTaskResultMap {}", tCruiseTaskResultMap);
 
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
@@ -232,7 +234,7 @@ public class InspectionResultThread implements Runnable{
             HashMap<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
             map.put("deviceName", MapUtils.getString(patrolDevice, "deviceName"));
             map.put("cruiseDeviceId", MapUtils.getString(patrolDevice, "patroldevice_code"));
-            map.put("cruiseDeviceName", MapUtils.getString(patrolDevice, "patroldevice_name"));
+            map.put("cruiseDeviceName", MapUtils.getString(patrolDevice, "patroldevice_name", ""));
             map.put("deviceMeteId", MapUtils.getString(patrolDevice, "deviceMeteId"));
             map.put("deviceMeteName", MapUtils.getString(patrolDevice, "deviceMeteName"));
             map.put("customId", MapUtils.getString(patrolDevice, "customId"));

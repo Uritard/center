@@ -497,6 +497,9 @@
         <if test="cameraType != null">
             and d.camera_type = #{cameraType}
         </if>
+        <if test="useType != null">
+            and d.use_type = #{useType}
+        </if>
         <if test="robotFlag != null">
             UNION ALL (
             SELECT  e.up_region_id,

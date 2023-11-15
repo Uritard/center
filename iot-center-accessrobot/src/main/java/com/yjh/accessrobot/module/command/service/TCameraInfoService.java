@@ -51,12 +51,12 @@ public class TCameraInfoService {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
         Map<String, String> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, tStdRegion -> tStdRegion.getRegionId().toString()));
         List<TCameraInfo> tCameraInfoList = cameraModelList.stream().peek(cameraModel -> {
+            cameraModel.setOriginId(String.valueOf(cameraModel.getCameraId()));
+            cameraModel.setEdgeCode(edgeNode);
             cameraModel.setCameraId(null);
             cameraModel.setCameraName(cameraModel.getPatroldeviceName());
             cameraModel.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId().toString()));
             cameraModel.setUpRegionId(stdRegionMap.get(cameraModel.getUpRegionId()));
-            cameraModel.setEdgeCode(edgeNode);
-            cameraModel.setOriginId(String.valueOf(cameraModel.getCameraId()));
             if (StringUtils.length(cameraModel.getPatroldeviceCode()) >= 16) {
                 cameraModel.setCameraChannelId(cameraModel.getPatroldeviceCode());
             }

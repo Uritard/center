@@ -89,4 +89,8 @@ public class RobotPatrolTaskAlarm implements Serializable {
      */
     @ApiModelProperty(value = "非同源告警所有巡视名称")
     private String patroldeviceAll;
+
+    private String originId;
+
+    private String edgeCode;
 }
