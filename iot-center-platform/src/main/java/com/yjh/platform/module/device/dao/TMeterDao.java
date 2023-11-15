@@ -32,6 +32,7 @@ public interface TMeterDao {
     List<Map<String,Float>> countPowerTotalByRegion();
     List<Map<String,String>> countPowerTotalByEdge(@Param(value = "startTime")LocalDateTime startTime,
                                                   @Param(value = "endTime")LocalDateTime endTime);
+    String countPowerTotalAll();
 
     List<TMeter> selectMeterByDeviceId();
 

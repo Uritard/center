@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -611,28 +612,64 @@ public class HomePageService {
 //
 //    }
 
-    public Map<String,List<Map<String,String>>> countPowerTotalByDay(){
+    public Map<String,Object> countPowerTotalByDay(){
         LocalDate today = LocalDate.now();
-
-        LocalDateTime todayTime = LocalDateTime.now();
-
         // 获取昨天的日期
         LocalDate yesterday = today.minusDays(1);
-
         // 昨天的开始时间，即00:00:00
         LocalDateTime yesterdayStart = LocalDateTime.of(yesterday, LocalTime.MIN);
-
         // 昨天的结束时间，即23:59:59.999999999
         LocalDateTime yesterdayEnd = LocalDateTime.of(yesterday, LocalTime.MAX);
 
-        List<Map<String,String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart,yesterdayEnd);
+        LocalDate beforeYesterday = today.minusDays(2);
+        // 昨天的开始时间，即00:00:00
+        LocalDateTime beforeYesterdayStart = LocalDateTime.of(beforeYesterday, LocalTime.MIN);
+        // 昨天的结束时间，即23:59:59.999999999
+        LocalDateTime beforeYesterdayEnd = LocalDateTime.of(beforeYesterday, LocalTime.MAX);
 
-        List<Map<String,String>> todayList = tMeterDao.countPowerTotalByEdge(yesterdayEnd,todayTime);
-        Map<String,List<Map<String,String>>> reMap = new HashMap<>(2);
-        reMap.put("昨天",yesterdayList);
-        reMap.put("今天",todayList);
+        List<Map<String,String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart,yesterdayEnd);
+        List<Map<String,String>> beforeYesterdayList = tMeterDao.countPowerTotalByEdge(beforeYesterdayStart,beforeYesterdayEnd);
+
+        Map<String,Object> reMap = new HashMap<>(4);
+        dealPowerInfo(yesterdayList,beforeYesterdayList,reMap);
+
+        reMap.put("yesterdayList",yesterdayList);
 
         return  reMap;
+    }
+
+    private void dealPowerInfo(List<Map<String,String>> yesterday,
+                                 List<Map<String,String>> beforeYesterdayList,
+                                 Map<String,Object> reMap){
+        //1.计算总量
+        Double yesterdayAll = 0d;
+        for (Map<String,String> item : yesterday){
+            yesterdayAll = yesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
+        }
+        reMap.put("yesterdayAllTotal",yesterdayAll);
+        Double beforeYesterdayAll = 0d;
+        for (Map<String,String> item : beforeYesterdayList){
+            beforeYesterdayAll = beforeYesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
+        }
+        reMap.put("beforeYesterdayAll",beforeYesterdayAll);
+        //2.计算百分比
+        for (Map<String,String> item : yesterday){
+            Double value = ValueUtil.toDouble(item.get("allTotal"),0d);
+            double percentage = value * 100 / yesterdayAll;
+            item.put("percentage",String.valueOf(Math.round(percentage)));
+            item.put("yesterdayTotal",item.get("allTotal"));
+            String beforeYesterdayTotal = "0";
+            item.put("beforeYesterdayTotal",beforeYesterdayTotal);
+            for (Map<String,String> beforeItem : beforeYesterdayList){
+                if (beforeItem.containsValue(item.get("regionName"))){
+                    item.put("beforeYesterdayTotal",beforeItem.get("allTotal"));
+                    Double beforeValue = ValueUtil.toDouble(item.get("allTotal"),0d);
+                    double beforeYesterdayPercentage = beforeValue * 100 / beforeYesterdayAll;
+                    item.put("beforeYesterdayPercentage",String.valueOf(Math.round(beforeYesterdayPercentage)));
+                    break;
+                }
+            }
+        }
     }
 
     public List<HomeDeviceInfo> deviceInfo(Integer type,String edgeCode){
