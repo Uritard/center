@@ -1311,6 +1311,8 @@ CREATE TABLE `t_defect_info` (
   `VALUE` varchar(100) DEFAULT '',
   `out_range` varchar(100) DEFAULT '',
   `link_message` varchar(512) DEFAULT '' COMMENT '联动信息',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   PRIMARY KEY (`defect_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='缺陷信息表';
 
@@ -2274,6 +2276,8 @@ CREATE TABLE `t_warn_info` (
   `out_range` varchar(100) DEFAULT '',
   `task_id` varchar(512) DEFAULT '' COMMENT '任务ID',
   `alarm_owner` int(11) DEFAULT NULL COMMENT '告警是用谁的告警规则产生的',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
 

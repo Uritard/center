@@ -257,7 +257,7 @@ public class PatrolResultHandler {
                 }
                 InspectionResultThread cruiseResultDealThread =
                     new InspectionResultThread(robotPatrolTaskResult, infoMap, instance,
-                            redisTemplate, true,eventPublisher);
+                            redisTemplate, true,eventPublisher, this);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
             } catch (Exception e) {

@@ -164,7 +164,8 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
             tDefectInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
             tDefectInfo.setDefectLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
-
+            tDefectInfo.setOriginId(taskAlarm.getOriginId());
+            tDefectInfo.setEdgeCode(taskAlarm.getEdgeCode());
         }catch (Exception e){
             log.error("组装缺陷信息异常：", e);
         }
@@ -201,7 +202,8 @@ public class RobotInspectionWarnThread implements Runnable{
                 warnInfo.setWarnType(analyseDataOperateService.selectDictCodeByUpDict("point_alarm_type", alarmType));
             }
             warnInfo.setWarnContent(taskAlarm.getContent());
-
+            warnInfo.setOriginId(taskAlarm.getOriginId());
+            warnInfo.setEdgeCode(taskAlarm.getEdgeCode());
             Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
             warnInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
             warnInfo.setWarnLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
