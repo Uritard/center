@@ -103,6 +103,21 @@ public class HomePageController {
         return result;
     }
 
+    @ApiOperation(value = "异常和告警级别数据")
+    @RequestMapping(value = "/countAllByAlarmLevelOnMonth", method = RequestMethod.GET)
+    public Result countAllByAlarmLevelOnMonth(@RequestParam(value = "type", defaultValue = "2") Integer type) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countAllByAlarmLevelOnMonth(type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警级别数据错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "告警内容数据")
     @RequestMapping(value = "/warnInfo", method = RequestMethod.GET)
     public Result warnInfo(@RequestParam(value = "alarmLevel", required = false) Integer alarmLevel) {

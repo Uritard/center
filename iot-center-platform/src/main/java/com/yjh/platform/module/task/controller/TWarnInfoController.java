@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
-//import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -372,12 +371,28 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "统计近一月的所有告警和缺陷个数-折线图")
-    @GetMapping(value = "/countWarnAndDefectOnMonth2")
+    @GetMapping(value = "/countWarnAndDefectOnMonthByStation")
     @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警和缺陷",logType = 1,authority = "1235")
-    public Result countWarnAndDefectOnMonth2(){
+    public Result countWarnAndDefectOnMonthByStation(@RequestParam(value = "regionId", required = false) Long regionId,
+        @RequestParam(value = "type", defaultValue = "2") Integer type){
         Result result = new Result();
         try {
-            result.setData(tWarnInfoService.countWarnAndDefectOnMonth2());
+            result.setData(tWarnInfoService.countWarnAndDefectOnMonthByStation(regionId, type));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "按站所统计近一月的所有告警和缺陷个数")
+    @GetMapping(value = "/countByStationOnMonth")
+    @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警和缺陷",logType = 1,authority = "1235")
+    public Result countByStationOnMonth(@RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
+        @RequestParam(value = "type", defaultValue = "2") Integer type){
+        Result result = new Result();
+        try {
+            result.setData(tWarnInfoService.countByStationOnMonth(alarmLevel, type));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("统计告警数据失败描述：", e);

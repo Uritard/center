@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
@@ -12,6 +13,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -20,6 +22,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +64,10 @@ public class TWarnInfoService{
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private TStdRegionDao tStdRegionDao;
-
+    @Autowired
+    private TStdRegionService stdRegionService;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
-
-    private DateTimeUtil dateTimeUtil;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TWarnInfo tWarnInfo) {
@@ -217,10 +219,10 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfoDetail> countByDeviceType(){
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        List<String> monthDates = DateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        Date startingTime = DateTimeUtil.parse(firstTime1);
+        String endTime = DateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
@@ -230,10 +232,10 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfoDetail> countAlarmByDeviceType(){
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        List<String> monthDates = DateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        Date startingTime = DateTimeUtil.parse(firstTime1);
+        String endTime = DateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
@@ -243,9 +245,9 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> countWarnAndDefectOnMonth() {
-        List<WarnStatistical> WarnList = tWarnInfoDao.countWarnAndDefectOnMonth1();//近一月告警
+        List<WarnStatistical> WarnList = tWarnInfoDao.countWarnAndDefectOnMonth1(null, 31);//近一月告警
         log.info("WarnList==="+WarnList);
-        List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2();//近一月缺陷
+        List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2(null, 31);//近一月缺陷
         log.info("defectList==="+defectList);
         List<WarnStatistical> finalLst = new ArrayList<>();
         for (WarnStatistical ws : WarnList){
@@ -262,24 +264,58 @@ public class TWarnInfoService{
         return finalLst;
     }
 
-    public String[][] countWarnAndDefectOnMonth2() {
+    /**
+     * 根据区域和类型查询告警信息
+     * @param regionId 区域ID
+     * @param type 1-周 2-月 3-半年 4-年
+     */
+    public String[][] countWarnAndDefectOnMonthByStation(Long regionId, Integer type) {
+        List<Long> deviceIdList = null;
+        if (regionId != null && regionId > 0) {
+            List<Long> regionIdList = stdRegionService.selectDownId(regionId);
+            if (regionIdList != null && !regionIdList.isEmpty()) {
+                deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            }
+        }
         // 近一月告警
-        List<WarnStatistical> warnList = tWarnInfoDao.countWarnAndDefectOnMonth1();
-        log.info("WarnList==={}", warnList);
-        // 近一月缺陷
-        List<WarnStatistical> defectList = tWarnInfoDao.countWarnAndDefectOnMonth2();
-        log.info("defectList==={}", defectList);
+        List<WarnStatistical> warnList;
+        List<WarnStatistical> defectList;
+        if (type < 3) {
+            Integer nearDays = nearDays(type);
+            warnList = tWarnInfoDao.countWarnAndDefectOnMonth1(deviceIdList, nearDays);
+            if (Constant.logUpLv2()) {
+                log.info("WarnList==={}", warnList);
+            }
+            // 近一月缺陷
+            defectList = tWarnInfoDao.countWarnAndDefectOnMonth2(deviceIdList, nearDays);
+            if (Constant.logUpLv2()) {
+                log.info("defectList==={}", defectList);
+            }
+        } else {
+            Integer nearMonths = type == 3 ? 6 : 12;
+            Date time = DateUtil.offsetMonth(new Date(), -nearMonths);
+            Date dateStart = DateUtil.beginOfMonth(time);
+            // 近一年告警
+            warnList = tWarnInfoDao.countWarnOnYear(deviceIdList, nearMonths, dateStart);
+            // 近一年缺陷
+            defectList = tWarnInfoDao.countDefectOnYear(deviceIdList, nearMonths, dateStart);
+            if (Constant.logUpLv2()) {
+                String dateStr = DateUtil.formatDateTime(dateStart);
+                log.info("dateStart:{}  WarnList==={}", dateStr, warnList);
+                log.info("dateStart:{}  defectList==={}", dateStr, defectList);
+            }
+        }
         int size = Math.min(warnList.size(), defectList.size());
 
-        String[][] dataSet = new String[3][size +1];
+        String[][] dataSet = new String[3][size + 1];
         String[] products = dataSet[0];
         String[] warns = dataSet[1];
         String[] defects = dataSet[2];
         products[0] = "product";
         warns[0] = "告警";
         defects[0] = "缺陷";
-        for (int i = 0; i<size; i++){
-            int idx = i+1;
+        for (int i = 0; i < size; i++) {
+            int idx = i + 1;
             products[idx] = Optional.ofNullable(warnList.get(i)).map(WarnStatistical::getTimeNode).orElse(null);
             warns[idx] = Optional.ofNullable(warnList.get(i)).map(WarnStatistical::getCount).orElse(0).toString();
             defects[idx] = Optional.ofNullable(defectList.get(i)).map(WarnStatistical::getCount).orElse(0).toString();
@@ -297,10 +333,10 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countWarnConfMode() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        List<String> monthDates = DateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        Date startingTime = DateTimeUtil.parse(firstTime1);
+        String endTime = DateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
@@ -319,10 +355,10 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countWarnDefectConfMode() {
-        List<String> monthDates = dateTimeUtil.getDayDateList(30);
+        List<String> monthDates = DateTimeUtil.getDayDateList(30);
         String firstTime1 = monthDates.get(0);
-        Date startingTime = dateTimeUtil.parse(firstTime1);
-        String endTime = dateTimeUtil.getDayBefore(startingTime);
+        Date startingTime = DateTimeUtil.parse(firstTime1);
+        String endTime = DateTimeUtil.getDayBefore(startingTime);
         String startTime = monthDates.get(29);
         log.info("startTime==="+startTime);
         log.info("endTime==="+endTime);
@@ -639,5 +675,75 @@ public class TWarnInfoService{
         }
     }
 
+    /**
+     * 按告警级别查询最近一周、一月、一年数据
+     * @param alarmLevel 告警级别过滤
+     * @param type 1-周 2-月 3-半年 4-年
+     * @return
+     */
+    public String[][] countByStationOnMonth(Integer alarmLevel, Integer type) {
+        Integer nearDays = nearDays(type);
+
+        // 近一月告警
+        List<WarnStatistical> alarmList = tWarnInfoDao.countWarnByStationOnMonth(alarmLevel, nearDays);
+        // 近一月缺陷
+        List<WarnStatistical> defectList = tWarnInfoDao.countDefectByStationOnMonth(alarmLevel, nearDays);
+
+        List<TStdRegion> list = tStdRegionDao.selectStations();
+
+        Map<Long, KeyValue<Long, String>> stationMap = stdRegionService.stationDownId();
+        Map<Long, Integer> stationWarnCount = alarmLoop(alarmList, stationMap);
+        Map<Long, Integer> stationDefectCount = alarmLoop(defectList, stationMap);
+
+        String[][] dataSet = new String[3][list.size() + 1];
+        String[] products = dataSet[0];
+        String[] warns = dataSet[1];
+        String[] defects = dataSet[2];
+        products[0] = "product";
+        warns[0] = "告警";
+        defects[0] = "缺陷";
+        for (int i = 0; i < list.size(); i++) {
+            int idx = i + 1;
+            TStdRegion region = list.get(i);
+            if (region != null) {
+                products[idx] = region.getRegionName();
+                warns[idx] = Optional.ofNullable(stationWarnCount.get(region.getRegionId())).orElse(0).toString();
+                defects[idx] = Optional.ofNullable(stationDefectCount.get(region.getRegionId())).orElse(0).toString();
+            }
+        }
+        return dataSet;
+    }
+
+    private Map<Long, Integer> alarmLoop(List<WarnStatistical> alarmList, Map<Long, KeyValue<Long, String>> stationMap) {
+        Map<Long, Integer> stationAlarmCount = new HashMap<>();
+        for (WarnStatistical stat : alarmList) {
+            Long regionId = stat.getRid();
+            Integer count = stat.getCount();
+            KeyValue<Long, String> kv = stationMap.get(regionId);
+            Long rid = regionId;
+            if (kv != null && kv.getKey() != null) {
+                rid = kv.getKey();
+            }
+            stationAlarmCount.compute(rid, (k, v) -> v == null ? count : v + count);
+        }
+        return stationAlarmCount;
+    }
+
+    public Integer nearDays(Integer type) {
+        int nearDays = 31;
+        switch (type) {
+            case 1:
+                nearDays = 7;
+                break;
+            case 3:
+                nearDays = 183;
+                break;
+            case 4:
+                nearDays = 365;
+                break;
+            default:
+        }
+        return nearDays;
+    }
 }
 

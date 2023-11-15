@@ -67,9 +67,13 @@ public interface TWarnInfoDao {
     List<WarnStatistical> countAllWarnOnMonth();
     List<WarnStatistical> countWarnOnMonth();
 
-    List<WarnStatistical> countWarnAndDefectOnMonth1();//近一月告警
-    List<WarnStatistical> countWarnAndDefectOnMonth2();//近一月缺陷
+    List<WarnStatistical> countWarnAndDefectOnMonth1(@Param("deviceIdList") List<Long> deviceIdList, @Param("nearDays")Integer nearDays);//近一月告警
+    List<WarnStatistical> countWarnAndDefectOnMonth2(@Param("deviceIdList") List<Long> deviceIdList, @Param("nearDays")Integer nearDays);//近一月缺陷
 
+    //近一年告警
+    List<WarnStatistical> countWarnOnYear(@Param("deviceIdList") List<Long> deviceIdList, @Param("nearMonths")Integer nearMonths, @Param("dateStart")Date dateStart);
+    //近一年缺陷
+    List<WarnStatistical> countDefectOnYear(@Param("deviceIdList") List<Long> deviceIdList, @Param("nearMonths")Integer nearMonths, @Param("dateStart")Date dateStart);
 
     //查询未审核告警信息数量(查询所有未被核查的告警信息条数)
     Integer warnCountsNonIdentify();
@@ -97,4 +101,8 @@ public interface TWarnInfoDao {
     int updateByEdgeCodeOriginIds(TWarnInfo tWarnInfo);
 
     List<Long> selectWarnIdByTaskId(@Param(value = "taskId") String taskId);
+
+    List<WarnStatistical> countWarnByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
+
+    List<WarnStatistical> countDefectByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
 }

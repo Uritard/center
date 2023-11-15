@@ -739,42 +739,99 @@
     </select>
     <!--统计近一月的所有告警和缺陷个数-->
     <select id="countWarnAndDefectOnMonth1" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT a.timeNode,
-               ifnull(b.count, 0) AS count
-        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 DAY), '%Y-%m-%d') as timeNode
+        SELECT a.timeNode, ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac DAY), '%Y-%m-%d') as timeNode
               FROM (
                        SELECT @ai := @ai + 1 as ac
-                       from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
+                       from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 6) ac1,
                             (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
                             (SELECT @ai := 0) xc0
-                   ) c) a
-                 LEFT JOIN (
-            SELECT DATE(warn_time) date,
-                   warn_time,
-                   count(1) AS     count
+              ) c where ac &lt;= #{nearDays,jdbcType=INTEGER}
+        ) a
+        LEFT JOIN ( SELECT DATE(warn_time) date, warn_time, count(1) AS count
             FROM t_warn_info
-            WHERE DATEDIFF(now(), warn_time) &lt;= 31
+            WHERE DATEDIFF(now(), warn_time) &lt;= #{nearDays,jdbcType=INTEGER} + 1 and (warn_type != '507' or warn_type is null)
+            <if test="deviceIdList != null and deviceIdList.size() > 0">
+                AND device_id IN
+                <foreach collection="deviceIdList" item="deviceId" separator="," open="(" close=")" index="index">
+                    #{deviceId,jdbcType=BIGINT}
+                </foreach>
+            </if>
             GROUP BY date
         ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
     <select id="countWarnAndDefectOnMonth2" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
-        SELECT a.timeNode,
-               ifnull(b.count, 0) AS count
-        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 DAY), '%Y-%m-%d') as timeNode
+        SELECT a.timeNode, ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac DAY), '%Y-%m-%d') as timeNode
               FROM (
                        SELECT @ai := @ai + 1 as ac
                        from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) ac1,
                             (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6) ac2,
                             (SELECT @ai := 0) xc0
-                   ) c) a
-                 LEFT JOIN (
-            SELECT DATE(defect_time) date,
-                   defect_time,
-                   count(1) AS       count
+              ) c  where ac &lt;= #{nearDays,jdbcType=INTEGER}
+        ) a
+        LEFT JOIN (
+            SELECT DATE(defect_time) date, defect_time, count(1) AS count
             FROM t_defect_info
-            WHERE DATEDIFF(now(), defect_time) &lt;= 31
+            WHERE DATEDIFF(now(), defect_time) &lt;= #{nearDays,jdbcType=INTEGER} + 1
+            <if test="deviceIdList != null and deviceIdList.size() > 0">
+                and device_id IN
+                <foreach collection="deviceIdList" item="deviceId" separator="," open="(" close=")" index="index">
+                    #{deviceId,jdbcType=BIGINT}
+                </foreach>
+            </if>
             GROUP BY date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
+    </select>
+
+    <!--按月统计告警个数-->
+    <select id="countWarnOnYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT a.timeNode, ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 MONTH), '%Y-%m') as timeNode
+            FROM (
+                SELECT @ai := @ai + 1 as ac
+                from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) ac1,
+                (SELECT 1 UNION SELECT 2 UNION SELECT 3) ac2,
+                (SELECT @ai := 0) xc0
+            ) c where ac &lt;= #{nearMonths,jdbcType=INTEGER}
+        ) a
+        LEFT JOIN ( SELECT DATE_FORMAT(warn_time, '%Y-%m') date, count(1) AS count
+        FROM t_warn_info
+        WHERE warn_time <![CDATA[>=]]> #{dateStart,jdbcType=TIMESTAMP} and (warn_type != '507' or warn_type is null)
+        <if test="deviceIdList != null and deviceIdList.size() > 0">
+            AND device_id IN
+            <foreach collection="deviceIdList" item="deviceId" separator="," open="(" close=")" index="index">
+                #{deviceId,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        GROUP BY date
+        ) b ON a.timeNode = b.date
+        order by a.timeNode
+    </select>
+
+    <select id="countDefectOnYear" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        SELECT a.timeNode, ifnull(b.count, 0) AS count
+        FROM (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ac - 1 MONTH), '%Y-%m') as timeNode
+            FROM (
+                SELECT @ai := @ai + 1 as ac
+                from (SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4) ac1,
+                (SELECT 1 UNION SELECT 2 UNION SELECT 3) ac2,
+                (SELECT @ai := 0) xc0
+            ) c where ac &lt;= #{nearMonths,jdbcType=INTEGER}
+        ) a
+        LEFT JOIN (
+        SELECT DATE_FORMAT(defect_time, '%Y-%m') date, defect_time, count(1) AS count
+        FROM t_defect_info
+        WHERE defect_time <![CDATA[>=]]> #{dateStart,jdbcType=TIMESTAMP}
+        <if test="deviceIdList != null and deviceIdList.size() > 0">
+            and device_id IN
+            <foreach collection="deviceIdList" item="deviceId" separator="," open="(" close=")" index="index">
+                #{deviceId,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        GROUP BY date
         ) b ON a.timeNode = b.date
         order by a.timeNode
     </select>
@@ -1064,4 +1121,35 @@
         select warn_id from t_warn_info where task_id = #{taskId}
     </select>
 
+    <select id="countWarnByStationOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        select
+        b.up_region_id as rid,
+        b.up_region_name,
+        count(1) as count
+        from
+        t_warn_info a
+        left join t_std_device b on
+        a.device_id = b.device_id
+        where
+        DATEDIFF(now(), a.warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER} and (a.warn_type != '507' or a.warn_type is null)
+        <if test="alarmLevel != null and alarmLevel > 0">and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        group by
+        b.up_region_id
+    </select>
+
+    <select id="countDefectByStationOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        select
+        b.up_region_id as rid,
+        b.up_region_name,
+        count(1) as count
+        from
+        t_defect_info a
+        left join t_std_device b on
+        a.device_id = b.device_id
+        where
+        DATEDIFF(now(), a.defect_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        <if test="alarmLevel != null and alarmLevel > 0">and a.defect_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        group by
+        b.up_region_id
+    </select>
 </mapper>

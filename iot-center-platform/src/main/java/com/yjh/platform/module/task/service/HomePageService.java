@@ -103,6 +103,8 @@ public class HomePageService {
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
     private TMeterDao tMeterDao;
+    @Autowired
+    private TWarnInfoService warnInfoService;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -170,6 +172,11 @@ public class HomePageService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> countByAlarmLevel() {
         return tDefectInfoDao.countByAlarmLevel();
+    }
+
+    public List<Map<String, Object>> countAllByAlarmLevelOnMonth(Integer type) {
+        Integer nearDays = warnInfoService.nearDays(type);
+        return tDefectInfoDao.countAllByAlarmLevel(nearDays);
     }
 
     @Transactional(rollbackFor = Exception.class)
