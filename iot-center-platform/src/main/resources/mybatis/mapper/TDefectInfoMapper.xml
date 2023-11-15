@@ -636,4 +636,39 @@
         WHERE
             robot_alarm_id = #{warnId}
     </select>
+
+    <select id="countAllByAlarmLevel" resultType="java.util.Map">
+        SELECT
+        IFNULL( c.count, 0 ) AS count,
+        b.dict_code as alarmLevel,
+        b.dict_note as alarmLevelName
+        FROM
+        t_dict_business b
+        LEFT JOIN (
+        SELECT
+        a.alarm_level,
+        count( a.warn_id ) AS count
+        FROM
+        (
+        SELECT
+        warn_level AS alarm_level,
+        warn_id
+        FROM
+        t_warn_info
+        WHERE (warn_type != '507' or warn_type is null) and DATEDIFF(now(), warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        union all
+        SELECT
+        defect_level AS alarm_level,
+        defect_id as warn_id
+        FROM
+        t_defect_info
+        WHERE DATEDIFF(now(), defect_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        ) a
+        GROUP BY
+        a.alarm_level
+        ) c ON c.alarm_level = b.dict_code
+        WHERE
+        b.col_name = 'alarm_level'
+        order by alarmLevel
+    </select>
 </mapper>

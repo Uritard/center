@@ -68,4 +68,6 @@ public interface TDefectInfoDao {
     TWarnInfoDetail selectRobotWarn(@Param(value = "warnId") Long warnId);
 
     int updateByEdgeCodeOriginIds(TDefectInfo tDefectInfo);
+
+    List<Map<String,Object>> countAllByAlarmLevel(@Param("nearDays")Integer nearDays);
 }

@@ -18,8 +18,12 @@ import java.io.Serializable;
 @ApiModel(value = "WarnStatistical对象", description = "告警历史统计一月")
 public class WarnStatistical implements Serializable {
 
+    @ApiModelProperty(value = "ID")
+    private Long rid;
+
     @ApiModelProperty(value = "时间")
     private String timeNode;
+
     @ApiModelProperty(value = "个数")
     private Integer count;
 }
