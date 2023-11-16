@@ -76,4 +76,17 @@ public class IPUtil {
         return ip;
     }
 
+    /**
+     * 获取当前系统ip地址
+     * @return
+     */
+    public static String getIp() {
+        String ip = "0.0.0.0";
+        try {
+            ip = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            logger.error("获取系统IP失败", e);
+        }
+        return ip;
+    }
 }

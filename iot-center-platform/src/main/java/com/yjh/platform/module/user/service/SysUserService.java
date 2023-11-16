@@ -1,7 +1,6 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.commons.DateUtils;
-import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -11,6 +10,7 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
@@ -314,36 +314,7 @@ public class SysUserService {
                                 changeUserState(sysUserLogin.getUserId(), 3);
                                 return mapResult;
                             }
-                            List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                            SysUserSelect sysUserSelect = new SysUserSelect();
-                            BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
-                            mapResult.put("roleMenuList", sysRoleMenuList);
-                            mapResult.put("sysUserLogin", sysUserSelect);
-                            Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-                            mapResult.put("systemName",systemNameMap.get("content"));
-                            mapResult.put("systemLevel", Constant.getLevelEdge());
-                            String userId = String.valueOf(sysUserLogin.getUserId());
-                            Map<String, Object> mapAccount = new HashMap<>();
-                            Map<String, Object> mapAppKey = new HashMap<>();
-                            mapAccount.put("userId", userId);
-                            mapAccount.put("userName", userName);
-                            mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                            mapAccount.put("appKey", appKey);
-                            mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            mapAccount.put("errorInputTimes", "0");
-                            String key = Constant.account_lock_times.replace("userAccountID", userId);
-                            redisTemplate.opsForHash().putAll(key, mapAccount);
-                            mapAppKey.put("userId", userId);
-                            mapAppKey.put("userName", userName);
-                            mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                            mapAppKey.put("appKey", appKey);
-                            mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
-                            if ("true".equals(isLogin)) {
-                                Map<String, Object> mapUser = new HashMap<>();
-                                mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                                redisTemplate.opsForHash().putAll("user:" + userId, mapUser);
-                            }
+                            userLoginInfo(mapResult, ip, sysUserLogin);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户登录", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                         }
 
@@ -367,37 +338,7 @@ public class SysUserService {
                             changeUserState(sysUserLogin.getUserId(), 3);
                             return mapResult;
                         }
-                        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                        SysUserSelect sysUserSelect = new SysUserSelect();
-                        BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
-                        mapResult.put("roleMenuList", sysRoleMenuList);
-                        mapResult.put("sysUserLogin", sysUserSelect);
-                        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-                        mapResult.put("systemName",systemNameMap.get("content"));
-                        mapResult.put("systemLevel", Constant.getLevelEdge());
-                        String userId = String.valueOf(sysUserLogin.getUserId());
-                        Map<String, Object> mapAccount = new HashMap<>();
-                        Map<String, Object> mapAppKey = new HashMap<>();
-                        mapAccount.put("userId", userId);
-                        mapAccount.put("userName", userName);
-                        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAccount.put("appKey", appKey);
-                        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        mapAccount.put("errorInputTimes", "0");
-                        String key = Constant.account_lock_times.replace("userAccountID", userId);
-                        redisTemplate.opsForHash().putAll(key, mapAccount);
-                        mapAppKey.put("userId", userId);
-                        mapAppKey.put("userName", userName);
-                        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
-                        mapAppKey.put("appKey", appKey);
-                        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                        mapAppKey.put("remoteIp", ip);
-                        redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
-                        if ("true".equals(isLogin)) {
-                            Map<String, Object> mapUser = new HashMap<>();
-                            mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
-                            redisTemplate.opsForHash().putAll("user:" + userId, mapUser);
-                        }
+                        userLoginInfo(mapResult, ip, sysUserLogin);
                         logsRecord.LoginLogsSend(request, "6", "登录", "用户登录", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                     }
                 } else {
@@ -506,6 +447,45 @@ public class SysUserService {
             }
         }
         return mapResult;
+    }
+
+    public void userLoginInfo(Map<String, Object> mapResult, String ip, SysUserLogin sysUserLogin) {
+
+        String isLogin = SysParamConfig.getSysContent("isLogin");
+        String userName = sysUserLogin.getUserName();
+        String appKey = sysUserLogin.getAppkey();
+
+        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+        SysUserSelect sysUserSelect = new SysUserSelect();
+        BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
+        mapResult.put("roleMenuList", sysRoleMenuList);
+        mapResult.put("sysUserLogin", sysUserSelect);
+        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        mapResult.put("systemName",systemNameMap.get("content"));
+        mapResult.put("systemLevel", Constant.getLevelEdge());
+        String userId = String.valueOf(sysUserLogin.getUserId());
+        Map<String, Object> mapAccount = new HashMap<>();
+        Map<String, Object> mapAppKey = new HashMap<>();
+        mapAccount.put("userId", userId);
+        mapAccount.put("userName", userName);
+        mapAccount.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+        mapAccount.put("appKey", appKey);
+        mapAccount.put("expireTime", String.valueOf(System.currentTimeMillis()));
+        mapAccount.put("errorInputTimes", "0");
+        String key = Constant.account_lock_times.replace("userAccountID", userId);
+        redisTemplate.opsForHash().putAll(key, mapAccount);
+        mapAppKey.put("userId", userId);
+        mapAppKey.put("userName", userName);
+        mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
+        mapAppKey.put("appKey", appKey);
+        mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+        mapAppKey.put("remoteIp", ip);
+        redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
+        if ("true".equals(isLogin)) {
+            Map<String, Object> mapUser = new HashMap<>();
+            mapUser.put("expireTime", String.valueOf(System.currentTimeMillis()));
+            redisTemplate.opsForHash().putAll("user:" + userId, mapUser);
+        }
     }
 
     private void sendToWs(String ip, String userId, String userName){
