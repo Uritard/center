@@ -54,6 +54,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
@@ -277,6 +278,7 @@ public class TCruiseTaskResultService {
         if (!Constant.fastTurbo()) {
             String videoPrefixKey = "videoInfo:";
             if (!CommonUtils.isEmptyOrNullstr(resultMap.get("robotId"))) {
+                videoInfo.put("robotId", resultMap.get("robotId"));
                 String robotId = resultMap.get("robotId");
                 String cacheKey = videoPrefixKey + "robot:" + robotId;
                 boolean getInRedis = getVideoFromRedis(cacheKey, videoInfo, inspectResult);
@@ -355,6 +357,7 @@ public class TCruiseTaskResultService {
 
             //拉机器人的红外和可见光的视频流
             if (!CommonUtils.isEmptyOrNullstr(resultMap.get("cameraId"))) {
+                videoInfo.put("cameraId", resultMap.get("cameraId"));
                 String camera = resultMap.get("cameraId");
                 String cacheKey = videoPrefixKey + "camera:" + camera;
                 boolean getInRedis = getVideoFromRedis(cacheKey, videoInfo, inspectResult);
