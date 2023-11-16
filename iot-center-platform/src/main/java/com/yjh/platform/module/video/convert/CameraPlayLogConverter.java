@@ -25,7 +25,7 @@ public class CameraPlayLogConverter {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 try {
                     Date startTime = format.parse(cameraPlayLogDTO.getStartTime());
-                    Date stopTime = format.parse(cameraPlayLogDTO.getStopTime());
+                    Date stopTime = cameraPlayLogDTO.getStopTime();
                     long diffInMilliseconds = Math.abs(stopTime.getTime() - startTime.getTime());
                     long diffHours = TimeUnit.MILLISECONDS.toHours(diffInMilliseconds);
                     long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilliseconds) % 60;
