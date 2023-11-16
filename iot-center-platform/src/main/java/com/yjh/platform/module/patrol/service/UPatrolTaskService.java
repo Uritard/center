@@ -666,7 +666,7 @@ public class UPatrolTaskService {
             String patrolledId = robotPatrolTaskStatus.getTaskPatrolledId();
             String taskCode = robotPatrolTaskStatus.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
-            String timeStr = StringUtils.substringAfterLast(patrolledId, "_");
+            String timeStr = robotPatrolTaskStatus.getPlanStartTime();
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = null;
 

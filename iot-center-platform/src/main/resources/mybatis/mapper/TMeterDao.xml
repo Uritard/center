@@ -116,12 +116,19 @@
     <select id="countPowerTotalByEdge" resultType="java.util.Map">
         SELECT
            ROUND(SUM(a.total_positive_power_difference_value * a.magnification_coefficient),2) as allTotal,
-            b.region_name
+           b.region_name as regionName
         FROM
             `t_meter_log` a
                 left join t_std_region b on a.edge_code = b.region_code
         where b.state = 1 and a.create_time between #{startTime} and #{endTime}
         GROUP BY a.edge_code
+    </select>
+
+    <select id="countPowerTotalAll" resultType="java.lang.String">
+        SELECT
+            ROUND(SUM(a.total_positive_power * a.magnification_coefficient),2) as allTotal
+        FROM
+            `t_meter` a
     </select>
 
     <select id="selectMeterByDeviceId" resultType="com.yjh.platform.module.device.entity.TMeter">
