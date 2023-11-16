@@ -6,6 +6,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.IPUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.config.dao.SystemConfigDao;
 import com.yjh.platform.module.config.entity.ConfigTreeNode;
@@ -17,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -198,7 +197,7 @@ public class SystemConfigService {
                 if (updateFlag) {
                     log.info("voiceMqtt 配置已修改：{}",applicationProperties.getAudioConfig());
                     voiceMqtt.shutdown();
-                    voiceMqtt = new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd());
+                    voiceMqtt = new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd());
                 }
             }
         }catch (Exception e){
@@ -235,7 +234,7 @@ public class SystemConfigService {
                 if (updateFlag) {
                     log.info("algorithmMqtt 配置已修改：{}",applicationProperties.getManagerMqttConfig());
                     algorithmMqtt.shutdown();
-                    algorithmMqtt = new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd());
+                    algorithmMqtt = new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd());
                 }
             }
         }catch (Exception e){
@@ -243,17 +242,4 @@ public class SystemConfigService {
         }
     }
 
-    /**
-     * 获取ip地址
-     * @return
-     */
-    private String getIp() {
-        String ip = "0.0.0.0";
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return ip;
-    }
 }
