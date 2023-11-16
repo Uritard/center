@@ -109,7 +109,8 @@ public class SilentTaskJob implements Runnable {
 
         Date now = new Date();
         Date lastDate = DateUtils.dateFromString(lastTime);
-        if ((now.getTime() - lastDate.getTime()) >= (waitTime*1000) ){
+        //允许一秒误差
+        if ((now.getTime() - lastDate.getTime()) >= ((waitTime-1)* 1000L) ){
             log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
             try {
                 cameraConService.moveToPreset(presetId, cameraId);
