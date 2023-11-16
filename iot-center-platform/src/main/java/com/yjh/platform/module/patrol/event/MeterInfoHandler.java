@@ -75,12 +75,11 @@ public class MeterInfoHandler {
                     log.info("计算电表差值出错！",e);
                 }
                 meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-                tMeterLogDao.insert(meter);
                 meter.setTotalPositivePower(meterInfo.get("totalPositivePower"));
                 meter.setTotalPositiveReactivePower(meterInfo.get("totalPositiveReactivePower"));
                 meter.setTotalNegativePositivePower(meterInfo.get("totalNegativePositivePower"));
                 tMeterDao.updateByPrimaryKey(meter);
-
+                tMeterLogDao.insert(meter);
                 meterInfoUpload(meter);
             }
         }
