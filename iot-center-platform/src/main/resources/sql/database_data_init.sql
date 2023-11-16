@@ -98,7 +98,6 @@ INSERT INTO `sys_menu` VALUES ('32', '任务诊断', '0701', '6', '', '', '1', '
 INSERT INTO `sys_menu` VALUES ('33', '信息查询', '0702', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('34', '任务管理', '0703', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('35', '视频双确认', '0801', '7', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
-INSERT INTO `sys_menu` VALUES ('36', '巡视设备告警', '0401', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('37', '传感器监控', '0208', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('38', '操作类任务', '0104', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('39', '操作类任务记录', '0105', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
@@ -1461,7 +1460,7 @@ INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `s
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'images/jiqirenjiankong.png', 7);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'images/wurenjijiankong.png', 8);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'images/liandongxinhao.png', 9);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '巡视设备告警', '/operation/intelligentAlarm', 'images/xunshishebeigaojing.png', 10);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '告警管理', '/scout/warningManagePage', 'images/xunshishebeigaojing.png', 10);
 
 INSERT INTO `dict_area` VALUES ('110000', '北京市', '-1');
 INSERT INTO `dict_area` VALUES ('110100', '市辖区', '110000');
