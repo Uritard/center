@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,7 +63,7 @@ public class CameraPlayLogServiceImpl extends ServiceImpl<CameraPlayLogDAO, Came
         cameraPlayLogDTO.setUserName(sysUser.getUserName());
         TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(cameraPlayLogDTO.getCameraId());
         cameraPlayLogDTO.setCameraName(tCameraInfo.getCameraName());
-        cameraPlayLogDTO.setStartTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        cameraPlayLogDTO.setStartTime(new Date());
         cameraPlayLogDAO.insert(cameraPlayLogDTO);
     }
 }

@@ -24,7 +24,7 @@ public class CameraPlayLogConverter {
                 // 计算时长
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 try {
-                    Date startTime = format.parse(cameraPlayLogDTO.getStartTime());
+                    Date startTime = cameraPlayLogDTO.getStartTime();
                     Date stopTime = cameraPlayLogDTO.getStopTime();
                     long diffInMilliseconds = Math.abs(stopTime.getTime() - startTime.getTime());
                     long diffHours = TimeUnit.MILLISECONDS.toHours(diffInMilliseconds);

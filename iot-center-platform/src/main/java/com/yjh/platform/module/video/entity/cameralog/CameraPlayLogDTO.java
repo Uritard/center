@@ -43,7 +43,8 @@ public class CameraPlayLogDTO {
      * 开始播放时间*
      */
     @TableField
-    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
     /**
      * 结束播放时间*
      */
