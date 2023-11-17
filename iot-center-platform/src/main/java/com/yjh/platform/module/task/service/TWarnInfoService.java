@@ -270,11 +270,15 @@ public class TWarnInfoService{
      * @param type 1-周 2-月 3-半年 4-年
      */
     public String[][] countWarnAndDefectOnMonthByStation(Long regionId, Integer type) {
-        List<Long> deviceIdList = null;
+        List<Long> deviceIdList = new ArrayList<>();
         if (regionId != null && regionId > 0) {
             List<Long> regionIdList = stdRegionService.selectDownId(regionId);
             if (regionIdList != null && !regionIdList.isEmpty()) {
                 deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionIdList);
+            }
+            // 如果查询不出来设备，则强制给-1，让结果为空
+            if (deviceIdList.isEmpty()) {
+                deviceIdList.add(-1L);
             }
         }
         // 近一月告警
