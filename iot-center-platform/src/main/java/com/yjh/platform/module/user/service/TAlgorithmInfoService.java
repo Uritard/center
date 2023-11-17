@@ -36,7 +36,7 @@ public class TAlgorithmInfoService{
     @Transactional(rollbackFor = Exception.class)
     public int insert(TAlgorithmInfo tAlgorithmInfo) {
         int i = this.tAlgorithmInfoDao.insert(tAlgorithmInfo);
-        algorithmDefectInfoRefresh ();
+        algorithmDefectInfoRefresh();
         return i;
     }
     public boolean judgeAnalyseType(String analyseType) {

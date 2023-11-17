@@ -565,7 +565,7 @@ public class UPatrolTaskController {
         return result;
     }
 
-    @ApiOperation(value = "旧的巡视数据迁移")
+    @ApiOperation(value = "重置数据迁移状态")
     @PostMapping(value = "/cruiseUpReset")
     public Result cruiseUpReset() {
         Result result = new Result();

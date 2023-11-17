@@ -48,15 +48,17 @@ public class TAlgorithmInfoController {
 
         Result result = new Result();
         try {
-            if (!"398".equals(tAlgorithmInfo.getAnalyseType()) && tAlgorithmInfoService.judgeAnalyseType(tAlgorithmInfo.getAnalyseType())
-            || ("398".equals(tAlgorithmInfo.getAnalyseType()) && tAlgorithmInfoService.judgeDefectType(tAlgorithmInfo.getDefectType()))){
+            if (tAlgorithmInfo.getIsAi() == 1 && tAlgorithmInfoService.judgeAnalyseType(tAlgorithmInfo.getAnalyseType())
+            || (tAlgorithmInfo.getIsAi() == 0 && tAlgorithmInfoService.judgeDefectType(tAlgorithmInfo.getDefectType()))){
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "已存在该分析类型对应的算法");
                 return result;
             }else {
                 if (0 == tAlgorithmInfo.getIsAi()){
                     tAlgorithmInfo.setAnalyseType("398");
+                    tAlgorithmInfo.setDefectLevel(131);
                 }else {
                     tAlgorithmInfo.setDefectType(450);
+                    tAlgorithmInfo.setDefectLevel(1);
                 }
                 result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));
             }
