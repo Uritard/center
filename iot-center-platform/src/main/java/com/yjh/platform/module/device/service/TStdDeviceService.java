@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.google.common.collect.Lists;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.TreesUtil;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
 
@@ -16,6 +17,7 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
+import com.yjh.platform.module.user.dao.TRobotDeviceConfigDao;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,8 @@ public class TStdDeviceService{
     private UPatrolTaskService uPatrolTaskService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TRobotDeviceConfigDao tRobotDeviceConfigDao;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -838,6 +842,31 @@ public class TStdDeviceService{
     public List<AreaInfo> selectOperationDevTree(Long regionId) {
         List<AreaInfo> listTree = this.tStdDeviceDao.selectDevTreeDevice(regionId);
         return assembleTrees(listTree);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfo> selectOperationDevTreeByName(Long regionId,String name) {
+        List<TStdDevice> listTree = this.tStdDeviceDao.selectDevTreeDeviceByNameAndRegion(regionId,name);
+
+        return getDeviceAreaInfo(listTree);
+    }
+
+    private List<AreaInfo> getDeviceAreaInfo(List<TStdDevice> deviceConfigList){
+        List<AreaInfo> areaInfoList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(deviceConfigList)) {
+            List<Long> regionList = deviceConfigList.stream().map(TStdDevice::getUpRegionId).collect(Collectors.toList());
+            Set<Long> upRegionList = deviceConfigList.stream().map(TStdDevice::getUpRegionId).collect(Collectors.toSet());
+            Set<Long> upRegionResult = new HashSet<>(upRegionList);
+            do {
+                upRegionList.addAll(upRegionResult);
+                upRegionResult.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+            } while (!upRegionList.containsAll(upRegionResult));
+            regionList.addAll(upRegionResult);
+            if (CollectionUtils.isNotEmpty(regionList)) {
+                areaInfoList = tStdDeviceDao.selectDeviceTreeByName(deviceConfigList, regionList);
+            }
+        }
+        return TreesUtil.assembleTrees(areaInfoList);
     }
 
 
