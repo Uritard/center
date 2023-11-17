@@ -3,8 +3,11 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.TreesUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TRobotDeviceConfigDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotDeviceConfig;
 import com.yjh.platform.module.user.entity.TRobotMapNodeDeviceInfo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,6 +34,8 @@ public class TRobotDeviceConfigService {
 
     @Resource
     private TRobotInfoDao tRobotInfoDao;
+    @Resource
+    private TCameraInfoDao tCameraInfoDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TRobotDeviceConfig tRobotDeviceConfig, String userName) {
@@ -92,10 +97,26 @@ public class TRobotDeviceConfigService {
         return tRobotInfoDao.updateEntrance(robotId, entrance);
     }
 
-    public List<AreaInfo> selectDeviceTree() {
-        List<AreaInfo> list = tRobotDeviceConfigDao.selectDeviceTree();
-        return TreesUtil.assembleTrees(list);
+    public List<AreaInfo> selectDeviceTree(String name) {
+        List<TStdDevice> deviceConfigList = tRobotDeviceConfigDao.selectDeviceByName(name);
+        return getDeviceAreaInfo(deviceConfigList);
     }
+    private List<AreaInfo> getDeviceAreaInfo(List<TStdDevice> deviceConfigList){
+        List<AreaInfo> areaInfoList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(deviceConfigList)) {
+            List<Long> regionList = deviceConfigList.stream().map(TStdDevice::getUpRegionId).collect(Collectors.toList());
+            Set<Long> upRegionList = deviceConfigList.stream().map(TStdDevice::getUpRegionId).collect(Collectors.toSet());
+            Set<Long> upRegionResult = new HashSet<>(upRegionList);
+            do {
+                upRegionList.addAll(upRegionResult);
+                upRegionResult.addAll(tCameraInfoDao.selectRegionListByUpRegionId(upRegionList));
+            } while (!upRegionList.containsAll(upRegionResult));
+            regionList.addAll(upRegionResult);
 
-
+            if (CollectionUtils.isNotEmpty(regionList)) {
+                areaInfoList = tRobotDeviceConfigDao.selectDeviceTreeByName(deviceConfigList, regionList);
+            }
+        }
+        return TreesUtil.assembleTrees(areaInfoList);
+    }
 }

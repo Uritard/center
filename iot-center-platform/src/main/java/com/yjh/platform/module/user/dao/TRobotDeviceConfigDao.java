@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.dao;
 
 
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.user.entity.TRobotDeviceConfig;
 import com.yjh.platform.module.user.entity.TRobotMapNodeDeviceInfo;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +29,9 @@ public interface TRobotDeviceConfigDao {
     List<TRobotMapNodeDeviceInfo> selectMapNodeDeviceByRobotId(Long robotId);
 
     List<AreaInfo> selectDeviceTree();
+
+    List<TStdDevice> selectDeviceByName(@Param(value = "name") String name);
+
+    List<AreaInfo> selectDeviceTreeByName(@Param(value = "deviceList") List<TStdDevice> deviceConfigList,
+                                          @Param(value = "regionList") List<Long> regionList);
 }

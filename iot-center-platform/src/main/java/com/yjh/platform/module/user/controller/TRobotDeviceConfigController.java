@@ -164,11 +164,11 @@ public class TRobotDeviceConfigController {
 
     @ApiOperation(value = "设备树查询")
     @RequestMapping(value = "/selectDevTree", method = RequestMethod.GET)
-    @Logs(title = "设备树查询",content = "设备树查询",logType = 1)
-    public Result selectDeviceTree() {
+    @Logs(title = "设备树关联机器人地图点查询",content = "设备树查询",logType = 1)
+    public Result selectDeviceTree(@RequestParam(value = "name",required = false)  String name){
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tRobotDeviceConfigService.selectDeviceTree();
+            List<AreaInfo> devTreeList = tRobotDeviceConfigService.selectDeviceTree(name);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
