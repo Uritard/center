@@ -414,10 +414,11 @@ public class TStdDeviceController {
     @ApiOperation(value = "操作设备树查询")
     @RequestMapping(value = "/selectOperationDevTree", method = RequestMethod.GET)
     @Logs(title = "操作设备树查询",content = "操作设备树查询",logType = 1)
-    public Result selectOperationDevTree(@RequestParam(value = "regionId", required = true) Long regionId) {
+    public Result selectOperationDevTree(@RequestParam(value = "regionId", required = true) Long regionId,
+                                         @RequestParam(value = "name", required = false) String name) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTaskTreeList = tStdDeviceService.selectOperationDevTree(regionId);
+            List<AreaInfo> devTaskTreeList = tStdDeviceService.selectOperationDevTreeByName(regionId,name);
             result.setData(devTaskTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
