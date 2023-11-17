@@ -169,8 +169,8 @@ public interface TStdDeviceDao {
 
     List<AreaInfo> selectPatrolDeviceTree();
 
-    List<AreaInfo> selectMeterDevTreeRegion();
+    List<AreaInfo> selectMeterDevTreeRegion(@Param(value = "name") String name);
 
-    List<AreaInfo> selectSensorDevTreeRegion();
+    List<AreaInfo> selectSensorDevTreeRegion(@Param(value = "name") String name);
 
 }

@@ -1390,6 +1390,7 @@ group by camera_id
 				FROM
 					`t_meter`
 			)
+		<if test="name != null and name != ''">and a.region_name like concat('%', #{name}, '%')</if>
 	</select>
 	<select id="selectSensorDevTreeRegion" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT
@@ -1435,6 +1436,7 @@ group by camera_id
 				FROM
 					t_robot_info
 				WHERE env_region_id IS NOT NULL)
+		<if test="name != null and name != ''">and a.region_name like concat('%', #{name}, '%')</if>
 	</select>
 
 </mapper>

@@ -62,8 +62,6 @@ public class TStdDeviceService{
     private UPatrolTaskService uPatrolTaskService;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private TRobotDeviceConfigDao tRobotDeviceConfigDao;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -565,13 +563,28 @@ public class TStdDeviceService{
         List<AreaInfo> devTreeByName = new ArrayList<>();
         switch (type){
             case "region":
-                //针对region的过滤
-                List<AreaInfo> allTree = tStdDeviceDao.selectAreaTree();
-                allTree = assembleTrees(allTree);
-                if (StringUtils.isNotEmpty(name)){
-                    if (!matchName(allTree.get(0),name)){
-                        allTree.remove(0);
-                    };
+                List<AreaInfo> allTree;
+                if (StringUtils.isNotEmpty(deviceType)){
+                    switch (deviceType) {
+                        case "meter":
+                            allTree = tStdDeviceDao.selectMeterDevTreeRegion(name);
+                            break;
+                        case "sensor":
+                            allTree = tStdDeviceDao.selectSensorDevTreeRegion(name);
+                            break;
+                        default:
+                            allTree = tStdDeviceDao.selectAreaTree();
+                    }
+                } else {
+                    //针对region的过滤
+                    allTree = tStdDeviceDao.selectAreaTree();
+                    allTree = assembleTrees(allTree);
+                    if (StringUtils.isNotEmpty(name)) {
+                        if (!matchName(allTree.get(0), name)) {
+                            allTree.remove(0);
+                        }
+                        ;
+                    }
                 }
                 return allTree;
             case "dev":
@@ -706,10 +719,10 @@ public class TStdDeviceService{
         if (StringUtils.isNotEmpty(deviceType)) {
             switch (deviceType) {
                 case "meter":
-                    areaTree = tStdDeviceDao.selectMeterDevTreeRegion();
+                    areaTree = tStdDeviceDao.selectMeterDevTreeRegion(null);
                     break;
                 case "sensor":
-                    areaTree = tStdDeviceDao.selectSensorDevTreeRegion();
+                    areaTree = tStdDeviceDao.selectSensorDevTreeRegion(null);
                     break;
                 default:
                     areaTree = tStdDeviceDao.selectDevTreeRegion();
@@ -847,7 +860,6 @@ public class TStdDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfo> selectOperationDevTreeByName(Long regionId,String name) {
         List<TStdDevice> listTree = this.tStdDeviceDao.selectDevTreeDeviceByNameAndRegion(regionId,name);
-
         return getDeviceAreaInfo(listTree);
     }
 
