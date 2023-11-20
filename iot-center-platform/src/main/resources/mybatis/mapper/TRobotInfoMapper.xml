@@ -758,14 +758,15 @@
         UNION ALL
         (
             SELECT
-                robot_id AS id,
-                robot_name AS label,
+                a.robot_id AS id,
+                a.robot_name AS label,
                 '-1' AS upId,
                 '机器人地图点' as upName,
                 'robot' as infoType
             FROM
-                t_robot_info
-            where robot_type = 161
+                t_robot_info a
+            JOIN t_robot_map_node b ON a.robot_id = b.robot_id
+            GROUP BY a.robot_id
         )
         UNION ALL
         (
