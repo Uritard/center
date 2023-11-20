@@ -431,6 +431,7 @@
 
     <select id="selectStations" resultType="com.yjh.platform.module.device.entity.TStdRegion">
         select
+        REPLACE(region_name,'主所','') AS aliasName,
         <include refid="Base_Column_List" />
         from
           t_std_region

@@ -11,6 +11,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -681,6 +682,7 @@ public class HomePageService {
 
     public List<HomeDeviceInfo> deviceInfo(Integer type,String edgeCode){
         List<TRobotInfo> robotInfoList = tRobotInfoDao.selectAllRobotByEdgeCodeOrType(edgeCode,type);
+        DictConvertUtil.optional("robotType").covertToDict(robotInfoList);
         List<HomeDeviceInfo> homeDeviceInfoList = new ArrayList<>();
         for (TRobotInfo robotInfo : robotInfoList) {
             HomeDeviceInfo homeDeviceInfo = new HomeDeviceInfo();
@@ -709,7 +711,7 @@ public class HomePageService {
                 }
             }
             homeDeviceInfo.setState(robotState);
-
+            homeDeviceInfo.setRobotType(robotInfo.getRobotTypeName());
             homeDeviceInfoList.add(homeDeviceInfo);
         }
 

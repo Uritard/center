@@ -36,6 +36,9 @@ public class TStdRegion implements Serializable {
     @TableField(value = "region_name",updateStrategy = FieldStrategy.IGNORED)
     private String regionName;
 
+    @ApiModelProperty(value = "别名")
+    private String aliasName;
+
     @Max(value=9)
     @ApiModelProperty(value = "区域类型（1:国家,2:省份、直辖市,3:运维站,4:变电站,5:间隔,6:设备,7:部位）")
     private Integer sort;
