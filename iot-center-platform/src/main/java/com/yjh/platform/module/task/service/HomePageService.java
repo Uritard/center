@@ -460,14 +460,18 @@ public class HomePageService {
         StationDetail stationDetail = new StationDetail();
         stationDetail.setStationCounts(this.queryStations(regionId));
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
-        List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
-        for (Long aLong : envReginIdList) {
-            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong);
-            envDeviceStatusList.addAll(envDeviceStatuses);
-        }
-        stationDetail.setEnvDeviceStatuses(envDeviceStatusList);
+        stationDetail.setEnvDeviceStatuses(this.queryWeatherInfos(regionIdList));
         List<RegionVideo> regionVideoList = tCruiseTaskDao.queryRegionVideoList(regionIdList);
+        Map<String, String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for (Long recordId : recordIdList) {
+            Map<String, String> recordIdMap = cameraConService.getCameraStatus(recordId);
+            if (recordIdMap == null) {
+                continue;
+            }
+            map.putAll(recordIdMap);
+        }
+        regionVideoList = regionVideoList.stream().filter(r -> StringUtils.equals(map.get(r.getCameraId().toString()), "1")).collect(Collectors.toList());
         stationDetail.setRegionVideos(regionVideoList);
         return stationDetail;
     }
@@ -487,6 +491,16 @@ public class HomePageService {
      */
     public List<WarnInforForHomePages> deviceWarnInfo(String state) {
         return tDefectInfoDao.selectDeviceWarnInfo(state);
+    }
+
+    public List<EnvDeviceStatus> queryWeatherInfos(List<Long> regionIdList) {
+        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
+        List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
+        for (Long aLong : envReginIdList) {
+            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong);
+            envDeviceStatusList.addAll(envDeviceStatuses);
+        }
+        return envDeviceStatusList;
     }
 
     public List<EnvDeviceStatus> queryWeatherInfo(Long regionId) {

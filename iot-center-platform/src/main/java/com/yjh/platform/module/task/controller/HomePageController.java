@@ -14,6 +14,7 @@ import com.yjh.platform.module.task.entity.RegionPath;
 import com.yjh.platform.module.task.service.HomePageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lqh
@@ -317,8 +315,10 @@ public class HomePageController {
         Long regionId = object.getLong("regionId");
         Result result = new Result();
         try {
-            if (regionId!=null){
-                result.setData(homePageService.queryWeatherInfo(regionId));
+            if (Objects.isNull(regionId)){
+                result.setData(homePageService.queryWeatherInfos(null));
+            }else {
+                result.setData(homePageService.queryWeatherInfos(Collections.singletonList(regionId)));
             }
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e) {
