@@ -14,4 +14,8 @@ public class HomeDeviceInfo {
     private String state;
 
     private String robotType;
+
+    private String robotId;
+
+    private String robotCode;
 }
