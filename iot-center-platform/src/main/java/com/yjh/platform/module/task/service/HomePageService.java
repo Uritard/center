@@ -689,7 +689,7 @@ public class HomePageService {
             homeDeviceInfo.setRobotName(robotInfo.getRobotName());
             //<41>: = 运行状态 <1>: = 空闲状态 <2>: = 巡视状态 <3>: = 充电状态 <4>: = 检修状态
             Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotInfo.getRobotCode() + ":41");
-            String robotState = "未知";
+            String robotState = "离线";
             if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
                 String value = String.valueOf(mapForRobotState.get("value"));
                 switch (value) {
@@ -706,10 +706,12 @@ public class HomePageService {
                         robotState = "检修状态";
                         break;
                     default:
-                        robotState = "未知";
+                        robotState = "离线";
                         break;
                 }
             }
+            homeDeviceInfo.setRobotId(robotInfo.getOriginId());
+            homeDeviceInfo.setRobotCode(robotInfo.getRobotCode());
             homeDeviceInfo.setState(robotState);
             homeDeviceInfo.setRobotType(robotInfo.getRobotTypeName());
             homeDeviceInfoList.add(homeDeviceInfo);
