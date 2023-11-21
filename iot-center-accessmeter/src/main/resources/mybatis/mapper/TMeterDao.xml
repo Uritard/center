@@ -13,8 +13,7 @@
             <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>
             <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>
             <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
-            <result property="totalPositivePowerDifferenceValue" column="total_positive_power_difference_value" jdbcType="VARCHAR"/>
-            <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="VARCHAR"/>
+            <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="INTEGER"/>
             <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>

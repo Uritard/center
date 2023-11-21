@@ -119,6 +119,21 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                 if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL)) {
                     log.info("采集到正向有功电能:{}", powerTotalString);
                     tMeter.setTotalPositivePower(powerTotalString);
+                    //查询上一次的
+                    TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
+                    // 记录电表历史
+                    Float value = 0f;
+                    Float zero = 0f;
+                    try {
+                        value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
+                    }catch (Exception e){
+                        log.info("计算电表差值出错！",e);
+                    }
+                    tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+                    if (!value.equals(zero)) {
+                        log.info("电表有差值,上报数据");
+                        platformProxy.uploadMeterInfo(tMeter);
+                    }
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL)) {
                     log.info("采集到正向无功电能:{}", powerTotalString);
                     tMeter.setTotalPositiveReactivePower(powerTotalString);
@@ -126,21 +141,9 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     log.info("采集到反向无功电能:{}", powerTotalString);
                     tMeter.setTotalNegativeReactivePower(powerTotalString);
                 }
-                //查询上一次的
-                TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
                 log.info("tMeter {}", tMeter);
                 tMeterDao.updateData(tMeter);
-                // 记录电表历史
-                Float value = 0f;
-                try {
-                    value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
-                }catch (Exception e){
-                    log.info("计算电表差值出错！",e);
-                }
-                tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
                 tMeterLogDao.insert(tMeter);
-
-                platformProxy.uploadMeterInfo(tMeter);
             } else {
                 log.error("数据类型不是正向有功/正向无功/反向无功总电能, dataType:{}", ByteBufUtil.hexDump(dataType));
             }

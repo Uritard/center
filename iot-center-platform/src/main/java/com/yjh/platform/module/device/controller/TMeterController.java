@@ -71,6 +71,21 @@ public class TMeterController {
         return result;
     }
 
+    @ApiOperation(value = "更新电表配置")
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @Logs(title = "更新电表配置", content = "新增电表配置", logType = 3, authority = "1234")
+    public Result update(@RequestBody TMeter tMeter) {
+        Result result = new Result();
+        try {
+            result.setData(tMeterService.update(tMeter));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("更新电表配置失败：", e);
+        }
+        return result;
+    }
+
 
     @ApiOperation(value = "删除电表")
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
