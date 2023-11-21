@@ -1327,9 +1327,8 @@ INSERT INTO `t_sys_param` VALUES ('100128', '404', 'deviceMaintenance', '检修�
 INSERT INTO `t_sys_param` VALUES ('100129', '404', 'defectAnalyseType', 'AI判别传入的AnalyseType', 'tx_pb', 'AI判别传入的AnalyseType', '{\"rule\":\"^(tx_pb|tx_yzwpy)$\",\"msg\":\"只能填 tx_pb或 tx_yzwpy\"}');
 INSERT INTO `t_sys_param` VALUES ('100130', '404', 'silentMonitorAnalyseMap', '静默监视AI判别传入的AnalyseType映射关系', '1|drqgd,2|dxdg,3|pzqcd,4|yxdghsg,5|sly_bjbmyw,6|xdwcr,7|hzyw,8|sly_dmyw', '静默监视AI判别传入的AnalyseType映射关系', '{\"rule\":\"^[_a-zA-Z0-9# \\\\|,]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` VALUES ('100131', '404', 'isInfraredAnalysis', '红外结果是否需要算法分析', 'false', '红外测温的结果是否需要调用算法分析', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100132', '404', 'standardPoints', '是否使用标准点位ID', 'true', '标准点位ID，巡视主机和边缘节点使用统一的点位ID，不使用自增ID，此情况一个测点只可以绑定一个巡视设备，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100132', '404', 'standardPoints', '是否使用标准点位ID', 'false', '标准点位ID，巡视主机和边缘节点使用统一的点位ID，不使用自增ID，此情况一个测点只可以绑定一个巡视设备，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100133', '404', 'fastTurbo', '是否启用极速模式', 'false', '极速模式，减少日志和不必要消息上报，开启后会影响问题定位，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100134', '404', 'selectEdge', '要查询的edgeCode', 'Edge01', '要查询的edgeCode', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false', '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100136', '404', 'robotTaskStatusUp', '机器人任务状态上报开关', 'true', '机器人任务状态上报开关', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100140', '404', 'linkMete', '是否自动绑定同步机器人测点', 'true', '此参数用于控制在机器人台账中，进行巡视点位同步时，是否自动新建测点并进行绑定', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
@@ -1337,16 +1336,16 @@ INSERT INTO `t_sys_param` VALUES ('100141', '404', 'cameraServicePort', '海康�
 INSERT INTO `t_sys_param` VALUES ('100142', '404', 'droneOpen', '无人机任务启动报文开关', 'true', '针对普宙无人机不支持周期任务，需要额外发送启动命令，开启后会额外发送一条任务启动报文，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100143', '404', 'isPcmEncode', '语音对讲音频编码是否为pcm', 'true', '语音对讲音频编码是否为pcm，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100144', '404', 'cameraConfigPath', '相机设备参数备份位置', '/home/yjh_iot_center/iot-files/cameraConfig/', '相机设备参数备份位置', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'cleanContinue', '是否继续未完成的磁盘清理任务', 'false', '服务重启后继续执行没有执行完成的磁盘清理任务，此操作会导致备份不完整', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'logLevel', '打印日志级别', '2', '调试使用，级别越高打印日志越详细，范围 1-4', '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1-4的整数\"}');
-INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100149', '404', 'logoImage', 'logo', 'logo/logo_gw_text.png', '首页logo', '');
-INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100150', '404', 'loginLogoImage', 'loginLogo', 'logo/login_title_2.png', '登录页logo路径', '');
-INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100151', '404', 'hostIp', '映射ip', '172.24.39.9', '映射ip', NULL);
-INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100152', '404', 'zmlHostIp', 'ZMLip', '172.24.39.9:1935', 'ZMLip端口', NULL);
-INSERT INTO `t_sys_param` (`param_id`, `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('100153', '404', 'gbCode', '国标编码', '3201140049', '国标编码', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'cleanContinue', '是否继续未完成的磁盘清理任务', 'false', '服务重启后继续执行没有执行完成的磁盘清理任务，此操作会导致备份不完整', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'logLevel', '打印日志级别', '2', '调试使用，级别越高打印日志越详细，范围 1-4', '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1-4的整数\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'logoImage', 'logo', 'logo/logo_gw_text.png', '首页logo', '');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'loginLogoImage', 'loginLogo', 'logo/login_title_2.png', '登录页logo路径', '');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'hostIp', '映射ip', '172.24.39.9', '映射ip', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'zmlHostIp', 'ZMLip', '172.24.39.9:1935', 'ZMLip端口', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'gbCode', '国标编码', '3201140049', '国标编码', NULL);
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'downResultPic', '任务报告下载算法分析图', 'false', '任务报告下载的大图下载算法分析后图片还是原图，true是算法分析后图片，false是原图', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false', '任务报告按站所拆分视图，站所为区域根节点下第一层节点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'upEnvDevice', '是否上传环控设备数据', 'false', '此参数用于向上级上传环控设备相关数据,用于轨交环控设备上传', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'upEnvDevice', '是否上传环控设备数据', 'false', '此参数用于向上级上传环控设备相关数据,用于轨交环控设备上传', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
