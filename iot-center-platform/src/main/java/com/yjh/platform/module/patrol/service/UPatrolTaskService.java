@@ -703,7 +703,8 @@ public class UPatrolTaskService {
                 taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             }
             if (StringUtils.isEmpty(taskId)) {
-                taskId = patrolledId;
+                taskId = StringUtils.countMatches(patrolledId, "_") > 1 ? StringUtils.substringAfter(patrolledId, "_") : patrolledId;
+                log.warn("查询数据库中 taskId 失败，taskCode: {}, date: {}, taskId: {}", taskCode, date, taskId);
             }
             //判断是不是机器人或者无人机
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);

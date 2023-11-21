@@ -248,8 +248,7 @@
     </select>
 
     <select id="selectAllRobotConInfo" parameterType="java.lang.Long" resultType="com.yjh.platform.module.video.entity.RobotConInfo">
-        select
-        a.robot_id,
+        select a.robot_id,
         a.robot_code,
         a.robot_name,
         a.robot_status,
@@ -276,11 +275,25 @@
         a.robot_position,
         a.remarks,
         a.record_id,
-        a.channel_num_light as numLight,
+        a.channel_num_light   as numLight,
         a.channel_num_inferad as numInferad,
+        a.channel_num_light,
+        a.channel_num_inferad,
         a.light_channel_id,
-        a.infrared_channel_id
+        a.infrared_channel_id,
+        c.record_id,
+        c.record_ip,
+        c.identity_manager,
+        c.identity_code,
+        c.rtsp_port,
+        c.recorder_type,
+        c.http_port as recordPort,
+        c.vendor_id recordVendor,
+        c.device_channel,
+        a.light_vendor,
+        a.infrared_vendor
         from t_robot_info a
+        LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id where a.robot_status = '在线' limit 3
     </select>
 
 </mapper>

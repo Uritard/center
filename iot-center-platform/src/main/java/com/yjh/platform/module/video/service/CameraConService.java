@@ -206,80 +206,15 @@ public class CameraConService {
         String lightCameraId = robotId + "9901";
         String infraredCameraId = robotId + "9902";
         RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
-        // 当配置了nvr的通道就走nvr的，并且recordID != null and recordID > 0L and recorderConInfo != null and recorderConInfo.getRecordIp() != null ,反之走原先的
-        if (Objects.nonNull(robotConInfo.getRecordId()) && robotConInfo.getRecordId() > 0L) {
-            RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
-            if (Objects.nonNull(recorderConInfo) && StringUtils.isNotEmpty(recorderConInfo.getRecordIp())) {
-                try {
-                    PlayEntity playEntity;
-                    if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId())) {
-                        playEntity = PlayEntity.builder().deviceId(recorderConInfo.getDeviceChannel())
-                            .channelId(String.valueOf(robotConInfo.getLightChannelId())).build();
-                        Result result = iPlayService.videoPlayByWvp(playEntity);
-                        Map data = (Map)result.getData();
-                        Map<String, Object> lightMap = new HashMap<>();
-                        lightMap.put("light", lightCameraId);
-                        lightMap.put("rtmpUrl", data.get("rtmp"));
-                        webRtcUrl(data, lightMap);
-                        returnMapList.add(lightMap);
-                    }
-                    if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId())) {
-                        playEntity = PlayEntity.builder().deviceId(recorderConInfo.getDeviceChannel())
-                            .channelId(String.valueOf(robotConInfo.getInfraredChannelId())).build();
-                        Result result = iPlayService.videoPlayByWvp(playEntity);
-                        Map data = (Map)result.getData();
-                        Map<String, Object> infraredMap = new HashMap<>();
-                        infraredMap.put("inferad", infraredCameraId);
-                        infraredMap.put("rtmpUrlInferad", data.get("rtmp"));
-                        webRtcUrl(data, infraredMap);
-                        returnMapList.add(infraredMap);
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        } else {
-            // 拉流
-            try {
-                // 可见光相机拉流
-                Map<String, Object> returnLightMap = getRobotStream(robotConInfo, lightCameraId);
-                // 红外相机拉流
-                String inferadIp = robotConInfo.getLnferadIp();
-                Integer inferadPort = robotConInfo.getInferadPort();
-                String inferadUsername = robotConInfo.getInferadUsername();
-                String inferadPassword = robotConInfo.getInferadPassword();
-                String robotInfraredVideo = String.valueOf(
-                    redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getInfraredVendor()));
-                Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
-                String hostIp = hostIpMap.get("content");
-                Map params = new HashMap();
-                params.put("username", inferadUsername);
-                params.put("password", inferadPassword);
-                params.put("ip", inferadIp);
-                params.put("port", inferadPort);
-                params.put("channelId", 1);
-                params.put("hostIp", hostIp);
-                params.put("name", infraredCameraId);
-                String transUrlInfrared = PathVariableUtil.variableParse(robotInfraredVideo, params);
-                transUrlInfrared = sign(transUrlInfrared, infraredCameraId);
-                PlayEntity playEntity = PlayEntity.builder().deviceId(infraredCameraId).command(transUrlInfrared).build();
-                iPlayService.videoPlayByFFM(playEntity);
-                log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort, infraredCameraId,
-                    transUrlInfrared);
-                String[] rtmpUrlsInferad = transUrlInfrared.split("rtmp");
-                String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 
-                Map<String, Object> returnInferadMap = new HashMap<>();
-                returnInferadMap.put("inferad", infraredCameraId);
-                returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
-                webRtcUrl(infraredCameraId, returnInferadMap);
-                returnMapList.add(returnLightMap);
-                returnMapList.add(returnInferadMap);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+        // 可见光相机拉流
+        Map<String, Object> returnLightMap = getRobotStream(robotConInfo, lightCameraId);
+        // 红外相机拉流
+        Map<String, Object> returnInferadMap = getRobotInfraredStream(robotConInfo, infraredCameraId);
+
+        returnMapList.add(returnLightMap);
+        returnMapList.add(returnInferadMap);
+
         return returnMapList;
     }
 
@@ -287,6 +222,7 @@ public class CameraConService {
         Map<String, Object> returnLightMap = new HashMap<>();
         IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
         try {
+            // 当配置了nvr的通道就走nvr的，并且recordID != null and recordID > 0L and recorderConInfo != null and recorderConInfo.getRecordIp() != null ,反之走原先的
             if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId()) && Objects.nonNull(robotConInfo.getRecordId())
                 && robotConInfo.getRecordId() > 0L) {
                 RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
@@ -295,6 +231,7 @@ public class CameraConService {
                         .build();
                 Result result = iPlayService.videoPlayByWvp(playEntity);
                 Map data = (Map)result.getData();
+                returnLightMap.put("rtmpUrl", data.get("rtmp"));
                 webRtcUrl(data, returnLightMap);
             } else {
                 String lightIp = robotConInfo.getLightIp();
@@ -310,7 +247,8 @@ public class CameraConService {
                 params.put("password", lightPassword);
                 params.put("ip", lightIp);
                 params.put("port", lightPort);
-                params.put("channelId", 1);
+                String channelId = StringUtils.defaultIfBlank(robotConInfo.getNumLight(), "1");
+                params.put("channelId", channelId);
                 params.put("hostIp", hostIp);
                 params.put("name", robotCameraId);
                 String transUrlLight = PathVariableUtil.variableParse(robotLightVideo, params);
@@ -319,13 +257,74 @@ public class CameraConService {
                 iPlayService.videoPlayByFFM(playEntity);
                 log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword, lightIp, lightPort,
                     robotCameraId, transUrlLight);
-                returnLightMap.put("light", robotCameraId);
+
+                int rtmpIdx = StringUtils.lastIndexOf(transUrlLight, "rtmp");
+                String rtmpUrlInferad = StringUtils.substring(transUrlLight, rtmpIdx);
+                returnLightMap.put("rtmpUrl", rtmpUrlInferad);
+
                 webRtcUrl(robotCameraId, returnLightMap);
             }
+            returnLightMap.put("light", robotCameraId);
+            redisTemplate.opsForHash().put("cameraRealFlow", robotCameraId, JSONObject.toJSONString(returnLightMap));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return returnLightMap;
+    }
+
+    public Map<String, Object> getRobotInfraredStream(RobotConInfo robotConInfo, String robotCameraId) {
+        Map<String, Object> returnInfraredMap = new HashMap<>();
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        try {
+            // 当配置了nvr的通道就走nvr的，并且recordID != null and recordID > 0L and recorderConInfo != null and recorderConInfo.getRecordIp() != null ,反之走原先的
+            if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId()) && Objects.nonNull(robotConInfo.getRecordId())
+                && robotConInfo.getRecordId() > 0L) {
+                RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
+                PlayEntity playEntity =
+                    new PlayEntity.Builder().deviceId(recorderConInfo.getDeviceChannel()).channelId(robotConInfo.getInfraredChannelId())
+                        .build();
+                Result result = iPlayService.videoPlayByWvp(playEntity);
+                Map data = (Map)result.getData();
+                returnInfraredMap.put("rtmpUrl", data.get("rtmp"));
+                webRtcUrl(data, returnInfraredMap);
+            } else {
+                // 红外相机拉流
+                String inferadIp = robotConInfo.getLnferadIp();
+                Integer inferadPort = robotConInfo.getInferadPort();
+                String inferadUsername = robotConInfo.getInferadUsername();
+                String inferadPassword = robotConInfo.getInferadPassword();
+                String robotInfraredVideo = String.valueOf(
+                    redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getInfraredVendor()));
+                Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
+                String hostIp = hostIpMap.get("content");
+                Map params = new HashMap();
+                params.put("username", inferadUsername);
+                params.put("password", inferadPassword);
+                params.put("ip", inferadIp);
+                params.put("port", inferadPort);
+                String channelId = StringUtils.defaultIfBlank(robotConInfo.getNumInferad(), "1");
+                params.put("channelId", channelId);
+                params.put("hostIp", hostIp);
+                params.put("name", robotCameraId);
+                String transUrlInfrared = PathVariableUtil.variableParse(robotInfraredVideo, params);
+                transUrlInfrared = sign(transUrlInfrared, robotCameraId);
+                PlayEntity playEntity = PlayEntity.builder().deviceId(robotCameraId).command(transUrlInfrared).build();
+                iPlayService.videoPlayByFFM(playEntity);
+                log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort, robotCameraId,
+                    transUrlInfrared);
+
+                int rtmpIdx = StringUtils.lastIndexOf(transUrlInfrared, "rtmp");
+                String rtmpUrlInferad = StringUtils.substring(transUrlInfrared, rtmpIdx);
+                returnInfraredMap.put("rtmpUrl", rtmpUrlInferad);
+
+                webRtcUrl(robotCameraId, returnInfraredMap);
+            }
+            returnInfraredMap.put("inferad", robotCameraId);
+            redisTemplate.opsForHash().put("cameraRealFlow", robotCameraId, JSONObject.toJSONString(returnInfraredMap));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return returnInfraredMap;
     }
 
     /**
@@ -1289,7 +1288,7 @@ public class CameraConService {
         if (MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
             webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=" + app + "&stream=" + id + "&type=play";
-            file = String.format("/%s/%s.live.flv", app, id);
+            file = String.format("/ZLM/%s/%s.live.flv", app, id);
         } else {
             // webrtc://172.24.39.10/live/40001
             webRtcUrl = "webrtc://" + hostIp + "/" + app + "/" + id;
@@ -1300,8 +1299,9 @@ public class CameraConService {
         String wsFlvUrl = wsScheam + hostIp + file;
 
         returnMap.put("webRtcUrl", webRtcUrl);
-        returnMap.put("flvUrl", webRtcUrl);
-        returnMap.put("wsFlvUrl", webRtcUrl);
+        returnMap.put("flvUrl", flvUrl);
+        returnMap.put("wsFlvUrl", wsFlvUrl);
+        returnMap.put("streamId", id);
     }
 
     private CameraVendor cameraVendor(int vendorId) {
@@ -1988,7 +1988,7 @@ public class CameraConService {
     public List<Map<String, Object>> robotStartRealPlayAll() {
         List<Map<String, Object>> res = new ArrayList<>();
         List<RobotConInfo> robotConInfos = cameraConDao.selectAllRobotConInfo();
-        if(org.apache.commons.collections.CollectionUtils.isEmpty(robotConInfos)){
+        if(CollectionUtils.isEmpty(robotConInfos)){
             log.info("robotConInfos is empty");
             return res;
         }
@@ -1999,105 +1999,13 @@ public class CameraConService {
                 String lightCameraId = robotId + "9901";
                 String infraredCameraId = robotId + "9902";
 
-                IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
-                // 当配置了nvr的通道就走nvr的，并且recordID != null and recordID > 0L and recorderConInfo != null and recorderConInfo.getRecordIp() != null ,反之走原先的
-                if (Objects.nonNull(robotConInfo.getRecordId()) && robotConInfo.getRecordId() > 0L) {
-                    RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
-                    if (Objects.nonNull(recorderConInfo) && StringUtils.isNotEmpty(recorderConInfo.getRecordIp())) {
-                        try {
-                            PlayEntity playEntity;
-                            if (StringUtils.isNotEmpty(robotConInfo.getLightChannelId())) {
-                                playEntity = PlayEntity.builder().deviceId(recorderConInfo.getDeviceChannel())
-                                        .channelId(String.valueOf(robotConInfo.getLightChannelId())).build();
-                                Result result = iPlayService.videoPlayByWvp(playEntity);
-                                Map data = (Map)result.getData();
-                                Map<String, Object> lightMap = new HashMap<>();
-                                lightMap.put("cameraId", lightCameraId);
-                                lightMap.put("rtmpUrl", data.get("rtmp"));
-                                webRtcUrl(data, lightMap);
-                                returnMapList.add(lightMap);
-                            }
-                            if (StringUtils.isNotEmpty(robotConInfo.getInfraredChannelId())) {
-                                playEntity = PlayEntity.builder().deviceId(recorderConInfo.getDeviceChannel())
-                                        .channelId(String.valueOf(robotConInfo.getInfraredChannelId())).build();
-                                Result result = iPlayService.videoPlayByWvp(playEntity);
-                                Map data = (Map)result.getData();
-                                Map<String, Object> infraredMap = new HashMap<>();
-                                infraredMap.put("cameraId", infraredCameraId);
-                                infraredMap.put("rtmpUrl", data.get("rtmp"));
-                                webRtcUrl(data, infraredMap);
-                                returnMapList.add(infraredMap);
-                            }
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    }
-                } else {
-                    // 拉流
-                    try {
-                        // 可见光相机拉流
-                        Map<String, Object> returnLightMap = new HashMap<>();
-                        String lightIp = robotConInfo.getLightIp();
-                        String lightPort = robotConInfo.getLightPort();
-                        String lightUsername = robotConInfo.getIdentityManager();
-                        String lightPassword = robotConInfo.getIdentityCode();
-                        String robotLightVideo = String.valueOf(
-                                redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getLightVendor()));
-                        Map<String, String> hostIpMap = redisTemplate.opsForHash().entries("t_sys_param:zmlHostIp");
-                        String hostIp = hostIpMap.get("content");
-                        Map params = new HashMap();
-                        params.put("username", lightUsername);
-                        params.put("password", lightPassword);
-                        params.put("ip", lightIp);
-                        params.put("port", lightPort);
-                        params.put("channelId", 1);
-                        params.put("hostIp", hostIp);
-                        params.put("name", lightCameraId);
-                        String transUrlLight = PathVariableUtil.variableParse(robotLightVideo, params);
-                        transUrlLight = sign(transUrlLight, lightCameraId);
-                        PlayEntity playEntity = new PlayEntity.Builder().command(transUrlLight).deviceId(lightCameraId).build();
-                        iPlayService.videoPlayByFFM(playEntity);
-                        log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword, lightIp, lightPort,
-                                lightCameraId, transUrlLight);
-                        returnLightMap.put("cameraId", lightCameraId);
-                        webRtcUrl(lightCameraId, returnLightMap);
+                // 可见光相机拉流
+                Map<String, Object> returnLightMap = getRobotStream(robotConInfo, lightCameraId);
+                // 红外相机拉流
+                Map<String, Object> returnInferadMap = getRobotInfraredStream(robotConInfo, infraredCameraId);
+                returnMapList.add(returnLightMap);
+                returnMapList.add(returnInferadMap);
 
-                        // 红外相机拉流
-                        String inferadIp = robotConInfo.getLnferadIp();
-                        Integer inferadPort = robotConInfo.getInferadPort();
-                        String inferadUsername = robotConInfo.getInferadUsername();
-                        String inferadPassword = robotConInfo.getInferadPassword();
-                        String robotInfraredVideo = String.valueOf(
-                                redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpeg-" + robotConInfo.getInfraredVendor()));
-                        Map inferadParams = new HashMap();
-                        inferadParams.put("username", inferadUsername);
-                        inferadParams.put("password", inferadPassword);
-                        inferadParams.put("ip", inferadIp);
-                        inferadParams.put("port", inferadPort);
-                        inferadParams.put("channelId", 1);
-                        inferadParams.put("hostIp", hostIp);
-                        inferadParams.put("name", infraredCameraId);
-                        String transUrlInfrared = PathVariableUtil.variableParse(robotInfraredVideo, inferadParams);
-                        transUrlInfrared = sign(transUrlInfrared, infraredCameraId);
-                        PlayEntity infreadPlayEntity = PlayEntity.builder().deviceId(infraredCameraId).command(transUrlInfrared).build();
-                        iPlayService.videoPlayByFFM(infreadPlayEntity);
-                        log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort, infraredCameraId,
-                                transUrlInfrared);
-                        String[] rtmpUrlsInferad = transUrlInfrared.split("rtmp");
-                        String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
-
-                        Map<String, Object> returnInferadMap = new HashMap<>();
-                        returnInferadMap.put("cameraId", infraredCameraId);
-                        returnInferadMap.put("rtmpUrl", rtmpUrlInferad);
-                        webRtcUrl(infraredCameraId, returnInferadMap);
-                        returnMapList.add(returnLightMap);
-                        returnMapList.add(returnInferadMap);
-                        redisTemplate.opsForHash().put("cameraRealFlow", lightCameraId, JSONObject.toJSONString(returnLightMap));
-                        redisTemplate.opsForHash().put("cameraRealFlow", infraredCameraId, JSONObject.toJSONString(returnInferadMap));
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
             } catch (Exception e) {
                 log.error("start robotRealPlay error,robotId is {}",robotId,e);
             }
