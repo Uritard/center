@@ -85,6 +85,10 @@ public class TMeterService {
         return result;
     }
 
+    public int update(TMeter tMeter){
+        return tMeterDao.update(tMeter);
+    }
+
     public Result collectData(Long id) {
         Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/collect?id={0}", Result.class, id);
         log.info("采集电量 result:{}", result);

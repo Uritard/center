@@ -27,6 +27,8 @@ public interface TMeterDao {
 
     TMeter selectByPrimaryKey(Long id);
 
+    int update(TMeter record);
+
     int updateByPrimaryKey(TMeter record);
 
     List<Map<String,Float>> countPowerTotalByRegion();

@@ -359,11 +359,11 @@
     <update id="updateById" parameterType="com.yjh.accessrobot.module.command.entity.TMeter">
         update t_meter
         <set>
-            <if test="totalPositivePower != null">total_positive_power = #{totalPositivePower,jdbcType=VARCHAR},</if>
-            <if test="totalPositiveReactivePower != null">total_positive_reactive_power = #{totalPositiveReactivePower,jdbcType=VARCHAR},</if>
-            <if test="totalNegativePositivePower != null">total_negative_positive_power = #{totalNegativePositivePower,jdbcType=VARCHAR},</if>
+            <if test="totalPositivePower != null and totalPositivePower != ''">total_positive_power = #{totalPositivePower,jdbcType=VARCHAR},</if>
+            <if test="totalPositiveReactivePower != null and totalPositiveReactivePower != ''">total_positive_reactive_power = #{totalPositiveReactivePower,jdbcType=VARCHAR},</if>
+            <if test="totalNegativePositivePower != null and totalNegativePositivePower != ''">total_negative_positive_power = #{totalNegativePositivePower,jdbcType=VARCHAR},</if>
             collect_power_time= now(),
-            <if test="magnificationCoefficient != null">magnification_coefficient = #{magnificationCoefficient},</if>
+            <if test="magnificationCoefficient != null and magnificationCoefficient != ''">magnification_coefficient = #{magnificationCoefficient},</if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
