@@ -14,7 +14,6 @@ import com.yjh.gateway.commons.utils.gmhelper.SM2Verify_SKF;
 import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +60,12 @@ public class zuulFilter extends ZuulFilter {
 
     private static RedisTemplate redisTemplate;
 
+    private static final String[] NO_AUTH =
+        new String[] {"/sysUser/v1/randomNumbers", "/sysUser/v1/getPubk", "/tSysParam/v1/sysConfig", "/tSysParam/v1/homePageInfo",
+            "/ssoAuth/v1/authority"};
+
+    private static final String[] LOGIN_PATH = new String[] {"/sysUser/v1/login", "/sysUser/v1/loginChangePassword"};
+
     @Resource
     private LogsAspect logsAspect;
 
@@ -89,17 +94,16 @@ public class zuulFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
         String remoteIp = IPUtil.getRemoteIP(request);
-        log.info("tt-url: {}", remoteIp);
+        log.info("tt-url: {}, url: {}", remoteIp, url);
         ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", remoteIp);
+        if (StringUtils.containsAny(url, NO_AUTH)) {
+            // 无需进行验证的接口
+            return true;
+        }
 
         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
         String token = request.getHeader("token") != null ? request.getHeader("token") : "";
-        if (!url.contains("/sysUser/v1/login")
-            && !url.contains("/sysUser/v1/randomNumbers")
-            && !url.contains("/sysUser/v1/loginChangePassword")
-            && !url.contains("/sysUser/v1/getPubk")
-            && !url .contains("/tSysParam/v1/sysConfig")
-            && !url .contains("/tSysParam/v1/homePageInfo")) {
+        if (!StringUtils.containsAny(url, LOGIN_PATH)) {
             if (StringUtils.isNoneBlank(token)) {
                 Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
@@ -131,8 +135,7 @@ public class zuulFilter extends ZuulFilter {
                                 !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount") && !url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot") &&
                                 !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
                                 !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
-                                !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo") &&
-                                !url.contains("/sysUser/v1/randomNumbers") && !url.contains("/sysUser/v1/getPubk")
+                                !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
                         ) {
                             redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             if ("true".equals(isLogin)) {
@@ -171,12 +174,7 @@ public class zuulFilter extends ZuulFilter {
         }
 
         if ("true".equals(isDecode)) {
-            if (!url.contains("/sysUser/v1/randomNumbers")
-                &&!url.contains("/sysUser/v1/getPubk")
-                && !url.contains("/sysUser/v1/login")
-                && !url.contains("/sysUser/v1/loginChangePassword")
-                &&!url.contains("/tSysParam/v1/sysConfig")
-                && !url .contains("/tSysParam/v1/homePageInfo")) {
+            if (!StringUtils.containsAny(url, LOGIN_PATH)) {
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
                 if (StringUtils.isNoneBlank(userId)) {
                     StringBuilder sb = new StringBuilder();
@@ -337,46 +335,35 @@ public class zuulFilter extends ZuulFilter {
         }
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {
-            if (!url.contains("/sysUser/v1/randomNumbers")
-                &&!url.contains("/homePage/v1/getWeatherInfo")
-                &&!url.contains("/sysUser/v1/getPubk")
-                &&!url.contains("/tSysParam/v1/sysConfig")
-                && !url .contains("/tSysParam/v1/homePageInfo")) {
-                if(StringUtils.isEmpty(userId)) {
-                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
-                }
-                String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
-                Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
+            if(StringUtils.isEmpty(userId)) {
+                return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
+            }
+            String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
+            Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
 
-                boolean ipValid = ips == null || ips.isEmpty() || ips.contains(ipAddr);
+            boolean ipValid = ips == null || ips.isEmpty() || ips.contains(ipAddr);
 
-                if (!ipValid || StringUtils.isEmpty(userId)) {
-                    log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
-                    ipAddr = ipAddr.replace("\"", "");
-                    JSONObject jsonMap = new JSONObject();
-                    jsonMap.put("type", "alarmPopUp");
-                    jsonMap.put("ip", ipAddr);
-                    jsonMap.put("warningInfo", "未绑定的IP地址");
-                    jsonMap.put("userId", userId);
-                    jsonMap.put("logType", "6");
-                    jsonMap.put("userName", userName);
-                    jsonMap.put("content", "用户[" + userName + "]在未绑定的IP地址访问系统!");
-                    WebSocketServer.sendMsg(jsonMap.toJSONString());
-                    logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 3);
-                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
-                }
+            if (!ipValid || StringUtils.isEmpty(userId)) {
+                log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
+                ipAddr = ipAddr.replace("\"", "");
+                JSONObject jsonMap = new JSONObject();
+                jsonMap.put("type", "alarmPopUp");
+                jsonMap.put("ip", ipAddr);
+                jsonMap.put("warningInfo", "未绑定的IP地址");
+                jsonMap.put("userId", userId);
+                jsonMap.put("logType", "6");
+                jsonMap.put("userName", userName);
+                jsonMap.put("content", "用户[" + userName + "]在未绑定的IP地址访问系统!");
+                WebSocketServer.sendMsg(jsonMap.toJSONString());
+                logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 3);
+                return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
             }
         }
         // 判断登录用户 UKey
         if ("true".equals(isUkey)) {
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-            if (!url.contains("/sysUser/v1/randomNumbers")
-                &&!url.contains("/homePage/v1/getWeatherInfo")
-                &&!url.contains("/sysUser/v1/getPubk")
-                &&!url.contains("/sysUser/v1/logout")
-                &&!url.contains("/tSysParam/v1/sysConfig")
-                && !url .contains("/tSysParam/v1/homePageInfo")) {
+            if (!url.contains("/sysUser/v1/logout")) {
                 if(StringUtils.isEmpty(userId)) {
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }

@@ -498,7 +498,9 @@ public class HomePageService {
         List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
         for (Long aLong : envReginIdList) {
             List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong);
-            envDeviceStatusList.addAll(envDeviceStatuses);
+            if (CollectionUtils.isNotEmpty(envDeviceStatuses)) {
+                envDeviceStatusList.addAll(envDeviceStatuses);
+            }
         }
         return envDeviceStatusList;
     }

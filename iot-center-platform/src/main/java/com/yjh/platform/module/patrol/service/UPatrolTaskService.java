@@ -303,12 +303,13 @@ public class UPatrolTaskService {
                 throw new BusinessException(ResultCodeEnum.CODE10005.getName());
             }
         } else {
+            Date now = DateUtil.dateSecond();
             if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
                 uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
             } else {
-                uPatrolTask.setStartTime(new Date());
+                uPatrolTask.setStartTime(now);
             }
-            uPatrolTask.setEndTime(new Date());
+            uPatrolTask.setEndTime(now);
         }
         if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
             uPatrolTask.setTaskCode(tCruiseTaskAdd.getTaskCode());
@@ -637,7 +638,7 @@ public class UPatrolTaskService {
 
         String stationCode = SysParamConfig.getSysContent("edgeId");
         String taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
-        mapForAbnormal.put("taskPatrolledId", taskPatrolledId);
+        mapForAbnormal.put("task_patrolled_id", taskPatrolledId);
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
@@ -667,7 +668,7 @@ public class UPatrolTaskService {
             String taskCode = robotPatrolTaskStatus.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
             String timeStr = robotPatrolTaskStatus.getPlanStartTime();
-            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern());
             String taskId = null;
 
             boolean robotEnd = false;
@@ -3032,7 +3033,7 @@ public class UPatrolTaskService {
         UPatrolTask tCruiseTask = new UPatrolTask();
         tCruiseTask.setTaskId(taskId);
         tCruiseTask.setTaskName("图像判别-" + taskId);
-        tCruiseTask.setStartTime(new Date());
+        tCruiseTask.setStartTime(DateUtil.dateSecond());
         int status = uPatrolTaskDao.add(tCruiseTask);
 
         // TODO: 2021/2/6 联调时放开 任务下发请求
@@ -3433,7 +3434,7 @@ public class UPatrolTaskService {
         tCruiseTaskAdd.setIntervalEndTime(aInterfaceTaskInfo.getIntervalEndTime());
         tCruiseTaskAdd.setTaskLevel(ValueUtil.toInteger(aInterfaceTaskInfo.getPriority(),2));
         tCruiseTaskAdd.setIfRun(173);
-        tCruiseTaskAdd.setStartTime(new Date());
+        tCruiseTaskAdd.setStartTime(DateUtil.dateSecond());
         boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
         if (standardPoints) {
             List<String> instanceIds = uPatrolTaskDao.selectForTaskInstanceId(aInterfaceTaskInfo.getDeviceList());
