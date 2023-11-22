@@ -71,4 +71,7 @@ public class CruiseResultAnalyzeMeteInfo extends CruiseResultAnalMeteInfo{
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cruiseTime;
 
+    @ApiModelProperty(value = "巡检点类型")
+    private Integer cruiseType;
+
 }

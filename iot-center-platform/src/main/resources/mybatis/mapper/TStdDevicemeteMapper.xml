@@ -837,9 +837,10 @@
         h.cruise_result,
         IFNULL(h.identify_result, h.cruise_result) as FinalState,
         k.dict_note as cruise_result_name,
-        h.identify_result
+        h.identify_result,
+        e.cruise_type
         FROM
-        LEFT JOIN t_cruise_point_instance e
+        t_cruise_point_instance e
         JOIN t_std_devicemete f on f.device_mete_id = e.device_mete_id
         LEFT JOIN t_std_device g on g.device_id = f.device_id
         LEFT JOIN t_std_devicemete_update h on  h.device_mete_id = e.device_mete_id
@@ -876,7 +877,8 @@
         h.cruise_result,
         IFNULL(h.identify_result, h.cruise_result) as FinalState,
         k.dict_note as cruise_result_name,
-        h.identify_result
+        h.identify_result,
+        e.cruise_type
         FROM
         t_cruise_point_instance e
         JOIN t_std_devicemete f on f.device_mete_id = e.device_mete_id
