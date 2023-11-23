@@ -505,7 +505,7 @@ public class HomePageService {
 
     public List<EnvDeviceStatus> queryWeatherInfo(Long regionId) {
         String envDataJson = getRedisMapString("Weather", regionId.toString());
-        List<EnvDeviceStatus> queryEnvDeviceInfo = null;
+        List<EnvDeviceStatus> queryEnvDeviceInfo = new ArrayList<>();
         if (StringUtils.isNotEmpty(envDataJson)) {
             JSONArray objects = JSONArray.parseArray(envDataJson);
             queryEnvDeviceInfo = objects.toJavaList(EnvDeviceStatus.class);

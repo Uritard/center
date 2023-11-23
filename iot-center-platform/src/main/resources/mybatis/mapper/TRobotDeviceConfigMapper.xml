@@ -26,7 +26,7 @@
         select
         <include refid="Base_Column_List" />
         from t_robot_device_config
-        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT}
     </select>
     <select id="selectDeviceConfigByRobotId" resultType="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
         select
@@ -86,7 +86,7 @@
         FROM
             t_std_device b
         WHERE
-            b.alias_name != ''
+            b.alias_name != '' AND node_id IS NOT NULL
         <if test="name != null and name != ''">
             and b.alias_name like concat('%',#{name},'%')
         </if>
@@ -116,7 +116,7 @@
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_robot_device_config
-        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+        where  device_config_id = #{deviceConfigId,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByRobotId">
         delete from t_robot_device_config
@@ -186,11 +186,11 @@
                     update_person = #{updatePerson,jdbcType=VARCHAR},
                 </if>
         </set>
-        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.platform.module.user.entity.TRobotDeviceConfig">
         update t_robot_device_config
-        set 
+        set
             robot_id =  #{robotId,jdbcType=SMALLINT},
             equipment_id =  #{equipmentId,jdbcType=BIGINT},
             equipment_name =  #{equipmentName,jdbcType=VARCHAR},
@@ -199,6 +199,6 @@
             y_coordinate =  #{yCoordinate,jdbcType=INTEGER},
             update_time =  #{updateTime,jdbcType=TIMESTAMP},
             update_person =  #{updatePerson,jdbcType=VARCHAR}
-        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT} 
+        where   device_config_id = #{deviceConfigId,jdbcType=BIGINT}
     </update>
 </mapper>
