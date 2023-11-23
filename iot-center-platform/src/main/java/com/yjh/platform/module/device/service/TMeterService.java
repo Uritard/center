@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.base.Strings;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -12,6 +13,7 @@ import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.device.entity.TMeterVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,12 +62,40 @@ public class TMeterService {
         }
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<TMeter> tMeterList = tMeterDao.selectByUpRegionId(list);
-        Map<String, Object> resultMap = new HashMap<>();
+        this.setPower(tMeterList, true);
+        Map<String, Object> resultMap = new HashMap<>(2);
         resultMap.put("count", page.getTotal());
         resultMap.put("list", tMeterList);
         result.setData(resultMap);
         result.setCode(ResultCodeEnum.NORMAL.getCode());
         return result;
+    }
+
+    public void setPower(List<TMeter> tMeterList, Boolean flag) {
+        tMeterList.forEach(tMeter -> {
+            int mc = Integer.parseInt(StringUtils.isNotBlank(tMeter.getMagnificationCoefficient()) ? tMeter.getMagnificationCoefficient() : "1");
+            String totalPositivePower = StringUtils.isNotBlank(tMeter.getTotalPositivePower()) ? tMeter.getTotalPositivePower() : "0";
+            tMeter.setTotalPositivePower(getMeterRealNum(Double.parseDouble(totalPositivePower) * mc, flag));
+            String totalPositiveReactivePower = StringUtils.isNotBlank(tMeter.getTotalPositiveReactivePower()) ? tMeter.getTotalPositiveReactivePower() : "0";
+            tMeter.setTotalPositiveReactivePower(getMeterRealNum(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
+            String totalNegativeReactivePower = StringUtils.isNotBlank(tMeter.getTotalNegativeReactivePower()) ? tMeter.getTotalNegativeReactivePower() : "0";
+            tMeter.setTotalNegativeReactivePower(getMeterRealNum(Double.parseDouble(totalNegativeReactivePower) * mc, flag));
+            String totalNegativePositivePower = StringUtils.isNotBlank(tMeter.getTotalNegativePositivePower()) ? tMeter.getTotalNegativePositivePower() : "0";
+            tMeter.setTotalNegativePositivePower(getMeterRealNum(Double.parseDouble(totalNegativePositivePower) * mc, flag));
+        });
+    }
+
+    public String getMeterRealNum(Double num, Boolean flag) {
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        String res;
+        double million = 1000000L;
+        if (num > million && flag) {
+            num = num / million;
+            res = decimalFormat.format(num) + "m";
+        } else {
+            res = decimalFormat.format(num);
+        }
+        return res;
     }
 
     public int deleteByPrimaryKey(Long id) {
@@ -100,6 +131,7 @@ public class TMeterService {
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
+        this.setPower(list, false);
         return list.stream().map(e -> {
             TMeterVo tMeterVo = new TMeterVo();
             BeanUtils.copyProperties(e, tMeterVo);
