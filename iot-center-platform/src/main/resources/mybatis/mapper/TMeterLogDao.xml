@@ -54,7 +54,7 @@
         insert into t_meter_log
          (<include refid="Base_Column_List_exclude_id"></include>)
         values (
-            #{id}, #{name}, #{ip}, #{port}, #{address}, #{type},#{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativeReactivePower},
+            #{id}, #{name}, #{ip}, #{port}, #{address}, #{type},#{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativePositivePower},
             now(), '0', now(), '0', 0
         )
     </insert>
