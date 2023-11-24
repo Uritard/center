@@ -27,6 +27,7 @@ public class DLT645Decoder extends ByteToMessageDecoder {
         log.info("消息进站 before decode remoteAddress:{} msg: {}", ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         if (byteBuf.readableBytes() < Constant.minLength) {
             log.error("length 小于最小 ,length:{}", byteBuf.readableBytes());
+            byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
         // 过滤0xfe
@@ -40,6 +41,7 @@ public class DLT645Decoder extends ByteToMessageDecoder {
         byteBuf.readBytes(dataFrame);
         if (dataFrame[0] != Constant.START_OF_FRAME || dataFrame[7] != Constant.START_OF_FRAME) {
             log.error("帧起始符不正确");
+            byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
         //计算校验码

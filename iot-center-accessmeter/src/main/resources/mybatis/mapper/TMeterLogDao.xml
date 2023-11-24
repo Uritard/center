@@ -55,7 +55,7 @@
          (<include refid="Base_Column_List_exclude_id"></include>)
         values (
             #{id}, #{name}, #{ip}, #{port}, #{address}, #{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativeReactivePower},
-            now(), '0', now(), '0', 0
+            #{collectPowerTime}, '0', now(), '0', 0
         )
     </insert>
 </mapper>
