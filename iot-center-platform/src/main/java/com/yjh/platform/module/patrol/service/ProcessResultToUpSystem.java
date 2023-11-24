@@ -92,12 +92,8 @@ public class ProcessResultToUpSystem {
      * @param tWarnInfo 告警信息
      */
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
-        if (Constant.fastTurbo()) {
+        if (Constant.fastTurbo() || !Constant.upSystemFlag()) {
             // 压测模式，结果不上报上级系统
-            return null;
-        }
-        if (!Constant.upSystemFlag()) {
-            // 上级系统未启用,不上报
             return null;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -500,11 +496,10 @@ public class ProcessResultToUpSystem {
     /**
      * 缺陷和判别上报算法管理平台
      *
-     * @param taskId 任务id
-     * @param instanceId 巡视点id
+     * @param cruiseResultMap 任务结果
      * @param msgId
      */
-    public void defectToAlgorithmM(String taskId, String instanceId, String msgId) {
+    public void defectToAlgorithmM(Map<String, String> cruiseResultMap, String msgId) {
         if (Constant.fastTurbo()) {
             // 压测模式，结果不上报上级系统
             return;
@@ -517,16 +512,19 @@ public class ProcessResultToUpSystem {
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-        if(DISTING_MAP.containsKey(msgId) && Constant.managerSystemFlag()){
+
+        List<String> diffList = DISTING_MAP.remove(msgId);
+        // Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
+        Long instanceId = MapUtils.getLong(cruiseResultMap, "instanceId");
+        if(CollectionUtils.isNotEmpty(diffList) && Constant.managerSystemFlag()){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
 
             // 先取出算法平台返回的resultinfo中的结果图片路径
             String resultImage;
-            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
             String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
             String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
             resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
@@ -535,7 +533,7 @@ public class ProcessResultToUpSystem {
             //,获取结果路径.并拼接算法管理平台对应远程文件路径
             String remotefilepath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
-            TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
+            TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(instanceId);
             // 获取巡视点位id
             String cruiseId=String.valueOf(tCruisePointInstance.getCruiseid());
             String judgeBaseImagepath= SysParamConfig.getSysContent("presetImgPath");
@@ -544,7 +542,6 @@ public class ProcessResultToUpSystem {
             //拼接算法管理平台分析告警结果图片地址
             String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
 
-            List<String> diffList = DISTING_MAP.remove(msgId);
             List<Different> defectTempList = new ArrayList<>();
             Alarm alarmDetail = new Alarm();
             for (String resultValue : diffList) {
@@ -601,20 +598,22 @@ public class ProcessResultToUpSystem {
             }
             alarmService.PushMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
+        }
 
-            // 判别上报上一级系统
+        // 判别上报上一级系统
+        if (CollectionUtils.isNotEmpty(diffList) && Constant.upSystemFlag()) {
             distinguishToUpSystem(cruiseResultMap, diffList);
         }
 
-        if(DEFECT_MAP.containsKey(msgId) && Constant.managerSystemFlag()) {
+        List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
+        if(CollectionUtils.isNotEmpty(defectList) && Constant.managerSystemFlag()) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
 
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
             // 先取出算法平台返回的resultinfo中的结果图片路径
             String resultImage;
-            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
             String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
             resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
@@ -624,7 +623,6 @@ public class ProcessResultToUpSystem {
             //拼接算法管理平台分析告警结果图片地址
             String remotefilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
-            List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
             Alarm alarmDetail = new Alarm();
             List<Defect> defectTempList = new ArrayList<>();
             for (Map<String, String> defectMap : defectList) {
@@ -683,6 +681,8 @@ public class ProcessResultToUpSystem {
             alarmService.PushMsg(alarmDetail);
             log.info("缺陷告警发送算法管理平台结束");
 
+        }
+        if (CollectionUtils.isNotEmpty(defectList) && Constant.upSystemFlag()) {
             // 缺陷上报上一级系统
             defectToUpSystem(cruiseResultMap, defectList);
         }

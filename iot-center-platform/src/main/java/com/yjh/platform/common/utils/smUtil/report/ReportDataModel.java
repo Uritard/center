@@ -2,6 +2,7 @@ package com.yjh.platform.common.utils.smUtil.report;
 
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
@@ -213,6 +214,10 @@ public class ReportDataModel {
                 } else {
                     cbsInspectionResultVo.setIdentifyResultName("异常");
                     abnormalList.add(cbsInspectionResultVo);
+                    if (isNormal) {
+                        String desc = cbsInspectionResultVo.getResultDesc() + "(" + DictConvertUtil.DICT.covertToDict("identifyResult", cbsInspectionResultVo.getIdentifyResult()) + ")";
+                        cbsInspectionResultVo.setResultDesc(desc);
+                    }
                 }
             } else {
                 if (isNormal) {
