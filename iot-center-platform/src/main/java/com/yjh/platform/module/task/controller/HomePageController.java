@@ -357,7 +357,7 @@ public class HomePageController {
     public Result queryStations(@RequestParam(value = "regionId", required = false) Long regionId) {
         Result result = new Result();
         try {
-            result.setData(homePageService.queryStations(regionId));
+            result.setData(homePageService.queryStations(regionId, "1"));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

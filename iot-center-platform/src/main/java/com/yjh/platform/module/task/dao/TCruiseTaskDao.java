@@ -67,6 +67,8 @@ public interface TCruiseTaskDao {
 
     List<StationCount> queryStations(List<Long> list);
 
+    List<StationCount> queryStations2(List<Long> list);
+
     RegionPath queryRegion(@Param(value = "regionId")Long regionId);
 
     TCruiseTask selectCruiseTask(@Param(value = "taskId") String taskId,

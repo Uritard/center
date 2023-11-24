@@ -434,8 +434,9 @@ public class HomePageService {
      * 站所状况统计
      *
      * @date 2022/3/1
+     * @param type 1 机器人拆分统计  2 机器人合并统计
      */
-    public List<StationCount> queryStations(Long regionId) {
+    public List<StationCount> queryStations(Long regionId, String type) {
 
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
         StationCount sta = new StationCount();
@@ -445,7 +446,12 @@ public class HomePageService {
         List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
         staSize = envReginIdList.stream().map(this::queryWeatherInfo).filter(list -> list != null && list.size() > 0).mapToInt(List::size).sum();
         sta.setCount(staSize);
-        List<StationCount> stationCounts = tCruiseTaskDao.queryStations(regionIdList);
+        List<StationCount> stationCounts;
+        if ("1".equals(type)) {
+            stationCounts = tCruiseTaskDao.queryStations(regionIdList);
+        } else {
+            stationCounts = tCruiseTaskDao.queryStations2(regionIdList);
+        }
         stationCounts.add(sta);
         return stationCounts;
     }
@@ -458,7 +464,7 @@ public class HomePageService {
      */
     public StationDetail queryStationDetail(Long regionId) {
         StationDetail stationDetail = new StationDetail();
-        stationDetail.setStationCounts(this.queryStations(regionId));
+        stationDetail.setStationCounts(this.queryStations(regionId, "2"));
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
         List<EnvDeviceStatus> envDeviceStatusList = this.queryWeatherInfos(regionIdList);
         envDeviceStatusList = envDeviceStatusList.stream().filter(e -> StringUtils.equals(e.getShowType(), "2")).limit(6).collect(Collectors.toList());
@@ -603,7 +609,7 @@ public class HomePageService {
 
     public TaskInfoBean queryTaskInfo() {
         TaskInfoBean taskInfoBean = uPatrolResultDao.queryTaskInfo();
-        List<StationCount> list = this.queryStations(null);
+        List<StationCount> list = this.queryStations(null, "1");
         taskInfoBean.setTotalDeviceCount(list.stream().mapToInt(StationCount::getCount).sum());
         taskInfoBean.setTotalPointCount(tStdDevicemeteDao.selectStdDeviceMeteCount());
         TaskInfoBean taskInfoBean2 = tWarnInfoDao.selectAllCount();
