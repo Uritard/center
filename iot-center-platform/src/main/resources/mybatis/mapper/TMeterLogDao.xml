@@ -22,13 +22,15 @@
         id, meter_id, meter_name,ip,
         port,address,type,up_region_id,total_positive_power,
         total_positive_reactive_power,total_negative_positive_power,
-        create_time, create_person, update_time, update_person, is_deleted, magnification_coefficient
+        create_time, create_person, update_time, update_person, is_deleted,
+        total_positive_power_difference_value,magnification_coefficient
     </sql>
     <sql id="Base_Column_List_exclude_id">
         meter_id, meter_name,ip,
         port,address,type,up_region_id,total_positive_power,
         total_positive_reactive_power,total_negative_positive_power,
-        create_time, create_person, update_time, update_person, is_deleted, magnification_coefficient
+        create_time, create_person, update_time, update_person, is_deleted,
+        total_positive_power_difference_value,magnification_coefficient
     </sql>
 
     <select id="list" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
@@ -55,7 +57,7 @@
          (<include refid="Base_Column_List_exclude_id"></include>)
         values (
             #{id}, #{name}, #{ip}, #{port}, #{address}, #{type},#{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativePositivePower},
-            now(), '0', now(), '0', 0, #{magnificationCoefficient}
+            now(), '0', now(), '0', 0, #{totalPositivePowerDifferenceValue}, #{magnificationCoefficient}
         )
     </insert>
 </mapper>
