@@ -460,7 +460,9 @@ public class HomePageService {
         StationDetail stationDetail = new StationDetail();
         stationDetail.setStationCounts(this.queryStations(regionId));
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-        stationDetail.setEnvDeviceStatuses(this.queryWeatherInfos(regionIdList));
+        List<EnvDeviceStatus> envDeviceStatusList = this.queryWeatherInfos(regionIdList);
+        envDeviceStatusList = envDeviceStatusList.stream().filter(e -> StringUtils.equals(e.getShowType(), "2")).limit(6).collect(Collectors.toList());
+        stationDetail.setEnvDeviceStatuses(envDeviceStatusList);
         List<RegionVideo> regionVideoList = tCruiseTaskDao.queryRegionVideoList(regionIdList);
         Map<String, String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
@@ -471,7 +473,7 @@ public class HomePageService {
             }
             map.putAll(recordIdMap);
         }
-        regionVideoList = regionVideoList.stream().filter(r -> StringUtils.equals(map.get(r.getCameraId().toString()), "1")).collect(Collectors.toList());
+        regionVideoList = regionVideoList.stream().filter(r -> StringUtils.equals(map.get(r.getCameraId().toString()), "1")).limit(6).collect(Collectors.toList());
         stationDetail.setRegionVideos(regionVideoList);
         return stationDetail;
     }
