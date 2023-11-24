@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -116,6 +117,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                 log.info("dataValue hex:{} value:{}", hexString, powerTotal);
                 String powerTotalString = String.format("%.2f", powerTotal / 100.0);
                 //数据入库
+                tMeter.setCollectPowerTime(new Date());
                 if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL)) {
                     log.info("采集到正向有功电能:{}", powerTotalString);
                     tMeter.setTotalPositivePower(powerTotalString);
@@ -129,17 +131,15 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                         log.info("计算电表差值出错！",e);
                     }
                     tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-                    tMeterDao.updateData(tMeter);
                     platformProxy.uploadMeterInfo(tMeter);
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL)) {
                     log.info("采集到正向无功电能:{}", powerTotalString);
                     tMeter.setTotalPositiveReactivePower(powerTotalString);
-                    tMeterDao.updateData(tMeter);
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL)) {
                     log.info("采集到反向无功电能:{}", powerTotalString);
                     tMeter.setTotalNegativeReactivePower(powerTotalString);
-                    tMeterDao.updateData(tMeter);
                 }
+                tMeterDao.updateData(tMeter);
                 log.info("tMeter {}", tMeter);
                 tMeterLogDao.insert(tMeter);
             } else {
