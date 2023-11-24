@@ -755,7 +755,7 @@ select *from (
         COUNT(1) AS count
         FROM t_robot_info a
         LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code AND b.col_name = 'robot_type'
-        WHERE 1=1
+        WHERE 1=1 and is_use = 166
         <if test="list!=null and list.size>0">
             and a.up_region_id IN
             <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
@@ -763,6 +763,29 @@ select *from (
             </foreach>
         </if>
         GROUP BY a.robot_type
+        UNION
+        SELECT '视频设备' type,COUNT(1) AS count FROM t_camera_info b WHERE 1=1
+        <if test="list!=null and list.size>0">
+            and b.up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryStations2" resultType="com.yjh.platform.module.task.entity.StationCount">
+        SELECT
+        '机器人设备' as type,
+        COUNT(robot_type) AS count
+        FROM t_robot_info a
+        LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code AND b.col_name = 'robot_type'
+        WHERE 1=1 and is_use = 166
+        <if test="list!=null and list.size>0">
+            and a.up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
         UNION
         SELECT '视频设备' type,COUNT(1) AS count FROM t_camera_info b WHERE 1=1
         <if test="list!=null and list.size>0">
