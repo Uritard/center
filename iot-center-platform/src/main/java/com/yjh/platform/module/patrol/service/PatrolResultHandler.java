@@ -218,14 +218,6 @@ public class PatrolResultHandler {
                     }
                 }
 
-                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
-                if (Constant.isHost() && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
-                    log.info("No alarms need to be handled...");
-                }else if(!Constant.fastTurbo() && !Constant.isUpSystem()) {
-                    // 告警处理
-                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
-                }
-
                 infoMap.put("instanceId", instanceId);
 
                 Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(robotCode);
@@ -260,6 +252,13 @@ public class PatrolResultHandler {
                             redisTemplate, true,eventPublisher, this);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
+                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
+                if (Constant.isHost() && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())){
+                    log.info("No alarms need to be handled...");
+                }else if(!Constant.fastTurbo() && !Constant.isUpSystem()) {
+                    // 告警处理
+                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
+                }
             } catch (Exception e) {
                 log.error("处理下级系统的巡视结果异常:", e);
             }
@@ -479,7 +478,7 @@ public class PatrolResultHandler {
                     String resultValue = resultList.get(0).getResultValue();
                     //检查相 是否对应  算法返回结果示例：A36.0
                     String resultPhase = resultValue.substring(0,1);
-                    String presetAttributeToPhase = String.valueOf((char)((int)presetAttribute.charAt(0)+16));
+                    String presetAttributeToPhase = String.valueOf((char)(presetAttribute.charAt(0)+16));
                     synchronized (Constant.threePhaseCountMap) {
                         if (presetAttributeToPhase.equals(resultPhase)) {
                             resultValue = resultValue.substring(1);
@@ -494,7 +493,7 @@ public class PatrolResultHandler {
                         } else {
                             //相 不匹配 本次结果不处理
                             log.info("现在是第几个点：{},总共有：{}", Constant.threePhaseCountMap.get(instanceId), Constant.threePhaseMap.get(instanceId));
-                            if (Constant.threePhaseCountMap.get(instanceId) == Constant.threePhaseMap.get(instanceId)) {
+                            if (Objects.equals(Constant.threePhaseCountMap.get(instanceId), Constant.threePhaseMap.get(instanceId))) {
                                 //最后一个点 还不匹配 识别失败
                                 resultList.get(0).setResultValue("-1");
                                 Constant.threePhaseCountMap.remove(instanceId);
@@ -530,8 +529,8 @@ public class PatrolResultHandler {
 
                 uPatrolTaskService.patrolTaskResultHandler(cruiseResultMap);
 
-                // 缺陷和判别上报算法管理平台
-                processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
+                // 缺陷和判别上报算法管理平台及上级系统
+                processResultToUpSystem.defectToAlgorithmM(cruiseResultMap, msgId);
 
             } catch (Exception e) {
                 log.error("处理算法分析后的巡视结果异常：", e);

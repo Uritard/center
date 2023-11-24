@@ -556,7 +556,7 @@ public class Constant {
      * 上级系统连接开关 1开 0关
      * @return
      */
-    public static Boolean upSystemFlag() {
+    public static boolean upSystemFlag() {
         if (upSystemFlag == null) {
             try {
                 upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
@@ -573,7 +573,7 @@ public class Constant {
      * 算法平台连接开关 1开 0关
      * @return
      */
-    public static Boolean managerSystemFlag() {
+    public static boolean managerSystemFlag() {
         if (managerSystemFlag == null) {
             try {
                 managerSystemFlag = redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag").toString();

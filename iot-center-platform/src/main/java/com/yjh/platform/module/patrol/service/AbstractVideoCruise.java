@@ -219,7 +219,7 @@ public abstract class AbstractVideoCruise {
                                 inspectionMap.put("picpath", urlPath);
                                 inspectionMap.put("origpic", absPath);
 
-                                algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, re, algorithm);
+                                algorithmAnalysis(inspectionMap, String.valueOf(presetId), taskId, item, algorithm);
                             }
                             return false;
                         } else {
