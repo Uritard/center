@@ -8,6 +8,7 @@ import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -45,9 +46,8 @@ public class MeterInfoHandler {
         // 巡视结果
         if (StringUtils.isNotEmpty(event.getResult())) {
             String key = meterKey + event.getTaskId() + ":" + event.getDeviceId();
-            Map<String, String> meterInfo = new HashMap<>(2);
+            Map<String, String> meterInfo = new HashMap<>(4);
             String value = getNumeric(event.getResult());
-            ;
             if (event.getResult().contains("正向有功总")) {
                 meterInfo.put("totalPositivePower", value);
             } else if (event.getResult().contains("无功I总")) {
@@ -68,16 +68,12 @@ public class MeterInfoHandler {
         for (TMeter meter : meterList) {
             Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + meter.getDeviceId());
             if (meterInfo.size() == 3) {
-                Float value = 0F;
-                try {
-                    value = Float.parseFloat(meterInfo.get("totalPositivePower")) - Float.parseFloat(meter.getTotalPositivePower());
-                }catch (Exception e){
-                    log.info("计算电表差值出错！",e);
-                }
+                Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
+
                 meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-                meter.setTotalPositivePower(meterInfo.get("totalPositivePower"));
-                meter.setTotalPositiveReactivePower(meterInfo.get("totalPositiveReactivePower"));
-                meter.setTotalNegativePositivePower(meterInfo.get("totalNegativePositivePower"));
+                meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
+                meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
+                meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
                 tMeterDao.updateByPrimaryKey(meter);
                 tMeterLogDao.insert(meter);
                 meterInfoUpload(meter);

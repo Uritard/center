@@ -124,7 +124,7 @@ public class TMeter implements Serializable {
     /**
      * 电表耗电量计算系数
      */
-    private String magnificationCoefficient;
+    private int magnificationCoefficient = 1;
     /**
      * 正向有功总电量与上一次的差值
      */

@@ -287,7 +287,7 @@
          total_positive_reactive_power,
          total_negative_positive_power,
          collect_power_time,
-        magnification_coefficient
+         magnification_coefficient
         )
         values
         <foreach collection="list"  item="tMeter" separator=",">
