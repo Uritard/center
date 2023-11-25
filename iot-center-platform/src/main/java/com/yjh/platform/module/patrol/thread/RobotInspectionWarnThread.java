@@ -153,9 +153,10 @@ public class RobotInspectionWarnThread implements Runnable{
             tDefectInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
             tDefectInfo.setConfMode(276);
             String type = tRobotInspectionDao.selectTypeByInstanceId(instanceId);
-            int alarmSource = 998;
+            int alarmSource = 279;
             if (StringUtils.isNotEmpty(type)){
-                alarmSource = NumberUtils.toInt(analyseDataOperateService.selectDictCode("alarm_source", type),998);
+                String cruiseTypeName = DictConvertUtil.DICT.covertToDict("cruiseType", type);
+                alarmSource = NumberUtils.toInt(DictConvertUtil.DICT.getDictCode("alarmSource", cruiseTypeName),279);
             }
             tDefectInfo.setAlarmSource(alarmSource);
             tDefectInfo.setValue(taskAlarm.getValue());

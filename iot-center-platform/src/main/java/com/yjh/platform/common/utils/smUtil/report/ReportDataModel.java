@@ -206,6 +206,7 @@ public class ReportDataModel {
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
+            cbsInspectionResultVo.setIdentifyResultName("正常");
             // 正常结果 巡视结果正常 246， 无告警
             boolean isNormal =  CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0) && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL);
             if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResult())) {
@@ -222,7 +223,6 @@ public class ReportDataModel {
             } else {
                 if (isNormal) {
                     // 无告警放入正常
-                    cbsInspectionResultVo.setIdentifyResultName("正常");
                     normalList.add(cbsInspectionResultVo);
                 } else if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 1)) {
                     // 告警放入异常

@@ -373,13 +373,13 @@ public class ReportManageService {
     }
 
     public String getTaskVoCount(List<TCruiseDataResultDetail> tCruiseDataResultDetailList) {
-        //总点数
+        // 总点数
         long allCount = tCruiseDataResultDetailList.size();
-//        审核结果正常
-        long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL)).count();
-        //未审核
-        long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)).count();
-        //已检点数
+        // 正常，巡视结果正常且无告警，且未审核或审核结果正常
+        long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL) && !CommonUtils.equals(detail.getIsWarn(), 1) && (CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN) || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL))).count();
+        // 待人工确认，未审核，且巡视结果异常
+        long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN) && CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)).count();
+        // 已检点数
         // long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail ->
         //         !ArrayUtils.contains(new String[]{"超时", "任务终止", "设备检修中", "机器人离线,未执行", "机器人处于检修状态,未执行"}, detail.getResultDesc())).count();
         long alreadyCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseState(), CruiseConstant.CRUISE_STATE_DONE)).count();

@@ -79,7 +79,7 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
                 tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
-                tMeter.setMagnificationCoefficient(MapUtils.getString(item,"magnificationCoefficient"));
+                tMeter.setMagnificationCoefficient(MapUtils.getIntValue(item,"magnificationCoefficient", 1));
                 updateMeterList.add(tMeter);
             } else {
                 tMeter = new TMeter();
@@ -95,6 +95,7 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
                 tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
+                tMeter.setMagnificationCoefficient(MapUtils.getIntValue(item,"magnificationCoefficient", 1));
                 addMeterList.add(tMeter);
             }
             meterLogList.add(tMeter);
