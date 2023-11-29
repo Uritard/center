@@ -599,7 +599,8 @@ public class CameraConService {
      */
     public void backSpeedSeek(String streamId, Double speed, Long seek) {
         if ((speed == null || speed == 0D) && (seek == null || seek == 0L)) {
-            throw new BusinessException(ResultCodeEnum.INVALIDREQUEST, "speed 或 seek 必须存在一个");
+            log.warn("speed 或 seek 都为空或0，streamId: {}, speed: {}, seek: {}", streamId, speed, seek);
+            return;
         }
 
         PlayBackControlEntity playBackEntity =
