@@ -279,7 +279,7 @@ public class RobotInspectionWarnThread implements Runnable{
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             log.info("taskId是：{}，instanceId是：{}的 tCruiseTaskResultMap：{}", taskId, instanceId, tCruiseTaskResultMap);
-            if (Objects.nonNull(tCruiseTaskResultMap.get("picpath"))) {
+            if (!CommonUtils.isEmptyOrNullstr(tCruiseTaskResultMap.get("picpath"))) {
                 map.put("imagePath", tCruiseTaskResultMap.get("picpath"));
             } else {
                 MAP_LOCK.put(taskId + instanceId, waiter);

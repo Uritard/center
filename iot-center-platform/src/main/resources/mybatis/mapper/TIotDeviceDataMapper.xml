@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.iot.dao.TIotDeviceDataMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.iot.entity.TIotDeviceData">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="pointId" column="point_id" jdbcType="BIGINT"/>
+        <result property="pointName" column="point_name" jdbcType="VARCHAR"/>
+        <result property="iotDeviceId" column="iot_device_id" jdbcType="BIGINT"/>
+        <result property="iotDeviceName" column="iot_device_name" jdbcType="VARCHAR"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="unit" column="unit" jdbcType="VARCHAR"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id
+        ,point_id,point_name,
+        iot_device_id,iot_device_name,value,
+        unit,up_region_id,create_time,
+        magnification_coefficient
+    </sql>
+</mapper>
