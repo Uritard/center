@@ -6,6 +6,7 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -67,4 +68,6 @@ public interface TStdRegionDao {
      * 查询所有的站点，即根目录下第一级目录
      */
     List<TStdRegion> selectStations();
+
+    Collection<Long> selectRegionListByUpRegionId(@Param(value = "upRegionList") Set<Long> regionParam);
 }

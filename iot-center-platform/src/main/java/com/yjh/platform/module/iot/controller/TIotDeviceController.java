@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
@@ -73,7 +74,7 @@ public class TIotDeviceController {
 
 
     @ApiOperation(value = "删除物联设备")
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除物联设备", content = "新增物联设备配置", logType = 4, authority = "1234")
     public Result delete(@RequestParam("id") Long id) {
         Result result = new Result();
@@ -93,7 +94,7 @@ public class TIotDeviceController {
     public Result select(@RequestParam(value = "name", required = false) String name,
                          @RequestParam(value = "regionId", required = false) Long regionId,
                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                         @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
+                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         try {
             QueryWrapper<TIotDevice> queryWrapper = new QueryWrapper<>();
@@ -116,6 +117,23 @@ public class TIotDeviceController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "物联设备树查询(level：5-区域，6-设备)")
+    @RequestMapping(value = "/selectDevTree", method = RequestMethod.GET)
+    @Logs(title = "物联设备树查询", content = "物联设备树查询", logType = 1)
+    public Result selectDevTree(@RequestParam(value = "level", required = false) String level,
+                                @RequestParam(value = "name", required = false) String name,
+                                @RequestParam(value = "id", required = false) Long id) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = tIotDeviceService.selectDevTree(level, id, name);
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("物联设备树查询失败描述：", e);
         }
         return result;
     }

@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <功能描述>
@@ -74,7 +75,7 @@ public class TIotDevicePointController {
 
 
     @ApiOperation(value = "删除物联设备测点")
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除物联设备测点", content = "新增物联设备测点配置", logType = 4, authority = "1234")
     public Result delete(@RequestParam("id") Long id) {
         Result result = new Result();
@@ -92,6 +93,7 @@ public class TIotDevicePointController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @Logs(title = "查询物联设备测点", content = "新增物联设备测点配置", logType = 1, authority = "1234")
     public Result select(@RequestParam(value = "name", required = false) String name,
+                         @RequestParam(value = "iotDeviceId", required = false) Long iotDeviceId,
                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                          @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         Result result = new Result();
@@ -99,6 +101,9 @@ public class TIotDevicePointController {
             QueryWrapper<TIotDevicePoint> queryWrapper = new QueryWrapper<>();
             if (StringUtils.isNotBlank(name)) {
                 queryWrapper.like("point_name", name);
+            }
+            if (Objects.nonNull(iotDeviceId)) {
+                queryWrapper.eq("iot_device_id", iotDeviceId);
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TIotDevicePoint> tIotDeviceList = tIotDevicePointService.list(queryWrapper);

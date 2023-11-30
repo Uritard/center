@@ -43,11 +43,10 @@ public interface LinkAutoMapper {
 
     /**
      *
-     * @param Id 父Id
      * @param nameList 区域名称List
      * @return
      */
-    List<TStdRegion> listTStdRegionByParentIdAndNameList(@Param("rootId")Long Id,@Param("nameList")Set<String> nameList);
+    List<TStdRegion> listTStdRegionByParentIdAndNameList(@Param("nameList")Set<String> nameList);
 
     /**
      * 批量插入区域信息

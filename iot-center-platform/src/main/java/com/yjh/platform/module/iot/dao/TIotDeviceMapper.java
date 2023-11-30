@@ -1,7 +1,11 @@
 package com.yjh.platform.module.iot.dao;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author YIJIAHE
@@ -11,6 +15,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface TIotDeviceMapper extends BaseMapper<TIotDevice> {
 
+    List<AreaInfo> selectDeviceByRegionId(@Param(value = "upRegionId") Long upRegionId);
+
+    List<Long> selectIotDeviceByName(@Param(value = "name") String name);
+
+    List<Long> selectRegionByIotDeviceList(@Param(value = "list") List<Long> iotDeviceList);
+
+    List<AreaInfo> selectIotDeviceByNameTree(@Param(value = "list") List<Long> iotDeviceList,
+                                             @Param(value = "regionList") List<Long> regionList);
 }
 
 

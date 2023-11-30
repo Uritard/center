@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
+import com.yjh.platform.module.task.entity.WarnStatistical;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <功能描述>
@@ -67,7 +68,7 @@ public class TIotDeviceDataController {
 
 
     @ApiOperation(value = "删除物联设备结果")
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除物联设备结果", content = "新增物联设备结果配置", logType = 4)
     public Result delete(@RequestParam("id") Long id) {
         Result result = new Result();
@@ -84,25 +85,12 @@ public class TIotDeviceDataController {
     @ApiOperation(value = "查询物联设备结果")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @Logs(title = "查询物联设备结果", content = "新增物联设备结果配置", logType = 1)
-    public Result select(@RequestParam(value = "pointName", required = false) String pointName,
-                         @RequestParam(value = "iotDeviceName", required = false) String iotDeviceName,
-                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                         @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
+    public Result select(@RequestParam(value = "iotDeviceId") Long iotDeviceId,
+                         @RequestParam(value = "startTime") String startTime,
+                         @RequestParam(value = "endTime") String endTime) {
         Result result = new Result();
         try {
-            QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
-            if (StringUtils.isNotBlank(pointName)) {
-                queryWrapper.like("point_name", pointName);
-            }
-            if (StringUtils.isNotBlank(iotDeviceName)) {
-                queryWrapper.like("iot_device_name", iotDeviceName);
-            }
-            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<TIotDeviceData> tIotDeviceList = tIotDeviceDataService.list(queryWrapper);
-            Map<String, Object> resultMap = new HashMap<>(2);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", tIotDeviceList);
-            result.setData(resultMap);
+            result.setData(tIotDeviceDataService.select(iotDeviceId, startTime, endTime));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

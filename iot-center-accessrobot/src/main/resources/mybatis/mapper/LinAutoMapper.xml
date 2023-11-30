@@ -161,8 +161,7 @@
         select
         <include refid="TStdRegionSql"/>
         from t_std_region
-        where up_region_id = #{rootId}
-        and region_name in
+        where region_name in
         <foreach collection="nameList" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>

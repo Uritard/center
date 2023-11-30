@@ -438,4 +438,10 @@
         where
           up_region_id = (select region_id from t_std_region where up_region_id =-1)
     </select>
+    <select id="selectRegionListByUpRegionId" resultType="java.lang.Long">
+        SELECT up_region_id from t_std_region where region_id in
+        <foreach collection="upRegionList" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
