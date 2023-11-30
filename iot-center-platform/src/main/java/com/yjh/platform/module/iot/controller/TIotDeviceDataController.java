@@ -53,7 +53,7 @@ public class TIotDeviceDataController {
 
     @ApiOperation(value = "更新物联设备结果配置")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @Logs(title = "更新物联设备结果配置", content = "新增物联设备结果配置", logType = 3)
+    @Logs(title = "更新物联设备结果配置", content = "更新物联设备结果配置", logType = 3)
     public Result update(@RequestBody TIotDeviceData tIotDeviceData) {
         Result result = new Result();
         try {
@@ -69,7 +69,7 @@ public class TIotDeviceDataController {
 
     @ApiOperation(value = "删除物联设备结果")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Logs(title = "删除物联设备结果", content = "新增物联设备结果配置", logType = 4)
+    @Logs(title = "删除物联设备结果", content = "删除物联设备结果", logType = 4)
     public Result delete(@RequestParam("id") Long id) {
         Result result = new Result();
         try {
@@ -82,15 +82,30 @@ public class TIotDeviceDataController {
         return result;
     }
 
-    @ApiOperation(value = "查询物联设备结果")
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询物联设备结果", content = "新增物联设备结果配置", logType = 1)
-    public Result select(@RequestParam(value = "iotDeviceId") Long iotDeviceId,
-                         @RequestParam(value = "startTime") String startTime,
-                         @RequestParam(value = "endTime") String endTime) {
+    @ApiOperation(value = "查询物联设备结果曲线")
+    @RequestMapping(value = "/selectIotLine", method = RequestMethod.GET)
+    @Logs(title = "查询物联设备结果曲线", content = "查询物联设备结果曲线", logType = 1)
+    public Result selectIotLine(@RequestParam(value = "iotDeviceId") Long iotDeviceId,
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "endTime") String endTime) {
         Result result = new Result();
         try {
-            result.setData(tIotDeviceDataService.select(iotDeviceId, startTime, endTime));
+            result.setData(tIotDeviceDataService.selectIotLine(iotDeviceId, startTime, endTime));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询物联设备结果失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询物联设备结果")
+    @RequestMapping(value = "/selectIotData", method = RequestMethod.GET)
+    @Logs(title = "查询物联设备结果", content = "查询物联设备结果", logType = 1)
+    public Result selectIotData(@RequestParam(value = "upRegionId", required = false) Long upRegionId) {
+        Result result = new Result();
+        try {
+            result.setData(tIotDeviceDataService.selectIotData(upRegionId));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

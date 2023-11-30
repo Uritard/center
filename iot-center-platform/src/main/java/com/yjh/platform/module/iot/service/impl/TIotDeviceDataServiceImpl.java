@@ -2,18 +2,21 @@ package com.yjh.platform.module.iot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.Lists;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.task.entity.BrokenLineInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,10 +25,31 @@ import java.util.stream.Collectors;
  * @createDate 2023-11-28 14:48:41
  */
 @Service
+@Slf4j
 public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper, TIotDeviceData> implements TIotDeviceDataService {
 
     @Override
-    public List<List<String>> select(Long iotDeviceId, String startTime, String endTime) {
+    public List<Map<String, Object>> selectIotData(Long upRegionId) {
+        QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
+        if (Objects.nonNull(upRegionId)) {
+            queryWrapper.eq("up_region_id", upRegionId);
+        }
+        queryWrapper.groupBy("point_name");
+        List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
+        Map<String, List<TIotDeviceData>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
+        List<Map<String, Object>> resultList = Lists.newArrayList();
+        resultMap.forEach((k, v) -> {
+            Map<String, Object> map = new HashMap<>(3);
+            map.put("iotName", k);
+            map.put("time", DateTimeUtil.getDateTimeString(v.get(0).getCreateTime()));
+            map.put("list", v);
+            resultList.add(map);
+        });
+        return resultList;
+    }
+
+    @Override
+    public List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime) {
         QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("iot_device_id", iotDeviceId);
         queryWrapper.between("create_time", startTime, endTime);

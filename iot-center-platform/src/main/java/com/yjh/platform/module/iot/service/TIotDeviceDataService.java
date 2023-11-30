@@ -4,6 +4,7 @@ import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author YIJIAHE
@@ -12,5 +13,8 @@ import java.util.List;
 */
 public interface TIotDeviceDataService extends IService<TIotDeviceData> {
 
-    List<List<String>> select(Long iotDeviceId, String startTime, String endTime);
+    List<Map<String, Object>> selectIotData(Long upRegionId);
+
+    List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime);
+
 }
