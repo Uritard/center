@@ -3,6 +3,8 @@ package com.yjh.platform.module.iot.service;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
 * @author YIJIAHE
 * @description 针对表【t_iot_device_data(物联设备结果表)】的数据库操作Service
@@ -10,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface TIotDeviceDataService extends IService<TIotDeviceData> {
 
+    List<List<String>> select(Long iotDeviceId, String startTime, String endTime);
 }

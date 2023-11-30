@@ -68,7 +68,7 @@ Integer cruiseType = linkAutoMapper.selectCruiseTypeByRobotId(robotId);
         //取出所有区域
         Set<String> regionNameSet = buildList.stream().map(TRobotInspection::getAreaName).collect(Collectors.toSet());
         //查询已存在区域
-        List<TStdRegion> tStdRegionList = linkAutoMapper.listTStdRegionByParentIdAndNameList(rootId, regionNameSet);
+        List<TStdRegion> tStdRegionList = linkAutoMapper.listTStdRegionByParentIdAndNameList(regionNameSet);
         //处理不存在区域
         if (CollectionUtils.isNotEmpty(tStdRegionList)) {
             tStdRegionList.forEach(o -> regionNameSet.remove(o.getRegionName()));

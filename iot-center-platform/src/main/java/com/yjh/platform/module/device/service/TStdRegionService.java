@@ -281,6 +281,16 @@ public class TStdRegionService{
         return tStdRegionDao.countByRegionCode(regionCode, upRegionId);
     }
 
+    public List<Long> getRegionIdByLeafNode(Set<Long> regionParam) {
+        Set<Long> regionTemp = new HashSet<>(regionParam);
+        do {
+            //通过regionList查询上层节点，后将结果放入插入参数继续查询，直到结果与入参一致
+            regionParam.addAll(regionTemp);
+            regionTemp.addAll(tStdRegionDao.selectRegionListByUpRegionId(regionParam));
+        } while (!regionParam.containsAll(regionTemp));
+        return  new ArrayList<>(regionTemp);
+    }
+
     private void treeToList(List<TStdRegion> tStdRegionList, TStdRegion tStdRegion) {
         if (CollectionUtils.isNotEmpty(tStdRegion.getChildren())) {
             List<TStdRegion> childrenList = tStdRegion.getChildren();
