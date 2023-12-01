@@ -54,14 +54,14 @@ public class TMeterService {
     @Autowired
     private TStdRegionDao tStdRegionDao;
 
-    public Result select(Long upRegionId, int pageNum, int pageSize) {
+    public Result select(Long upRegionId, String meterName,int pageNum, int pageSize) {
         Result result = new Result();
         List<Long> list = tStdRegionDao.selectDownId(upRegionId);
         if (CollectionUtils.isNotEmpty(list)) {
             list.add(upRegionId);
         }
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        List<TMeter> tMeterList = tMeterDao.selectByUpRegionId(list);
+        List<TMeter> tMeterList = tMeterDao.selectByUpRegionId(list,meterName);
         this.setPower(tMeterList, true);
         Map<String, Object> resultMap = new HashMap<>(2);
         resultMap.put("count", page.getTotal());

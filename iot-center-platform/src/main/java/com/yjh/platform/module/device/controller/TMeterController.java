@@ -44,11 +44,12 @@ public class TMeterController {
     @RequestMapping(value = "/query", method = RequestMethod.GET)
     @Logs(title = "查询电表信息", content = "根据用户传递的参数查询电表信息", logType = 2, authority = "1235")
     public Result query(@RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                        @RequestParam(value = "meterName", required = false) String meterName,
                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         try {
-            result = tMeterService.select(upRegionId, pageNum, pageSize);
+            result = tMeterService.select(upRegionId, meterName,pageNum, pageSize);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除电表失败：", e);

@@ -17,7 +17,8 @@ import java.util.Map;
 @Repository
 public interface TMeterDao {
 
-    List<TMeter> selectByUpRegionId(List<Long> list);
+    List<TMeter> selectByUpRegionId(@Param(value = "list")List<Long> list,
+                                    @Param(value = "meterName")String meterName);
 
     List<TMeter> selectAll();
 

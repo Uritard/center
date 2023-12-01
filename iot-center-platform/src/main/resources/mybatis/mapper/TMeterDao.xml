@@ -55,13 +55,14 @@
         collect_power_time,
         create_time,
         magnification_coefficient
-        from t_meter a
+        from t_meter a where 1=1
         <if test="list!=null and list.size() > 0" >
-            where a.up_region_id in
+            and  a.up_region_id in
             <foreach collection="list" item="regionId" separator=","  open="(" close=")">
                 #{regionId}
             </foreach>
         </if>
+        <if test="meterName != null and meterName != ''"> and a.name like concat('%',#{meterName},'%')</if>
     </select>
 
 
