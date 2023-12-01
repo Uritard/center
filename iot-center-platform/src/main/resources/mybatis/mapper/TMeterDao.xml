@@ -98,7 +98,7 @@
         <set>
             <if test="name != null and name != ''">name = #{name,jdbcType=VARCHAR},</if>
             <if test="address != null and address != ''">address = #{address,jdbcType=VARCHAR},</if>
-            <if test="deviceId != null and deviceId != ''">device_id = #{deviceId,jdbcType=BIGINT},</if>
+            device_id = #{deviceId,jdbcType=BIGINT},
             <if test="magnificationCoefficient != null and magnificationCoefficient != ''">magnification_coefficient = #{magnificationCoefficient,jdbcType=INTEGER},</if>
         </set>
         where id = #{id,jdbcType=BIGINT}
