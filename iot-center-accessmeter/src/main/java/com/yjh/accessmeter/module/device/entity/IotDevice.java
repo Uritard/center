@@ -17,7 +17,6 @@ import java.util.Date;
  * @since [产品/模块版本] （可选）
  */
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class IotDevice {
     /**
      *

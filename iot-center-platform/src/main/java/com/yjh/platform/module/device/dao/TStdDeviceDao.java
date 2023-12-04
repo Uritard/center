@@ -173,4 +173,5 @@ public interface TStdDeviceDao {
 
     List<AreaInfo> selectSensorDevTreeRegion(@Param(value = "name") String name);
 
+    List<AreaInfo> selectIotDevTreeRegion(@Param(value = "name") String name);
 }

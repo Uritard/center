@@ -572,6 +572,9 @@ public class TStdDeviceService{
                         case "sensor":
                             allTree = tStdDeviceDao.selectSensorDevTreeRegion(name);
                             break;
+                        case "iot":
+                            allTree = tStdDeviceDao.selectIotDevTreeRegion(name);
+                            break;
                         default:
                             allTree = tStdDeviceDao.selectAreaTree();
                     }
@@ -724,6 +727,9 @@ public class TStdDeviceService{
                     break;
                 case "sensor":
                     areaTree = tStdDeviceDao.selectSensorDevTreeRegion(null);
+                    break;
+                case "iot":
+                    areaTree = tStdDeviceDao.selectIotDevTreeRegion(null);
                     break;
                 default:
                     areaTree = tStdDeviceDao.selectDevTreeRegion();
