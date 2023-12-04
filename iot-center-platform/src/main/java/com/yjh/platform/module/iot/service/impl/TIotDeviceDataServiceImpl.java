@@ -39,8 +39,9 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         Map<String, List<TIotDeviceData>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
-            Map<String, Object> map = new HashMap<>(3);
+            Map<String, Object> map = new HashMap<>(4);
             map.put("iotName", k);
+            map.put("iotDeviceId", v.get(0).getIotDeviceId());
             map.put("time", DateTimeUtil.getDateTimeString(v.get(0).getCreateTime()));
             map.put("list", v);
             resultList.add(map);
