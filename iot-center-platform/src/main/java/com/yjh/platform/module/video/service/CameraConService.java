@@ -1468,24 +1468,21 @@ public class CameraConService {
         String password = cameraConInfo.getCameraCode();
         String cameraIp = cameraConInfo.getCameraIp();
 
-        try {
-            IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
-            PlayEntity playEntity = PlayEntity.builder()
-                    .ip(cameraIp)
-                    .port(cameraConInfo.getPort())
-                    .userName(userName)
-                    .password(password).build();
-            Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
-            CameraConfigResp cameraConfigResp = result.getData();
-            String filePath = getConfigFileDir();
-            String fileName = getConfigFileName(cameraId.toString());
-            log.info("相机 {} 配置文件路径：{}{}", cameraId, filePath, fileName);
-            bytesToFile(cameraConfigResp.getData(), filePath, fileName);
-        } catch (Exception e) {
-            log.info("exportCameraConfig err: {}", e);
-            return false;
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IRecordService.class);
+        PlayEntity playEntity = PlayEntity.builder()
+                .ip(cameraIp)
+                .port(cameraConInfo.getPort())
+                .userName(userName)
+                .password(password).build();
+        Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
+        if (result.getCode() != 200) {
+            throw new RuntimeException(result.getMsg());
         }
-
+        CameraConfigResp cameraConfigResp = result.getData();
+        String filePath = getConfigFileDir();
+        String fileName = getConfigFileName(cameraId.toString());
+        log.info("相机 {} 配置文件路径：{}{}", cameraId, filePath, fileName);
+        bytesToFile(cameraConfigResp.getData(), filePath, fileName);
         return true;
     }
 
