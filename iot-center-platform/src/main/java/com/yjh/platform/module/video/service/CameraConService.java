@@ -64,6 +64,8 @@ public class CameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
+    private static final Set<Long>recordCameraMap = new HashSet<>();
+
     /**
      * 流媒体服务器 ZLMediaKit
      */
@@ -1944,6 +1946,7 @@ public class CameraConService {
         if (result.getCode() != 200) {
             throw new RuntimeException(result.getMsg());
         }
+        recordCameraMap.add(cameraId);
     }
 
     /**
@@ -1952,6 +1955,10 @@ public class CameraConService {
      * @param cameraId 摄像头id
      */
     public String stopRecord(long cameraId) throws Exception{
+        if ( !recordCameraMap.contains(cameraId)){
+            log.info("相机：{}没有开始录制，不用结束！",cameraId);
+            return null;
+        }
         String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
         String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -1964,6 +1971,7 @@ public class CameraConService {
         if (result.getCode() != 200) {
             throw new RuntimeException(result.getMsg());
         }
+        recordCameraMap.remove(cameraId);
         if (!result.getData().getFileUrl().contains(videoPath)){
             RecordResultInfo recordResultInfo = result.getData();
             int index = recordResultInfo.getRecordUrl().lastIndexOf("/");
