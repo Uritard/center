@@ -25,4 +25,6 @@ public class OperationTaskRecord {
 
     private String mainOperatioTypeName;
 
+    private String meteName;
+
 }
