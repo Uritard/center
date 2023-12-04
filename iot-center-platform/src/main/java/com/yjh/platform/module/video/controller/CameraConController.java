@@ -688,7 +688,10 @@ public class CameraConController {
             log.info("service返回值："+path + ";" + userId);
             if(null!=path) {
                 result.setData(path);
-            } else { result.setData("结束录制失败"); }
+            } else {
+                result.setCode(ResultCodeEnum.CODE1.getCode());
+                result.setData("结束录制失败");
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("视频上传服务器失败",e);

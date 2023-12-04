@@ -1476,7 +1476,7 @@ public class CameraConService {
                 .password(password).build();
         Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
         if (result.getCode() != 200) {
-            throw new RuntimeException(result.getMsg());
+            throw new BusinessException(result.getMsg());
         }
         CameraConfigResp cameraConfigResp = result.getData();
         String filePath = getConfigFileDir();
@@ -1829,7 +1829,7 @@ public class CameraConService {
         IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
         Result result = iInfraredService.getTemperature(entity);
         if (result.getCode() != 200) {
-            throw new RuntimeException(result.getMsg());
+            throw new BusinessException(result.getMsg());
         }
         return result.getData().toString();
     }

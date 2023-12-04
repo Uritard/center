@@ -575,6 +575,7 @@ public class TStdDeviceService{
                         default:
                             allTree = tStdDeviceDao.selectAreaTree();
                     }
+                    allTree = assembleTrees(allTree);
                 } else {
                     //针对region的过滤
                     allTree = tStdDeviceDao.selectAreaTree();
