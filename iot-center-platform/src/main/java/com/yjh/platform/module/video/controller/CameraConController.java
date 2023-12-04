@@ -655,7 +655,10 @@ public class CameraConController {
             }else {
                 result.setData(cameraConService.getLineTemperature(temperatureInfo.getCameraId(), temperatureInfo.getPoints()));
             }
-        }catch (Exception e){
+        } catch (BusinessException e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("根据坐标获取温度失败描述:", e);
+        } catch (Exception e){
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("根据坐标获取温度失败描述:", e);
         }
