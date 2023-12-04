@@ -2324,6 +2324,13 @@ public class UPatrolTaskService {
             log.error("执行完成点位重复：【{}】", JSON.toJSONString(inter));
         }
         if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
+            //如果是操作任务  返回
+            UPatrolTask task = selectByPrimaryId(taskId);
+            if (task.getTaskType() == 456 ||
+                    task.getTaskType() == 508 ||
+                    task.getTaskType() == 509){
+                return  -1;
+            }
             endOnece = true;
         }
 
