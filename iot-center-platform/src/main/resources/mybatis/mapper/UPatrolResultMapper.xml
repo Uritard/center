@@ -1431,12 +1431,14 @@
         date_format( b.execute_time,'%Y-%c-%d %H:%i:%s') AS startTime,
         i.region_name AS regionName,
         u.user_name AS  userName,
-        IF(a.task_type = 456, '-', f.dict_note) AS mainOperatioTypeName
+        IF(a.task_type = 456, '-', f.dict_note) AS mainOperatioTypeName,
+        IF(a.task_type = 456, '-', g.mete_name) AS meteName
         FROM
         u_patrol_task a
         LEFT JOIN u_patrol_result b ON a.task_id = b.task_id
         LEFT JOIN u_patrol_task_attr c ON a.task_code = c.task_id
         LEFT JOIN t_cruise_point_instance d ON d.instance_id= c.instance_id
+        left join t_std_devicemete g on d.device_mete_id = g.device_mete_id
         LEFT JOIN t_robot_inspection e ON e.inspection_id = d.cruise_id
         LEFT JOIN t_dict_business f ON  f.dict_code = e.operation_type AND f.col_name ='operation_type'
         LEFT JOIN sys_user u ON u.user_id = a.create_user_id
