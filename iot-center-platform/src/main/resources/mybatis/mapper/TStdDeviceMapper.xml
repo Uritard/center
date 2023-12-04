@@ -1373,6 +1373,7 @@ group by camera_id
 								up_region_id
 							FROM
 								`t_meter`)
+		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 					UNION ALL
 					SELECT
 						d.region_id,
@@ -1385,12 +1386,12 @@ group by camera_id
 				FROM
 					cte
 				UNION ALL
-				SELECT DISTINCT
-					up_region_id
-				FROM
-					`t_meter`
+			SELECT DISTINCT
+				e.up_region_id
+			FROM
+				`t_meter` e
+			join cte on e.up_region_id = cte.region_id
 			)
-		<if test="name != null and name != ''">and a.region_name like concat('%', #{name}, '%')</if>
 	</select>
 	<select id="selectSensorDevTreeRegion" resultType="com.yjh.platform.module.device.entity.AreaInfo">
 		SELECT
@@ -1419,6 +1420,7 @@ group by camera_id
 								t_robot_info
 							WHERE env_region_id IS NOT NULL
 						)
+		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 					UNION ALL
 					SELECT
 						d.region_id,
@@ -1432,11 +1434,12 @@ group by camera_id
 					cte
 				UNION ALL
 				SELECT
-					env_region_id
+					e.env_region_id
 				FROM
-					t_robot_info
-				WHERE env_region_id IS NOT NULL)
-		<if test="name != null and name != ''">and a.region_name like concat('%', #{name}, '%')</if>
+					t_robot_info e
+		join cte on e.env_region_id = cte.region_id
+				WHERE e.env_region_id IS NOT NULL
+				    )
 	</select>
 
 </mapper>
