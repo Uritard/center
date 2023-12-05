@@ -76,7 +76,7 @@ public class TCameraInfoExcel implements Serializable {
     private String address;
 
     @ExcelProperty(value = "生产厂家")
-    @ExcelExtend(dictType = "cameraVendor", convent = "Str")
+    @ExcelExtend(require = true, dictType = "cameraVendor", convent = "Str")
     private String vendorIdStr;
 
     private Integer vendorId;
@@ -98,5 +98,9 @@ public class TCameraInfoExcel implements Serializable {
     @ExcelProperty(value = "投运时间")
     @ExcelExtend
     private Date commissionDate;
+
+    @ExcelProperty(value = "国标编码")
+    @ExcelExtend
+    private String cameraChannelId;
 
 }

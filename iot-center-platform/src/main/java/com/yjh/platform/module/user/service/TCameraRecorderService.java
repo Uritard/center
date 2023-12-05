@@ -278,6 +278,7 @@ public class TCameraRecorderService {
             tCameraRecorder.setBufferDay(t.getBufferDay());
             tCameraRecorder.setHddSize(t.getHddSize());
             tCameraRecorder.setTimeLong(t.getTimeLong());
+            tCameraRecorder.setDeviceChannel(t.getDeviceChannel());
             tCameraRecorders.add(tCameraRecorder);
         });
         if (CollectionUtils.isNotEmpty(tCameraRecorders)) {

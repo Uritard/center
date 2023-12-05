@@ -600,6 +600,7 @@ public class TCameraInfoService {
                 tCameraInfo.setLatitude(t.getLatitude());
                 tCameraInfo.setIsControl("云台球机".equals(t.getIsControlStr()) ? 1 : 0);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
+                tCameraInfo.setCameraChannelId(t.getCameraChannelId());
                 tCameraInfos.add(tCameraInfo);
             } else {
                 errorList.add("【" + t.getCameraName() + "】设备所属区域或录像机不存在");
