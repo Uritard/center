@@ -1803,35 +1803,36 @@ public class CameraConService {
      *
      * @param cameraId 摄像头id
      */
-    public String getLineTemperature(long cameraId, String points) throws Exception{
-        Integer x1 = null;
-        Integer y1 = null;
-        Integer x2 = null;
-        Integer y2 = null;
-        String[] pointList = points.split(",");
-        x1 = ValueUtil.toInteger(pointList[0],0);
-        y1 = ValueUtil.toInteger(pointList[1],0);
-        if (pointList.length == 4){
-            x2 = ValueUtil.toInteger(pointList[2],1);
-            y2 = ValueUtil.toInteger(pointList[3],1);
-        }
+    public List<String> getLineTemperature(long cameraId, List<String> points) {
+
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        ThermometerEntity entity = ThermometerEntity.builder()
+        ThermoEntity.Builder entity = ThermoEntity.builder()
                 .ip(cameraConInfo.getCameraIp())
                 .port(cameraConInfo.getPort())
                 .userName(cameraConInfo.getCameraManager())
-                .password(cameraConInfo.getCameraCode())
-                .x1(x1)
-                .y1(y1)
-                .x2(x2)
-                .y2(y2)
-                .build();
+                .password(cameraConInfo.getCameraCode());
+
+        for (String point : points) {
+            Integer x1;
+            Integer y1;
+            Integer x2 = null;
+            Integer y2 = null;
+            String[] pointList = point.split(",");
+            x1 = ValueUtil.toInteger(pointList[0],0);
+            y1 = ValueUtil.toInteger(pointList[1],0);
+            if (pointList.length == 4){
+                x2 = ValueUtil.toInteger(pointList[2],1);
+                y2 = ValueUtil.toInteger(pointList[3],1);
+            }
+            entity.thermoPoint(new ThermoPoint(x1, y1, x2, y2));
+        }
+
         IInfraredService iInfraredService = VideoServiceFactory.loadSnapService(cameraVendor(cameraConInfo.getVendorId()), IInfraredService.class);
-        Result result = iInfraredService.getTemperature(entity);
+        Result<List<String>> result = iInfraredService.getTemperature(entity.build());
         if (result.getCode() != 200) {
             throw new BusinessException(result.getMsg());
         }
-        return result.getData().toString();
+        return result.getData();
     }
 
     /**
@@ -1839,7 +1840,7 @@ public class CameraConService {
      *
      * @param picPath Dlt图像路径
      */
-    public String getLineTemperature(String points,String picPath){
+    public List<String> getLineTemperature(String points,String picPath){
         Integer column = null;
         Integer row = null;
         Integer xPlus = null;
@@ -1896,7 +1897,7 @@ public class CameraConService {
                 log.error("解析对应csv文件出错！",e);
                 throw new BusinessException("文件读取错误！");
             }
-            return temperature;
+            return Collections.singletonList(temperature);
         } else {
             try {
                 InputStream stream = new FileInputStream(new File(csvPath));
@@ -1921,7 +1922,7 @@ public class CameraConService {
                 throw new BusinessException("文件读取错误！");
             }
         }
-        return temperature;
+        return Collections.singletonList(temperature);
     }
 
     /**

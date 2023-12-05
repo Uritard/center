@@ -4,8 +4,9 @@
 
 package com.yjh.accessmeter.module.device.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Date;
 
@@ -16,12 +17,13 @@ import java.util.Date;
  * @date 2023/11/28
  * @since [产品/模块版本] （可选）
  */
-@Data
+@Getter
+@Setter
+@ToString
 public class IotDevice {
     /**
      *
      */
-    @EqualsAndHashCode.Include
     private Long id;
     /**
      * 设备名称
@@ -91,4 +93,24 @@ public class IotDevice {
      * 单位
      */
     private String unit;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        IotDevice device = (IotDevice)o;
+
+        return new EqualsBuilder().append(id, device.id).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    }
 }
