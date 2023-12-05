@@ -651,7 +651,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             if (StringUtils.isNotEmpty(temperatureInfo.getPicPath())){
-                result.setData(cameraConService.getLineTemperature(temperatureInfo.getPoints(),temperatureInfo.getPicPath()));
+                result.setData(cameraConService.getLineTemperature(temperatureInfo.getPoints().get(0),temperatureInfo.getPicPath()));
             }else {
                 result.setData(cameraConService.getLineTemperature(temperatureInfo.getCameraId(), temperatureInfo.getPoints()));
             }

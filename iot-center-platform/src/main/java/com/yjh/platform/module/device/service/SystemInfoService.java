@@ -202,20 +202,17 @@ public class SystemInfoService {
 
     //获取NVR容量
     public synchronized List<Map<String, Object>> getNVRInfo(boolean force) {
-
-        List<Map<String, Object>> cache = RECORDER_INFO_CACHE.get(RECORDER_KEY, false);
-        if (!force && cache != null) {
-            return cache;
+        if (!force) {
+            List<Map<String, Object>> cache = RECORDER_INFO_CACHE.get(RECORDER_KEY, false);
+            if (cache != null) {
+                return cache;
+            }
         }
 
         List<TCameraRecorderDetail> list = tCameraRecorderDao.selectIdAndName();
-        List<Map<String, Object>> reList = recordInfoList(list, !force);
+        List<Map<String, Object>> reList = recordInfoList(list, true);
 
-        if (!force) {
-            ThreadPoolUtil.COMMON_POOL.addThread(() -> {
-                recordInfoList(list, false);
-            });
-        }
+        ThreadPoolUtil.COMMON_POOL.addThread(() -> recordInfoList(list, false));
 
         return reList;
     }
