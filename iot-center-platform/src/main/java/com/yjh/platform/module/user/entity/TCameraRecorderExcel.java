@@ -36,7 +36,7 @@ public class TCameraRecorderExcel implements Serializable {
     private String recorderModelStr;
 
     @ExcelProperty(value = "生产厂家")
-    @ExcelExtend(dictType = "cameraVendor", convent = "Str")
+    @ExcelExtend(require = true, dictType = "cameraVendor", convent = "Str")
     private String vendorIdStr;
 
     @ExcelProperty(value = "使用单位")
@@ -87,4 +87,8 @@ public class TCameraRecorderExcel implements Serializable {
 
     @ApiModelProperty(value = "生产厂家")
     private Integer vendorId;
+
+    @ExcelProperty(value = "国标编码")
+    @ExcelExtend
+    private String deviceChannel;
 }

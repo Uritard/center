@@ -216,7 +216,7 @@
             ,#{tCameraRecorder.identityManager,jdbcType=VARCHAR},#{tCameraRecorder.identityCode,jdbcType=VARCHAR},#{tCameraRecorder.protocolUrl,jdbcType=VARCHAR}
             ,#{tCameraRecorder.maxChannel,jdbcType=INTEGER},#{tCameraRecorder.hddSize,jdbcType=INTEGER},#{tCameraRecorder.bufferDay,jdbcType=INTEGER}
             ,#{tCameraRecorder.timeLong,jdbcType=INTEGER},#{tCameraRecorder.unit,jdbcType=VARCHAR},#{tCameraRecorder.edgeCode,jdbcType=VARCHAR}
-            ,#{tCameraRecorder.originId,jdbcType=VARCHAR},#{deviceChannel,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.originId,jdbcType=VARCHAR},#{tCameraRecorder.deviceChannel,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

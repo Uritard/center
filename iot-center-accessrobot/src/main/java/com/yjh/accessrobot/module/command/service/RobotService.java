@@ -1506,6 +1506,9 @@ public class RobotService {
                 }
                 map.put("plan_code", Optional.ofNullable(item.getPlanCode()).orElse(""));
                 map.put("type", Optional.ofNullable(planType).orElse(""));
+                if (StringUtils.isNotBlank(item.getIsOcr())){
+                    map.put("isocr", Optional.ofNullable(item.getIsOcr()).orElse(""));
+                }
                 map.put("priority", Optional.ofNullable(item.getPriority()).orElse(""));
                 map.put("device_level", item.getDeviceLevel());
                 // 定期和立即任务参数
