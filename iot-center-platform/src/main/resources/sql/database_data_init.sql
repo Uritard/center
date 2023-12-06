@@ -1300,7 +1300,7 @@ INSERT INTO `t_sys_param` VALUES ('100084', '404', 'checkWaitTimeByOne', '检测
 INSERT INTO `t_sys_param` VALUES ('100087', '404', 'webSocketUrl', '调用其他服务的webSocket', 'http://172.24.39.9:18701/route/syncWebsocket', '调用其他服务的webSocket', '{\"rule\":\"^(http|https):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
 INSERT INTO `t_sys_param` VALUES ('100094', '404', 'zipFileSize', '采集文件大小限制', '20', '采集文件大小超过此限制，禁止下载。（单位：M）(默认值为20)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2})$\",\"msg\":\"请输入0-999的整数\"}');
 INSERT INTO `t_sys_param` VALUES ('100095', '404', 'keepWatchTime', '摄相机回到守望位置时间', '10', '检测专用，摄像机在时间内未收到控制摄像机请求， 应自动回归守望位（默认10），单位分钟', '{\"rule\":\"^(\\\\d|[1-9]\\\\d)$\",\"msg\":\"请输入0-99的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100096', '404', 'stationName', '变电站名称', '江苏变电站-巡视系统', '变电站名称', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param` VALUES ('100096', '404', 'stationName', '变电站名称', '江苏变电站-巡视系统', '变电站名称', '{"rule":"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]{1,18}$","msg":"请不要输入特殊字符，长度不超过18"}');
 INSERT INTO `t_sys_param` VALUES ('100098', '404', 'voiceDeviceTime', '声纹设备录音时长', '60', '单位：秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
 INSERT INTO `t_sys_param` VALUES ('100099', '404', 'isIntelDefectAnalysis', '是否开启调用智能分析主机缺陷接口', 'true', '是否开启调用智能分析主机接口', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100100', '404', 'stationType', '变电站类别', 'HGIS站', '变电站类别', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
