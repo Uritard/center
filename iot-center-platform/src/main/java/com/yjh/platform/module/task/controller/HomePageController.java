@@ -9,6 +9,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.entity.QueryWeatherLogReq;
 import com.yjh.platform.module.task.entity.RegionPath;
 import com.yjh.platform.module.task.service.HomePageService;
@@ -39,6 +40,8 @@ public class HomePageController {
     private HomePageService homePageService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TStdRegionService tStdRegionService;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
@@ -318,7 +321,8 @@ public class HomePageController {
             if (Objects.isNull(regionId)){
                 result.setData(homePageService.queryWeatherInfos(null));
             }else {
-                result.setData(homePageService.queryWeatherInfos(Collections.singletonList(regionId)));
+                List<Long> regionList = tStdRegionService.selectDownId(regionId);
+                result.setData(homePageService.queryWeatherInfos(regionList));
             }
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e) {
