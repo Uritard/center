@@ -127,6 +127,9 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     Float value = 0f;
                     try {
                         value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
+                        if (value < 0){
+                            value = 0f;
+                        }
                     }catch (Exception e){
                         log.info("计算电表差值出错！",e);
                     }
