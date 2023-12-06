@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -1864,63 +1865,64 @@ public class CameraConService {
 
 //        csvPath = "D://testCdoe/11.csv";
         String temperature = "0.00";
-        if (xPlus != null) {
 
-            try {
-                InputStream stream = new FileInputStream(new File(csvPath));
-                InputStreamReader reader = new InputStreamReader(stream, "GBK");
-                BufferedReader reade = new BufferedReader(reader);
-                String line = null;
-                int rowIndex = 1;
-                List<Double> arr = new ArrayList<>();
-                while ((line = reade.readLine()) != null) {
-                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                    String[] item = line.split(",");
-                    if (row <= rowIndex && rowIndex <= row + yPlus) {
-                        List<Double> arrColumn = new ArrayList<>();
-                        for (int i = 0; i <= item.length; i++) {
-                            if (column - 1 <= i && i <= column + xPlus) {
-                                arrColumn.add(Double.parseDouble(item[i - 1]));
-                            }
-                        }
-                        arr.add(Collections.max(arrColumn));
-                    } else if (rowIndex > row + yPlus) {
-                        break;
-                    }
-                    rowIndex++;
-                }
-                log.info("arr: " + arr);
-                //转换保留后两位小数
-                temperature = new DecimalFormat("0.00").format(Collections.max(arr));
-                log.info("框测temperature转换保留后两位小数" + temperature);
-            } catch (Exception e) {
-                log.error("解析对应csv文件出错！",e);
-                throw new BusinessException("文件读取错误！");
+        try (BufferedReader reade = new BufferedReader(new InputStreamReader(new FileInputStream(csvPath), "GBK"))){
+
+            List<String[]> dataTmp = new ArrayList<>();
+            String line;
+            while ((line = reade.readLine()) != null) {
+                //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                String[] item = line.split(",");
+                dataTmp.add(item);
             }
-            return Collections.singletonList(temperature);
-        } else {
-            try {
-                InputStream stream = new FileInputStream(new File(csvPath));
-                InputStreamReader reader = new InputStreamReader(stream, "GBK");
-                BufferedReader reade = new BufferedReader(reader);
-                String line = null;
-                int rowIndex = 0;
-                while ((line = reade.readLine()) != null) {
-                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                    String[] item = line.split(",");
-                    if (row == rowIndex) {
-                        temperature = item[column - 1];
-                        break;
-                    }
-                    rowIndex++;
+
+            int width = dataTmp.get(0).length;
+            int height = dataTmp.size();
+
+            String[][] tmpData = new String[width][height];
+            for (int i = 0; i < height; i++) {
+                String[] itemRow = dataTmp.get(i);
+                for (int j = 0; j < width; j++) {
+                    tmpData[j][i] = itemRow[j];
                 }
-                //转换保留后两位小数
-                temperature = new DecimalFormat("0.00").format(Double.parseDouble(temperature));
-                log.info("点测temperature转换保留后两位小数" + temperature);
-            } catch (Exception e) {
-                log.error("解析对应csv文件出错！",e);
-                throw new BusinessException("文件读取错误！");
             }
+
+            double xRatio = (double)width /640;
+            double yRatio = (double)height /512;
+
+            log.info("温度点阵文件数据大小: {}x{}, 系数: {}x{}", width, height, xRatio, yRatio);
+            if (xPlus != null) {
+                int x1 = (int)(column * xRatio);
+                int y1 = (int)(row * yRatio);
+                int x2 = (int)(xPlus * xRatio);
+                int y2 = (int)(yPlus * yRatio);
+
+                List<Float> tempList = new ArrayList<>();
+
+                for (int x = x1; x <= x2; x++) {
+                    for (int y = y1; y <= y2; y++) {
+                        tempList.add(NumberUtils.toFloat(tmpData[Math.min(x, width - 1)][Math.min(y, height - 1)]));
+                    }
+                }
+                Float max = NumberUtil.max(tempList.toArray(new Float[0]));
+
+                log.info("arr: {}", tempList);
+                //转换保留后两位小数
+                temperature = NumberUtil.roundStr(max, 2);
+                log.info("框测temperature转换保留后两位小数 {}", temperature);
+
+                return Collections.singletonList(temperature);
+            } else {
+                int x = (int)(column * xRatio);
+                int y = (int)(row * yRatio);
+
+                //转换保留后两位小数
+                temperature = NumberUtil.roundStr(tmpData[Math.min(x, width - 1)][Math.min(y, height - 1)], 2);
+                log.info("点测temperature转换保留后两位小数 {}", temperature);
+            }
+        } catch (Exception e) {
+            log.error("解析对应csv文件出错！", e);
+            throw new BusinessException("文件读取错误！");
         }
         return Collections.singletonList(temperature);
     }
