@@ -178,6 +178,8 @@ public class RobotService {
         NOT_NEED_CONFIRM_SET.add("1_6"); // 机器人控制权获得
         NOT_NEED_CONFIRM_SET.add("1_7"); // 机器人控制权释放
         NOT_NEED_CONFIRM_SET.add("1_12"); // 机器人去地图点
+        NOT_NEED_CONFIRM_SET.add("1_4"); // 机器人开始充电
+        NOT_NEED_CONFIRM_SET.add("1_9"); // 机器人结束充电
         NOT_NEED_CONFIRM_SET.add("20001_5"); //无人机控制模式切换
         NOT_NEED_CONFIRM_SET.add("20001_6"); //无人机控制权获得
         NOT_NEED_CONFIRM_SET.add("20001_7"); //无人机控制权释放
