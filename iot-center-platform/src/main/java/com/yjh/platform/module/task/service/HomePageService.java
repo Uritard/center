@@ -502,10 +502,13 @@ public class HomePageService {
     }
 
     public List<EnvDeviceStatus> queryWeatherInfos(List<Long> regionIdList) {
+        List<TStdRegion> regions = tStdRegionService.queryAll();
+        Map<Long, String> regionMap = regions.stream().collect(Collectors.toMap(TStdRegion::getRegionId, TStdRegion::getRegionName));
+
         List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
         List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
         for (Long aLong : envReginIdList) {
-            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong);
+            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong, regionMap.getOrDefault(aLong, ""));
             if (CollectionUtils.isNotEmpty(envDeviceStatuses)) {
                 envDeviceStatusList.addAll(envDeviceStatuses);
             }
@@ -514,11 +517,19 @@ public class HomePageService {
     }
 
     public List<EnvDeviceStatus> queryWeatherInfo(Long regionId) {
+        return queryWeatherInfo(regionId, null);
+    }
+
+    public List<EnvDeviceStatus> queryWeatherInfo(Long regionId, String regionName) {
         String envDataJson = getRedisMapString("Weather", regionId.toString());
         List<EnvDeviceStatus> queryEnvDeviceInfo = new ArrayList<>();
+
         if (StringUtils.isNotEmpty(envDataJson)) {
             JSONArray objects = JSONArray.parseArray(envDataJson);
             queryEnvDeviceInfo = objects.toJavaList(EnvDeviceStatus.class);
+        }
+        if (StringUtils.isNotEmpty(regionName)) {
+            queryEnvDeviceInfo.forEach(d -> d.setRegionName(regionName));
         }
         return queryEnvDeviceInfo;
     }

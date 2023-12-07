@@ -241,14 +241,19 @@ public class TSysParamService{
         return this.tSysParamDao.selectByParamType(paramType);
     }
 
-    public Map<String,Boolean> sysConfig(){
-        Map<String,Boolean> result = Maps.newHashMap();
+    public Map<String,Object> sysConfig(){
+        Map<String,Object> result = Maps.newHashMap();
         if (MapUtil.isNotEmpty(sysParamConfig.getSecure())) {
             result.put("isEncryption", Boolean.valueOf(sysParamConfig.getSecure().get("isEncryption")));
             result.put("isUkey", Boolean.valueOf(sysParamConfig.getSecure().get("isUkey")));
             result.put("summaryFlag", Boolean.valueOf(sysParamConfig.getSecure().get("isDecode")));
         }
-        result.put("pcmEncode", Boolean.valueOf((String)redisTemplate.opsForHash().get("t_sys_param:isPcmEncode", "content")));
+        result.put("pcmEncode", Boolean.valueOf(SysParamConfig.getSysContent("isPcmEncode")));
+
+        result.put("systemName", SysParamConfig.getSysContent("stationName"));
+        result.put("logoImage", SysParamConfig.getSysContent("logoImage"));
+        result.put("loginLogoImage", SysParamConfig.getSysContent("loginLogoImage"));
+
         return result;
     }
     public Map<String,String > homePageInfo(){
