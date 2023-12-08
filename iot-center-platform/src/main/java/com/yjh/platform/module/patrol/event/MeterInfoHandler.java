@@ -14,10 +14,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: lqh
@@ -68,6 +65,9 @@ public class MeterInfoHandler {
         for (TMeter meter : meterList) {
             Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + meter.getDeviceId());
             if (meterInfo.size() == 3) {
+                if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
+                    continue;
+                }
                 Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
                 if (value < 0){
                     value = 0f;
@@ -76,6 +76,7 @@ public class MeterInfoHandler {
                 meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
                 meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
                 meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
+                meter.setCollectPowerTime(new Date());
                 tMeterDao.updateByPrimaryKey(meter);
                 tMeterLogDao.insert(meter);
                 meterInfoUpload(meter);
