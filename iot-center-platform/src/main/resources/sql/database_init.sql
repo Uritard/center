@@ -2763,3 +2763,53 @@ CREATE TABLE `t_camera_play_log` (
  PRIMARY KEY (`id`),
  KEY `idx_camera_user` (`camera_id`,`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='相机播放记录';
+
+DROP TABLE IF EXISTS `t_iot_device`;
+CREATE TABLE `t_iot_device` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
+`device_name` varchar(128) DEFAULT '' COMMENT '设备名称',
+`ip` varchar(20) DEFAULT '' COMMENT '设备IP',
+`port` int DEFAULT '1' COMMENT '设备端口号',
+`address` varchar(30) DEFAULT '' COMMENT '设备地址',
+`iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
+`protocol_model` varchar(128) DEFAULT '' COMMENT '协议模式 TCP-ACTIVE,TCP-PASSIVE',
+`device_id` bigint DEFAULT NULL COMMENT '关联设备Id',
+`up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
+`up_region_name` varchar(128) DEFAULT '' COMMENT '上级区域名称',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`create_person` varchar(20) NOT NULL COMMENT '创建人',
+`update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+`update_person` varchar(20) NOT NULL COMMENT '更新人',
+`edge_code` varchar(20) DEFAULT NULL COMMENT '区域编码',
+`magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+`collection_frequency` int DEFAULT NULL COMMENT '采集频率 单位:分钟',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备表';
+
+DROP TABLE IF EXISTS `t_iot_device_data`;
+CREATE TABLE `t_iot_device_data` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
+`point_id` bigint NOT NULL COMMENT '测点Id',
+`point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
+`iot_device_id` bigint NOT NULL COMMENT '物联设备Id',
+`iot_device_name` varchar(128) DEFAULT '' COMMENT '物联设备名称',
+`value` varchar(128) DEFAULT '' COMMENT '值',
+`unit` varchar(50) DEFAULT '' COMMENT '单位',
+`up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备结果表';
+
+DROP TABLE IF EXISTS `t_iot_device_point`;
+CREATE TABLE `t_iot_device_point` (
+ `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
+ `iot_device_id` bigint NOT NULL COMMENT '物联设备Id',
+ `iot_device_name` varchar(128) DEFAULT '' COMMENT '物联设备名称',
+ `channel_num` int DEFAULT '1' COMMENT '通道号',
+ `point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
+ `unit` varchar(50) DEFAULT '' COMMENT '单位',
+ PRIMARY KEY (`id`) USING BTREE,
+ KEY `iot_device_id` (`iot_device_id`),
+ CONSTRAINT `iot_device_id` FOREIGN KEY (`iot_device_id`) REFERENCES `t_iot_device` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备测点表';

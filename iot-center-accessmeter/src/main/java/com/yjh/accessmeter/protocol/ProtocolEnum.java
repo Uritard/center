@@ -18,7 +18,7 @@ public enum ProtocolEnum {
     /**
      * 协议类型
      */
-    MODBUS_RTU(201, "MODBUS_RTU");
+    MODBUS_RTU(841, "MODBUS_RTU");
 
     final int code;
     final String desc;

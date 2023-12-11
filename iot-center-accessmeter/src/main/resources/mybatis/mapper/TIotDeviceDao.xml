@@ -32,7 +32,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from t_iot_device where type = 1
+        from t_iot_device where iot_device_type = 841
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">

@@ -228,7 +228,7 @@ INSERT INTO `t_algorithm_info` VALUES ('1000055', '汇控柜凝露', 'hkgnl', ''
 INSERT INTO `t_algorithm_info` VALUES ('1000056', '膨胀器冲顶', 'pzqcd', '', '', '398', '0', '687', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
 INSERT INTO `t_algorithm_info` VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '389', '0', '839', '132');
+INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '398', '0', '839', '132');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------
@@ -752,6 +752,8 @@ INSERT INTO `t_dict_business` VALUES ('300771', '836', 'operation_type', '轨交
 INSERT INTO `t_dict_business` VALUES ('300772', '837', 'operation_type', '轨交_控制开关', '49', '操作类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300773', '838', 'abnormal_type', '放电', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300774', '839', 'defect_model', '人员闯入', '0', '缺陷类型', '45');
+INSERT INTO `t_dict_business` VALUES ('300775', '840', 'iot_device_type', '电量表', '1', '物联设备类型', '1');
+INSERT INTO `t_dict_business` VALUES ('300776', '841', 'iot_device_type', '温控器', '1', '物联设备类型', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
