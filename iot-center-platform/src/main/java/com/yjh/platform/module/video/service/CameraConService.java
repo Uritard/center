@@ -1957,7 +1957,7 @@ public class CameraConService {
     public String stopRecord(long cameraId) throws Exception{
         if ( !recordCameraMap.contains(cameraId)){
             log.info("相机：{}没有开始录制，不用结束！",cameraId);
-            return null;
+            return "";
         }
         String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
         String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));

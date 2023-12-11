@@ -689,7 +689,6 @@ public class CameraConController {
             if(null!=path) {
                 result.setData(path);
             } else {
-                result.setCode(ResultCodeEnum.CODE1.getCode());
                 result.setData("结束录制失败");
             }
         } catch (Exception e) {
