@@ -44,7 +44,7 @@ public class SensorCollectService {
 
     private static final Map<Integer, DataCollectTask> COLLECT_TASK_MAP = new HashMap<>(8);
 
-    @PostConstruct
+//    @PostConstruct
     public void initAllMeter() {
         List<IotDevice> iotDeviceList = iotDeviceDao.selectAll();
         Map<ProtocolEnum, List<IotDevice>> protocolSet =
