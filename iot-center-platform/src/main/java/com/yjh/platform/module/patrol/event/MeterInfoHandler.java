@@ -66,6 +66,7 @@ public class MeterInfoHandler {
             Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + meter.getDeviceId());
             if (meterInfo.size() == 3) {
                 if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
+                    log.info("数值小于0！{}",meterInfo);
                     continue;
                 }
                 Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
