@@ -45,6 +45,10 @@ public class MeterInfoHandler {
             String key = meterKey + event.getTaskId() + ":" + event.getDeviceId();
             Map<String, String> meterInfo = new HashMap<>(4);
             String value = getNumeric(event.getResult());
+            if (StringUtils.isEmpty(value)){
+                log.info("结果为空：{}",value);
+//                return;
+            }
             if (event.getResult().contains("正向有功总")) {
                 meterInfo.put("totalPositivePower", value);
             } else if (event.getResult().contains("无功I总")) {
@@ -55,9 +59,33 @@ public class MeterInfoHandler {
             redisTemplate.opsForHash().putAll(key, meterInfo);
             log.info("巡视：{}结束了", meterInfo);
         }
-    }
+        Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + event.getDeviceId());
+        if (meterInfo.size() == 3) {
+            if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
+                log.info("电表数值小于0！");
+            }
+            log.info("电表：{}结束了", event.getDeviceId());
+            handleMeterEndEvent(meterInfo);
+        }
 
-    @EventListener
+    }
+    public void handleMeterEndEvent(Map<String, String> meterInfo) {
+        List<TMeter> meterList = tMeterDao.selectMeterByDeviceId();
+        for (TMeter meter : meterList) {
+            Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
+            if (value < 0){
+                value = 0f;
+            }
+            meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+            meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
+            meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
+            meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
+            meter.setCollectPowerTime(new Date());
+            tMeterDao.updateByPrimaryKey(meter);
+            tMeterLogDao.insert(meter);
+            meterInfoUpload(meter);
+        }
+    }
     public void handleTaskEndEvent(TaskEndEvent event) {
         // 任务结束后 处理电表数据
         log.info("任务：{}结束了", event.getTaskId());

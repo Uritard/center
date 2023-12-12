@@ -716,10 +716,6 @@ public class UPatrolTaskService {
             // 如果下级上报任务结束，则走任务结束处理逻辑，避免提前更改任务状态
             if (robotEnd) {
 
-                TaskEndEvent event = new TaskEndEvent();
-                event.setTaskId(taskId);
-                eventPublisher.publishEvent(event);
-
                 String taskIdFinal = taskId;
                 int fanalTaskState = taskState;
                 if (task.getTaskType() == SINGLE_DEVICE_PATROL
