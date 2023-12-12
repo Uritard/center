@@ -684,17 +684,18 @@ public class HomePageService {
     private void dealPowerInfo(List<Map<String,String>> yesterday,
                                  List<Map<String,String>> beforeYesterdayList,
                                  Map<String,Object> reMap){
+        DecimalFormat df = new DecimalFormat("#.00");
         //1.计算总量
         Double yesterdayAll = 0d;
         for (Map<String,String> item : yesterday){
             yesterdayAll = yesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
         }
-        reMap.put("yesterdayAllTotal",yesterdayAll);
+        reMap.put("yesterdayAllTotal",df.format(yesterdayAll));
         Double beforeYesterdayAll = 0d;
         for (Map<String,String> item : beforeYesterdayList){
             beforeYesterdayAll = beforeYesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
         }
-        reMap.put("beforeYesterdayAll",beforeYesterdayAll);
+        reMap.put("beforeYesterdayAll",df.format(beforeYesterdayAll));
         //2.计算百分比
         for (Map<String,String> item : yesterday){
             Double value = ValueUtil.toDouble(item.get("allTotal"),0d);
