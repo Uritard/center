@@ -65,25 +65,35 @@ public class MeterInfoHandler {
                 log.info("电表数值小于0！");
             }
             log.info("电表：{}结束了", event.getDeviceId());
-            handleMeterEndEvent(meterInfo);
+            handleMeterEndEvent(event.getTaskId());
         }
 
     }
-    public void handleMeterEndEvent(Map<String, String> meterInfo) {
+    public void handleMeterEndEvent(String taskId) {
         List<TMeter> meterList = tMeterDao.selectMeterByDeviceId();
         for (TMeter meter : meterList) {
-            Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
-            if (value < 0){
-                value = 0f;
+            Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + taskId + ":" + meter.getDeviceId());
+            if (meterInfo.size() == 3) {
+                if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
+                    log.info("数值小于0！{}",meterInfo);
+                    continue;
+                }
+                Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
+                if (value < 0){
+                    value = 0f;
+                }
+                meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+                meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
+                meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
+                meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
+                meter.setCollectPowerTime(new Date());
+                tMeterDao.updateByPrimaryKey(meter);
+                tMeterLogDao.insert(meter);
+                meterInfoUpload(meter);
+                //处理完了  删除电表数据
+                log.info("电表：{} 数据已处理完毕！删除redis数据:{}",meter.getName(),meterInfo);
+                redisTemplate.delete(meterKey + taskId + ":" + meter.getDeviceId());
             }
-            meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-            meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
-            meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
-            meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
-            meter.setCollectPowerTime(new Date());
-            tMeterDao.updateByPrimaryKey(meter);
-            tMeterLogDao.insert(meter);
-            meterInfoUpload(meter);
         }
     }
     public void handleTaskEndEvent(TaskEndEvent event) {
