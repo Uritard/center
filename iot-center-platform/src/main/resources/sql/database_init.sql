@@ -2671,6 +2671,7 @@ CREATE TABLE `t_meter` (
 `ip` varchar(20) DEFAULT '' COMMENT '电表IP',
 `port` int DEFAULT '1' COMMENT '电表端口号',
 `address` varchar(30) DEFAULT '' COMMENT '电表地址',
+`protocol` varchar(32) DEFAULT '' COMMENT 'DL/T645协议 1997/2007',
 `type` int DEFAULT '1' COMMENT '电表类型 1-485获取数据 2-巡视任务获取数据',
 `device_id` bigint DEFAULT NULL COMMENT '类型为2时，电表数据通过巡视这个设备获取',
 `up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',

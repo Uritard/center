@@ -163,6 +163,7 @@ public class TMeterController {
             item.put("ip", meter.getIp());
             item.put("port", meter.getPort());
             item.put("address", meter.getAddress());
+            item.put("protocol", meter.getProtocol());
             item.put("upRegionId", meter.getUpRegionId());
             item.put("totalPositivePower", meter.getTotalPositivePower());
             item.put("totalPositiveReactivePower", meter.getTotalPositiveReactivePower());

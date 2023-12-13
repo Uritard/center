@@ -97,15 +97,15 @@ public class TMeterCollectService {
         TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
         try {
             DLT645Message dlt645Message = new DLT645Message();
-            dlt645Message.setControlCode(Constant.CONTROLL_CODE_REQUEST);
+            dlt645Message.setControlCode("1997".equals(tMeter.getProtocol()) ? Constant.CONTROLL_CODE_REQUEST : Constant.CONTROLL_CODE_REQUEST_2007);
             dlt645Message.setAddress(tMeter.getAddress());
-            dlt645Message.setData(Constant.DATA_TYPE_POSITVICE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITVICE_POWER_TOTAL : Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007);
             channel.writeAndFlush(dlt645Message);
             Thread.sleep(500);
-            dlt645Message.setData(Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007);
             channel.writeAndFlush(dlt645Message);
             Thread.sleep(500);
-            dlt645Message.setData(Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007);
             channel.writeAndFlush(dlt645Message);
         } catch (InterruptedException e) {
             e.printStackTrace();
