@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -118,8 +119,13 @@ public class ReportManageController {
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            String filePath = reportManageService.cruiseReportGenerate(taskId);
-            result.setData(filePath);
+            Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+            if (progress > 0) {
+                result.setMessage("任务报告正在生成中，请耐心等待，当前进度" + progress + "%");
+            } else {
+                result.setMessage("开始生成任务报告...");
+            }
+            result.setData(progress);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -131,10 +137,11 @@ public class ReportManageController {
     @ApiOperation(value = "下载巡视报告")
     @GetMapping(value = "/downLoadCruiseReport")
     @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9,authority = "1235")
-    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId,@RequestParam(value = "remark")String remark) {
+    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId,@RequestParam(value = "remark")String remark, HttpServletRequest request) {
         Result result = new Result();
         try {
-            result = reportManageService.downLoadCruiseReport(taskId,remark);
+            String userId = request.getHeader("userId") + "_" + request.getHeader("token");
+            result = reportManageService.downLoadCruiseReport(taskId, userId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

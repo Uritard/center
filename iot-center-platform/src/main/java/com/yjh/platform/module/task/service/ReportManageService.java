@@ -1,15 +1,18 @@
 package com.yjh.platform.module.task.service;
 
+import cn.hutool.cache.Cache;
+import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.net.URLEncodeUtil;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.DictConvertUtil;
-import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
@@ -53,6 +56,8 @@ public class ReportManageService {
     private UPatrolTaskService uPatrolTaskService;
     @Autowired
     private TStdRegionService stdRegionService;
+
+    public static final Cache<String, Integer> REPORT_CACHE = CacheUtil.newFIFOCache(1000);
 
     @Transactional(rollbackFor = Exception.class)
     public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
@@ -166,62 +171,101 @@ public class ReportManageService {
         }
         return res;
     }
-    @Transactional(rollbackFor = Exception.class)
-    public String cruiseReportGenerate(String taskId){
-        // 明细
-        List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
-        List<String>  originalImgList = new ArrayList<>();
-        boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
-        Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = cruiseDataGroup(cruiseDataResultDetailList, originalImgList, downResultPic);
 
-        // UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        // String remark = uPatrolResult.getRemark();
-
-        //顺便处理非同源合并问题
-        List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
-
-        List<KeyValue<String, ContentData>> contentDataList = new ArrayList<>();
-        TaskVO taskBaseVO = getTaskVoDefined(taskId);
-        listMap.forEach((k, detailList)->{
-            try {
-                TaskVO taskVO = new TaskVO();
-                BeanUtil.copyProperties(taskBaseVO, taskVO);
-                taskVO.setCruiseStatistics(getTaskVoCount(detailList));
-
-                ReportData recordData = new ReportData();
-                recordData.setTaskVO(taskVO);
-
-                recordData.setDownResultPic(downResultPic);
-
-                recordData.setTCDRDList(detailList);
-                recordData.setNonList(nonList);
-
-                ContentData contentData = ReportDataModel.getData(recordData);
-
-                contentDataList.add(new DefaultKeyValue<>(k.getValue(), contentData));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
+    public Integer reportCheckGenerate(String taskId, String userId){
+        if (StringUtils.isEmpty(taskId)) {
+            throw new BusinessException(ResultCodeEnum.PARAMERROR, "请选择正确的任务生成巡视报告");
+        }
+        synchronized (REPORT_CACHE) {
+            Integer step = REPORT_CACHE.get(taskId);
+            if (step != null) {
+                log.warn("文件任务已经生成，等待执行完成...{}", step);
+                return step;
             }
+            REPORT_CACHE.put(taskId, 1);
+        }
+
+        ThreadPoolUtil.PATROL_POOL.addThread(()->{
+            TaskVO taskVO = cruiseReportGenerate(taskId);
+            pushDownload(taskVO, taskId, userId);
         });
-        // 概况
+        return 0;
+    }
 
-        String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
-        File file = reportFile(taskBaseVO);
-        if (!file.exists()) {
-            FileUtil.mkdir(file.getParentFile());
-            log.info("不存在，创建的文件绝对路径是==={}", file.getAbsolutePath());
-        }else {
-            log.info("存在，该文件绝对路径是==={}", file.getAbsolutePath());
-        }
+    public synchronized Integer reportGenerateProgress(String taskId) {
+        return REPORT_CACHE.get(taskId);
+    }
 
-        ReportHelper.createDocument(contentDataList, file, taskId);
+    public TaskVO cruiseReportGenerate(String taskId){
+
         try {
-            //将任务下的巡视原图图片 打包成一份zip
-            FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
-        }catch (Exception e){
-            log.info("压缩任务下图片失败：",e);
+            // 明细
+            List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+            // 更新任务进度
+            REPORT_CACHE.put(taskId, 15);
+            log.info("查询任务结果完成，{}", taskId);
+            List<String>  originalImgList = new ArrayList<>();
+            boolean downResultPic = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:downResultPic", "content"));
+            Map<KeyValue<Long, String>, List<TCruiseDataResultDetail>> listMap = cruiseDataGroup(cruiseDataResultDetailList, originalImgList, downResultPic);
+            REPORT_CACHE.put(taskId, 18);
+            log.info("任务结果分组完成，{}", taskId);
+            // UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+            // String remark = uPatrolResult.getRemark();
+
+            //顺便处理非同源合并问题
+            List<NonhomologousInfo> nonList = uPatrolResultDao.selectWarnByTaskId(taskId);
+
+            List<KeyValue<String, ContentData>> contentDataList = new ArrayList<>();
+            TaskVO taskBaseVO = getTaskVoDefined(taskId);
+            listMap.forEach((k, detailList)->{
+                try {
+                    TaskVO taskVO = new TaskVO();
+                    BeanUtil.copyProperties(taskBaseVO, taskVO);
+                    taskVO.setCruiseStatistics(getTaskVoCount(detailList));
+
+                    ReportData recordData = new ReportData();
+                    recordData.setTaskVO(taskVO);
+
+                    recordData.setDownResultPic(downResultPic);
+
+                    recordData.setTCDRDList(detailList);
+                    recordData.setNonList(nonList);
+
+                    ContentData contentData = ReportDataModel.getData(recordData);
+
+                    contentDataList.add(new DefaultKeyValue<>(k.getValue(), contentData));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            });
+            // 概况
+            REPORT_CACHE.put(taskId, 25);
+            log.info("任务概况统计计算完成，{}", taskId);
+
+            String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
+            File file = reportFile(taskBaseVO);
+            if (!file.exists()) {
+                FileUtil.mkdir(file.getParentFile());
+                log.info("不存在，创建的文件绝对路径是==={}", file.getAbsolutePath());
+            }else {
+                log.info("存在，该文件绝对路径是==={}", file.getAbsolutePath());
+            }
+
+            ReportHelper.createDocument(contentDataList, file, taskId);
+            try {
+                //将任务下的巡视原图图片 打包成一份zip
+                FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
+            }catch (Exception e){
+                log.info("压缩任务下图片失败：",e);
+            }
+            return taskBaseVO;
+        } catch (Exception e) {
+            log.error("生成任务报告失败", e);
+            throw new BusinessException("任务报告生成失败");
+        } finally {
+            REPORT_CACHE.remove(taskId);
+            log.info("报告生成，删除任务缓存 {}", taskId);
         }
-        return file.getAbsolutePath();
     }
 
     private File reportFile(TaskVO taskVO) {
@@ -399,36 +443,35 @@ public class ReportManageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result  downLoadCruiseReport(String taskId,String remark){
+    public Result downLoadCruiseReport(String taskId, String userId){
+        if (StringUtils.isEmpty(taskId)) {
+            throw new BusinessException(ResultCodeEnum.PARAMERROR, "请选择正确的任务生成巡视报告");
+        }
         Result result = new Result();
         TaskVO taskVO = getTaskVoDefined(taskId);
-        if ("0".equals(remark)) {
-            //自动生成巡视报告
-            File file = reportFile(taskVO);
-            if (!file.exists()) {
-                String reportFilePath = cruiseReportGenerate(taskId);
-                log.info("自动生成巡视报告的路径是=={}", reportFilePath);
+        //自动生成巡视报告
+        File file = reportFile(taskVO);
+        Integer prog = reportGenerateProgress(taskId);
+        if (!file.exists()) {
+            prog = reportCheckGenerate(taskId, userId);
+            if (prog > 0) {
+                result.setMessage("任务报告正在生成中，请耐心等待，当前进度" + prog + "%");
             } else {
-                log.info("巡视报告已经生成，直接下载=={}", file.getAbsolutePath());
+                result.setMessage("开始生成任务报告...");
             }
+            log.info("生成巡视报告的进度是=={}", prog);
+            return result;
+        } else if (prog != null) {
+            result.setMessage("任务报告正在生成中，请耐心等待，当前进度" + prog + "%");
+            return result;
+        } else {
+            log.info("巡视报告已经生成，直接下载=={}", file.getAbsolutePath());
         }
 
-        // 报告名称:站所名称+任务名称+巡视时间
-        String fileNameTemp = taskVO.getStationName() + "-" + taskVO.getTaskName();
-        String reportName = fileNameTemp + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
+        // 推送巡视报告下载
+        ThreadPoolUtil.COMMON_POOL.addThread(()->pushDownload(taskVO, taskId, userId));
 
-        String fileRelativePathTemp = (String) redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content");
-        String fileRelativePath = fileRelativePathTemp + "/" + reportName;
-        log.info("excel文件相对路径是==={}", fileRelativePath);
-
-        String zipName = taskId + ".zip";
-        String zipRelativePath = fileRelativePathTemp + "/" + zipName;
-        log.info("zip文件相对路径是==={}", zipRelativePath);
-
-        Map<String, String> fileMap = new HashMap<>(2);
-        fileMap.put("reportPath", fileRelativePath);
-        fileMap.put("zipPath", zipRelativePath);
-        result.setData(fileMap);
+        result.setMessage("开始下载任务报告");
         return result;
     }
 
@@ -466,5 +509,30 @@ public class ReportManageService {
         });
 
         return listMap;
+    }
+
+    public void pushDownload(TaskVO taskVO, String taskId, String userId) {
+        if (StringUtils.isNotEmpty(userId)) {
+            try {
+                // 报告名称:站所名称+任务名称+巡视时间
+                String reportName = taskVO.getStationName() + "-" + taskVO.getTaskName() + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
+
+                String fileRelativePathTemp = SysParamConfig.getSysContent("meteModelPath");
+                String fileRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(reportName));
+                log.info("excel文件下载路径是==={}", fileRelativePath);
+
+                String zipName = taskId + ".zip";
+                String zipRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(zipName));
+                log.info("zip文件下载路径是==={}", zipRelativePath);
+
+                Map<String, Object> jasonMap = new HashMap<>(4);
+                jasonMap.put("type", "cruiseDataReport");
+                jasonMap.put("url", new String[]{fileRelativePath, zipRelativePath});
+                log.info("发送给前端的消息 —— 巡视报告下载:{}", jasonMap);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.yjh.platform.common.utils.smUtil.report;
 import com.google.common.base.Strings;
 import com.yjh.platform.module.task.entity.ContentData;
 import com.yjh.platform.module.task.entity.TableCellElement;
+import com.yjh.platform.module.task.service.ReportManageService;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.common.usermodel.HyperlinkType;
@@ -156,10 +157,13 @@ public class ReportHelper {
 
     public static boolean createDocument(List<KeyValue<String, ContentData>> contentDataList, File dest,String taskId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook();
+        int size = contentDataList.size();
+        int idx = 1;
         for (KeyValue<String, ContentData> dataKeyValue : contentDataList) {
             try {
+                float ratio = Math.min((float)idx++/size, 1.0F);
                 ContentData contentData = dataKeyValue.getValue();
-                createDocumentSheet(contentData.getRowCount(), contentData.getColumnCount(), contentData.getElements(), wb, dataKeyValue.getKey(), taskId);
+                createDocumentSheet(contentData.getRowCount(), contentData.getColumnCount(), contentData.getElements(), wb, dataKeyValue.getKey(), taskId, ratio);
             } catch (Exception e) {
                 logger.info("create sheet error: ", e);
             }
@@ -191,7 +195,11 @@ public class ReportHelper {
         return true;
     }
 
-    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId) {
+    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId){
+        return createDocumentSheet(rowNum, columnNum, elements, wb, sheetName, taskId, 0);
+    }
+
+    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId, float ratio) {
         final SXSSFSheet sheet = wb.createSheet(sheetName);
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         // Row row;
@@ -216,6 +224,8 @@ public class ReportHelper {
         }
 
         HashMap<Integer, Boolean> imageColumnMap = new HashMap<>();
+        int prog = 1;
+        int size = elements.size();
         for (TableCellElement element : elements) {
             if (element == null) {
                 continue;
@@ -232,6 +242,13 @@ public class ReportHelper {
                 for (int j = 0; j < columnNum; ++j) {
                     row.createCell(j).setCellStyle(defaultCellStyle);
                 }
+            }
+
+            if (ratio > 0.01F && (prog++%1500) == 0) {
+                int step = (int)(prog*ratio*100*0.55/size) + 25;
+                step = Math.min(step, (int)(80*ratio));
+                ReportManageService.REPORT_CACHE.put(taskId, step);
+                logger.info("正在生成excel, taskId: {}, row: {}, progress: {}", taskId, prog, step);
             }
 
             Cell cell = row.getCell(colStart);
