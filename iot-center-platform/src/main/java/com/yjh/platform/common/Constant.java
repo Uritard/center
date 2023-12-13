@@ -209,7 +209,7 @@ public class Constant {
         return result;
     }
 
-    public static String websocketSendMsg(String url, Map<String, String> map, String userId) throws IOException {
+    public static String websocketSendMsg(String url, Map<String, ?> map, String userId) throws IOException {
         // 将WebSocket信息写入Redis
         String json = JSON.toJSONString(map);
         String type = "type";

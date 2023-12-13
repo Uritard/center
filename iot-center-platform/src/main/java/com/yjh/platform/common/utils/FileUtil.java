@@ -1,11 +1,12 @@
 package com.yjh.platform.common.utils;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -159,11 +159,18 @@ public class FileUtil {
         }
         File inputFile = null;
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(path+File.separator+zipFileName));
+        int prog = 1;
+        int size = fileList.size();
         for (String str: fileList) {
             inputFile = new File(str);
             if (!inputFile.exists()){
                 log.info("文件：{} 不存在",str);
                 continue;
+            }
+            if ((prog++%100) == 0) {
+                int step = (int)(prog*100*0.2/size);
+                step = Math.min(step, 100);
+                ReportManageService.REPORT_CACHE.put(basePath, step);
             }
 
             Boolean flag = true;
@@ -197,7 +204,9 @@ public class FileUtil {
             out.putNextEntry(new ZipEntry(base));
             FileInputStream in = new FileInputStream(f);
             int b;
-            log.info(base);
+            if (Constant.logUpLv2()) {
+                log.info(base);
+            }
 //			while ((b = in.read()) != -1) {
 //				out.write(b);
 //			}

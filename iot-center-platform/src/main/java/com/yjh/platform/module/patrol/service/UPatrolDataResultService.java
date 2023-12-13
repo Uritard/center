@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.net.URLEncodeUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -227,9 +228,9 @@ public class UPatrolDataResultService {
                     Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
                     String fileRelativePath = map.get("content") + "/" + fileName;
 
-                    Map<String, String> jasonMap = new HashMap<>(2);
+                    Map<String, Object> jasonMap = new HashMap<>(4);
                     jasonMap.put("type", "cruiseDataReport");
-                    jasonMap.put("url", fileRelativePath);
+                    jasonMap.put("url", new String[] {fileRelativePath});
                     log.info("发送给前端的消息:{}", jasonMap);
                     Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
                 } catch (Exception e) {
@@ -237,7 +238,7 @@ public class UPatrolDataResultService {
                 }
             }
         };
-        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
+        ThreadPoolUtil.PATROL_POOL.addThread(runnable);
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList(Integer cruiseType, Integer cType, String deviceMeteIds, String meteType, Integer meterType, String endTime, String startTime) {
@@ -499,10 +500,10 @@ public class UPatrolDataResultService {
                 //关闭写excel
                 excelWriter.finish();
 
-                String fileRelativePath = redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content") + "/" + fileName;
-                Map<String, String> jasonMap = new HashMap<>(2);
+                String fileRelativePath = redisTemplate.opsForHash().get("t_sys_param:meteModelPath", "content") + "/" + URLEncodeUtil.encode(fileName);
+                Map<String, Object> jasonMap = new HashMap<>(4);
                 jasonMap.put("type", "cruiseDataReport");
-                jasonMap.put("url", fileRelativePath);
+                jasonMap.put("url", new String[] {fileRelativePath});
                 log.info("发送给前端的消息:{}", jasonMap);
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
             } catch (Exception e) {

@@ -308,8 +308,8 @@ public class UPatrolResultService {
         if (checkedSize == cruiseManualReviewList.size()) {
             result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
             //自动生成巡视报告
-            String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
-            log.info("自动生成巡视报告的路径是=={}", reportFilePath);
+            Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+            log.info("开始生成巡视报告=={}", progress);
         }
         return result2;
     }
@@ -569,8 +569,8 @@ public class UPatrolResultService {
         List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
         processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
         //自动生成巡视报告
-        String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
-        log.info("自动生成巡视报告的路径是==" + reportFilePath);
+        Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+        log.info("开始生成巡视报告=={}", progress);
         return result + reviewList.size();
     }
 

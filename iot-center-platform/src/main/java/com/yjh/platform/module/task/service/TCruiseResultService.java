@@ -255,7 +255,7 @@ public class TCruiseResultService{
             result2 = tCruiseResultDao.updateCheck(taskId,checkUserName,taskCheckDate,"1");
             //自动生成巡视报告
             String taskID = cruiseManualReview.getTaskId();
-            String reportFilePath = reportManageService.cruiseReportGenerate(taskID);
+            TaskVO reportFilePath = reportManageService.cruiseReportGenerate(taskID);
             log.info("自动生成巡视报告的路径是=="+reportFilePath);
         }
 //        insert QrDecode as device's real code. by tt.
@@ -479,7 +479,7 @@ public class TCruiseResultService{
             }
         }
         //自动生成巡视报告
-        String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
+        TaskVO reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是=="+reportFilePath);
         return result + list.size();
     }

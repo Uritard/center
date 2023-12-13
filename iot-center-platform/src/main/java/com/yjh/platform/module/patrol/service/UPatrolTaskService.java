@@ -667,8 +667,21 @@ public class UPatrolTaskService {
             String patrolledId = robotPatrolTaskStatus.getTaskPatrolledId();
             String taskCode = robotPatrolTaskStatus.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
-            String timeStr = robotPatrolTaskStatus.getPlanStartTime();
-            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern());
+            Date date = null;
+            String timeStr = StringUtils.substringAfterLast(patrolledId, "_");
+            if (StringUtils.isNotEmpty(timeStr)) {
+                date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            }
+            if (date == null) {
+                timeStr = robotPatrolTaskStatus.getPlanStartTime();
+                date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern());
+            }
+            if (date == null) {
+                String statusStr = JSON.toJSONString(robotPatrolTaskStatus);
+                log.error("下级上报任务状态处理失败，没有获取到正确的时间格式，status: {}", statusStr);
+                return;
+            }
+
             String taskId = null;
 
             boolean robotEnd = false;
