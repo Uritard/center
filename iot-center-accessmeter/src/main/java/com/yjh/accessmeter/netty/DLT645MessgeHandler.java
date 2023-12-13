@@ -75,7 +75,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         TMeter tMeter = ctx.channel().attr(Constant.tMeterAttributeKey).get();
         log.info("连接断开:{}", tMeter);
         // 电表数据未删除时 60秒后重连
-        TMeter meterData = tMeterDao.selectByPrimaryKey(tMeter.getId());
+        TMeter meterData = tMeterDao.select(tMeter);
         if (Objects.nonNull(meterData)) {
             log.info("电表未移除,60秒后重连  tmeter:{}", tMeter);
             TMeterCollectService tMeterCollectService = SpringBeanUtils.getBean(TMeterCollectService.class);

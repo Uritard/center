@@ -116,8 +116,13 @@ public class TMeterService {
         return result;
     }
 
-    public int update(TMeter tMeter){
-        return tMeterDao.update(tMeter);
+    public int update(TMeter tMeter) {
+        int result = tMeterDao.update(tMeter);
+        threadPoolTaskExecutor.execute(() -> {
+            Result result1 = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/add?id={0}", Result.class, tMeter.getId());
+            log.info("新增电表 result:{}", result1);
+        });
+        return result;
     }
 
     public Result collectData(Long id) {

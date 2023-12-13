@@ -14,6 +14,8 @@ import java.util.List;
 @Repository
 public interface TMeterDao {
 
+    TMeter select(TMeter tMeter);
+
     List<TMeter> selectAll();
 
     int deleteByPrimaryKey(Long id);
