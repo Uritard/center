@@ -67,7 +67,10 @@ public class TMeterCollectService {
             return;
         }
         if (map.containsKey(id)) {
-            log.info("该电表已经连接 id:{}", id);
+            log.info("该电表已经连接 修改电表信息 id:{}", id);
+            Channel channel = map.get(id);
+            channel.attr(Constant.tMeterAttributeKey).set(tMeter);
+            collect(id);
             return;
         }
         asyncExecutor.execute(() -> initMeter(tMeter));

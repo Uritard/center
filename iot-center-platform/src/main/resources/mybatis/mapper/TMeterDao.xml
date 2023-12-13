@@ -101,6 +101,8 @@
         update t_meter
         <set>
             <if test="name != null and name != ''">name = #{name,jdbcType=VARCHAR},</if>
+            <if test="ip != null and ip != ''">ip = #{ip,jdbcType=VARCHAR},</if>
+            <if test="port != null and port != ''">port = #{port,jdbcType=INTEGER},</if>
             <if test="address != null and address != ''">address = #{address,jdbcType=VARCHAR},</if>
             <if test="protocol != null and protocol != ''">protocol = #{protocol,jdbcType=VARCHAR},</if>
             type = #{type,jdbcType=INTEGER},
