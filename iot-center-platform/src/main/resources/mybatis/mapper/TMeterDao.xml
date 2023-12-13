@@ -103,6 +103,7 @@
             <if test="name != null and name != ''">name = #{name,jdbcType=VARCHAR},</if>
             <if test="address != null and address != ''">address = #{address,jdbcType=VARCHAR},</if>
             <if test="protocol != null and protocol != ''">protocol = #{protocol,jdbcType=VARCHAR},</if>
+            type = #{type,jdbcType=INTEGER},
             device_id = #{deviceId,jdbcType=BIGINT},
             <if test="magnificationCoefficient != null and magnificationCoefficient != ''">magnification_coefficient = #{magnificationCoefficient,jdbcType=INTEGER},</if>
         </set>
