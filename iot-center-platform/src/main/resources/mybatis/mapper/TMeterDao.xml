@@ -11,6 +11,7 @@
         <result property="ip" column="ip" jdbcType="VARCHAR"/>
         <result property="port" column="port" jdbcType="INTEGER"/>
         <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="protocol" column="protocol" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="INTEGER"/>
         <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
         <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>
@@ -22,8 +23,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,up_region_id,name,
-        ip,port,address,type,device_id,total_positive_power,
+        id,up_region_id,name,ip,port,address,protocol,type,device_id,total_positive_power,
         total_positive_reactive_power,total_negative_positive_power,
         collect_power_time,create_time,magnification_coefficient
     </sql>
@@ -47,6 +47,7 @@
         ip,
         port,
         address,
+        protocol,
         type,
         device_id,
         total_positive_power,
@@ -79,6 +80,7 @@
              ip,
              port,
              address,
+             protocol,
              type,
              device_id,
              magnification_coefficient)
@@ -88,6 +90,7 @@
                 #{ip,jdbcType=VARCHAR},
                 #{port,jdbcType=VARCHAR},
                 #{address,jdbcType=VARCHAR},
+                #{protocol,jdbcType=VARCHAR},
                 #{type,jdbcType=INTEGER},
                 #{deviceId,jdbcType=BIGINT},
                 #{magnificationCoefficient,jdbcType=BIGINT}
@@ -99,6 +102,7 @@
         <set>
             <if test="name != null and name != ''">name = #{name,jdbcType=VARCHAR},</if>
             <if test="address != null and address != ''">address = #{address,jdbcType=VARCHAR},</if>
+            <if test="protocol != null and protocol != ''">protocol = #{protocol,jdbcType=VARCHAR},</if>
             device_id = #{deviceId,jdbcType=BIGINT},
             <if test="magnificationCoefficient != null and magnificationCoefficient != ''">magnification_coefficient = #{magnificationCoefficient,jdbcType=INTEGER},</if>
         </set>

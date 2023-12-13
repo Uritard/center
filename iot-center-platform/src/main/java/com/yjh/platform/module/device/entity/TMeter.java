@@ -49,6 +49,11 @@ public class TMeter implements Serializable {
     private String address;
 
     /**
+     * 电表协议 DL/T645协议 1997/2007
+     */
+    private String protocol;
+
+    /**
      * 电表类型 1-485获取数据 2-巡视任务获取数据
      */
     private Integer type;

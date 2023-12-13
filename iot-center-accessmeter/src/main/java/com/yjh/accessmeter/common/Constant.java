@@ -33,23 +33,33 @@ public class Constant {
      */
     public  static final  byte CONTROLL_CODE_ANSWER = (byte) 0x81;
 
+    public  static final  byte CONTROLL_CODE_ANSWER_2007 = (byte) 0x91;
+
     /**
      * 主站读数据控制码
      */
     public  static final  byte CONTROLL_CODE_REQUEST =  0x01;
 
+    public  static final  byte CONTROLL_CODE_REQUEST_2007 = 0x11;
+
     /**
      * 正向有功总电能数据类型
      */
     public static final byte[] DATA_TYPE_POSITVICE_POWER_TOTAL = new byte[]{(byte) 0x10, (byte) 0x90};
+
+    public static final byte[] DATA_TYPE_POSITVICE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x01,(byte)0x00};
     /**
      * 正向无功 positive_reactive
      */
     public static final byte[] DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL = new byte[]{(byte) 0x10, (byte) 0x91};
+
+    public static final byte[] DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x03,(byte)0x00};
     /**
      * 反向无功 negative_reactive
      */
     public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL = new byte[]{(byte) 0x20, (byte) 0x91};
+
+    public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x04,(byte)0x00};;
 
     public static final int minLength = 12;
     public static final AttributeKey<TMeter> tMeterAttributeKey =AttributeKey.valueOf("TMeter");

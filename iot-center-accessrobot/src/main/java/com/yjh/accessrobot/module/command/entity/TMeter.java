@@ -59,6 +59,11 @@ public class TMeter implements Serializable {
     private String address;
 
     /**
+     * 电表协议 DL/T645协议 1997/2007
+     */
+    private String protocol;
+
+    /**
      * 正向有功总电量
      */
     @ApiModelProperty(value = "正向有功总电量")

@@ -11,7 +11,7 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,15 +55,15 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         //连接时查询一次电量
         try {
             DLT645Message dlt645Message = new DLT645Message();
-            dlt645Message.setControlCode(Constant.CONTROLL_CODE_REQUEST);
+            dlt645Message.setControlCode("1997".equals(tMeter.getProtocol()) ? Constant.CONTROLL_CODE_REQUEST : Constant.CONTROLL_CODE_REQUEST_2007);
             dlt645Message.setAddress(tMeter.getAddress());
-            dlt645Message.setData(Constant.DATA_TYPE_POSITVICE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITVICE_POWER_TOTAL : Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007);
             ctx.writeAndFlush(dlt645Message);
             Thread.sleep(500);
-            dlt645Message.setData(Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007);
             ctx.writeAndFlush(dlt645Message);
             Thread.sleep(500);
-            dlt645Message.setData(Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL);
+            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007);
             ctx.writeAndFlush(dlt645Message);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -139,6 +139,57 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     log.info("采集到正向无功电能:{}", powerTotalString);
                     tMeter.setTotalPositiveReactivePower(powerTotalString);
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL)) {
+                    log.info("采集到反向无功电能:{}", powerTotalString);
+                    tMeter.setTotalNegativeReactivePower(powerTotalString);
+                }
+                tMeterDao.updateData(tMeter);
+                log.info("tMeter {}", tMeter);
+                tMeterLogDao.insert(tMeter);
+            } else {
+                log.error("数据类型不是正向有功/正向无功/反向无功总电能, dataType:{}", ByteBufUtil.hexDump(dataType));
+            }
+        } else if (dlt645Message.getControlCode() == Constant.CONTROLL_CODE_ANSWER_2007){
+            byte[] data = dlt645Message.getData();
+            // 数据域前四位是数据类型
+            byte[] dataType = new byte[4];
+            System.arraycopy(data, 0, dataType, 0, 4);
+            String dataTypeStr = ByteUtils.toHexString(dataType);
+            log.info("dataType:{} ", dataTypeStr);
+            // 判断数据类型是正向有功总电能
+            if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007)
+                    || Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007)
+                    || Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007)) {
+                // 解析值
+                byte[] dataValue = new byte[data.length - 4];
+                System.arraycopy(dlt645Message.getData(), 4, dataValue, 0, data.length - 4);
+                ArrayUtils.reverse(dataValue);
+                String hexString = ByteBufUtil.hexDump(dataValue);
+                long powerTotal = Long.parseLong(hexString, 10);
+                log.info("dataValue hex:{} value:{}", hexString, powerTotal);
+                String powerTotalString = String.format("%.2f", powerTotal / 100.0);
+                //数据入库
+                tMeter.setCollectPowerTime(new Date());
+                if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007)) {
+                    log.info("采集到正向有功电能:{}", powerTotalString);
+                    tMeter.setTotalPositivePower(powerTotalString);
+                    //查询上一次的
+                    TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
+                    // 记录电表历史
+                    Float value = 0f;
+                    try {
+                        value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
+                        if (value < 0){
+                            value = 0f;
+                        }
+                    }catch (Exception e){
+                        log.info("计算电表差值出错！",e);
+                    }
+                    tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+                    platformProxy.uploadMeterInfo(tMeter);
+                } else if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007)) {
+                    log.info("采集到正向无功电能:{}", powerTotalString);
+                    tMeter.setTotalPositiveReactivePower(powerTotalString);
+                } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007)) {
                     log.info("采集到反向无功电能:{}", powerTotalString);
                     tMeter.setTotalNegativeReactivePower(powerTotalString);
                 }

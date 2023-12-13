@@ -87,6 +87,7 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setIp(MapUtils.getString(item,"ip"));
                 tMeter.setPort(MapUtils.getInteger(item,"port"));
                 tMeter.setAddress(MapUtils.getString(item,"address"));
+                tMeter.setProtocol(MapUtils.getString(item,"protocol"));
                 tMeter.setUpRegionId(upRegionId);
                 tMeter.setEdgeCode(sendCode);
                 tMeter.setType(MapUtils.getInteger(item,"type"));
