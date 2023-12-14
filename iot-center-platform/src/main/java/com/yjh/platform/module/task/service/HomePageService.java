@@ -224,7 +224,7 @@ public class HomePageService {
 
             Map<String, Object> mapForCell = redisTemplate.opsForHash().entries("RobotOperation:" + item.getRobotCode() + ":3");
             if (mapForCell.size() != 0) {
-                Double value = NumberUtils.toDouble(MapUtils.getString(mapForCell,"value"));//电池电量
+                Double value = NumberUtils.toDouble(MapUtils.getString(mapForCell, "value"));//电池电量
                 String valueUnit = df.format(value) + "%";
                 item.setBatteryLevel(valueUnit);
             } else {
@@ -356,8 +356,8 @@ public class HomePageService {
         //获取相机的状态
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for (Long recordId : recordIdList) {
-            Map<String,String> reMap = cameraConService.getCameraStatus(recordId);
-            if (reMap != null){
+            Map<String, String> reMap = cameraConService.getCameraStatus(recordId);
+            if (reMap != null) {
                 map.putAll(reMap);
             }
         }
@@ -401,8 +401,8 @@ public class HomePageService {
         //获取相机的状态
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for (Long recordId : recordIdList) {
-            Map<String,String> reMap = cameraConService.getCameraStatus(recordId);
-            if (reMap != null){
+            Map<String, String> reMap = cameraConService.getCameraStatus(recordId);
+            if (reMap != null) {
                 map.putAll(reMap);
             }
 
@@ -433,8 +433,8 @@ public class HomePageService {
     /**
      * 站所状况统计
      *
-     * @date 2022/3/1
      * @param type 1 机器人拆分统计  2 机器人合并统计
+     * @date 2022/3/1
      */
     public List<StationCount> queryStations(Long regionId, String type) {
 
@@ -655,7 +655,7 @@ public class HomePageService {
 //
 //    }
 
-    public Map<String,Object> countPowerTotalByDay(){
+    public Map<String, Object> countPowerTotalByDay() {
         LocalDate today = LocalDate.now();
         // 获取昨天的日期
         LocalDate yesterday = today.minusDays(1);
@@ -670,81 +670,93 @@ public class HomePageService {
         // 昨天的结束时间，即23:59:59.999999999
         LocalDateTime beforeYesterdayEnd = LocalDateTime.of(beforeYesterday, LocalTime.MAX);
 
-        List<Map<String,String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart,yesterdayEnd);
-        List<Map<String,String>> beforeYesterdayList = tMeterDao.countPowerTotalByEdge(beforeYesterdayStart,beforeYesterdayEnd);
+        List<Map<String, String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart, yesterdayEnd);
+        List<Map<String, String>> beforeYesterdayList = tMeterDao.countPowerTotalByEdge(beforeYesterdayStart, beforeYesterdayEnd);
 
-        Map<String,Object> reMap = new HashMap<>(4);
-        dealPowerInfo(yesterdayList,beforeYesterdayList,reMap);
+        Map<String, Object> reMap = new HashMap<>(4);
+        dealPowerInfo(yesterdayList, beforeYesterdayList, reMap);
 
-        reMap.put("yesterdayList",yesterdayList);
+        reMap.put("yesterdayList", yesterdayList);
 
-        return  reMap;
+        return reMap;
     }
 
-    private void dealPowerInfo(List<Map<String,String>> yesterday,
-                                 List<Map<String,String>> beforeYesterdayList,
-                                 Map<String,Object> reMap){
+    private void dealPowerInfo(List<Map<String, String>> yesterday,
+                               List<Map<String, String>> beforeYesterdayList,
+                               Map<String, Object> reMap) {
         DecimalFormat df = new DecimalFormat("#.00");
         //1.计算总量
         Double yesterdayAll = 0d;
-        for (Map<String,String> item : yesterday){
-            yesterdayAll = yesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
+        for (Map<String, String> item : yesterday) {
+            yesterdayAll = yesterdayAll + ValueUtil.toDouble(item.get("allTotal"), 0d);
         }
-        reMap.put("yesterdayAllTotal",df.format(yesterdayAll));
+        reMap.put("yesterdayAllTotal", df.format(yesterdayAll));
         Double beforeYesterdayAll = 0d;
-        for (Map<String,String> item : beforeYesterdayList){
-            beforeYesterdayAll = beforeYesterdayAll + ValueUtil.toDouble(item.get("allTotal"),0d);
+        for (Map<String, String> item : beforeYesterdayList) {
+            beforeYesterdayAll = beforeYesterdayAll + ValueUtil.toDouble(item.get("allTotal"), 0d);
         }
-        reMap.put("beforeYesterdayAll",df.format(beforeYesterdayAll));
+        reMap.put("beforeYesterdayAll", df.format(beforeYesterdayAll));
         //2.计算百分比
-        for (Map<String,String> item : yesterday){
-            Double value = ValueUtil.toDouble(item.get("allTotal"),0d);
+        for (Map<String, String> item : yesterday) {
+            Double value = ValueUtil.toDouble(item.get("allTotal"), 0d);
             double percentage = value * 100 / yesterdayAll;
-            item.put("percentage",String.valueOf(Math.round(percentage)));
-            item.put("yesterdayTotal",item.get("allTotal"));
+            item.put("percentage", String.valueOf(Math.round(percentage)));
+            item.put("yesterdayTotal", item.get("allTotal"));
             String beforeYesterdayTotal = "0";
-            item.put("beforeYesterdayTotal",beforeYesterdayTotal);
-            for (Map<String,String> beforeItem : beforeYesterdayList){
-                if (beforeItem.containsValue(item.get("regionName"))){
-                    item.put("beforeYesterdayTotal",beforeItem.get("allTotal"));
-                    Double beforeValue = ValueUtil.toDouble(item.get("allTotal"),0d);
+            item.put("beforeYesterdayTotal", beforeYesterdayTotal);
+            for (Map<String, String> beforeItem : beforeYesterdayList) {
+                if (beforeItem.containsValue(item.get("regionName"))) {
+                    item.put("beforeYesterdayTotal", beforeItem.get("allTotal"));
+                    Double beforeValue = ValueUtil.toDouble(item.get("allTotal"), 0d);
                     double beforeYesterdayPercentage = beforeValue * 100 / beforeYesterdayAll;
-                    item.put("beforeYesterdayPercentage",String.valueOf(Math.round(beforeYesterdayPercentage)));
+                    item.put("beforeYesterdayPercentage", String.valueOf(Math.round(beforeYesterdayPercentage)));
                     break;
                 }
             }
         }
     }
 
-    public List<HomeDeviceInfo> deviceInfo(Integer type,String edgeCode){
-        List<TRobotInfo> robotInfoList = tRobotInfoDao.selectAllRobotByEdgeCodeOrType(edgeCode,type);
+    public List<HomeDeviceInfo> deviceInfo(Integer type, String edgeCode) {
+        List<TRobotInfo> robotInfoList = tRobotInfoDao.selectAllRobotByEdgeCodeOrType(edgeCode, type);
         DictConvertUtil.optional("robotType").covertToDict(robotInfoList);
         List<HomeDeviceInfo> homeDeviceInfoList = new ArrayList<>();
         for (TRobotInfo robotInfo : robotInfoList) {
             HomeDeviceInfo homeDeviceInfo = new HomeDeviceInfo();
             homeDeviceInfo.setRobotName(robotInfo.getRobotName());
-            //<41>: = 运行状态 <1>: = 空闲状态 <2>: = 巡视状态 <3>: = 充电状态 <4>: = 检修状态
-            Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotInfo.getRobotCode() + ":41");
+            Map<String, Object> robotStatus = redisTemplate.opsForHash().entries("RobotStatus:" + robotInfo.getRobotCode() + ":2");
             String robotState = "离线";
-            if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
-                String value = String.valueOf(mapForRobotState.get("value"));
-                switch (value) {
-                    case "1":
-                        robotState = "空闲状态";
-                        break;
-                    case "2":
-                        robotState = "巡视状态";
-                        break;
-                    case "3":
-                        robotState = "充电状态";
-                        break;
-                    case "4":
-                        robotState = "检修状态";
-                        break;
-                    default:
-                        robotState = "离线";
-                        break;
+            if (robotStatus.size() != 0 && Optional.ofNullable(robotStatus.get("value")).isPresent()) {
+                if (!"1".equals(String.valueOf(robotStatus.get("value")))) {
+                    Map<String, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotInfo.getRobotCode() + ":41");
+                    /**
+                     * <41>: = 运行状态
+                     * * <1>: = 空闲状态
+                     * * <2>: = 巡视状态
+                     * * <3>: = 充电状态
+                     * * <4>: = 检修状态
+                     */
+                    if (mapForRobotState.size() != 0 && Optional.ofNullable(mapForRobotState.get("value")).isPresent()) {
+                        String value = String.valueOf(mapForRobotState.get("value"));
+                        switch (value) {
+                            case "1":
+                                robotState = "空闲状态";
+                                break;
+                            case "2":
+                                robotState = "巡视状态";
+                                break;
+                            case "3":
+                                robotState = "充电状态";
+                                break;
+                            case "4":
+                                robotState = "检修状态";
+                                break;
+                            default:
+                                robotState = "离线";
+                                break;
+                        }
+                    }
                 }
+
             }
             homeDeviceInfo.setRobotId(robotInfo.getOriginId());
             homeDeviceInfo.setRobotCode(robotInfo.getRobotCode());
