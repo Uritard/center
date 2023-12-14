@@ -275,7 +275,7 @@
             )
     </delete>
 
-    <insert id="batchInsertMeter" keyColumn="id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
+    <insert id="batchInsertMeter" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
         insert into t_meter
         (name,
          ip,
