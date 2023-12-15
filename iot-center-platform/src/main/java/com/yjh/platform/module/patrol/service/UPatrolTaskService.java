@@ -717,7 +717,13 @@ public class UPatrolTaskService {
                 taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             }
             if (StringUtils.isEmpty(taskId)) {
-                taskId = StringUtils.countMatches(patrolledId, "_") > 1 ? StringUtils.substringAfter(patrolledId, "_") : patrolledId;
+                String upLevel = "3";
+                if (upLevel.equals(Constant.getLevelEdge())) {
+                    taskId = StringUtils.countMatches(patrolledId, "_") > 1 ? StringUtils.substringAfter(patrolledId, "_") : patrolledId;
+                } else {
+                    //针对周期任务由平台调度  下级taskCode =  平台taskId
+                    taskId = taskCode;
+                }
                 log.warn("查询数据库中 taskId 失败，taskCode: {}, date: {}, taskId: {}", taskCode, date, taskId);
             }
             //判断是不是机器人或者无人机
@@ -3205,7 +3211,9 @@ public class UPatrolTaskService {
                 if (mapA != null && mapA.size() > 0) {
                     robotOrDroneTaskInfo.put("taskState", "2");
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    robotOrDroneTaskInfo.put("taskProgress", mapA.getOrDefault("rate", "0").toString());
+                    float i = Float.parseFloat(mapA.getOrDefault("rate","0").toString());
+                    i = i * 100F;
+                    robotOrDroneTaskInfo.put("taskProgress", String.valueOf((int) i));
                     robotOrDroneTaskInfo.put("startTime", mapA.getOrDefault("startTime", simpleDateFormat.format(new Date())).toString());
                 }
             }
