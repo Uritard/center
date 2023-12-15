@@ -61,7 +61,14 @@ public class Constant {
 
     public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x04,(byte)0x00};;
 
-    public static final int minLength = 12;
+    /**
+     * 最小长度
+     */
+    public static final int MIN_LENGTH = 12;
+    /**
+     * 地址位 6
+     */
+    public static final int ADDRESS = 6;
     public static final AttributeKey<TMeter> tMeterAttributeKey =AttributeKey.valueOf("TMeter");
 
     /**

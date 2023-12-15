@@ -92,12 +92,12 @@ public class TMeterCollectService {
         if (channel == null) {
             log.error("与该电表未连接 id:{}", id);
         } else {
-            sendCollectMsg(channel);
+            TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
+            sendCollectMsg(channel, tMeter);
         }
     }
 
-    private void sendCollectMsg(Channel channel) {
-        TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
+    public static void sendCollectMsg(Channel channel, TMeter tMeter) {
         try {
             DLT645Message dlt645Message = new DLT645Message();
             dlt645Message.setControlCode("1997".equals(tMeter.getProtocol()) ? Constant.CONTROLL_CODE_REQUEST : Constant.CONTROLL_CODE_REQUEST_2007);
@@ -152,7 +152,8 @@ public class TMeterCollectService {
     public void collectDataTask() {
         log.info("开始采集所有电表电量");
         for (Channel channel : map.values()) {
-            sendCollectMsg(channel);
+            TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
+            sendCollectMsg(channel, tMeter);
         }
     }
 

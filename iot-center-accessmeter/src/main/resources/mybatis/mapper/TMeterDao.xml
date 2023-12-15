@@ -19,8 +19,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,name,ip,
-        port,address,up_region_id,total_positive_power,total_positive_power,
+        id,name,ip,port,address,protocol,up_region_id,total_positive_power,total_positive_power,
         total_positive_reactive_power,total_negative_positive_power,
         collect_power_time,create_time,magnification_coefficient
     </sql>

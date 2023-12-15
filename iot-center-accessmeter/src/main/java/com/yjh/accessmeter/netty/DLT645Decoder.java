@@ -24,49 +24,55 @@ public class DLT645Decoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        log.info("消息进站 before decode remoteAddress:{} msg: {}", ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        if (byteBuf.readableBytes() < Constant.minLength) {
-            log.error("length 小于最小 ,length:{}", byteBuf.readableBytes());
+        log.info("消息进站 before decode remoteAddress:{} msg: {}" , ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
+        if (byteBuf.readableBytes() < Constant.MIN_LENGTH) {
+            log.error("length 小于最小 ,length:{}" , byteBuf.readableBytes());
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
-        // 过滤0xfe
-        byte b = byteBuf.readByte();
-        while (b == Constant.FRAME_PREAMBLE) {
-            b = byteBuf.readByte();
-        }
-        byteBuf.readerIndex(byteBuf.readerIndex() - 1);
-        // 获取数据帧
-        byte[] dataFrame = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(dataFrame);
-        if (dataFrame[0] != Constant.START_OF_FRAME || dataFrame[7] != Constant.START_OF_FRAME) {
-            log.error("帧起始符不正确");
-            byteBuf.skipBytes(byteBuf.readableBytes());
-            return;
-        }
-        //计算校验码
-        byte cs = 0;
-        for (int i = 0; i < dataFrame.length - 2; i++) {
-            cs += Byte.toUnsignedInt(dataFrame[i]) % 256;
-        }
-        byte realCS = dataFrame[dataFrame.length - 2];
-        if (cs != realCS) {
-            log.error("校验码检验失败,计算校验码:{} 实际校验码:{}", cs, realCS);
+        byteBuf.markReaderIndex();
+        if (byteBuf.readByte() != Constant.START_OF_FRAME) {
+            byteBuf.skipBytes(1);
             return;
         }
         List<String> addressList = new ArrayList<>();
         //读取地址
-        for (int i = 0; i < 6; i++) {
-            byte address = dataFrame[1 + i];
+        for (int i = 0; i < Constant.ADDRESS; i++) {
+            byte address = byteBuf.readByte();
             addressList.add(StringUtils.leftPad(Integer.toHexString(Byte.toUnsignedInt(address)), 2, '0'));
         }
         Collections.reverse(addressList);
-        String addressStr = String.join("", addressList);
+        String addressStr = String.join("" , addressList);
+
+        if (byteBuf.readByte() != Constant.START_OF_FRAME) {
+            byteBuf.skipBytes(byteBuf.readableBytes());
+            log.error("结束符不正确{}" , Byte.toUnsignedInt(byteBuf.readByte()));
+            return;
+        }
         // 获取控制码
-        byte controlCode = dataFrame[8];
+        byte controlCode = byteBuf.readByte();
         //数据长度
-        int dataLength = Byte.toUnsignedInt(dataFrame[9]);
-        log.info("数据长度 {}", dataLength);
+        int dataLength = Byte.toUnsignedInt(byteBuf.readByte());
+        log.info("数据长度 {}" , dataLength);
+        byteBuf.resetReaderIndex();
+        if (byteBuf.readableBytes() < dataLength + Constant.MIN_LENGTH) {
+            log.error("完整报文length:{}, 报文缺失length:{}" , dataLength + Constant.MIN_LENGTH, byteBuf.readableBytes());
+            byteBuf.skipBytes(byteBuf.readableBytes());
+            return;
+        }
+        byte[] dataFrame = new byte[dataLength + Constant.MIN_LENGTH];
+        byteBuf.readBytes(dataFrame);
+        //计算校验码
+        byte cs = 0;
+        int end = 2;
+        for (int i = 0; i < dataFrame.length - end; i++) {
+            cs += Byte.toUnsignedInt(dataFrame[i]) % 256;
+        }
+        byte realCs = dataFrame[dataFrame.length - 2];
+        if (cs != realCs) {
+            log.error("校验码检验失败,计算校验码:{} 实际校验码:{}" , cs, realCs);
+            return;
+        }
         // 获取数据
         byte[] dataArray = new byte[dataLength];
         for (int i = 0; i < dataLength; i++) {
@@ -78,7 +84,7 @@ public class DLT645Decoder extends ByteToMessageDecoder {
         message.setControlCode(controlCode);
         message.setAddress(addressStr);
         message.setData(dataArray);
-        log.info("消息进站 after decode message :{}", message);
+        log.info("消息进站 after decode message :{}" , message);
         list.add(message);
     }
 }

@@ -10,14 +10,13 @@ import com.yjh.accessmeter.module.service.TMeterCollectService;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -53,21 +52,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         TMeterCollectService.map.put(tMeter.getId(), ctx.channel());
         log.info("电表已经连接 remoteAddress:{},tMeter:{}", ctx.channel().remoteAddress(), tMeter);
         //连接时查询一次电量
-        try {
-            DLT645Message dlt645Message = new DLT645Message();
-            dlt645Message.setControlCode("1997".equals(tMeter.getProtocol()) ? Constant.CONTROLL_CODE_REQUEST : Constant.CONTROLL_CODE_REQUEST_2007);
-            dlt645Message.setAddress(tMeter.getAddress());
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITVICE_POWER_TOTAL : Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007);
-            ctx.writeAndFlush(dlt645Message);
-            Thread.sleep(500);
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007);
-            ctx.writeAndFlush(dlt645Message);
-            Thread.sleep(500);
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007);
-            ctx.writeAndFlush(dlt645Message);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        TMeterCollectService.sendCollectMsg(ctx.channel(), tMeter);
     }
 
     @Override
@@ -79,7 +64,10 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         if (Objects.nonNull(meterData)) {
             log.info("电表未移除,60秒后重连  tmeter:{}", tMeter);
             TMeterCollectService tMeterCollectService = SpringBeanUtils.getBean(TMeterCollectService.class);
-            ctx.channel().eventLoop().schedule(() -> tMeterCollectService.initMeter(meterData), 60, TimeUnit.SECONDS);
+            ctx.channel().eventLoop().schedule(() -> {
+                assert tMeterCollectService != null;
+                tMeterCollectService.initMeter(meterData);
+            }, 60, TimeUnit.SECONDS);
         }
     }
 
