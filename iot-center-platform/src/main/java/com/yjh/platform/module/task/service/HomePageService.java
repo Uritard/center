@@ -684,7 +684,7 @@ public class HomePageService {
     private void dealPowerInfo(List<Map<String, String>> yesterday,
                                List<Map<String, String>> beforeYesterdayList,
                                Map<String, Object> reMap) {
-        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df = new DecimalFormat("#0.00");
         //1.计算总量
         Double yesterdayAll = 0d;
         for (Map<String, String> item : yesterday) {

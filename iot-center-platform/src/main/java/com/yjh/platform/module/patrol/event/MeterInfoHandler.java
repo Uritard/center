@@ -79,7 +79,7 @@ public class MeterInfoHandler {
                     continue;
                 }
                 Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
-                if (value < 0){
+                if (value < 0 || value > 100){
                     value = 0f;
                 }
                 meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
