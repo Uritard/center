@@ -168,7 +168,7 @@ public class FileUtil {
                 continue;
             }
             if ((prog++%100) == 0) {
-                int step = (int)(prog*100*0.2/size);
+                int step = (int)(prog*100*0.2/size) + 80;
                 step = Math.min(step, 100);
                 ReportManageService.REPORT_CACHE.put(basePath, step);
             }

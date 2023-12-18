@@ -10,7 +10,7 @@
     <version>2.1.1.221031_BETA</version>
     <modules>
         <module>iot-center-accessrobot</module>
-        <module>iot-center-accessvideo</module>
+        <!--<module>iot-center-accessvideo</module>-->
         <module>iot-center-accessudp</module>
         <module>iot-center-accesstcp</module>
         <module>iot-center-platform</module>

@@ -582,7 +582,10 @@
         d.task_id,
         d.task_name,
         d.task_type as Type,
-        d.task_state as 'taskState', b.dict_note AS 'taskStateName', e.dict_note AS 'typeName'
+        d.task_state as 'taskState',
+        b.dict_note AS 'taskStateName',
+        e.dict_note AS 'typeName',
+        d.execute_time
         FROM u_patrol_result d
         left JOIN t_dict_business e ON d.task_type = e.dict_code AND e.col_name = 'plan_type'
         LEFT JOIN t_dict_business b ON d.task_state = b.dict_code AND b.col_name = 'task_state'

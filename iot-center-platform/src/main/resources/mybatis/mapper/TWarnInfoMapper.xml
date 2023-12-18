@@ -1109,10 +1109,9 @@
                      t_warn_info
              ) a,
              (
-             SELECT count(IF (conf_mode = 275,NULL,conf_mode)) AS curAlarmCount,
-                count(IF(DATE(defect_time) = CURDATE(),defect_time,null)) AS untreatedAlarmCount
-
-                FROM
+             SELECT count(IF(DATE(defect_time) = CURDATE(),defect_time,null)) AS curAlarmCount,
+                count(IF (conf_mode = 275,NULL,conf_mode)) AS untreatedAlarmCount
+             FROM
                 t_defect_info
              )b
              )
