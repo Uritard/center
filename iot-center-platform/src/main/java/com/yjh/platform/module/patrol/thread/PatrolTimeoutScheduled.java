@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.patrol.thread;
 
+import cn.hutool.core.date.DateUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -80,7 +81,7 @@ public class PatrolTimeoutScheduled {
                 String key = PATROL_SUMMARY_PREFIX + taskId;
                 Map<String, String> taskMap = hashOperations.entries(key);
                 String lastDate = taskMap.get("lastCruiseTime");
-                String taskStart = taskMap.get("taskStart");
+                Date taskStart = task.getExecuteTime() == null ? DateUtil.beginOfWeek(new Date()) : task.getExecuteTime();
                 int taskState = task.getTaskState();
                 Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
                 if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !uPatrolTaskService.taskIsEnded(taskState) && TASK_STATE_PAUSE != taskState) {
