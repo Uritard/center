@@ -19,13 +19,25 @@ public class TMeterVo implements Serializable {
      */
     private String totalPositivePower;
     /**
+     * 正向有功总电量 x 系数
+     */
+    private String totalPositivePowerLast;
+    /**
      * 正向无功总电量
      */
     private String totalPositiveReactivePower;
     /**
+     * 正向无功总电量 x 系数
+     */
+    private String totalPositiveReactivePowerLast;
+    /**
      * 反向无功总电量
      */
     private String totalNegativePositivePower;
+    /**
+     * 反向无功总电量 x 系数
+     */
+    private String totalNegativePositivePowerLast;
 
     /**
      * 创建时间

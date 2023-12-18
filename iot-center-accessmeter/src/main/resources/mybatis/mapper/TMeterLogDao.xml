@@ -4,20 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.accessmeter.module.dao.TMeterLogDao">
 
-<!--    <resultMap id="BaseResultMap" type="com.yjh.accessmeter.module.device.entity.TMeter">-->
-<!--            <id property="id" column="id" jdbcType="BIGINT"/>-->
-<!--            <result property="name" column="name" jdbcType="VARCHAR"/>-->
-<!--            <result property="ip" column="ip" jdbcType="VARCHAR"/>-->
-<!--            <result property="port" column="port" jdbcType="INTEGER"/>-->
-<!--            <result property="address" column="address" jdbcType="VARCHAR"/>-->
-<!--            <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>-->
-<!--            <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>-->
-<!--            <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>-->
-<!--            <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>-->
-<!--            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>-->
-<!--    </resultMap>-->
-
-
     <sql id="Base_Column_List">
         id, meter_id, meter_name,ip,
         port,address,up_region_id,total_positive_power,
@@ -56,7 +42,7 @@
         insert into t_meter_log
          (<include refid="Base_Column_List_exclude_id"></include>)
         values (
-        #{id}, #{name}, #{ip}, #{port}, #{address}, #{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativeReactivePower},
+        #{id}, #{name}, #{ip}, #{port}, #{address}, #{upRegionId}, #{totalPositivePower}, #{totalPositiveReactivePower}, #{totalNegativePositivePower},
         #{collectPowerTime}, '0', now(), '0', 0, #{totalPositivePowerDifferenceValue}, #{magnificationCoefficient}
         )
     </insert>

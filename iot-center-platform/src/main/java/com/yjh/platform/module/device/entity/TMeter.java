@@ -70,6 +70,11 @@ public class TMeter implements Serializable {
     private String totalPositivePower;
 
     /**
+     * 正向有功总电量 x系数
+     */
+    private String totalPositivePowerLast;
+
+    /**
      * 正向无功总电量
      */
     @ApiModelProperty(value = "正向无功总电量")
@@ -77,17 +82,22 @@ public class TMeter implements Serializable {
     private String totalPositiveReactivePower;
 
     /**
+     * 正向无功总电量 x系数
+     */
+    private String totalPositiveReactivePowerLast;
+
+    /**
      * 反向无功总电量
      */
     @ApiModelProperty(value = "反向无功总电量")
     @TableField(value = "total_negative_positive_power", updateStrategy = FieldStrategy.IGNORED)
-    private String totalNegativeReactivePower;
+    private String totalNegativePositivePower;
 
     /**
-     * 反向无功总电量(对应数据库字段，轨交mybatis-plus注解会失效)*
+     * 反向无功总电量 x系数
      */
-    @ApiModelProperty(value = "反向无功总电量")
-    private String totalNegativePositivePower;
+    private String totalNegativePositivePowerLast;
+
 
     /**
      * 电量采集时间

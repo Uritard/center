@@ -52,7 +52,7 @@ public class TMeterController {
             result = tMeterService.select(upRegionId, meterName,pageNum, pageSize);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("删除电表失败：", e);
+            log.error("查询电表失败：", e);
         }
         return result;
     }
@@ -167,7 +167,7 @@ public class TMeterController {
             item.put("upRegionId", meter.getUpRegionId());
             item.put("totalPositivePower", meter.getTotalPositivePower());
             item.put("totalPositiveReactivePower", meter.getTotalPositiveReactivePower());
-            item.put("totalNegativePositivePower", meter.getTotalNegativeReactivePower());
+            item.put("totalNegativePositivePower", meter.getTotalNegativePositivePower());
             item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
             item.put("totalPositivePowerDifferenceValue", meter.getTotalPositivePowerDifferenceValue());
             item.put("magnificationCoefficient", meter.getMagnificationCoefficient());

@@ -128,7 +128,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     tMeter.setTotalPositiveReactivePower(powerTotalString);
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL)) {
                     log.info("采集到反向无功电能:{}", powerTotalString);
-                    tMeter.setTotalNegativeReactivePower(powerTotalString);
+                    tMeter.setTotalNegativePositivePower(powerTotalString);
                 }
                 tMeterDao.updateData(tMeter);
                 log.info("tMeter {}", tMeter);
@@ -179,7 +179,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
                     tMeter.setTotalPositiveReactivePower(powerTotalString);
                 } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007)) {
                     log.info("采集到反向无功电能:{}", powerTotalString);
-                    tMeter.setTotalNegativeReactivePower(powerTotalString);
+                    tMeter.setTotalNegativePositivePower(powerTotalString);
                 }
                 tMeterDao.updateData(tMeter);
                 log.info("tMeter {}", tMeter);
