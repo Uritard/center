@@ -1360,9 +1360,9 @@
         <if test="taskId != null and taskId != ''">and f.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <select id="queryTaskInfo" resultType="com.yjh.platform.module.device.entity.TaskInfoBean">
-        select count(IF(a.task_state = 238, null, a.task_state))  totalTaskCount,
-               count(IF(a.task_state in (242, 243, 244), a.task_state, null))   abnormalTaskCount,
-               count(IF(a.task_state in (239, 241), a.task_state, null)) runningTaskCount
+        select count(IF(a.task_state = 238 OR a.task_type in (456,508,509), null, a.task_state))  totalTaskCount,
+               count(IF(a.task_state in (242, 243, 244) AND a.task_type not in (456,508,509), a.task_state, null))   abnormalTaskCount,
+               count(IF(a.task_state in (239, 241) AND a.task_type not in (456,508,509), a.task_state, null)) runningTaskCount
         from u_patrol_result a
     </select>
 
