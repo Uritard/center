@@ -41,13 +41,13 @@ public class DebugController {
     public Result testMeterUpload(@RequestParam("id") Long id,
                                   @RequestParam("totalPositivePower") String totalPositivePower,
                                   @RequestParam("totalPositiveReactivePower") String totalPositiveReactivePower,
-                                  @RequestParam("totalNegativeReactivePower") String totalNegativeReactivePower) {
+                                  @RequestParam("totalNegativePositivePower") String totalNegativePositivePower) {
         Result result = new Result();
         try {
             TMeter tMeter = tMeterDao.selectByPrimaryKey(id);
             tMeter.setTotalPositivePower(totalPositivePower);
             tMeter.setTotalPositiveReactivePower(totalPositiveReactivePower);
-            tMeter.setTotalNegativeReactivePower(totalNegativeReactivePower);
+            tMeter.setTotalNegativePositivePower(totalNegativePositivePower);
             tMeter.setTotalPositivePowerDifferenceValue("120");
             platformProxy.uploadMeterInfo(tMeter);
         } catch (Exception e) {
