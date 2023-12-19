@@ -139,5 +139,5 @@ public interface TRobotInfoDao {
 
     List<TRobotInfo> selectAllRobotByEdgeCodeOrType(@Param(value = "edgeCode")String edgeCode,
                                                     @Param(value = "type")Integer type);
-
+    TRobotInfo selectByRobotCode(@Param(value = "robotCode") String robotCode);
 }

@@ -2,6 +2,7 @@ package com.yjh.platform.module.iot.service;
 
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.yjh.platform.module.task.entity.EnvDeviceStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -16,5 +17,7 @@ public interface TIotDeviceDataService extends IService<TIotDeviceData> {
     List<Map<String, Object>> selectIotData(Long upRegionId);
 
     List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime);
+
+    Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 
 }

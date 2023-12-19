@@ -20,6 +20,8 @@ import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
@@ -766,5 +768,23 @@ public class HomePageService {
         }
 
         return homeDeviceInfoList;
+    }
+
+    public List<TStdRegion> getEnvRegion(){
+        return tStdRegionDao.getEnvRegion();
+    }
+
+    public List<IotDeviceDataEx> getEnvByRegion(Long regionId){
+        List<IotDeviceDataEx> deviceDataExList = tStdRegionDao.getEnvByRegion(regionId);
+        deviceDataExList.forEach(data ->{
+            if (data.getChannelNum() != null){
+                String key = Constant.envKey+regionId;
+                Map<String,String> map = redisTemplate.opsForHash().entries(key);
+                String value = map.get(data.getIotDeviceId()+":"+data.getChannelNum());
+                data.setValue(value);
+            }
+
+        });
+        return deviceDataExList;
     }
 }

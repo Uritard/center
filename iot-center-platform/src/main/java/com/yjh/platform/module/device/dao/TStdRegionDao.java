@@ -3,6 +3,8 @@ package com.yjh.platform.module.device.dao;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -70,4 +72,9 @@ public interface TStdRegionDao {
     List<TStdRegion> selectStations();
 
     Collection<Long> selectRegionListByUpRegionId(@Param(value = "upRegionList") Set<Long> regionParam);
+
+    TStdRegion selectByRegionCode(@Param(value = "regionCode") String regionCode);
+
+    List<TStdRegion> getEnvRegion();
+    List<IotDeviceDataEx> getEnvByRegion(@Param(value = "regionId") Long regionId);
 }

@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.dao;
 
+import com.yjh.accessrobot.module.command.entity.TIotDeviceData;
 import com.yjh.accessrobot.module.command.entity.TMeter;
 import com.yjh.accessrobot.module.command.entity.TStdDevice;
 import org.apache.ibatis.annotations.Param;
@@ -52,4 +53,8 @@ public interface TStdDeviceMapper {
     List<TMeter> selectAllMeterByEdgeCode(@Param("edgeCode") String edgeCode);
     int updateById(TMeter tMeter);
 
+    List<TIotDeviceData> selectByOriginId(@Param("list") List<Map<String,Object>> list);
+    int batchInsertIotDevice(@Param("list") List<TIotDeviceData> list);
+    int batchInsertIotDevicePoint(@Param("list") List<TIotDeviceData> list);
+    int batchInsertIotDeviceData(@Param("list") List<TIotDeviceData> list);
 }

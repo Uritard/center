@@ -1,26 +1,24 @@
-package com.yjh.platform.module.iot.entity;
+package com.yjh.accessrobot.module.command.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 物联设备结果表
  * @TableName t_iot_device_data
  */
-@TableName(value ="t_iot_device_data")
 @Data
 public class TIotDeviceData implements Serializable {
     /**
      * Id
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -69,8 +67,24 @@ public class TIotDeviceData implements Serializable {
      */
     private Integer magnificationCoefficient;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    private Integer channelNum;
 
     private Integer iotDeviceType;
+
+    private String ip;
+
+    private Integer port;
+
+    private String address;
+
+    private Long deviceId;
+
+    private String upRegionName;
+
+    private Long originId;
+
+    private String edgeCode;
+
+    private String createPerson;
+    private String updatePerson;
 }
