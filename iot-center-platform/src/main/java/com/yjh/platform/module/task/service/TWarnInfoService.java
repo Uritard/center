@@ -718,7 +718,7 @@ public class TWarnInfoService{
         return dataSet;
     }
 
-    private Map<Long, Integer> alarmLoop(List<WarnStatistical> alarmList, Map<Long, KeyValue<Long, String>> stationMap) {
+    public Map<Long, Integer> alarmLoop(List<WarnStatistical> alarmList, Map<Long, KeyValue<Long, String>> stationMap) {
         Map<Long, Integer> stationAlarmCount = new HashMap<>();
         for (WarnStatistical stat : alarmList) {
             Long regionId = stat.getRid();

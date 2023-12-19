@@ -119,6 +119,35 @@ public class HomePageController {
         return result;
     }
 
+    @ApiOperation(value = "根据巡检,监控,入侵分类查询告警")
+    @RequestMapping(value = "/countAllByAlarmType", method = RequestMethod.GET)
+    public Result countAllByAlarmType(@RequestParam(value = "type", defaultValue = "2") Integer type) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countAllByAlarmType(type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警类别数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "按站所统计近一月的所有巡检,监控,入侵告警个数")
+    @GetMapping(value = "/countWarnByStationOnMonth")
+    public Result countWarnByStationOnMonth(@RequestParam(value = "alarmSource", required = false, defaultValue = "") String alarmSource,
+                                            @RequestParam(value = "type", defaultValue = "2") Integer type){
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countWarnByStationOnMonth(alarmSource, type));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "告警内容数据")
     @RequestMapping(value = "/warnInfo", method = RequestMethod.GET)
     public Result warnInfo(@RequestParam(value = "alarmLevel", required = false) Integer alarmLevel) {

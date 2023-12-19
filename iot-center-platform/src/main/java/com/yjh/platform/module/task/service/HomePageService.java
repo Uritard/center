@@ -22,10 +22,7 @@ import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
-import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.dao.TDefectInfoDao;
-import com.yjh.platform.module.task.dao.TStdWeatherLogDao;
-import com.yjh.platform.module.task.dao.TWarnInfoDao;
+import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.entity.input.RegionVideo;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
@@ -36,6 +33,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -179,6 +177,62 @@ public class HomePageService {
     public List<Map<String, Object>> countAllByAlarmLevelOnMonth(Integer type) {
         Integer nearDays = warnInfoService.nearDays(type);
         return tDefectInfoDao.countAllByAlarmLevel(nearDays);
+    }
+
+
+    public List<Map<String, Object>> countAllByAlarmType(Integer type) {
+        Integer nearDays = warnInfoService.nearDays(type);
+        return tDefectInfoDao.countAllByAlarmType(nearDays);
+    }
+
+
+    public String[][] countWarnByStationOnMonth(String alarmSource, Integer type) {
+        Integer nearDays = warnInfoService.nearDays(type);
+        List<WarnStatistical> alarmList = new ArrayList<>();
+        //静默告警字典值
+        int jm = 689;
+        if (StringUtils.isNotBlank(alarmSource)) {
+            switch (alarmSource) {
+                case "巡视":
+                    alarmList = tWarnInfoDao.countWarnByStationOnMonth(null, nearDays);
+                    alarmList = alarmList.stream().filter(w -> w.getAlarmSource() != jm).collect(Collectors.toList());
+                    List<WarnStatistical> defectList = tWarnInfoDao.countDefectByStationOnMonth(null, nearDays);
+                    alarmList.addAll(defectList);
+                    break;
+                case "监控":
+                    alarmList = tWarnInfoDao.countMonByStationOnMonth(nearDays);
+                    break;
+                case "入侵":
+                    alarmList = tWarnInfoDao.countWarnByStationOnMonth(null, nearDays);
+                    alarmList = alarmList.stream().filter(w -> w.getAlarmSource() == jm).collect(Collectors.toList());
+                    break;
+                default:
+                    alarmList = tWarnInfoDao.countAllByStationOnMonth(nearDays);
+                    break;
+            }
+        } else {
+            alarmList = tWarnInfoDao.countAllByStationOnMonth(nearDays);
+        }
+
+        List<TStdRegion> list = tStdRegionDao.selectStations();
+
+        Map<Long, KeyValue<Long, String>> stationMap = tStdRegionService.stationDownId();
+        Map<Long, Integer> stationWarnCount = warnInfoService.alarmLoop(alarmList, stationMap);
+
+        String[][] dataSet = new String[2][list.size() + 1];
+        String[] products = dataSet[0];
+        String[] warns = dataSet[1];
+        products[0] = "product";
+        warns[0] = "告警";
+        for (int i = 0; i < list.size(); i++) {
+            int idx = i + 1;
+            TStdRegion region = list.get(i);
+            if (region != null) {
+                products[idx] = region.getRegionName();
+                warns[idx] = Optional.ofNullable(stationWarnCount.get(region.getRegionId())).orElse(0).toString();
+            }
+        }
+        return dataSet;
     }
 
     @Transactional(rollbackFor = Exception.class)
