@@ -58,5 +58,5 @@ public class IotDeviceData {
     /**
      * 系数
      */
-    private Integer magnificationCoefficient;
+    private Float magnificationCoefficient;
 }

@@ -4,14 +4,17 @@
 
 package com.yjh.accessmeter.module.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDeviceData;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
-import com.yjh.accessmeter.protocol.ResultMete;
+import com.yjh.accessmeter.protocol.entity.ModbusExtend;
+import com.yjh.accessmeter.protocol.entity.ResultMete;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
  * @date 2023/11/29
  * @since [产品/模块版本] （可选）
  */
+@Slf4j
 public class DataCollectTask implements Runnable {
 
     final TIotDeviceDao iotDeviceDao;
@@ -48,32 +52,48 @@ public class DataCollectTask implements Runnable {
     public void collectMeter(List<IotDevice> devices) {
         List<IotDeviceData> deviceDataList = new ArrayList<>();
         for (IotDevice device : devices) {
-            ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getIotDeviceType()));
-            List<ResultMete> resultMetes = sensorProtocol.send(device);
+            try {
+                List<IotDevicePoint> devicePoints = iotDeviceDao.selectPointByDeviceId(device.getId());
 
-            List<IotDevicePoint> devicePoints = iotDeviceDao.selectPointByDeviceId(device.getDeviceId());
-            IotDeviceData baseData = new IotDeviceData();
-            baseData.setIotDeviceId(device.getDeviceId()).setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L)
-                .setPointName(device.getDeviceName()).setUpRegionId(device.getUpRegionId())
-                .setMagnificationCoefficient(device.getMagnificationCoefficient()).setCreateTime(new Date());
-            // 结果入库
-            if (devicePoints.isEmpty()) {
-                baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));
-                deviceDataList.add(baseData);
-            } else {
-                devicePoints.forEach(d -> {
-                    int chanNum = d.getChannelNum();
-                    IotDeviceData data = new IotDeviceData();
-                    BeanUtils.copyProperties(baseData, data);
-                    data.setPointId(d.getId()).setPointName(d.getPointName()).setUnit(d.getUnit());
-                    resultMetes.stream().filter(m -> chanNum == m.getChannle()).findFirst()
-                        .ifPresent(m -> data.setValue(String.valueOf(m.getValue())));
+                ProtocolEnum protocolEnum = ProtocolEnum.getEnum(device.getProtocolModel());
+                if (protocolEnum.getType() == 0) {
+                    log.warn("协议类型无需主动建立连接: {}, device: {}", protocolEnum, device);
+                }
 
-                    deviceDataList.add(data);
-                });
+                ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(protocolEnum);
+                if (sensorProtocol == null) {
+                    log.error("设备协议未实现，请检查协议是否正确: {}, device: {}", protocolEnum, device);
+                    continue;
+                }
+                List<ResultMete> resultMetes = sensorProtocol.send(device, devicePoints);
+
+                IotDeviceData baseData = new IotDeviceData();
+                baseData.setIotDeviceId(device.getId()).setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L)
+                    .setPointName(device.getDeviceName()).setUpRegionId(device.getUpRegionId())
+                    .setMagnificationCoefficient(device.getMagnificationCoefficient()).setCreateTime(new Date());
+                // 结果入库
+                if (devicePoints.isEmpty()) {
+                    baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));
+                    deviceDataList.add(baseData);
+                } else {
+                    devicePoints.forEach(d -> {
+                        int chanNum = d.getChannelNum();
+                        IotDeviceData data = new IotDeviceData();
+                        BeanUtils.copyProperties(baseData, data);
+                        data.setPointId(d.getId()).setPointName(d.getPointName()).setUnit(d.getUnit());
+                        resultMetes.stream().filter(m -> chanNum == m.getChannle()).findFirst()
+                            .ifPresent(m -> data.setValue(String.valueOf(m.getValue())));
+
+                        deviceDataList.add(data);
+                    });
+                }
+            } catch (Exception e) {
+                log.error("采集设备数据失败: {}", device, e);
             }
         }
-        iotDeviceDao.batchInsertData(deviceDataList);
+        if (!deviceDataList.isEmpty()) {
+            iotDeviceDao.batchInsertData(deviceDataList);
+        }
     }
 
     public void addDevice(IotDevice device) {

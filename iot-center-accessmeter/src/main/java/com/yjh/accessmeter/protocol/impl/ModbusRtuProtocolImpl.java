@@ -10,19 +10,19 @@ import com.serotonin.modbus4j.BatchResults;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
-import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusInitException;
-import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
+import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.protocol.*;
+import com.yjh.accessmeter.protocol.entity.ModbusExtend;
+import com.yjh.accessmeter.protocol.entity.ResultMete;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -51,34 +51,34 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
     }
 
     @Override
-    public List<ResultMete> send(IotDevice device) {
+    public List<ResultMete> send(IotDevice device, List<IotDevicePoint> devicePoints) {
         List<ResultMete> metes = new ArrayList<>();
         try {
             ModbusMaster master = master(device);
-            BatchRead<Integer> batch = new BatchRead<>();
+            BatchRead<Number> batch = new BatchRead<>();
 
-            batch.addLocator(0, BaseLocator.holdingRegister(1, 0x43, DataType.TWO_BYTE_INT_SIGNED));
-            batch.addLocator(1, BaseLocator.holdingRegister(1, 0x44, DataType.TWO_BYTE_INT_SIGNED));
-            batch.addLocator(2, BaseLocator.holdingRegister(1, 0x45, DataType.TWO_BYTE_INT_SIGNED));
-            batch.addLocator(3, BaseLocator.holdingRegister(1, 0x46, DataType.TWO_BYTE_INT_SIGNED));
-            BatchResults<Integer> results = master.send(batch);
-            LOGGER.info("BatchResults: {}", JSON.toJSONString(results));
-            ResultMete mete1 = new ResultMete();
-            mete1.setChannle(1).setValue(Double.valueOf(results.getIntValue(0)));
-            metes.add(mete1);
+            for (IotDevicePoint point : devicePoints) {
+                ModbusExtend ext = JSON.parseObject(point.getExtend(), ModbusExtend.class);
+                int dataType = ext.getDataType() == null || ext.getDataType() == 0 ? DataType.TWO_BYTE_INT_SIGNED : ext.getDataType();
+                batch.addLocator(point.getChannelNum(), BaseLocator.holdingRegister(ext.getSlaveId(), ext.getStart(), dataType));
+            }
 
-            ResultMete mete2 = new ResultMete();
-            mete2.setChannle(2).setValue(Double.valueOf(results.getIntValue(1)));
-            metes.add(mete2);
+            BatchResults<Number> results = master.send(batch);
+            LOGGER.info("BatchResults: {}", results);
 
-            ResultMete mete3 = new ResultMete();
-            mete3.setChannle(3).setValue(Double.valueOf(results.getIntValue(2)));
-            metes.add(mete3);
+            for (IotDevicePoint point : devicePoints) {
+                ResultMete mete = new ResultMete();
+                int channel = point.getChannelNum();
 
-            ResultMete mete4 = new ResultMete();
-            mete4.setChannle(4).setValue(Double.valueOf(results.getIntValue(3)));
-            metes.add(mete4);
-        } catch (ModbusTransportException | ErrorResponseException e) {
+                Number ret = (Number)results.getValue(channel);
+                double value = ret.doubleValue();
+                if (device.getMagnificationCoefficient() != null) {
+                    value = device.getMagnificationCoefficient() * value;
+                }
+                mete.setChannle(channel).setValue(round(String.valueOf(value), 2));
+                metes.add(mete);
+            }
+        } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
 
@@ -96,9 +96,12 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
             IpParameters params = new IpParameters();
             params.setHost(device.getIp());
             params.setPort(device.getPort());
-            ModbusMaster master = factory.createTcpMaster(params, true);
+            // MODBUS_RTU 协议需要校验码，TCP 不需要
+            if (ProtocolEnum.getEnum(device.getProtocolModel()) == ProtocolEnum.MODBUS_RTU) {
+                params.setEncapsulated(true);
+            }
+            ModbusMaster master = factory.createTcpMaster(params, false);
             master.setTimeout(4000);
-            master.setRetries(1);
             try {
                 master.init();
                 return master;
@@ -107,5 +110,24 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
             }
             return null;
         });
+    }
+
+    public static void main(String[] args) {
+        ModbusRtuProtocolImpl modbusRtuProtocol = new ModbusRtuProtocolImpl();
+        IotDevice device = new IotDevice();
+        device.setIp("172.24.49.234");
+        device.setPort(502);
+
+        modbusRtuProtocol.init(Collections.singletonList(device));
+
+        IotDevicePoint point = new IotDevicePoint();
+        point.setChannelNum(1).setExtend("{\"slaveId\": 1,\"start\": \"67\"}");
+
+        IotDevicePoint point2 = new IotDevicePoint().setChannelNum(2).setExtend("{\"slaveId\": 1,\"start\": \"68\"}");
+        IotDevicePoint point3 = new IotDevicePoint().setChannelNum(3).setExtend("{\"slaveId\": 1,\"start\": \"69\"}");
+        IotDevicePoint point4 = new IotDevicePoint().setChannelNum(4).setExtend("{\"slaveId\": 1,\"start\": \"70\"}");
+
+        List<ResultMete> metes = modbusRtuProtocol.send(device, Arrays.asList(point, point2, point3, point4));
+        System.out.println(JSON.toJSONString(metes));
     }
 }

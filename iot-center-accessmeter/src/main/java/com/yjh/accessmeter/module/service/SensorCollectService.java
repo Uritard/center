@@ -19,10 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,18 +41,25 @@ public class SensorCollectService {
 
     private static final Map<Integer, DataCollectTask> COLLECT_TASK_MAP = new HashMap<>(8);
 
-//    @PostConstruct
+    @PostConstruct
     public void initAllMeter() {
         List<IotDevice> iotDeviceList = iotDeviceDao.selectAll();
         Map<ProtocolEnum, List<IotDevice>> protocolSet =
-            iotDeviceList.stream().collect(Collectors.groupingBy(i -> ProtocolEnum.getEnum(i.getIotDeviceType())));
+            iotDeviceList.stream().collect(Collectors.groupingBy(i -> ProtocolEnum.getEnum(i.getProtocolModel())));
 
         protocolSet.forEach((k, v) -> {
-            ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(k);
-            sensorProtocol.init(v);
+            if (k.getType() == 0) {
+                log.info("协议类型无需主动建立连接: {}", k);
+            } else {
+                ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(k);
+                sensorProtocol.init(v);
+            }
         });
 
-        Map<Integer, List<IotDevice>> freSet = iotDeviceList.stream().collect(Collectors.groupingBy(IotDevice::getCollectionFrequency));
+        Map<Integer, List<IotDevice>> freSet = iotDeviceList.stream().filter(
+                i -> i.getCollectionFrequency() != null && i.getCollectionFrequency() > 0
+                    && Optional.ofNullable(ProtocolEnum.getEnum(i.getProtocolModel())).map(ProtocolEnum::getType).orElse(0) != 0)
+            .collect(Collectors.groupingBy(IotDevice::getCollectionFrequency));
 
         freSet.forEach((k, v) -> taskScheduler.scheduleAtFixedRate(
             COLLECT_TASK_MAP.compute(k, (k1, v1) -> new DataCollectTask(v, iotDeviceDao, asyncExecutor)),
@@ -72,7 +76,12 @@ public class SensorCollectService {
         }
         DataCollectTask dataCollectTask = COLLECT_TASK_MAP.get(device.getCollectionFrequency());
         if (dataCollectTask == null) {
-            ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getIotDeviceType()));
+            ProtocolEnum protocolEnum = ProtocolEnum.getEnum(device.getProtocolModel());
+            if (protocolEnum.getType() == 0) {
+                log.info("协议类型无需主动建立连接: {}", protocolEnum);
+                return;
+            }
+            ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getProtocolModel()));
             sensorProtocol.init(Collections.singletonList(device));
 
             dataCollectTask = COLLECT_TASK_MAP.compute(device.getCollectionFrequency(),
