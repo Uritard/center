@@ -4,16 +4,14 @@
 
 package com.yjh.accessmeter.module.service;
 
-import com.alibaba.fastjson.JSON;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDeviceData;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
-import com.yjh.accessmeter.protocol.entity.ModbusExtend;
-import com.yjh.accessmeter.protocol.entity.ResultMete;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
+import com.yjh.accessmeter.protocol.entity.ResultMete;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -69,8 +67,8 @@ public class DataCollectTask implements Runnable {
 
                 IotDeviceData baseData = new IotDeviceData();
                 baseData.setIotDeviceId(device.getId()).setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L)
-                    .setPointName(device.getDeviceName()).setUpRegionId(device.getUpRegionId())
-                    .setMagnificationCoefficient(device.getMagnificationCoefficient()).setCreateTime(new Date());
+                    .setPointName(device.getDeviceName()).setUpRegionId(device.getUpRegionId()).setIotDeviceType(device.getIotDeviceType())
+                    .setCreateTime(new Date());
                 // 结果入库
                 if (devicePoints.isEmpty()) {
                     baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));

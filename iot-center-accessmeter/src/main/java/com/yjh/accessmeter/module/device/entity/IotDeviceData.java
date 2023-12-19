@@ -58,5 +58,13 @@ public class IotDeviceData {
     /**
      * 系数
      */
-    private Float magnificationCoefficient;
+    private Float magnificationCoefficient = 1F;
+    /**
+     * 所属节点
+     */
+    private String edgeCode;
+    /**
+     * 设备类型
+     */
+    private Integer iotDeviceType;
 }
