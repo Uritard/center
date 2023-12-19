@@ -56,7 +56,9 @@
             unit,
             up_region_id,
             create_time,
-            magnification_coefficient
+            magnification_coefficient,
+            edge_code,
+            iot_device_type
         )values(
             #{id, jdbcType=BIGINT},
             #{pointId, jdbcType=BIGINT},
@@ -67,7 +69,9 @@
             #{unit, jdbcType=VARCHAR},
             #{upRegionId, jdbcType=BIGINT},
             #{createTime, jdbcType=TIMESTAMP},
-            #{magnificationCoefficient, jdbcType=BIGINT}
+            #{item.magnificationCoefficient, jdbcType=FLOAT},
+            #{item.edgeCode, jdbcType=VARCHAR},
+            #{item.iotDeviceType, jdbcType=INTEGER}
         )
     </insert>
 
@@ -82,7 +86,9 @@
         unit,
         up_region_id,
         create_time,
-        magnification_coefficient
+        magnification_coefficient,
+        edge_code,
+        iot_device_type
         ) values
         <foreach collection="list" separator="," item="item">
             (
@@ -95,7 +101,9 @@
             #{item.unit, jdbcType=VARCHAR},
             #{item.upRegionId, jdbcType=BIGINT},
             #{item.createTime, jdbcType=TIMESTAMP},
-            #{item.magnificationCoefficient, jdbcType=BIGINT}
+            #{item.magnificationCoefficient, jdbcType=FLOAT},
+            #{item.edgeCode, jdbcType=VARCHAR},
+            #{item.iotDeviceType, jdbcType=INTEGER}
             )
         </foreach>
     </insert>
