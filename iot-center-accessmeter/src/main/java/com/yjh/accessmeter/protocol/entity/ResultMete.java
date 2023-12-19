@@ -2,7 +2,7 @@
  * Copyright (c) 2023 Yijiahe Technology Co., Ltd. All rights reserved.
  */
 
-package com.yjh.accessmeter.protocol;
+package com.yjh.accessmeter.protocol.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -28,7 +28,7 @@ public class ResultMete {
     /**
      * 结果值
      */
-    private Double value;
+    private String value;
     /**
      * 原始数据
      */

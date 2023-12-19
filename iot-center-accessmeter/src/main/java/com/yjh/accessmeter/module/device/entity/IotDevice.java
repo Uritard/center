@@ -42,11 +42,11 @@ public class IotDevice {
      */
     private String address;
     /**
-     * 协议类型
+     * 设备类型
      */
     private Integer iotDeviceType;
     /**
-     * 协议模式 TCP-ACTIVE,TCP-PASSIVE
+     * 协议类型，MODBUS, RS485, DLT645
      */
     private String protocolModel;
     /**
@@ -84,7 +84,7 @@ public class IotDevice {
     /**
      * 系数
      */
-    private Integer magnificationCoefficient;
+    private Float magnificationCoefficient;
     /**
      * 采集频率 单位:分钟
      */
@@ -111,6 +111,6 @@ public class IotDevice {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(id).toHashCode();
+        return new HashCodeBuilder().append(id).toHashCode();
     }
 }
