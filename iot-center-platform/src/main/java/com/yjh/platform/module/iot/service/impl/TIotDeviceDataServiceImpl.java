@@ -34,7 +34,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         if (Objects.nonNull(upRegionId)) {
             queryWrapper.eq("up_region_id", upRegionId);
         }
-        queryWrapper.groupBy("point_name");
+        queryWrapper.inSql("(point_id, create_time)", "SELECT point_id, MAX(create_time) FROM t_iot_device_data GROUP BY point_id");
         List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
         Map<String, List<TIotDeviceData>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();

@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -74,15 +75,19 @@ public class DataCollectTask implements Runnable {
                     baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));
                     deviceDataList.add(baseData);
                 } else {
-                    devicePoints.forEach(d -> {
-                        int chanNum = d.getChannelNum();
+                    Map<Integer, IotDevicePoint> pointMap = devicePoints.stream().collect(Collectors.toMap(IotDevicePoint::getChannelNum, Function.identity(), (e1, e2) -> e1));
+                    resultMetes.forEach(m->{
+                        int chanNum = m.getChannle();
                         IotDeviceData data = new IotDeviceData();
                         BeanUtils.copyProperties(baseData, data);
-                        data.setPointId(d.getId()).setPointName(d.getPointName()).setUnit(d.getUnit());
-                        resultMetes.stream().filter(m -> chanNum == m.getChannle()).findFirst()
-                            .ifPresent(m -> data.setValue(String.valueOf(m.getValue())));
-
-                        deviceDataList.add(data);
+                        IotDevicePoint point = pointMap.get(chanNum);
+                        data.setValue(m.getValue());
+                        if (point != null) {
+                            data.setPointId(point.getId()).setPointName(point.getPointName()).setUnit(point.getUnit());
+                            deviceDataList.add(data);
+                        } else {
+                            log.error("查询到数据 Channle 不匹配: {}, {}", m, device);
+                        }
                     });
                 }
             } catch (Exception e) {
