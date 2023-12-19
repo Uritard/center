@@ -41,7 +41,7 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         envWarn.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
         envWarn.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
         envWarn.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());
-        envWarn.put("sn", "0000" + xmlBaseModel.getItems().get(0).get("sn").toString());
+        envWarn.put("sn", xmlBaseModel.getItems().get(0).get("sn").toString());
         envWarn.put("valueType", xmlBaseModel.getItems().get(0).get("value_type").toString());
         envWarn.put("alarmTime", xmlBaseModel.getItems().get(0).get("alarm_time").toString());
         envWarn.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());

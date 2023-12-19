@@ -105,4 +105,8 @@ public interface TWarnInfoDao {
     List<WarnStatistical> countWarnByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
 
     List<WarnStatistical> countDefectByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
+
+    List<WarnStatistical> countMonByStationOnMonth(Integer nearDays);
+
+    List<WarnStatistical> countAllByStationOnMonth(Integer nearDays);
 }

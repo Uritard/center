@@ -70,4 +70,6 @@ public interface TDefectInfoDao {
     int updateByEdgeCodeOriginIds(TDefectInfo tDefectInfo);
 
     List<Map<String,Object>> countAllByAlarmLevel(@Param("nearDays")Integer nearDays);
+
+    List<Map<String, Object>> countAllByAlarmType(@Param("nearDays")Integer nearDays);
 }

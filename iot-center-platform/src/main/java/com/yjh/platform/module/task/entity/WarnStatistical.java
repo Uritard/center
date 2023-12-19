@@ -26,4 +26,6 @@ public class WarnStatistical implements Serializable {
 
     @ApiModelProperty(value = "个数")
     private Integer count;
+
+    private Integer alarmSource;
 }
