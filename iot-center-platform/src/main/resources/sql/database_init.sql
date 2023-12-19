@@ -2784,6 +2784,7 @@ CREATE TABLE `t_iot_device` (
 `edge_code` varchar(20) DEFAULT NULL COMMENT '区域编码',
 `magnification_coefficient` int DEFAULT '1' COMMENT '系数',
 `collection_frequency` int DEFAULT NULL COMMENT '采集频率 单位:分钟',
+`origin_id` bigint DEFAULT NULL COMMENT '下级物联设备id',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备表';
 
@@ -2799,6 +2800,8 @@ CREATE TABLE `t_iot_device_data` (
 `up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 `magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+`edge_code` varchar(128) DEFAULT '' COMMENT '区域编码',
+`iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备结果表';
 

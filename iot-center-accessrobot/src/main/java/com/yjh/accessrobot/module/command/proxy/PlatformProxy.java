@@ -1,11 +1,15 @@
 package com.yjh.accessrobot.module.command.proxy;
 
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * <功能描述>
@@ -22,4 +26,8 @@ public interface PlatformProxy {
         @RequestParam(value = "startTime", required = false) String startTime,
         @RequestParam(value = "source", required = false) String source
     );
+
+    @ApiOperation(value = "下级上报环控设备信息入库")
+    @RequestMapping(value = "/tIotDeviceData/v1/envData", method = RequestMethod.POST)
+    Result insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 }

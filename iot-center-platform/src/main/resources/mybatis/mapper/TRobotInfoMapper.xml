@@ -785,4 +785,8 @@
         <if test="type != null and type == 161 and type != -1">and robot_type = #{type}</if>
         <if test="type != null and type != 161 and type != -1">and robot_type != 161</if>
     </select>
+
+    <select id="selectByRobotCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select * from t_robot_info where robot_code = #{robotCode}
+    </select>
 </mapper>

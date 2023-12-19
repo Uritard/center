@@ -574,5 +574,26 @@ public class HomePageController {
         }
         return result;
     }
+    /**
+     * 获取有环境设备的区域
+     *
+     * @date
+     */
+    @ApiOperation(value = "获取有环境设备的区域")
+    @RequestMapping(value = "/getEnvByRegion", method = RequestMethod.GET)
+    public Result getEnvByRegion(@RequestParam(value = "regionId", required = false) Long regionId) {
+        Result result = new Result();
+        try {
+            if (regionId == null) {
+                result.setData(homePageService.getEnvRegion());
+            } else {
+                result.setData(homePageService.getEnvByRegion(regionId));
+            }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
+        }
+        return result;
+    }
 
 }
