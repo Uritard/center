@@ -2773,7 +2773,7 @@ CREATE TABLE `t_iot_device` (
 `port` int DEFAULT '1' COMMENT '设备端口号',
 `address` varchar(30) DEFAULT '' COMMENT '设备地址',
 `iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
-`protocol_model` varchar(128) DEFAULT '' COMMENT '协议模式 TCP-ACTIVE,TCP-PASSIVE',
+`protocol_model` varchar(128) DEFAULT '' COMMENT '协议类型，MODBUS, RS485, DLT645',
 `device_id` bigint DEFAULT NULL COMMENT '关联设备Id',
 `up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
 `up_region_name` varchar(128) DEFAULT '' COMMENT '上级区域名称',
@@ -2782,8 +2782,10 @@ CREATE TABLE `t_iot_device` (
 `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
 `edge_code` varchar(20) DEFAULT NULL COMMENT '区域编码',
-`magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+`magnification_coefficient` float DEFAULT '1' COMMENT '系数',
 `collection_frequency` int DEFAULT NULL COMMENT '采集频率 单位:分钟',
+`origin_id` bigint DEFAULT NULL COMMENT '下级物联设备id',
+`controllable` int DEFAULT '0' COMMENT '是否可以控制 0-不可控制 1-可以控制',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备表';
 
@@ -2799,6 +2801,9 @@ CREATE TABLE `t_iot_device_data` (
 `up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
 `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 `magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+`edge_code` varchar(128) DEFAULT '' COMMENT '区域编码',
+`channel_num` varchar(128) DEFAULT '' COMMENT '通道编码',
+`iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备结果表';
 
@@ -2810,6 +2815,7 @@ CREATE TABLE `t_iot_device_point` (
  `channel_num` int DEFAULT '1' COMMENT '通道号',
  `point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
  `unit` varchar(50) DEFAULT '' COMMENT '单位',
+ `extend` varchar(256) DEFAULT NULL COMMENT '额外参数，如起始位置，返回数据，json字符串存储',
  PRIMARY KEY (`id`) USING BTREE,
  KEY `iot_device_id` (`iot_device_id`),
  CONSTRAINT `iot_device_id` FOREIGN KEY (`iot_device_id`) REFERENCES `t_iot_device` (`id`) ON DELETE CASCADE

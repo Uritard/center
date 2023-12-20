@@ -98,7 +98,6 @@ INSERT INTO `sys_menu` VALUES ('32', '任务诊断', '0701', '6', '', '', '1', '
 INSERT INTO `sys_menu` VALUES ('33', '信息查询', '0702', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('34', '任务管理', '0703', '6', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('35', '视频双确认', '0801', '7', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
-INSERT INTO `sys_menu` VALUES ('37', '传感器监控', '0208', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('38', '操作类任务', '0104', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('39', '操作类任务记录', '0105', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('40', '无人机监控', '0209', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
@@ -108,8 +107,9 @@ INSERT INTO `sys_menu` VALUES ('41', '可靠性指标', '0900', '-1', '', '', '1
 INSERT INTO `sys_menu` VALUES ('42', '可靠性指标', '0901', '41', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 INSERT INTO `sys_menu` VALUES ('45', '告警屏蔽管理', '0406', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('46', '声纹管理', '0106', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
-INSERT INTO `sys_menu` VALUES ('47', '电表监控', '0210', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('48', '告警管理', '0107', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('49', '物联监控', '0211', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
+INSERT INTO `sys_menu` VALUES ('50', '物联管理', '0611', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -754,6 +754,17 @@ INSERT INTO `t_dict_business` VALUES ('300773', '838', 'abnormal_type', '放电'
 INSERT INTO `t_dict_business` VALUES ('300774', '839', 'defect_model', '人员闯入', '0', '缺陷类型', '45');
 INSERT INTO `t_dict_business` VALUES ('300775', '840', 'iot_device_type', '电量表', '1', '物联设备类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300776', '841', 'iot_device_type', '温控器', '1', '物联设备类型', '1');
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('1', 'protocol_model', 'MODBUS_RTU', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('2', 'protocol_model', 'MODBUS_TCP', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('3', 'protocol_model', 'RS485', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('4', 'protocol_model', 'DLT645_97', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('5', 'protocol_model', 'DLT645_07', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('6', 'protocol_model', '环控终端', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,up_dict,remark,sort) VALUES ('7', 'protocol_model', '机器人', 0, '设备连接协议', 1);
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('5','frequency','5 分钟','物联设备采集频率');
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('30','frequency','30 分钟','物联设备采集频率');
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('60','frequency','1 小时','物联设备采集频率');
+INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('240','frequency','4 小时','物联设备采集频率');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1348,6 +1359,7 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'downResultPic', '任务报告下载算法分析图', 'false', '任务报告下载的大图下载算法分析后图片还是原图，true是算法分析后图片，false是原图', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false', '任务报告按站所拆分视图，站所为区域根节点下第一层节点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'upEnvDevice', '是否上传环控设备数据', 'false', '此参数用于向上级上传环控设备相关数据,用于轨交环控设备上传', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'missedPointRetry', '是否开启遗漏点位重试', 'false', '此参数用于遗漏点位重试,用于巡视任务对遗漏点位的重新巡视', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
