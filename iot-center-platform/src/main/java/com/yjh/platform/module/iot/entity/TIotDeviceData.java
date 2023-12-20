@@ -67,7 +67,7 @@ public class TIotDeviceData implements Serializable {
     /**
      * 系数
      */
-    private Integer magnificationCoefficient;
+    private Float magnificationCoefficient;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

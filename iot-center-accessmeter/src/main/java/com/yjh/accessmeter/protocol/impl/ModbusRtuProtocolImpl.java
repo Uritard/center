@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2023/11/27
  * @since [产品/模块版本] （可选）
  */
-@ProtocolType(ProtocolEnum.MODBUS_RTU)
+@ProtocolType({ProtocolEnum.MODBUS_RTU, ProtocolEnum.MODBUS_TCP})
 public class ModbusRtuProtocolImpl implements ISensorProtocol {
     private static final Map<String, ModbusMaster> MASTER_MAP = new ConcurrentHashMap<>(16);
     private ModbusFactory factory = new ModbusFactory();
@@ -79,7 +79,7 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
                 metes.add(mete);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("请求数据失败：{}", device, e);
         }
 
         return metes;
@@ -91,7 +91,7 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
     }
 
     private ModbusMaster master(IotDevice device) {
-        String key = device.getIp() + ":" + device.getPort();
+        String key = device.getIp() + ":" + device.getPort() + ":" + device.getProtocolModel();
         return MASTER_MAP.computeIfAbsent(key, k -> {
             IpParameters params = new IpParameters();
             params.setHost(device.getIp());
