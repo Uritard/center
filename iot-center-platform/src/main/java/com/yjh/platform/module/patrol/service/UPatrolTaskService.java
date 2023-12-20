@@ -2507,7 +2507,7 @@ public class UPatrolTaskService {
                 }
             }
 
-            if (CollectionUtils.isNotEmpty(missInstanceMapList)) {
+            if (CollectionUtils.isNotEmpty(missInstanceMapList) && Constant.missedPointRetry()) {
                 log.info("任务：{}开始重试！",taskId);
                 ThreadPoolUtil.PATROL_POOL.addThread(new CruiseRetryThread(uPatrolTaskDao,this,missInstanceMapList,taskId));
             }
