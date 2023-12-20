@@ -68,7 +68,10 @@ public enum SensorProtocolFactory {
                         //判断是否有指定注解
                         if (clazz.isAnnotationPresent(ProtocolType.class)) {
                             ProtocolType type = clazz.getAnnotation(ProtocolType.class);
-                            classMap.put(type.value(), clazz);
+                            ProtocolEnum[] protocolEnums = type.value();
+                            for (ProtocolEnum protocol : protocolEnums) {
+                                classMap.put(protocol, clazz);
+                            }
                         }
                     }
                 } catch (IOException | ClassNotFoundException e) {

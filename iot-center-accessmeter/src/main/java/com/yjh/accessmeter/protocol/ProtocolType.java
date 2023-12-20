@@ -17,7 +17,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ProtocolType {
-    ProtocolEnum value();
+    ProtocolEnum[] value();
 
     int order() default 1;
 }

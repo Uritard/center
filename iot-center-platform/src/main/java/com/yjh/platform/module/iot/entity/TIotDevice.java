@@ -104,7 +104,7 @@ public class TIotDevice implements Serializable {
     /**
      * 系数
      */
-    private Integer magnificationCoefficient;
+    private Float magnificationCoefficient;
 
     /**
      * 采集频率 单位:分钟
