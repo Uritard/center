@@ -10,6 +10,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.task.entity.QueryWeatherLogReq;
 import com.yjh.platform.module.task.entity.RegionPath;
 import com.yjh.platform.module.task.service.HomePageService;
@@ -42,6 +43,8 @@ public class HomePageController {
     private RedisTemplate redisTemplate;
     @Autowired
     private TStdRegionService tStdRegionService;
+    @Autowired
+    private TIotDeviceDataService tIotDeviceDataService;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)

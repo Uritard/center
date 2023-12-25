@@ -394,7 +394,8 @@
             origin_id,
             edge_code,
             create_person,
-            update_person
+            update_person,
+            controllable
         ) values <foreach collection="list" item="iotDeviceData" separator=",">
         (
          #{iotDeviceData.iotDeviceName},
@@ -409,7 +410,8 @@
          #{iotDeviceData.originId},
          #{iotDeviceData.edgeCode},
          #{iotDeviceData.createPerson},
-         #{iotDeviceData.updatePerson}
+         #{iotDeviceData.updatePerson},
+         #{iotDeviceData.controllable}
         )
     </foreach>
     </insert>

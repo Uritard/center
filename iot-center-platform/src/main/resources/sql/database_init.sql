@@ -2785,6 +2785,7 @@ CREATE TABLE `t_iot_device` (
 `magnification_coefficient` int DEFAULT '1' COMMENT '系数',
 `collection_frequency` int DEFAULT NULL COMMENT '采集频率 单位:分钟',
 `origin_id` bigint DEFAULT NULL COMMENT '下级物联设备id',
+`controllable` int DEFAULT '0' COMMENT '是否可以控制 0-不可控制 1-可以控制',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备表';
 
