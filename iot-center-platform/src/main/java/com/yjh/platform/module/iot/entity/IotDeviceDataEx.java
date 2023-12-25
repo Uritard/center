@@ -21,4 +21,6 @@ public class IotDeviceDataEx extends TIotDeviceData{
 
     private Integer channelNum;
 
+    private Integer controllable;
+
 }

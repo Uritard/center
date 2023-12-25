@@ -45,21 +45,20 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Override
     public List<Map<String, Object>> selectIotData(Long upRegionId) {
-        QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
-        if (Objects.nonNull(upRegionId)) {
-            queryWrapper.eq("up_region_id", upRegionId);
-        }
-        queryWrapper.groupBy("point_name");
-        List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
-        Map<String, List<TIotDeviceData>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
+        List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
+        List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
+        Map<String, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
             Map<String, Object> map = new HashMap<>(4);
             map.put("iotName", k);
             map.put("iotDeviceId", v.get(0).getIotDeviceId());
+            map.put("controllable", v.get(0).getControllable());
             map.put("time", DateTimeUtil.getDateTimeString(v.get(0).getCreateTime()));
             map.put("list", v);
             resultList.add(map);
@@ -216,6 +215,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
                 item.put("deviceId", tIotDeviceData.getDeviceId());
                 item.put("upRegionName", tIotDeviceData.getUpRegionName());
+                item.put("controllable", tIotDeviceData.getControllable());
                 itemList.add(item);
             });
             Constant.otherServer(map, Constant.TCP_URL);

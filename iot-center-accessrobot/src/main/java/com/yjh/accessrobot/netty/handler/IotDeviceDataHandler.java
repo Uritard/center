@@ -93,6 +93,7 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
             data.setUpRegionName(MapUtils.getString(item,"upRegionName"));
             data.setCreatePerson("10001");
             data.setUpdatePerson("10001");
+            data.setControllable(MapUtils.getInteger(item,"controllable"));
             insertDataList.add(data);
         }
         if (!insertDeviceList.isEmpty()) {

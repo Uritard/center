@@ -16,6 +16,8 @@ import java.util.List;
 public interface TIotDeviceDataMapper extends BaseMapper<TIotDeviceData> {
 
     List<IotDeviceDataEx> selectInfoByIp(@Param(value = "ip") String ip);
+
+    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list);
 }
 
 

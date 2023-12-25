@@ -22,6 +22,7 @@ import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
 import com.yjh.platform.module.task.dao.*;
@@ -828,7 +829,7 @@ public class HomePageService {
         return tStdRegionDao.getEnvRegion();
     }
 
-    public List<IotDeviceDataEx> getEnvByRegion(Long regionId){
+    public List<Map<String, Object>> getEnvByRegion(Long regionId){
         List<IotDeviceDataEx> deviceDataExList = tStdRegionDao.getEnvByRegion(regionId);
         deviceDataExList.forEach(data ->{
             if (data.getChannelNum() != null){
@@ -839,6 +840,15 @@ public class HomePageService {
             }
 
         });
-        return deviceDataExList;
+        Map<String, List<TIotDeviceData>> resultMap = deviceDataExList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
+        List<Map<String, Object>> resultList = Lists.newArrayList();
+        resultMap.forEach((k, v) -> {
+            Map<String, Object> map = new HashMap<>(4);
+            map.put("iotName", k);
+            map.put("iotDeviceId", v.get(0).getIotDeviceId());
+            map.put("list", v);
+            resultList.add(map);
+        });
+        return resultList;
     }
 }
