@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModbusRtuProtocolImpl implements ISensorProtocol {
     private static final Map<String, ModbusMaster> MASTER_MAP = new ConcurrentHashMap<>(16);
     private ModbusFactory factory = new ModbusFactory();
+    private volatile boolean inited = false;
 
     @Override
     public ISensorProtocol init(List<IotDevice> devices) {
@@ -46,8 +47,13 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
         for (IotDevice device : devices) {
             master(device);
         }
-
+        inited = true;
         return null;
+    }
+
+    @Override
+    public boolean isInit() {
+        return inited;
     }
 
     @Override

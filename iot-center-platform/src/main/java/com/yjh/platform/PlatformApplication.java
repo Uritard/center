@@ -123,10 +123,4 @@ public class PlatformApplication  implements CommandLineRunner {
         return factory;
     }
 
-    @LoadBalanced
-    @Bean(name = "serviceRestTemplate")
-    ServiceRestTemplate serviceRestTemplate() {
-        return new ServiceRestTemplate();
-    }
-
 }

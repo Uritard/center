@@ -1,5 +1,7 @@
 package com.yjh.platform.common.result;
 
+import com.alibaba.fastjson.JSON;
+
 /**
  * @author tt
  * @ClassName: Result
@@ -77,7 +79,7 @@ public class Result {
         return "Result{" +
                 "code=" + code +
                 ", message='" + message + '\'' +
-                ", data=" + data +
+                ", data=" + JSON.toJSONString(data) +
                 '}';
     }
 }

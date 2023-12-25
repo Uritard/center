@@ -5,6 +5,7 @@
 package com.yjh.accessmeter.module.device.entity;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -20,6 +21,7 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
+@Accessors(chain = true)
 public class IotDevice {
     /**
      *

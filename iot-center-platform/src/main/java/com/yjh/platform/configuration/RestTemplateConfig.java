@@ -1,9 +1,11 @@
 package com.yjh.platform.configuration;
 
 import com.yjh.platform.common.aop.handler.ThrowErrorHandler;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -18,9 +20,11 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 public class RestTemplateConfig {
-    @Bean
+
+    @LoadBalanced
+    @Bean(name = "serviceRestTemplate")
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+        ServiceRestTemplate restTemplate = new ServiceRestTemplate(clientHttpRequestFactory());
         //Response status code 4XX or 5XX to the client.
         restTemplate.setErrorHandler(new ThrowErrorHandler());
         return restTemplate;
@@ -47,9 +51,9 @@ public class RestTemplateConfig {
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setHttpClient(httpClientBuilder().build());
-        factory.setReadTimeout(20000);
-        factory.setConnectTimeout(20000);
-        factory.setConnectionRequestTimeout(20000);
+        factory.setReadTimeout(15000);
+        factory.setConnectTimeout(5000);
+        factory.setConnectionRequestTimeout(5000);
         return factory;
     }
 

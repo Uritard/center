@@ -1,5 +1,6 @@
 package com.yjh.platform.common.restTemplate;
 
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,5 +13,10 @@ import org.springframework.web.client.RestTemplate;
 public class ServiceRestTemplate extends RestTemplate {
     public ServiceRestTemplate() {
         super();
+    }
+
+    public ServiceRestTemplate(ClientHttpRequestFactory requestFactory) {
+
+        super(requestFactory);
     }
 }

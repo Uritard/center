@@ -85,6 +85,10 @@ public enum SensorProtocolFactory {
     }
 
     ISensorProtocol classInstance(ProtocolEnum protocol) {
+        if (protocol.getType() == 0) {
+            log.warn("协议类型无需主动建立连接: {}", protocol);
+            return null;
+        }
         Class<?> clazz = SENSOR_CLASS_MAP.get(protocol);
         try {
             if (clazz == null) {
@@ -99,8 +103,4 @@ public enum SensorProtocolFactory {
         return null;
     }
 
-    public static void main(String[] args) {
-        ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.MODBUS_RTU);
-        sensorProtocol.init(null);
-    }
 }
