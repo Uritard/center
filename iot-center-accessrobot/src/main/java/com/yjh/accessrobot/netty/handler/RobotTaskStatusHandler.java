@@ -91,20 +91,6 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             taskStatus.setTaskEstimatedTime(Objects.nonNull(item.get("task_estimated_time")) ? String.valueOf(item.get("task_estimated_time")) : "");
             taskStatus.setDescription(Objects.nonNull(item.get("description")) ? String.valueOf(item.get("description")) : "");
             statusList.add(taskStatus);
-
-            // 判断任务是否属于机器人本体任务
-            Long robotId = robotService.selectIsRobotTask(taskCode);
-            if (Objects.nonNull(robotId)) {
-                Map<String, String> jasonMap = new HashMap<>(2);
-                jasonMap.put("type", "newTask");
-                jasonMap.put("taskId", taskCode);
-                String json = JSON.toJSONString(jasonMap);
-                String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-                Constant.postUrl(webSocketUrl, json);
-
-                // StandTaskDealThread standTaskDealThread = new StandTaskDealThread(redisTemplate, taskCode, robotCode);
-                // TaskExecutePool.getInstance().execute(standTaskDealThread);
-            }
         }
 
         log.info("The statusList to platform is=={}", statusList);
