@@ -2819,3 +2819,24 @@ CREATE TABLE `t_iot_device_point` (
  KEY `iot_device_id` (`iot_device_id`),
  CONSTRAINT `iot_device_id` FOREIGN KEY (`iot_device_id`) REFERENCES `t_iot_device` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备测点表';
+
+DROP TABLE IF EXISTS `t_iot_device_warn`;
+CREATE TABLE `t_iot_device_warn` (
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
+`point_id` bigint NOT NULL COMMENT '测点Id',
+`point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
+`iot_device_id` bigint NOT NULL COMMENT '物联设备Id',
+`iot_device_name` varchar(128) DEFAULT '' COMMENT '物联设备名称',
+`iot_device_type` int DEFAULT '1' COMMENT '物联设备类型',
+`alarm_content` varchar(128) DEFAULT '' COMMENT '告警信息',
+`robot_code` varchar(32) DEFAULT '' COMMENT '机器人编码',
+`channel_num` varchar(32) DEFAULT '' COMMENT '通道号',
+`up_region_id` bigint DEFAULT '1' COMMENT '上级区域id',
+`up_region_name` varchar(64) DEFAULT '' COMMENT '上级区域名称',
+`create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`magnification_coefficient` int DEFAULT '1' COMMENT '系数',
+`alarm_time` datetime DEFAULT NULL COMMENT '告警时间',
+`delete_flag` bigint DEFAULT '1' COMMENT '告警消除标志 1未消除 2 已消除',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备告警表';
+
