@@ -27,6 +27,8 @@ public interface ISensorProtocol {
 
     ISensorProtocol init(List<IotDevice> devices);
 
+    boolean isInit();
+
     List<ResultMete> send(IotDevice device, List<IotDevicePoint> devicePoints);
 
     void sendAsync(IotDevice device, ProtocolListener listener);

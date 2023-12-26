@@ -587,7 +587,8 @@ public class UPatrolTaskService {
 
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
 
-        sendTaskStateToUp(task, 5);
+        // 延时上报任务状态，避免上级下发任务启动时，任务状态在任务启动返回报文前返回
+        ScheduledMapConfig.schedule(6 , task, t -> sendTaskStateToUp(t, 5));
         return detailList;
     }
 
@@ -1809,7 +1810,7 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setCreateUserId(uPatrolTask.getCreateUserId());
             tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
             Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
-            taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
+            taskPatrolledId = String.valueOf(taskMap.get("task_patrolled_id"));
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
@@ -3469,7 +3470,7 @@ public class UPatrolTaskService {
         tCruiseTaskAdd.setAreaId(sendCode);
 
         Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
-        String taskPatrolledId = String.valueOf(taskMap.get("taskPatrolledId"));
+        String taskPatrolledId = String.valueOf(taskMap.get("task_patrolled_id"));
         List<String> robotCodeList = uPatrolTaskDao.selectRobotCodeByTaskId(taskId);
         log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
         robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());

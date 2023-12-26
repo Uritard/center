@@ -1,8 +1,5 @@
 package com.yjh.platform.module.iot.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -10,17 +7,13 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
-import com.yjh.platform.module.task.entity.WarnStatistical;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * <功能描述>

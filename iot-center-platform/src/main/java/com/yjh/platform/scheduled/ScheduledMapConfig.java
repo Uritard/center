@@ -2,9 +2,13 @@ package com.yjh.platform.scheduled;
 
 import com.yjh.commons.NamedThreadFactory;
 import com.yjh.platform.configuration.ThreadPoolConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -23,6 +27,8 @@ public class ScheduledMapConfig {
     private static final ScheduledThreadPoolExecutor
         SCHEDULED_THREAD_POOLS = new ScheduledThreadPoolExecutor(ThreadPoolConfig.getScheduledPoolSize(), new NamedThreadFactory("plartform-scheduled"));
 
+    private static final Map<String, ScheduledFuture<?>> SCHEDULED_FUTURE_MAP = new ConcurrentHashMap<>(16);
+
     private ScheduledMapConfig(){
         // nothing to do
     }
@@ -40,7 +46,7 @@ public class ScheduledMapConfig {
             try {
                 succ = taskFunction.getAsBoolean();
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.error("schedule task running failed, nextRetries {}", nextRetries, e);
             }
             if (!succ && nextRetries > 0) {
                 schedule(seconds, nextRetries, taskFunction);
@@ -73,7 +79,12 @@ public class ScheduledMapConfig {
     private static void schedule(int seconds, int numRetries, int times, Predicate<Integer> taskFunction) {
         SCHEDULED_THREAD_POOLS.schedule(() -> {
             int currTimes = times + 1;
-            boolean succ = taskFunction.test(currTimes);
+            boolean succ = false;
+            try {
+                succ = taskFunction.test(currTimes);
+            } catch (Exception e) {
+                LOGGER.error("schedule task running failed, times {}", currTimes, e);
+            }
             if (!succ && numRetries - currTimes > 0) {
                 LOGGER.info("schedule running times {}", currTimes);
                 schedule(seconds, numRetries, currTimes, taskFunction);
@@ -90,6 +101,32 @@ public class ScheduledMapConfig {
      * @param taskFunction 执行内容
      */
     public static <T> void schedule(int seconds, T param, Consumer<T> taskFunction) {
-        SCHEDULED_THREAD_POOLS.schedule(() -> taskFunction.accept(param), seconds, TimeUnit.SECONDS);
+        schedule(null, seconds, param, taskFunction);
+    }
+
+    public static <T> void schedule(String taskId, int seconds, T param, Consumer<T> taskFunction) {
+        if (StringUtils.isNotEmpty(taskId)) {
+            SCHEDULED_FUTURE_MAP.compute(taskId, (k, v) -> {
+                if (v != null) {
+                    v.cancel(false);
+                }
+                return SCHEDULED_THREAD_POOLS.schedule(() -> {
+                    try {
+                        SCHEDULED_FUTURE_MAP.remove(taskId);
+                        taskFunction.accept(param);
+                    } catch (Exception e) {
+                        LOGGER.error("schedule task running failed", e);
+                    }
+                }, seconds, TimeUnit.SECONDS);
+            });
+        } else {
+            SCHEDULED_THREAD_POOLS.schedule(() -> {
+                try {
+                    taskFunction.accept(param);
+                } catch (Exception e) {
+                    LOGGER.error("schedule task running failed", e);
+                }
+            }, seconds, TimeUnit.SECONDS);
+        }
     }
 }

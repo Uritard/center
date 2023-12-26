@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,7 +41,7 @@ public class TIotDevicePointController {
     @ApiOperation(value = "新增物联设备测点配置")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增物联设备测点配置", content = "新增物联设备测点配置", logType = 2, authority = "1234")
-    public Result add(@RequestBody TIotDevicePoint tIotDevicePoint) {
+    public Result add(@RequestBody @Validated TIotDevicePoint tIotDevicePoint) {
         Result result = new Result();
         try {
             QueryWrapper<TIotDevicePoint> queryWrapper = new QueryWrapper<>();
@@ -63,7 +64,7 @@ public class TIotDevicePointController {
     @ApiOperation(value = "更新物联设备测点配置")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "更新物联设备测点配置", content = "新增物联设备测点配置", logType = 3, authority = "1234")
-    public Result update(@RequestBody TIotDevicePoint tIotDevicePoint) {
+    public Result update(@RequestBody @Validated TIotDevicePoint tIotDevicePoint) {
         Result result = new Result();
         try {
             result.setData(tIotDevicePointService.updateById(tIotDevicePoint));

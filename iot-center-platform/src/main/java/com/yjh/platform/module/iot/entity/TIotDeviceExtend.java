@@ -4,49 +4,22 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yjh.platform.common.ValidateConstant;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 物联设备测点表
- * @TableName t_iot_device_point
+ * 物联设备表
+ * @TableName t_iot_device
  */
-@TableName(value ="t_iot_device_point")
 @Data
-@Accessors(chain = true)
-public class TIotDevicePoint implements Serializable {
-    /**
-     * Id
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
-
-    /**
-     * 物联设备Id
-     */
-    private Long iotDeviceId;
-
-    /**
-     * 物联设备名称
-     */
-    @Length(max = 128)
-    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = ValidateConstant.MSG_RICH_NAME)
-    private String iotDeviceName;
-
-    /**
-     * 通道号
-     */
-    @Min(0)
-    @Max(65535)
-    private Integer channelNum;
+public class TIotDeviceExtend extends TIotDevice {
 
     /**
      * 测点名称
@@ -68,6 +41,4 @@ public class TIotDevicePoint implements Serializable {
     @Pattern(regexp= ValidateConstant.REG_DEVICE_PROPERTIES, message = ValidateConstant.MSG_DEVICE_PROPERTIES)
     private String extend;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

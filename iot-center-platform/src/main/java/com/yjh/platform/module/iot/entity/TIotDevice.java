@@ -8,7 +8,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yjh.platform.common.ValidateConstant;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 
 /**
  * 物联设备表
@@ -26,6 +33,8 @@ public class TIotDevice implements Serializable {
     /**
      * 设备名称
      */
+    @Length(max = 128)
+    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = ValidateConstant.MSG_RICH_NAME)
     private String deviceName;
 
     /**
@@ -36,6 +45,7 @@ public class TIotDevice implements Serializable {
     /**
      * 设备端口号
      */
+    @Range(min = 1, max = 65535)
     private Integer port;
 
     /**
@@ -58,6 +68,9 @@ public class TIotDevice implements Serializable {
      * 协议模式 TCP-ACTIVE,TCP-PASSIVE
      */
     private String protocolModel;
+
+    @TableField(exist = false)
+    private String protocolModelName;
 
     /**
      * 关联设备Id
@@ -110,6 +123,9 @@ public class TIotDevice implements Serializable {
      * 采集频率 单位:分钟
      */
     private Integer collectionFrequency;
+
+    @TableField(exist = false)
+    private String collectionFrequencyName;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

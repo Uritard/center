@@ -11,12 +11,14 @@ import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.entity.TIotDevice;
+import com.yjh.platform.module.iot.entity.TIotDeviceExtend;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -46,7 +48,7 @@ public class TIotDeviceController {
     @ApiOperation(value = "新增物联设备配置")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增物联设备配置", content = "新增物联设备配置", logType = 2, authority = "1234")
-    public Result add(@RequestBody TIotDevice tIotDevice) {
+    public Result add(@RequestBody @Validated TIotDeviceExtend tIotDevice) {
         Result result = new Result();
         try {
             result.setData(tIotDeviceService.save(tIotDevice));
@@ -63,7 +65,7 @@ public class TIotDeviceController {
     @ApiOperation(value = "更新物联设备配置")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "更新物联设备配置", content = "新增物联设备配置", logType = 3, authority = "1234")
-    public Result update(@RequestBody TIotDevice tIotDevice) {
+    public Result update(@RequestBody @Validated TIotDevice tIotDevice) {
         Result result = new Result();
         try {
             result.setData(tIotDeviceService.updateById(tIotDevice));
@@ -115,7 +117,7 @@ public class TIotDeviceController {
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TIotDevice> tIotDeviceList = tIotDeviceService.list(queryWrapper);
-            DictConvertUtil.optional("iotDeviceType").covertToDict(tIotDeviceList);
+            DictConvertUtil.optional("iotDeviceType").add("protocolModel").add("frequency", "collectionFrequency", "collectionFrequencyName").covertToDict(tIotDeviceList);
             Map<String, Object> resultMap = new HashMap<>(2);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", tIotDeviceList);
