@@ -131,7 +131,7 @@ public class TIotDeviceWarnController {
                 queryWrapper.like("point_name", pointName);
             }
             if (StringUtils.isNotBlank(iotDeviceName)) {
-                queryWrapper.eq("iot_device_name", iotDeviceName);
+                queryWrapper.like("iot_device_name", iotDeviceName);
             }
             if (Objects.nonNull(deleteFlag)) {
                 queryWrapper.eq("delete_flag", deleteFlag);
@@ -142,7 +142,8 @@ public class TIotDeviceWarnController {
             if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
                 queryWrapper.between("alarm_time", startTime, endTime);
             }
-            queryWrapper.orderByDesc("delete_flag", "alarm_time");
+            queryWrapper.orderByAsc("delete_flag");
+            queryWrapper.orderByDesc("alarm_time");
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TIotDeviceWarn> tIotDeviceWarnList = tIotDeviceWarnService.list(queryWrapper);
             DictConvertUtil.optional("iotDeviceType").covertToDict(tIotDeviceWarnList);

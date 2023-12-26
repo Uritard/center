@@ -47,12 +47,14 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         Long id = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
         TIotDeviceWarn tIotDeviceWarn = new TIotDeviceWarn();
         String flag = "deleteFlag";
-        if (Objects.nonNull(id) && StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
-            tIotDeviceWarn.setId(id);
-            Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, "deleteFlag"));
-            tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
-            tIotDeviceWarn.setDeleteFlag(deleteFlag);
-            this.updateById(tIotDeviceWarn);
+        if (Objects.nonNull(id)) {
+            if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
+                tIotDeviceWarn.setId(id);
+                Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, "deleteFlag"));
+                tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
+                tIotDeviceWarn.setDeleteFlag(deleteFlag);
+                this.updateById(tIotDeviceWarn);
+            }
         } else {
             tIotDeviceWarn = getBaseMapper().selectDeviceByIpAndNum(ip, channelNum);
             tIotDeviceWarn.setCreateTime(new Date());
