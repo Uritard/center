@@ -20,7 +20,7 @@
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="updatePerson" column="update_person" jdbcType="VARCHAR"/>
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
-        <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="INTEGER"/>
+        <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="FLOAT"/>
         <result property="collectionFrequency" column="collection_frequency" jdbcType="INTEGER"/>
     </resultMap>
 
@@ -32,7 +32,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from t_iot_device where iot_device_type = 841
+        from t_iot_device
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
@@ -42,7 +42,7 @@
     </select>
 
     <select id="selectPointByDeviceId" resultType="com.yjh.accessmeter.module.device.entity.IotDevicePoint">
-        select id,iot_device_id,iot_device_name,channel_num,point_name,unit from t_iot_device_point where iot_device_id = #{deviceId, jdbcType=BIGINT}
+        select id,iot_device_id,iot_device_name,channel_num,point_name,unit,extend from t_iot_device_point where iot_device_id = #{deviceId, jdbcType=BIGINT}
     </select>
 
     <insert id="insertData" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.IotDeviceData">
@@ -56,7 +56,9 @@
             unit,
             up_region_id,
             create_time,
-            magnification_coefficient
+            magnification_coefficient,
+            edge_code,
+            iot_device_type
         )values(
             #{id, jdbcType=BIGINT},
             #{pointId, jdbcType=BIGINT},
@@ -67,7 +69,9 @@
             #{unit, jdbcType=VARCHAR},
             #{upRegionId, jdbcType=BIGINT},
             #{createTime, jdbcType=TIMESTAMP},
-            #{magnificationCoefficient, jdbcType=BIGINT}
+            #{item.magnificationCoefficient, jdbcType=FLOAT},
+            #{item.edgeCode, jdbcType=VARCHAR},
+            #{item.iotDeviceType, jdbcType=INTEGER}
         )
     </insert>
 
@@ -82,7 +86,9 @@
         unit,
         up_region_id,
         create_time,
-        magnification_coefficient
+        magnification_coefficient,
+        edge_code,
+        iot_device_type
         ) values
         <foreach collection="list" separator="," item="item">
             (
@@ -95,7 +101,9 @@
             #{item.unit, jdbcType=VARCHAR},
             #{item.upRegionId, jdbcType=BIGINT},
             #{item.createTime, jdbcType=TIMESTAMP},
-            #{item.magnificationCoefficient, jdbcType=BIGINT}
+            #{item.magnificationCoefficient, jdbcType=FLOAT},
+            #{item.edgeCode, jdbcType=VARCHAR},
+            #{item.iotDeviceType, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

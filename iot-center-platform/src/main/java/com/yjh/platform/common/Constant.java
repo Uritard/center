@@ -180,6 +180,8 @@ public class Constant {
 
     private static Boolean packetLog;
 
+    private static Boolean missedPointRetry;
+
     private static Boolean hasEncoding;
 
     private static Boolean fastTurbo;
@@ -236,6 +238,19 @@ public class Constant {
             log.error(e.getMessage(), e);
         }
         return result;
+    }
+
+    /**
+     * 是否开启遗漏点位重试
+     */
+    public static boolean missedPointRetry() {
+        try {
+            missedPointRetry = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:missedPointRetry", "content"));
+            log.warn("missedPointRetry is {}", missedPointRetry);
+        } catch (Exception e) {
+            missedPointRetry = false;
+        }
+        return missedPointRetry;
     }
 
     public static boolean isPacketLog() {

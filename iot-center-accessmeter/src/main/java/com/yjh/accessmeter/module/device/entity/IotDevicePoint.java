@@ -5,6 +5,7 @@
 package com.yjh.accessmeter.module.device.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * <功能描述>
@@ -14,6 +15,7 @@ import lombok.Data;
  * @since [产品/模块版本] （可选）
  */
 @Data
+@Accessors(chain = true)
 public class IotDevicePoint {
     /**
      *
@@ -39,5 +41,9 @@ public class IotDevicePoint {
      * 单位
      */
     private String unit;
-
+    /**
+     * 额外参数，如起始位置，返回数据，json字符串存储
+     * {"slaveId": 1,"start": "起始位置 0x43", "length": 返回长度}
+     */
+    private String extend;
 }

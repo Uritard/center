@@ -44,13 +44,15 @@ public class TIotDevicePointController {
         Result result = new Result();
         try {
             QueryWrapper<TIotDevicePoint> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("channel_num", tIotDevicePoint.getChannelNum());
+            queryWrapper.eq("channel_num", tIotDevicePoint.getChannelNum()).eq("iot_device_id", tIotDevicePoint.getIotDeviceId());
             int count = tIotDevicePointService.count(queryWrapper);
             if (count > 0) {
                 throw new BusinessException(209, "该物联设备通道号已使用");
             }
             result.setData(tIotDevicePointService.save(tIotDevicePoint));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("新增物联设备测点配置失败：", e);
@@ -66,6 +68,8 @@ public class TIotDevicePointController {
         try {
             result.setData(tIotDevicePointService.updateById(tIotDevicePoint));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("更新物联设备测点配置失败：", e);
@@ -82,6 +86,8 @@ public class TIotDevicePointController {
         try {
             result.setData(tIotDevicePointService.removeById(id));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除物联设备测点失败：", e);
@@ -112,6 +118,8 @@ public class TIotDevicePointController {
             resultMap.put("list", tIotDeviceList);
             result.setData(resultMap);
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备测点失败：", e);

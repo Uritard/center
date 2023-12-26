@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
@@ -50,6 +51,8 @@ public class TIotDeviceController {
         try {
             result.setData(tIotDeviceService.save(tIotDevice));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("新增物联设备配置失败：", e);
@@ -65,6 +68,8 @@ public class TIotDeviceController {
         try {
             result.setData(tIotDeviceService.updateById(tIotDevice));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("更新物联设备配置失败：", e);
@@ -81,6 +86,8 @@ public class TIotDeviceController {
         try {
             result.setData(tIotDeviceService.removeById(id));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除物联设备失败：", e);
@@ -114,6 +121,8 @@ public class TIotDeviceController {
             resultMap.put("list", tIotDeviceList);
             result.setData(resultMap);
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备失败：", e);
@@ -131,6 +140,8 @@ public class TIotDeviceController {
         try {
             List<AreaInfo> devTreeList = tIotDeviceService.selectDevTree(level, id, name);
             result.setData(devTreeList);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("物联设备树查询失败描述：", e);
