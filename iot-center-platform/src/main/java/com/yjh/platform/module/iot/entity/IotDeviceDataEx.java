@@ -19,7 +19,7 @@ public class IotDeviceDataEx extends TIotDeviceData{
 
     private String upRegionName;
 
-    private Integer channelNum;
+    private String channelNum;
 
     private Integer controllable;
 
