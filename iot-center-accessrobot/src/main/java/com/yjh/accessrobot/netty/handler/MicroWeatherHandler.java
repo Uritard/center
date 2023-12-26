@@ -7,6 +7,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.proxy.PlatformProxy;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -38,6 +39,9 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
 
     @Autowired
     private RobotService robotService;
+
+    @Autowired
+    private PlatformProxy platformProxy;
 
 
     @Override
@@ -227,6 +231,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 map.put("list", Collections.singletonList(xmlBaseModel1));
                 Constant.mapToOtherServer(map, Constant.TCP_URL);
             }
+
+            platformProxy.insertEnvData(envDeviceStatusList);
         }
 
 

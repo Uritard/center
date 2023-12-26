@@ -671,4 +671,54 @@
         b.col_name = 'alarm_level'
         order by alarmLevel
     </select>
+    <select id="countAllByAlarmType" resultType="java.util.Map">
+        SELECT
+            SUM(a.count) AS count,
+	        '巡检告警' AS alarmSource
+        FROM
+            (
+            SELECT
+            COUNT(*) AS count
+            FROM
+            t_warn_info
+            WHERE
+            alarm_source != 689
+            AND (
+            warn_type != '507'
+            OR warn_type IS NULL
+            )
+            AND DATEDIFF(now(), warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            UNION ALL
+            SELECT
+            COUNT(*) AS count
+            FROM
+            t_defect_info
+            WHERE DATEDIFF(now(), defect_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            ) a
+        UNION ALL
+        SELECT
+            SUM(b.count) AS count,
+		    '监控告警' AS alarmSource
+        FROM
+            (
+            SELECT
+            count(*) AS count
+            FROM
+            t_robot_alarm
+            WHERE DATEDIFF(now(), alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            UNION ALL
+            SELECT
+            count(*) AS count
+            FROM t_iot_device_warn a
+            WHERE DATEDIFF(now(), alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            ) b
+        UNION ALL
+        SELECT
+            count(*) AS count,
+		    '入侵告警' AS alarmSource
+        FROM
+            t_warn_info
+        WHERE
+            alarm_source = 689 AND DATEDIFF(now(), warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+    </select>
 </mapper>

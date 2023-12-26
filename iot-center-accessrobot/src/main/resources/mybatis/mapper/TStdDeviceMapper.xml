@@ -367,4 +367,102 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectByOriginId" resultType="com.yjh.accessrobot.module.command.entity.TIotDeviceData">
+        select
+        device.*,
+        point.id as pointId
+        from t_iot_device device
+        left join t_iot_device_point point on device.id = point.iot_device_id
+        where origin_id in
+        <foreach collection="list" item="map" open="(" close=")" separator=",">
+            #{map.iotDeviceId}
+        </foreach>
+    </select>
+
+    <insert id="batchInsertIotDevice" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_iot_device (
+            device_name,
+            ip,
+            port,
+            address,
+            iot_device_type,
+            device_id,
+            up_region_id,
+            up_region_name,
+            magnification_coefficient,
+            origin_id,
+            edge_code,
+            create_person,
+            update_person,
+            controllable
+        ) values <foreach collection="list" item="iotDeviceData" separator=",">
+        (
+         #{iotDeviceData.iotDeviceName},
+         #{iotDeviceData.ip},
+         #{iotDeviceData.port},
+         #{iotDeviceData.address},
+         #{iotDeviceData.iotDeviceType},
+         #{iotDeviceData.deviceId},
+         #{iotDeviceData.upRegionId},
+         #{iotDeviceData.upRegionName},
+         #{iotDeviceData.magnificationCoefficient},
+         #{iotDeviceData.originId},
+         #{iotDeviceData.edgeCode},
+         #{iotDeviceData.createPerson},
+         #{iotDeviceData.updatePerson},
+         #{iotDeviceData.controllable}
+        )
+    </foreach>
+    </insert>
+
+    <insert id="batchInsertIotDeviceData" keyColumn="id" parameterType="java.util.List">
+        insert into t_iot_device_data (
+        point_id,
+        point_name,
+        iot_device_id,
+        iot_device_name,
+        value,
+        unit,
+        up_region_id,
+        create_time,
+        magnification_coefficient,
+        edge_code,
+        channel_num,
+        iot_device_type
+        ) values <foreach collection="list" item="iotDeviceData" separator=",">
+        (
+        #{iotDeviceData.pointId},
+        #{iotDeviceData.pointName},
+        #{iotDeviceData.id},
+        #{iotDeviceData.iotDeviceName},
+        #{iotDeviceData.value},
+        #{iotDeviceData.unit},
+        #{iotDeviceData.upRegionId},
+        #{iotDeviceData.createTime,jdbcType=TIMESTAMP},
+        #{iotDeviceData.magnificationCoefficient},
+        #{iotDeviceData.edgeCode},
+        #{iotDeviceData.channelNum},
+        #{iotDeviceData.iotDeviceType}
+        )
+    </foreach>
+    </insert>
+
+    <insert id="batchInsertIotDevicePoint" keyColumn="id" keyProperty="pointId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_iot_device_point (
+        iot_device_id,
+        iot_device_name,
+        channel_num,
+        point_name,
+        unit
+        ) values <foreach collection="list" item="iotDeviceData" separator=",">
+        (
+        #{iotDeviceData.id},
+        #{iotDeviceData.iotDeviceName},
+        #{iotDeviceData.channelNum},
+        #{iotDeviceData.pointName},
+        #{iotDeviceData.unit}
+        )
+    </foreach>
+    </insert>
 </mapper>

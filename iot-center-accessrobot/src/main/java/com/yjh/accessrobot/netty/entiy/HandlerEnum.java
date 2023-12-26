@@ -66,7 +66,8 @@ public enum HandlerEnum {
     // 站所投运时间
     STATION_COMMISSIONING_TIME("82", "stationCommissioningTime"),
     //电表信息
-    METER_INFO("meter","meterInfo")
+    METER_INFO("meter","meterInfo"),
+    IOT_DEVICE_DATA("iotDeviceData","iotDeviceData"),
 
 
     ;

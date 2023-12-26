@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
+import com.yjh.platform.module.task.entity.EnvDeviceStatus;
 import com.yjh.platform.module.task.entity.WarnStatistical;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -118,6 +119,20 @@ public class TIotDeviceDataController {
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询物联设备结果失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "下级上报环控设备信息入库")
+    @RequestMapping(value = "/envData", method = RequestMethod.POST)
+    public Result insertEnvData(@RequestBody List<EnvDeviceStatus> envDeviceStatusList) {
+        Result result = new Result();
+        try {
+            result.setData(tIotDeviceDataService.insertEnvData(envDeviceStatusList));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备结果失败：", e);

@@ -1,7 +1,11 @@
 package com.yjh.platform.module.iot.dao;
 
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author YIJIAHE
@@ -11,6 +15,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface TIotDeviceDataMapper extends BaseMapper<TIotDeviceData> {
 
+    List<IotDeviceDataEx> selectInfoByIp(@Param(value = "ip") String ip);
+
+    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list);
 }
 
 

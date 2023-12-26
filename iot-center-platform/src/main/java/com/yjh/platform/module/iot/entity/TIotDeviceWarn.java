@@ -11,12 +11,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * 物联设备结果表
- * @TableName t_iot_device_data
+ * 物联设备告警表
+ * @TableName t_iot_device_warn
  */
-@TableName(value ="t_iot_device_data")
+@TableName(value ="t_iot_device_warn")
 @Data
-public class TIotDeviceData implements Serializable {
+public class TIotDeviceWarn implements Serializable {
     /**
      * Id
      */
@@ -44,19 +44,39 @@ public class TIotDeviceData implements Serializable {
     private String iotDeviceName;
 
     /**
-     * 值
+     * 物联设备类型
      */
-    private String value;
+    private Integer iotDeviceType;
 
     /**
-     * 单位
+     * 物联设备类型名称
      */
-    private String unit;
+    @TableField(exist = false)
+    private String iotDeviceTypeName;
+
+    /**
+     * 告警信息
+     */
+    private String alarmContent;
+
+    /**
+     * 机器人code
+     */
+    private String robotCode;
+    /**
+     * 通道号
+     */
+    private String channelNum;
 
     /**
      * 上级区域id
      */
     private Long upRegionId;
+
+    /**
+     * 上级区域名称
+     */
+    private String upRegionName;
 
     /**
      * 创建时间
@@ -67,10 +87,25 @@ public class TIotDeviceData implements Serializable {
     /**
      * 系数
      */
-    private Float magnificationCoefficient;
+    private Integer magnificationCoefficient;
+
+    /**
+     * 告警时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date alarmTime;
+
+    /**
+     * 告警消除标志 1未消除 2 已消除
+     */
+    private Long deleteFlag;
+
+    /**
+     * 消除时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date deleteTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
-
-    private Integer iotDeviceType;
 }

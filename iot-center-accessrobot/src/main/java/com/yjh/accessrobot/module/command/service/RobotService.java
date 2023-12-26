@@ -2656,65 +2656,65 @@ public class RobotService {
         }
     }
 
-    /**
-     * 环控告警数据入库
-     */
-    public void addEnvWarning(Map<String, String> envWarn) {
-        log.info("接收环境设备告警开始");
-        try {
-            if (envWarn.size() > 0) {
-                String type = null;
-                envWarn.put("envWarnId", getUUID());
-                switch (Integer.parseInt(envWarn.get("type"))) {
-                    case 1:
-                        type = "510";
-                        break;
-                    case 2:
-                        type = "511";
-                        break;
-                    case 3:
-                        type = "512";
-                        break;
-                    case 2104:
-                        type = "513";
-                        break;
-                    case 2105:
-                        type = "514";
-                        break;
-                    case 2106:
-                        type = "515";
-                        break;
-                    case 2107:
-                        type = "516";
-                        break;
-                    case 2108:
-                        type = "517";
-                        break;
-                    case 8:
-                        type = "518";
-                        break;
-                    case 2110:
-                        type = "519";
-                        break;
-                    case 2111:
-                        type = "520";
-                        break;
-                    case 2112:
-                        type = "521";
-                        break;
-                    case 2113:
-                        type = "522";
-                        break;
-                    default:
-                        break;
-                }
-                envWarn.put("type", type);
-                tRobotInfoDao.insertEnv(envWarn);
-            }
-        } catch (Exception e) {
-            log.error("接收环境设备告警数据错误:", e);
-        }
-    }
+//    /**
+//     * 环控告警数据入库
+//     */
+//    public void addEnvWarning(Map<String, String> envWarn) {
+//        log.info("接收环境设备告警开始");
+//        try {
+//            if (envWarn.size() > 0) {
+//                String type = null;
+//                envWarn.put("envWarnId", getUUID());
+//                switch (Integer.parseInt(envWarn.get("type"))) {
+//                    case 1:
+//                        type = "510";
+//                        break;
+//                    case 2:
+//                        type = "511";
+//                        break;
+//                    case 3:
+//                        type = "512";
+//                        break;
+//                    case 2104:
+//                        type = "513";
+//                        break;
+//                    case 2105:
+//                        type = "514";
+//                        break;
+//                    case 2106:
+//                        type = "515";
+//                        break;
+//                    case 2107:
+//                        type = "516";
+//                        break;
+//                    case 2108:
+//                        type = "517";
+//                        break;
+//                    case 8:
+//                        type = "518";
+//                        break;
+//                    case 2110:
+//                        type = "519";
+//                        break;
+//                    case 2111:
+//                        type = "520";
+//                        break;
+//                    case 2112:
+//                        type = "521";
+//                        break;
+//                    case 2113:
+//                        type = "522";
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                envWarn.put("type", type);
+//                tRobotInfoDao.insertEnv(envWarn);
+//            }
+//        } catch (Exception e) {
+//            log.error("接收环境设备告警数据错误:", e);
+//        }
+//    }
 
     /**
      * 32位UUID生成方法

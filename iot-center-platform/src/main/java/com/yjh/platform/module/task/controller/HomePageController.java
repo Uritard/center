@@ -10,6 +10,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.task.entity.QueryWeatherLogReq;
 import com.yjh.platform.module.task.entity.RegionPath;
 import com.yjh.platform.module.task.service.HomePageService;
@@ -42,6 +43,8 @@ public class HomePageController {
     private RedisTemplate redisTemplate;
     @Autowired
     private TStdRegionService tStdRegionService;
+    @Autowired
+    private TIotDeviceDataService tIotDeviceDataService;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
@@ -115,6 +118,35 @@ public class HomePageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取告警级别数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "根据巡检,监控,入侵分类查询告警")
+    @RequestMapping(value = "/countAllByAlarmType", method = RequestMethod.GET)
+    public Result countAllByAlarmType(@RequestParam(value = "type", defaultValue = "2") Integer type) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countAllByAlarmType(type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警类别数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "按站所统计近一月的所有巡检,监控,入侵告警个数")
+    @GetMapping(value = "/countWarnByStationOnMonth")
+    public Result countWarnByStationOnMonth(@RequestParam(value = "alarmSource", required = false, defaultValue = "") String alarmSource,
+                                            @RequestParam(value = "type", defaultValue = "2") Integer type){
+        Result result = new Result();
+        try {
+            result.setData(homePageService.countWarnByStationOnMonth(alarmSource, type));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("统计告警数据失败描述：", e);
         }
         return result;
     }
@@ -539,6 +571,27 @@ public class HomePageController {
         try {
             result.setData(homePageService.deviceInfo(type,edgeCode));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
+        }
+        return result;
+    }
+    /**
+     * 获取有环境设备的区域
+     *
+     * @date
+     */
+    @ApiOperation(value = "获取有环境设备的区域")
+    @RequestMapping(value = "/getEnvByRegion", method = RequestMethod.GET)
+    public Result getEnvByRegion(@RequestParam(value = "regionId", required = false) Long regionId) {
+        Result result = new Result();
+        try {
+            if (regionId == null) {
+                result.setData(homePageService.getEnvRegion());
+            } else {
+                result.setData(homePageService.getEnvByRegion(regionId));
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("站所概况统计信息错误:", e);

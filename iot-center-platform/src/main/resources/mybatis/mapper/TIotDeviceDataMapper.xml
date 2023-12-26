@@ -24,4 +24,42 @@
         unit,up_region_id,create_time,
         magnification_coefficient
     </sql>
+
+
+    <select id="selectInfoByIp" resultType="com.yjh.platform.module.iot.entity.IotDeviceDataEx">
+        SELECT
+            point.id as pointId,
+            point.point_name,
+            point.iot_device_id,
+            point.iot_device_name,
+            point.unit,
+            device.up_region_id,
+            device.magnification_coefficient,
+            point.channel_num,
+            device.iot_device_type,
+            device.ip,
+            device.port,
+            device.address,
+            device.device_id,
+            device.up_region_name
+        FROM
+            t_iot_device device
+        LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
+        where device.ip = #{ip}
+    </select>
+
+    <select id="selectIotData"  resultType="com.yjh.platform.module.iot.entity.IotDeviceDataEx">
+        SELECT
+            data.*,
+            device.controllable
+        FROM
+            t_iot_device_data data
+                left join t_iot_device device on data.iot_device_id = device.id
+        where 1 = 1
+        <if test="list.size > 0"> and data.up_region_id in
+            <foreach collection="list" item="regionId" separator="," open="(" close=")">
+                #{regionId}
+            </foreach></if>
+        group by data.point_name
+    </select>
 </mapper>

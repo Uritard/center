@@ -16,7 +16,7 @@
         <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
         <result property="totalPositivePower" column="total_positive_power" jdbcType="VARCHAR"/>
         <result property="totalPositiveReactivePower" column="total_positive_reactive_power" jdbcType="VARCHAR"/>
-        <result property="totalNegativeReactivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
+        <result property="totalNegativePositivePower" column="total_negative_positive_power" jdbcType="VARCHAR"/>
         <result property="collectPowerTime" column="collect_power_time" jdbcType="TIMESTAMP"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="VARCHAR"/>

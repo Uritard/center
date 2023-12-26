@@ -599,5 +599,8 @@ public class Constant {
         }
         return "1".equals(managerSystemFlag);
     }
+
+    public final static String envKey="EnvDevice:";
+
 }
 

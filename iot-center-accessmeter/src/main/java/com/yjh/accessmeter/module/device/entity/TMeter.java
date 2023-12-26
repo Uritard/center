@@ -54,7 +54,7 @@ public class TMeter implements Serializable {
     /**
      * 反向无功总电量
      */
-    private String totalNegativeReactivePower;
+    private String totalNegativePositivePower;
 
     /**
      * 电量采集时间

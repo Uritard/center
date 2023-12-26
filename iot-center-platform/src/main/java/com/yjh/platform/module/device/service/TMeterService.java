@@ -2,7 +2,6 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.google.common.base.Strings;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -75,13 +74,11 @@ public class TMeterService {
         tMeterList.forEach(tMeter -> {
             int mc = Integer.parseInt(StringUtils.isNotBlank(tMeter.getMagnificationCoefficient()) ? tMeter.getMagnificationCoefficient() : "1");
             String totalPositivePower = StringUtils.isNotBlank(tMeter.getTotalPositivePower()) ? tMeter.getTotalPositivePower() : "0";
-            tMeter.setTotalPositivePower(getMeterRealNum(Double.parseDouble(totalPositivePower) * mc, flag));
+            tMeter.setTotalPositivePowerLast(getMeterRealNum(Double.parseDouble(totalPositivePower) * mc, flag));
             String totalPositiveReactivePower = StringUtils.isNotBlank(tMeter.getTotalPositiveReactivePower()) ? tMeter.getTotalPositiveReactivePower() : "0";
-            tMeter.setTotalPositiveReactivePower(getMeterRealNum(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
-            String totalNegativeReactivePower = StringUtils.isNotBlank(tMeter.getTotalNegativeReactivePower()) ? tMeter.getTotalNegativeReactivePower() : "0";
-            tMeter.setTotalNegativeReactivePower(getMeterRealNum(Double.parseDouble(totalNegativeReactivePower) * mc, flag));
+            tMeter.setTotalPositiveReactivePowerLast(getMeterRealNum(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
             String totalNegativePositivePower = StringUtils.isNotBlank(tMeter.getTotalNegativePositivePower()) ? tMeter.getTotalNegativePositivePower() : "0";
-            tMeter.setTotalNegativePositivePower(getMeterRealNum(Double.parseDouble(totalNegativePositivePower) * mc, flag));
+            tMeter.setTotalNegativePositivePowerLast(getMeterRealNum(Double.parseDouble(totalNegativePositivePower) * mc, flag));
         });
     }
 
