@@ -70,6 +70,8 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         envWarn.put("valueUnit", MapUtils.getString(envWarnMap, "value_unit"));
         envWarn.put("unit", MapUtils.getString(envWarnMap, "unit"));
         envWarn.put("sn", MapUtils.getString(envWarnMap, "sn"));
+        envWarn.put("device_num", MapUtils.getString(envWarnMap, "device_num"));
+        envWarn.put("type_device_num", MapUtils.getString(envWarnMap, "type_device_num"));
         envWarn.put("alarmTime", MapUtils.getString(envWarnMap, "alarm_time"));
         envWarn.put("deviceName", MapUtils.getString(envWarnMap, "device_name"));
         envWarn.put("deleteFlag", MapUtils.getString(envWarnMap, "delete_flag"));

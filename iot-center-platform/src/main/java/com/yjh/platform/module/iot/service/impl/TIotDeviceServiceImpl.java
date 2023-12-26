@@ -66,7 +66,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             // 自动创建第一个通道
             TIotDeviceExtend iotExtend = (TIotDeviceExtend)iotDevice;
             TIotDevicePoint devicePoint =
-                new TIotDevicePoint().setIotDeviceId(iotExtend.getId()).setIotDeviceName(iotExtend.getDeviceName()).setChannelNum(1)
+                new TIotDevicePoint().setIotDeviceId(iotExtend.getId()).setIotDeviceName(iotExtend.getDeviceName()).setChannelNum("1")
                     .setPointName(Optional.ofNullable(iotExtend.getPointName()).orElse(iotExtend.getDeviceName()))
                     .setExtend(iotExtend.getExtend()).setUnit(iotExtend.getUnit());
             tIotDevicePointService.save(devicePoint);
