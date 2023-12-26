@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -34,9 +35,10 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     private TRobotInfoDao tRobotInfoDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean robotIotWarn(Map<String, String> iotWarn) {
         String robotCode = iotWarn.get("robotCode");
-        String channelNum = iotWarn.get("sn");
+        String channelNum = iotWarn.get("type_device_num");
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
         String ip = "-1";
         if (StringUtils.isNotBlank(tRobotInfo.getRobotIp())) {
@@ -46,10 +48,9 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         }
         Long id = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
         TIotDeviceWarn tIotDeviceWarn = new TIotDeviceWarn();
-        String flag = "deleteFlag";
         if (Objects.nonNull(id)) {
-            if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
-                tIotDeviceWarn.setId(id);
+            tIotDeviceWarn.setId(id);
+            if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, "deleteFlag"))) {
                 Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, "deleteFlag"));
                 tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
                 tIotDeviceWarn.setDeleteFlag(deleteFlag);
@@ -83,6 +84,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean update(TIotDeviceWarn tIotDeviceWarn) {
         tIotDeviceWarn.setDeleteTime(new Date());
         boolean flag = this.updateById(tIotDeviceWarn);
@@ -95,12 +97,12 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 XMLBaseModel xmlBaseModel = new XMLBaseModel();
                 List<Map<String, Object>> itemList = new ArrayList<>();
                 Map<String, Object> item = Maps.newHashMap();
-                item.put("patroldevice_code", tRobotInfo.getRobotCode());
+                item.put("patroldevice_code", tRobotInfo.getRobotNum());
                 item.put("patroldevice_name", tRobotInfo.getRobotName());
-                item.put("alarm_time", tdw.getAlarmTime());
+                item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
                 item.put("sn", tdw.getChannelNum());
                 item.put("delete_flag", 2);
-                item.put("delete_time", tdw.getDeleteTime());
+                item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
                 itemList.add(item);
                 xmlBaseModel.setItems(itemList);
                 xmlBaseModel.setType("22");
