@@ -196,7 +196,7 @@ public class HomePageService {
         int jm = 689;
         if (StringUtils.isNotBlank(alarmSource)) {
             switch (alarmSource) {
-                case "巡视":
+                case "巡检":
                     alarmList = tWarnInfoDao.countWarnByStationOnMonth(null, nearDays);
                     alarmList = alarmList.stream().filter(w -> w.getAlarmSource() != jm).collect(Collectors.toList());
                     List<WarnStatistical> defectList = tWarnInfoDao.countDefectByStationOnMonth(null, nearDays);

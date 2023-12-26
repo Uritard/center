@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.iot.dao.TIotDeviceWarnMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.iot.entity.TIotDeviceWarn">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="pointId" column="point_id" jdbcType="BIGINT"/>
+            <result property="pointName" column="point_name" jdbcType="VARCHAR"/>
+            <result property="iotDeviceId" column="iot_device_id" jdbcType="BIGINT"/>
+            <result property="iotDeviceName" column="iot_device_name" jdbcType="VARCHAR"/>
+            <result property="iotDeviceType" column="iot_device_type" jdbcType="INTEGER"/>
+            <result property="alarmContent" column="alarm_content" jdbcType="VARCHAR"/>
+            <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
+            <result property="channelNum" column="channel_num" jdbcType="VARCHAR"/>
+            <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+            <result property="upRegionName" column="up_region_name" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="magnificationCoefficient" column="magnification_coefficient" jdbcType="INTEGER"/>
+            <result property="alarmTime" column="alarm_time" jdbcType="TIMESTAMP"/>
+            <result property="deleteFlag" column="delete_flag" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,point_id,point_name,
+        iot_device_id,iot_device_name,iot_device_type,
+        alarm_content,robot_code,channel_num,up_region_id,up_region_name,
+        create_time,magnification_coefficient,alarm_time,
+        delete_flag
+    </sql>
+    <select id="selectIdByIpAndNum" resultType="java.lang.Long">
+        SELECT
+            a.id
+        FROM
+            t_iot_device_warn a
+                LEFT JOIN t_iot_device_point b ON a.point_id = b.id
+                LEFT JOIN t_iot_device c ON a.iot_device_id = c.id
+        WHERE c.ip =  #{ip,jdbcType=VARCHAR}
+          AND b.channel_num = #{channelNum, jdbcType=VARCHAR}
+          AND a.delete_flag = 1
+    </select>
+    <select id="selectDeviceByIpAndNum" resultType="com.yjh.platform.module.iot.entity.TIotDeviceWarn">
+        SELECT
+            a.id AS point_id,
+            a.point_name,
+            a.iot_device_id,
+            a.iot_device_name,
+            b.iot_device_type,
+            b.up_region_id,
+            b.up_region_name,
+            b.magnification_coefficient
+        FROM
+            t_iot_device_point a
+        LEFT JOIN t_iot_device b ON a.iot_device_id = b.id
+        WHERE b.ip = #{ip,jdbcType=VARCHAR}
+          AND a.channel_num = #{channelNum, jdbcType=VARCHAR}
+    </select>
+    <select id="selectIotDeviceWarn" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        SELECT
+            a.id AS warnId,
+            a.alarm_time,
+            132 AS alarm_level,
+            '严重告警' AS alarmLevelName,
+            a.delete_flag AS confMode,
+            a.iot_device_name AS alarmSourceName,
+            a.iot_device_id AS deviceId,
+            '1' AS videoCameraType,
+            a.iot_device_name AS deviceName,
+            a.alarm_content AS warnContent,
+            '本体' AS customName,
+            '0' AS deviceType,
+            a.up_region_name AS regionName,
+            (SELECT region_name FROM t_std_region where up_region_id = -1) AS stationName
+        FROM
+            t_iot_device_warn a
+        WHERE
+            a.id =  #{warnId, jdbcType=BIGINT}
+    </select>
+</mapper>

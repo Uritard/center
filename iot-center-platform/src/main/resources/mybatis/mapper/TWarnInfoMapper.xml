@@ -1162,6 +1162,14 @@
             LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
         where
             DATEDIFF(now(), a.alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        UNION ALL
+        SELECT
+            a.up_region_id AS rid,
+            COUNT(1) AS count
+        FROM
+            t_iot_device_warn a
+        where
+            DATEDIFF(now(), a.alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
     </select>
 
     <select id="countAllByStationOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
@@ -1195,6 +1203,13 @@
         FROM
         t_robot_alarm a
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
+        where
+        DATEDIFF(now(), a.alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        union all
+        SELECT
+        a.up_region_id AS rid,
+        count(1) AS count
+        FROM t_iot_device_warn a
         where
         DATEDIFF(now(), a.alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
     </select>

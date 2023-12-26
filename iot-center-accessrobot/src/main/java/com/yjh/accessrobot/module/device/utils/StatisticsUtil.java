@@ -185,6 +185,7 @@ public class StatisticsUtil {
     Map<String, Object> jasonMaps = new HashMap<>(16);
     jasonMaps.put("type", "alarmPopUp");
     jasonMaps.put("warnType", "2");
+    jasonMaps.put("source", "robot");
     jasonMaps.put("warnLevel", tRobotAlarm.getAlarmLevel());
     jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
     String json = JSON.toJSONString(jasonMaps);

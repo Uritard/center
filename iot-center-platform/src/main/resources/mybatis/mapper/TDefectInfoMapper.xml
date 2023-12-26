@@ -674,7 +674,7 @@
     <select id="countAllByAlarmType" resultType="java.util.Map">
         SELECT
             SUM(a.count) AS count,
-	        '巡视告警' AS alarmSource
+	        '巡检告警' AS alarmSource
         FROM
             (
             SELECT
@@ -709,8 +709,7 @@
             UNION ALL
             SELECT
             count(*) AS count
-            FROM
-            t_env_warning
+            FROM t_iot_device_warn a
             WHERE DATEDIFF(now(), alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
             ) b
         UNION ALL
