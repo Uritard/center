@@ -2811,7 +2811,7 @@ CREATE TABLE `t_iot_device_point` (
  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
  `iot_device_id` bigint NOT NULL COMMENT '物联设备Id',
  `iot_device_name` varchar(128) DEFAULT '' COMMENT '物联设备名称',
- `channel_num` int DEFAULT '1' COMMENT '通道号',
+ `channel_num` varchar(50) DEFAULT '1' COMMENT '通道号',
  `point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
  `unit` varchar(50) DEFAULT '' COMMENT '单位',
  `extend` varchar(256) DEFAULT NULL COMMENT '额外参数，如起始位置，返回数据，json字符串存储',

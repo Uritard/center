@@ -44,9 +44,7 @@ public class TIotDevicePoint implements Serializable {
     /**
      * 通道号
      */
-    @Min(0)
-    @Max(65535)
-    private Integer channelNum;
+    private String channelNum;
 
     /**
      * 测点名称

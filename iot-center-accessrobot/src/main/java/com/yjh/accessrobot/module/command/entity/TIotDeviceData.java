@@ -67,7 +67,7 @@ public class TIotDeviceData implements Serializable {
      */
     private Integer magnificationCoefficient;
 
-    private Integer channelNum;
+    private String channelNum;
 
     private Integer iotDeviceType;
 
