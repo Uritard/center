@@ -40,10 +40,14 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         String robotCode = iotWarn.get("robotCode");
         String channelNum = iotWarn.get("type_device_num");
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
-        String ip = "-1";
+        String ip;
         if (StringUtils.isNotBlank(tRobotInfo.getRobotIp())) {
             ip = tRobotInfo.getRobotIp();
         } else {
+            return false;
+        }
+        if (StringUtils.isBlank(channelNum)){
+            log.error("type_device_num is null");
             return false;
         }
         Long id = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
@@ -55,6 +59,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
                 tIotDeviceWarn.setDeleteFlag(deleteFlag);
                 this.updateById(tIotDeviceWarn);
+                return true;
             }
         } else {
             tIotDeviceWarn = getBaseMapper().selectDeviceByIpAndNum(ip, channelNum);
@@ -100,7 +105,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 item.put("patroldevice_code", tRobotInfo.getRobotNum());
                 item.put("patroldevice_name", tRobotInfo.getRobotName());
                 item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
-                item.put("sn", tdw.getChannelNum());
+                item.put("type_device_num", tdw.getChannelNum());
                 item.put("delete_flag", 2);
                 item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
                 itemList.add(item);

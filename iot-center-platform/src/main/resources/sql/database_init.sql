@@ -2837,6 +2837,7 @@ CREATE TABLE `t_iot_device_warn` (
 `magnification_coefficient` int DEFAULT '1' COMMENT '系数',
 `alarm_time` datetime DEFAULT NULL COMMENT '告警时间',
 `delete_flag` bigint DEFAULT '1' COMMENT '告警消除标志 1未消除 2 已消除',
+`delete_time` datetime DEFAULT NULL COMMENT '消除时间',
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备告警表';
 
