@@ -119,6 +119,12 @@ public class Constant {
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
     /**
+     * platform接收机器人/无人机环控告警
+     */
+    public static final String ENV_ALARM_PROCESS = "http://iot-center-platform/tIotDeviceWarn/v1/robotIotWarn";
+
+
+    /**
      * platform接收机器人/无人机/摄像机等巡视统计信息接口
      */
     public static final String CRUISE_DEVICE_STATICS_PROCESS = "http://iot-center-platform/uPatrolDataResult/v1" +
