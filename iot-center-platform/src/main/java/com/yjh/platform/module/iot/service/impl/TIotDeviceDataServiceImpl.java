@@ -3,6 +3,7 @@ package com.yjh.platform.module.iot.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -48,15 +49,31 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     public List<Map<String, Object>> selectIotData(Long upRegionId) {
         List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
         List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
-        Map<String, List<IotDeviceDataEx>> resultMap =
-            tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
+        tIotDeviceList.forEach(data ->{
+            if (data.getChannelNum() != null){
+                String key = Constant.envKey+data.getIotDeviceId();
+                Map<String,String> map = redisTemplate.opsForHash().entries(key);
+                String value = map.get(data.getChannelNum());
+                data.setValue(ValueUtil.getOrDefault(value,""));
+                data.setCreateTime(DateTimeUtil.parse(map.get("time")));
+                data.setState(ValueUtil.getOrDefault(map.get("state"),"0"));
+                data.setType(ValueUtil.getOrDefault(map.get("type"),"0"));
+            }
+
+        });
+        Map<String, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
             Map<String, Object> map = new HashMap<>(4);
             map.put("iotName", k);
             map.put("iotDeviceId", v.get(0).getIotDeviceId());
             map.put("controllable", v.get(0).getControllable());
-            map.put("time", DateTimeUtil.getDateTimeString(v.get(0).getCreateTime()));
+            map.put("iotDeviceType", v.get(0).getIotDeviceType());
+            if (v.get(0).getCreateTime() != null){
+                map.put("time", DateTimeUtil.getDateTimeString(v.get(0).getCreateTime()));
+            } else {
+                map.put("time", "");
+            }
             map.put("list", v);
             resultList.add(map);
         });
@@ -146,33 +163,39 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         if (StringUtils.isNotEmpty((tRobotInfo.getRobotIp()))) {
             ip = tRobotInfo.getRobotIp();
         } else {
-            log.info("根据robotCode:{} 没找对应机器人信息！", robotCode);
+            log.info("根据robotCode:{} 没找对应机器人信息！",robotCode);
             return false;
         }
-        //        TStdRegion tStdRegion = tStdRegionDao.selectByRegionCode(robotCode);
-        //        if (StringUtils.isNotEmpty((tStdRegion.getRobotIp()))) {
-        //            ip = tRobotInfo.getRobotIp();
-        //        } else {
-        //            log.info("根据robotCode:{} 没找对应区域信息！",robotCode);
-        //        }
+//        TStdRegion tStdRegion = tStdRegionDao.selectByRegionCode(robotCode);
+//        if (StringUtils.isNotEmpty((tStdRegion.getRobotIp()))) {
+//            ip = tRobotInfo.getRobotIp();
+//        } else {
+//            log.info("根据robotCode:{} 没找对应区域信息！",robotCode);
+//        }
         List<IotDeviceDataEx> deviceDataList = getBaseMapper().selectInfoByIp(ip);
         List<IotDeviceDataEx> insertDeviceDataList = new ArrayList<>();
         envDeviceStatusList.forEach(envDeviceStatus -> {
-            IotDeviceDataEx data = deviceDataList.stream()
-                .filter(deviceData -> Objects.equals(deviceData.getChannelNum(), Integer.valueOf(envDeviceStatus.getDeviceId())))
-                .findFirst().orElse(null);
-            if (data != null) {
+            IotDeviceDataEx data = deviceDataList.
+                            stream().
+                            filter(deviceData -> Objects.equals(deviceData.getChannelNum(), envDeviceStatus.getDeviceId()))
+                            .findFirst()
+                            .orElse(null);
+            if (data != null){
                 data.setValue(envDeviceStatus.getDeviceValue());
                 insertDeviceDataList.add(data);
+            } else {
+                return;
             }
-            String key = Constant.envKey + data.getIotDeviceId();
-            Map<String, String> map = new HashMap<>();
-            map.put(data.getChannelNum(), data.getValue() + data.getUnit());
-            map.put("time", DateTimeUtil.format(new Date()));
+            String key = Constant.envKey+data.getIotDeviceId();
+            Map<String,String> map = new HashMap<>();
+            map.put(data.getChannelNum(),data.getValue());
+            map.put("time",DateTimeUtil.format(new Date()));
+            map.put("state", ValueUtil.toString(envDeviceStatus.getStatus(),"0"));
+            map.put("type", ValueUtil.getOrDefault(envDeviceStatus.getType(),"0"));
             //将本次数据放入redis
-            redisTemplate.opsForList().leftPush(key, data);
+            redisTemplate.opsForHash().putAll(key,map);
         });
-        if (!insertDeviceDataList.isEmpty()) {
+        if (!insertDeviceDataList.isEmpty()){
             iotDeviceDataUpload(insertDeviceDataList);
             List<TIotDeviceData> insertList = new ArrayList<>(insertDeviceDataList);
             return this.saveBatch(insertList);
