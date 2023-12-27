@@ -171,11 +171,12 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 data.setValue(envDeviceStatus.getDeviceValue());
                 insertDeviceDataList.add(data);
             }
-            String key = Constant.envKey+data.getUpRegionId();
+            String key = Constant.envKey+data.getIotDeviceId();
             Map<String,String> map = new HashMap<>();
-            map.put(data.getIotDeviceId()+":"+data.getChannelNum(),data.getValue()+data.getUnit());
+            map.put(data.getChannelNum(),data.getValue()+data.getUnit());
+            map.put("time",DateTimeUtil.format(new Date()));
             //将本次数据放入redis
-            redisTemplate.opsForHash().putAll(key,map);
+            redisTemplate.opsForList().leftPush(key,data);
         });
         if (!insertDeviceDataList.isEmpty()){
             iotDeviceDataUpload(insertDeviceDataList);
