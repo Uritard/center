@@ -833,9 +833,9 @@ public class HomePageService {
         List<IotDeviceDataEx> deviceDataExList = tStdRegionDao.getEnvByRegion(regionId);
         deviceDataExList.forEach(data ->{
             if (data.getChannelNum() != null){
-                String key = Constant.envKey+regionId;
+                String key = Constant.envKey+data.getIotDeviceId();
                 Map<String,String> map = redisTemplate.opsForHash().entries(key);
-                String value = map.get(data.getIotDeviceId()+":"+data.getChannelNum());
+                String value = map.get(data.getChannelNum());
                 data.setValue(value);
             }
 
