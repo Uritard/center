@@ -61,8 +61,10 @@ public class SensorCollectService {
                     log.info("协议类型无需主动建立连接: {}", k);
                 } else {
                     ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(k);
-                    if (!sensorProtocol.isInit()) {
+                    if (sensorProtocol != null && !sensorProtocol.isInit()) {
                         sensorProtocol.init(v);
+                    } else {
+                        log.warn("协议未实现或已经初始化: {}", k);
                     }
                 }
             });
@@ -104,8 +106,10 @@ public class SensorCollectService {
                 }
                 ISensorProtocol sensorProtocol =
                     SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getProtocolModel()));
-                if (!sensorProtocol.isInit()) {
+                if (sensorProtocol != null && !sensorProtocol.isInit()) {
                     sensorProtocol.init(Collections.singletonList(device));
+                } else {
+                    log.warn("协议未实现或已经初始化: {}", protocolEnum);
                 }
 
                 COLLECT_TASK_MAP.compute(device.getCollectionFrequency(), (k1, v1) -> {

@@ -48,7 +48,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     public List<Map<String, Object>> selectIotData(Long upRegionId) {
         List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
         List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
-        Map<String, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
+        Map<String, List<IotDeviceDataEx>> resultMap =
+            tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
             Map<String, Object> map = new HashMap<>(4);
@@ -73,7 +74,6 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         List<String> fir = new ArrayList<>();
         Map<Date, String[]> dateIdx = new LinkedHashMap<>(64);
         Map<KeyValue<String, String>, Integer> deviceMap = new HashMap<>(8);
-
 
         // 第一行 ["product","2023-07-25 11:36:55","2023-07-25 11:41:15","2023-07-25 15:59:46","2023-07-26 11:25:44","2023-07-26 16:34:32"]
         fir.add("product");
@@ -134,8 +134,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     }
 
     @Override
-    public Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList){
-        if (envDeviceStatusList.isEmpty()){
+    public Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList) {
+        if (envDeviceStatusList.isEmpty()) {
             log.info("环境数据为空！");
             return false;
         }
@@ -146,35 +146,33 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         if (StringUtils.isNotEmpty((tRobotInfo.getRobotIp()))) {
             ip = tRobotInfo.getRobotIp();
         } else {
-            log.info("根据robotCode:{} 没找对应机器人信息！",robotCode);
+            log.info("根据robotCode:{} 没找对应机器人信息！", robotCode);
             return false;
         }
-//        TStdRegion tStdRegion = tStdRegionDao.selectByRegionCode(robotCode);
-//        if (StringUtils.isNotEmpty((tStdRegion.getRobotIp()))) {
-//            ip = tRobotInfo.getRobotIp();
-//        } else {
-//            log.info("根据robotCode:{} 没找对应区域信息！",robotCode);
-//        }
+        //        TStdRegion tStdRegion = tStdRegionDao.selectByRegionCode(robotCode);
+        //        if (StringUtils.isNotEmpty((tStdRegion.getRobotIp()))) {
+        //            ip = tRobotInfo.getRobotIp();
+        //        } else {
+        //            log.info("根据robotCode:{} 没找对应区域信息！",robotCode);
+        //        }
         List<IotDeviceDataEx> deviceDataList = getBaseMapper().selectInfoByIp(ip);
         List<IotDeviceDataEx> insertDeviceDataList = new ArrayList<>();
         envDeviceStatusList.forEach(envDeviceStatus -> {
-            IotDeviceDataEx data = deviceDataList.
-                            stream().
-                            filter(deviceData -> Objects.equals(deviceData.getChannelNum(), Integer.valueOf(envDeviceStatus.getDeviceId())))
-                            .findFirst()
-                            .orElse(null);
-            if (data != null){
+            IotDeviceDataEx data = deviceDataList.stream()
+                .filter(deviceData -> Objects.equals(deviceData.getChannelNum(), Integer.valueOf(envDeviceStatus.getDeviceId())))
+                .findFirst().orElse(null);
+            if (data != null) {
                 data.setValue(envDeviceStatus.getDeviceValue());
                 insertDeviceDataList.add(data);
             }
-            String key = Constant.envKey+data.getIotDeviceId();
-            Map<String,String> map = new HashMap<>();
-            map.put(data.getChannelNum(),data.getValue()+data.getUnit());
-            map.put("time",DateTimeUtil.format(new Date()));
+            String key = Constant.envKey + data.getIotDeviceId();
+            Map<String, String> map = new HashMap<>();
+            map.put(data.getChannelNum(), data.getValue() + data.getUnit());
+            map.put("time", DateTimeUtil.format(new Date()));
             //将本次数据放入redis
-            redisTemplate.opsForList().leftPush(key,data);
+            redisTemplate.opsForList().leftPush(key, data);
         });
-        if (!insertDeviceDataList.isEmpty()){
+        if (!insertDeviceDataList.isEmpty()) {
             iotDeviceDataUpload(insertDeviceDataList);
             List<TIotDeviceData> insertList = new ArrayList<>(insertDeviceDataList);
             return this.saveBatch(insertList);
@@ -184,25 +182,31 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
 
     @Override
     public Boolean addToRedis(List<IotDeviceDataEx> dataList) {
-        Map<Long, List<IotDeviceDataEx>> groupData = dataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
+        try {
+            Map<Long, List<IotDeviceDataEx>> groupData = dataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
 
-        redisTemplate.executePipelined(new SessionCallback<Object>() {
-            @Override
-            public Object execute(RedisOperations operations) throws DataAccessException {
-                groupData.forEach((k, v) -> {
-                    Map<String, String> valMap = v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, d-> d.getValue() + Optional.ofNullable(d.getUnit()).orElse("")));
-                    valMap.put("time", DateTimeUtil.format(v.get(0).getCreateTime()));
-                    String key = "EnvDevice:" + k;
-                    operations.opsForHash().putAll(key, valMap);
-                });
-                return null;
-            }
-        });
+            redisTemplate.executePipelined(new SessionCallback<Object>() {
+                @Override
+                public Object execute(RedisOperations operations) throws DataAccessException {
+                    groupData.forEach((k, v) -> {
+                        Map<String, String> valMap =
+                            v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, TIotDeviceData::getValue));
+                        valMap.put("time", DateTimeUtil.format(v.get(0).getCreateTime()));
+                        String key = "EnvDevice:" + k;
+                        operations.opsForHash().putAll(key, valMap);
+                    });
+                    return null;
+                }
+            });
 
+            iotDeviceDataUpload(dataList);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         return true;
     }
 
-    private void iotDeviceDataUpload(List<IotDeviceDataEx> deviceDataList){
+    private void iotDeviceDataUpload(List<IotDeviceDataEx> deviceDataList) {
         try {
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
@@ -236,8 +240,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 itemList.add(item);
             });
             Constant.otherServer(map, Constant.TCP_URL);
-        }catch (Exception e){
-            log.info("上报环控数据出错！",e);
+        } catch (Exception e) {
+            log.info("上报环控数据出错！", e);
         }
     }
 }

@@ -49,23 +49,6 @@ public class TIotDeviceDataController {
         return result;
     }
 
-    @ApiOperation(value = "新增物联设备结果配置")
-    @RequestMapping(value = "/addToRedis", method = RequestMethod.POST)
-    @Logs(title = "新增物联设备结果配置", content = "新增物联设备结果配置", logType = 2)
-    public Result addToRedis(@RequestBody List<IotDeviceDataEx> dataList) {
-        Result result = new Result();
-        try {
-            result.setData(tIotDeviceDataService.addToRedis(dataList));
-            result.setCode(ResultCodeEnum.NORMAL.getCode());
-        } catch (BusinessException b) {
-            result.setCode(b.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("新增物联设备结果配置失败：", e);
-        }
-        return result;
-    }
-
     @ApiOperation(value = "更新物联设备结果配置")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "更新物联设备结果配置", content = "更新物联设备结果配置", logType = 3)
@@ -147,6 +130,23 @@ public class TIotDeviceDataController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备结果失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "新增物联设备结果配置")
+    @RequestMapping(value = "/addToRedis", method = RequestMethod.POST)
+    @Logs(title = "新增物联设备结果配置", content = "新增物联设备结果配置", logType = 2)
+    public Result addToRedis(@RequestBody List<IotDeviceDataEx> dataList) {
+        Result result = new Result();
+        try {
+            result.setData(tIotDeviceDataService.addToRedis(dataList));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("新增物联设备结果配置失败：", e);
         }
         return result;
     }

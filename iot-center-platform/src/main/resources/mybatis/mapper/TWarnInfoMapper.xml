@@ -1212,4 +1212,10 @@
         where
         DATEDIFF(now(), a.alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
     </select>
+
+    <select id="countByTaskId" resultType="java.lang.Integer">
+        select count(*)
+        from t_warn_info
+        where task_id = #{taskId}
+    </select>
 </mapper>

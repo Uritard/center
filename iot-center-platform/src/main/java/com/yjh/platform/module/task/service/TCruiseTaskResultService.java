@@ -618,50 +618,20 @@ public class TCruiseTaskResultService {
     public CruiseResultCounter selectCruiseStatusCountNew(String taskId) {
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
         //处理上级系统逻辑
-        if (Constant.isUpSystem()) {
-            //处理巡视点数量信息
-            getCruiseCountByCache(cruiseResultCounter, taskId);
-            Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
-
-            if (!countResult.isEmpty()) {
-                //获取任务开始时间
-                String startTime = countResult.get("taskStart").toString();
-                //将两个时间字符串转为日期类型
-                Date d1 = DateTimeUtil.parse(startTime);
-                Date d2 = new Date();
-                cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
-            } else {
-                cruiseResultCounter.setRunningTime(Long.valueOf("0"));
-            }
-             return cruiseResultCounter;
-
-        }
+        Map<String, String> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
 
         //计算运行时间
-        int abnormalCounts = 0;
-        int normalCounts = 0;
-
-        Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId + ":");
-        for (String key : robotInfoKeys) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-            boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
-            if (conditionRes && Objects.equals(String.valueOf(CRUISE_RESULT_ABNORMAL), redisInfoMap.get("cruiseResult"))) {
-                abnormalCounts++;
-            } else if (conditionRes && Objects.equals(String.valueOf(CRUISE_RESULT_NORMAL), redisInfoMap.get("cruiseResult"))){
-                normalCounts++;
-            }
-        }
-        Map<String, String> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
+        int abnormal = MapUtils.getIntValue(countResult, "abnormal");
+        int normal = MapUtils.getIntValue(countResult, "normal");
 
         if (MapUtils.isNotEmpty(countResult)) {
             //获取任务开始时间
             String startTime = countResult.get("taskStart");
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
-            Integer normal = ValueUtil.toInteger(normalCounts, 0);
-            Integer abnormal = ValueUtil.toInteger(abnormalCounts,0);
             cruiseResultCounter.setAlarmCount(getAlarmCount(taskId));
             cruiseResultCounter.setCruisedCount(normal+abnormal);
             cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
+            cruiseResultCounter.setTaskProgress(countResult.get("taskProgress"));
             Date d1 = DateTimeUtil.parse(startTime, new Date());
             Date d2 = new Date();
             cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
@@ -685,10 +655,7 @@ public class TCruiseTaskResultService {
         int alarmCount = 0;
 
         try {
-            Set<String> warnKeys = redisScan("warnInfo:" + taskId);
-
-            Set<String> defectKeys = redisScan("defectInfo:" + taskId);
-            alarmCount = warnKeys.size() + defectKeys.size();
+            alarmCount = tWarnInfoDao.countByTaskId(taskId);
         } catch (Exception e) {
             log.error("getAlarmCount err: ", e);
         }

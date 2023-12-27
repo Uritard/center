@@ -81,7 +81,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
 
         // 15 s后将设备加入到采集列表中，并触发一次采集
         String scheduleTaskId = "IotDevice_" + iotDevice.getId();
-        ScheduledMapConfig.schedule(scheduleTaskId, 15, iotDevice, (device)->{
+        ScheduledMapConfig.schedule(scheduleTaskId, 15, iotDevice, device -> {
             Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/add?id={0}", Result.class, device.getId());
             log.info("add device collect, {}", result);
         });
