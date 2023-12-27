@@ -83,7 +83,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     @Override
     public List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime) {
         QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("iot_device_id", iotDeviceId);
+        queryWrapper.eq("iot_device_id", iotDeviceId);
         queryWrapper.between("create_time", startTime, endTime);
         List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
 
