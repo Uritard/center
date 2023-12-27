@@ -7,8 +7,9 @@ package com.yjh.accessmeter.module.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
-import com.yjh.accessmeter.module.device.entity.IotDeviceData;
+import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
+import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
@@ -31,21 +32,25 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DataCollectTask implements Runnable {
 
-    final TIotDeviceDao iotDeviceDao;
-    final ThreadPoolTaskExecutor asyncExecutor;
-    final Set<IotDevice> devices;
+    private final TIotDeviceDao iotDeviceDao;
+    private final ThreadPoolTaskExecutor asyncExecutor;
+    private final PlatformProxy platformProxy;
+    private final Map<Long, IotDevice> devices;
 
-    public DataCollectTask(List<IotDevice> devices, TIotDeviceDao iotDeviceDao, ThreadPoolTaskExecutor asyncExecutor) {
-        this.devices = new HashSet<>(devices);
+    public DataCollectTask(List<IotDevice> devices, TIotDeviceDao iotDeviceDao, ThreadPoolTaskExecutor asyncExecutor,
+        PlatformProxy platformProxy) {
+        this.devices = devices.stream().collect(Collectors.toMap(IotDevice::getId, Function.identity(), (e1, e2) -> e2));
         this.iotDeviceDao = iotDeviceDao;
         this.asyncExecutor = asyncExecutor;
+        this.platformProxy = platformProxy;
     }
 
     @Override
     public void run() {
         try {
-            log.info("开始数据采集，Size: {}", devices.size());
-            Map<String, List<IotDevice>> deviceGroup = devices.stream().collect(Collectors.groupingBy(d -> d.getIp() + ":" + d.getPort()));
+            log.info("开始数据采集，devices: {}", JSON.toJSONString(devices.keySet()));
+            Map<String, List<IotDevice>> deviceGroup =
+                devices.values().stream().collect(Collectors.groupingBy(d -> d.getIp() + ":" + d.getPort()));
             for (List<IotDevice> des : deviceGroup.values()) {
                 asyncExecutor.execute(() -> collectMeter(des));
             }
@@ -55,7 +60,7 @@ public class DataCollectTask implements Runnable {
     }
 
     public void collectMeter(List<IotDevice> devices) {
-        List<IotDeviceData> deviceDataList = new ArrayList<>();
+        List<IotDeviceDataEx> deviceDataList = new ArrayList<>();
         for (IotDevice device : devices) {
             try {
                 List<IotDevicePoint> devicePoints = iotDeviceDao.selectPointByDeviceId(device.getId());
@@ -77,33 +82,39 @@ public class DataCollectTask implements Runnable {
         if (!deviceDataList.isEmpty()) {
             try {
                 iotDeviceDao.batchInsertData(deviceDataList);
+
+                platformProxy.uploadToRedis(deviceDataList);
             } catch (Exception e) {
                 log.error("设备采集数据入库失败: {}", JSON.toJSONString(deviceDataList), e);
             }
+
         }
     }
 
     /**
      * 采集结果处理
      */
-    private void resultParseToInsert(List<IotDeviceData> deviceDataList, IotDevice device, List<IotDevicePoint> devicePoints,
+    private void resultParseToInsert(List<IotDeviceDataEx> deviceDataList, IotDevice device, List<IotDevicePoint> devicePoints,
         List<ResultMete> resultMetes) {
-        IotDeviceData baseData = new IotDeviceData();
-        baseData.setIotDeviceId(device.getId()).setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L)
-            .setPointName(device.getDeviceName()).setUpRegionId(device.getUpRegionId()).setIotDeviceType(device.getIotDeviceType())
-            .setCreateTime(new Date());
+        IotDeviceDataEx baseData = new IotDeviceDataEx();
+        baseData.setIp(device.getIp()).setPort(device.getPort()).setDeviceId(device.getDeviceId()).setAddress(device.getAddress())
+            .setControllable(device.getControllable()).setUpRegionName(device.getUpRegionName()).setIotDeviceId(device.getId())
+            .setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L).setPointName(device.getDeviceName())
+            .setUpRegionId(device.getUpRegionId()).setIotDeviceType(device.getIotDeviceType()).setCreateTime(new Date());
 
         if (devicePoints.isEmpty()) {
             baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));
             deviceDataList.add(baseData);
         } else {
-            Map<Integer, IotDevicePoint> pointMap = devicePoints.stream().collect(Collectors.toMap(IotDevicePoint::getChannelNum, Function.identity(), (e1, e2) -> e1));
-            resultMetes.forEach(m->{
-                int chanNum = m.getChannle();
-                IotDeviceData data = new IotDeviceData();
+            Map<String, IotDevicePoint> pointMap =
+                devicePoints.stream().collect(Collectors.toMap(IotDevicePoint::getChannelNum, Function.identity(), (e1, e2) -> e1));
+            resultMetes.forEach(m -> {
+                String chanNum = m.getChannle();
+                IotDeviceDataEx data = new IotDeviceDataEx();
                 BeanUtils.copyProperties(baseData, data);
                 IotDevicePoint point = pointMap.get(chanNum);
                 data.setValue(m.getValue());
+                data.setChannelNum(chanNum);
                 if (point != null) {
                     data.setPointId(point.getId()).setPointName(point.getPointName()).setUnit(point.getUnit());
                     deviceDataList.add(data);
@@ -119,7 +130,7 @@ public class DataCollectTask implements Runnable {
     }
 
     public void addDevice(IotDevice device, boolean collectImmediate) {
-        devices.add(device);
+        devices.put(device.getId(), device);
         if (collectImmediate) {
             // 新增设备立即采集一次数据
             collectMeter(Collections.singletonList(device));
@@ -127,10 +138,11 @@ public class DataCollectTask implements Runnable {
     }
 
     public boolean removeDevice(IotDevice device) {
-        return devices.remove(device);
+        IotDevice d = devices.remove(device.getId());
+        return d != null;
     }
 
     public boolean containsDevice(IotDevice device) {
-        return devices.contains(device);
+        return devices.containsKey(device.getId());
     }
 }

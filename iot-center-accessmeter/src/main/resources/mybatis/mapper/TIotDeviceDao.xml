@@ -75,7 +75,7 @@
         )
     </insert>
 
-    <insert id="batchInsertData" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.IotDeviceData">
+    <insert id="batchInsertData" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessmeter.module.device.entity.IotDeviceDataEx">
         insert into t_iot_device_data (
         id,
         point_id,

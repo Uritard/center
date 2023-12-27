@@ -24,7 +24,7 @@ public class ResultMete {
     /**
      * 通道号
      */
-    private int channle;
+    private String channle;
     /**
      * 结果值
      */

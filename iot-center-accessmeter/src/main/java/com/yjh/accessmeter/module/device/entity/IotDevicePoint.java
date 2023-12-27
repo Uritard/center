@@ -32,7 +32,7 @@ public class IotDevicePoint {
     /**
      * 通道号
      */
-    private Integer channelNum;
+    private String channelNum;
     /**
      * 测点名称
      */

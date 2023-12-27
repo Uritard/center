@@ -1,5 +1,6 @@
 package com.yjh.platform.module.iot.service;
 
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
@@ -20,4 +21,5 @@ public interface TIotDeviceDataService extends IService<TIotDeviceData> {
 
     Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 
+    Boolean addToRedis(List<IotDeviceDataEx> dataList);
 }

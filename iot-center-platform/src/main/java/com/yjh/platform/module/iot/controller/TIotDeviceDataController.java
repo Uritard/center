@@ -4,6 +4,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
@@ -38,6 +39,23 @@ public class TIotDeviceDataController {
         Result result = new Result();
         try {
             result.setData(tIotDeviceDataService.save(tIotDeviceData));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("新增物联设备结果配置失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "新增物联设备结果配置")
+    @RequestMapping(value = "/addToRedis", method = RequestMethod.POST)
+    @Logs(title = "新增物联设备结果配置", content = "新增物联设备结果配置", logType = 2)
+    public Result addToRedis(@RequestBody List<IotDeviceDataEx> dataList) {
+        Result result = new Result();
+        try {
+            result.setData(tIotDeviceDataService.addToRedis(dataList));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
