@@ -118,10 +118,10 @@
         LEFT JOIN t_std_device_attr g ON g.device_id= f.device_id
         left join t_std_region re on f.up_region_id = re.region_id
         left join t_std_region region on re.up_region_id = region.region_id
-        left join t_dict_business j on f.device_type = j.dict_code
-        left join t_dict_business k on b.mete_type = k.dict_code
+        left join t_dict_business j on f.device_type = j.dict_code and j.col_name = 'device_type'
+        left join t_dict_business k on b.mete_type = k.dict_code and k.col_name = 'mete_type'
         LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
-        where 1=1
+        where 1=1 and f.up_region_id is not null
         <if test="edgeCode != null and edgeCode != ''"> and a.edge_code = #{edgeCode}</if>
     </select>
 
