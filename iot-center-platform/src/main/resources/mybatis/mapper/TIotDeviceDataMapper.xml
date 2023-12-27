@@ -55,11 +55,10 @@
         FROM
             t_iot_device_data data
                 left join t_iot_device device on data.iot_device_id = device.id
-        where 1 = 1
+        where 1 = 1 and (data.point_id, data.create_time) in (SELECT point_id, MAX(create_time) FROM t_iot_device_data GROUP BY point_id)
         <if test="list.size > 0"> and data.up_region_id in
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}
             </foreach></if>
-        group by data.point_name
     </select>
 </mapper>

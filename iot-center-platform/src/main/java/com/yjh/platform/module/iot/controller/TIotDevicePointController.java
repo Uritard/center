@@ -127,4 +127,22 @@ public class TIotDevicePointController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询指定物联设备测点")
+    @RequestMapping(value = "/selectByDeviceId", method = RequestMethod.GET)
+    public Result selectByDeviceId(@RequestParam(value = "iotDeviceId") Long iotDeviceId) {
+        Result result = new Result();
+        try {
+            List<TIotDevicePoint> tIotDeviceList = tIotDevicePointService.listByDeviceId(iotDeviceId);
+
+            result.setData(tIotDeviceList);
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询物联设备测点失败：", e);
+        }
+        return result;
+    }
 }
