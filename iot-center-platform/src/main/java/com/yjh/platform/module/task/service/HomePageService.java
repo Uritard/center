@@ -23,6 +23,7 @@ import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dal.TStdWeatherLogDO;
 import com.yjh.platform.module.task.dao.*;
@@ -108,6 +109,8 @@ public class HomePageService {
     private TMeterDao tMeterDao;
     @Autowired
     private TWarnInfoService warnInfoService;
+    @Autowired
+    private TIotDeviceDataService tIotDeviceDataService;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
@@ -823,25 +826,20 @@ public class HomePageService {
     }
 
     public List<Map<String, Object>> getEnvByRegion(Long regionId){
-        List<IotDeviceDataEx> deviceDataExList = tStdRegionDao.getEnvByRegion(regionId);
-        deviceDataExList.forEach(data ->{
-            if (data.getChannelNum() != null){
-                String key = Constant.envKey+data.getIotDeviceId();
-                Map<String,String> map = redisTemplate.opsForHash().entries(key);
-                String value = map.get(data.getChannelNum());
-                data.setValue(value);
+        List<Map<String, Object>> resultList = tIotDeviceDataService.selectIotData(regionId);
+        List<Map<String, Object>> re = new ArrayList<>();
+        for (Map<String, Object> item: resultList){
+            if ("850".equals(item.get("iotDeviceType").toString()) ||
+                    "851".equals(item.get("iotDeviceType").toString()) ||
+                    "852".equals(item.get("iotDeviceType").toString()) ||
+                    "858".equals(item.get("iotDeviceType").toString()) ||
+                    "859".equals(item.get("iotDeviceType").toString()) ||
+                    "860".equals(item.get("iotDeviceType").toString()) ||
+                    "861".equals(item.get("iotDeviceType").toString())
+                            ){
+                re.add(item);
             }
-
-        });
-        Map<String, List<TIotDeviceData>> resultMap = deviceDataExList.stream().collect(Collectors.groupingBy(TIotDeviceData::getIotDeviceName));
-        List<Map<String, Object>> resultList = Lists.newArrayList();
-        resultMap.forEach((k, v) -> {
-            Map<String, Object> map = new HashMap<>(4);
-            map.put("iotName", k);
-            map.put("iotDeviceId", v.get(0).getIotDeviceId());
-            map.put("list", v);
-            resultList.add(map);
-        });
-        return resultList;
+        }
+        return re;
     }
 }

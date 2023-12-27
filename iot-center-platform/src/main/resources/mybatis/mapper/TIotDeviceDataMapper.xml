@@ -49,16 +49,22 @@
     </select>
 
     <select id="selectIotData"  resultType="com.yjh.platform.module.iot.entity.IotDeviceDataEx">
-        SELECT
-            data.*,
-            device.controllable
+        SELECT DISTINCT
+        point.iot_device_id,
+        point.iot_device_name,
+        point.channel_num,
+        point.point_name,
+        device.iot_device_type,
+        device.controllable,
+        point.unit
         FROM
-            t_iot_device_data data
-                left join t_iot_device device on data.iot_device_id = device.id
-        where 1 = 1 and (data.point_id, data.create_time) in (SELECT point_id, MAX(create_time) FROM t_iot_device_data GROUP BY point_id)
-        <if test="list.size > 0"> and data.up_region_id in
+        t_iot_device device
+        LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
+        where 1 = 1
+        <if test="list.size > 0"> and device.up_region_id in
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}
             </foreach></if>
+        group by point.point_name
     </select>
 </mapper>
