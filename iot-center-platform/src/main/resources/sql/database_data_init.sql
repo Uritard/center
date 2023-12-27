@@ -109,7 +109,7 @@ INSERT INTO `sys_menu` VALUES ('45', '告警屏蔽管理', '0406', '4', '', '', 
 INSERT INTO `sys_menu` VALUES ('46', '声纹管理', '0106', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('48', '告警管理', '0107', '2', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
 INSERT INTO `sys_menu` VALUES ('49', '物联监控', '0211', '3', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1235');
-INSERT INTO `sys_menu` VALUES ('50', '物联管理', '0611', '4', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
+INSERT INTO `sys_menu` VALUES ('50', '物联管理', '0611', '5', '', '', '1', '2', '', '1', '1', '1', '', '1', '1', '1234');
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
@@ -127,9 +127,7 @@ INSERT INTO `sys_role_menu` VALUES ('210011', '0204', null, null, '-1');
 INSERT INTO `sys_role_menu` VALUES ('210012', '0205', null, null, '-1');
 INSERT INTO `sys_role_menu` VALUES ('210013', '0206', null, null, '-1');
 INSERT INTO `sys_role_menu` VALUES ('210014', '0207', null, null, '-1');
-INSERT INTO `sys_role_menu` VALUES ('210015', '0208', null, null, '-1');
 INSERT INTO `sys_role_menu` VALUES ('210016', '0209', null, null, '-1');
-INSERT INTO `sys_role_menu` VALUES ('210017', '0210', null, null, '-1');
 INSERT INTO `sys_role_menu` VALUES ('210018', '0609', null, 'checked', '1236');
 INSERT INTO `sys_role_menu` VALUES ('210019', '0600', null, 'halfChecked', '1236');
 INSERT INTO `sys_role_menu` VALUES ('210115', '0001', null, 'checked', '1235');
@@ -169,6 +167,8 @@ INSERT INTO `sys_role_menu` VALUES ('210149', '0900', null, 'checked', '1234');
 INSERT INTO `sys_role_menu` VALUES ('210150', '0901', null, 'checked', '1234');
 INSERT INTO `sys_role_menu` VALUES ('210151', '0200', null, 'halfChecked', '1234');
 INSERT INTO `sys_role_menu` VALUES ('210152', '0600', null, 'halfChecked', '1234');
+INSERT INTO `sys_role_menu` VALUES ('210153', '0211', null, 'checked', '1235');
+INSERT INTO `sys_role_menu` VALUES ('210154', '0611', null, 'checked', '1234');
 
 -- ----------------------------
 -- Records of t_algorithm_info
@@ -570,7 +570,7 @@ INSERT INTO `t_dict_business` VALUES ('300473', '519', 'env_type', 'O3', '0', '�
 INSERT INTO `t_dict_business` VALUES ('300474', '520', 'env_type', '烟雾', '0', '环控设备类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300475', '521', 'env_type', '液位传感器', '0', '环控设备类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300476', '522', 'env_type', '风机', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300477', '523', 'mete_type', '录像', null, '巡视内容', '14');
+INSERT INTO `t_dict_business` VALUES ('300477', '523', 'mete_type', '录像', '105', '巡视内容', '14');
 INSERT INTO `t_dict_business` VALUES ('300478', '524', 'cruise_type', '无人机', '0', '巡检方式', '4');
 INSERT INTO `t_dict_business` VALUES ('300479', '525', 'drone_type', 'q100', null, '无人机型号', '1');
 INSERT INTO `t_dict_business` VALUES ('300480', '667', 'voice_type', '声纹传感器', null, '声纹类型', null);
@@ -713,9 +713,9 @@ INSERT INTO `t_dict_business` VALUES ('300724', '997', 'alarm_source', '无人�
 INSERT INTO `t_dict_business` VALUES ('300725', '998', 'alarm_source', '声纹', '0', '告警来源', '5');
 INSERT INTO `t_dict_business` VALUES ('300732', '689', 'defect_model', '地面沉降', '0', '缺陷类型', '6');
 INSERT INTO `t_dict_business` VALUES ('300733', '693', 'partial_dischargr_type', '局放', NULL, '局放类型', 1);
-INSERT INTO `t_dict_business` VALUES ('300734', '690', 'mete_type', '局放地电压检测', NULL, '巡视内容', 8);
-INSERT INTO `t_dict_business` VALUES ('300735', '691', 'mete_type', '局放超声波检测', NULL, '巡视内容', 7);
-INSERT INTO `t_dict_business` VALUES ('300736', '692', 'mete_type', '局放特高频图谱', NULL, '巡视内容', 9);
+INSERT INTO `t_dict_business` VALUES ('300734', '690', 'mete_type', '局放地电压检测', '12', '巡视内容', 8);
+INSERT INTO `t_dict_business` VALUES ('300735', '691', 'mete_type', '局放超声波检测', '11', '巡视内容', 7);
+INSERT INTO `t_dict_business` VALUES ('300736', '692', 'mete_type', '局放特高频图谱', '13', '巡视内容', 9);
 INSERT INTO `t_dict_business` VALUES ('300737', '901', 'prioritized_task_type', '站端日常巡视任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300738', '902', 'prioritized_task_type', '上级系统控制任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300739', '903', 'prioritized_task_type', '区域巡视系统控制任务', '0', '执行等级配置任务类型', '1');
@@ -724,10 +724,10 @@ INSERT INTO `t_dict_business` VALUES ('300741', '810', 'robot_type', '模拟机�
 INSERT INTO `t_dict_business` VALUES ('300742', '811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
 INSERT INTO `t_dict_business` VALUES ('300743', '812', 'device_type', '变电站环境', '32', '设备类型', '23');
 INSERT INTO `t_dict_business` VALUES ('300744', '813', 'recorder_type', '海康超脑', '0', 'NVR类型', '1' );
-INSERT INTO `t_dict_business` VALUES ('300745', '814', 'mete_type', '环境温度检测', '1', '巡视内容', '10');
-INSERT INTO `t_dict_business` VALUES ('300746', '815', 'mete_type', '环境湿度检测', '1', '巡视内容', '11');
-INSERT INTO `t_dict_business` VALUES ('300747', '816', 'mete_type', '氧气浓度检测', '1', '巡视内容', '12');
-INSERT INTO `t_dict_business` VALUES ('300748', '817', 'mete_type', 'SF6浓度检测', '1', '巡视内容', '13');
+INSERT INTO `t_dict_business` VALUES ('300745', '814', 'mete_type', '环境温度检测', '101', '巡视内容', '10');
+INSERT INTO `t_dict_business` VALUES ('300746', '815', 'mete_type', '环境湿度检测', '102', '巡视内容', '11');
+INSERT INTO `t_dict_business` VALUES ('300747', '816', 'mete_type', '氧气浓度检测', '103', '巡视内容', '12');
+INSERT INTO `t_dict_business` VALUES ('300748', '817', 'mete_type', 'SF6浓度检测', '104', '巡视内容', '13');
 INSERT INTO `t_dict_business` VALUES ('300749', '340', 'cruise_data_state', '执行忽略', NULL, '巡检数据状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300750', '341', 'cruise_data_state', '执行遗漏', NULL, '巡检数据状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300751', '342', 'cruise_data_state', '算法分析中', NULL, '巡检数据状态', 0);
@@ -765,6 +765,19 @@ INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('5','f
 INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('30','frequency','30 分钟','物联设备采集频率');
 INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('60','frequency','1 小时','物联设备采集频率');
 INSERT INTO t_dict_business (dict_code,col_name,dict_note,remark) VALUES ('240','frequency','4 小时','物联设备采集频率');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('850', 'iot_device_type', '温度', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('851', 'iot_device_type', '湿度', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('852', 'iot_device_type', '风速', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('853', 'iot_device_type', '水泵', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('854', 'iot_device_type', '防盗', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('855', 'iot_device_type', '灯', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('856', 'iot_device_type', '空调', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('857', 'iot_device_type', '门禁', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('858', 'iot_device_type', 'SF6', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('859', 'iot_device_type', 'O3', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位传感器', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '0', '环控设备类型', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
