@@ -151,6 +151,9 @@ public class HomePageService {
                 item.setCruisedCount(cruiseResultCounter.getCruisedCount());
                 item.setCruiseNotCount(cruiseResultCounter.getCruiseNotCount());
                 item.setRunningTime(cruiseResultCounter.getRunningTime());
+                Float i = NumberUtils.toFloat(cruiseResultCounter.getTaskProgress());
+                i = i * 100F;
+                item.setTaskProgress(i.intValue());
             } catch (Exception e) {
                 log.info("出错了" + e);
                 item.setAlarmCount(null);
@@ -158,16 +161,6 @@ public class HomePageService {
                 item.setCruiseNotCount(null);
                 item.setRunningTime(null);
             }
-            try {
-                Map<String, Object> map = tCruiseTaskResultService.selectCruiseAdvance(item.getTaskId());
-                Float i = Float.parseFloat(map.get("rate").toString());
-                i = i * 100F;
-                item.setTaskProgress(i.intValue());
-            } catch (Exception e) {
-                log.info("出错了" + e);
-                item.setTaskProgress(0);
-            }
-
         }
         return listTask;
     }

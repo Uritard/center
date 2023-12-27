@@ -27,5 +27,8 @@ public class CruiseResultCounter implements Serializable {
 
     @ApiModelProperty(value = "运行时间")
     private Long runningTime;
+
+    @ApiModelProperty(value = "任务进度")
+    private String taskProgress;
 }
 

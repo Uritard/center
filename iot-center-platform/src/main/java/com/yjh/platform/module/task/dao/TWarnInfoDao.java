@@ -109,4 +109,6 @@ public interface TWarnInfoDao {
     List<WarnStatistical> countMonByStationOnMonth(Integer nearDays);
 
     List<WarnStatistical> countAllByStationOnMonth(Integer nearDays);
+
+    Integer countByTaskId(@Param("taskId")String taskId);
 }
