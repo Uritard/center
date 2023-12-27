@@ -127,6 +127,11 @@ public class TIotDevice implements Serializable {
     @TableField(exist = false)
     private String collectionFrequencyName;
 
+    /**
+     * 是否可以控制 0-不可控制 1-可以控制
+     */
+    private Integer controllable;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

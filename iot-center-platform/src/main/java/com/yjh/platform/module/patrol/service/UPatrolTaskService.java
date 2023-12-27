@@ -583,7 +583,6 @@ public class UPatrolTaskService {
         String cruiseDeviceKey = TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice";
         log.info("cruiseDeviceSet === {}: {}", cruiseDeviceKey, JSON.toJSONString(cruiseDeviceSet));
         redisTemplate.opsForSet().add(cruiseDeviceKey, cruiseDeviceSet.toArray(new String[0]));
-        redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
 
         initializeThisTaskInfo(task, detailList.size(), nodeSet);
 
@@ -899,12 +898,12 @@ public class UPatrolTaskService {
             }
             String subKey = PATROL_SUMMARY_PREFIX + "sub_state:" + taskId + ":" + realCode;
             redisTemplate.opsForValue().set(subKey, taskState);
-            redisTemplate.expire(subKey, 3, TimeUnit.DAYS);
+            redisTemplate.expire(subKey, 7, TimeUnit.DAYS);
 
             log.info("update down task status: {}，taskState: {}, subCreateTask: {}, nodes: {}", JSON.toJSONString(countChangeMap), taskState, subCreateTask, JSON.toJSONString(nodes));
 
             redisTemplate.opsForHash().putAll(key, countChangeMap);
-            redisTemplate.expire(key, 3, TimeUnit.DAYS);
+            redisTemplate.expire(key, 7, TimeUnit.DAYS);
 
             Map<String, String> jasonMap = new HashMap<>();
             jasonMap.put("type", "newTask");
@@ -1468,8 +1467,8 @@ public class UPatrolTaskService {
         try {
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
 
-            String key = PATROL_SUMMARY_PREFIX+task.getTaskId();
-            String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
+            String taskPatrolledId = mapForGet.get("task_patrolled_id");
             if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
                 taskPatrolledId = stationCode+"_"+task.getTaskCode()+"_"+DateTimeUtil.format(task.getStartTime(), DateTimeUtil.getDateTimePattern3());
             }
@@ -1481,20 +1480,18 @@ public class UPatrolTaskService {
             String planTime = DateTimeUtil.format(task.getStartTime());
             item.put("plan_start_time", planTime);
 
-            Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
-
             item.put("start_time", mapForGet.getOrDefault("taskStart", planTime));
 
-            int all = NumberUtils.toInt(mapForGet.get("all"));
-            all = Math.max(all, 1);
             Integer normal = NumberUtils.toInt(mapForGet.get("normal"));
             Integer abnormal = NumberUtils.toInt(mapForGet.get("abnormal"));
-            int i = all - normal - abnormal;
-            i = Math.max(i, 0);
-            String progress = String.format("%.2f", 100F * (normal + abnormal) / all);
+
+            float taskProgress = MapUtils.getFloat(mapForGet, "taskProgress");
+            float estimated = (1-taskProgress) * (normal + abnormal)/taskProgress;
+
+            String progress = String.format("%.2f", 100F * taskProgress);
             item.put("task_progress", progress + "%");
 
-            item.put("task_estimated_time", i * 60 * 5);
+            item.put("task_estimated_time", (int)(estimated * 60 * 5));
             item.put("description", "");
             items.add(item);
             xmlBaseModel.setItems(items);
@@ -2315,7 +2312,7 @@ public class UPatrolTaskService {
 
         // 存储执行完成的instanceId
         redisTemplate.opsForSet().add(countAbnormal, insIds);
-        redisTemplate.expire(countAbnormal, 3, TimeUnit.DAYS);
+        redisTemplate.expire(countAbnormal, 7, TimeUnit.DAYS);
 
         abnormalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL);
         normalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_NORMAL);
@@ -2351,10 +2348,10 @@ public class UPatrolTaskService {
         }
 
         redisTemplate.opsForHash().putAll(strForCountAll, resultCountsMap);
-        redisTemplate.expire(strForCountAll, 3, TimeUnit.DAYS);
+        redisTemplate.expire(strForCountAll, 7, TimeUnit.DAYS);
 
-        redisTemplate.opsForHash().putAll(strForCountAll, resultCountsMap);
-        redisTemplate.expire(strForCountAll, 3, TimeUnit.DAYS);
+        String cruiseDeviceKey = TASK_LOWER_REDIS_KEY + taskId + ":cruiseDevice";
+        redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
 
         // 压测模式减少非必要消息传输
         if (!Constant.fastTurbo()) {
@@ -3162,7 +3159,7 @@ public class UPatrolTaskService {
                 if (interDevice) {
                     String highKey = TASK_LOWER_REDIS_KEY + htId;
                     redisTemplate.opsForSet().add(highKey, taskId);
-                    redisTemplate.expire(highKey, 3, TimeUnit.DAYS);
+                    redisTemplate.expire(highKey, 7, TimeUnit.DAYS);
                     pauseFlag = true;
                 }
             }
@@ -3544,7 +3541,7 @@ public class UPatrolTaskService {
             uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
         }
 
-        redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTask.getTaskId(),"done",3,TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(TASK_RETRY_PREFIX + uPatrolTask.getTaskId(), "done", 7, TimeUnit.DAYS);
 
         List<Long> instanceList = insertTaskAttrForRetry(uPatrolTask, tCruiseTaskAdd,instanceIdList);
         if (CollectionUtils.isEmpty(instanceList)) {
@@ -3713,6 +3710,7 @@ public class UPatrolTaskService {
             robotTaskInfo.setRobotCode(item);
             robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
             robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
+            robotTaskInfo.setIsenable("0");
 
             // 根据任务信息及协议组装任务信息
             packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);

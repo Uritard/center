@@ -1,5 +1,6 @@
 package com.yjh.platform.module.iot.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
@@ -16,6 +17,7 @@ import com.yjh.platform.module.iot.entity.TIotDeviceExtend;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.service.TIotDevicePointService;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,10 +29,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author YIJIAHE
@@ -65,12 +65,26 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         if (iotDevice instanceof TIotDeviceExtend) {
             // 自动创建第一个通道
             TIotDeviceExtend iotExtend = (TIotDeviceExtend)iotDevice;
-            TIotDevicePoint devicePoint =
-                new TIotDevicePoint().setIotDeviceId(iotExtend.getId()).setIotDeviceName(iotExtend.getDeviceName()).setChannelNum("1")
-                    .setPointName(Optional.ofNullable(iotExtend.getPointName()).orElse(iotExtend.getDeviceName()))
-                    .setExtend(iotExtend.getExtend()).setUnit(iotExtend.getUnit());
-            tIotDevicePointService.save(devicePoint);
+            List<TIotDevicePoint> devicePoints = iotExtend.getPointList();
+            // 校验通道号
+            channelNumCheck(devicePoints);
+
+            devicePoints.forEach(d -> {
+                d.setIotDeviceId(iotExtend.getId());
+                d.setIotDeviceName(iotExtend.getDeviceName());
+            });
+            if(Constant.logUpLv2()) {
+                log.info("IotDevice pointsAdd: {}", JSON.toJSONString(devicePoints));
+            }
+            tIotDevicePointService.saveBatch(devicePoints);
         }
+
+        // 15 s后将设备加入到采集列表中，并触发一次采集
+        String scheduleTaskId = "IotDevice_" + iotDevice.getId();
+        ScheduledMapConfig.schedule(scheduleTaskId, 15, iotDevice, (device)->{
+            Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/add?id={0}", Result.class, device.getId());
+            log.info("add device collect, {}", result);
+        });
 
         return ret;
     }
@@ -79,10 +93,68 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
     public boolean updateById(TIotDevice iotDevice) {
         boolean ret = super.updateById(iotDevice);
 
+        if (iotDevice instanceof TIotDeviceExtend) {
+            // 自动创建第一个通道
+            TIotDeviceExtend iotExtend = (TIotDeviceExtend)iotDevice;
+            List<TIotDevicePoint> devicePoints = iotExtend.getPointList();
+            // 校验通道号
+            channelNumCheck(devicePoints);
+
+            List<TIotDevicePoint> devicePointsOld = tIotDevicePointService.listByDeviceId(iotDevice.getId());
+            Map<String, TIotDevicePoint> pointMap = devicePointsOld.stream().collect(Collectors.toMap(TIotDevicePoint::getChannelNum, s->s, (e1,e2)->e1));
+
+            List<TIotDevicePoint> pointsInsert = new ArrayList<>();
+            List<TIotDevicePoint> pointsUpdate = new ArrayList<>();
+
+            devicePoints.forEach(d -> {
+                d.setIotDeviceId(iotExtend.getId());
+                d.setIotDeviceName(iotExtend.getDeviceName());
+                if (d.getId() == null) {
+                    TIotDevicePoint pold = pointMap.get(d.getChannelNum());
+                    if (pold != null) {
+                        d.setId(pold.getId());
+                    }
+                }
+                if (d.getId() == null) {
+                    pointsInsert.add(d);
+                } else {
+                    pointsUpdate.add(d);
+                }
+            });
+            List<Long> pointsDelete = devicePointsOld.stream().map(TIotDevicePoint::getId)
+                .filter(id -> devicePoints.stream().noneMatch(p2 -> p2.getId() != null && id.equals(p2.getId())))
+                .collect(Collectors.toList());
+            if (!pointsInsert.isEmpty()) {
+                if(Constant.logUpLv2()) {
+                    log.info("IotDevice pointsInsert: {}", JSON.toJSONString(pointsInsert));
+                }
+                tIotDevicePointService.saveBatch(pointsInsert);
+            }
+            if (!pointsUpdate.isEmpty()) {
+                if(Constant.logUpLv2()) {
+                    log.info("IotDevice pointsUpdate: {}", JSON.toJSONString(pointsUpdate));
+                }
+                tIotDevicePointService.updateBatchById(pointsUpdate);
+            }
+            if (!pointsDelete.isEmpty()) {
+                if(Constant.logUpLv2()) {
+                    log.info("IotDevice pointsDelete: {}", JSON.toJSONString(pointsDelete));
+                }
+                tIotDevicePointService.removeByIds(pointsDelete);
+            }
+        }
+
         Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/update?id={0}", Result.class, iotDevice.getId());
         log.info("update device collect, {}", result);
 
         return ret;
+    }
+
+    private void channelNumCheck(List<TIotDevicePoint> devicePoints) {
+        long disCount = devicePoints.stream().map(TIotDevicePoint::getChannelNum).filter(StringUtils::isNotBlank).distinct().count();
+        if (disCount != devicePoints.size()) {
+            throw new BusinessException(ResultCodeEnum.CODE10005, "通道号不可重复不可为空");
+        }
     }
 
     @Override
@@ -91,6 +163,10 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         QueryWrapper<TIotDevicePoint> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("iot_device_id", id);
         tIotDevicePointService.remove(queryWrapper);
+
+        // 取消定时器
+        String scheduleTaskId = "IotDevice_" + id;
+        ScheduledMapConfig.remove(scheduleTaskId);
 
         Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/delete?id={0}", Result.class, id);
         if (!(Optional.ofNullable(result).orElseThrow(() -> new BusinessException(ResultCodeEnum.CODE10001, "调用接口删除数据采集失败"))

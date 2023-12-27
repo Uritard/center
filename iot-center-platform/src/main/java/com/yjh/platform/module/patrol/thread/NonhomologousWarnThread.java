@@ -527,7 +527,7 @@ public class NonhomologousWarnThread implements Runnable{
         triphaseRetMap.put(instanceId, robotInsResult + "_" + desc);
 
         redisTemplate.opsForHash().putAll(triphaseKey, triphaseRetMap);
-        redisTemplate.expire(triphaseKey, 3, TimeUnit.DAYS);
+        redisTemplate.expire(triphaseKey, 7, TimeUnit.DAYS);
 
         triphaseNameMap.put(MapUtils.getString(map, "instanceOneId"), MapUtils.getString(map, "instanceOneName"));
         triphaseNameMap.put(MapUtils.getString(map, "instanceTwoId"), MapUtils.getString(map, "instanceTwoName"));

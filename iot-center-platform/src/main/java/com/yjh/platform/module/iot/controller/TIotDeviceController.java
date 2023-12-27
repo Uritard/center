@@ -65,7 +65,7 @@ public class TIotDeviceController {
     @ApiOperation(value = "更新物联设备配置")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "更新物联设备配置", content = "新增物联设备配置", logType = 3, authority = "1234")
-    public Result update(@RequestBody @Validated TIotDevice tIotDevice) {
+    public Result update(@RequestBody @Validated TIotDeviceExtend tIotDevice) {
         Result result = new Result();
         try {
             result.setData(tIotDeviceService.updateById(tIotDevice));

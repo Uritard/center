@@ -43,9 +43,14 @@ public class DataCollectTask implements Runnable {
 
     @Override
     public void run() {
-        Map<String, List<IotDevice>> deviceGroup = devices.stream().collect(Collectors.groupingBy(d -> d.getIp() + ":" + d.getPort()));
-        for (List<IotDevice> des : deviceGroup.values()) {
-            asyncExecutor.execute(() -> collectMeter(des));
+        try {
+            log.info("开始数据采集，Size: {}", devices.size());
+            Map<String, List<IotDevice>> deviceGroup = devices.stream().collect(Collectors.groupingBy(d -> d.getIp() + ":" + d.getPort()));
+            for (List<IotDevice> des : deviceGroup.values()) {
+                asyncExecutor.execute(() -> collectMeter(des));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
     }
 

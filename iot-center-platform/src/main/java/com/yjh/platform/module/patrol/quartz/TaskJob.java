@@ -257,7 +257,7 @@ public class TaskJob extends QuartzJobBean {
                 if (CollectionUtils.isNotEmpty(interList)) {
                     String lowTaskKey = UPatrolTaskService.TASK_LOWER_REDIS_KEY + taskId;
                     redisTemplate.opsForSet().add(lowTaskKey, interList.toArray(new String[0]));
-                    redisTemplate.expire(lowTaskKey, 3, TimeUnit.DAYS);
+                    redisTemplate.expire(lowTaskKey, 7, TimeUnit.DAYS);
                     //将低优先任务暂停
                     interList.forEach(lowTask -> uPatrolTaskService.taskPauseWithoutRobot(lowTask));
                 }

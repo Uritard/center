@@ -129,4 +129,11 @@ public class ScheduledMapConfig {
             }, seconds, TimeUnit.SECONDS);
         }
     }
+
+    public static void remove(String taskId) {
+        if (StringUtils.isNotEmpty(taskId)) {
+            ScheduledFuture<?> future = SCHEDULED_FUTURE_MAP.remove(taskId);
+            future.cancel(true);
+        }
+    }
 }
