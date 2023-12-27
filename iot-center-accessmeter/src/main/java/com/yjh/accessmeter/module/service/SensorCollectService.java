@@ -8,6 +8,7 @@ import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
+import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
@@ -40,6 +41,8 @@ public class SensorCollectService {
     private ThreadPoolTaskExecutor asyncExecutor;
     @Resource
     private TIotDeviceDao iotDeviceDao;
+    @Resource
+    private PlatformProxy platformProxy;
 
     private static final Map<Integer, DataCollectTask> COLLECT_TASK_MAP = new HashMap<>(8);
 
@@ -70,7 +73,7 @@ public class SensorCollectService {
                 .collect(Collectors.groupingBy(IotDevice::getCollectionFrequency));
 
             freSet.forEach((k, v) -> taskScheduler.scheduleAtFixedRate(
-                COLLECT_TASK_MAP.compute(k, (k1, v1) -> new DataCollectTask(v, iotDeviceDao, asyncExecutor)),
+                COLLECT_TASK_MAP.compute(k, (k1, v1) -> new DataCollectTask(v, iotDeviceDao, asyncExecutor, platformProxy)),
                 Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(k)));
         } catch (Exception e) {
             log.error("初始化设备连接出错", e);
@@ -105,12 +108,19 @@ public class SensorCollectService {
                     sensorProtocol.init(Collections.singletonList(device));
                 }
 
-                COLLECT_TASK_MAP.compute(device.getCollectionFrequency(),
-                    (k1, v1) -> new DataCollectTask(Collections.singletonList(device), iotDeviceDao, asyncExecutor));
+                COLLECT_TASK_MAP.compute(device.getCollectionFrequency(), (k1, v1) -> {
+                    if (v1 == null) {
+                        return new DataCollectTask(Collections.singletonList(device), iotDeviceDao, asyncExecutor, platformProxy);
+                    } else {
+                        v1.addDevice(device, collectImmediate);
+                        return v1;
+                    }
+                });
             }
         } else {
             dataCollectTask.addDevice(device, collectImmediate);
         }
+        log.info("新增数据采集 device:{}", device);
 
         return true;
     }
@@ -139,7 +149,7 @@ public class SensorCollectService {
             log.info("没有查到设备配置 id:{}", id);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
         }
-
+        log.info("更新数据采集 device:{}", device);
         delete(device);
         return add(device, false);
     }
@@ -150,6 +160,7 @@ public class SensorCollectService {
             log.info("没有查到设备配置 id:{}", id);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
         }
+
         DataCollectTask dataCollectTask = COLLECT_TASK_MAP.get(device.getCollectionFrequency());
         if (dataCollectTask != null) {
             dataCollectTask.collectMeter(Collections.singletonList(device));

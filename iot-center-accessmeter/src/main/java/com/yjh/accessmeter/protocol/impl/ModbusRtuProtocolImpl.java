@@ -66,17 +66,17 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
             for (IotDevicePoint point : devicePoints) {
                 ModbusExtend ext = JSON.parseObject(point.getExtend(), ModbusExtend.class);
                 int dataType = ext.getDataType() == null || ext.getDataType() == 0 ? DataType.TWO_BYTE_INT_SIGNED : ext.getDataType();
-                batch.addLocator(point.getChannelNum(), BaseLocator.holdingRegister(ext.getSlaveId(), ext.getStart(), dataType));
+                batch.addLocator(NumberUtils.toInt(point.getChannelNum()), BaseLocator.holdingRegister(ext.getSlaveId(), ext.getStart(), dataType));
             }
 
             BatchResults<Number> results = master.send(batch);
-            LOGGER.info("BatchResults: {}", results);
+            LOGGER.info("Device: {}  BatchResults: {}", device, results);
 
             for (IotDevicePoint point : devicePoints) {
                 ResultMete mete = new ResultMete();
-                int channel = point.getChannelNum();
+                String channel = point.getChannelNum();
 
-                Number ret = (Number)results.getValue(channel);
+                Number ret = (Number)results.getValue(NumberUtils.toInt(channel));
                 double value = ret.doubleValue();
                 if (device.getMagnificationCoefficient() != null) {
                     value = device.getMagnificationCoefficient() * value;
@@ -127,11 +127,11 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
         modbusRtuProtocol.init(Collections.singletonList(device));
 
         IotDevicePoint point = new IotDevicePoint();
-        point.setChannelNum(1).setExtend("{\"slaveId\": 1,\"start\": \"67\"}");
+        point.setChannelNum("1").setExtend("{\"slaveId\": 1,\"start\": \"67\"}");
 
-        IotDevicePoint point2 = new IotDevicePoint().setChannelNum(2).setExtend("{\"slaveId\": 1,\"start\": \"68\"}");
-        IotDevicePoint point3 = new IotDevicePoint().setChannelNum(3).setExtend("{\"slaveId\": 1,\"start\": \"69\"}");
-        IotDevicePoint point4 = new IotDevicePoint().setChannelNum(4).setExtend("{\"slaveId\": 1,\"start\": \"70\"}");
+        IotDevicePoint point2 = new IotDevicePoint().setChannelNum("2").setExtend("{\"slaveId\": 1,\"start\": \"68\"}");
+        IotDevicePoint point3 = new IotDevicePoint().setChannelNum("3").setExtend("{\"slaveId\": 1,\"start\": \"69\"}");
+        IotDevicePoint point4 = new IotDevicePoint().setChannelNum("4").setExtend("{\"slaveId\": 1,\"start\": \"70\"}");
 
         List<ResultMete> metes = modbusRtuProtocol.send(device, Arrays.asList(point, point2, point3, point4));
         System.out.println(JSON.toJSONString(metes));

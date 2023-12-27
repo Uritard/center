@@ -1,35 +1,31 @@
 package com.yjh.platform.module.iot.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
-import com.yjh.platform.module.device.entity.TStdRegion;
-import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
-import com.yjh.platform.module.iot.entity.TIotDevice;
-import com.yjh.platform.module.iot.service.TIotDeviceDataService;
-import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
-import com.yjh.platform.module.iot.service.TIotDeviceService;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.TIotDeviceData;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
-import com.yjh.platform.module.task.entity.BrokenLineInfo;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.KeyValue;
-import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -183,6 +179,26 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
             return this.saveBatch(insertList);
         }
         return false;
+    }
+
+    @Override
+    public Boolean addToRedis(List<IotDeviceDataEx> dataList) {
+        Map<Long, List<IotDeviceDataEx>> groupData = dataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
+
+        redisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public Object execute(RedisOperations operations) throws DataAccessException {
+                groupData.forEach((k, v) -> {
+                    Map<String, String> valMap = v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, d-> d.getValue() + Optional.ofNullable(d.getUnit()).orElse("")));
+                    valMap.put("time", DateTimeUtil.format(v.get(0).getCreateTime()));
+                    String key = "EnvDevice:" + k;
+                    operations.opsForHash().putAll(key, valMap);
+                });
+                return null;
+            }
+        });
+
+        return true;
     }
 
     private void iotDeviceDataUpload(List<IotDeviceDataEx> deviceDataList){

@@ -82,7 +82,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         // 15 s后将设备加入到采集列表中，并触发一次采集
         String scheduleTaskId = "IotDevice_" + iotDevice.getId();
         ScheduledMapConfig.schedule(scheduleTaskId, 15, iotDevice, (device)->{
-            Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/add?id={0}", Result.class, device.getId());
+            Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/add?id={0}", Result.class, device.getId());
             log.info("add device collect, {}", result);
         });
 
@@ -144,7 +144,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             }
         }
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/update?id={0}", Result.class, iotDevice.getId());
+        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/update?id={0}", Result.class, iotDevice.getId());
         log.info("update device collect, {}", result);
 
         return ret;
@@ -168,7 +168,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         String scheduleTaskId = "IotDevice_" + id;
         ScheduledMapConfig.remove(scheduleTaskId);
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_METER_URL + "/delete?id={0}", Result.class, id);
+        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/delete?id={0}", Result.class, id);
         if (!(Optional.ofNullable(result).orElseThrow(() -> new BusinessException(ResultCodeEnum.CODE10001, "调用接口删除数据采集失败"))
             .isSuccess())) {
             throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());

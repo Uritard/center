@@ -96,6 +96,11 @@ public class IotDevice {
      */
     private String unit;
 
+    /**
+     * 是否可以控制 0-不可控制 1-可以控制
+     */
+    private Integer controllable;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
