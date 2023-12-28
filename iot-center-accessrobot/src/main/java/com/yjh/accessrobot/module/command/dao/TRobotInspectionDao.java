@@ -41,7 +41,7 @@ public interface TRobotInspectionDao {
     int batchInsertTRobotInspection(List<TRobotInspection> list);
     List<String> selectAllByRobotId(@Param(value = "robotId") Long robotId);
 
-    List<Long> selectInspectionIdList(List<String> list);
+    List<Long> selectInspectionIdList(@Param(value = "list") List<String> list, @Param(value = "robotId") Long robotId);
     List<Long> selectInstanceIdList(List<Long> list);
     int batchDeleteTRobotInspection(List<Long> list);
     int batchDeleteTDeviceMete(List<Long> list);
