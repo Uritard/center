@@ -909,7 +909,7 @@ public class RobotService {
         log.info("最后要插库的deviceList是==={}", newInspectionList.size());
         log.info("准备要删除的inspectionCodeList是==={}", nowInspectionList.size());
         if (CollectionUtils.isNotEmpty(nowInspectionList)) {
-            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowInspectionList);
+            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowInspectionList, robotId);
             //            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
             List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
             //            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);

@@ -2020,7 +2020,7 @@ CREATE TABLE `t_std_region` (
   `longitude` varchar(32) DEFAULT NULL COMMENT '经度',
   `latitude` varchar(32) DEFAULT NULL COMMENT '纬度',
   `voltage_level` varchar(32) DEFAULT NULL COMMENT '电压层级',
-  `commissioning_time` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '投运时间',
+  `commissioning_time` varchar(32) DEFAULT NULL COMMENT '投运时间',
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`region_id`) USING BTREE,
@@ -2662,7 +2662,7 @@ CREATE TABLE `a_interface_task_info` (
 `isenable` varchar(5) DEFAULT NULL COMMENT '是否可用 <0>: = 可用<1>: = 不可用 2 删除',
 `creator` varchar(32) DEFAULT NULL COMMENT '编制人',
 `create_time` varchar(32) DEFAULT NULL COMMENT '编制时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='A接口任务信息';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='A接口任务信息';
 
 DROP TABLE IF EXISTS `t_meter`;
 CREATE TABLE `t_meter` (
@@ -2703,7 +2703,7 @@ CREATE TABLE `t_meter_log` (
 `create_person` varchar(20) NOT NULL COMMENT '创建人',
 `update_time` datetime NOT NULL COMMENT '更新时间',
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
-`is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
+`is_deleted` int DEFAULT '0' COMMENT '是否删除 0 未删除 2 已删除',
 `total_positive_power_difference_value` varchar(256) DEFAULT '0' COMMENT '正向有功总电量与上一次的差值',
 `magnification_coefficient` int DEFAULT '1' COMMENT '电表耗电量计算系数',
 PRIMARY KEY (`id`)
@@ -2747,7 +2747,7 @@ CREATE TABLE `t_std_weather_log` (
 `update_time` datetime NOT NULL COMMENT '更新时间',
 `create_person` varchar(20) NOT NULL COMMENT '创建人',
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
-`is_deleted` int DEFAULT '0' COMMENT '是否删除\r\n0 未删除\r\n2 已删除',
+`is_deleted` int DEFAULT '0' COMMENT '是否删除 0 未删除 2 已删除',
 PRIMARY KEY (`id`),
 KEY `IDX_DEVICE_ROBOT` (`device_id`,`robot_code`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4 COMMENT='环控信息';
@@ -2763,7 +2763,7 @@ CREATE TABLE `t_camera_play_log` (
  `user_name` varchar(20) DEFAULT NULL COMMENT '用户名',
  PRIMARY KEY (`id`),
  KEY `idx_camera_user` (`camera_id`,`user_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='相机播放记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='相机播放记录';
 
 DROP TABLE IF EXISTS `t_iot_device`;
 CREATE TABLE `t_iot_device` (
