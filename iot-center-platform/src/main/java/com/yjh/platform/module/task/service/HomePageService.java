@@ -39,6 +39,7 @@ import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.util.Asserts;
@@ -493,11 +494,11 @@ public class HomePageService {
 
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
         StationCount sta = new StationCount();
-        sta.setType("环控设备");
+        sta.setType("物联设备");
         int staSize;
         //环控数量
-        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
-        staSize = envReginIdList.stream().map(this::queryWeatherInfo).filter(list -> list != null && list.size() > 0).mapToInt(List::size).sum();
+        List<IotDeviceDataEx> iotDeviceDataList = this.queryIotDeviceDataEx(regionIdList);
+        staSize = iotDeviceDataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName)).size();
         sta.setCount(staSize);
         List<StationCount> stationCounts;
         if ("1".equals(type)) {
@@ -519,9 +520,11 @@ public class HomePageService {
         StationDetail stationDetail = new StationDetail();
         stationDetail.setStationCounts(this.queryStations(regionId, "2"));
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-        List<EnvDeviceStatus> envDeviceStatusList = this.queryWeatherInfos(regionIdList);
-        envDeviceStatusList = envDeviceStatusList.stream().filter(e -> StringUtils.equals(e.getShowType(), "2")).limit(6).collect(Collectors.toList());
-        stationDetail.setEnvDeviceStatuses(envDeviceStatusList);
+        List<IotDeviceDataEx> iotDeviceDataList = this.queryIotDeviceDataEx(regionIdList);
+        iotDeviceDataList = iotDeviceDataList.stream().
+                filter(iot -> ArrayUtils.contains(new Integer[]{850, 851, 852, 858, 859, 860, 861}, iot.getIotDeviceType()))
+                .limit(6).collect(Collectors.toList());
+        stationDetail.setIotDeviceDataExList(iotDeviceDataList);
         List<RegionVideo> regionVideoList = tCruiseTaskDao.queryRegionVideoList(regionIdList);
         Map<String, String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
@@ -554,37 +557,8 @@ public class HomePageService {
         return tDefectInfoDao.selectDeviceWarnInfo(state);
     }
 
-    public List<EnvDeviceStatus> queryWeatherInfos(List<Long> regionIdList) {
-        List<TStdRegion> regions = tStdRegionService.queryAll();
-        Map<Long, String> regionMap = regions.stream().collect(Collectors.toMap(TStdRegion::getRegionId, TStdRegion::getRegionName));
-
-        List<Long> envReginIdList = tRobotInfoDao.selectAllEnvRegionId(regionIdList);
-        List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
-        for (Long aLong : envReginIdList) {
-            List<EnvDeviceStatus> envDeviceStatuses = queryWeatherInfo(aLong, regionMap.getOrDefault(aLong, ""));
-            if (CollectionUtils.isNotEmpty(envDeviceStatuses)) {
-                envDeviceStatusList.addAll(envDeviceStatuses);
-            }
-        }
-        return envDeviceStatusList;
-    }
-
-    public List<EnvDeviceStatus> queryWeatherInfo(Long regionId) {
-        return queryWeatherInfo(regionId, null);
-    }
-
-    public List<EnvDeviceStatus> queryWeatherInfo(Long regionId, String regionName) {
-        String envDataJson = getRedisMapString("Weather", regionId.toString());
-        List<EnvDeviceStatus> queryEnvDeviceInfo = new ArrayList<>();
-
-        if (StringUtils.isNotEmpty(envDataJson)) {
-            JSONArray objects = JSONArray.parseArray(envDataJson);
-            queryEnvDeviceInfo = objects.toJavaList(EnvDeviceStatus.class);
-        }
-        if (StringUtils.isNotEmpty(regionName)) {
-            queryEnvDeviceInfo.forEach(d -> d.setRegionName(regionName));
-        }
-        return queryEnvDeviceInfo;
+    public List<IotDeviceDataEx> queryIotDeviceDataEx(List<Long> regionIdList) {
+        return tIotDeviceDataService.selectIotDataEx(regionIdList);
     }
 
     /**

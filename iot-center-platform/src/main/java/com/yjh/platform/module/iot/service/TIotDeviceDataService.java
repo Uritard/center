@@ -19,6 +19,8 @@ public interface TIotDeviceDataService extends IService<TIotDeviceData> {
 
     List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime);
 
+    List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList);
+
     Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 
     Boolean addToRedis(List<IotDeviceDataEx> dataList);
