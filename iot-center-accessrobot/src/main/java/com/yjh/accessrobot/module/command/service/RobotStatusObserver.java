@@ -23,16 +23,17 @@ public class RobotStatusObserver {
     private static final Object platformRobotStatusLock = new Object();
 
     public static void postNetStatus(String patrolDeviceName, String patrolDeviceCode, String netStatus) {
-        boolean flag = false;
-        synchronized (platformRobotStatusLock) {
-            if (!netStatus.equals(platformRobotStatus.getNetStatus())) {
-                platformRobotStatus.setNetStatus(netStatus);
-                flag = true;
-            }
-        }
-        if (flag) {
+        //跨级上报通信状态会存在上报不及时
+//        boolean flag = false;
+//        synchronized (platformRobotStatusLock) {
+//            if (!netStatus.equals(platformRobotStatus.getNetStatus())) {
+//                platformRobotStatus.setNetStatus(netStatus);
+//                flag = true;
+//            }
+//        }
+//        if (flag) {
             send(patrolDeviceName, patrolDeviceCode, netStatus);
-        }
+//        }
     }
 
     private static void send(String patrolDeviceName, String patrolDeviceCode, String status) {
