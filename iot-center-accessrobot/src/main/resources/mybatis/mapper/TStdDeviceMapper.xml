@@ -374,7 +374,7 @@
         point.id as pointId
         from t_iot_device device
         left join t_iot_device_point point on device.id = point.iot_device_id
-        where origin_id in
+        where device.origin_id in
         <foreach collection="list" item="map" open="(" close=")" separator=",">
             #{map.iotDeviceId}
         </foreach>

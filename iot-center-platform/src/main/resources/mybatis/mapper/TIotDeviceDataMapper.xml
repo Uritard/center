@@ -65,6 +65,5 @@
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}
             </foreach></if>
-        group by point.point_name
     </select>
 </mapper>
