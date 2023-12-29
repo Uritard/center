@@ -343,31 +343,6 @@ public class HomePageController {
      * 查詢微气象数据信息
      * station  站所id
      */
-    @ApiOperation(value = "查询微气象数据信息")
-    @RequestMapping(value = "/queryWeatherInfo", method = RequestMethod.POST)
-    @Logs(title = "查询微气象数据信息",content = "根据用户传递的参数查询微气象数据信息",logType = 1, authority = "1235")
-    public Result queryWeatherInfo(@RequestBody JSONObject object){
-        Long regionId = object.getLong("regionId");
-        Result result = new Result();
-        try {
-            if (Objects.isNull(regionId)){
-                result.setData(homePageService.queryWeatherInfos(null));
-            }else {
-                List<Long> regionList = tStdRegionService.selectDownId(regionId);
-                result.setData(homePageService.queryWeatherInfos(regionList));
-            }
-            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-        }catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询微气象数据信息错误:", e);
-        }
-        return result;
-    }
-
-    /**
-     * 查詢微气象数据信息
-     * station  站所id
-     */
     @ApiOperation(value = "统计微气象数据信息")
     @RequestMapping(value = "/queryWeatherLog", method = RequestMethod.POST)
     @Logs(title = "统计微气象数据信息", content = "根据用户传递的参数查询微气象数据信息", logType = 1, authority = "1235")

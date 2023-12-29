@@ -48,19 +48,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     @Override
     public List<Map<String, Object>> selectIotData(Long upRegionId) {
         List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
-        List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
-        tIotDeviceList.forEach(data ->{
-            if (data.getChannelNum() != null){
-                String key = Constant.envKey+data.getIotDeviceId();
-                Map<String,String> map = redisTemplate.opsForHash().entries(key);
-                String value = map.get(data.getChannelNum());
-                data.setValue(ValueUtil.getOrDefault(value,""));
-                data.setCreateTime(DateTimeUtil.parse(map.get("time")));
-                data.setState(ValueUtil.getOrDefault(map.get("state"),"0"));
-                data.setType(ValueUtil.getOrDefault(map.get("type"),"0"));
-            }
-
-        });
+        List<IotDeviceDataEx> tIotDeviceList = this.selectIotDataEx(regionList);
         Map<String, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
@@ -78,6 +66,23 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
             resultList.add(map);
         });
         return resultList;
+    }
+
+    @Override
+    public List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList) {
+        List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
+        tIotDeviceList.forEach(data ->{
+            if (data.getChannelNum() != null){
+                String key = Constant.envKey+data.getIotDeviceId();
+                Map<String,String> map = redisTemplate.opsForHash().entries(key);
+                String value = map.get(data.getChannelNum());
+                data.setValue(ValueUtil.getOrDefault(value,""));
+                data.setCreateTime(DateTimeUtil.parse(map.get("time")));
+                data.setState(ValueUtil.getOrDefault(map.get("state"),"0"));
+                data.setType(ValueUtil.getOrDefault(map.get("type"),"0"));
+            }
+        });
+        return tIotDeviceList;
     }
 
     @Override

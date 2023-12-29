@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.task.entity.input.RegionVideo;
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class StationDetail {
 
     List<StationCount> stationCounts;
 
-    List<EnvDeviceStatus> envDeviceStatuses;
+    List<IotDeviceDataEx> iotDeviceDataExList;
 
     List<RegionVideo> regionVideos;
 
