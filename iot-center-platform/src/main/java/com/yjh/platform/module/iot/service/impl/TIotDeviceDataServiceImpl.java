@@ -49,11 +49,11 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     public List<Map<String, Object>> selectIotData(Long upRegionId) {
         List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
         List<IotDeviceDataEx> tIotDeviceList = this.selectIotDataEx(regionList);
-        Map<String, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName));
+        Map<Long, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
             Map<String, Object> map = new HashMap<>(4);
-            map.put("iotName", k);
+            map.put("iotName", v.get(0).getIotDeviceName());
             map.put("iotDeviceId", v.get(0).getIotDeviceId());
             map.put("controllable", v.get(0).getControllable());
             map.put("iotDeviceType", v.get(0).getIotDeviceType());
