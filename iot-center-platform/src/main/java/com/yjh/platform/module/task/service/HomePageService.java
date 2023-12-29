@@ -498,7 +498,7 @@ public class HomePageService {
         int staSize;
         //环控数量
         List<IotDeviceDataEx> iotDeviceDataList = this.queryIotDeviceDataEx(regionIdList);
-        staSize = iotDeviceDataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceName)).size();
+        staSize = iotDeviceDataList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId)).size();
         sta.setCount(staSize);
         List<StationCount> stationCounts;
         if ("1".equals(type)) {
