@@ -2581,13 +2581,18 @@ public class RobotService {
 
     /**
      * 智能环境设备控制指令
+     * 1.deviceId   环控设备序列号
+     * 2.deviceStatus  1. 打开  2.关闭
+     * 3. deviceAttr  类型空调  1.制冷  2. 制热
+     * 4.deviceType 环控设备类型 type
+     * 5.type= 26 环境设备开关控制
      */
-    public Result robotControl(HashMap<String, String> map) {
-        log.info("下发智能环境设备控制指令,map===" + map);
+    public Result envDeviceControl(JSONObject jsonObject) {
+        log.info("下发智能环境设备控制指令,map===" + jsonObject);
 
         Result result = new Result();
         try {
-            String robotCode = map.get("robotCode");
+            String robotCode = jsonObject.getString("robotCode");
             log.info("sendCode:{},robotCode:{}====", Constant.sendCode(), robotCode);
             if (StringUtils.isEmpty(robotCode)) {
                 log.error("当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
@@ -2602,14 +2607,14 @@ public class RobotService {
                     result.setMessage(200, "该环控设备处于离线状态,没有成功将控制指令下发到环控设备......");
                 } else {
                     log.info("开始生成xml");
-                    String type = map.get("type");
-                    String cmd = map.get("deviceStatus");
-                    String value = map.get("deviceAttr");
-                    String deviceType = map.get("deviceType");
-                    String deviceId = map.get("deviceId");
+                    String type = "26";
+                    String cmd = jsonObject.getString("deviceStatus");
+                    String deviceType = jsonObject.getString("deviceType");
+                    String deviceId = jsonObject.getString("deviceId");
                     List<Map<String, Object>> Item = new LinkedList<>();
                     Map<String, Object> maps = new HashMap<>();
                     if (StringUtils.equals("2107", deviceType)) {  //7.空调
+                        String value = jsonObject.getString("deviceAttr");
                         maps.put("value", value);
                     }
                     Item.add(maps);

@@ -56,11 +56,15 @@
         point.point_name,
         device.iot_device_type,
         device.controllable,
-        point.unit
+        point.unit,
+        robot.robot_code,
+        b.up_dict AS type
         FROM
         t_iot_device device
         LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
-        where 1 = 1
+        LEFT JOIN t_robot_info robot ON robot.robot_ip = device.ip
+        LEFT JOIN t_dict_business b ON device.iot_device_type = b.dict_code AND b.col_name = 'iot_device_type'
+        WHERE 1 = 1
         <if test="list.size > 0"> and device.up_region_id in
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}

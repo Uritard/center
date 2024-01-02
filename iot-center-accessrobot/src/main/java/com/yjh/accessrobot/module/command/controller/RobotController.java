@@ -351,11 +351,6 @@ public class RobotController {
 
     /**
      * 智能环境设备控制
-     * 1.deviceId   环控设备序列号
-     * 2.deviceStatus  1. 打开  2.关闭
-     * 3. deviceAttr  类型空调  1.制冷  2. 制热
-     * 4.deviceType 环控设备类型 type
-     * 5.tpe= 23 环境设备开关控制
      */
     @ApiOperation(value = "智能环境设备控制")
     @PostMapping(value = "/envDeviceControl")
@@ -365,27 +360,7 @@ public class RobotController {
         Result result = new Result();
         try {
             if (Objects.nonNull(jsonObject) && jsonObject.size() > 0) {
-                String regionId = jsonObject.get("regionId").toString();
-                String envDataJson = getRedisMapString("Weather", regionId);
-                List<EnvDeviceStatus> weather;
-                if (StringUtils.isNotEmpty(envDataJson)) {
-                    JSONArray objects = JSONArray.parseArray(envDataJson);
-                    weather = objects.toJavaList(EnvDeviceStatus.class);
-                    String robotCode = weather.get(0).getRobotCode();
-                    String deviceId = jsonObject.getString("deviceId");
-                    String deviceStatus = jsonObject.getString("deviceStatus");
-                    String deviceAttr = jsonObject.getString("deviceAttr");
-                    String deviceType = jsonObject.getString("deviceType");
-                    String type = "26";
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put("robotCode", robotCode);
-                    map.put("deviceId", deviceId);
-                    map.put("deviceStatus", deviceStatus);
-                    map.put("deviceAttr", deviceAttr);
-                    map.put("type", type);
-                    map.put("deviceType", deviceType);
-                    result = robotService.robotControl(map);
-                }
+                result = robotService.envDeviceControl(jsonObject);
             } else {
                 result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
                 return result;

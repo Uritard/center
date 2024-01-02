@@ -27,4 +27,6 @@ public class IotDeviceDataEx extends TIotDeviceData{
 
     private String type;
 
+    private String robotCode;
+
 }
