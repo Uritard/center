@@ -79,7 +79,6 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 data.setValue(ValueUtil.getOrDefault(value,""));
                 data.setCreateTime(DateTimeUtil.parse(map.get("time")));
                 data.setState(ValueUtil.getOrDefault(map.get("state"),"0"));
-                data.setType(ValueUtil.getOrDefault(map.get("type"),"0"));
             }
         });
         return tIotDeviceList;
