@@ -123,7 +123,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 dateIdx.put(time, dateLine);
             }
             // 将巡视设备编号作为数组下标，存入巡视设备对应巡视值，对“,”分割的值取前面部分（当前特指红外测点）
-            dateLine[dex] = StringUtils.substringBefore(vb.getValue(), ",");
+            dateLine[dex] = conventResult(StringUtils.substringBefore(vb.getValue(), ","));
         }
 
         // 初始化剩余行信息
@@ -152,6 +152,19 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         });
         line.addAll(Arrays.asList(dataLine));
         return line;
+    }
+
+    private String conventResult(String value) {
+        switch (value) {
+            case "正常":
+            case "开启":
+                return "1";
+            case "异常":
+            case "关闭":
+                return "-1";
+            default:
+                return value;
+        }
     }
 
     @Override
