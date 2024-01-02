@@ -52,14 +52,18 @@ public class Constant {
      * 正向无功 positive_reactive
      */
     public static final byte[] DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL = new byte[]{(byte) 0x10, (byte) 0x91};
-
-    public static final byte[] DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x03,(byte)0x00};
+    /**
+     * 第一象限无功总电能  电表显示  无功Ⅰ总
+     */
+    public static final byte[] DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x05,(byte)0x00};
     /**
      * 反向无功 negative_reactive
      */
     public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL = new byte[]{(byte) 0x20, (byte) 0x91};
-
-    public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x04,(byte)0x00};;
+    /**
+     * 第四象限无功总电能 电表显示  无功Ⅳ总
+     */
+    public static final byte[] DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007 = new byte[]{(byte)0x00,(byte)0x00,(byte)0x08,(byte)0x00};
 
     /**
      * 最小长度
