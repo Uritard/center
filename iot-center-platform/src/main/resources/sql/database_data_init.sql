@@ -766,19 +766,18 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `up_dict`, `remark`, `so
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `up_dict`, `remark`, `sort`) VALUES ('30','frequency','30 分钟','物联设备采集频率', 3);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `up_dict`, `remark`, `sort`) VALUES ('60','frequency','1 小时','物联设备采集频率', 4);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `up_dict`, `remark`, `sort`) VALUES ('240','frequency','4 小时','物联设备采集频率', 5);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('850', 'iot_device_type', '温度', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('851', 'iot_device_type', '湿度', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('852', 'iot_device_type', '风速', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('853', 'iot_device_type', '水泵', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('854', 'iot_device_type', '防盗', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('855', 'iot_device_type', '灯', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('856', 'iot_device_type', '空调', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('857', 'iot_device_type', '门禁', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('858', 'iot_device_type', 'SF6', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('859', 'iot_device_type', 'O3', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位传感器', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('850', 'iot_device_type', '温度', '1', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('851', 'iot_device_type', '湿度', '2', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('853', 'iot_device_type', '水泵', '2104', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('854', 'iot_device_type', '防盗', '2105', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('855', 'iot_device_type', '灯', '2106', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('856', 'iot_device_type', '空调', '2107', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('857', 'iot_device_type', '门禁', '2108', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('858', 'iot_device_type', 'SF6', '8', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('859', 'iot_device_type', 'O3', '2110', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '2111', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位传感器', '2112', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '2113', '环控设备类型', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
