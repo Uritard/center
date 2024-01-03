@@ -156,6 +156,11 @@ public class SystemConfigService {
                 if (port.equals(systemConfig.getConfigKey())){
                     Constant.getToOtherServer(Constant.UPDATE_ROBOT_SERVER);
                 }
+                String needConfirmSet = "needConfirmSet";
+                //修改密码校验的巡视设备控制命令
+                if (needConfirmSet.equals(systemConfig.getConfigKey())){
+                    Constant.getToOtherServer(Constant.SET_NEED_CONFIRM_SET);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
