@@ -465,8 +465,6 @@ public class Constant {
      */
     public static final String UPDATE_ROBOT_SERVER = "http://iot-center-accessrobot/robot/v1/updateRobotServer";
 
-    public static final String SET_NEED_CONFIRM_SET = "http://iot-center-accessrobot/robot/v1/setNeedConfirmSet";
-
     public static<T> void getToOtherServer(String url) throws Exception{
         Result re = new Result();
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class);

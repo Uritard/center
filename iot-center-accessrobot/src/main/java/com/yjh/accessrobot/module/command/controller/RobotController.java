@@ -447,18 +447,6 @@ public class RobotController {
         return result;
     }
 
-    @ApiOperation(value = "更新密码校验的巡视设备控制命令")
-    @RequestMapping(value = "/setNeedConfirmSet", method = RequestMethod.GET)
-    public Result setNeedConfirmSet() {
-        Result result = new Result();
-        try {
-            robotService.setNeedConfirmSet();
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("更新失败描述：", e);
-        }
-        return result;
-    }
 
     @ApiOperation(value = "测试收到消息")
     @RequestMapping(value = "/testRecMsg", method = RequestMethod.GET)
