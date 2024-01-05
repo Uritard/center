@@ -789,7 +789,7 @@ public class UPatrolTaskService {
                     .setCreateTime(createTime)
                     .setExecuteTime(startTime);
 
-            UPatrolTask taskExist = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode());
+            UPatrolTask taskExist = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode(), startTime);
             if (taskExist == null || (
                     !StringUtils.equals(taskId, taskExist.getTaskId()) &&
                             Optional.ofNullable(taskExist.getTaskSource()).orElse(0) == 1)) {

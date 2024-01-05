@@ -431,7 +431,7 @@
         <if test="executeTime != null">
             and b.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
         </if>
-        ORDER BY a.create_time desc
+        ORDER BY b.start_time desc
         LIMIT 1
     </select>
 
