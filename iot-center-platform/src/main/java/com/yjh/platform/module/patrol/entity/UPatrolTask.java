@@ -52,7 +52,7 @@ public class UPatrolTask implements Serializable {
     @ApiModelProperty(value = "定时时间类型（1.周，2.日）")
     private String dateType;
 
-    @ApiModelProperty(value = "任务来源（暂时没用）")
+    @ApiModelProperty(value = "任务来源")
     private Integer taskSource;
 
     @ApiModelProperty(value = "任务等级(从高到低):4级,3级,2级,1级")
