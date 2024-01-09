@@ -816,4 +816,24 @@ public class HomePageService {
         }
         return re;
     }
+
+    public List<String> queryWarningStation() {
+        List<String> warningRegions = new ArrayList<>();
+        List<TRobotInfo> tRobotInfos = tRobotInfoDao.selectAllRobotCode();
+        Map<String, List<TRobotInfo>> robotMap = tRobotInfos.stream().collect(Collectors.groupingBy(TRobotInfo::getEdgeCode));
+        robotMap.forEach((edgeCode, robotList) -> {
+            if (CollectionUtils.isEmpty(robotList)) return;
+            robotList.stream().forEach(tRobotInfo -> {
+                // 判断是否有离线机器人
+                Map<String, Object> robotStatus = redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":2");
+                if (robotStatus.size() != 0 && Optional.ofNullable(robotStatus.get("value")).isPresent()) {
+                    if ("1".equals(String.valueOf(robotStatus.get("value")))) {
+                        warningRegions.add(edgeCode);
+                        return;
+                    }
+                }
+            });
+        });
+        return warningRegions;
+    }
 }

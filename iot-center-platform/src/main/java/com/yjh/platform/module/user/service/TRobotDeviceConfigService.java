@@ -97,8 +97,11 @@ public class TRobotDeviceConfigService {
         return tRobotInfoDao.updateEntrance(robotId, entrance);
     }
 
-    public List<AreaInfo> selectDeviceTree(String name) {
-        List<TStdDevice> deviceConfigList = tRobotDeviceConfigDao.selectDeviceByName(name);
+    public List<AreaInfo> selectDeviceTree(String name,Long robotId) {
+        List<TStdDevice> deviceConfigList = tRobotDeviceConfigDao.selectDeviceByName(name,robotId);
+        if (deviceConfigList.isEmpty()){
+            return new ArrayList<>();
+        }
         return getDeviceAreaInfo(deviceConfigList);
     }
     private List<AreaInfo> getDeviceAreaInfo(List<TStdDevice> deviceConfigList){

@@ -41,5 +41,8 @@ public interface TWiringDiagramDao {
      * @param regionId 区域id
      * @return TWiringDiagram
      */
-    TWiringDiagram selectByCondition(@Param(value = "regionId")Long regionId);
+    TWiringDiagram selectByCondition(@Param(value = "regionId")Long regionId,
+                                     @Param(value = "robotId")Long robotId,
+                                     @Param(value = "type")Integer type
+                                     );
 }

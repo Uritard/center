@@ -2591,7 +2591,7 @@ CREATE TABLE `t_wiring_config` (
 `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 `update_person` varchar(20) DEFAULT '' COMMENT '更新人',
 PRIMARY KEY (`wiring_config_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4 COMMENT='主接线图配置点位信息';
 
 -- ----------------------------
 -- Table structure for t_wiring_diagram
@@ -2609,8 +2609,10 @@ CREATE TABLE `t_wiring_diagram` (
 `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
 `update_person` varchar(20) DEFAULT '' COMMENT '更新人',
 `delete_flag` tinyint DEFAULT '0' COMMENT '删除标记，1-是0-否',
+`type` int DEFAULT '1' COMMENT '接线图类型 1-主接线图 2-机器人去看看图',
+`robot_id` bigint DEFAULT null COMMENT '机器人去看看图对应的机器人',
 PRIMARY KEY (`wiring_diagram_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5000 DEFAULT CHARSET=utf8mb4 COMMENT='主接线图信息';
 -- ----------------------------
 -- Table structure for alarm_shield
 -- ----------------------------
@@ -2815,6 +2817,8 @@ CREATE TABLE `t_iot_device_point` (
  `point_name` varchar(128) DEFAULT '' COMMENT '测点名称',
  `unit` varchar(50) DEFAULT '' COMMENT '单位',
  `extend` varchar(256) DEFAULT NULL COMMENT '额外参数，如起始位置，返回数据，json字符串存储',
+ `origin_id` bigint DEFAULT NULL COMMENT '下级物联设备测点id',
+ `edge_code` varchar(128) DEFAULT '' COMMENT '区域编码',
  PRIMARY KEY (`id`) USING BTREE,
  KEY `iot_device_id` (`iot_device_id`),
  CONSTRAINT `iot_device_id` FOREIGN KEY (`iot_device_id`) REFERENCES `t_iot_device` (`id`) ON DELETE CASCADE

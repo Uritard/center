@@ -569,6 +569,28 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
                 super.updateById(cleanup);
             }
         }
+        ThreadPoolUtil.COMMON_POOL.addThread(this::clearTmp);
     }
 
+    /**
+     * 清理ftps文件夹下的临时文件
+     */
+    public void clearTmp() {
+        // 临时文件保留时长
+        String retainedTempTime = (String)redisTemplate.opsForHash().get("t_sys_param:retainedTempTime", "content");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -NumberUtils.toInt(retainedTempTime, 7));
+        String tmpFilePath = (String) redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
+        int cleanSize = 0;
+        try (FileProcess process = new FileProcess(calendar.getTime(), false, tmpFilePath, "", "")) {
+            boolean p1 = process.cleanup();
+            cleanSize += process.truncateSize();
+            String totalSpace = CommonUtils.fileSpace(cleanSize);
+            if (p1){
+                log.info("ftps文件清理成功，清理大小 {} ", totalSpace);
+            }else {
+                log.error("ftps文件清理失败");
+            }
+        }
+    }
 }

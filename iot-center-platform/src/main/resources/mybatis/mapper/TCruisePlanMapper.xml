@@ -355,6 +355,7 @@
             #{deviceId, jdbcType=BIGINT}
         </foreach>
         AND j.inspection_type = 1
+        <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name like concat('%',#{cruiseName},'%') </if>
         GROUP BY a.instance_id
         ORDER BY a.device_id, j.custom_id
     </select>

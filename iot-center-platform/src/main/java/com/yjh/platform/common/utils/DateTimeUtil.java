@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import com.mysql.jdbc.StringUtils;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TCruiseTaskCron;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -949,7 +950,8 @@ public class DateTimeUtil {
     public static Date addHour(Date date, int n) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.HOUR_OF_DAY, n);// 日期加n个小时
+        // 日期加n个小时
+        cal.add(Calendar.HOUR_OF_DAY, n);
         return cal.getTime();
     }
 
@@ -1102,6 +1104,81 @@ public class DateTimeUtil {
         logger.info("validTimeList2: "+validTimeList2);*/
         return validTimeList;
     }
+
+    /**
+     * 获取间隔内的所有时间
+     *
+     * @param interval  间隔类型  类型,间隔数量
+     * @param dayBefore 开始时间
+     * @param dayAfter  结束时间
+     * @return list
+     */
+    public static List<Date> intervalTransTime(String interval, Date dayBefore, Date dayAfter) {
+        List<Date> validTimeList = new ArrayList<>();
+        int intervalNumber = getIntervalNumber(interval);
+        Date dd = intervalNextTime(interval, dayBefore);
+        while (dd.getTime() <= dayAfter.getTime()) {
+            if (dd.getTime() >= dayBefore.getTime()) {
+                validTimeList.add(dd);
+            }
+            dd = addHour(dd, intervalNumber);
+        }
+        return validTimeList;
+    }
+
+    public static void main(String[] args) {
+        Date date = intervalNextTime(UPatrolTaskService.INTERVAL + "2,2", getDate("2024-01-21 10:00:00"));
+        System.out.println(getDateTimeString(date));
+        System.out.println("-----------------");
+        List<Date> list = intervalTransTime(UPatrolTaskService.INTERVAL + "2,2", getDate("2024-01-31 10:00:00"), getDate("2024-02-29 23:59:59"));
+        list.forEach(d -> System.out.println(getDateTimeString(d)));
+    }
+
+    public static Date intervalNextTime(String interval, Date startTime) {
+        Date now = new Date();
+        Date newDate;
+        if (startTime.before(now)) {
+            newDate = getReNextTime(now, getIntervalNumber(interval), startTime);
+        } else {
+            newDate = startTime;
+        }
+        return newDate;
+    }
+    /**
+     * 获取下一次比当时时间大的时间
+     * @param now 当前时间
+     * @param num 间隔数 小时
+     * @param start 开始时间
+     * @return
+     */
+    public static Date getReNextTime(Date now, int num, Date start){
+        Date newDate = addHour(start, num);
+        while (newDate.before(now) || newDate.equals(now)){
+            newDate = addHour(newDate, num);
+        }
+        return newDate;
+    }
+
+    /**
+     * 获取间隔小时数
+     *
+     * @param interval 间隔类型  interval_类型,间隔数量  类型 1:小时; 2:天
+     * @return 间隔小时数量
+     */
+    public static int getIntervalNumber(String interval) {
+        interval = interval.replace(UPatrolTaskService.INTERVAL, "");
+        int intervalType = Integer.parseInt(interval.split(",")[0]);
+        int intervalNumber;
+        if (intervalType == 1) {
+            //间隔小时
+            intervalNumber = Integer.parseInt(interval.split(",")[1]);
+        } else {
+            //间隔天
+            intervalNumber = Integer.parseInt(interval.split(",")[1]) * 24;
+        }
+        return intervalNumber;
+    }
+
 
     public static Date cornNextTime(String cronExpression, Date startTime) {
         Date date = new Date();

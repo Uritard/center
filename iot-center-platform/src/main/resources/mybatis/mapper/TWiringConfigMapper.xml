@@ -97,8 +97,31 @@
         from t_wiring_config a
         left join t_wiring_diagram b on a.wiring_diagram_id = b.wiring_diagram_id
         LEFT JOIN t_camera_info d on a.equipment_id = d.camera_id
-        where 1 = 1
+        where 1 = 1 and b.type = #{type}
         and b.region_id = #{regionId, jdbcType=BIGINT}
+        <if test="robotId != null and robotId != ''"> and b.robot_id = #{robotId}</if>
+    </select>
+
+    <select id="selectByWiringDiagram"  resultType="com.yjh.platform.module.user.entity.TWiringConfigEX">
+        select
+            a.wiring_config_id,
+            a.wiring_diagram_id,
+            a.equipment_id,
+            a.equipment_name,
+            a.equipment_type,
+            a.x_coordinate,
+            a.y_coordinate,
+            a.update_time,
+            a.update_person,
+            e.inspection_code as nodeId
+        from t_wiring_config a
+        left join t_std_device b on a.equipment_id = b.device_id
+        LEFT JOIN t_cruise_point_instance d on b.node_id = d.instance_id
+        left join t_robot_inspection e on d.cruise_id = e.inspection_id
+        where a.wiring_diagram_id = #{wiringDiagramId}
+        <if test="inspectionType != null and inspectionType == 2"> and a.equipment_id in (
+             select distinct  device_id from t_std_devicemete where inspection_type = 2
+            )</if>
     </select>
 
 </mapper>

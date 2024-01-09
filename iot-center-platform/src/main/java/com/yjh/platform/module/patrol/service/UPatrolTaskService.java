@@ -103,6 +103,7 @@ public class UPatrolTaskService {
     public static final String TASK_LOWER_REDIS_KEY = "lowPatrolTask:";
     public static final String TASK_RETRY_SUFFIX = "_遗漏点位重试任务";
     public static final String TASK_RETRY_PREFIX = "taskRetry:";
+    public static final String INTERVAL = "interval_";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -281,22 +282,13 @@ public class UPatrolTaskService {
                 }
                 // 间隔
                 if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
-                    String hour = intervalExecuteTime.startsWith("0") ? intervalExecuteTime.substring(1, 2) : intervalExecuteTime.substring(0,2);
-                    String min = intervalExecuteTime.substring(3, 5).startsWith("0") ? intervalExecuteTime.substring(4, 5) : intervalExecuteTime.substring(3, 5);
-                    String second = intervalExecuteTime.substring(6, 8).startsWith("0") ? intervalExecuteTime.substring(7, 8) : intervalExecuteTime.substring(6, 8);
-
-                    // 天: 秒 分 时 */日 * ?
-                    if (StringUtils.equals("2", intervalType)) {
-                        cronExpressionDate = String.format("%s %s %s */%s * ?", second, min, hour, intervalNumber);
-                    }
-                    // 时: 秒 分 */时 * * ？
-                    else {
-                        cronExpressionDate = String.format("%s %s %s/%s * * ?", second, min, 0,intervalNumber);
-                    }
+                    cronExpressionDate = INTERVAL + intervalType + "," + intervalNumber;
+                    tCruiseTaskAdd.setDateType(cronExpressionDate);
+                    uPatrolTask.setDateType(cronExpressionDate);
                 }
                 log.info("cronExpressionDate==================: {}", cronExpressionDate);
             }
-            if (CronExpression.isValidExpression(cronExpressionDate)) {
+            if (cronExpressionDate.contains(INTERVAL) || CronExpression.isValidExpression(cronExpressionDate)) {
                 tCruiseTaskAdd.setDateType(cronExpressionDate);
                 uPatrolTask.setDateType(cronExpressionDate);
             } else {
@@ -600,7 +592,12 @@ public class UPatrolTaskService {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             // 周期任务的下一次任务时间和名称在初始化时就通过cron表达式进行计算，不再通过任务执行时再修改名称
-            Date nextStartTime = DateTimeUtil.cornNextTime(task.getDateType(), task.getStartTime());
+            Date nextStartTime;
+            if (task.getDateType().contains(INTERVAL)){
+                nextStartTime = DateTimeUtil.intervalNextTime(task.getDateType(), task.getStartTime());
+            }else {
+                nextStartTime = DateTimeUtil.cornNextTime(task.getDateType(), task.getStartTime());
+            }
             String taskNameTime = DateTimeUtil.format3(nextStartTime);
             nextTask.setTaskId(newTaskId)
                     .setTaskCode(task.getTaskCode())
@@ -2679,9 +2676,15 @@ public class UPatrolTaskService {
                 if (Objects.nonNull(tCruiseTaskCount.getEndTime()) && tCruiseTaskCount.getEndTime().before(dayAfterTime)){
                     dayAfterTime = tCruiseTaskCount.getEndTime();
                 }
-
-//                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                List<Date> timeList;
+                if (tCruiseTaskCount.getDateType().contains(INTERVAL)) {
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                    timeList = DateTimeUtil.intervalTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                } else {
+                    timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                }
+                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();
@@ -2936,7 +2939,14 @@ public class UPatrolTaskService {
                 }
 
                 log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                List<Date> timeList;
+                if (tCruiseTaskCount.getDateType().contains(INTERVAL)) {
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                    timeList = DateTimeUtil.intervalTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                } else {
+                    timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
+                }
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();

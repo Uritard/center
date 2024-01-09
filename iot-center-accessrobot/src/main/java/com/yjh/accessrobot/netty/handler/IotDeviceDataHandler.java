@@ -9,9 +9,9 @@ import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
 import com.yjh.accessrobot.module.command.entity.TIotDeviceData;
-import com.yjh.accessrobot.module.command.entity.TMeter;
 import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.proxy.PlatformProxy;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <功能描述> 上级系统接收巡视主机消息
@@ -42,6 +41,8 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
     private TStdDeviceMapper tStdDeviceMapper;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private PlatformProxy platformProxy;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -56,25 +57,22 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给下级响应
-        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send(operationProtocol, sendCode);
-        log.info("本级系统给下级{}响应了", sendCode);
-
-        List<TIotDeviceData> deviceDataList = tStdDeviceMapper.selectByOriginId(xmlBaseModel.getItems());
+        List<TIotDeviceData> deviceDataList = tStdDeviceMapper.selectIotDeviceByEdgeCode(sendCode);
         List<TIotDeviceData> insertDataList = new ArrayList<>();
-        List<TIotDeviceData> insertDeviceList = new ArrayList<>();
         List<TStdRegion> regionList = tStdRegionDao.selectAll();
         for (Map<String, Object> item : xmlBaseModel.getItems()) {
             Long upRegionId = isContains(regionList, ValueUtil.Object2String(item.get("upRegionId"), "-1"));
             if (upRegionId == null) {
                 continue;
             }
-            TIotDeviceData data = dataContains(deviceDataList, MapUtils.getLong(item, "iotDeviceId"));
-            if (data == null) {
-                data = new TIotDeviceData();
-                insertDeviceList.add(data);
+            TIotDeviceData data = new TIotDeviceData();
+            TIotDeviceData oldData = dataContains(deviceDataList, MapUtils.getLong(item, "iotDeviceId"),MapUtils.getLong(item, "pointId"));
+            if (oldData == null) {
+                log.info("根据数据查找不到对应设备和测点！{}",item);
+                continue;
+            } else {
+                data.setId(oldData.getId());
+                data.setPointId(oldData.getPointId());
             }
             data.setEdgeCode(sendCode);
             data.setPointName(MapUtils.getString(item,"pointName"));
@@ -96,14 +94,10 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
             data.setControllable(MapUtils.getInteger(item,"controllable"));
             insertDataList.add(data);
         }
-        if (!insertDeviceList.isEmpty()) {
-            tStdDeviceMapper.batchInsertIotDevice(insertDeviceList);
-            tStdDeviceMapper.batchInsertIotDevicePoint(insertDeviceList);
-        }
         if (!insertDataList.isEmpty()) {
             tStdDeviceMapper.batchInsertIotDeviceData(insertDataList);
         }
-
+        platformProxy.uploadToRedis(insertDataList);
     }
 
     private Long isContains(List<TStdRegion> regionList, String upRegionId) {
@@ -115,9 +109,9 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
         return null;
     }
 
-    private TIotDeviceData dataContains(List<TIotDeviceData> dataList, Long address) {
+    private TIotDeviceData dataContains(List<TIotDeviceData> dataList, Long iotDeviceID,Long pointId) {
         for (TIotDeviceData data : dataList) {
-            if (data.getOriginId().equals(address)) {
+            if (data.getOriginId().equals(iotDeviceID) && data.getPointOriginId() != null && data.getPointOriginId().equals(pointId)) {
                 return data;
             }
         }

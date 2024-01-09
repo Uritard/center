@@ -30,7 +30,8 @@ public interface TRobotDeviceConfigDao {
 
     List<AreaInfo> selectDeviceTree();
 
-    List<TStdDevice> selectDeviceByName(@Param(value = "name") String name);
+    List<TStdDevice> selectDeviceByName(@Param(value = "name") String name,
+                                        @Param(value = "robotId") Long robotId);
 
     List<AreaInfo> selectDeviceTreeByName(@Param(value = "deviceList") List<TStdDevice> deviceConfigList,
                                           @Param(value = "regionList") List<Long> regionList);

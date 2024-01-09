@@ -56,4 +56,8 @@ public interface SendToUpSystemDao {
 
     String selectIsRobotDevice(@Param(value = "list") List<String> list);
     String selectIsDownSystem(@Param(value = "list") List<String> list);
+
+    List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap);
+
+    List<String> selectInstanceIdsByComponent(@Param(value = "list") List<DeviceModel> deviceModels);
 }

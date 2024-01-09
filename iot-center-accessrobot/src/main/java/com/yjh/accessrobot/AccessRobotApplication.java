@@ -48,6 +48,7 @@ public class AccessRobotApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         Constant.redisTemplate = redisTemplate;
         robotService.updateAllRobotStatus();
+        robotService.setNeedConfirmSet();
         String url = Constant.getLocalIp();
         InetSocketAddress address = new InetSocketAddress(url, Constant.port());
         log.info("accessrobot is running, url is : " + url);

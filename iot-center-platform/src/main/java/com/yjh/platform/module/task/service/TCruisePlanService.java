@@ -237,7 +237,7 @@ public class TCruisePlanService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<InstanceTree> findInstanceTree(String deviceIds) {
+    public List<InstanceTree> findInstanceTree(String deviceIds,String cruiseName) {
         List<Long> deviceIdList = new ArrayList<>();
         if (StringUtils.hasText(deviceIds)) {
             for (String deviceIdTem:deviceIds.split(",")) {
@@ -246,7 +246,7 @@ public class TCruisePlanService{
             }
         }
 //        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
-        return tCruisePlanDao.findInstanceTree(deviceIdList);
+        return tCruisePlanDao.findInstanceTree(deviceIdList,cruiseName);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -255,7 +255,7 @@ public class TCruisePlanService{
         List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionList);
         List<InstanceTree> list = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(deviceIdList)) {
-            list = tCruisePlanDao.findInstanceTree(deviceIdList);
+            list = tCruisePlanDao.findInstanceTree(deviceIdList,null);
         }
         return list;
     }

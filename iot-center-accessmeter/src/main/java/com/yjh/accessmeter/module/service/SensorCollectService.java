@@ -111,8 +111,7 @@ public class SensorCollectService {
                 } else {
                     log.warn("协议未实现或已经初始化: {}", protocolEnum);
                 }
-
-                COLLECT_TASK_MAP.compute(device.getCollectionFrequency(), (k1, v1) -> {
+                dataCollectTask = COLLECT_TASK_MAP.compute(device.getCollectionFrequency(), (k1, v1) -> {
                     if (v1 == null) {
                         return new DataCollectTask(Collections.singletonList(device), iotDeviceDao, asyncExecutor, platformProxy);
                     } else {
@@ -120,6 +119,8 @@ public class SensorCollectService {
                         return v1;
                     }
                 });
+                taskScheduler.scheduleAtFixedRate(dataCollectTask,
+                        Instant.ofEpochMilli(System.currentTimeMillis() + 15000), Duration.ofMinutes(device.getCollectionFrequency()));
             }
         } else {
             dataCollectTask.addDevice(device, collectImmediate);

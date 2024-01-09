@@ -15,11 +15,14 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="update_person" jdbcType="VARCHAR" property="updatePerson" />
         <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        wiring_diagram_id,region_id,region_name,pic_path,pic_length,pic_width,upload_time,upload_person,update_time,update_person,delete_flag
+        wiring_diagram_id,region_id,region_name,pic_path,pic_length,pic_width,upload_time,
+        upload_person,update_time,update_person,delete_flag,type,robot_id
     </sql>
 
 
@@ -37,7 +40,9 @@
                    #{uploadPerson, jdbcType=VARCHAR},
                    #{updateTime, jdbcType=TIMESTAMP},
                    #{updatePerson, jdbcType=VARCHAR},
-                   #{deleteFlag, jdbcType=INTEGER}
+                   #{deleteFlag, jdbcType=INTEGER},
+                   #{type, jdbcType=INTEGER},
+                   #{robotId, jdbcType=BIGINT}
                )
     </insert>
 
@@ -69,7 +74,9 @@
             a.upload_person,
             a.update_time,
             a.update_person,
-            a.delete_flag
+            a.delete_flag,
+            a.type,
+            a.robot_id
         from t_wiring_diagram a
         where 1 = 1
           and a.wiring_diagram_id = #{wiringDiagramId, jdbcType=INTEGER}
@@ -88,11 +95,14 @@
             a.upload_person,
             a.update_time,
             a.update_person,
-            a.delete_flag
+            a.delete_flag,
+            a.type,
+            a.robot_id
         from t_wiring_diagram a
-        where 1 = 1
+        where 1 = 1 and a.type = #{type}
         and a.delete_flag = 0
         and a.region_id = #{regionId, jdbcType=BIGINT}
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId}</if>
     </select>
 
 </mapper>

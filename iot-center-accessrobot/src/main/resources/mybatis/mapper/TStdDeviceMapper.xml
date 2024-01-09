@@ -368,16 +368,18 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectByOriginId" resultType="com.yjh.accessrobot.module.command.entity.TIotDeviceData">
+    <select id="selectIotDeviceByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TIotDeviceData">
         select
         device.*,
-        point.id as pointId
+        point.origin_id as pointOriginId,
+        point.id as pointId,
+        point.point_name,
+        point.iot_device_id,
+        point.iot_device_name,
+        point.unit
         from t_iot_device device
         left join t_iot_device_point point on device.id = point.iot_device_id
-        where device.origin_id in
-        <foreach collection="list" item="map" open="(" close=")" separator=",">
-            #{map.iotDeviceId}
-        </foreach>
+        where device.edge_code = #{edgeCode}
     </select>
 
     <insert id="batchInsertIotDevice" keyColumn="id" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
@@ -415,6 +417,29 @@
         )
     </foreach>
     </insert>
+
+    <update id="updateIotDevice" parameterType="com.yjh.accessrobot.module.command.entity.TIotDeviceData">
+        update t_iot_device
+        set
+        device_name = #{iotDeviceName},
+        ip = #{ip},
+        port = #{port},
+        address = #{address},
+        iot_device_type = #{iotDeviceType},
+        magnification_coefficient = #{magnificationCoefficient},
+        controllable = #{controllable}
+        where origin_id = #{originId} and edge_code = #{edgeCode}
+    </update>
+
+    <update id="updateIotDevicePoint" parameterType="com.yjh.accessrobot.module.command.entity.TIotDeviceData">
+        update t_iot_device_point
+        set
+            channel_num = #{channelNum},
+            point_name = #{pointName},
+            unit = #{unit},
+            extend = #{extend}
+        where id = #{id}
+    </update>
 
     <insert id="batchInsertIotDeviceData" keyColumn="id" parameterType="java.util.List">
         insert into t_iot_device_data (
@@ -454,15 +479,37 @@
         iot_device_name,
         channel_num,
         point_name,
-        unit
+        unit,
+        origin_id,
+        edge_code
         ) values <foreach collection="list" item="iotDeviceData" separator=",">
         (
         #{iotDeviceData.id},
         #{iotDeviceData.iotDeviceName},
         #{iotDeviceData.channelNum},
         #{iotDeviceData.pointName},
-        #{iotDeviceData.unit}
+        #{iotDeviceData.unit},
+        #{iotDeviceData.pointId},
+        #{iotDeviceData.edgeCode}
         )
     </foreach>
     </insert>
+
+    <delete id="deleteIotDevice">
+        delete from t_iot_device
+        where id in (
+            <foreach collection="list" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+    </delete>
+
+    <delete id="deleteIotDevicePoint">
+        delete from t_iot_device_point
+        where id in (
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
 </mapper>

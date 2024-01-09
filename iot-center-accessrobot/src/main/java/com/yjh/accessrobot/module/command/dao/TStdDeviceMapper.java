@@ -53,8 +53,12 @@ public interface TStdDeviceMapper {
     List<TMeter> selectAllMeterByEdgeCode(@Param("edgeCode") String edgeCode);
     int updateById(TMeter tMeter);
 
-    List<TIotDeviceData> selectByOriginId(@Param("list") List<Map<String,Object>> list);
+    List<TIotDeviceData> selectIotDeviceByEdgeCode(@Param("edgeCode") String edgeCode);
     int batchInsertIotDevice(@Param("list") List<TIotDeviceData> list);
     int batchInsertIotDevicePoint(@Param("list") List<TIotDeviceData> list);
     int batchInsertIotDeviceData(@Param("list") List<TIotDeviceData> list);
+    int updateIotDevice(TIotDeviceData tIotDeviceData);
+    int updateIotDevicePoint(TIotDeviceData tIotDeviceData);
+    int deleteIotDevice(@Param("list") List<Long> list);
+    int deleteIotDevicePoint(@Param("list") List<Long> list);
 }

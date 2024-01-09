@@ -86,7 +86,9 @@
         FROM
             t_std_device b
         WHERE
-            b.alias_name != '' AND node_id IS NOT NULL
+            b.alias_name != '' AND node_id in (
+            select instance_id from t_cruise_point_instance ins
+            left join t_robot_inspection pec on ins.cruise_id = pec.inspection_id where pec.robot_id = #{robotId} )
         <if test="name != null and name != ''">
             and b.alias_name like concat('%',#{name},'%')
         </if>

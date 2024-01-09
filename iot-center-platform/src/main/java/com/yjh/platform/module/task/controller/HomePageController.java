@@ -552,6 +552,25 @@ public class HomePageController {
         }
         return result;
     }
+
+    /**
+     * 机器人信息
+     *
+     * @date
+     */
+    @ApiOperation(value = "查询机器人异常站所")
+    @RequestMapping(value = "/queryWarningStation", method = RequestMethod.POST)
+    public Result queryWarningStation() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryWarningStation());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
+        }
+        return result;
+    }
     /**
      * 获取有环境设备的区域
      *
