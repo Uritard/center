@@ -1218,4 +1218,26 @@
         from t_warn_info
         where task_id = #{taskId}
     </select>
+    <select id="countPollOrInvadeWarnByStationOnMonth" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
+        select
+        b.up_region_id as rid,
+        b.up_region_name,
+        count(1) as count,
+        a.alarm_source
+        from
+        t_warn_info a
+        left join t_std_device b on
+        a.device_id = b.device_id
+        where
+        DATEDIFF(now(), a.warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+        and (a.warn_type != '507' or a.warn_type is null)
+        <if test="alarmSource == 1">
+            and a.alarm_source != 689
+        </if>
+        <if test="alarmSource == 2">
+            and a.alarm_source = 689
+        </if>
+        group by
+        b.up_region_id
+    </select>
 </mapper>

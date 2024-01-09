@@ -111,4 +111,13 @@ public interface TWarnInfoDao {
     List<WarnStatistical> countAllByStationOnMonth(Integer nearDays);
 
     Integer countByTaskId(@Param("taskId")String taskId);
+
+    /**
+     *
+     * @param nearDays 最近天数
+     * @param alarmSource 巡检：1  入侵 ：2
+     * @return
+     */
+    List<WarnStatistical> countPollOrInvadeWarnByStationOnMonth(@Param("nearDays") Integer nearDays, @Param("alarmSource") Integer alarmSource);
+
 }
