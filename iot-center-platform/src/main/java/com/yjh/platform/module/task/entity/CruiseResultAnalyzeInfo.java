@@ -124,4 +124,6 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     @ApiModelProperty(value = "告警级别Desc")
     private String alarmLevelName;
 
+    @ApiModelProperty(value = "计数")
+    private Integer count;
 }

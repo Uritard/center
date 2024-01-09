@@ -550,6 +550,31 @@ public class CommonUtils {
         return baseTem + filePathTem;
     }
 
+    /**
+     * 连接字符串，默认 - ，空字符串略过
+     * @param objs
+     * @return
+     */
+    public static String concat(Object... objs) {
+        return join("-", objs);
+    }
+
+    /**
+     * 连接字符串，空字符串略过
+     */
+    public static String join(CharSequence conjunction, Object... objs) {
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : objs) {
+            if (StringUtils.isNotEmpty(Objects.toString(obj, ""))) {
+                sb.append(obj).append(conjunction);
+            }
+        }
+        if (sb.length() > conjunction.length() && !"".contentEquals(conjunction)) {
+            sb.delete(sb.length() - conjunction.length(), sb.length());
+        }
+        return sb.toString();
+    }
+
     public static void removeEmptyValue(Map<?, ?> map) {
         if (MapUtils.isNotEmpty(map)) {
             Iterator<? extends Map.Entry<?, ?>> iter = map.entrySet().iterator();

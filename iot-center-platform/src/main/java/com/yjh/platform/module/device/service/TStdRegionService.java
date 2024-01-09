@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,10 @@ public class TStdRegionService{
 
     public final static String LOWER_UP_KEY = "region:lowerUpStation";
 
+    private final static Map<Long,TStdRegion> REGION_MAP = new ConcurrentHashMap<>(32);
+
+    private volatile boolean changed = false;
+
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdRegion tStdRegion) {
         if (StringUtils.isNotBlank(tStdRegion.getRegionCode())) {
@@ -50,6 +55,7 @@ public class TStdRegionService{
                 throw new BusinessException(201, "区域编码" + tStdRegion.getRegionCode() + "已存在");
             }
         }
+        changed = true;
         return this.tStdRegionDao.insert(tStdRegion);
     }
 
@@ -63,6 +69,7 @@ public class TStdRegionService{
         if(deviceList != null && deviceList.size() > 0){
             return -1;
         }
+        changed = true;
         return this.tStdRegionDao.deleteByPrimaryId(regionId);
     }
 
@@ -79,6 +86,7 @@ public class TStdRegionService{
         if (!oldStdRegion.getRegionCode().equals(tStdRegion.getRegionCode()) && StringUtils.isNotEmpty(oldStdRegion.getEdgeStatus())) {
             tStdRegion.setEdgeStatus("离线");
         }
+        changed = true;
         return this.tStdRegionDao.update(tStdRegion);
     }
 
@@ -222,6 +230,7 @@ public class TStdRegionService{
                 return downToStationMap;
             }
 
+            regionMaps(false);
             // 查询所有站所，即
             List<TStdRegion> stationList = tStdRegionDao.selectStations();
 
@@ -234,11 +243,15 @@ public class TStdRegionService{
                 }
             }
             redisTemplate.opsForHash().putAll(LOWER_UP_KEY, Object2Map.toStringMap(downToStationMap));
+            changed = false;
             return downToStationMap;
         }
     }
 
     private Map<Long, KeyValue<Long, String>> redisStation() {
+        if (changed) {
+            return Collections.emptyMap();
+        }
         Map<String, String> downStringMap = redisTemplate.opsForHash().entries(LOWER_UP_KEY);
         if (MapUtils.isNotEmpty(downStringMap)) {
             return toLongMap(downStringMap);
@@ -312,7 +325,7 @@ public class TStdRegionService{
         if (StringUtils.isNotEmpty(regionName)){
             if (!matchName(allTree.get(0),regionName)){
                 allTree.remove(0);
-            };
+            }
         }
         return allTree;
     }
@@ -357,6 +370,47 @@ public class TStdRegionService{
         }).collect(Collectors.toList());
     }
 
+    public Map<Long, TStdRegion> regionMaps() {
+        return regionMaps(true);
+    }
+
+    private Map<Long, TStdRegion> regionMaps(boolean needChange) {
+        if (REGION_MAP.isEmpty() || changed) {
+            synchronized (REGION_MAP) {
+                if (REGION_MAP.isEmpty() || changed) {
+                    List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
+                    Map<Long, TStdRegion> regionMaps =
+                        stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId, Function.identity()));
+                    REGION_MAP.putAll(regionMaps);
+                }
+            }
+
+            if (needChange) {
+                stationDownId();
+            }
+        }
+
+        return REGION_MAP;
+    }
+
+    public TStdRegion getRegion(Long regionId) {
+        return getRegion(regionId, null);
+    }
+
+    public TStdRegion getRegion(Long regionId, TStdRegion def) {
+        if (regionId == null) {
+            return null;
+        }
+        return regionMaps().getOrDefault(regionId, def);
+    }
+
+    public String getRegionName(Long regionId) {
+        if (regionId == null) {
+            return "";
+        }
+        TStdRegion region = regionMaps().get(regionId);
+        return Optional.ofNullable(region).map(TStdRegion::getRegionName).orElse("");
+    }
 
     /**
      * 返回不为空的对象（如果第一个对象为空，则返回第二个对象）

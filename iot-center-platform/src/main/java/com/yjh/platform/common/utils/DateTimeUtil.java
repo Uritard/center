@@ -1,8 +1,8 @@
 package com.yjh.platform.common.utils;
 
-import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TCruiseTaskCron;
+import org.apache.commons.lang.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,14 +289,16 @@ public class DateTimeUtil {
     public static Date parse(String source, String defaultDateStr) {
         Date rtn = null;
         try {
-            if(StringUtils.isNullOrEmpty(source) && !StringUtils.isNullOrEmpty(defaultDateStr)){
+            if(StringUtils.isEmpty(source) && StringUtils.isNotEmpty(defaultDateStr)){
                 source = defaultDateStr;
             }
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
-            rtn = sdf.parse(source);
+            if(StringUtils.isNotEmpty(source)){
+                SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+                rtn = sdf.parse(source);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
-            if(!StringUtils.isNullOrEmpty(defaultDateStr)) {
+            if(StringUtils.isNotEmpty(defaultDateStr)) {
                 parse(defaultDateStr, new Date());
             }
         }
@@ -306,7 +308,7 @@ public class DateTimeUtil {
     public static Date parse(String source, Date defaultDate) {
         Date rtn;
         try {
-            if(StringUtils.isNullOrEmpty(source)){
+            if(StringUtils.isEmpty(source)){
                 return defaultDate;
             }
             SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
@@ -859,7 +861,7 @@ public class DateTimeUtil {
             return "";
         }
 
-        if (StringUtils.isNullOrEmpty(format)) {
+        if (StringUtils.isEmpty(format)) {
             format = getDateTimePattern();
         }
 

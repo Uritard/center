@@ -26,10 +26,8 @@ public class CruiseResultDetail extends TStdDeviceMete {
     private String realCode;
     @ApiModelProperty(value = "巡视点数据id")
     private Long cruiseDataId;
-    @ApiModelProperty(value = "巡视任务结果id")
-    private String cruiseResultId;
     @ApiModelProperty(value = "巡检任务id")
-    private String taskResultId;
+    private String taskId;
 
     @ApiModelProperty(value = "设备id")
     private Long deviceId;
@@ -38,21 +36,35 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "巡视设备")
     private String deviceName;
 
+    @ApiModelProperty(value = "巡视测点名称")
+    private String deviceMeteName;
+
     @ApiModelProperty(value = "巡视点id")
     private Long instanceId;
     @ApiModelProperty(value = "巡视点名称")
     private String instanceName;
+
+    @ApiModelProperty(value = "关联预置位/机器人测点/声纹设备ID")
+    private Long cruiseId;
+    @ApiModelProperty(value = "关联巡视点名称")
+    private String cruiseName;
 
     @ApiModelProperty(value = "巡视点类型")
     private Integer cruiseType;
     @ApiModelProperty(value = "巡检方式字典表")
     private String cruiseTypeName;
 
+    @ApiModelProperty(value = "状态:0-已执行 1-未执行")
+    private Integer cruiseStatus;
+
     @ApiModelProperty(value = "巡视值")
     private String resultNum;
 
-    @ApiModelProperty(value = "温差值")
+    @ApiModelProperty(value = "温差结果说明")
     private String resultDesc;
+
+    @ApiModelProperty(value = "审核值")
+    private String modifyNum;
 
     @ApiModelProperty(value = "巡视执行结果")
     private Integer cruiseResult;
@@ -96,6 +108,8 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     @ApiModelProperty(value = "状态评价")
     private Integer identifyState;
+    @ApiModelProperty(value = "状态评价--字典表")
+    private String identifyStateName;
 
     @ApiModelProperty(value = "实际结果")
     private Integer identifyResult;
@@ -107,6 +121,9 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     @ApiModelProperty(value = "巡检分析图片")
     private String picPath;
+
+    @ApiModelProperty(value = "原始图片")
+    private String origpic;
 
     @ApiModelProperty(value = "摄像机id")
     private Long cameraId;
@@ -122,12 +139,19 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     private String voicePath;
 
-    private String dbValue;//分贝告警值
-
-    private String fValue;//频率告警值
+    //分贝告警值
+    private String dbValue;
+    //频率告警值
+    private String fValue;
 
     @ApiModelProperty(value = "变电站名称/边缘节点名称")
     private String edgeName;
+
+    @ApiModelProperty(value = "巡视设备ID")
+    private String cruiseDeviceId;
+
+    @ApiModelProperty(value = "巡视设备名称")
+    private String cruiseDeviceName;
 
 }
 

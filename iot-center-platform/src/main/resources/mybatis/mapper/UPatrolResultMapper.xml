@@ -456,7 +456,9 @@
         b.person_check,
         b.device_id,
         b.instance_id,
-        e.device_mete_id,
+        b.device_mete_id,
+        b.cruise_device_id,
+        b.cruise_device_name,
         q.mete_name,
         q.state_zero,
         q.state_one,
@@ -472,7 +474,7 @@
         q.mete_kind,
         q.meter_type,
         q.mete_type,
-        e.cruise_id as preset_id,
+        b.cruise_id as preset_id,
         k.camera_id,
         b.is_warn,
         q.alarm_state,
@@ -486,11 +488,10 @@
         b.custom_name,
         b.device_point_id
         FROM u_patrol_data_result b
-        LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
         LEFT JOIN t_std_device n on n.device_id = b.device_id
-        LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
-        LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
-        left join t_voice_device voice on e.cruise_id = voice.voice_device_id
+        LEFT JOIN t_std_devicemete q on q.device_mete_id = b.device_mete_id
+        LEFT JOIN t_camera_preset k on k.preset_id = b.cruise_id
+        left join t_voice_device voice on b.cruise_id = voice.voice_device_id
         left join t_voice_config conf on voice.config_id = conf.config_id
         left join t_std_region region on ifnull(n.edge_code,'0')=region.region_code and region.state=1
         WHERE 1 = 1
@@ -509,14 +510,14 @@
             #{cruiseResult, jdbcType=INTEGER}
         </if>
 
-        <if test="customId != null and customId != -1 ">and e.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="customId != null and customId != -1 ">and b.custom_id = #{customId, jdbcType=VARCHAR}</if>
 
         <if test="list != null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY b.cruise_time asc, b.instance_id asc, b.device_id asc
+        ORDER BY b.cruise_time asc, b.instance_id asc
     </select>
 
     <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"

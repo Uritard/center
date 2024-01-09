@@ -403,6 +403,10 @@
         and preset_type = 2
     </select>
 
+    <select id="selectKeepWatchList" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select * from t_camera_preset where preset_type = 2
+    </select>
+
     <select id="selectKeepWatchTask" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
             *
