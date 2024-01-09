@@ -86,6 +86,7 @@ public interface UPatrolResultDao {
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "cruiseResult") Integer cruiseResult,
                                                 @Param(value = "deviceType") Integer deviceType,
+                                                @Param(value = "instanceName") String instanceName,
                                                 @Param(value = "startTime") String startTime,
                                                 @Param(value = "endTime") String endTime,
                                                 @Param(value = "list") List<Long> list,
