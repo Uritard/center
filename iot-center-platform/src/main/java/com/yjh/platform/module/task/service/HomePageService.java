@@ -190,12 +190,10 @@ public class HomePageService {
         Integer nearDays = warnInfoService.nearDays(type);
         List<WarnStatistical> alarmList = new ArrayList<>();
         //静默告警字典值
-        int jm = 689;
         if (StringUtils.isNotBlank(alarmSource)) {
             switch (alarmSource) {
                 case "巡检":
-                    alarmList = tWarnInfoDao.countWarnByStationOnMonth(null, nearDays);
-                    alarmList = alarmList.stream().filter(w -> w.getAlarmSource() != jm).collect(Collectors.toList());
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(nearDays, 1);
                     List<WarnStatistical> defectList = tWarnInfoDao.countDefectByStationOnMonth(null, nearDays);
                     alarmList.addAll(defectList);
                     break;
@@ -203,8 +201,7 @@ public class HomePageService {
                     alarmList = tWarnInfoDao.countMonByStationOnMonth(nearDays);
                     break;
                 case "入侵":
-                    alarmList = tWarnInfoDao.countWarnByStationOnMonth(null, nearDays);
-                    alarmList = alarmList.stream().filter(w -> w.getAlarmSource() == jm).collect(Collectors.toList());
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(nearDays, 2);
                     break;
                 default:
                     alarmList = tWarnInfoDao.countAllByStationOnMonth(nearDays);
