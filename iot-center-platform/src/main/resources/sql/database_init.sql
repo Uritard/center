@@ -2024,8 +2024,6 @@ CREATE TABLE `t_std_region` (
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`region_id`) USING BTREE,
-  UNIQUE KEY `idx_region_code` (`region_code`) USING BTREE,
-  KEY `region_code` (`region_code`,`origin_region_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=700002 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
 
 -- ----------------------------
