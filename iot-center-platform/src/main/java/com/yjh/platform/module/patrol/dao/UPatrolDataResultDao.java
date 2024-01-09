@@ -1,10 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
-import com.yjh.platform.module.task.entity.BrokenLineInfo;
-import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -119,4 +116,17 @@ public interface UPatrolDataResultDao {
     int updateDeviceMeteUpdate(@Param(value = "taskId") String taskId);
 
     int batchInsertDeviceMeteUpdate(List<TStdDeviceMeteUpdate> list);
+
+    List<CruiseResultAnalyzeInfo> selectIdentifyAbnormal(@Param(value = "cType") Integer cType,
+        @Param(value = "meteType") String meteType,
+        @Param(value = "meterType") Integer meterType,
+        @Param(value = "endTime") Date endTime,
+        @Param(value = "startTime") Date startTime,
+        @Param(value = "list") List<Long> list,
+        @Param(value = "meteName") String meteName);
+
+    List<CruiseResultDetail> selectIdentifyAbnormalDetails(@Param(value = "cruiseType") Integer cruiseType,
+        @Param(value = "deviceMeteId") Long deviceMeteId,
+        @Param(value = "endTime") Date endTime,
+        @Param(value = "startTime") Date startTime);
 }

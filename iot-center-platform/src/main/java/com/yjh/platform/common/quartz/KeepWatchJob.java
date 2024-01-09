@@ -1,18 +1,12 @@
 package com.yjh.platform.common.quartz;
 
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,46 +44,43 @@ public class KeepWatchJob implements Runnable {
     @Override
     public void run() {
         while (true) {
-            List<Long> cameraIdList = tCameraInfoDao.selectCameraAll();
+            List<TCameraPreset> cameraPresetList = tCameraPresetDao.selectKeepWatchList();
             //获取间隔时间
             Map<String, String> mapForKeepWatchTime = redisTemplate.opsForHash().entries("t_sys_param:keepWatchTime");
             Integer keepWatchTime = Integer.parseInt(mapForKeepWatchTime.get("content")) * 60 * 1000;
             Date start = new Date();
-            cameraIdList.forEach(cameraId -> {
-                        String str = "camera_info:" + cameraId;
-                        Map<String, String> map = redisTemplate.opsForHash().entries(str);
-                        if (map != null && map.size() > 0) {
-                            if ("0".equals(map.get("state"))) {
-                                //摄像机空闲 回归守望预置位
-                                String lastTime = map.get("lastTime");
-                                long oldTime = -1L;
-                                try {
-                                    if (lastTime != null && !"".equals(lastTime)) {
-                                        oldTime = simpleDateFormat.parse(lastTime).getTime();
-                                    }
-                                } catch (Exception e) {
-                                    log.info("摄像机id：{} 回到守望位错误：{}", cameraId, e);
-                                }
-                                long now = new Date().getTime();
-                                if ((now - oldTime) >= keepWatchTime) {
-                                    TCameraPreset preset = tCameraPresetDao.selectKeepWatch(cameraId);
-                                    if (preset != null) {
-                                        HashMap<String, Object> moveMap = new HashMap<>();
-                                        moveMap.put("presetId", preset.getPresetId());
-                                        moveMap.put("cameraId", preset.getCameraId());
-                                        log.info("守望时间："+new Date());
-                                        new Thread(()->{
-                                            cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId());
-                                        }).start();
-                                        map.put("lastTime",simpleDateFormat.format(new Date()));
-                                        redisTemplate.opsForHash().putAll(str,map);
-                                    }
-                                }
-
+            cameraPresetList.forEach(preset -> {
+                Long cameraId = preset.getCameraId();
+                String str = "camera_info:" + cameraId;
+                Map<String, String> map = redisTemplate.opsForHash().entries(str);
+                if (map != null && map.size() > 0) {
+                    if ("0".equals(map.get("state"))) {
+                        //摄像机空闲 回归守望预置位
+                        String lastTime = map.get("lastTime");
+                        long oldTime = -1L;
+                        try {
+                            if (lastTime != null && !"".equals(lastTime)) {
+                                oldTime = simpleDateFormat.parse(lastTime).getTime();
+                            }
+                        } catch (Exception e) {
+                            log.info("摄像机id：{} 回到守望位错误：{}", cameraId, e);
+                        }
+                        long now = new Date().getTime();
+                        if ((now - oldTime) >= keepWatchTime) {
+                            if (preset != null) {
+                                HashMap<String, Object> moveMap = new HashMap<>();
+                                moveMap.put("presetId", preset.getPresetId());
+                                moveMap.put("cameraId", preset.getCameraId());
+                                log.info("守望时间：" + new Date());
+                                new Thread(() -> cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId())).start();
+                                map.put("lastTime", simpleDateFormat.format(new Date()));
+                                redisTemplate.opsForHash().putAll(str, map);
                             }
                         }
+
                     }
-            );
+                }
+            });
 
             try {
                 Date End = new Date();

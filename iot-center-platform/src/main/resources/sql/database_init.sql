@@ -2351,7 +2351,10 @@ CREATE TABLE `u_patrol_data_result` (
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
   `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
   PRIMARY KEY (`cruise_data_id`) USING BTREE,
-  KEY `task_id_index` (`task_id`) USING BTREE
+  KEY `task_id_index` (`task_id`) USING BTREE,
+  KEY `index_device_mete_id` (`device_mete_id`) USING BTREE,
+  KEY `index_device_id` (`device_id`) USING BTREE,
+  KEY `index_cruise_time` (`cruise_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='巡检点数据表';
 
 

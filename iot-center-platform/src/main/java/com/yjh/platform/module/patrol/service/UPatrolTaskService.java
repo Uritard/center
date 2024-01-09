@@ -505,12 +505,13 @@ public class UPatrolTaskService {
                     .setCustomName(item.getCustomName())
                     .setDevicePointId(item.getDevicePointId())
                     .setIsWarn(0)
+                    .setDeviceMeteId(item.getDeviceMeteId())
+                    .setDeviceMeteName(item.getDeviceMeteName())
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
             map.put("edgeCode", edgeCode);
             map.put("devicePointId", String.valueOf(item.getDevicePointId()));
-            map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));

@@ -15,8 +15,8 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
-import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
@@ -41,7 +41,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +53,7 @@ public class UPatrolDataResultService {
     private final UPatrolDataResultDao uPatrolDataResultDao;
     private final TStdDevicemeteDao tStdDevicemeteDao;
     @Autowired
-    private TStdRegionDao tStdRegionDao;
+    private TStdRegionService regionService;
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -92,28 +91,15 @@ public class UPatrolDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
 
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
 
-        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
-
-
-        cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
-
-        List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
-        Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
         for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
-            if (Objects.isNull(cruiseResultAnalyzeInfo.getIdentifyResult())) {
-                cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getIdentifyResultName());
-            }
-            if (Objects.isNull(cruiseResultAnalyzeInfo.getPersonCheck())) {
-                cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getPersonCheck());
-            }
-
             if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
-                TStdRegion tStdRegion = regionMaps.get(cruiseResultAnalyzeInfo.getRegionId());
+                TStdRegion tStdRegion = regionService.getRegion(cruiseResultAnalyzeInfo.getRegionId(), new TStdRegion());
                 Long upRegionId = tStdRegion.getUpRegionId();
-                TStdRegion up = regionMaps.get(upRegionId);
-                if (Objects.nonNull(up)){
-                    cruiseResultAnalyzeInfo.setRegionName(up.getRegionName() );
+                String upRegionName = regionService.getRegionName(upRegionId);
+                if (StringUtils.isNotEmpty(upRegionName)){
+                    cruiseResultAnalyzeInfo.setRegionName(upRegionName);
                 } else {
                     cruiseResultAnalyzeInfo.setRegionName(tStdRegion.getRegionName());
                 }
@@ -143,24 +129,14 @@ public class UPatrolDataResultService {
 
             cruiseResultAnalyzeInfoList = uPatrolDataResultDao.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
 
-            List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
-            Map<Long, TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId, Function.identity()));
-
-
             cruiseResultAnalyzeInfoList.forEach(cruiseResultAnalyzeInfoMap -> {
-                if (Objects.isNull(cruiseResultAnalyzeInfoMap.get("identifyResult"))) {
-                    cruiseResultAnalyzeInfoMap.put("identifyResult", cruiseResultAnalyzeInfoMap.get("identifyResult"));
-                }
-                if (Objects.isNull(cruiseResultAnalyzeInfoMap.get("personCheck"))) {
-                    cruiseResultAnalyzeInfoMap.put("personCheck", cruiseResultAnalyzeInfoMap.get("personCheck"));
-                }
 
                 if (Objects.nonNull(cruiseResultAnalyzeInfoMap.get("regionId"))) {
-                    TStdRegion tStdRegion = regionMaps.get(MapUtils.getLongValue(cruiseResultAnalyzeInfoMap, "regionId"));
+                    TStdRegion tStdRegion = regionService.getRegion(MapUtils.getLongValue(cruiseResultAnalyzeInfoMap, "regionId"), new TStdRegion());
                     Long upRegionId = tStdRegion.getUpRegionId();
-                    TStdRegion up = regionMaps.get(upRegionId);
-                    if (Objects.nonNull(up)) {
-                        cruiseResultAnalyzeInfoMap.put("regionName", up.getRegionName());
+                    String upRegionName = regionService.getRegionName(upRegionId);
+                    if (StringUtils.isNotEmpty(upRegionName)){
+                        cruiseResultAnalyzeInfoMap.put("regionName", upRegionName);
                     } else {
                         cruiseResultAnalyzeInfoMap.put("regionName", tStdRegion.getRegionName());
                     }
@@ -546,6 +522,57 @@ public class UPatrolDataResultService {
         }
 
         return imageBytes;
+    }
+
+    public List<CruiseResultAnalyzeInfo> selectIdentifyAbnormal(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String meteName) {
+
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectIdentifyAbnormal(cType, meteType, meterType, DateTimeUtil.parse(endTime), DateTimeUtil.parse(startTime), deviceIdList, meteName);
+
+        DictConvertUtil.DictOptional optional = DictConvertUtil
+            .optional("meteType")
+            .add("meterType")
+            .add("deviceType");
+        DictConvertUtil.DICT.covertToDict(cruiseResultAnalyzeInfoList,optional);
+
+        for (CruiseResultAnalyzeInfo info : cruiseResultAnalyzeInfoList) {
+            if (Objects.nonNull(info.getRegionId())) {
+                TStdRegion tStdRegion = regionService.getRegion(info.getRegionId(), new TStdRegion());
+                Long upRegionId = tStdRegion.getUpRegionId();
+                String upRegionName = regionService.getRegionName(upRegionId);
+                if (StringUtils.isNotEmpty(upRegionName)){
+                    info.setRegionName(upRegionName);
+                } else {
+                    info.setRegionName(tStdRegion.getRegionName());
+                }
+            }
+
+            if (StringUtils.isNotEmpty(info.getMeterTypeName())) {
+                String meteTypeName = CommonUtils.concat(info.getMeteTypeName(), info.getMeterTypeName());
+                info.setMeteTypeName(meteTypeName);
+            }
+            if (CommonUtils.isEmptyOrNullstr(info.getInstanceName())) {
+                info.setInstanceName("【Deleted】");
+            }
+        }
+
+        return cruiseResultAnalyzeInfoList;
+    }
+
+    public List<CruiseResultDetail> selectIdentifyAbnormalByMeteId(Integer cruiseType, Long deviceMeteId, String endTime, String startTime) {
+        List<CruiseResultDetail> cruiseResultList = uPatrolDataResultDao.selectIdentifyAbnormalDetails(cruiseType, deviceMeteId, DateTimeUtil.parse(endTime), DateTimeUtil.parse(startTime));
+
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
+            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("meteKind").add("meteType")
+            .add("meterType").add("identifyState");
+        DictConvertUtil.DICT.covertToDict(cruiseResultList,optional);
+        for (CruiseResultDetail info : cruiseResultList) {
+            if (StringUtils.isNotEmpty(info.getMeterTypeName())) {
+                String meteTypeName = CommonUtils.concat(info.getMeteTypeName(), info.getMeterTypeName());
+                info.setMeteTypeName(meteTypeName);
+            }
+        }
+
+        return cruiseResultList;
     }
 }
 

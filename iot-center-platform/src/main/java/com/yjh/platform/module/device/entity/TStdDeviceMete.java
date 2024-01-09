@@ -65,6 +65,7 @@ public class TStdDeviceMete implements Serializable {
     @Max(value = 99999999)
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
+    private String meterTypeName;
 
     @Length(max = 50, message = "meteName长度必须小于等于50")
     @ApiModelProperty(value = "设备名称")
@@ -173,6 +174,7 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 10, message = "meteType长度必须小于等于10")
     @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     private String meteType;
+    private String meteTypeName;
 
     @Max(value = 99999999)
     @ApiModelProperty(value = "系数")

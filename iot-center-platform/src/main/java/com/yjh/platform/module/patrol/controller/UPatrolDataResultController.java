@@ -2,29 +2,28 @@ package com.yjh.platform.module.patrol.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.page.PageMethod;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
-import com.yjh.platform.module.task.entity.FirAndPicInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
+import com.yjh.platform.module.task.entity.CruiseResultDetail;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -314,4 +313,92 @@ public class UPatrolDataResultController {
         return result;
     }
 
+    @ApiOperation(value = "审核异常点位")
+    @GetMapping(value = "/identifyAbnormal")
+    public Result identifyAbnormal(@RequestParam(value = "cType", required = false) Integer cType,
+        @RequestParam(value = "meteType", required = false) String meteType,
+        @RequestParam(value = "meterType", required = false) Integer meterType,
+        @RequestParam(value = "regionId", required = false) Long regionId,
+        @RequestParam(value = "meteName", required = false) String meteName,
+        @RequestParam(value = "endTime", required = false) String endTime,
+        @RequestParam(value = "startTime", required = false) String startTime,
+        @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
+        Result result = new Result();
+        try (Page<CruiseResultAnalyzeInfo> page = PageMethod.startPage(pageNum, pageSize, true, null, true)) {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","审核异常点位列表导出");
+            }else{
+                logsRecord.LogsSend(request,"1","审核异常点位","根据用户传递的参数获取审核异常点位信息");
+            }
+            if (StringUtils.isEmpty(startTime)) {
+                startTime = null;
+            }
+            if (StringUtils.isEmpty(endTime)) {
+                endTime = null;
+            }
+            uPatrolDataResultService.checkDate(startTime, endTime);
+
+            List<Long> deviceIdList = null;
+            if (regionId != null){
+                //查询该regionId的子节点
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+                if (CollectionUtils.isNotEmpty(regionIdList)){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList = new ArrayList<>();
+                    deviceIdList.add(regionId);
+                }
+            }
+
+            Map<String, Object> resultMap = new HashMap<>(4);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormal(cType, meteType, meterType, endTime, startTime, deviceIdList, meteName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultAnalyzeInfoList);
+            result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("审核异常点位--审核异常点位列表失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "审核异常点位详细")
+    @GetMapping(value = "/identifyAbnormalDetail")
+    public Result identifyAbnormalDetail(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+        @RequestParam(value = "deviceMeteId") Long deviceMeteId,
+        @RequestParam(value = "endTime", required = false) String endTime,
+        @RequestParam(value = "startTime", required = false) String startTime,
+        @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+        @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
+        Result result = new Result();
+        try (Page<CruiseResultDetail> page = PageMethod.startPage(pageNum, pageSize, true, null, true)) {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","审核异常点位详细信息导出");
+            }else{
+                logsRecord.LogsSend(request,"1","审核异常点位详细","根据用户传递的参数获取审核异常点位详细信息");
+            }
+            if (StringUtils.isEmpty(startTime)) {
+                startTime = null;
+            }
+            if (StringUtils.isEmpty(endTime)) {
+                endTime = null;
+            }
+            uPatrolDataResultService.checkDate(startTime, endTime);
+
+            Map<String, Object> resultMap = new HashMap<>(4);
+            List<CruiseResultDetail> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormalByMeteId(cruiseType, deviceMeteId, endTime, startTime);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultAnalyzeInfoList);
+            result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("审核异常点位详细--审核异常点位详细失败描述：", e);
+        }
+        return result;
+    }
 }
