@@ -165,7 +165,7 @@ public class TaskJob extends QuartzJobBean {
                 List<String> robotCodeList = new ArrayList<>();
                 robotCodeList.add(robotCode);
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", task.getTaskId());
+                robotTaskStatesMap.put("taskId", task.getTaskCode());
                 robotTaskStatesMap.put("commandValue", 1);
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 // 3s 后下发任务启动指令给无人机，避免41报文比101报文更先抵达无人机

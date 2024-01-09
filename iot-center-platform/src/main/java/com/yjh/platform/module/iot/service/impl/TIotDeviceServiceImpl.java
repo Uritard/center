@@ -7,16 +7,20 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.common.utils.TreesUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.dao.TIotDeviceMapper;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.entity.TIotDeviceExtend;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.service.TIotDevicePointService;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -85,7 +89,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/add?id={0}", Result.class, device.getId());
             log.info("add device collect, {}", result);
         });
-
+        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
         return ret;
     }
 
@@ -146,7 +150,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
 
         Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/update?id={0}", Result.class, iotDevice.getId());
         log.info("update device collect, {}", result);
-
+        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
         return ret;
     }
 
@@ -173,7 +177,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             .isSuccess())) {
             throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());
         }
-
+        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
         return super.removeById(id);
     }
 
@@ -228,6 +232,47 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             }
         });
         return areaTree;
+    }
+
+    @Override
+    public void deviceUpload(){
+        List<IotDeviceDataEx> deviceDataList = getBaseMapper().selectIotDeviceInfo();
+        try {
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> itemList = new ArrayList<>();
+
+            xmlBaseModel.setItems(itemList);
+            xmlBaseModel.setType("iotDevice");
+            xmlBaseModelList.add(xmlBaseModel);
+
+            map.put("list", xmlBaseModelList);
+            deviceDataList.forEach(tIotDeviceData -> {
+                Map<String, Object> item = new HashMap<>();
+                item.put("pointId", tIotDeviceData.getPointId());
+                item.put("pointName", tIotDeviceData.getPointName());
+                item.put("iotDeviceId", tIotDeviceData.getIotDeviceId());
+                item.put("iotDeviceName", tIotDeviceData.getIotDeviceName());
+                item.put("ip", tIotDeviceData.getIp());
+                item.put("port", tIotDeviceData.getPort());
+                item.put("address", tIotDeviceData.getAddress());
+                item.put("unit", tIotDeviceData.getUnit());
+                item.put("upRegionId", tIotDeviceData.getUpRegionId());
+                item.put("createTime", DateTimeUtil.format(new Date()));
+                item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
+                item.put("channelNum", tIotDeviceData.getChannelNum());
+                item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
+                item.put("deviceId", tIotDeviceData.getDeviceId());
+                item.put("upRegionName", tIotDeviceData.getUpRegionName());
+                item.put("controllable", tIotDeviceData.getControllable());
+                item.put("extend", tIotDeviceData.getExtend());
+                itemList.add(item);
+            });
+            Constant.otherServer(map, Constant.TCP_URL);
+        } catch (Exception e) {
+            log.info("上报物联设备出错！", e);
+        }
     }
 
 }

@@ -660,6 +660,7 @@
     </select>
     <select id="selectAllRobotCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
        select
+            a.edge_code,
             a.robot_id,
             a.robot_code
         FROM t_robot_info a

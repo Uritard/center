@@ -1716,4 +1716,12 @@ public class SendToUpSystemServices {
         }
 
     }
+
+    public List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap) {
+        return sendToUpSystemDao.selectInstanceIdsByRegionOrDevice(idMap);
+    }
+
+    public List<String> selectInstanceIdsByComponent(List<DeviceModel> deviceModels) {
+        return sendToUpSystemDao.selectInstanceIdsByComponent(deviceModels);
+    }
 }

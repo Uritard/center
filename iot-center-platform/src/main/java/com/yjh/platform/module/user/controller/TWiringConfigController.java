@@ -99,13 +99,28 @@ public class TWiringConfigController {
 
     @ApiOperation(value = "条件查询")
     @GetMapping(value = "/selectByCondition")
-    public Result selectByCondition(@RequestParam(value = "regionId", required = false) Long regionId) {
+    public Result selectByCondition(@RequestParam(value = "regionId", required = false) Long regionId,
+                                    @RequestParam(value = "robotId", required = false) Long robotId,
+                                    @RequestParam(value = "type") Integer type) {
         Result result = new Result();
         try {
-            result.setData(tWiringConfigService.selectByCondition(regionId));
+            result.setData(tWiringConfigService.selectByCondition(regionId, robotId,type));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("条件查询失败描述：", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "根据图id查询对应设备信息及机器人点位")
+    @GetMapping(value = "/selectByWiringDiagram")
+    public Result selectByCondition(@RequestParam(value = "wiringDiagramId", required = false) Long wiringDiagramId,
+                                    @RequestParam(value = "inspectionType", required = false) Integer inspectionType) {
+        Result result = new Result();
+        try {
+            result.setData(tWiringConfigService.selectByWiringDiagram(wiringDiagramId,inspectionType));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("根据机器人id查询对应设备信息及机器人点位描述：", e);
         }
         return result;
     }

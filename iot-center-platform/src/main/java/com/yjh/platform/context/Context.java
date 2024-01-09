@@ -3,6 +3,7 @@ package com.yjh.platform.context;
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.configuration.RedisUtil;
+import com.yjh.platform.module.iot.service.TIotDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -21,9 +22,12 @@ public class Context {
 
     private final RedisTemplate redisTemplate;
 
-    public Context(BaseSocketServer socketServer,RedisTemplate redisTemplate) {
+    private final TIotDeviceService tIotDeviceService;
+
+    public Context(BaseSocketServer socketServer,RedisTemplate redisTemplate,TIotDeviceService tIotDeviceService) {
         this.socketServer = socketServer;
         this.redisTemplate = redisTemplate;
+        this.tIotDeviceService = tIotDeviceService;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -32,6 +36,7 @@ public class Context {
         try {
             socketServer.start();
             deleteSecondSilentRedisConf();
+            tIotDeviceService.deviceUpload();
         } catch (Exception e) {
             throw new RuntimeException("Socket服务启动失败", e);
         }

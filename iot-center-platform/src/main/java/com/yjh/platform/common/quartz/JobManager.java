@@ -1,10 +1,12 @@
 package com.yjh.platform.common.quartz;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.quartz.TaskJob;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
@@ -158,10 +160,19 @@ public class JobManager {
         String str = quartzTask.getJobName() + "_trg";
         Trigger trigger = null;
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
-            trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(str, quartzTask.getJobGroup())
-                    .withSchedule(cronSchedule(quartzTask.getCronExpression()))
-                    .build();
+            if (quartzTask.getCronExpression().contains(UPatrolTaskService.INTERVAL)) {
+                trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(str, quartzTask.getJobGroup())
+                        .startAt(task.getStartTime())
+                        .endAt(task.getEndTime())
+                        .withSchedule(SimpleScheduleBuilder.repeatHourlyForever(DateTimeUtil.getIntervalNumber(quartzTask.getCronExpression())))
+                        .build();
+            } else {
+                trigger = TriggerBuilder.newTrigger()
+                        .withIdentity(str, quartzTask.getJobGroup())
+                        .withSchedule(cronSchedule(quartzTask.getCronExpression()))
+                        .build();
+            }
         } else if (task.getExecuteType() ==CruiseConstant.TaskTypeEnum.NOW.getType()) {
             trigger = TriggerBuilder.newTrigger()
                     .withIdentity(str, quartzTask.getJobGroup())

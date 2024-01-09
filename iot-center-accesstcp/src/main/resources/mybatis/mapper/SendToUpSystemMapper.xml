@@ -530,4 +530,28 @@
             #{instanceId, jdbcType=VARCHAR}
         </foreach>
     </select>
+
+    <select id="selectInstanceIdsByRegionOrDevice" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        RIGHT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
+        WHERE 1 = 1
+        <if test="upRegionIds != null">
+            AND FIND_IN_SET(tsd.up_region_id, #{upRegionIds,jdbcType=VARCHAR})
+        </if>
+        <if test="deviceIds != null">
+            AND FIND_IN_SET(tsd.device_id, #{deviceIds,jdbcType=VARCHAR})
+        </if>
+        ;
+    </select>
+
+    <select id="selectInstanceIdsByComponent" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        WHERE 1 = 1
+        <foreach collection="list" open="AND (" close=")" separator="OR" item="deviceModel">
+        tcpi.device_id = #{devicModel.deviceId}
+        AND FIND_IN_SET(tcpi.custom_id, #{devicModel.deviceId, jdbcType=VARCHAR})
+        </foreach>
+    </select>
 </mapper>

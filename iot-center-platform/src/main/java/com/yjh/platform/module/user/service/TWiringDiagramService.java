@@ -43,7 +43,8 @@ public class TWiringDiagramService {
     private final Logger log = LoggerFactory.getLogger(TWiringDiagramService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public Result insert(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
+    public Result insert(MultipartFile file, Long regionId, String regionName, Long userId, Result result,
+                         Long robotId,Integer type) {
         Result resultTemp = checkFileFormat(file, result);
         if (resultTemp != null) {
             return resultTemp;
@@ -54,7 +55,7 @@ public class TWiringDiagramService {
             regionId = tStdRegion.getRegionId();
             regionName = tStdRegion.getRegionName();
         }
-        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId);
+        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId,robotId,type);
         if (Objects.nonNull(tWiringDiagramTemp)) {
             result.setMessage(209, "同一站所/区域只能上传一张图");
             return result;
@@ -64,6 +65,7 @@ public class TWiringDiagramService {
         tWiringDiagram.setRegionId(regionId);
         tWiringDiagram.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");
+        fileAbsPath = "D:\\sync";
         String fileRealPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileRealPath", "content");
         String folderName = "wiringDiagram" + "/" +  regionName + "/" + DateTimeUtil.format3(new Date()) + "/";
         String fileRealPathTemp = fileRealPath + folderName + file.getOriginalFilename();
@@ -93,6 +95,8 @@ public class TWiringDiagramService {
         String userName = (String) redisTemplate.opsForHash().get("userInfo:" + userId, "userName");
         tWiringDiagram.setUploadPerson(userName);
         tWiringDiagram.setDeleteFlag(0);
+        tWiringDiagram.setRobotId(robotId);
+        tWiringDiagram.setType(type);
         result.setData(tWiringDiagramDao.insert(tWiringDiagram));
         return result;
     }
@@ -111,7 +115,7 @@ public class TWiringDiagramService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result) {
+    public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result,Integer type) {
         Result resultTemp = checkFileFormat(file, result);
         if (resultTemp != null) {
             return resultTemp;
@@ -122,7 +126,7 @@ public class TWiringDiagramService {
             regionId = tStdRegion.getRegionId();
             regionName = tStdRegion.getRegionName();
         }
-        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId);
+        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId,null,type);
         tWiringDiagramTemp.setRegionId(regionId);
         tWiringDiagramTemp.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");
@@ -175,12 +179,12 @@ public class TWiringDiagramService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TWiringDiagram selectByCondition(Long regionId) {
+    public TWiringDiagram selectByCondition(Long regionId,Long robotId,Integer type) {
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
         }
-        return this.tWiringDiagramDao.selectByCondition(regionId);
+        return this.tWiringDiagramDao.selectByCondition(regionId, robotId,type);
     }
 
 }

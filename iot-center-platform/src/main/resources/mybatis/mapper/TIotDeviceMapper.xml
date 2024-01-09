@@ -83,4 +83,19 @@
         )
         )
     </select>
+
+    <select id="selectIotDeviceInfo" resultType="com.yjh.platform.module.iot.entity.IotDeviceDataEx">
+        SELECT
+            point.id as pointId,
+            point.point_name,
+            point.iot_device_id,
+            point.iot_device_name,
+            point.unit,
+            point.channel_num,
+            point.extend,
+            device.*
+        FROM
+            t_iot_device device
+        LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
+    </select>
 </mapper>

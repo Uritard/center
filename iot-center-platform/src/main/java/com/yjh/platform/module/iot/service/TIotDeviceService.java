@@ -14,4 +14,6 @@ import java.util.List;
 public interface TIotDeviceService extends IService<TIotDevice> {
 
     List<AreaInfo> selectDevTree(String level, Long id, String name);
+
+    void deviceUpload();
 }

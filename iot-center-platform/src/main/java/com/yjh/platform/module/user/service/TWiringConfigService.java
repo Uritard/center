@@ -7,6 +7,7 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TWiringConfigDao;
 import com.yjh.platform.module.user.entity.TWiringConfig;
+import com.yjh.platform.module.user.entity.TWiringConfigEX;
 import com.yjh.platform.module.user.entity.TWiringConfigVo;
 import com.yjh.platform.module.video.controller.CameraConController;
 import com.yjh.platform.module.video.service.CameraConService;
@@ -72,12 +73,12 @@ public class TWiringConfigService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TWiringConfigVo> selectByCondition(Long regionId) {
+    public List<TWiringConfigVo> selectByCondition(Long regionId,Long robotId,Integer type) {
         if (-1 == regionId) {
             TStdRegion tStdRegion = tStdRegionDao.selectRootRegion();
             regionId = tStdRegion.getRegionId();
         }
-        List<TWiringConfigVo> tWiringConfigVos = tWiringConfigDao.selectByCondition(regionId);
+        List<TWiringConfigVo> tWiringConfigVos = tWiringConfigDao.selectByCondition(regionId,robotId,type);
         DictConvertUtil.DictOptional optional = DictConvertUtil.optionalAliasColName("cruiseType", "equipmentType");
         DictConvertUtil.DICT.covertToDict(tWiringConfigVos, optional);
 
@@ -96,5 +97,9 @@ public class TWiringConfigService {
             tWiringConfigVo.setOnlineState(NumberUtils.toInt(statusMap.getOrDefault(tWiringConfigVo.getEquipmentId().toString(), "0")))
         );
         return tWiringConfigVos;
+    }
+
+    public List<TWiringConfigEX> selectByWiringDiagram(Long wiringConfigId,Integer inspectionType){
+        return tWiringConfigDao.selectByWiringDiagram(wiringConfigId, inspectionType);
     }
 }

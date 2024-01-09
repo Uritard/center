@@ -68,6 +68,7 @@ public enum HandlerEnum {
     //电表信息
     METER_INFO("meter","meterInfo"),
     IOT_DEVICE_DATA("iotDeviceData","iotDeviceData"),
+    IOT_DEVICE("iotDevice","iotDeviceData"),
 
 
     ;

@@ -36,7 +36,8 @@ public interface TCruisePlanDao {
     int updateByMap(@Param("map") Map<String, Object> map);
 
     int batchInsert(List<TCruisePlan> list);
-    List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList);
+    List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList,
+                                        @Param("cruiseName") String cruiseName);
     List<TDictBusiness>selectCruiseType();
     List<TDictBusiness>selectCruiseTypeChild(@Param("dictCode") String dictCode);
     List<String> selectByRobotId(@Param("robotId") Long robotId);

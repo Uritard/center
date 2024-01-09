@@ -89,4 +89,8 @@ public class TIotDeviceData implements Serializable {
     private String updatePerson;
 
     private Integer controllable;
+
+    private String extend;
+
+    private Long pointOriginId;
 }

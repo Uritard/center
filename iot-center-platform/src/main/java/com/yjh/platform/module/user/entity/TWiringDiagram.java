@@ -56,4 +56,11 @@ public class TWiringDiagram implements Serializable {
 
     @ApiModelProperty(value = "删除标记:0-存在 1-删除")
     private Integer deleteFlag;
+
+    @ApiModelProperty(value = "接线图类型 1-主接线图 2-机器人去看看图")
+    private Integer type;
+
+    @ApiModelProperty(value = "机器人去看看图对应的机器人")
+    private Long robotId;
+
 }

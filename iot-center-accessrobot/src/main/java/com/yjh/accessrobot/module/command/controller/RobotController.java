@@ -447,7 +447,6 @@ public class RobotController {
         return result;
     }
 
-
     @ApiOperation(value = "测试收到消息")
     @RequestMapping(value = "/testRecMsg", method = RequestMethod.GET)
     public Result testRecMsg(@RequestParam(value = "xml") String xml) {

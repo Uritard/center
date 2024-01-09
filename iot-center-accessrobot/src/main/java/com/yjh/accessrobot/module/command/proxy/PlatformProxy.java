@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.proxy;
 
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
+import com.yjh.accessrobot.module.command.entity.TIotDeviceData;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,4 +31,8 @@ public interface PlatformProxy {
     @ApiOperation(value = "下级上报环控设备信息入库")
     @RequestMapping(value = "/tIotDeviceData/v1/envData", method = RequestMethod.POST)
     Result insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
+
+    @ApiOperation(value = "物联设备信息入redis和上报")
+    @RequestMapping(value = "/tIotDeviceData/v1/addToRedis", method = RequestMethod.POST)
+    void uploadToRedis(@RequestBody List<TIotDeviceData> deviceDataList);
 }

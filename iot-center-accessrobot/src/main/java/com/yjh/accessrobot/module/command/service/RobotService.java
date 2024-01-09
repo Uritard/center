@@ -137,25 +137,35 @@ public class RobotService {
     private static final Map<String, TRobotInfo> ROBOT_INFO_MAP = new ConcurrentHashMap<>(16);
 
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
-    static {
-        NEED_CONFIRM_SET.add("1_1"); // 机器人远方复位
-        NEED_CONFIRM_SET.add("1_3"); // 机器人一键返航
-        NEED_CONFIRM_SET.add("1_5"); // 机器人控制模式切换
+
+    /**
+     * 需要密码校验的巡视设备控制命令
+     */
+    public void setNeedConfirmSet() {
         NEED_CONFIRM_SET.add("1_6"); // 机器人控制权获得
         NEED_CONFIRM_SET.add("1_7"); // 机器人控制权释放
-        NEED_CONFIRM_SET.add("3_9"); // 机器人云台复位
-        NEED_CONFIRM_SET.add("22_8"); // 机器人红外热像仪重启
-        NEED_CONFIRM_SET.add("21_8"); // 机器人可见光摄像机重启
-        NEED_CONFIRM_SET.add("20001_2"); //无人机系统自检
-        NEED_CONFIRM_SET.add("20001_3"); //无人机一键返航
-        NEED_CONFIRM_SET.add("20001_4"); //无人机自动降落
-        NEED_CONFIRM_SET.add("20001_5"); //无人机控制模式
         NEED_CONFIRM_SET.add("20001_6"); //无人机控制权获得
         NEED_CONFIRM_SET.add("20001_7"); //无人机控制权释放
-        NEED_CONFIRM_SET.add("20001_8"); //无人机电源管理
-        NEED_CONFIRM_SET.add("20003_5"); //无人机云台重置
-        NEED_CONFIRM_SET.add("20005_1"); //机巢
-        NEED_CONFIRM_SET.add("20005_3"); //机巢舱门
+        String needConfirmSet = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:needConfirmSet", "content"));
+        if (StringUtils.isNotBlank(needConfirmSet)) {
+            String[] setList = needConfirmSet.split(",");
+            NEED_CONFIRM_SET.addAll(Arrays.asList(setList));
+        } else {
+            NEED_CONFIRM_SET.add("1_1"); // 机器人远方复位
+            NEED_CONFIRM_SET.add("1_3"); // 机器人一键返航
+            NEED_CONFIRM_SET.add("1_5"); // 机器人控制模式切换
+            NEED_CONFIRM_SET.add("3_9"); // 机器人云台复位
+            NEED_CONFIRM_SET.add("22_8"); // 机器人红外热像仪重启
+            NEED_CONFIRM_SET.add("21_8"); // 机器人可见光摄像机重启
+            NEED_CONFIRM_SET.add("20001_2"); //无人机系统自检
+            NEED_CONFIRM_SET.add("20001_3"); //无人机一键返航
+            NEED_CONFIRM_SET.add("20001_4"); //无人机自动降落
+            NEED_CONFIRM_SET.add("20001_5"); //无人机控制模式
+            NEED_CONFIRM_SET.add("20001_8"); //无人机电源管理
+            NEED_CONFIRM_SET.add("20003_5"); //无人机云台重置
+            NEED_CONFIRM_SET.add("20005_1"); //机巢
+            NEED_CONFIRM_SET.add("20005_3"); //机巢舱门
+        }
     }
 
     /**
@@ -1719,7 +1729,7 @@ public class RobotService {
      */
     public Map<String, Object> booleanZcz(String key, Long userId, String password, HttpServletRequest request) throws Exception {
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>(3);
         String keys = Constant.map.get(String.valueOf(userId));
         if (StringUtils.isEmpty(key) && keys == null && StringUtils.isEmpty(password)) {
             String random = String.valueOf((int) (Math.random() * 1000000000 + 1));

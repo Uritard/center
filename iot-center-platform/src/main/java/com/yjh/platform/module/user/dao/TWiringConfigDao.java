@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.user.entity.TWiringConfig;
+import com.yjh.platform.module.user.entity.TWiringConfigEX;
 import com.yjh.platform.module.user.entity.TWiringConfigVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -55,10 +56,21 @@ public interface TWiringConfigDao {
     TWiringConfig selectByPrimaryId(@Param(value = "wiringConfigId") Long wiringConfigId);
 
     /**
+     * 根据机器人去看看图id查询地图上对应的设备点位信息和对应的机器人点位inspection_code
+     * @param wiringDiagramId
+     * @param inspectionType  ==2 只查有操作点的设备
+     * @return
+     */
+    List<TWiringConfigEX> selectByWiringDiagram(@Param(value = "wiringDiagramId") Long wiringDiagramId,
+                                                @Param(value = "inspectionType") Integer inspectionType);
+
+    /**
      * 条件查询主接线图关系信息
      *
      * @param regionId 区域id
      * @return List<TWiringConfigVo>
      */
-    List<TWiringConfigVo> selectByCondition(@Param(value = "regionId")Long regionId);
+    List<TWiringConfigVo> selectByCondition(@Param(value = "regionId")Long regionId,
+                                            @Param(value = "robotId")Long robotId,
+                                            @Param(value = "type")Integer type);
 }
