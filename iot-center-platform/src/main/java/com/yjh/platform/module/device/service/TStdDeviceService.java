@@ -864,9 +864,16 @@ public class TStdDeviceService{
         return assembleTrees(listTree);
     }
 
+    /**
+     *
+     * @param regionId
+     * @param name
+     * @param type 单设备：single  操作票：ticket
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfo> selectOperationDevTreeByName(Long regionId,String name) {
-        List<TStdDevice> listTree = this.tStdDeviceDao.selectDevTreeDeviceByNameAndRegion(regionId,name);
+    public List<AreaInfo> selectOperationDevTreeByName(Long regionId,String name, String type) {
+        List<TStdDevice> listTree = this.tStdDeviceDao.selectDevTreeDeviceByNameAndRegion(regionId,name,type);
         return getDeviceAreaInfo(listTree);
     }
 
