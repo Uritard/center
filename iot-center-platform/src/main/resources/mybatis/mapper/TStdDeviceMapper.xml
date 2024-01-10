@@ -554,8 +554,15 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT DISTINCT
 		b.device_id,
 		b.up_region_id
-		FROM t_std_device b RIGHT JOIN t_std_devicemete a ON a.device_id = b.device_id
-		where 1 = 1 AND a.inspection_type = 2
+		FROM t_std_device b
+		<if test="type == 'single'">
+			RIGHT JOIN t_std_devicemete a ON a.device_id = b.device_id
+		</if>
+		<if test="type == 'ticket'">
+			RIGHT JOIN t_cruise_plan c ON c.device_id = b.device_id
+		</if>
+		where 1 = 1
+		<if test="type == 'single'">AND a.inspection_type = 2</if>
 		<if test="regionId != null">and b.up_region_id =#{regionId, jdbcType=BIGINT}</if>
 		<if test="name != null and name != ''">and b.device_name like concat('%', #{name},'%')</if>
 	</select>

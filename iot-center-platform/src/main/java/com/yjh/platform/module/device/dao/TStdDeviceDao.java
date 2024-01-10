@@ -91,7 +91,8 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectDevTreeCustom();
     List<AreaInfo> selectDevTreeDevice(@Param(value = "regionId") Long regionId);
     List<TStdDevice> selectDevTreeDeviceByNameAndRegion(@Param(value = "regionId") Long regionId,
-                                                      @Param(value = "name") String name);
+                                                        @Param(value = "name") String name,
+                                                        @Param(value = "type") String type);
     List<AreaInfo> selectDeviceTreeByName(@Param(value = "deviceList") List<TStdDevice> deviceConfigList,
                                           @Param(value = "regionList") List<Long> regionList);
     List<AreaInfo> selectDevTreeRegion();
