@@ -74,11 +74,14 @@ public class TMeterService {
         tMeterList.forEach(tMeter -> {
             int mc = Integer.parseInt(StringUtils.isNotBlank(tMeter.getMagnificationCoefficient()) ? tMeter.getMagnificationCoefficient() : "1");
             String totalPositivePower = StringUtils.isNotBlank(tMeter.getTotalPositivePower()) ? tMeter.getTotalPositivePower() : "0";
+            tMeter.setTotalPositivePower(getMeterRealNum(Double.parseDouble(totalPositivePower), flag));
             tMeter.setTotalPositivePowerLast(getMeterRealNum(Double.parseDouble(totalPositivePower) * mc, flag));
             String totalPositiveReactivePower = StringUtils.isNotBlank(tMeter.getTotalPositiveReactivePower()) ? tMeter.getTotalPositiveReactivePower() : "0";
-            tMeter.setTotalPositiveReactivePowerLast(getMeterRealNum(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
+            tMeter.setTotalPositiveReactivePower(getMeterRealNumKvarh(Double.parseDouble(totalPositiveReactivePower), flag));
+            tMeter.setTotalPositiveReactivePowerLast(getMeterRealNumKvarh(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
             String totalNegativePositivePower = StringUtils.isNotBlank(tMeter.getTotalNegativePositivePower()) ? tMeter.getTotalNegativePositivePower() : "0";
-            tMeter.setTotalNegativePositivePowerLast(getMeterRealNum(Double.parseDouble(totalNegativePositivePower) * mc, flag));
+            tMeter.setTotalNegativePositivePower(getMeterRealNumKvarh(Double.parseDouble(totalNegativePositivePower), flag));
+            tMeter.setTotalNegativePositivePowerLast(getMeterRealNumKvarh(Double.parseDouble(totalNegativePositivePower) * mc, flag));
         });
     }
 
@@ -86,9 +89,34 @@ public class TMeterService {
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String res;
         double million = 1000000L;
-        if (num > million && flag) {
+        double billion = 1000000000L;
+        if (num > billion && flag) {
+            num = num / billion;
+            res = decimalFormat.format(num) + "gwh";
+        } else if (num > million && flag) {
             num = num / million;
-            res = decimalFormat.format(num) + "m";
+            res = decimalFormat.format(num) + "mwh";
+        } else if (flag) {
+            res = decimalFormat.format(num) + "kwh";
+        } else {
+            res = decimalFormat.format(num);
+        }
+        return res;
+    }
+
+    public String getMeterRealNumKvarh(Double num, Boolean flag) {
+        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+        String res;
+        double million = 1000000L;
+        double billion = 1000000000L;
+        if (num > billion && flag) {
+            num = num / billion;
+            res = decimalFormat.format(num) + "gvarh";
+        } else if (num > million && flag) {
+            num = num / million;
+            res = decimalFormat.format(num) + "mvarh";
+        } else if (flag) {
+            res = decimalFormat.format(num) + "kvarh";
         } else {
             res = decimalFormat.format(num);
         }
