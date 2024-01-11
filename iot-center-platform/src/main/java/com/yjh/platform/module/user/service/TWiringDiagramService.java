@@ -114,7 +114,7 @@ public class TWiringDiagramService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result,Integer type) {
+    public Result update(MultipartFile file, Long regionId, String regionName, Long userId, Result result,Integer type,Long robotId) {
         Result resultTemp = checkFileFormat(file, result);
         if (resultTemp != null) {
             return resultTemp;
@@ -125,7 +125,7 @@ public class TWiringDiagramService {
             regionId = tStdRegion.getRegionId();
             regionName = tStdRegion.getRegionName();
         }
-        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId,null,type);
+        TWiringDiagram tWiringDiagramTemp = selectByCondition(regionId,robotId,type);
         tWiringDiagramTemp.setRegionId(regionId);
         tWiringDiagramTemp.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");

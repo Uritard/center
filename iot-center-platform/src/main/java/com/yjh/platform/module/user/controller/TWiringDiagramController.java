@@ -78,12 +78,13 @@ public class TWiringDiagramController {
     public Result update(MultipartFile file,
                          @RequestParam(value = "regionId", required = false) Long regionId,
                          @RequestParam(value = "regionName", required = false) String regionName,
+                         @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "type") Integer type,
                          HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId = NumberUtils.toLong(request.getHeader(USERID));
-            result = tWiringDiagramService.update(file, regionId, regionName, userId, result,type);
+            result = tWiringDiagramService.update(file, regionId, regionName, userId, result,type, robotId);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("更新主接线图片异常:", e);
