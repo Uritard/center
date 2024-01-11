@@ -37,6 +37,7 @@ public interface TCruisePlanDao {
 
     int batchInsert(List<TCruisePlan> list);
     List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList,
+                                        @Param("inspectionType") Integer inspectionType,
                                         @Param("cruiseName") String cruiseName);
     List<TDictBusiness>selectCruiseType();
     List<TDictBusiness>selectCruiseTypeChild(@Param("dictCode") String dictCode);

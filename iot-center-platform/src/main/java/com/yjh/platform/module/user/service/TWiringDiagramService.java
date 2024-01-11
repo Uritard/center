@@ -65,7 +65,6 @@ public class TWiringDiagramService {
         tWiringDiagram.setRegionId(regionId);
         tWiringDiagram.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");
-        fileAbsPath = "D:\\sync";
         String fileRealPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileRealPath", "content");
         String folderName = "wiringDiagram" + "/" +  regionName + "/" + DateTimeUtil.format3(new Date()) + "/";
         String fileRealPathTemp = fileRealPath + folderName + file.getOriginalFilename();

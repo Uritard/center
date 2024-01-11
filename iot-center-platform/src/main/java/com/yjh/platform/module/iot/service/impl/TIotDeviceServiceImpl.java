@@ -89,7 +89,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/add?id={0}", Result.class, device.getId());
             log.info("add device collect, {}", result);
         });
-        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
+        ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return ret;
     }
 
@@ -150,7 +150,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
 
         Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/update?id={0}", Result.class, iotDevice.getId());
         log.info("update device collect, {}", result);
-        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
+        ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return ret;
     }
 
@@ -177,7 +177,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             .isSuccess())) {
             throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());
         }
-        ThreadPoolUtil.COMMON_POOL.addThread(this::deviceUpload);
+        ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return super.removeById(id);
     }
 
@@ -232,6 +232,12 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             }
         });
         return areaTree;
+    }
+
+    private void needDeviceUpload(){
+        if (Constant.updateSyncModel()) {
+            deviceUpload();
+        }
     }
 
     @Override

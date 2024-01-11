@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.iot.service.TIotDeviceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,8 @@ public class TStdDeviceController {
     private final TStdDeviceService tStdDeviceService;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private TIotDeviceService tIotDeviceService;
 
     private Logger log = LoggerFactory.getLogger(TStdDeviceController.class);
 
@@ -561,7 +564,9 @@ public class TStdDeviceController {
                     code = type;
                     break;
             }
-            if (StringUtils.isNotEmpty(code)) {
+            if (StringUtils.isNotEmpty(code) && "1003".equals(type)) {
+                tIotDeviceService.deviceUpload();
+            } else if (StringUtils.isNotEmpty(code)) {
                 Constant.modelUpload(code);
                 result.setData("type:" + type + "upload success");
             } else {

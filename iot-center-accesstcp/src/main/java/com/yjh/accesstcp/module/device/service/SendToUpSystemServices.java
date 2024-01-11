@@ -334,6 +334,12 @@ public class SendToUpSystemServices {
                     map.put("record_file_path", recordModelTargetPath);
                     list.add(map);
                     break;
+                case "1003":
+                    // 物联设备模型
+                    Map<String,Object> param = new HashMap<>();
+                    param.put("type",type);
+                    Constant.otherServerPost(param,Constant.IOT_DEVICE_UPLOAD_URL);
+                    break;
                 default:
                     break;
             }

@@ -376,6 +376,8 @@ public class MessageThread {
                 //7-任务文件  任务模型 A.2.5
                 //8-检修区域配置文件 检修区域模型 A.2.6
                 //9-地图文件
+                //10-设备资源信息配置文件
+                //11-物联设备模型
                 List<Map<String, Object>> list = sendToUpSystemServices.creatModelList(xmlBaseModel.getCommand());
                 String edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
                 String command = "4";
