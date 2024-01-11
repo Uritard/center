@@ -237,7 +237,7 @@ public class TCruisePlanService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<InstanceTree> findInstanceTree(String deviceIds,String cruiseName,Integer inspectionType) {
+    public List<InstanceTree> findInstanceTree(String deviceIds,String cruiseName,Integer inspectionType,Integer cruiseType) {
         //为空标识只查询巡检点  不为空标识巡检和操作都查询
         if (inspectionType == null){
             inspectionType = 1;
@@ -252,7 +252,7 @@ public class TCruisePlanService{
             }
         }
 //        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
-        return tCruisePlanDao.findInstanceTree(deviceIdList,inspectionType,cruiseName);
+        return tCruisePlanDao.findInstanceTree(deviceIdList,inspectionType,cruiseName, cruiseType);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -261,7 +261,7 @@ public class TCruisePlanService{
         List<Long> deviceIdList = tStdDeviceDao.selectDeviceIdListByRegion(regionList);
         List<InstanceTree> list = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(deviceIdList)) {
-            list = tCruisePlanDao.findInstanceTree(deviceIdList,1,null);
+            list = tCruisePlanDao.findInstanceTree(deviceIdList,1,null,null);
         }
         return list;
     }

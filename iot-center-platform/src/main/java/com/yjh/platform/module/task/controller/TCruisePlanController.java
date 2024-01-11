@@ -275,6 +275,7 @@ public class TCruisePlanController {
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "cruiseName", required = false) String cruiseName,
                                 @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
+                                @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
@@ -289,7 +290,7 @@ public class TCruisePlanController {
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             if (deviceIds.equals(-1)) deviceIds = "";
-            List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds,cruiseName,inspectionType);
+            List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds,cruiseName,inspectionType, cruiseType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
