@@ -1278,6 +1278,7 @@ public class UPatrolTaskService {
                         taskInfo.setIfRun("173");
                         taskInfo.setEdgeCode(edgeCode);
                         taskInfo.setFixedStartTime(format.format(new Date()));
+                        taskInfo.setIsenable("0");
                         edgeTaskInfoList.add(taskInfo);
                     });
 
@@ -1315,6 +1316,7 @@ public class UPatrolTaskService {
             robotTaskInfo.setIfRun("173");
             robotTaskInfo.setRobotCode(item);
             robotTaskInfo.setFixedStartTime(format.format(new Date()));
+            robotTaskInfo.setIsenable("0");
             robotTaskInfoList.add(robotTaskInfo);
         }
         Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(4);
@@ -3671,6 +3673,7 @@ public class UPatrolTaskService {
                     taskInfo.setInstanceList(new ArrayList<>(edgeInstanceList));
                     taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
                     taskInfo.setEdgeCode(edgeCode);
+                    taskInfo.setIsenable("0");
                     edgeTaskInfoList.add(taskInfo);
                 });
 
