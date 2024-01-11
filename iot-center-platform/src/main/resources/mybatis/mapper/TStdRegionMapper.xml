@@ -463,6 +463,7 @@
         LEFT JOIN t_std_region region ON device.up_region_id = region.region_id
         WHERE
             device.iot_device_type IN ( 850, 851, 852, 858, 859, 860, 861 )
+        order by region_name desc
     </select>
     <select id="getEnvByRegion" resultType="com.yjh.platform.module.iot.entity.IotDeviceDataEx">
         SELECT DISTINCT
