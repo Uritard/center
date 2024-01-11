@@ -274,6 +274,7 @@ public class TCruisePlanController {
     @Logs(title = "查询预案",content = "查询标准设备下的巡检点 ",logType = 1 ,authority = "1234,1235")
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "cruiseName", required = false) String cruiseName,
+                                @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
@@ -288,7 +289,7 @@ public class TCruisePlanController {
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             if (deviceIds.equals(-1)) deviceIds = "";
-            List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds,cruiseName);
+            List<InstanceTree> list = tCruisePlanService.findInstanceTree(deviceIds,cruiseName,inspectionType);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

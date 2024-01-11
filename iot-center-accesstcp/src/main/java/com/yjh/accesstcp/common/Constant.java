@@ -123,6 +123,7 @@ public class Constant {
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     //任务删除
     public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&source={source}";
+    public static final String IOT_DEVICE_UPLOAD_URL = "http://iot-center-platform//tStdDevice/v1/uploadModel?type={type}";
     public static  XMLBaseModel weatherXmlModel = null;
 
     public static RedisTemplate redisTemplate;
