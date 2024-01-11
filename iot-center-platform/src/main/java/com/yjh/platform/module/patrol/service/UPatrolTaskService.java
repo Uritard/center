@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.RateLimiter;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -26,7 +25,6 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -38,7 +36,6 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
@@ -62,18 +59,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -104,6 +95,7 @@ public class UPatrolTaskService {
     public static final String TASK_RETRY_SUFFIX = "_遗漏点位重试任务";
     public static final String TASK_RETRY_PREFIX = "taskRetry:";
     public static final String INTERVAL = "interval_";
+    public static final String TASK_ALL = "--ALL";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -491,6 +483,7 @@ public class UPatrolTaskService {
 
         Set<String> nodeSet = new HashSet<>(8);
         Set<String> cruiseDeviceSet = new HashSet<>(128);
+        Set<ZSetOperations.TypedTuple<String>> itemSets = new HashSet<>(128);
         for (TCruisePointInstanceNameDetail item : detailList) {
             UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
             uPatrolDataResult.setTaskId(task.getTaskId())
@@ -569,6 +562,7 @@ public class UPatrolTaskService {
                 default:
                     break;
             }
+            itemSets.add(new DefaultTypedTuple<>(String.valueOf(item.getInstanceId()), 0D));
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
@@ -576,8 +570,7 @@ public class UPatrolTaskService {
         String cruiseDeviceKey = TASK_LOWER_REDIS_KEY + task.getTaskId() + ":cruiseDevice";
         log.info("cruiseDeviceSet === {}: {}", cruiseDeviceKey, JSON.toJSONString(cruiseDeviceSet));
         redisTemplate.opsForSet().add(cruiseDeviceKey, cruiseDeviceSet.toArray(new String[0]));
-
-        initializeThisTaskInfo(task, detailList.size(), nodeSet);
+        initializeThisTaskInfo(task, detailList.size(), nodeSet, itemSets);
 
         // 延时上报任务状态，避免上级下发任务启动时，任务状态在任务启动返回报文前返回
         ScheduledMapConfig.schedule(6 , task, t -> sendTaskStateToUp(t, 5));
@@ -623,9 +616,9 @@ public class UPatrolTaskService {
         return initializeTaskInfo(instanceList, ctask);
     }
 
-    public void initializeThisTaskInfo(UPatrolTask task, int allSize, Set<String> nodeSet) {
+    public void initializeThisTaskInfo(UPatrolTask task, int allSize, Set<String> nodeSet, Set<ZSetOperations.TypedTuple<String>> itemSets) {
 
-        Map<String, String> mapForAbnormal = new HashMap<>();
+        Map<String, String> mapForAbnormal = new HashMap<>(16);
         mapForAbnormal.put("all", String.valueOf(allSize));
         mapForAbnormal.put("abnormal", "0");
         mapForAbnormal.put("normal", "0");
@@ -633,6 +626,7 @@ public class UPatrolTaskService {
         mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
         mapForAbnormal.put("nodes", JSON.toJSONString(nodeSet));
         mapForAbnormal.put("taskId", task.getTaskId());
+        mapForAbnormal.put("taskType", CommonUtils.defaultEmpty(task.getTaskType()));
 
         String stationCode = SysParamConfig.getSysContent("edgeId");
         String taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
@@ -640,6 +634,9 @@ public class UPatrolTaskService {
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+
+        String taskItemsKey = strForCountAbnormal + TASK_ALL;
+        redisTemplate.opsForZSet().add(taskItemsKey, itemSets);
     }
     @Transactional(rollbackFor = Exception.class)
     public Integer selectRobotType(String robotCode) {
@@ -932,7 +929,7 @@ public class UPatrolTaskService {
 
         String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
         //处理结果 获取机器人的点
-        Set<String> keys = RedisUtil.redisScan(cruiseResultKey);
+        Set<String> keys = queryTaskUndoneKeys(taskId);
         List<Map<String, String>> resultMap = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
             keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
@@ -1984,10 +1981,11 @@ public class UPatrolTaskService {
         updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {
 
-            Set<String> tasKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":*");
+            Set<String> tasKeys = queryTaskUndoneKeys(taskId);
             if (CollectionUtils.isEmpty(tasKeys)) {
-                log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
+                log.error("patrol_task_result:{}:* 未查到未执行任务点位，请检查任务", taskId);
                 log.error("直接更新任务状态，不执行入库操作， {}", taskId);
+                forceCompletionTask(taskId);
                 uPatrolResultDao.update(uPatrolResult);
                 throw new BusinessException("任务未正确初始化");
             }
@@ -2003,9 +2001,9 @@ public class UPatrolTaskService {
 
                 log.info("taskInfoList size: {}", taskInfoList.size());
 
+                List<Map<String, String>> skipPointList = new ArrayList<>();
                 if (!taskInfoList.isEmpty()) {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    List<Map<String, String>> skipPointList = new ArrayList<>();
                     for (Map<String, String> taskInfo : taskInfoList) {
                         if (MapUtils.isNotEmpty(taskInfo)) {
                             //count = count+1;
@@ -2021,15 +2019,15 @@ public class UPatrolTaskService {
                             }
                         }
                     }
-                    log.info("task [{}] shut down, skipPointList: {}", tid, skipPointList.size());
-                    ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, tid));
                 }
+                log.info("task [{}] shut down, skipPointList: {}", tid, skipPointList.size());
+                ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, tid));
 
                 log.info("任务终止成功=={}", tid);
 
                 //任务状态上报站端
                 // sendTaskStateToUp(task, 4);
-                uPatrolResultDao.update(uPatrolResult);
+                // uPatrolResultDao.update(uPatrolResult);
 
                 lowTaskGoOn(tid);
             });
@@ -2043,7 +2041,7 @@ public class UPatrolTaskService {
      * 本地任务执行
      */
     public void localTaskStart(String taskId) {
-        Set<String> tasKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":*");
+        Set<String> tasKeys = queryTaskKeys(taskId, false);
         String operateTaskRobotId = (String) redisTemplate.opsForHash().get(PATROL_SUMMARY_PREFIX + taskId, "operateTaskRobotId");
         if (CollectionUtils.isEmpty(tasKeys)) {
             log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
@@ -2336,7 +2334,9 @@ public class UPatrolTaskService {
         if (CollectionUtils.isNotEmpty(inter)) {
             log.error("执行完成点位重复：【{}】", JSON.toJSONString(inter));
         }
-        if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
+        // 已经执行的点位，正常点位数 + 异常点位数 - 重复点位数
+        long alredyDone = normalCounts + abnormalCounts - inter.size();
+        if (allCounts != 0 && alredyDone >= allCounts && !ended) {
             //如果是操作任务  返回
             UPatrolTask task = selectByPrimaryId(taskId);
             if (task.getTaskType() == 456 ||
@@ -2353,22 +2353,31 @@ public class UPatrolTaskService {
         String cruiseDeviceKey = TASK_LOWER_REDIS_KEY + taskId + ":cruiseDevice";
         redisTemplate.expire(cruiseDeviceKey, 7, TimeUnit.DAYS);
 
+        // 更新每个点位执行分数，后续根据分数排序
+        updateCruiseScores(strForCountAll, insIds);
+
         // 压测模式减少非必要消息传输
         if (!Constant.fastTurbo()) {
             //限流
-            if (allCounts > 500) {
-                if (rateLimiter.tryAcquire()) {
-                    sendWebSocket(taskId);
-                }
-            } else {
-                sendWebSocket(taskId);
-            }
+            sendWebSocket(taskId);
         }
         // 判断任务是否结束
         if (endOnece) {
             return abnormalCounts;
         }
         return -1;
+    }
+
+    /**
+     * 更新点位分数，点位分数是时间戳秒值
+     */
+    private void updateCruiseScores(String strForCountAll, String[] insIds) {
+        Double scores = (double)(System.currentTimeMillis()>>3);
+        Set<ZSetOperations.TypedTuple<String>> scoresSet = Arrays.stream(insIds).map(s-> new DefaultTypedTuple<>(s, scores)).collect(Collectors.toSet());
+
+        String cruiseScoresKey = strForCountAll + TASK_ALL;
+        redisTemplate.opsForZSet().add(cruiseScoresKey, scoresSet);
+        redisTemplate.expire(cruiseScoresKey, 7, TimeUnit.DAYS);
     }
 
     /**
@@ -2456,7 +2465,7 @@ public class UPatrolTaskService {
 
             int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
-            Set<String> robotInfoKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":");
+            Set<String> robotInfoKeys = queryTaskKeys(taskId, false);
             List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
                 robotInfoKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
@@ -3314,7 +3323,7 @@ public class UPatrolTaskService {
             // String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
             String cruiseResultKey = PATROL_TASK_PREFIX + taskId + ":";
             //处理结果 获取机器人的点
-            Set<String> keys = RedisUtil.redisScan(cruiseResultKey);
+            Set<String> keys = queryTaskKeys(taskId, true);
             if (!keys.isEmpty()) {
                 for (String item : keys) {
                     //获取任务数据
@@ -3785,5 +3794,48 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public Result sendConfirmMsg(Map<String, Object> confirmMessageMap) {
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ROBOT_CONFIRM_MSG_URL, confirmMessageMap, Result.class);
+    }
+
+    public Set<String> queryTaskKeys(String taskId, boolean desc) {
+        return queryTaskKeys(taskId, 0, -1, desc);
+    }
+
+    public Set<String> queryTaskKeys(String taskId, int start, int end, boolean desc) {
+        String key = PATROL_SUMMARY_PREFIX + taskId + TASK_ALL;
+
+        Set<String> instanceIds;
+        if (desc) {
+            instanceIds = redisTemplate.opsForZSet().reverseRange(key, start, end);
+        } else {
+            instanceIds = redisTemplate.opsForZSet().range(key, start, end);
+        }
+
+        if (CollectionUtils.isNotEmpty(instanceIds)) {
+            return instanceIds.stream().map(s->PATROL_TASK_PREFIX + taskId + ":" + s).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+
+        return Collections.emptySet();
+    }
+
+    /**
+     * 获取所有未执行的点位，即分数小于10的点位
+     * @param taskId
+     * @return
+     */
+    public Set<String> queryTaskUndoneKeys(String taskId) {
+        String key = PATROL_SUMMARY_PREFIX + taskId + TASK_ALL;
+
+        Set<String> instanceIds = redisTemplate.opsForZSet().rangeByScore(key, 0, 10);
+
+        if (CollectionUtils.isNotEmpty(instanceIds)) {
+            return instanceIds.stream().map(s->PATROL_TASK_PREFIX + taskId + ":" + s).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+        return Collections.emptySet();
+    }
+
+    public Long taskCount(String taskId) {
+        String key = PATROL_SUMMARY_PREFIX + taskId + TASK_ALL;
+
+        return redisTemplate.opsForZSet().zCard(key);
     }
 }

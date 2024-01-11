@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
@@ -152,7 +153,7 @@ public abstract class AbstractVideoCruise {
                         log.error("抓图重试依旧失败", e);
                     }
                 } finally {
-                    redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
+                    hashOperations.put("camera_info:" + cameraId, "state", "0");
                 }
             }
 
@@ -279,7 +280,7 @@ public abstract class AbstractVideoCruise {
             // 判别该点为本级系统的点还是下级系统的
             String edgeCode = tAlgorithmInfoDao.selectEdgeCodeByInstanceId(analysis.getInstanceId());
             if (StringUtils.isNotEmpty(edgeCode)) {
-                String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + edgeCode).get("stationId"));
+                String stationId = String.valueOf(hashOperations.entries("region:" + edgeCode).get("stationId"));
                 analysis.setReferenceImage(presetImgPath + "/" + stationId + "/" + presetId + "/" + presetId + ".jpg");
             } else {
                 analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
@@ -288,6 +289,7 @@ public abstract class AbstractVideoCruise {
             // 调用算法中
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_ANALYSE_DOING));
             inspectionMap.put("resultDesc", AbnormalResDescEnum.ANALYSISING.getDesc());
+            addCruiseAnalyScore(taskId, inspectionMap.get("instanceId"));
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
                 analysis.setAnalyseType(algorithm.getMeteAnalyse());
@@ -336,38 +338,9 @@ public abstract class AbstractVideoCruise {
         return true;
     }
 
-    protected boolean waitCamera(String taskName, String cameraId, String presetName) {
-
-        Map<String, String> mapForCameraState = hashOperations.entries("camera_info:" + cameraId);
-        int cameraState = Integer.parseInt(mapForCameraState.get("state"));
-        boolean waitFlag = true;
-        if (cameraState == 1) {//摄像头在任务中
-            int waitCount = 0;
-            while (cameraState == 1) {
-                try {
-                    Thread.sleep(waitTime + 1000);
-                } catch (InterruptedException e) {
-                    log.error(e.getMessage(), e);
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-                log.info("任务：{} 在 {} 时已经等待了 {} 预置位,摄像机Id {} {}s", taskName, DateTimeUtil.getDateTimeString(), cameraId, presetName,
-                    ((waitCount + 1) * waitTime + 1000) / 1000);
-                Map<String, String> mapForCameraStateForGet = hashOperations.entries("camera_info:" + cameraId);
-                cameraState = Integer.parseInt(mapForCameraStateForGet.get("state"));
-                waitCount = waitCount + 1;
-                if (waitCount == 30) {
-                    log.info("任务：{} 已经等待了 {} 秒,仍未等待到 {} 预置位,摄像机Id {} 退出等待", taskName, ((waitCount + 1) * waitTime + 1000) / 1000,
-                        presetName, cameraId);
-                    waitFlag = false;
-                    break;
-                }
-            }
-        }
-        if (waitFlag) {
-            redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "1");
-        }
-        return waitFlag;
+    protected void addCruiseAnalyScore(String taskId, String instanceId) {
+        String cruiseScoresKey = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId + UPatrolTaskService.TASK_ALL;
+        ((ZSetOperations<String, String>)redisTemplate.opsForZSet()).add(cruiseScoresKey, instanceId, 1D);
     }
 
     protected boolean waitCamera2(String taskId, String cameraId, String presetName) {
@@ -399,7 +372,7 @@ public abstract class AbstractVideoCruise {
                 if (waitCount == 30) {
                     log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 直接获取", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
                         presetName, cameraId);
-                    redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
+                    hashOperations.put("camera_info:" + cameraId, "state", "0");
                     break;
                 }
             }

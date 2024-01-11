@@ -429,15 +429,11 @@ public class TCruisePointInstanceService{
                 }
 
                 for (Long id : paramIds) {
-                    TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                     tCruisePointInstance.setCruiseId(id);
                     tCruisePointInstance.setCruiseName(nameMap.get(id));
                     TCruisePointInstance tCruisePointInstance1 = new TCruisePointInstance();
                     BeanUtils.copyProperties(tCruisePointInstance,tCruisePointInstance1);
                     list.add(tCruisePointInstance1);
-                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName() + "/" + nameMap.get(id));
-                    tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-
                 }
 
             }

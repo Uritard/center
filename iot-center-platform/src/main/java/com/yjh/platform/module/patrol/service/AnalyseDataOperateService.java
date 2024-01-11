@@ -760,7 +760,9 @@ public class AnalyseDataOperateService {
      */
     public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
-            if(CommonUtils.isEmptyOrNullstr(sourcePath) || CommonUtils.isEmptyOrNullstr(targetPathName)) {return;}
+            if(CommonUtils.isEmptyOrNullstr(sourcePath) || CommonUtils.isEmptyOrNullstr(targetPathName)) {
+                return;
+            }
             if (StringUtils.equals("--", sourcePath)) {
                 return;
             }
