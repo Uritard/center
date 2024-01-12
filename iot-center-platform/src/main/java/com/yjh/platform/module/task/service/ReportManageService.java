@@ -469,9 +469,12 @@ public class ReportManageService {
         }
 
         // 推送巡视报告下载
-        ThreadPoolUtil.COMMON_POOL.addThread(()->pushDownload(taskVO, taskId, userId));
+        // ThreadPoolUtil.COMMON_POOL.addThread(()->pushDownload(taskVO, taskId, userId));
+
+        String[] urlPath = reportFilePath(taskVO, taskId);
 
         result.setMessage("开始下载任务报告");
+        result.setData(urlPath);
         return result;
     }
 
@@ -511,23 +514,35 @@ public class ReportManageService {
         return listMap;
     }
 
+    public String[] reportFilePath(TaskVO taskVO, String taskId) {
+        try {
+            // 报告名称:站所名称+任务名称+巡视时间
+            String reportName =
+                taskVO.getStationName() + "-" + taskVO.getTaskName() + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
+
+            String fileRelativePathTemp = SysParamConfig.getSysContent("meteModelPath");
+            String fileRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(reportName));
+            log.info("excel文件下载路径是==={}", fileRelativePath);
+
+            String zipName = taskId + ".zip";
+            String zipRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(zipName));
+            log.info("zip文件下载路径是==={}", zipRelativePath);
+
+            return new String[] {fileRelativePath, zipRelativePath};
+        } catch (Exception e) {
+            log.error("组装文件下载路径失败", e);
+        }
+        return new String[0];
+    }
+
     public void pushDownload(TaskVO taskVO, String taskId, String userId) {
         if (StringUtils.isNotEmpty(userId)) {
             try {
-                // 报告名称:站所名称+任务名称+巡视时间
-                String reportName = taskVO.getStationName() + "-" + taskVO.getTaskName() + "-" + DateTimeUtil.format3(taskVO.getCruiseDate()) + ".xlsx";
-
-                String fileRelativePathTemp = SysParamConfig.getSysContent("meteModelPath");
-                String fileRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(reportName));
-                log.info("excel文件下载路径是==={}", fileRelativePath);
-
-                String zipName = taskId + ".zip";
-                String zipRelativePath = CommonUtils.concatPath(fileRelativePathTemp, URLEncodeUtil.encode(zipName));
-                log.info("zip文件下载路径是==={}", zipRelativePath);
+                String[] urlPath = reportFilePath(taskVO, taskId);
 
                 Map<String, Object> jasonMap = new HashMap<>(4);
                 jasonMap.put("type", "cruiseDataReport");
-                jasonMap.put("url", new String[]{fileRelativePath, zipRelativePath});
+                jasonMap.put("url", urlPath);
                 log.info("发送给前端的消息 —— 巡视报告下载:{}", jasonMap);
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
             } catch (IOException e) {
