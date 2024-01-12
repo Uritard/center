@@ -105,6 +105,10 @@ public class CommonUtils {
         return (str == null || "null".equalsIgnoreCase(str)) ? "" : str;
     }
 
+    public static String defaultEmpty(Object str) {
+        return str == null ? "" : String.valueOf(str);
+    }
+
     /**
      * @param json String
      * @return true/false

@@ -72,11 +72,6 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     public void run() {
         //随机暂停 控制调用设备频率
         int waitTime = NumberUtil.getIntRandomNum(0, 10000);
-        try {
-            Thread.sleep(waitTime);
-        } catch (InterruptedException e) {
-            log.error("随机暂停失败", e);
-        }
         log.warn("cruiseExecutThread start, cruisePoints size: {}, skip: {}, forceStop: {}", CollectionUtils.size(cruisePointList), skip,
             forceStop);
 
@@ -84,16 +79,26 @@ public class LocalCruiseExecutThread<T> implements Runnable {
             if (skip) {
                 skipPointList(cruisePointList);
             } else {
-                for (Map<String, String> m : cruisePointList) {
-                    int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
-                    if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
-                        skipPoint(m);
-                    } else {
-                        // 执行点位，并判断是否暂停
-                        if (!pointExecut(m)) {
-                            break;
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error("随机暂停失败", e);
+                }
+                try {
+                    for (Map<String, String> m : cruisePointList) {
+                        int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
+                        if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
+                            skipPoint(m);
+                        } else {
+                            // 执行点位，并判断是否暂停
+                            if (!pointExecut(m)) {
+                                break;
+                            }
                         }
                     }
+                } catch (Exception e) {
+                    log.error("任务执行失败", e);
                 }
             }
         }
@@ -108,8 +113,12 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     }
 
     private void skipPointList(List<Map<String, String>> inspectionMapList) {
-        CruiseRedisStorage.piplinePutPatrolDetail(inspectionMapList);
-        uPatrolTaskService.patrolTaskResultHandler(inspectionMapList);
+        try {
+            CruiseRedisStorage.piplinePutPatrolDetail(inspectionMapList);
+            uPatrolTaskService.patrolTaskResultHandler(inspectionMapList);
+        } catch (Exception e) {
+            log.error("任务执行失败", e);
+        }
     }
 
     private void skipPoint(Map<String, String> inspectionMap) {

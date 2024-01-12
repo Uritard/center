@@ -99,10 +99,30 @@ public class PatrolTimeoutScheduled {
 
     private void taskTimeout(String taskId) {
 
-        Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
+        Set<String> tasKeys = uPatrolTaskService.queryTaskUndoneKeys(taskId);
+
+        timeoutPointExecute(taskId, tasKeys);
+
+        uPatrolTaskService.forceCompletionTask(taskId);
+
+        // 16秒后终止下级任务，延后终止避免与本级超时状态冲突，终止后下级上报任务状态是终止，本级是超时
+        ScheduledMapConfig.schedule(16, taskId, tid -> {
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(tid);
+            log.info("下级任务超时终止,robotCodeList:{}", robotCodeList);
+            if (robotCodeList != null && !robotCodeList.isEmpty()) {
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", tid);
+                robotTaskStatesMap.put("commandValue", 4);
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
+            }
+        });
+    }
+
+    private void timeoutPointExecute(String taskId, Set<String> tasKeys) {
         if (CollectionUtils.isEmpty(tasKeys)) {
-            log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
-            throw new BusinessException("任务未正确初始化");
+            log.warn("patrol_task_result:{}:* 未查到未执行定位", taskId);
+            return;
         }
 
         List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
@@ -143,20 +163,6 @@ public class PatrolTimeoutScheduled {
         CruiseRedisStorage.piplinePutPatrolDetail(outPointList);
         // 更新 PATROL_SUMMARY_PREFIX 并存储
         uPatrolTaskService.patrolTaskResultHandler(outPointList);
-        uPatrolTaskService.forceCompletionTask(taskId);
 
-        // 16秒后终止下级任务，延后终止避免与本级超时状态冲突，终止后下级上报任务状态是终止，本级是超时
-        ScheduledMapConfig.schedule(16, taskId, tid -> {
-            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(tid);
-            log.info("下级任务超时终止,robotCodeList:{}", robotCodeList);
-            if (robotCodeList != null && !robotCodeList.isEmpty()) {
-                Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", tid);
-                robotTaskStatesMap.put("commandValue", 4);
-                robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                uPatrolTaskService.robotTaskStates(robotTaskStatesMap);
-            }
-        });
     }
-
 }

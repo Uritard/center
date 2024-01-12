@@ -3,7 +3,6 @@ package com.yjh.platform.module.task.service;
 import cn.hutool.cache.Cache;
 import cn.hutool.cache.CacheUtil;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Sets;
 import com.yjh.commons.CollectionUtil;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -11,8 +10,8 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.*;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
@@ -22,17 +21,16 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.controller.HelloController;
-import com.yjh.platform.module.task.dao.*;
+import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
+import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
-import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.video.service.CameraConService;
 import com.yjh.platform.module.video.service.DroneCameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +41,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
@@ -54,12 +48,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
-import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author czh
@@ -88,6 +77,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
+
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
 
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
@@ -140,49 +132,20 @@ public class TCruiseTaskResultService {
         return this.tCruiseTaskResultDao.batchInsert(list);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match(key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
-    }
-
     public List<Map<String, Object>> selectCruiseTaskResult(String taskId, int pageNum, int pageSize) throws ParseException {
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
 
-        // 使用一个内部缓存，减少查询数据库压力
-        List<CruiseInspectResult> cruiseInspectResults = CRUISE_TIMER_CACHE.get(taskId, ()-> uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId));
-
         pageSize = pageSize < 20 ? 100 : pageSize;
         int start = (pageNum < 1) ? 1 : (pageNum - 1) * pageSize;
 
+        Set<String> keyResult = uPatrolTaskService.queryTaskKeys(taskId, start, start + pageSize, true);
+
         List<CruiseInspectResult> inspectPageResults = new ArrayList<>();
-        if (CollectionUtils.isEmpty(cruiseInspectResults)){
-            Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
+        if (CollectionUtils.isNotEmpty(keyResult)) {
             if (!keyResult.isEmpty()) {
-                List<String> pageKeys = keyResult.stream().skip(start).limit(pageSize).collect(Collectors.toList());
                 List<Map<String, String>> resultMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
-                    pageKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                    keyResult.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                     return null;
                 });
                 for (Map<String, String> resultMap : resultMapList) {
@@ -196,27 +159,17 @@ public class TCruiseTaskResultService {
                     }
                 }
             }
-            resultsMap.put("index", keyResult.size());
+            resultsMap.put("index", uPatrolTaskService.taskCount(taskId));
         } else {
+            // 使用一个内部缓存，减少查询数据库压力
+            List<CruiseInspectResult> cruiseInspectResults = CRUISE_TIMER_CACHE.get(taskId, ()-> uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId));
             List<CruiseInspectResult> pageResults = cruiseInspectResults.stream().skip(start).limit(pageSize).collect(Collectors.toList());
-            List<Map<String, String>> resultMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
-                pageResults.forEach(s -> {
-                    String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + s.getInstanceId();
-                    connection.hGetAll(key.getBytes(StandardCharsets.UTF_8));
-                });
-                return null;
-            });
-            Map<String, Map<String, String>> listMap = resultMapList.stream().collect(Collectors.toMap(s -> s.get("instanceId"), s -> s));
+
             for (CruiseInspectResult cruiseInspectResult : pageResults) {
                 cruiseInspectResult.setCruiseResultName("--");
                 cruiseInspectResult.setEndTime(null);
-                String instanceId = String.valueOf(cruiseInspectResult.getInstanceId());
 
-                Map<String, String> resultMap = listMap.get(instanceId);
-                if (resultMap.size() > 0) {
-                    getDataFromRedis(cruiseInspectResult, resultMap);
-                    inspectPageResults.add(cruiseInspectResult);
-                }
+                inspectPageResults.add(cruiseInspectResult);
             }
             resultsMap.put("index", cruiseInspectResults.size());
         }
@@ -227,9 +180,6 @@ public class TCruiseTaskResultService {
     }
 
     private void getDataFromRedis(CruiseInspectResult inspectResult, Map<String, String> resultMap) throws ParseException {
-        if (Constant.logUpLv3()) {
-            log.info("getDataFromRedis 方法入参：inspectResult：{}， resultMap：{}", JSONUtil.toJSONString(inspectResult), JSONUtil.toJSONString(resultMap));
-        }
 
         //最终结果集容器
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -240,15 +190,10 @@ public class TCruiseTaskResultService {
         inspectResult.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", resultMap.get("cruiseType")));
         inspectResult.setDeviceName(resultMap.get("deviceName"));
         inspectResult.setCruiseStatus(DictConvertUtil.DICT.covertToDict("cruiseDataState", resultMap.get("cruiseStatus")));
-        if ("".equals(resultMap.get("resultNum")) || "null".equals(resultMap.get("resultNum"))) {
-            inspectResult.setCruiseResultName("--");
-        } else {
-//            inspectResult.setCruiseResultName(resultMap.get("resultNum"));
+        if (!CommonUtils.isEmptyOrNullstr(resultMap.get("resultDesc"))) {
             inspectResult.setCruiseResultName(resultMap.get("resultDesc"));
         }
-        if ("null".equals(resultMap.get("cruiseTime")) || "".equals(resultMap.get("cruiseTime"))) {
-            inspectResult.setEndTime(null);
-        } else {
+        if (!CommonUtils.isEmptyOrNullstr(resultMap.get("cruiseTime"))) {
             inspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime")));
         }
         if (Objects.nonNull(resultMap.get("isWarn"))) {
@@ -413,7 +358,7 @@ public class TCruiseTaskResultService {
     @Transactional(rollbackFor = Exception.class)
     public String cruiseCameraStop(String taskId) {
         String stopResult = "失败";
-        Set<String> cruiseVideos = redisScan("cruiseVideo:" + taskId);
+        Set<String> cruiseVideos = RedisUtil.redisScan("cruiseVideo:" + taskId);
         for (String cruiseVideo : cruiseVideos) {
             Map<String, Object> videoInfo = redisTemplate.opsForHash().entries(cruiseVideo);
 
@@ -431,8 +376,8 @@ public class TCruiseTaskResultService {
     public List<RealTimeWarn> realTimeWarnInfo(String taskId) {
         List<RealTimeWarn> realTimeWarns = new ArrayList<>();
 
-        Set<String> warnKeys = redisScan("warnInfo:" + taskId);
-        Set<String> defectKeys = redisScan("defectInfo:" + taskId);
+        Set<String> warnKeys = RedisUtil.redisScan("warnInfo:" + taskId);
+        Set<String> defectKeys = RedisUtil.redisScan("defectInfo:" + taskId);
 
         List<Map<String, String>> warnMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
             warnKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
@@ -536,7 +481,7 @@ public class TCruiseTaskResultService {
         Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
         List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
-        Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
+        Set<String> keyResult = uPatrolTaskService.queryTaskKeys(taskId, true);
 
 
 //        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
@@ -670,7 +615,7 @@ public class TCruiseTaskResultService {
         Integer cruiseNotCount = 0;
         Integer cruisedCount = 0;
         Integer alarmCount = 0;
-        Set<String> instanceKey = redisTemplate.keys(PATROL_TASK_PREFIX + taskId +":*");
+        Set<String> instanceKey = uPatrolTaskService.queryTaskKeys(taskId, true);
         log.info("查询任务[{}]下所有instance:{}", taskId, JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {
             //遍历key，根据缓存信息判别巡视点结果
@@ -711,8 +656,8 @@ public class TCruiseTaskResultService {
         List<Object> finalResult = new ArrayList<>();//最终结果集(封装机器人、可见光、红外相机的信息)
 
 
-        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":");
-        Set<String> robotKeys = redisScan("robot_info*");
+        Set<String> cruiseKeys = uPatrolTaskService.queryTaskKeys(taskId, true);
+        Set<String> robotKeys = RedisUtil.redisScan("robot_info");
         for (String robotKey : robotKeys) {
             Map<String, Object> robotInfo = redisTemplate.opsForHash().entries(robotKey);
             String taskIdTemp = taskId.toString();
@@ -746,7 +691,7 @@ public class TCruiseTaskResultService {
         }
 
 
-        Set<String> cameraKeys = redisScan("camera_info*");
+        Set<String> cameraKeys = RedisUtil.redisScan("camera_info");
         float cruiseCount = 0;//总巡检点数量
         float cruisedCount = 0;//已执行数量
         float cruisedFailCount = 0;//执行失败数量
@@ -931,13 +876,7 @@ public class TCruiseTaskResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> cameraInfoByRedis() {
-        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX+"*");
-        for (String cruiseKey : cruiseKeys) {
-            Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
-            CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));
-            cruiseTypeInfo.getCruiseId().toString();
 
-        }
         Map<String, Object> cameraInfo = redisTemplate.opsForHash().entries("camera_info:21000000015");
         System.out.print(cameraInfo.getClass());
         return cameraInfo;

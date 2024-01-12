@@ -21,12 +21,13 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -59,6 +60,7 @@ public class ProcessResultToUpSystem {
     private final FtpsService ftpsService;
     private final ApplicationProperties applicationProperties;
     private final AlarmService alarmService;
+    private final TRobotInfoDao tRobotInfoDao;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -71,13 +73,14 @@ public class ProcessResultToUpSystem {
 
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
-                                   AlarmService alarmService,ApplicationProperties applicationProperties) {
+                                   AlarmService alarmService,ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
         this.ftpsService = ftpsService;
         this.alarmService = alarmService;
         this.applicationProperties = applicationProperties;
+        this.tRobotInfoDao = tRobotInfoDao;
     }
 
     public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
@@ -102,8 +105,19 @@ public class ProcessResultToUpSystem {
         try {
             String edgeCode = SysParamConfig.getSysContent("edgeCode");
             String stationCode = SysParamConfig.getSysContent("edgeId");
+            String taskId = Optional.ofNullable(cruiseResultList.get(0).get("taskId")).orElse("");
+            UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
+            String taskCode = uPatrolTask.getTaskCode();
+            String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
+            String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+            if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+                taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
+            }
+
+            Map<Long, TRobotInfo> allRobot = tRobotInfoDao.selectAll();
+
             for(Map<String, String> cruiseResultMap : cruiseResultList) {
-                if (Constant.logUpLv2()) {
+                if (Constant.logUpLv3()) {
                     log.info("cruiseResultMap=={}", cruiseResultMap);
                 }
                 String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
@@ -136,20 +150,16 @@ public class ProcessResultToUpSystem {
                     continue;
                 }
                 Map<String, Object> xmlItem = new HashMap<>(16);
-                String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
                 String devicePointId = Optional.ofNullable(cruiseResultMap.get("devicePointId")).orElse("");
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
 
-                HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
+                Map<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
+                // Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
+                String patroldeviceCode = patroldeviceCode(cruiseResultMap, allRobot);
 
-                Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
-                // String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
-                UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
-                String taskCode = uPatrolTask.getTaskCode();
-
-                xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "patroldevice_code"));
-                xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "patroldevice_name"));
+                xmlItem.put("patroldevice_code", patroldeviceCode);
+                xmlItem.put("patroldevice_name", MapUtils.getString(cruiseResultMap, "cruiseDeviceName"));
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
                 xmlItem.put("device_id", Constant.standardPoints() ? devicePointId : instanceId);
@@ -157,12 +167,6 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
                 xmlItem.put("task_code", taskCode);
-
-                String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
-                String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
-                if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
-                    taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
-                }
 
                 xmlItem.put("task_patrolled_id", taskPatrolledId);
                 xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
@@ -271,6 +275,20 @@ public class ProcessResultToUpSystem {
         map.put("fileType", fileType);
         map.put("isTemdif", isTemdif);
         return map;
+    }
+
+    private String patroldeviceCode(Map<String, String> cruiseResultMap, Map<Long, TRobotInfo> allRobot){
+        HashMap<String, String> map = new HashMap<>(4);
+        // 识别类型、文件类型、文件名命名
+        int cruiseType = MapUtils.getInteger(cruiseResultMap, "cruiseType");
+        CruiseConstant.TypeEnum type = CruiseConstant.TypeEnum.getEnum(cruiseType);
+
+        String deviceCode = MapUtils.getString(cruiseResultMap, "cruiseDeviceId");
+        if (type == CruiseConstant.TypeEnum.ROBOT || type == CruiseConstant.TypeEnum.UAV) {
+            deviceCode = Optional.ofNullable(allRobot.get(NumberUtils.toLong(deviceCode))).map(TRobotInfo::getRobotNum).orElse(deviceCode);
+        }
+
+        return deviceCode;
     }
 
     /**

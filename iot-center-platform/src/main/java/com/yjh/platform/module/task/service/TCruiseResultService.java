@@ -60,6 +60,8 @@ public class TCruiseResultService{
     private RedisTemplate redisTemplate;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
@@ -403,7 +405,7 @@ public class TCruiseResultService{
     private void getTaskCountByCache(TaskSimpleInfo temTask) {
         //取出taskId对应下的所有instanceId
         log.info("doing taskId is==={}", temTask.getTaskId());
-        Set<String> instanceKey = redisTemplate.keys(UPatrolTaskService.PATROL_TASK_PREFIX + temTask.getTaskId() +":*");
+        Set<String> instanceKey = uPatrolTaskService.queryTaskKeys(temTask.getTaskId(), false);
 //        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {
             Long instanceCount = (long)instanceKey.size();

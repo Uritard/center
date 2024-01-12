@@ -549,35 +549,7 @@
         select a.instance_id, a.edge_code, a.origin_id, a.device_mete_id, a.station_id, a.station_name, a.device_id, a.custom_id,
         a.data_format, a.identify_type, a.identify_son_type, a.cruise_type, a.cruise_id, a.cruise_name, a.cruise_content,
         tsd.device_type,tsd.up_region_id,
-        (
-        CASE
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(c.inspection_id)
-        AND ISNULL(d.preset_name) THEN
-        ''
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(c.inspection_name) THEN
-        d.preset_name
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(d.preset_img) THEN
-        c.inspection_name
-        WHEN ISNULL(c.inspection_name)
-        AND ISNULL(d.preset_name) THEN
-        b.mete_name
-        WHEN ISNULL(c.inspection_name) THEN
-        CONCAT(
-        b.mete_name,
-        ' /',
-        d.preset_name
-        )
-        WHEN ISNULL(d.preset_name) THEN
-        CONCAT(
-        b.mete_name,
-        ' /',
-        c.inspection_name
-        )
-        END
-        ) AS instanceName,
+        b.mete_name AS instanceName,
         b.mete_type,
         b.analyse_type,
         b.is_ai,
@@ -586,7 +558,7 @@
         tsd.device_name,
         tsd.real_code,
         c.robot_id,
-        IFNULL(c.inspection_name,d.preset_name) as cruiseName,
+        a.cruise_name,
         d.camera_id,
         e.voice_device_id as cruise_device_id,
         e.voice_device_name as cruise_device_name,
