@@ -108,12 +108,16 @@ public class TaskJob extends QuartzJobBean {
 
 
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
-        // 如果是一天多个时间点 调度走本级 给下级设备或节点发立即任务
-        // 若任务优先级低，则需给这个任务下发暂停 todo
-        uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
+        try {
+            // 如果是一天多个时间点 调度走本级 给下级设备或节点发立即任务
+            // 若任务优先级低，则需给这个任务下发暂停 todo
+            uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType(), allInstanceList);
 
-        // 增加下发给下级系统的
-        droneTaskStart(task);
+            // 增加下发给下级系统的
+            droneTaskStart(task);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         log.info("当前任务优先级：{}", task.getTaskLevel());
         // 判断当前任务是否可继续执行，低优先级任务暂停
