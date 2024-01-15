@@ -1042,7 +1042,13 @@ public class CameraConService {
      */
     public Map<String, Object> getNVRStoreAndChanle(Long recordId) {
         RecorderConInfo conInfo = cameraConDao.selectByRecordId(recordId);
-        Map<String, Object> channleStatusMap = new HashMap<>();
+        Map<String, Object> channleStatusMap = new HashMap<>(8);
+        if (StringUtils.isEmpty(conInfo.getDeviceChannel())) {
+            log.warn("未配置国标通道号: {}", conInfo);
+            channleStatusMap.put("errorMessage", "录像机不在线");
+            channleStatusMap.put("status", "离线");
+            return channleStatusMap;
+        }
 
         RecordFileEntity entity =
             RecordFileEntity.builder().ip(conInfo.getRecordIp()).port(conInfo.getHttpPort()).deviceId(conInfo.getDeviceChannel())
