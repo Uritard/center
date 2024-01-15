@@ -1261,7 +1261,7 @@ public class UPatrolTaskService {
                 list.add(Constant.standardPoints() ? StringUtils.defaultIfEmpty(t.getDevicePointId(), t.getOriginId()) : t.getOriginId());
             });
 
-            if (StringUtils.isNotEmpty(dateType)) {
+            if (StringUtils.countMatches(dateType, " ") > 2) {
                 boolean moreTime = dateType.split(" ")[2].contains(",");
                 if (moreTime && task.getExecuteType() == 172) {
                     List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
