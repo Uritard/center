@@ -1321,7 +1321,7 @@ public class UPatrolTaskService {
         log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
         //让机器人和无人机做任务
         log.info("task=={}, dateType: {}", task, dateType);
-        if (StringUtils.isNotEmpty(dateType)) {
+        if (StringUtils.countMatches(dateType, " ") > 2) {
             boolean moreTime = dateType.split(" ")[2].contains(",");
             if (moreTime && task.getExecuteType() == 172) {
                 robotTask(robotTaskInfoMap);
