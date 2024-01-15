@@ -2,6 +2,7 @@ package com.yjh.platform.module.iot.entity;
 
 import lombok.Data;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ public class TIotDeviceExtend extends TIotDevice {
     /**
      * 设备通道
      */
+    @Valid
     List<TIotDevicePoint> pointList;
 
 }

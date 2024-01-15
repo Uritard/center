@@ -37,20 +37,22 @@ public class TIotDevicePoint implements Serializable {
     /**
      * 物联设备名称
      */
-    @Length(max = 128)
-    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = ValidateConstant.MSG_RICH_NAME)
+    @Length(max = 64)
+    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = "设备名称" + ValidateConstant.MSG_RICH_NAME)
     private String iotDeviceName;
 
     /**
      * 通道号
      */
+    @Length(max = 32)
+    @Pattern(regexp= ValidateConstant.REG_SPECIAL_CHARACTERS, message = "通道号" + ValidateConstant.MSG_SPECIAL_CHARACTERS)
     private String channelNum;
 
     /**
      * 测点名称
      */
-    @Length(max = 128)
-    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = ValidateConstant.MSG_RICH_NAME)
+    @Length(max = 64)
+    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = "测点名称" + ValidateConstant.MSG_RICH_NAME)
     private String pointName;
 
     /**
@@ -63,7 +65,7 @@ public class TIotDevicePoint implements Serializable {
      * 额外参数配置
      */
     @Length(max = 256)
-    @Pattern(regexp= ValidateConstant.REG_DEVICE_PROPERTIES, message = ValidateConstant.MSG_DEVICE_PROPERTIES)
+    @Pattern(regexp= ValidateConstant.REG_DEVICE_PROPERTIES, message = "额外参数" + ValidateConstant.MSG_DEVICE_PROPERTIES)
     private String extend;
 
     @TableField(exist = false)

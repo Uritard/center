@@ -13,6 +13,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
@@ -33,13 +34,14 @@ public class TIotDevice implements Serializable {
     /**
      * 设备名称
      */
-    @Length(max = 128)
-    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = ValidateConstant.MSG_RICH_NAME)
+    @Length(max = 64)
+    @Pattern(regexp= ValidateConstant.REG_RICH_NAME, message = "设备名称" + ValidateConstant.MSG_RICH_NAME)
     private String deviceName;
 
     /**
      * 设备IP
      */
+    @Pattern(regexp= ValidateConstant.REG_IP_ADDRESS, message = ValidateConstant.MSG_IP_ADDRESS)
     private String ip;
 
     /**
@@ -51,6 +53,8 @@ public class TIotDevice implements Serializable {
     /**
      * 设备地址
      */
+    @Length(max = 30)
+    @Pattern(regexp= ValidateConstant.REG_DEVICE_PROPERTIES, message = ValidateConstant.MSG_DEVICE_PROPERTIES)
     private String address;
 
     /**

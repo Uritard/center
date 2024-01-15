@@ -1479,11 +1479,12 @@ public class UPatrolTaskService {
 
             item.put("start_time", mapForGet.getOrDefault("taskStart", planTime));
 
-            Integer normal = NumberUtils.toInt(mapForGet.get("normal"));
-            Integer abnormal = NumberUtils.toInt(mapForGet.get("abnormal"));
+            int all = MapUtils.getIntValue(mapForGet, "all");
+            int normal = MapUtils.getIntValue(mapForGet, "normal");
+            int abnormal = MapUtils.getIntValue(mapForGet, "abnormal");
 
-            float taskProgress = MapUtils.getFloat(mapForGet, "taskProgress");
-            float estimated = (1-taskProgress) * (normal + abnormal)/taskProgress;
+            float taskProgress = MapUtils.getFloatValue(mapForGet, "taskProgress");
+            float estimated = taskProgress == 0.0F ? all : (1-taskProgress) * (normal + abnormal)/taskProgress;
 
             String progress = String.format("%.2f", 100F * taskProgress);
             item.put("task_progress", progress + "%");

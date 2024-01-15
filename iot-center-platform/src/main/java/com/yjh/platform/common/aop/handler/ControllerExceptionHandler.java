@@ -7,6 +7,9 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +19,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolationException;
+import java.util.List;
 
 /**
  * 
@@ -31,18 +35,24 @@ public class ControllerExceptionHandler {
    
    private static final Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
     
-   @ExceptionHandler(value = { ConstraintViolationException.class })
+   @ExceptionHandler(value = { ConstraintViolationException.class, IllegalArgumentException.class })
    @ResponseStatus(HttpStatus.BAD_REQUEST)
-   public Result constraintViolationException(ConstraintViolationException ex) {
+   public Result constraintViolationException(RuntimeException ex) {
        logger.info(ex.getMessage(), ex);
        return new Result(HttpStatus.BAD_REQUEST.value(),"参数错误");
    }
    
-   @ExceptionHandler(value = { IllegalArgumentException.class })
+   @ExceptionHandler(value = { MethodArgumentNotValidException.class })
    @ResponseStatus(HttpStatus.BAD_REQUEST)
-   public Result IllegalArgumentException(IllegalArgumentException ex) {
+   public Result IllegalArgumentException(MethodArgumentNotValidException ex) {
        logger.info(ex.getMessage(), ex);
-       return new Result(HttpStatus.BAD_REQUEST.value(), "参数错误，请检查参数是否合规");
+       FieldError err = ex.getBindingResult().getFieldError();
+       String message = "参数校验失败，请检查参数";
+       if (err != null) {
+           message = err.getDefaultMessage();
+       }
+
+       return new Result(HttpStatus.BAD_REQUEST.value(), message);
    }
 
    @ExceptionHandler(value = { NoHandlerFoundException.class})
