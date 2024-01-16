@@ -1,6 +1,7 @@
 package com.yjh.accessmeter.module.service;
 
 import com.yjh.accessmeter.common.Constant;
+import com.yjh.accessmeter.configuration.DynamicTask;
 import com.yjh.accessmeter.module.dao.TMeterDao;
 import com.yjh.accessmeter.module.dao.TMeterLogDao;
 import com.yjh.accessmeter.module.device.entity.TMeter;
@@ -58,6 +59,8 @@ public class TMeterCollectService {
     private TMeterLogDao tMeterLogDao;
     @Resource
     private PlatformProxy platformProxy;
+    @Resource
+    private DynamicTask dynamicTask;
 
 
     public void add(Long id) {
@@ -131,7 +134,7 @@ public class TMeterCollectService {
                         protected void initChannel(SocketChannel channel) throws Exception {
                             channel.pipeline().addLast(new DLT645Decoder(),
                                     new DLT645Encoder(),
-                                    new DLT645MessgeHandler(tMeterDao, tMeterLogDao,platformProxy));
+                                    new DLT645MessgeHandler(tMeterDao, tMeterLogDao, platformProxy, dynamicTask));
                         }
                     });
             List<TMeter> tMeterList = tMeterDao.selectAll();
