@@ -10,6 +10,7 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
  * @date 2020/12/8 9:58
  * 机器人巡视结果处理线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
+@Deprecated
 public class InspectionResultThread implements Runnable{
 
     /**
