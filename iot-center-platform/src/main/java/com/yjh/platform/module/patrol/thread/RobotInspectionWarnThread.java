@@ -79,11 +79,8 @@ public class RobotInspectionWarnThread implements Runnable{
 
             UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
             log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
-            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
-                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
-                if (moreTime) {
-                    robotTaskId = taskId;
-                }
+            if (Objects.nonNull(uPatrolTaskTemp) && uPatrolTaskService.scheduledByLocal(uPatrolTaskTemp.getDateType())){
+                robotTaskId = taskId;
             }
             log.info("robotTaskId=={}", robotTaskId);
 

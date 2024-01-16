@@ -30,6 +30,7 @@ import java.util.Objects;
  **/
 @Slf4j
 @Service
+@Deprecated
 public class OperationResultHandler implements MessageHandlerStrategy, InitializingBean {
 
     @Autowired
