@@ -14,6 +14,7 @@ import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -66,6 +67,8 @@ public class TWarnInfoService{
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private TStdRegionService stdRegionService;
+    @Autowired
+    private ProcessResultToUpSystem processResultToUpSystem;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
 
@@ -447,6 +450,29 @@ public class TWarnInfoService{
         }
         return jieGuo;
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int alarmAndDefectProcessList(List<AlarmAndDefectProcess> list, String userId) {
+        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
+        int warn = 0;
+        List<Long> warnIdList = list.stream()
+                .filter(t -> t.getDefectModel().equals(warnFlag))
+                .map(AlarmAndDefectProcess::getWarnId).collect(Collectors.toList());
+        int defect = 0;
+        List<Long> defectIdList = list.stream()
+                .filter(t -> Objects.nonNull(t.getDefectModel()) && !t.getDefectModel().equals(warnFlag))
+                .map(AlarmAndDefectProcess::getWarnId).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(warnIdList)) {
+            warn = tWarnInfoDao.batchUpDate(warnIdList, userId);
+            processResultToUpSystem.reviewAlarmToUpSystem(warnIdList, false);
+        }
+        if (CollectionUtils.isNotEmpty(defectIdList)) {
+            defect = tDefectInfoDao.batchUpDate(defectIdList, userId);
+            processResultToUpSystem.reviewAlarmToUpSystem(defectIdList, true);
+        }
+        return warn + defect;
+    }
+
     public void sendWebSocket(Long warnId){
         //给前端推webSocket
         Map<String,String> jasonMap=new HashMap<>();

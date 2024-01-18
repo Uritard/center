@@ -165,6 +165,19 @@
     </set>
         where a.origin_id = #{originId} and a.edge_code = #{edgeCode}
     </update>
+    <update id="batchUpDate">
+        update t_defect_info a
+        set
+            a.deal_type = 286,
+            a.deal_info = '批量审核',
+            a.deal_person_id = #{userId},
+            a.deal_time = now()
+        where a.defect_id in(
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TDefectInfo">
         select
