@@ -5,6 +5,7 @@ import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,6 +38,8 @@ public class AccessRobotApplication implements CommandLineRunner {
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
+    @Value("${spring.websocket.send.url}")
+    private String url;
 
     private final NettyServer nettyServer = new NettyServer();
 
@@ -47,6 +50,7 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         Constant.redisTemplate = redisTemplate;
+        Constant.WEBSOCKET_URL = url;
         robotService.updateAllRobotStatus();
         robotService.setNeedConfirmSet();
         String url = Constant.getLocalIp();
