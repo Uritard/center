@@ -242,8 +242,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         String json = JSON.toJSONString(jasonMaps);
         log.info("发送给前端的消息：{}", json);
         try {
-            String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-            String result = serviceRestTemplate.postForObject(webSocketUrl, json, String.class);
+            String result = serviceRestTemplate.postForObject(Constant.WEBSOCKET_URL, json, String.class);
             log.info("param:{} result:{}", json, result);
         } catch (Exception e) {
             log.error("发送前端失败", e);

@@ -44,16 +44,14 @@ public class InspectionResultThread implements Runnable{
 
     private RedisTemplate redisTemplate;
     private Map<String,String> cruiseResultMap;
-    private String webSocketUrl;
     private Boolean changeTaskStatus;
     private static final String IS_AI_AlGORITHM = "on";
 
     private static final byte[] LOCK_FLAG = new byte[0];
 
-    public InspectionResultThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl, boolean changeTaskStatus){
+    public InspectionResultThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate,boolean changeTaskStatus){
         this.cruiseResultMap = cruiseResultMap;
         this.redisTemplate = redisTemplate;
-        this.webSocketUrl = webSocketUrl;
         this.changeTaskStatus = changeTaskStatus;
     }
 
@@ -471,7 +469,7 @@ public class InspectionResultThread implements Runnable{
                 jasonMap.put("taskId", taskId);
                 String json = JSON.toJSONString(jasonMap);
                 log.info("最后一个点-前端推送：" + json);
-                Constant.postUrl(webSocketUrl,json);
+                Constant.postUrl(Constant.WEBSOCKET_URL,json);
 
                 for (TCruiseTaskResultDetail tctrd : tctrdList){
                    StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());

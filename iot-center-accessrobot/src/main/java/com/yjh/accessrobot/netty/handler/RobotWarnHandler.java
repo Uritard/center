@@ -64,8 +64,7 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 
         // Start alarmResultDealThread
-        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService,webSocketUrl);
+        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService);
         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
         // 国网要求
