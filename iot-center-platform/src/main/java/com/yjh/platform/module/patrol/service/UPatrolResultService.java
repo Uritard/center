@@ -308,7 +308,7 @@ public class UPatrolResultService {
         if (checkedSize == cruiseManualReviewList.size()) {
             result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
             //自动生成巡视报告
-            Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+            Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             log.info("开始生成巡视报告=={}", progress);
         }
         return result2;
@@ -540,7 +540,7 @@ public class UPatrolResultService {
         return map;
     }
 
-    public int manualReviewTask(String taskId, String userId, HttpServletRequest request) {
+    public int manualReviewTask(String taskId, String userId, String token, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
@@ -569,7 +569,7 @@ public class UPatrolResultService {
         List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
         processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
         //自动生成巡视报告
-        Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+        Integer progress = reportManageService.reportCheckGenerate(taskId, userId + "_" + token, false);
         log.info("开始生成巡视报告=={}", progress);
         return result + reviewList.size();
     }

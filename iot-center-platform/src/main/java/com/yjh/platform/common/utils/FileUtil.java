@@ -153,7 +153,7 @@ public class FileUtil {
      * @param path 压缩到那个路径下
      *                    此方法保留空白文件
      */
-    public static void zip(List<String> fileList, String zipFileName,String basePath,String path)throws Exception{
+    public static void zip(List<String> fileList, String zipFileName,String basePath,String path, String taskName, String userId)throws Exception{
         if(fileList ==null || fileList.size() ==0){
             return;
         }
@@ -171,6 +171,7 @@ public class FileUtil {
                 int step = (int)(prog*100*0.2/size) + 80;
                 step = Math.min(step, 100);
                 ReportManageService.REPORT_CACHE.put(basePath, step);
+                Constant.sendProcess(taskName, userId, 1, step);
             }
 
             Boolean flag = true;
