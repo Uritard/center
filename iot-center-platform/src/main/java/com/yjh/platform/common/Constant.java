@@ -212,6 +212,38 @@ public class Constant {
         return result;
     }
 
+
+    /**
+     * 发送任务进度
+     */
+    public static void sendProcess(String taskName, String userId, Integer status, Integer num) {
+        String desc = status == 1 ? num == 100 ? "报告已生成" : "报告生成中:" + num + "%" : "报告生成失败!";
+        sendProcess(taskName, userId, status, desc);
+    }
+
+    /**
+     * 向前端推送 desc的进度值
+     *
+     * @param title 标识
+     * @param userId 推送用户
+     * @param status 成功 1  失败 0
+     * @param desc 进程描述
+     */
+    public static void sendProcess(String title, String userId, Integer status, String desc) {
+        if (StringUtils.isNotEmpty(userId)) {
+            try {
+                Map<String, Object> jasonMap = new HashMap<>(4);
+                jasonMap.put("type", "popProcess");
+                jasonMap.put("status", status);
+                jasonMap.put("title", title);
+                jasonMap.put("desc", desc);
+                websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, userId);
+            } catch (IOException e) {
+                log.error("向前端推送进度值错误", e);
+            }
+        }
+    }
+
     public static String websocketSendMsg(String url, Map<String, ?> map, String userId) throws IOException {
         // 将WebSocket信息写入Redis
         String json = JSON.toJSONString(map);

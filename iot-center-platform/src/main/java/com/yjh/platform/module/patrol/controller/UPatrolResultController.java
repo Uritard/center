@@ -288,9 +288,10 @@ public class UPatrolResultController {
     @Logs(title = "审核任务",content = "一键审核",logType = 5, authority = "1235")
     public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
         String userId = request.getHeader("userId");
+        String token = request.getHeader("token");
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,request));
+            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,token,request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);

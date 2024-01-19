@@ -119,7 +119,7 @@ public class ReportManageController {
     public Result reportByTask(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+            Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             if (progress > 0) {
                 result.setMessage("任务报告正在生成中，请耐心等待，当前进度" + progress + "%");
             } else {
