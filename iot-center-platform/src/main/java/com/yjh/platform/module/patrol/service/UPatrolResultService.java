@@ -31,6 +31,7 @@ import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
+import com.yjh.platform.module.task.service.TCruiseResultService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -85,6 +86,8 @@ public class UPatrolResultService {
     private ProcessResultToUpSystem processResultToUpSystem;
     @Autowired
     private LogsRecord logsRecord;
+    @Autowired
+    private TCruiseResultService cruiseResultService;
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -188,20 +191,7 @@ public class UPatrolResultService {
     }
 
     public List<TaskSimpleInfo> selectTaskIsRunning() {
-        List<TaskSimpleInfo> novelTaskList = uPatrolResultDao.selectTaskIsRunning();
-        for (TaskSimpleInfo temTask : novelTaskList) {
-            List<Long> counts = uPatrolResultDao.cruiseInspectCount(temTask.getTaskId());
-            temTask.setDeviceMeteCount(counts.get(0));
-            temTask.setCameraCount(counts.get(1));
-            temTask.setRobotPointsCount(counts.get(2));
-
-        }
-
-        List<TaskSimpleInfo> res = novelTaskList.stream()
-                .filter(taskSimpleInfo -> !taskSimpleInfo.getType().equals(508) || !taskSimpleInfo.getType().equals(509) || !taskSimpleInfo.getType().equals(456))
-                .collect(Collectors.toList());
-
-        return res;
+        return cruiseResultService.selectTaskIsRunning();
     }
 
     @Transactional(rollbackFor = Exception.class)

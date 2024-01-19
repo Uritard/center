@@ -75,7 +75,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             // 2022过检 修改robot_name为patroldevice_name
             String patrolDeviceName = robotService.getRobotName(String.valueOf(res.get("patroldevice_code")));
             if (StringUtils.isNotEmpty(patrolDeviceName)) {
-                res.put("patrolDeviceName", patrolDeviceName);
+                res.put("patroldevice_name", patrolDeviceName);
             }
             robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotOperationMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));

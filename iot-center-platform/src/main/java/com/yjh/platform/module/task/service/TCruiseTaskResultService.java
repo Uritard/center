@@ -92,8 +92,8 @@ public class TCruiseTaskResultService {
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
-    private final static Cache<String, List<CruiseInspectResult>> CRUISE_TIMER_CACHE = CacheUtil.newTimedCache(15*60*1000);
-    private final static Cache<String, List<CruiseCountOfType>> CRUISE_COUNT_TIMER_CACHE = CacheUtil.newTimedCache(6*60*60*1000);
+    private final static Cache<String, List<CruiseInspectResult>> CRUISE_TIMER_CACHE = CacheUtil.newTimedCache(5*60*1000);
+    private final static Cache<String, List<CruiseCountOfType>> CRUISE_COUNT_TIMER_CACHE = CacheUtil.newTimedCache(5*60*1000);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTaskResult tCruiseTaskResult) {
