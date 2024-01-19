@@ -486,6 +486,24 @@ public class TWarnInfoController {
         return result;
     }
 
+    @ApiOperation(value = "告警核查")
+    @PostMapping(value = "/alarmAndDefectProcessList")
+    @Logs(title = "告警核查",content = "告警核查",logType = 5,authority = "1235")
+    public Result alarmAndDefectProcessList(@RequestBody List<AlarmAndDefectProcess> list, HttpServletRequest request){
+        Result result = new Result();
+        String userId = request.getHeader("userId");
+        try {
+            result.setData(tWarnInfoService.alarmAndDefectProcessList(list, userId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("进行告警处理发生异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("进行告警处理发生错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "告警信息计数统计(未核查)")
     @GetMapping(value = "/warnCountsNonIdentify")
     @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1, authority = "1234,1235")
