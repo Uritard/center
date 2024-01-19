@@ -243,7 +243,7 @@ public class UPatrolTaskService {
 
     private UPatrolTask dealTaskInfo(TCruiseTaskAdd tCruiseTaskAdd){
         UPatrolTask uPatrolTask = new UPatrolTask();
-        if (tCruiseTaskAdd.getIfRun() == 172) {
+        if (tCruiseTaskAdd.getIfRun() == TaskTypeEnum.CYCLE.getType()) {
             String cronExpressionDate = "";
             Long periodId = tCruiseTaskAdd.getPeriodId();
             if (Objects.nonNull(periodId)) {
@@ -288,12 +288,13 @@ public class UPatrolTaskService {
             }
         } else {
             Date now = DateUtil.dateSecond();
-            if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
-                uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
-            } else {
+            Date time = Optional.ofNullable(tCruiseTaskAdd.getStartTime()).orElse(now);
+            if (tCruiseTaskAdd.getIfRun() == TaskTypeEnum.NOW.getType()) {
                 uPatrolTask.setStartTime(now);
+            } else {
+                uPatrolTask.setStartTime(time);
             }
-            uPatrolTask.setEndTime(now);
+            uPatrolTask.setEndTime(time);
         }
         if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
             uPatrolTask.setTaskCode(tCruiseTaskAdd.getTaskCode());

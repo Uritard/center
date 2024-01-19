@@ -4,6 +4,8 @@ package com.yjh.accessrobot.module.command.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.ModelFileEnum;
@@ -61,6 +63,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -134,7 +137,7 @@ public class RobotService {
         return tRobotInfoDao.updateAllRobotStatus("离线");
     }
 
-    private static final Map<String, TRobotInfo> ROBOT_INFO_MAP = new ConcurrentHashMap<>(16);
+    private static final Cache<String, TRobotInfo> ROBOT_INFO_CACHE = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build();
 
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
 
@@ -3115,16 +3118,17 @@ public class RobotService {
         return CollectionUtils.isNotEmpty(tStdRegionList);
     }
 
-    public int changeStatistic(String deviceCode,String deviceRun,String robotCode) {
+    public int changeStatistic(String deviceRun,String robotCode) {
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+        String deviceCode = tRobotInfo.getRobotNum();
         DeviceStatisticInfoResult deviceStatisticInfoResult = deviceStatisticInfoResultDao.select(deviceCode);
         if (deviceStatisticInfoResult != null) {
             deviceStatisticInfoResult.setDeviceRun(deviceRun);
-            return    deviceStatisticInfoResultDao.changeRun(deviceStatisticInfoResult);
+            return deviceStatisticInfoResultDao.changeRun(deviceStatisticInfoResult);
         }
         else {
             deviceStatisticInfoResult = new DeviceStatisticInfoResult();
-            TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-            deviceStatisticInfoResult.setDeviceCode(tRobotInfo.getRobotNum());
+            deviceStatisticInfoResult.setDeviceCode(deviceCode);
             deviceStatisticInfoResult.setDeviceName(tRobotInfo.getRobotName());
             deviceStatisticInfoResult.setDeviceRun(deviceRun);
             deviceStatisticInfoResult.setDeviceResumeDate(new Date());
@@ -3246,8 +3250,13 @@ public class RobotService {
     }
 
     public String getRobotName(String robotNum) {
-        TRobotInfo robotInfo = ROBOT_INFO_MAP.computeIfAbsent(robotNum, k-> tRobotInfoDao.selectRobotInfoByRobotNum(k, null));
-        return Optional.ofNullable(robotInfo).map(TRobotInfo::getRobotName).orElse("");
+        try {
+            TRobotInfo robotInfo = ROBOT_INFO_CACHE.get(robotNum, () -> tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, null));
+            return Optional.ofNullable(robotInfo).map(TRobotInfo::getRobotName).orElse("");
+        } catch (ExecutionException e) {
+            log.error(e.getMessage(), e);
+        }
+        return StringUtils.EMPTY;
     }
 }
 

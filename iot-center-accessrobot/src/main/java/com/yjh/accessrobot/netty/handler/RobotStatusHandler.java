@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +59,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             // 2022过检 robot_name修改为patroldevice_name
             String patrolDeviceName = robotService.getRobotName(String.valueOf(res.get("patroldevice_code")));
             if (StringUtils.isNotEmpty(patrolDeviceName)) {
-                res.put("patrolDeviceName", patrolDeviceName);
+                res.put("patroldevice_name", patrolDeviceName);
             }
             robotStatusMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotStatusMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
@@ -90,7 +89,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             }
             //若设备故障报警，记录设备状态及正常运行时长
             if ("21".equals(res.get("type").toString())) {
-                robotService.changeStatistic(String.valueOf(res.get("patroldevice_code")), res.get("value").toString(), robotCode);
+                robotService.changeStatistic(res.get("value").toString(), robotCode);
             }
         }
         log.info("下级的状态数据是：" + robotStatusList);

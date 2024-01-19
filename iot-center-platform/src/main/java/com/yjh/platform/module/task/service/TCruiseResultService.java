@@ -372,7 +372,6 @@ public class TCruiseResultService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TaskSimpleInfo> selectTaskIsRunning(){
-//        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
         List<TaskSimpleInfo> novelTaskList=uPatrolResultDao.selectTaskIsRunning();
         for(TaskSimpleInfo temTask:novelTaskList){
            String systemLevel = Constant.getLevelEdge();
