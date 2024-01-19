@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
 import com.google.common.base.Strings;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.task.entity.ContentData;
 import com.yjh.platform.module.task.entity.TableCellElement;
 import com.yjh.platform.module.task.service.ReportManageService;
@@ -155,7 +156,7 @@ public class ReportHelper {
         cell.setCellStyle(hlink_style);
     }
 
-    public static boolean createDocument(List<KeyValue<String, ContentData>> contentDataList, File dest,String taskId) {
+    public static boolean createDocument(List<KeyValue<String, ContentData>> contentDataList, File dest,String taskId, String taskName, String userId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook();
         int size = contentDataList.size();
         int idx = 1;
@@ -163,7 +164,7 @@ public class ReportHelper {
             try {
                 float ratio = Math.min((float)idx++/size, 1.0F);
                 ContentData contentData = dataKeyValue.getValue();
-                createDocumentSheet(contentData.getRowCount(), contentData.getColumnCount(), contentData.getElements(), wb, dataKeyValue.getKey(), taskId, ratio);
+                createDocumentSheet(contentData.getRowCount(), contentData.getColumnCount(), contentData.getElements(), wb, dataKeyValue.getKey(), taskId, taskName, userId, ratio);
             } catch (Exception e) {
                 logger.info("create sheet error: ", e);
             }
@@ -177,11 +178,11 @@ public class ReportHelper {
         return true;
     }
 
-    public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest,String taskId) {
+    public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest,String taskId, String taskName, String userId) {
         final SXSSFWorkbook wb = new SXSSFWorkbook(rowNum);
 
         try {
-            createDocumentSheet(rowNum, columnNum, elements, wb, "巡检报告", taskId);
+            createDocumentSheet(rowNum, columnNum, elements, wb, "巡检报告", taskId, taskName, userId);
         } catch (Exception e) {
             logger.info("create sheet error: ", e);
         }
@@ -195,11 +196,13 @@ public class ReportHelper {
         return true;
     }
 
-    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId){
-        return createDocumentSheet(rowNum, columnNum, elements, wb, sheetName, taskId, 0);
+    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName,
+                                              String taskId, String taskName, String userId){
+        return createDocumentSheet(rowNum, columnNum, elements, wb, sheetName, taskId, taskName, userId, 0);
     }
 
-    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb, String sheetName, String taskId, float ratio) {
+    public static boolean createDocumentSheet(int rowNum, int columnNum, List<TableCellElement> elements, SXSSFWorkbook wb,
+                                              String sheetName, String taskId, String taskName, String userId, float ratio) {
         final SXSSFSheet sheet = wb.createSheet(sheetName);
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         // Row row;
@@ -248,6 +251,7 @@ public class ReportHelper {
                 int step = (int)(prog*ratio*100*0.55/size) + 25;
                 step = Math.min(step, (int)(80*ratio));
                 ReportManageService.REPORT_CACHE.put(taskId, step);
+                Constant.sendProcess(taskName, userId, 1, step);
                 logger.info("正在生成excel, taskId: {}, row: {}, progress: {}", taskId, prog, step);
             }
 

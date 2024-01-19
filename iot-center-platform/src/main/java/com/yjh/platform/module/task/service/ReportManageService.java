@@ -18,6 +18,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
@@ -94,7 +95,7 @@ public class ReportManageService {
 
         ContentData contentData = ReportDataRepo.getData(recordData);
         ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-                contentData.getElements(), file,null);
+                contentData.getElements(), file, null, null, null);
 
         TReportInfo reportInfo = new TReportInfo()
                 .setReportId(String.valueOf(UUID.randomUUID()).replace("-", ""))
@@ -172,7 +173,7 @@ public class ReportManageService {
         return res;
     }
 
-    public Integer reportCheckGenerate(String taskId, String userId){
+    public Integer reportCheckGenerate(String taskId, String userId, Boolean downLoad){
         if (StringUtils.isEmpty(taskId)) {
             throw new BusinessException(ResultCodeEnum.PARAMERROR, "请选择正确的任务生成巡视报告");
         }
@@ -186,8 +187,8 @@ public class ReportManageService {
         }
 
         ThreadPoolUtil.PATROL_POOL.addThread(()->{
-            TaskVO taskVO = cruiseReportGenerate(taskId);
-            pushDownload(taskVO, taskId, userId);
+            TaskVO taskVO = cruiseReportGenerate(taskId, userId);
+            pushDownload(taskVO, taskId, userId, downLoad);
         });
         return 0;
     }
@@ -196,8 +197,8 @@ public class ReportManageService {
         return REPORT_CACHE.get(taskId);
     }
 
-    public TaskVO cruiseReportGenerate(String taskId){
-
+    public TaskVO cruiseReportGenerate(String taskId, String userId){
+        UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
         try {
             // 明细
             List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
@@ -241,7 +242,7 @@ public class ReportManageService {
             // 概况
             REPORT_CACHE.put(taskId, 25);
             log.info("任务概况统计计算完成，{}", taskId);
-
+            Constant.sendProcess(uPatrolTask.getTaskName(), userId, 1, reportGenerateProgress(taskId));
             String reportPath = (String) redisTemplate.opsForHash().get("t_sys_param:tempReflect", "content");
             File file = reportFile(taskBaseVO);
             if (!file.exists()) {
@@ -251,16 +252,18 @@ public class ReportManageService {
                 log.info("存在，该文件绝对路径是==={}", file.getAbsolutePath());
             }
 
-            ReportHelper.createDocument(contentDataList, file, taskId);
+            ReportHelper.createDocument(contentDataList, file, taskId, uPatrolTask.getTaskName(), userId);
             try {
                 //将任务下的巡视原图图片 打包成一份zip
-                FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath);
+                FileUtil.zip(originalImgList, taskId + ".zip", taskId, reportPath, uPatrolTask.getTaskName(), userId);
+                Constant.sendProcess(uPatrolTask.getTaskName(), userId, 1, 100);
             }catch (Exception e){
                 log.info("压缩任务下图片失败：",e);
             }
             return taskBaseVO;
         } catch (Exception e) {
             log.error("生成任务报告失败", e);
+            Constant.sendProcess(uPatrolTask.getTaskName(), userId, 0, reportGenerateProgress(taskId));
             throw new BusinessException("任务报告生成失败");
         } finally {
             REPORT_CACHE.remove(taskId);
@@ -453,7 +456,7 @@ public class ReportManageService {
         File file = reportFile(taskVO);
         Integer prog = reportGenerateProgress(taskId);
         if (!file.exists()) {
-            prog = reportCheckGenerate(taskId, userId);
+            prog = reportCheckGenerate(taskId, userId, true);
             if (prog > 0) {
                 result.setMessage("任务报告正在生成中，请耐心等待，当前进度" + prog + "%");
             } else {
@@ -535,8 +538,8 @@ public class ReportManageService {
         return new String[0];
     }
 
-    public void pushDownload(TaskVO taskVO, String taskId, String userId) {
-        if (StringUtils.isNotEmpty(userId)) {
+    public void pushDownload(TaskVO taskVO, String taskId, String userId, Boolean downLoad) {
+        if (downLoad && StringUtils.isNotEmpty(userId)) {
             try {
                 String[] urlPath = reportFilePath(taskVO, taskId);
 
