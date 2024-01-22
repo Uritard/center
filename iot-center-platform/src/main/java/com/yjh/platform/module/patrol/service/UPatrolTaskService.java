@@ -66,6 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -412,7 +413,9 @@ public class UPatrolTaskService {
             String[] deviceInstancesFromUpperSystem = StringUtils.isEmpty(tCruiseTaskAdd.getDeviceList())
                     ? new String[0] : tCruiseTaskAdd.getDeviceList().split(",");
             for (String item : deviceInstancesFromUpperSystem) {
-                instanceList.add(Long.valueOf(item));
+                if (StringUtils.isNotBlank(item)) {
+                    instanceList.add(Long.valueOf(item));
+                }
             }
             List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
             if (Constant.logUpLv3()) {
@@ -3656,7 +3659,9 @@ public class UPatrolTaskService {
         }
         String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
         for (String item : deviceInstancesFromUpperSystem) {
-            instanceList.add(Long.valueOf(item));
+            if (StringUtils.isNotBlank(item)) {
+                instanceList.add(Long.valueOf(item));
+            }
         }
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
         List<TCruisePointInstanceNameDetail> edgeDetailList = detailList.stream()
