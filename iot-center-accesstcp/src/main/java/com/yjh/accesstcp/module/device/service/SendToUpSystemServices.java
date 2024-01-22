@@ -512,9 +512,10 @@ public class SendToUpSystemServices {
         String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(null, presetRealImgPath,presetImgPath);
+        String stationName = getStationName();
         list.forEach(item->{
             item.put("station_code",stationCode);
-            item.put("station_name", getStationName());
+            item.put("station_name", stationName);
             JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("device_code","");
@@ -544,6 +545,7 @@ public class SendToUpSystemServices {
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
             }
+            item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
             item.remove("cruise_type");
             item.remove("camera_id");
             item.remove("preset_id");

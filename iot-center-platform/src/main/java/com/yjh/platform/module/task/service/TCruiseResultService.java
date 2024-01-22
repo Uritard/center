@@ -383,9 +383,7 @@ public class TCruiseResultService{
                 long all = Optional.ofNullable(counts.get("all")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
                 if (all == 0) {
                     getTaskCountByCache(temTask);
-                }
-                else {
-
+                } else {
                     temTask.setDeviceMeteCount(all);
                     long c229 = Optional.ofNullable(counts.get("229")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
                     long c230 = Optional.ofNullable(counts.get("230")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L);
@@ -395,7 +393,6 @@ public class TCruiseResultService{
                     temTask.setDronePointsCount( Optional.ofNullable(counts.get("524")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
                 }
             }
-
         }
 
         return novelTaskList ;
