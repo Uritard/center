@@ -550,8 +550,8 @@
         FROM t_cruise_point_instance tcpi
         WHERE 1 = 1
         <foreach collection="list" open="AND (" close=")" separator="OR" item="deviceModel">
-        tcpi.device_id = #{devicModel.deviceId}
-        AND FIND_IN_SET(tcpi.custom_id, #{devicModel.deviceId, jdbcType=VARCHAR})
+        tcpi.device_id = #{deviceModel.deviceId}
+        AND FIND_IN_SET(tcpi.custom_id, #{deviceModel.componentId, jdbcType=VARCHAR})
         </foreach>
     </select>
 </mapper>
