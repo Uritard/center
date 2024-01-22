@@ -282,6 +282,10 @@ public interface CruiseConstant {
          */
         ROBOT_OVERHAUL("机器人处于检修状态,未执行"),
         /**
+         * 设备操作任务中
+         */
+        EQUIPMENT_OPERATE("机器人操作任务中,未执行"),
+        /**
          * 设备检修中
          */
         EQUIPMENT_MAINTENANCE("设备检修中"),

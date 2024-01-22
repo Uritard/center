@@ -740,7 +740,7 @@ INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '过期删�
 INSERT INTO `t_dict_business` VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
 INSERT INTO `t_dict_business` VALUES ('300759', '818', 'camera_vendor', '巨哥', '0', '厂家类型', 1);
 INSERT INTO `t_dict_business` VALUES ('300760', '819', 'camera_vendor', '高德', '0', '厂家类型', 1);
-INSERT INTO `t_dict_business` VALUES ('300761', '821', 'abnormal_type', '操作异常', NULL, '操作任务中不可下发巡视任务', '0');
+INSERT INTO `t_dict_business` VALUES ('300761', '821', 'abnormal_type', '设备操作任务中', NULL, '操作任务中不可下发巡视任务', '0');
 INSERT INTO `t_dict_business` VALUES ('300762', '689', 'alarm_source', '静默监视', '0', '告警来源', '6');
 INSERT INTO `t_dict_business` VALUES ('300765', '830', 'operation_type', '双按钮手车-进车', '42', '操作类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300766', '831', 'operation_type', '双按钮手车-退车', '43', '操作类型', '1');

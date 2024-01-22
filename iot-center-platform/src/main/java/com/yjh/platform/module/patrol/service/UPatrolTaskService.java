@@ -1155,10 +1155,10 @@ public class UPatrolTaskService {
             } else {
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 for (String item : robotCode) {
-                    String taskId = uPatrolTaskDao.selectRobotTaskOnStartByRobotCode(item);
-                    if (StringUtils.isNotEmpty(taskId)) {
+                    String operationTaskId = uPatrolTaskDao.selectRobotTaskOnStartByRobotCode(item);
+                    if (StringUtils.isNotEmpty(operationTaskId)) {
                         Long robotId = tRobotInfoDao.selectRobotIdByCode(item);
-                        redisTemplate.opsForHash().put(PATROL_SUMMARY_PREFIX + taskId, "operateTaskRobotId", String.valueOf(robotId));
+                        redisTemplate.opsForHash().put(PATROL_SUMMARY_PREFIX + task.getTaskId(), "operateTaskRobotId", String.valueOf(robotId));
                         continue;
                     }
                     RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
@@ -1301,6 +1301,13 @@ public class UPatrolTaskService {
         List<Long> robotInstanceList = uPatrolTaskDao.selectInstanceIdByTaskId(task.getTaskCode());
         log.info("robotInstanceList : {}", robotInstanceList);
 
+        // 查询检修区域
+        Set<Long> finalOverhaul = new HashSet<>();
+        List<String> overhaulList = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        overhaulList.forEach(s -> finalOverhaul.add(NumberUtils.toLong(s)));
+        //去掉检修区域的点
+        robotInstanceList.removeAll(finalOverhaul);
+
         if (robotCruiseList.isEmpty()) {
             log.info("There are no instanceId for robot or drone to do！！！");
             return;
@@ -1309,6 +1316,12 @@ public class UPatrolTaskService {
         log.info("robotCode : {}", robotCode);
         List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
         for (String item: robotCode){
+            String operationTaskId = uPatrolTaskDao.selectRobotTaskOnStartByRobotCode(item);
+            if (StringUtils.isNotEmpty(operationTaskId)) {
+                Long robotId = tRobotInfoDao.selectRobotIdByCode(item);
+                redisTemplate.opsForHash().put(PATROL_SUMMARY_PREFIX + task.getTaskId(), "operateTaskRobotId", String.valueOf(robotId));
+                continue;
+            }
             RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
             robotTaskInfo.setCruiseType(task.getTaskType());
             robotTaskInfo.setTaskId(task.getTaskId());
@@ -2107,7 +2120,7 @@ public class UPatrolTaskService {
             if (!skipFlag && StringUtils.isNotEmpty(operateTaskRobotId) && !StringUtils.equals("null", operateTaskRobotId)) {
                 if (StringUtils.equals(operateTaskRobotId, m.get("robotId"))) {
                     m.put("resultNum", "-1");
-                    m.put("resultDesc", AbnormalResDescEnum.EQUIPMENT_MAINTENANCE.getDesc());
+                    m.put("resultDesc", AbnormalResDescEnum.EQUIPMENT_OPERATE.getDesc());
                     // 操作任务中不可下发巡视任务
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OPERATE));
                     // 巡检数据状态，忽略

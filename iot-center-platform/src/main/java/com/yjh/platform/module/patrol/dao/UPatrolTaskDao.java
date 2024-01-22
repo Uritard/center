@@ -151,13 +151,6 @@ public interface UPatrolTaskDao {
     String selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
 
     /**
-     * 根据robotId 查询正在执行的最新的操作任务
-     * @param robotId
-     * @return
-     */
-    String selectRobotTaskOnStartByRobotId(@Param(value = "robotId") Long robotId);
-
-    /**
      * 根据robotCode 查询正在执行的最新的操作任务
      * @param robotCode
      * @return
