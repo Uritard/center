@@ -98,10 +98,11 @@ public class RobotController {
     @ApiOperation(value = "发送模型同步指令接口")
     @GetMapping(value = "/fileTransfer")
     @Logs(title = "模型同步",content = "根据用户传递的参数给巡视设备发送模型同步指令",logType = 5,authority = "1234")
-    public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
+    public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode, HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTransfer(robotCode));
+            String userId = request.getHeader("userId");
+            result.setData(robotService.feignRobotTransfer(robotCode, userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -130,10 +131,12 @@ public class RobotController {
     @GetMapping(value = "/feignEdgeTransfer")
     @Logs(title = "模型同步",content = "根据用户传递的参数给边缘节点发送模型同步指令",logType = 5,authority = "1234")
     public Result feignEdgeTransfer(@RequestParam(value = "edgeId") String edgeId,
-                                    @RequestParam(value = "command") String command) {
+                                    @RequestParam(value = "command") String command,
+                                    HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignEdgeTransfer(edgeId, command));
+            String userId = request.getHeader("userId");
+            result.setData(robotService.feignEdgeTransfer(edgeId, command, userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
