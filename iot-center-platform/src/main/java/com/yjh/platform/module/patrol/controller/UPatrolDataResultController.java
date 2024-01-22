@@ -319,7 +319,7 @@ public class UPatrolDataResultController {
         @RequestParam(value = "meteType", required = false) String meteType,
         @RequestParam(value = "meterType", required = false) Integer meterType,
         @RequestParam(value = "regionId", required = false) Long regionId,
-        @RequestParam(value = "meteName", required = false) String meteName,
+        @RequestParam(value = "instanceName", required = false) String instanceName,
         @RequestParam(value = "endTime", required = false) String endTime,
         @RequestParam(value = "startTime", required = false) String startTime,
         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -352,7 +352,7 @@ public class UPatrolDataResultController {
             }
 
             Map<String, Object> resultMap = new HashMap<>(4);
-            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormal(cType, meteType, meterType, endTime, startTime, deviceIdList, meteName);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormal(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
