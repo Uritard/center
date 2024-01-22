@@ -438,7 +438,7 @@
             point_name = #{pointName},
             unit = #{unit},
             extend = #{extend}
-        where id = #{id}
+        where origin_id = #{pointId} and edge_code = #{edgeCode}
     </update>
 
     <insert id="batchInsertIotDeviceData" keyColumn="id" parameterType="java.util.List">
