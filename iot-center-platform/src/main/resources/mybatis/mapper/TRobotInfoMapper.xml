@@ -662,7 +662,8 @@
        select
             a.edge_code,
             a.robot_id,
-            a.robot_code
+            a.robot_code,
+            a.robot_status
         FROM t_robot_info a
     </select>
     <select id="selectAllRobotCode2" resultType="java.lang.String">

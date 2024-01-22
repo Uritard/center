@@ -823,11 +823,8 @@ public class HomePageService {
             robotList.stream().forEach(tRobotInfo -> {
                 // 判断是否有离线机器人
                 Map<String, Object> robotStatus = redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":2");
-                if (robotStatus.size() != 0 && Optional.ofNullable(robotStatus.get("value")).isPresent()) {
-                    if ("1".equals(String.valueOf(robotStatus.get("value")))) {
-                        warningRegions.add(edgeCode);
-                        return;
-                    }
+                if ("1".equals(MapUtils.getString(robotStatus,"value")) || "离线".equals(tRobotInfo.getRobotStatus())) {
+                    warningRegions.add(edgeCode);
                 }
             });
         });
