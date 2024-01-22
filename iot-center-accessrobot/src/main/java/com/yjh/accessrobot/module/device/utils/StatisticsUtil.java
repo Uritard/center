@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.device.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -155,16 +156,7 @@ public class StatisticsUtil {
           log.info("tRobotAlarm的内容==={}", tRobotAlarm);
           //告警屏蔽处理
           AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-          List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getAlarmInfo());
-          if (alarmShieldList.size() > 0){
-            alarmShieldList.forEach(alarmShield -> {
-              Date endTime = alarmShield.getEndTime();
-              if (now.before(endTime)){
-                log.info("告警屏蔽：{}",alarmShield);
-                isWarn.set(false);
-              }
-            });
-          }
+          robotService.needPopAlarm(tRobotAlarm.getAlarmInfo(), isWarn);
           if (isWarn.get()){
             int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
             log.info("插告警表的结果=" + res);
@@ -191,8 +183,7 @@ public class StatisticsUtil {
     String json = JSON.toJSONString(jasonMaps);
     log.info("发送给前端的消息：{}", json);
     try {
-      String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-      String result = serviceRestTemplate.postForObject(webSocketUrl, json, String.class);
+      String result = serviceRestTemplate.postForObject(Constant.WEBSOCKET_URL, json, String.class);
       log.info("param:{} result:{}", json, result);
     } catch (Exception e) {
       log.error("发送前端失败", e);

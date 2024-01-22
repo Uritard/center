@@ -172,6 +172,8 @@ public class Constant {
         StaticContextAccessor.getBean(ServiceRestTemplate.class).delete(url, params);
     }
 
+    public static String WEBSOCKET_URL="";
+
     public static RedisTemplate redisTemplate;
 
     public static Map<Integer, Map<ChannelFuture, ServerBootstrap>> futureServerBootstrapHashMap = new ConcurrentHashMap<>();

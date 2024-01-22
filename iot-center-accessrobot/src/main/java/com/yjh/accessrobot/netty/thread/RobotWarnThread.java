@@ -20,12 +20,10 @@ public class RobotWarnThread implements Runnable{
 
     private Map<String,String> robotAlarmMap;
     private RobotService robotService;
-    private String syncWebsocketUrl;
 
-    public RobotWarnThread(Map<String, String> robotAlarmMap, RobotService robotService,String syncWebsocketUrl) {
+    public RobotWarnThread(Map<String, String> robotAlarmMap, RobotService robotService) {
         this.robotAlarmMap = robotAlarmMap;
         this.robotService = robotService;
-        this.syncWebsocketUrl = syncWebsocketUrl;
     }
 
     @Override
@@ -50,17 +48,7 @@ public class RobotWarnThread implements Runnable{
                 log.info("tRobotAlarm的内容==={}", tRobotAlarm);
                 //告警屏蔽处理
                 AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-                List<AlarmShield> alarmShieldList = robotService.selectAlarmShield(tRobotAlarm.getAlarmInfo());
-                if (alarmShieldList.size() > 0){
-                    alarmShieldList.forEach(alarmShield -> {
-                        Date now  = new Date();
-                        Date endTime = alarmShield.getEndTime();
-                        if (now.before(endTime)){
-                            log.info("告警屏蔽：{}",alarmShield);
-                            isWarn.set(false);
-                        }
-                    });
-                }
+                robotService.needPopAlarm(tRobotAlarm.getAlarmInfo(), isWarn);
                 if (isWarn.get()){
                     int res = robotService.insertRobotAlarm(tRobotAlarm);
                     log.info("插告警表的结果="+res);
@@ -73,7 +61,7 @@ public class RobotWarnThread implements Runnable{
                     jasonMaps.put("source", "robot");
                     String json = JSON.toJSONString(jasonMaps);
                     log.info("发送给前端的消息：{}", json);
-                    Constant.postUrl(syncWebsocketUrl, json);
+                    Constant.postUrl(Constant.WEBSOCKET_URL, json);
                 } else {
                     log.info("此告警被屏蔽了，不入库，不弹窗");
                 }

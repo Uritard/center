@@ -62,6 +62,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1603,8 +1604,7 @@ public class RobotService {
                 String jsons = JSON.toJSONString(robotConfirmMsg);
                 log.info("确认消息生成-前端推送：" + jsons);
                 try {
-                    String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-                    Constant.postUrl(webSocketUrl, jsons);
+                    Constant.postUrl(Constant.WEBSOCKET_URL, jsons);
                 } catch (IOException | URISyntaxException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -2236,8 +2236,7 @@ public class RobotService {
         //webSocket通知前端确认消息
         String jsons = JSON.toJSONString(jasonMaps);
         log.info("确认消息生成-前端推送：" + jsons);
-        String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl","content"));
-        Constant.postUrl(webSocketUrl, jsons);
+        Constant.postUrl(Constant.WEBSOCKET_URL, jsons);
     }
 
     /**
@@ -3241,6 +3240,24 @@ public class RobotService {
         platformProxy.delete(taskId,startTime,source);
     }
 
+    /**
+     * 告警屏蔽判断
+     * @param warnCount 告警信息
+     * @param isWarn
+     */
+    public void needPopAlarm(String warnCount, AtomicReference<Boolean> isWarn) {
+        List<AlarmShield> alarmShieldList = selectAlarmShield(warnCount);
+        if (alarmShieldList.size() > 0) {
+            alarmShieldList.forEach(alarmShield -> {
+                Date now = new Date();
+                Date endTime = alarmShield.getEndTime();
+                if (alarmShield.getEnable() == 1 && now.before(endTime)) {
+                    log.info("告警屏蔽：{}", alarmShield);
+                    isWarn.set(false);
+                }
+            });
+        }
+    }
     public List<AlarmShield> selectAlarmShield(String warnCount){
         return tRobotInfoDao.selectAlarmShield(warnCount);
     }
