@@ -10,6 +10,7 @@ import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -266,7 +267,9 @@ public class TStdDeviceModelService {
                 ? StringUtils.substringBefore(device.get("device_name").toString().replace(" ", ""), "/")
                 : String.valueOf(device.get("device_name")));
         tStdDeviceMete.setDeviceId(Long.valueOf(tStdDevice.getOriginId()));
-        tStdDeviceMete.setCustomId(String.valueOf(device.get("component_id")));
+
+        String comId = MapUtils.getString(device, "component_id");
+        tStdDeviceMete.setCustomId(StringUtils.contains(comId, "_") ? StringUtils.substringAfter(comId, "_") : comId);
         tStdDeviceMete.setCustomName(String.valueOf(device.get("component_name")));
         if (device.containsKey("device_mete_id")) {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_mete_id")));
