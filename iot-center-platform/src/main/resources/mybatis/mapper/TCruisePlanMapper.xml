@@ -294,35 +294,7 @@
         a.cruise_name,
         b.device_name,
         k.dict_note AS custom_name,
-        (
-        CASE
-        WHEN ISNULL(j.mete_name)
-        AND ISNULL(d.inspection_name)
-        AND ISNULL(f.preset_name) THEN
-        ''
-        WHEN ISNULL(j.mete_name)
-        AND ISNULL(d.inspection_name) THEN
-        f.preset_name
-        WHEN ISNULL(j.mete_name)
-        AND ISNULL(f.preset_name) THEN
-        d.inspection_name
-        WHEN ISNULL(d.inspection_name)
-        AND ISNULL(f.preset_name) THEN
-        j.mete_name
-        WHEN ISNULL(d.inspection_name) THEN
-        CONCAT(
-        j.mete_name,
-        '/',
-        f.preset_name
-        )
-        WHEN ISNULL(f.preset_name) THEN
-        CONCAT(
-        j.mete_name,
-        '/',
-        d.inspection_name
-        )
-        END
-        ) AS instance_name,
+        j.mete_name AS instance_name,
         (
         CASE
         WHEN a.cruise_type = '228' or a.cruise_type = '524'
