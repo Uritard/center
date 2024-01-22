@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
 import com.netflix.zuul.http.ServletInputStreamWrapper;
+import com.netflix.zuul.util.HTTPRequestUtils;
 import com.yjh.gateway.common.Constant;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.fileupload.FileItem;
@@ -26,7 +27,9 @@ import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,22 +70,11 @@ public class ParamUtil {
                 rewriteRequest(ctx, requestByte);
             } else {
                 if ("GET".equals(method)) {
-                    Map<String, List<String>> map = ctx.getRequestQueryParams();
-                    if (!(Objects.isNull(map) || map.isEmpty())) {
-                        param = Maps.newLinkedHashMap();
-                        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-                            param.put(entry.getKey(), entry.getValue().get(0));
-                        }
-                    }
+                    getQueryParams(param);
                 } else if ("POST".equals(method) || "PUT".equals(method)) {
                     String contentType = ctx.getRequest().getContentType();
                     if(StringUtils.contains(contentType, "multipart/form-data")){
-                        Map<String, List<String>> parMap = ctx.getRequestQueryParams();
-                        if (MapUtils.isNotEmpty(parMap)) {
-                            for (Map.Entry<String, List<String>> entry : parMap.entrySet()) {
-                                param.put(entry.getKey(), entry.getValue().get(0));
-                            }
-                        }
+                        getQueryParams(param);
 
                         MultipartResolver resolver = new CommonsMultipartResolver(ctx.getRequest().getServletContext());
                         MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(ctx.getRequest());
@@ -98,12 +90,7 @@ public class ParamUtil {
                             if (!"[]".equals(body) && StringUtils.isNotEmpty(body)) {
                                 param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
                             }
-                            Map<String, List<String>> map = ctx.getRequestQueryParams();
-                            if (MapUtils.isNotEmpty(map)) {
-                                for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-                                    param.put(entry.getKey(), entry.getValue().get(0));
-                                }
-                            }
+                            getQueryParams(param);
                         } catch (IOException e) {
                             logger.error(e.getMessage(), e);
                         }
@@ -114,6 +101,15 @@ public class ParamUtil {
             logger.error("***************ParamUtil->getRequestParams throw Exception：{}***************", e);
         }
         return param;
+    }
+
+    public static void getQueryParams(Map<String, Object> param) {
+        Map<String, List<String>> parMap = HTTPRequestUtils.getInstance().getQueryParams();
+        if (MapUtils.isNotEmpty(parMap)) {
+            for (Map.Entry<String, List<String>> entry : parMap.entrySet()) {
+                param.put(entry.getKey(), StringUtils.join(entry.getValue(), ","));
+            }
+        }
     }
 
     private static void rewriteRequest(RequestContext ctx, byte[] paramBytes) {

@@ -769,8 +769,8 @@ public class IntelAnalysisService {
         // 遍历多个点的分析结果
         for (AnalyseResult  analyseResult : response.getResultsList()){
             log.info("遍历当前analyseResult：", JSONUtil.toJSONString(analyseResult));
-            StringJoiner content = new StringJoiner(" ");
-            StringJoiner resultImg = new StringJoiner(" ");
+            List<String> content = new ArrayList<>();
+            List<String> resultImg = new ArrayList<>();
 
             List<AnalyseResultItem> results = analyseResult.getResults();
             if (StringUtils.isEmpty(results.get(0).getType())){
@@ -811,12 +811,10 @@ public class IntelAnalysisService {
                 resultImg.add(defectResultRealImg);
             }
 
-            List<String> resultImgList = new ArrayList<>();
-            Collections.addAll(resultImgList, String.valueOf(resultImg).split(" "));
-            resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
+            List<String> resultImgList = resultImg.stream().distinct().collect(Collectors.toList());
 
             if (StringUtils.isNotBlank(resultImgList.get(0))){
-                String[] resultArr = String.valueOf(content).split("\\s+");
+                String[] resultArr = content.toArray(new String[0]);
 
                 List<TWarnInfo> list = silentAlarmStore(resultArr, map, resultImgList);
                 alarmToUpSystem(map, list);

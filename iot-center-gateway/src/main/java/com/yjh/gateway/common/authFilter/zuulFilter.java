@@ -162,7 +162,7 @@ public class zuulFilter extends ZuulFilter {
                 return errorRespnse(ctx, HttpStatus.SC_BAD_REQUEST, "{\"code\":400,\"message\":\"" + validatStr + "\"}");
             }
         }
-        String userName = "unknown";
+        String userName;
         if (paramMap != null && paramMap.containsKey("userName")){
             userName = String.valueOf(paramMap.get("userName"));
         }else {

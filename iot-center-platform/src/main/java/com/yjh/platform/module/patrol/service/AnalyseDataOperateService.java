@@ -698,7 +698,7 @@ public class AnalyseDataOperateService {
      */
     public String resolveDefectResult(String resultValueOrigin, String desc) {
         String resultValue = resultValueOrigin.replaceAll(",", " ");
-        log.info("----缺陷识别结果解析---resultValue:{}, desc: {}", resultValue, desc);
+        log.info("----缺陷识别结果解析---resultValue:{}, 默认 desc: {}", resultValue, desc);
 
         StringBuilder defectValue = new StringBuilder();
         String finalValue = resultValue.replaceAll("[0-9]", "").replaceAll("\\.", "").replace("-", "");
