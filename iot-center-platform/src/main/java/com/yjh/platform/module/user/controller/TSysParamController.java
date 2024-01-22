@@ -103,7 +103,7 @@ public class TSysParamController {
             boolean verify = tSysParamService.secureVerify(tSysParam, userId, result);
             if (verify){
                 result.setData(tSysParamService.update(tSysParam));
-                dealSetIsSilentTask(tSysParam);
+                dealSetIsSilentTask(tSysParam.getParamCode(), tSysParam.getContent());
             }
             // 更新声纹日志开关
             Constant.refreshSwitchCach();
@@ -119,11 +119,11 @@ public class TSysParamController {
         return result;
     }
 
-    private void dealSetIsSilentTask(TSysParam tSysParam){
-        if ("isSilentTask".equals(tSysParam.getParamCode())){
-            if ("true".equals(tSysParam.getContent())){
+    private void dealSetIsSilentTask(String paramCode, String content) {
+        if ("isSilentTask".equals(paramCode)) {
+            if ("true".equals(content)) {
                 tCameraPresetService.startSilentTask();
-            }else if ("false".equals(tSysParam.getContent())){
+            } else if ("false".equals(content)) {
                 tCameraPresetService.stopSilentTask();
             }
         }
@@ -271,6 +271,7 @@ public class TSysParamController {
         Result result = new Result();
         try {
             result.setData(tSysParamService.updateByCode(paramCode, content));
+            dealSetIsSilentTask(paramCode, content);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("系统参数分页查询失败描述：", e);
