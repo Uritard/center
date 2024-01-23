@@ -292,16 +292,6 @@ public class MessageThread {
                 //存储A接口任务信息
                 sendToUpSystemServices.saveAInterfaceTaskInfo(list);
 
-            } else if ("102".equals(xmlBaseModel.getCommand())) {
-                List<Map<String, Object>> list = xmlBaseModel.getItems();
-                if (CollectionUtils.isNotEmpty(list)) {
-                    Map<String, Object> map = list.get(0);
-                    String taskId = map.getOrDefault("taskId", "").toString();
-                    String startTime = map.getOrDefault("startTime", "").toString();
-                    String source = map.getOrDefault("source", "").toString();
-                    UPatrolTaskProxy uPatrolTaskProxy = StaticContextAccessor.getBean(UPatrolTaskProxy.class);
-                    uPatrolTaskProxy.delete(taskId, startTime, source);
-                }
             }
         }
 
