@@ -763,7 +763,7 @@ public class TRobotInspectionService {
         }
 
         //0 开启状态 1 关闭状态
-        Map<String, String> mapForRobotStopStatus = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":102");
+        Map<String, String> mapForRobotStopStatus = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":10001");
         if (mapForRobotStopStatus.size() != 0 && Optional.ofNullable(mapForRobotStopStatus.get("value")).isPresent()) {
             re.put("stopFlag", mapForRobotStopStatus.get("value"));
         } else {

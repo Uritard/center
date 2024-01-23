@@ -63,13 +63,18 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
             }
         } else {
             tIotDeviceWarn = getBaseMapper().selectDeviceByIpAndNum(ip, channelNum);
-            tIotDeviceWarn.setCreateTime(new Date());
-            tIotDeviceWarn.setAlarmTime(DateTimeUtil.getDate(iotWarn.get("alarmTime")));
-            tIotDeviceWarn.setRobotCode(robotCode);
-            tIotDeviceWarn.setChannelNum(channelNum);
-            tIotDeviceWarn.setAlarmContent(MapUtils.getString(iotWarn, "value"));
-            tIotDeviceWarn.setDeleteFlag(1L);
-            this.save(tIotDeviceWarn);
+            if (Objects.nonNull(tIotDeviceWarn)) {
+                tIotDeviceWarn.setCreateTime(new Date());
+                tIotDeviceWarn.setAlarmTime(DateTimeUtil.getDate(iotWarn.get("alarmTime")));
+                tIotDeviceWarn.setRobotCode(robotCode);
+                tIotDeviceWarn.setChannelNum(channelNum);
+                tIotDeviceWarn.setAlarmContent(MapUtils.getString(iotWarn, "value"));
+                tIotDeviceWarn.setDeleteFlag(1L);
+                this.save(tIotDeviceWarn);
+            } else {
+                log.warn("该设备未找到,告警不入库!");
+                return false;
+            }
         }
         Map<String, String> jasonMaps = new HashMap<>(16);
         jasonMaps.put("type", "alarmPopUp");
