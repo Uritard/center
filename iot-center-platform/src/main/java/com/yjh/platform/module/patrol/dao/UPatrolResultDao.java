@@ -71,16 +71,6 @@ public interface UPatrolResultDao {
         @Param(value = "meteType") Integer meteType,
         @Param(value = "customId") String customId,
         @Param(value = "isCheck") Integer isCheck);
-    List<String> selectTaskByPageByPage(@Param(value = "taskName") String taskName,
-                                               @Param(value = "cState") Integer cState,
-                                               @Param(value = "cType") Integer cType,
-                                               @Param(value = "deviceType") Integer deviceType,
-                                               @Param(value = "startDate") String startDate,
-                                               @Param(value = "endDate") String endDate,
-                                               @Param(value = "list") List<Long> list,
-                                               @Param(value = "meteType") Integer meteType,
-                                               @Param(value = "customId") String customId,
-                                               @Param(value = "isCheck") Integer isCheck);
 
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId") String taskId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
