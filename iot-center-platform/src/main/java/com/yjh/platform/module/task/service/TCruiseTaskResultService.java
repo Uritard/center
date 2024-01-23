@@ -48,6 +48,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -383,25 +384,38 @@ public class TCruiseTaskResultService {
             warnKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
-        //表计告警
-        for (Map<String, String> warnMap : warnMapList) {
-            String instanceId = warnMap.get("instanceId");
-
-            RealTimeWarn realTimeWarn = new RealTimeWarn();
-            realTimeWarn.setDeviceName(warnMap.get("deviceName"));
-            realTimeWarn.setInstanceName(warnMap.get("instanceName"));
-            realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", warnMap.get("cruiseType")));
-            realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", warnMap.get("warnLevel")));
-            String cruiseTime = warnMap.get("cruiseTime");
-            if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
-                realTimeWarn.setCruiseTime(new Date());
-            }else {
-                realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
+        if (!CollectionUtils.isEmpty(warnMapList)) {
+            List<String> instanceIds = warnMapList.stream().map(e -> e.get("instanceId")).collect(Collectors.toList());
+            List<TWarnInfo> warnInfos = tWarnInfoDao.selectCruiseInfoByTaskAndInstanceIds(taskId, instanceIds);
+            Map<String, TWarnInfo> warnInfoMap = warnInfos.stream().collect(Collectors.toMap(e -> taskId + '_' + e.getInstanceId(), Function.identity(), (a, b) -> a));
+            //表计告警
+            for (Map<String, String> warnMap : warnMapList) {
+                String instanceId = warnMap.get("instanceId");
+                TWarnInfo tWarnInfo = warnInfoMap.get(taskId + '_' + instanceId);
+                RealTimeWarn realTimeWarn = new RealTimeWarn();
+                realTimeWarn.setDeviceName(warnMap.get("deviceName"));
+                realTimeWarn.setInstanceName(warnMap.get("instanceName"));
+                realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", warnMap.get("cruiseType")));
+                realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", warnMap.get("warnLevel")));
+                String cruiseTime = warnMap.get("cruiseTime");
+                if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
+                    realTimeWarn.setCruiseTime(new Date());
+                }else {
+                    realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
+                }
+                realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
+                realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
+                if (tWarnInfo != null) {
+                    realTimeWarn.setWarnId(tWarnInfo.getWarnId());
+                    realTimeWarn.setDefectModel(tWarnInfo.getDefectModel());
+                    realTimeWarn.setWarnType(tWarnInfo.getWarnType());
+                    realTimeWarn.setDealType(tWarnInfo.getDealType());
+                    realTimeWarn.setDealInfo(tWarnInfo.getDealInfo());
+                }
+                realTimeWarns.add(realTimeWarn);
             }
-            realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
-            realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
-            realTimeWarns.add(realTimeWarn);
         }
+
 
         List<Map<String, String>> defectMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
             defectKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));

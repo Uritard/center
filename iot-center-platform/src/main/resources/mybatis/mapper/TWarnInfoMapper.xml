@@ -1253,4 +1253,13 @@
         group by
         b.up_region_id
     </select>
+
+    <select id="selectCruiseInfoByTaskAndInstanceIds"
+            resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        SELECT warn_id, warn_type, warn_name, warn_content, defect_model, instance_id, task_id, deal_type, deal_info FROM t_warn_info
+        WHERE task_id = #{taskId, jdbcType=VARCHAR} AND instance_id IN
+        <foreach collection="instanceIds" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=VARCHAR}
+        </foreach>
+    </select>
 </mapper>
