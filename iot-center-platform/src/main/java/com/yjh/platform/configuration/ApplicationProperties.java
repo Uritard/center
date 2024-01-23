@@ -81,6 +81,7 @@ public class ApplicationProperties {
     @Accessors(chain = true)
     public static class FtpsConfig{
 
+        private String flag;
         private String ip;
         private Integer port;
         private String userName;
@@ -184,6 +185,7 @@ public class ApplicationProperties {
         Map<String,String> redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"upSystem");
         ApplicationProperties.FtpsConfig upSystemFtps = new ApplicationProperties.FtpsConfig();
         upSystemFtps.setIp(redisMap.get("upSystemFtpsIp"))
+                .setFlag(redisMap.get("upSystemFlag"))
                 .setPort(ValueUtil.toInteger(redisMap.get("upSystemFtpsPort"),10012))
                 .setUserName(redisMap.get("upSystemFtpsUsername"))
                 .setPassword(redisMap.get("upSystemFtpsPassword"));

@@ -1666,6 +1666,7 @@ public class SendToUpSystemServices {
      */
     private void stop() {
         if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
+            Constant.bootstrapHashMap.remove(1);
             TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(Constant.upSystemPort());
             try {
                 if (tcpClientHandler != null) {

@@ -1344,6 +1344,10 @@ public class IntelAnalysisService {
     private void uploadFileToUpFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            if ("0".equals(applicationProperties.getUpSystemFtps().getFlag())){
+                log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
+                return;
+            }
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(), upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);

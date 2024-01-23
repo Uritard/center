@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author lqh
@@ -66,8 +67,13 @@ public class SendToUpSystemController {
     public Result sendXML(@RequestBody Map<String,List<XMLBaseModel>> robotMap) {
         Result result = new Result();
         try {
-            XMLBaseModel xmlBaseModel = robotMap.get("list").get(0);
-            sendToUpSystemService.sendXML(xmlBaseModel);
+            String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+            if (Objects.isNull(flag) || "0".equals(flag)){
+                log.error("上级系统连接开关为空或者没开！{}",flag);
+            } else {
+                XMLBaseModel xmlBaseModel = robotMap.get("list").get(0);
+                sendToUpSystemService.sendXML(xmlBaseModel);
+            }
             result.setData(1);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

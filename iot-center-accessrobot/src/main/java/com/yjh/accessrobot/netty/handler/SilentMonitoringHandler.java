@@ -295,6 +295,11 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
                 return;
             }
             Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystem");
+            String upSystemFtpsFlag = upSystemFtps.get("upSystemFlag");
+            if ("0".equals(upSystemFtpsFlag)){
+                log.info("上级系统开关未开! {}",upSystemFtpsFlag);
+                return;
+            }
             String upSystemFtpsIp = upSystemFtps.get("upSystemFtpsIp");
             String upSystemFtpsPort = upSystemFtps.get("upSystemFtpsPort");
             String upSystemFtpsUsername = upSystemFtps.get("upSystemFtpsUsername");
