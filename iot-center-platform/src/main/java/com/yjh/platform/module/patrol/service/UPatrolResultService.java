@@ -99,11 +99,6 @@ public class UPatrolResultService {
 
         return resultExpandList;
     }
-    public List<String> selectTaskByPageByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
-        String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
-        return uPatrolResultDao.selectTaskByPageByPage(taskName, cState, cType, deviceType, startTime, endTime, deviceIdList, meteType, customId,
-                isCheck);
-    }
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, String instanceName,
         String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
