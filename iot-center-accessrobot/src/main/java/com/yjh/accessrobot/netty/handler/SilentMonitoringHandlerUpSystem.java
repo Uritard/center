@@ -64,13 +64,14 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         log.info("本级系统给下级{}响应了", sendCode);
 
         String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-        String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
+        String presetOriginId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
         String content= String.valueOf(xmlBaseModel.getItems().get(0).get("content"));
-        String alaramLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
+        String alarmLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
+        String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("origin_id"));
 
-        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(originId));
+        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(presetOriginId));
         if(map==null){
-            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,originId);
+            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,presetOriginId);
             return;
         }
         // 图片在ftps上的全路径
@@ -85,7 +86,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
         TWarnInfo tWarnInfo = new TWarnInfo()
-                .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alaramLevel).getCode()))
+                .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alarmLevel).getCode()))
                 .setWarnTime(new Date())
                 .setWarnName("静默监视告警数据")
                 .setWarnContent(content)
@@ -96,6 +97,8 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 .setConfMode(276)
                 .setDefectModel(450)
                 .setAlarmSource(689)
+                .setOriginId(originId)
+                .setEdgeCode(sendCode)
                 .setImagePath(defectResultRealImg);
         tWarnInfoMapper.insert(tWarnInfo);
         sendUpSystem(xmlBaseModel);
