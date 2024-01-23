@@ -591,6 +591,10 @@ public class SilentAlarmThread implements Runnable {
     private void uploadFileToUpFtps(String sourcePath, String targetPathName, ApplicationProperties.FtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            if ("0".equals(upFtpsConfig.getFlag())){
+                log.info("上级系统开关未开！ {}",upFtpsConfig.getFlag());
+                return;
+            }
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getUserName(), upFtpsConfig.getPassword());
         } catch (Exception e) {

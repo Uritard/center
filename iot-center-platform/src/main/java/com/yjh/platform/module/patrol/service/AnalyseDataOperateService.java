@@ -766,6 +766,10 @@ public class AnalyseDataOperateService {
             if (StringUtils.equals("--", sourcePath)) {
                 return;
             }
+            if ("0".equals(applicationProperties.getUpSystemFtps().getFlag())){
+                log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
+                return;
+            }
             FtpsUtil.putFile(sourcePath, targetPathName, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
                     applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
 
