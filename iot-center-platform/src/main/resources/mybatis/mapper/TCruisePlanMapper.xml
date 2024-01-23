@@ -289,6 +289,7 @@
         a.device_mete_id,
         a.station_id,
         j.custom_id,
+        j.mete_type,
         a.station_name,
         a.cruise_id,
         a.cruise_name,

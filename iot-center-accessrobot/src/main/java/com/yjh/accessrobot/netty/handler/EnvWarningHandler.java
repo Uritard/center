@@ -7,6 +7,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.AlarmShield;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -20,10 +21,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -77,10 +76,15 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         envWarn.put("deleteFlag", MapUtils.getString(envWarnMap, "delete_flag"));
         envWarn.put("deleteTime", MapUtils.getString(envWarnMap, "delete_time"));
 
-        try {
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarn, Result.class);
-        } catch (Exception e) {
-            log.error("调用platform出错：{}", e.getMessage(), e);
+        //告警屏蔽处理
+        AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
+        robotService.needPopAlarm(value, isWarn);
+        if (isWarn.get()) {
+            try {
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarn, Result.class);
+            } catch (Exception e) {
+                log.error("调用platform出错：{}", e.getMessage(), e);
+            }
         }
 
         if (Constant.upEnvDevice() && Constant.upSystemFlag()) {

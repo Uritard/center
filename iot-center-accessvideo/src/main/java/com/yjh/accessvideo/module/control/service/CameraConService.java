@@ -1889,10 +1889,9 @@ public class CameraConService {
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
             String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
-            String webSocketUrl = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:webSocketUrl", "content"));
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
-            TranscodeThread transcodeThread = new TranscodeThread(videoPath, videoRealPath, fileName, webSocketUrl,
+            TranscodeThread transcodeThread = new TranscodeThread(videoPath, videoRealPath, fileName, Constant.WEBSOCKET_URL,
                     userId, cameraConDao, platFromFtpsConfig);
             TaskExecutePool.getInstance().execute(transcodeThread);
         } catch (Exception ignored) {
