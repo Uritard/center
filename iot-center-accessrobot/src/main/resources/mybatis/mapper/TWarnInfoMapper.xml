@@ -48,12 +48,12 @@
         select
         <include refid="Base_Column_List" />
         from t_warn_info
-        where  warn_id = #{warnId,jdbcType=BIGINT} 
+        where  warn_id = #{warnId,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_warn_info
-        where  warn_id = #{warnId,jdbcType=BIGINT} 
+        where  warn_id = #{warnId,jdbcType=BIGINT}
     </delete>
     <insert id="insert" keyColumn="warn_id" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo" useGeneratedKeys="true">
         insert into t_warn_info
@@ -65,7 +65,7 @@
         ,deal_time,defect_model,alarm_source
         ,warn_subtype,device_code,image_path
         ,video_path,value,out_range
-        ,task_id)
+        ,task_id,edge_code,origin_id)
         values (#{warnLevel,jdbcType=INTEGER},#{warnTime,jdbcType=TIMESTAMP}
         ,#{warnType,jdbcType=INTEGER},#{warnName,jdbcType=VARCHAR},#{warnContent,jdbcType=VARCHAR}
         ,#{deviceId,jdbcType=BIGINT},#{deviceName,jdbcType=VARCHAR},#{cunstomId,jdbcType=VARCHAR},#{instanceId,jdbcType=BIGINT}
@@ -74,7 +74,7 @@
         ,#{dealTime,jdbcType=TIMESTAMP},#{defectModel,jdbcType=INTEGER},#{alarmSource,jdbcType=INTEGER}
         ,#{warnSubtype,jdbcType=INTEGER},#{deviceCode,jdbcType=VARCHAR},#{imagePath,jdbcType=VARCHAR}
         ,#{videoPath,jdbcType=VARCHAR},#{value,jdbcType=VARCHAR},#{outRange,jdbcType=VARCHAR}
-        ,#{taskId,jdbcType=VARCHAR})
+        ,#{taskId,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="warn_id" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo" useGeneratedKeys="true">
         insert into t_warn_info
@@ -213,11 +213,11 @@
                     task_id = #{taskId,jdbcType=VARCHAR},
                 </if>
         </set>
-        where   warn_id = #{warnId,jdbcType=BIGINT} 
+        where   warn_id = #{warnId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo">
         update t_warn_info
-        set 
+        set
             warn_level =  #{warnLevel,jdbcType=INTEGER},
             warn_time =  #{warnTime,jdbcType=TIMESTAMP},
             warn_type =  #{warnType,jdbcType=INTEGER},
@@ -242,7 +242,7 @@
             value =  #{value,jdbcType=VARCHAR},
             out_range =  #{outRange,jdbcType=VARCHAR},
             task_id =  #{taskId,jdbcType=VARCHAR}
-        where   warn_id = #{warnId,jdbcType=BIGINT} 
+        where   warn_id = #{warnId,jdbcType=BIGINT}
     </update>
 
 
