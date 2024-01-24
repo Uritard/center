@@ -417,7 +417,7 @@ public class RobotService {
         log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         SYNC_MODE_CACHE.put(robotCode, userId);
-        Constant.sendProcess(robotCode, tRobotInfo.getRobotName() + " 模型同步", 1, "模型同步开始");
+        Constant.sendProcess(robotCode, tRobotInfo.getRobotName(), 1, "模型同步开始");
         return true;
     }
 
@@ -447,7 +447,7 @@ public class RobotService {
             log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
             SYNC_MODE_CACHE.put(edgeCode, userId);
-            Constant.sendProcess(edgeCode, stdRegionList.get(0).getRegionName() + " 模型同步", 1, "模型同步开始");
+            Constant.sendProcess(edgeCode, stdRegionList.get(0).getRegionName(), 1, "模型同步开始");
             return true;
         } else {
             throw new BusinessException("当前节点编码不匹配,请检查后下发！");
@@ -715,16 +715,17 @@ public class RobotService {
                     }
                 } catch (DocumentException e) {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
-                    Constant.sendProcess(nodeCode, title + " 模型同步", 0, desc + "同步失败");
+                    Constant.sendProcess(nodeCode, title, 0, desc + "同步失败");
                 }
-                Constant.sendProcess(nodeCode, title + " 模型同步", state, state == 1 ? desc + "同步完成" : desc);
+                Constant.sendProcess(nodeCode, title, state, state == 1 ? desc + "同步完成" : desc);
             }
         } catch (Exception e) {
             log.error("处理机器人返回的模型文件异常: ", e);
-            Constant.sendProcess(nodeCode, title + " 模型同步", 0, desc + "同步失败");
+            Constant.sendProcess(nodeCode, title, 0, desc + "同步失败");
         } finally {
             SYNC_MODE_CACHE.remove(nodeCode);
         }
+        Constant.sendProcess(nodeCode, title, 1, "模型同步完成");
     }
     /**
      * 机器人模型文件信息处理

@@ -299,7 +299,7 @@ public class Constant {
 
     public static void sendProcess(String key, String title, Integer status, String desc) {
         if (SYNC_MODE_CACHE.containsKey(key)) {
-            sendProcess(title, status, desc, SYNC_MODE_CACHE.get(key));
+            sendProcess(title + "模型同步", status, desc, SYNC_MODE_CACHE.get(key));
         }
     }
 
