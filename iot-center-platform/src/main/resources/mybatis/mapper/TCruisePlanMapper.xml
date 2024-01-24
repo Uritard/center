@@ -335,6 +335,7 @@
         ELSE '其他'
         END
         ) AS cruise_device_name,
+        a.cruise_type,
         i.dict_note AS cruise_type_name,
         a.identify_type
         FROM
