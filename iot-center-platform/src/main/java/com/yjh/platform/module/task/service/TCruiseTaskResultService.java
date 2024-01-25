@@ -373,12 +373,13 @@ public class TCruiseTaskResultService {
         return stopResult;
     }
 
-    @Cacheable("EMEC15")
     public List<RealTimeWarn> realTimeWarnInfo(String taskId) {
         List<RealTimeWarn> realTimeWarns = new ArrayList<>();
 
-        Set<String> warnKeys = RedisUtil.redisScan("warnInfo:" + taskId);
-        Set<String> defectKeys = RedisUtil.redisScan("defectInfo:" + taskId);
+        List<String> warnKeyList = redisTemplate.opsForList().range("warnInfo:" + taskId, 0, -1);
+        List<String> warnKeys = CollectionUtils.isEmpty(warnKeyList) ? Collections.emptyList() : warnKeyList.stream().distinct().collect(Collectors.toList());
+        List<String> defectKeyList = redisTemplate.opsForList().range("defectInfo:" + taskId, 0, -1);
+        List<String> defectKeys = CollectionUtils.isEmpty(defectKeyList) ? Collections.emptyList() : defectKeyList.stream().distinct().collect(Collectors.toList());
 
         List<Map<String, String>> warnMapList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
             warnKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
@@ -589,8 +590,13 @@ public class TCruiseTaskResultService {
             String startTime = countResult.get("taskStart");
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
             cruiseResultCounter.setAlarmCount(getAlarmCount(taskId));
-            cruiseResultCounter.setCruisedCount(normal+abnormal);
-            cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
+            if (all > 0) {
+                cruiseResultCounter.setCruisedCount(normal+abnormal);
+                cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
+            } else {
+                cruiseResultCounter.setCruisedCount(normal);
+                cruiseResultCounter.setCruiseNotCount(abnormal);
+            }
             cruiseResultCounter.setTaskProgress(countResult.get("taskProgress"));
             Date d1 = DateTimeUtil.parse(startTime, new Date());
             Date d2 = new Date();
@@ -612,15 +618,12 @@ public class TCruiseTaskResultService {
      * @return result
      */
     private int getAlarmCount(String taskId) {
-        int alarmCount = 0;
+        List<String> warnKeyList = redisTemplate.opsForList().range("warnInfo:" + taskId, 0, -1);
+        List<String> warnKeys = CollectionUtils.isEmpty(warnKeyList) ? Collections.emptyList() : warnKeyList.stream().distinct().collect(Collectors.toList());
+        List<String> defectKeyList = redisTemplate.opsForList().range("defectInfo:" + taskId, 0, -1);
+        List<String> defectKeys = CollectionUtils.isEmpty(defectKeyList) ? Collections.emptyList() : defectKeyList.stream().distinct().collect(Collectors.toList());
 
-        try {
-            alarmCount = tWarnInfoDao.countByTaskId(taskId);
-        } catch (Exception e) {
-            log.error("getAlarmCount err: ", e);
-        }
-
-        return alarmCount;
+        return warnKeys.size() + defectKeys.size();
     }
 
 

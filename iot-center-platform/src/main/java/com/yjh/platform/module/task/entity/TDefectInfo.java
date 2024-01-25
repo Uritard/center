@@ -146,6 +146,8 @@ public class TDefectInfo implements Serializable {
     @TableField(value = "link_message", updateStrategy = FieldStrategy.IGNORED)
     private String linkMessage;
 
+    private String taskId;
+
     private String originId;
 
     private String edgeCode;

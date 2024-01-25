@@ -1311,6 +1311,7 @@ CREATE TABLE `t_defect_info` (
   `VALUE` varchar(100) DEFAULT '',
   `out_range` varchar(100) DEFAULT '',
   `link_message` varchar(512) DEFAULT '' COMMENT '联动信息',
+  `task_id` varchar(512) DEFAULT '' COMMENT '任务ID',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   PRIMARY KEY (`defect_id`) USING BTREE

@@ -757,7 +757,8 @@
             video_path,
             VALUE,
             out_range,
-            link_message
+            link_message,
+            task_id
         )values(
                 #{defectId, jdbcType=BIGINT},
                 #{defectLevel, jdbcType=INTEGER},
@@ -785,7 +786,8 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{linkMessage, jdbcType=VARCHAR}
+                #{linkMessage, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR}
         )
     </insert>
 

@@ -2464,6 +2464,7 @@ public class UPatrolTaskService {
             }
 
             int abnormalCounts = 0;
+            int taskWaitCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             Set<String> robotInfoKeys = queryTaskKeys(taskId, false);
             List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
@@ -2509,8 +2510,12 @@ public class UPatrolTaskService {
                 if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()) {
                     abnormalCounts++;
                 }
-                if (String.valueOf(CRUISE_STATE_OMIT).equals(redisInfoMap.get("cruiseStatus"))) {
+                int cruiseStatus = MapUtils.getIntValue(redisInfoMap, "cruiseStatus");
+                if (CRUISE_STATE_OMIT == cruiseStatus) {
                     missInstanceMapList.add(NumberUtils.toLong(redisInfoMap.get("instanceId")));
+                }
+                if (CRUISE_STATE_DONE != cruiseStatus) {
+                    taskWaitCounts++;
                 }
             }
 
@@ -2522,7 +2527,7 @@ public class UPatrolTaskService {
             // 更新upr
             int allCounts = robotInfoKeys.size();
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
-            uPatrolResult.setTaskState(taskStatus).setTaskWait(0).setEndTime(new Date()).setTaskAbnormal(abnormalCounts);
+            uPatrolResult.setTaskState(taskStatus).setTaskWait(taskWaitCounts).setEndTime(new Date()).setTaskAbnormal(abnormalCounts);
             // 如果 Redis 状态中总点数为 0，则表示非上级系统下发任务，需更新总点数值
             if ( all == 0) {
                 uPatrolResult.setTaskCount(allCounts);
