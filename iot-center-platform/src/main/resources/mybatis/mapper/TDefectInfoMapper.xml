@@ -614,6 +614,7 @@
                  else '机器人' end  AS alarmSourceName,
             alarm.robot_id AS deviceId,
             alarm.robot_id AS cameraId,
+            alarm.robot_id AS stdMeteId,
             "1" AS videoCameraType,
             c.robot_name AS deviceName,
             alarm.alarm_name AS warnContent,

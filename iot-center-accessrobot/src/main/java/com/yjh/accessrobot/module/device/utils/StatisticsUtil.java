@@ -156,7 +156,7 @@ public class StatisticsUtil {
           log.info("tRobotAlarm的内容==={}", tRobotAlarm);
           //告警屏蔽处理
           AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-          robotService.needPopAlarm(tRobotAlarm.getAlarmInfo(), isWarn);
+          robotService.needPopAlarm(tRobotAlarm.getRobotId(), tRobotAlarm.getAlarmInfo(), isWarn);
           if (isWarn.get()){
             int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
             log.info("插告警表的结果=" + res);

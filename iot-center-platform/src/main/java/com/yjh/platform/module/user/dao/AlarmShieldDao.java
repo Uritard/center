@@ -40,4 +40,6 @@ public interface AlarmShieldDao {
                                                        @Param(value = "shieldId")Long shieldId,
                                                        @Param(value = "time") Date time);
 
+    List<AlarmShield> selectAlarmShield(@Param(value = "pointId") Long pointId,
+                                        @Param(value = "alarmContent") String alarmContent);
 }

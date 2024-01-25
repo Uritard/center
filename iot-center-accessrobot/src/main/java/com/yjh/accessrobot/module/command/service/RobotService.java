@@ -3251,11 +3251,12 @@ public class RobotService {
 
     /**
      * 告警屏蔽判断
+     * @param robotId 设备信息
      * @param warnCount 告警信息
      * @param isWarn
      */
-    public void needPopAlarm(String warnCount, AtomicReference<Boolean> isWarn) {
-        List<AlarmShield> alarmShieldList = selectAlarmShield(warnCount);
+    public void needPopAlarm(Long robotId, String warnCount, AtomicReference<Boolean> isWarn) {
+        List<AlarmShield> alarmShieldList = tRobotInfoDao.selectAlarmShield(robotId, warnCount);
         if (alarmShieldList.size() > 0) {
             alarmShieldList.forEach(alarmShield -> {
                 Date now = new Date();
@@ -3266,9 +3267,6 @@ public class RobotService {
                 }
             });
         }
-    }
-    public List<AlarmShield> selectAlarmShield(String warnCount){
-        return tRobotInfoDao.selectAlarmShield(warnCount);
     }
 
     public String getRobotName(String robotNum) {

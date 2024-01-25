@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Param;
 */
 public interface TIotDeviceWarnMapper extends BaseMapper<TIotDeviceWarn> {
 
-    Long selectIdByIpAndNum(@Param(value = "ip") String ip, @Param(value = "channelNum") String channelNum);
+    TIotDeviceWarn selectIdByIpAndNum(@Param(value = "ip") String ip, @Param(value = "channelNum") String channelNum);
 
     TIotDeviceWarn selectDeviceByIpAndNum(@Param(value = "ip") String ip, @Param(value = "channelNum") String channelNum);
 

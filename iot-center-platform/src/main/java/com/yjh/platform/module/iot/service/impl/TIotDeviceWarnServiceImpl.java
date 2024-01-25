@@ -11,7 +11,9 @@ import com.yjh.platform.module.iot.service.TIotDeviceWarnService;
 import com.yjh.platform.module.iot.dao.TIotDeviceWarnMapper;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.TWarnInfoDetail;
+import com.yjh.platform.module.user.dao.AlarmShieldDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.AlarmShield;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author YIJIAHE
@@ -33,6 +36,9 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
 
     @Resource
     private TRobotInfoDao tRobotInfoDao;
+
+    @Resource
+    private AlarmShieldDao alarmShieldDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,10 +56,8 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
             log.error("type_device_num is null");
             return false;
         }
-        Long id = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
-        TIotDeviceWarn tIotDeviceWarn = new TIotDeviceWarn();
-        if (Objects.nonNull(id)) {
-            tIotDeviceWarn.setId(id);
+        TIotDeviceWarn tIotDeviceWarn = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
+        if (Objects.nonNull(tIotDeviceWarn)) {
             if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, "deleteFlag"))) {
                 Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, "deleteFlag"));
                 tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
@@ -76,15 +80,31 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 return false;
             }
         }
-        Map<String, String> jasonMaps = new HashMap<>(16);
-        jasonMaps.put("type", "alarmPopUp");
-        jasonMaps.put("warnLevel", "132");
-        jasonMaps.put("warnId", String.valueOf(tIotDeviceWarn.getId()));
-        jasonMaps.put("warnType", "2");
-        jasonMaps.put("source", "iot");
-        String json = JSON.toJSONString(jasonMaps);
-        log.info("发送给前端的消息：{}", json);
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+
+        //告警屏蔽判断
+        AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
+        List<AlarmShield> alarmShieldList = alarmShieldDao.selectAlarmShield(tIotDeviceWarn.getPointId(), tIotDeviceWarn.getAlarmContent());
+        if (alarmShieldList.size() > 0) {
+            alarmShieldList.forEach(alarmShield -> {
+                Date now = new Date();
+                Date endTime = alarmShield.getEndTime();
+                if (alarmShield.getEnable() == 1 && now.before(endTime)) {
+                    log.info("告警屏蔽：{}", alarmShield);
+                    isWarn.set(false);
+                }
+            });
+        }
+        if (isWarn.get()) {
+            Map<String, String> jasonMaps = new HashMap<>(16);
+            jasonMaps.put("type", "alarmPopUp");
+            jasonMaps.put("warnLevel", "132");
+            jasonMaps.put("warnId", String.valueOf(tIotDeviceWarn.getId()));
+            jasonMaps.put("warnType", "2");
+            jasonMaps.put("source", "iot");
+            String json = JSON.toJSONString(jasonMaps);
+            log.info("发送给前端的消息：{}", json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+        }
         return true;
     }
 
