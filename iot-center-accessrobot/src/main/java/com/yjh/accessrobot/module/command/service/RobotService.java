@@ -178,6 +178,7 @@ public class RobotService {
     private static final Set<String> NOT_NEED_CONTROL_SET = new HashSet<>();
     static {
         NOT_NEED_CONTROL_SET.add("1_8"); // 机器人急停
+        NOT_NEED_CONTROL_SET.add("10002_28"); // 机器人解除保护性停止
         NOT_NEED_CONTROL_SET.add("1_14"); // 机器人去看看
         NOT_NEED_CONTROL_SET.add("20002_7"); //无人机急停
         NOT_NEED_CONTROL_SET.add("20005_2"); //机巢急停
