@@ -29,7 +29,7 @@ public interface SysRoleMenuDao {
     List<SysRoleMenu> selectByPage(SysRoleMenu sysRoleMenu);
 
     int batchInsert(@Param("list") List<SysRoleMenu> list);
-    List<String> selectByRoleId(@Param(value = "roleId") Long roleId);
+    List<String> selectByRoleId(@Param(value = "roleId") Long roleId, @Param(value = "menuType") Integer menuType);
     List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
     List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId);
 }

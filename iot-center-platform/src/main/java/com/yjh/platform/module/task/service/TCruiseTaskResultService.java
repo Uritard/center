@@ -474,7 +474,8 @@ public class TCruiseTaskResultService {
 
         try {
             List<CruiseCountOfType> typeCountList = CRUISE_COUNT_TIMER_CACHE.get(taskId, ()-> uPatrolResultDao.selectCruiseCountByType(taskId));
-            rateAndTaskInfo.put("typeCount", typeCountList);
+            List<CruiseCountOfType> filterCountList = typeCountList.stream().filter(c -> c.getCount() > 0).collect(Collectors.toList());
+            rateAndTaskInfo.put("typeCount", filterCountList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

@@ -67,6 +67,7 @@ public class SysUserService {
 
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
+    public static final Long MANAGER_BUILT_IN = 10001L;
 
 //    @Resource
 //    private RedisAndYxsjUtil redisAndYxsjUtil;
@@ -157,7 +158,7 @@ public class SysUserService {
 
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
-        if (sysUser.getUserId() == 10001L && !Objects.equals(sysUserCurrent.getRoleId(), roleId)) {
+        if (sysUser.getUserId() == MANAGER_BUILT_IN && !Objects.equals(sysUserCurrent.getRoleId(), roleId)) {
             throw new BusinessException(10008, "默认管理员角色不可修改");
         }
         if (roleId != null) {
@@ -217,10 +218,6 @@ public class SysUserService {
                 if ("true".equals(isUkey)) {
                     try {
                         String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
-                        /*String xlh = Constant.UKEY_XLH.get(String.valueOf(sysUserLogin.getUserId()));
-                        if (!xlh.equals(ukeyId.substring(0, 16))) {
-                            throw new BusinessException(500, "当前用户与此ukey不匹配");
-                        }*/
                         if (!redisTemplate.opsForHash().hasKey("sysKey:" + sysUserLogin.getUserId() + ":1", ukeyId)){
                             throw new BusinessException(500, "当前用户与此ukey不匹配");
                         }
@@ -455,10 +452,15 @@ public class SysUserService {
         String userName = sysUserLogin.getUserName();
         String appKey = sysUserLogin.getAppkey();
 
-        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 1);
+        if (!sysRoleMenuList.contains("0602") && MANAGER_BUILT_IN != sysUserLogin.getUserId()) {
+            sysRoleMenuList.add("0602");
+        }
+        List<String> subMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 2);
         SysUserSelect sysUserSelect = new SysUserSelect();
         BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
         mapResult.put("roleMenuList", sysRoleMenuList);
+        mapResult.put("subMenuList", subMenuList);
         mapResult.put("sysUserLogin", sysUserSelect);
         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
         mapResult.put("systemName",systemNameMap.get("content"));

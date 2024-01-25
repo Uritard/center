@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/uPatrolResult/v1")
-@Api(value = "/uPatrolResult")
+@Api(value = "/uPatrolResult", tags = {"新的巡检结果接口"})
 public class UPatrolResultController {
 
     @Autowired
