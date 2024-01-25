@@ -762,12 +762,20 @@ public class TRobotInspectionService {
             re.put("cruiseMapPath", "");
         }
 
-        //0 开启状态 1 关闭状态
+        //机器人急停 0 开启状态 1 关闭状态
         Map<String, String> mapForRobotStopStatus = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":10001");
         if (mapForRobotStopStatus.size() != 0 && Optional.ofNullable(mapForRobotStopStatus.get("value")).isPresent()) {
             re.put("stopFlag", mapForRobotStopStatus.get("value"));
         } else {
             re.put("stopFlag", "");
+        }
+
+        //机器人保护性停止 0 开启状态 1 关闭状态
+        Map<String, String> mapForRobotProtectStopStatus = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":10002");
+        if (mapForRobotProtectStopStatus.size() != 0 && Optional.ofNullable(mapForRobotProtectStopStatus.get("value")).isPresent()) {
+            re.put("protectStopFlag", mapForRobotProtectStopStatus.get("value"));
+        } else {
+            re.put("protectStopFlag", "");
         }
 
         // 机器人建站地图
