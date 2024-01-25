@@ -272,9 +272,7 @@
         a.device_name,
         h.custom_id,
         b.text_desc AS behavior,
-        i.dict_note AS custom_name,
         a.point_type,
-        e.dict_note AS cruise_type_name,
         (
         CASE
         WHEN a.point_type = '228'
@@ -292,21 +290,18 @@
         b.cruise_type,
         a.area_id,
         a.create_time,
-        a.update_time
+        a.update_time,
+        h.mete_type
         FROM
         u_patrol_plan_attr a
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
         LEFT JOIN t_std_device d ON a.device_id = d.device_id
-        LEFT JOIN t_dict_business e ON a.point_type = e.dict_code
-        AND e.col_name = "cruise_type"
         LEFT JOIN t_robot_inspection f ON f.inspection_id = a.position_id
         LEFT JOIN t_robot_info k ON a.robot_id = k.robot_id
         LEFT JOIN t_camera_preset g ON a.position_id = g.preset_id
         LEFT JOIN t_camera_info j ON g.camera_id = j.camera_id
         LEFT JOIN t_voice_device c ON a.position_id = c.voice_device_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = a.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id
-        AND i.col_name = "custom_type"
         WHERE
         1 = 1
         and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, h.custom_id,a.instance_id
