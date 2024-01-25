@@ -29,9 +29,13 @@
         create_time,magnification_coefficient,alarm_time,
         delete_flag
     </sql>
-    <select id="selectIdByIpAndNum" resultType="java.lang.Long">
+    <select id="selectIdByIpAndNum" resultMap="BaseResultMap">
         SELECT
-            a.id
+            a.id,a.point_id,a.point_name,
+            a.iot_device_id,a.iot_device_name,a.iot_device_type,
+            a.alarm_content,a.robot_code,a.channel_num,a.up_region_id,a.up_region_name,
+            a.create_time,a.magnification_coefficient,a.alarm_time,
+            a.delete_flag
         FROM
             t_iot_device_warn a
                 LEFT JOIN t_iot_device_point b ON a.point_id = b.id
@@ -65,6 +69,7 @@
             a.delete_flag AS confMode,
             '物联设备' AS alarmSourceName,
             a.iot_device_id AS deviceId,
+            a.point_id AS stdMeteId,
             a.point_name AS meteName,
             '1' AS videoCameraType,
             a.iot_device_name AS deviceName,

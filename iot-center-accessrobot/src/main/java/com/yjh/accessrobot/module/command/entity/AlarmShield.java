@@ -30,7 +30,7 @@ public class AlarmShield implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "如果是巡视设备，就是巡视设备id，如机器人id。如果是被巡视设备，就是测点id。")
-    private Long shieldId;
+    private String shieldId;
 
     @ApiModelProperty(value = "测点的巡视类型")
     private Integer shieldCruiseType;
