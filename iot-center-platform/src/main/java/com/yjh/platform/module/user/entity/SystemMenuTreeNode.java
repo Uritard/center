@@ -12,5 +12,7 @@ public class SystemMenuTreeNode {
     private String menuCode;
     private String menuName;
     private String elementCode;
+    private int menuType;
+    private int sysState;
     private List<SystemMenuTreeNode> childrenList;
 }
