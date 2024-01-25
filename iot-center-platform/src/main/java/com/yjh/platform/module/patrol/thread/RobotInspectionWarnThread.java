@@ -7,6 +7,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -164,6 +165,7 @@ public class RobotInspectionWarnThread implements Runnable{
             tDefectInfo.setDefectLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
             tDefectInfo.setOriginId(taskAlarm.getOriginId());
             tDefectInfo.setEdgeCode(taskAlarm.getEdgeCode());
+            tDefectInfo.setTaskId(taskId);
         }catch (Exception e){
             log.error("组装缺陷信息异常：", e);
         }
@@ -214,7 +216,8 @@ public class RobotInspectionWarnThread implements Runnable{
     }
 
     private void putWarnMapRedis(String taskId, TWarnInfo warnInfo) {
-        String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+        String warnPrefix = "warnInfo:" + taskId;
+        String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
         Map<String, String> warnMap = new HashMap<>(16);
         try {
             warnMap.put("deviceId", warnInfo.getDeviceId().toString());
@@ -240,11 +243,12 @@ public class RobotInspectionWarnThread implements Runnable{
             log.error("组装告警map异常：", e);
         }
         log.info("warnMap==={}", warnMap);
-        redisTemplate.opsForHash().putAll(warnName, warnMap);
+        RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
     }
 
     private void putDefectMapRedis(String taskId, TDefectInfo tDefectInfo) {
-        String defectName = "defectInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+        String defectPrefix = "defectInfo:" + taskId;
+        String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
         Map<String, String> defectMap = new HashMap<>(32);
         try {
             defectMap.put("defectLevel", String.valueOf(tDefectInfo.getDefectLevel()));
@@ -262,12 +266,12 @@ public class RobotInspectionWarnThread implements Runnable{
             defectMap.put("instanceName", tCruiseTaskResultMap.get("instanceName"));
             defectMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", tCruiseTaskResultMap.get("cruiseTime"));
+            defectMap.put("taskId", taskId);
         }catch (Exception e){
             log.error("组装缺陷map异常：" , e);
         }
         log.info("defectMap==={}", defectMap);
-        redisTemplate.opsForHash().putAll(defectName, defectMap);
-        redisTemplate.expire(defectName, 3, TimeUnit.DAYS);
+        RedisUtil.setHashGroupAndExpire(defectPrefix, tempKey, defectMap, 7);
     }
 
     private Map<String, String> getWarnOrDefectInfo(String taskId, Long instanceId){

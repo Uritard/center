@@ -66,6 +66,7 @@
             VALUE,
             out_range,
             link_message,
+            task_id,
             origin_id,
             edge_code
         )values(
@@ -96,6 +97,7 @@
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
                 #{linkMessage, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR},
                 #{originId, jdbcType=VARCHAR},
                 #{edgeCode, jdbcType=VARCHAR}
         )

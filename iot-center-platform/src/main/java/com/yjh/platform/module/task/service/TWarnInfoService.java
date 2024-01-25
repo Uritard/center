@@ -571,9 +571,6 @@ public class TWarnInfoService{
     @Transactional(rollbackFor = Exception.class)
     public Integer warnCountsNonIdentify(){
         //总告警数量=redis中的数量+数据库中的数量
-//        Set<String> warnKeys=redisScan("warnInfo:");
-//        Set<String> defectKeys=redisScan("defectInfo:");
-//        return warnKeys.size() + defectKeys.size() + tWarnInfoDao.warnCountsNonIdentify();
         return tWarnInfoDao.warnCountsNonIdentify();
     }
     //告警弹窗

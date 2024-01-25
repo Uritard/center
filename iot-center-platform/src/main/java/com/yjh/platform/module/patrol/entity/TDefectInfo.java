@@ -104,6 +104,8 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "联动信息")
     private String linkMessage;
 
+    private String taskId;
+
     private String originId;
 
     private String edgeCode;
