@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.service;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -252,7 +253,13 @@ public class TCruisePlanService{
             }
         }
 //        System.out.print("&&&&&&&&&&&&*"+deviceIdList+"*****************");
-        return tCruisePlanDao.findInstanceTree(deviceIdList,inspectionType,cruiseName, cruiseType);
+        List<InstanceTree> list =tCruisePlanDao.findInstanceTree(deviceIdList,inspectionType,cruiseName, cruiseType);
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
+        return list;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -263,6 +270,11 @@ public class TCruisePlanService{
         if (CollectionUtils.isNotEmpty(deviceIdList)) {
             list = tCruisePlanDao.findInstanceTree(deviceIdList,1,null,null);
         }
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
         return list;
     }
 

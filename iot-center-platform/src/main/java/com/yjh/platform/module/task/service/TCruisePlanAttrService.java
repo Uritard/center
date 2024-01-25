@@ -4,6 +4,7 @@ import com.beust.jcommander.internal.Maps;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
@@ -50,7 +51,13 @@ public class TCruisePlanAttrService{
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanAttrDetail> selectByPrimaryId(Long planId) {
 //        return this.tCruisePlanAttrDao.selectByPrimaryId(planId);
-        return this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
+        List<TCruisePlanAttrDetail> list = this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
+        return list;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -58,6 +65,11 @@ public class TCruisePlanAttrService{
         Map<String, Object> resultMap = Maps.newHashMap();
         Page page = PageHelper.startPage(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 0, true, null, true);
         List<TCruisePlanAttrDetail> list = this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
         resultMap.put("count", page.getTotal());
         resultMap.put("list", list);
         return resultMap;
