@@ -472,6 +472,40 @@ public class ProcessResultToUpSystem {
         }
     }
 
+    public void defectOrDistinguishWarn(Long Id,String warnContent,
+                                         Integer warnSubType,Integer level,Map<String, String> cruiseResultMap){
+        try {
+            TWarnInfo tWarnInfo = new TWarnInfo();
+            tWarnInfo.setWarnId(Id);
+            tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
+            // 缺陷
+            tWarnInfo.setValue(warnContent);
+            tWarnInfo.setWarnContent(warnContent);
+
+            tWarnInfo.setWarnSubtype(warnSubType);
+            String alarmLevel = "1";
+            switch (level) {
+                case 130:
+                    alarmLevel = "1";
+                    break;
+                case 131:
+                    alarmLevel = "2";
+                    break;
+                case 132:
+                    alarmLevel = "3";
+                    break;
+                case 133:
+                    alarmLevel = "4";
+                    break;
+                default:
+                    break;
+            }
+            alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
+        }catch (Exception e){
+            log.info("缺陷告警和判别告警上报上级系统失败：",e);
+        }
+    }
+
     @Async
     public void defectToUpSystem(Map<String, String> cruiseResultMap, List<Map<String, String>> resultList){
         log.info("cruiseResultMap=={},resultList=={}", cruiseResultMap, resultList);
@@ -618,10 +652,10 @@ public class ProcessResultToUpSystem {
             log.info("判别告警发送算法管理平台结束");
         }
 
-        // 判别上报上一级系统
-        if (CollectionUtils.isNotEmpty(diffList) && Constant.upSystemFlag()) {
-            distinguishToUpSystem(cruiseResultMap, diffList);
-        }
+//        // 判别上报上一级系统 不在这里上报
+//        if (CollectionUtils.isNotEmpty(diffList) && Constant.upSystemFlag()) {
+//            distinguishToUpSystem(cruiseResultMap, diffList);
+//        }
 
         List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
         if(CollectionUtils.isNotEmpty(defectList) && Constant.managerSystemFlag()) {
@@ -700,10 +734,10 @@ public class ProcessResultToUpSystem {
             log.info("缺陷告警发送算法管理平台结束");
 
         }
-        if (CollectionUtils.isNotEmpty(defectList) && Constant.upSystemFlag()) {
-            // 缺陷上报上一级系统
-            defectToUpSystem(cruiseResultMap, defectList);
-        }
+//        if (CollectionUtils.isNotEmpty(defectList) && Constant.upSystemFlag()) {
+//            // 缺陷上报上一级系统  不在这里上报了
+//            defectToUpSystem(cruiseResultMap, defectList);
+//        }
     }
 
     /**

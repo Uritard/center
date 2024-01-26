@@ -1101,6 +1101,10 @@ public class PatrolResultHandler {
             alarmPopUp(tStdDevicemete, infoMap);
 
             defectNames.append(res.getResultDesc()).append(" ");
+
+            //缺陷告警上报上级系统
+            processResultToUpSystem.defectOrDistinguishWarn(tDefectInfo.getDefectId(),tDefectInfo.getDefectContent(),
+                    tDefectInfo.getDefectType(),tDefectInfo.getDefectLevel(),cruiseResultMap);
         }
 
         // newAlarm
