@@ -213,7 +213,16 @@ public class UPatrolTaskService {
                 if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalType())
                         && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalNumber())
                         && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalExecuteTime())){
-                    startTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalStartTime());
+                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
+                    Date intervalStartTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalStartTime());
+                    if (DateTimeUtil.isTimeFormat(intervalExecuteTime)) {
+                        String dateString = DateTimeUtil.getDateString(intervalStartTime);
+                        startTime = DateTimeUtil.getDate(dateString + " " + intervalExecuteTime);
+                        log.info("间隔执行时间 = {}", startTime);
+                    } else {
+                        log.warn("intervalExecuteTime = {},格式不正确不解析,使用IntervalStartTime", intervalExecuteTime);
+                        startTime = intervalStartTime;
+                    }
                     endTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalEndTime());
                 }
                 uPatrolTask.setStartTime(startTime);

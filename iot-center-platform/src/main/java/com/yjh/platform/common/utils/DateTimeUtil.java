@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 日期时间处理公共类.
@@ -161,6 +162,15 @@ public class DateTimeUtil {
     public static String getTimeString(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
         return sdf.format(date);
+    }
+
+    /**
+     * 判断是否为 时间
+     * @param time 时间
+     * @return boolean
+     */
+    public static boolean isTimeFormat(String time){
+        return Pattern.matches("\\d{2}:\\d{2}:\\d{2}", time);
     }
 
     /**
