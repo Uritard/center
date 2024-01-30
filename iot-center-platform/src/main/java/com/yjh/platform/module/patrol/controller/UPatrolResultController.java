@@ -140,6 +140,8 @@ public class UPatrolResultController {
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
                                      @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                     @RequestParam(value = "meteType", required = false) Integer meteType,
+                                     @RequestParam(value = "meterType", required = false) Integer meterType,
                                      @RequestParam(value = "instanceName",required = false) String instanceName,
                                      @RequestParam(value = "startTime",required = false) String startTime,
                                      @RequestParam(value = "endTime",required = false) String endTime,
@@ -185,7 +187,8 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,instanceName,startTime,endTime,deviceIdList,customId,isWarn);
+            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType, cruiseResult,deviceType,
+                    meteType,meterType,instanceName,startTime,endTime,deviceIdList,customId,isWarn);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);

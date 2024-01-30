@@ -102,22 +102,26 @@ public class UPatrolResultService {
                 isCheck);
     }
 
-    public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, String instanceName,
-        String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
+    public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, Integer meteType, Integer meterType,
+                                                       String instanceName, String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
         List<CruiseResultDetail> cruiseResultDetailList =
-                uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, instanceName, startTime, endTime, deviceIdList,
+                uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, meteType, meterType, instanceName, startTime, endTime, deviceIdList,
                     customId, isWarn);
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
-            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("alarmLevel").add("meteKind");
+                .add("abnormalType", "cruiseAbnormal", "abnormalType")
+                .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind");
         DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
 
-            String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
-            cruiseResultDetailList.forEach(c -> {
-                if (StringUtils.isBlank(c.getEdgeName())) {
-                    c.setEdgeName(currentEdge);
-                }
-            });
+        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        cruiseResultDetailList.forEach(c -> {
+            if (StringUtils.isBlank(c.getEdgeName())) {
+                c.setEdgeName(currentEdge);
+            }
+            if (StringUtils.isNotBlank(c.getMeterTypeName())) {
+                c.setMeteTypeName(c.getMeteTypeName() + "-" + c.getMeterTypeName());
+            }
+        });
         return cruiseResultDetailList;
     }
 
