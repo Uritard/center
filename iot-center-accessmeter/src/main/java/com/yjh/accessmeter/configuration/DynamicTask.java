@@ -2,6 +2,7 @@ package com.yjh.accessmeter.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
@@ -24,19 +25,11 @@ public class DynamicTask {
 
     private final Logger logger = LoggerFactory.getLogger(DynamicTask.class);
 
+    @Autowired
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     private final Map<String, ScheduledFuture<?>> futureMap = new ConcurrentHashMap<>();
     private final Map<String, Runnable> runnableMap = new ConcurrentHashMap<>();
-
-    @PostConstruct
-    public void dynamicTask() {
-        threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(300);
-        threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-        threadPoolTaskScheduler.setAwaitTerminationSeconds(10);
-        threadPoolTaskScheduler.initialize();
-    }
 
     /**
      * 延时任务

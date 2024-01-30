@@ -25,6 +25,10 @@ public class DLT645Message {
     /**
      * 数据域
      */
-    private byte[] data;
+    private byte[] dataType;
 
+    /**
+     *
+     */
+    private String value;
 }

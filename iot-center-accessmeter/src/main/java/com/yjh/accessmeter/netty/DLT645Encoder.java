@@ -20,7 +20,7 @@ public class DLT645Encoder extends MessageToByteEncoder<DLT645Message> {
     protected void encode(ChannelHandlerContext ctx, DLT645Message dlt645Message, ByteBuf byteBuf) throws Exception {
         log.info("消息出站 before encode  remoteAddress:{} msg:{}", ctx.channel().remoteAddress(), dlt645Message);
         //数据帧
-        byte[] dataFarme = new byte[dlt645Message.getData().length + 12];
+        byte[] dataFarme = new byte[dlt645Message.getDataType().length + 12];
         dataFarme[0] = Constant.START_OF_FRAME;
         byte[] address = ByteBufUtil.decodeHexDump(dlt645Message.getAddress());
         //地址域
@@ -31,10 +31,10 @@ public class DLT645Encoder extends MessageToByteEncoder<DLT645Message> {
         //控制码
         dataFarme[8] = dlt645Message.getControlCode();
         //数据长度
-        dataFarme[9] = (byte) dlt645Message.getData().length;
+        dataFarme[9] = (byte) dlt645Message.getDataType().length;
         //数据域
-        for (int i = 0; i < dlt645Message.getData().length; i++) {
-            dataFarme[10 + i] = (byte) (dlt645Message.getData()[i] + Constant.DIFF_VALUE);
+        for (int i = 0; i < dlt645Message.getDataType().length; i++) {
+            dataFarme[10 + i] = (byte) (dlt645Message.getDataType()[i] + Constant.DIFF_VALUE);
         }
         int cs = 0;
         //计算校验码

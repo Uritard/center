@@ -6,10 +6,7 @@ import com.yjh.accessmeter.module.dao.TMeterDao;
 import com.yjh.accessmeter.module.dao.TMeterLogDao;
 import com.yjh.accessmeter.module.device.entity.TMeter;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
-import com.yjh.accessmeter.netty.DLT645Decoder;
-import com.yjh.accessmeter.netty.DLT645Encoder;
-import com.yjh.accessmeter.netty.DLT645Message;
-import com.yjh.accessmeter.netty.DLT645MessgeHandler;
+import com.yjh.accessmeter.netty.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.AdaptiveRecvByteBufAllocator;
@@ -32,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +59,8 @@ public class TMeterCollectService {
     private PlatformProxy platformProxy;
     @Resource
     private DynamicTask dynamicTask;
-
+    @Resource
+    private SendMeterCodeManager sendMeterCodeManager;
 
     public void add(Long id) {
         TMeter tMeter = tMeterDao.selectByPrimaryKey(id);
@@ -96,28 +95,9 @@ public class TMeterCollectService {
             log.error("与该电表未连接 id:{}", id);
         } else {
             TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
-            sendCollectMsg(channel, tMeter);
+            sendMeterCodeManager.sendCollectMsg(channel, tMeter);
         }
     }
-
-    public static void sendCollectMsg(Channel channel, TMeter tMeter) {
-        try {
-            DLT645Message dlt645Message = new DLT645Message();
-            dlt645Message.setControlCode("1997".equals(tMeter.getProtocol()) ? Constant.CONTROLL_CODE_REQUEST : Constant.CONTROLL_CODE_REQUEST_2007);
-            dlt645Message.setAddress(tMeter.getAddress());
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITVICE_POWER_TOTAL : Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007);
-            channel.writeAndFlush(dlt645Message);
-            Thread.sleep(500);
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007);
-            channel.writeAndFlush(dlt645Message);
-            Thread.sleep(500);
-            dlt645Message.setData("1997".equals(tMeter.getProtocol()) ? Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL : Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007);
-            channel.writeAndFlush(dlt645Message);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public void init() {
         log.info("加载电表配置开始");
@@ -132,9 +112,9 @@ public class TMeterCollectService {
                     handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
-                            channel.pipeline().addLast(new DLT645Decoder(),
+                            channel.pipeline().addLast(new DLT645Decoder(sendMeterCodeManager),
                                     new DLT645Encoder(),
-                                    new DLT645MessgeHandler(tMeterDao, tMeterLogDao, platformProxy, dynamicTask));
+                                    new DLT645MessgeHandler(tMeterDao, tMeterLogDao, platformProxy, dynamicTask, sendMeterCodeManager));
                         }
                     });
             List<TMeter> tMeterList = tMeterDao.selectAll();
@@ -156,7 +136,7 @@ public class TMeterCollectService {
         log.info("开始采集所有电表电量");
         for (Channel channel : map.values()) {
             TMeter tMeter = channel.attr(Constant.tMeterAttributeKey).get();
-            sendCollectMsg(channel, tMeter);
+            sendMeterCodeManager.sendCollectMsg(channel, tMeter);
         }
     }
 
