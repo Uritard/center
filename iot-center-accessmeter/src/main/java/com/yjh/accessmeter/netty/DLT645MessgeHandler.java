@@ -8,17 +8,16 @@ import com.yjh.accessmeter.module.dao.TMeterLogDao;
 import com.yjh.accessmeter.module.device.entity.TMeter;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.module.service.TMeterCollectService;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
@@ -43,11 +42,15 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
 
     private final DynamicTask dynamicTask;
 
-    public DLT645MessgeHandler(TMeterDao tMeterDao, TMeterLogDao tMeterLogDao, PlatformProxy platformProxy, DynamicTask dynamicTask) {
+    private final SendMeterCodeManager sendMeterCodeManager;
+
+    public DLT645MessgeHandler(TMeterDao tMeterDao, TMeterLogDao tMeterLogDao, PlatformProxy platformProxy,
+                               DynamicTask dynamicTask, SendMeterCodeManager sendMeterCodeManager) {
         this.tMeterDao = tMeterDao;
         this.tMeterLogDao = tMeterLogDao;
         this.platformProxy = platformProxy;
         this.dynamicTask = dynamicTask;
+        this.sendMeterCodeManager = sendMeterCodeManager;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         TMeterCollectService.map.put(tMeter.getId(), ctx.channel());
         log.info("电表已经连接 remoteAddress:{},tMeter:{}", ctx.channel().remoteAddress(), tMeter);
         //连接时查询一次电量
-        TMeterCollectService.sendCollectMsg(ctx.channel(), tMeter);
+        sendMeterCodeManager.sendCollectMsg(ctx.channel(), tMeter);
     }
 
     @Override
@@ -88,30 +91,9 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
             log.info("更新电表地址 tMeter:{}", tMeter);
         }
         log.info("控制码 :{}", ByteUtils.toHexString(new byte[]{dlt645Message.getControlCode()}));
-        // 判断控制码返回正确应答  97版本2位数据  07版本4位数据
-        int valueNum;
-        if (dlt645Message.getControlCode() == Constant.CONTROLL_CODE_ANSWER) {
-            valueNum = 2;
-        }else if (dlt645Message.getControlCode() == Constant.CONTROLL_CODE_ANSWER_2007){
-            valueNum = 4;
-        }else {
-            log.error("从站返回错误应答控制码！");
-            return;
-        }
-        byte[] data = dlt645Message.getData();
         // 数据域前两位是数据类型
-        byte[] dataType = new byte[valueNum];
-        System.arraycopy(data, 0, dataType, 0, valueNum);
-        String dataTypeStr = ByteUtils.toHexString(dataType);
-        log.info("dataType:{} ", dataTypeStr);
-        // 解析值
-        byte[] dataValue = new byte[data.length - valueNum];
-        System.arraycopy(dlt645Message.getData(), valueNum, dataValue, 0, data.length - valueNum);
-        ArrayUtils.reverse(dataValue);
-        String hexString = ByteBufUtil.hexDump(dataValue);
-        long powerTotal = Long.parseLong(hexString, 10);
-        log.info("dataValue hex:{} value:{}", hexString, powerTotal);
-        String powerTotalString = String.format("%.2f", powerTotal / 100.0);
+        byte[] dataType = dlt645Message.getDataType();
+        String powerTotalString = dlt645Message.getValue();
         //数据入库
         tMeter.setCollectPowerTime(new Date());
         if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL)
@@ -150,7 +132,7 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         tMeterDao.updateData(tMeter);
         log.info("tMeter {}", tMeter);
         String key = tMeter.getIp() + tMeter.getPort();
-        dynamicTask.startDelay(key, () -> tMeterLogDao.insert(ctx.channel().attr(Constant.tMeterAttributeKey).get()), 3 * 1000);
+        dynamicTask.startDelay(key, () -> tMeterLogDao.insert(ctx.channel().attr(Constant.tMeterAttributeKey).get()), 12 * 1000);
     }
 
     @Override

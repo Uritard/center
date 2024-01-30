@@ -42,6 +42,8 @@ public class Constant {
 
     public  static final  byte CONTROLL_CODE_REQUEST_2007 = 0x11;
 
+
+
     /**
      * 正向有功总电能数据类型
      */

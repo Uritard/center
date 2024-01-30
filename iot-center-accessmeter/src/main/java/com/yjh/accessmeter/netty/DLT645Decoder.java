@@ -7,6 +7,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,11 +24,17 @@ import java.util.List;
 @Slf4j
 public class DLT645Decoder extends ByteToMessageDecoder {
 
+    private final SendMeterCodeManager sendMeterCodeManager;
+
+    public DLT645Decoder(SendMeterCodeManager sendMeterCodeManager) {
+        this.sendMeterCodeManager = sendMeterCodeManager;
+    }
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        log.info("消息进站 before decode remoteAddress:{} msg: {}" , ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
+        log.info("消息进站 before decode remoteAddress:{} msg: {}", ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         if (byteBuf.readableBytes() < Constant.MIN_LENGTH) {
-            log.error("length 小于最小 ,length:{}" , byteBuf.readableBytes());
+            log.error("length 小于最小 ,length:{}", byteBuf.readableBytes());
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
@@ -42,21 +50,21 @@ public class DLT645Decoder extends ByteToMessageDecoder {
             addressList.add(StringUtils.leftPad(Integer.toHexString(Byte.toUnsignedInt(address)), 2, '0'));
         }
         Collections.reverse(addressList);
-        String addressStr = String.join("" , addressList);
+        String addressStr = String.join("", addressList);
 
         if (byteBuf.readByte() != Constant.START_OF_FRAME) {
             byteBuf.skipBytes(byteBuf.readableBytes());
-            log.error("结束符不正确{}" , Byte.toUnsignedInt(byteBuf.readByte()));
+            log.error("结束符不正确{}", Byte.toUnsignedInt(byteBuf.readByte()));
             return;
         }
         // 获取控制码
         byte controlCode = byteBuf.readByte();
         //数据长度
         int dataLength = Byte.toUnsignedInt(byteBuf.readByte());
-        log.info("数据长度 {}" , dataLength);
+        log.info("数据长度 {}", dataLength);
         byteBuf.resetReaderIndex();
         if (byteBuf.readableBytes() < dataLength + Constant.MIN_LENGTH) {
-            log.error("完整报文length:{}, 报文缺失length:{}" , dataLength + Constant.MIN_LENGTH, byteBuf.readableBytes());
+            log.error("完整报文length:{}, 报文缺失length:{}", dataLength + Constant.MIN_LENGTH, byteBuf.readableBytes());
             byteBuf.skipBytes(byteBuf.readableBytes());
             return;
         }
@@ -70,7 +78,7 @@ public class DLT645Decoder extends ByteToMessageDecoder {
         }
         byte realCs = dataFrame[dataFrame.length - 2];
         if (cs != realCs) {
-            log.error("校验码检验失败,计算校验码:{} 实际校验码:{}" , cs, realCs);
+            log.error("校验码检验失败,计算校验码:{} 实际校验码:{}", cs, realCs);
             return;
         }
         // 获取数据
@@ -80,11 +88,35 @@ public class DLT645Decoder extends ByteToMessageDecoder {
             byte data = (byte) (dataFrame[10 + i] - Constant.DIFF_VALUE);
             dataArray[i] = data;
         }
-        DLT645Message message = new DLT645Message();
-        message.setControlCode(controlCode);
-        message.setAddress(addressStr);
-        message.setData(dataArray);
-        log.info("消息进站 after decode message :{}" , message);
-        list.add(message);
+        int valueNum;
+        if (controlCode == Constant.CONTROLL_CODE_ANSWER) {
+            valueNum = 2;
+        } else if (controlCode == Constant.CONTROLL_CODE_ANSWER_2007) {
+            valueNum = 4;
+        } else {
+            log.error("从站返回错误应答控制码！");
+            return;
+        }
+        // 数据域前两位是数据类型
+        byte[] dataType = new byte[valueNum];
+        System.arraycopy(dataArray, 0, dataType, 0, valueNum);
+        String dataTypeStr = ByteUtils.toHexString(dataType);
+        log.info("dataType:{} ", dataTypeStr);
+        // 解析值
+        byte[] dataValue = new byte[dataArray.length - valueNum];
+        System.arraycopy(dataArray, valueNum, dataValue, 0, dataArray.length - valueNum);
+        ArrayUtils.reverse(dataValue);
+        String hexString = ByteBufUtil.hexDump(dataValue);
+        long powerTotal = Long.parseLong(hexString, 10);
+        log.info("dataValue hex:{} value:{}", hexString, powerTotal);
+        String powerTotalString = String.format("%.2f", powerTotal / 100.0);
+        DLT645Message dlt645Message = new DLT645Message();
+        dlt645Message.setControlCode(controlCode);
+        dlt645Message.setDataType(dataType);
+        dlt645Message.setAddress(addressStr);
+        dlt645Message.setValue(powerTotalString);
+        sendMeterCodeManager.terminate(dlt645Message);
+        log.info("消息进站 after decode message :{}", dlt645Message);
+        list.add(dlt645Message);
     }
 }
