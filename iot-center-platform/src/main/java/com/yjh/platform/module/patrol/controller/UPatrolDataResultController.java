@@ -121,6 +121,10 @@ public class UPatrolDataResultController {
                 //查询该regionId的子节点
                 if (regionIdList != null && !regionIdList.isEmpty()){
                     deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                    // 若没有查询出设备，则增加一个-1表示该区域下无设备
+                    if (CollectionUtils.isEmpty(deviceIdList)) {
+                        deviceIdList = Collections.singletonList(-1L);
+                    }
                 }else {
                     deviceIdList.add(regionId);
                 }
@@ -325,7 +329,7 @@ public class UPatrolDataResultController {
         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
-        try (Page<CruiseResultAnalyzeInfo> page = PageMethod.startPage(pageNum, pageSize, true, null, true)) {
+        try {
             if(pageSize==0){
                 logsRecord.LogsSend(request,"9","导出","审核异常点位列表导出");
             }else{
@@ -345,6 +349,10 @@ public class UPatrolDataResultController {
                 List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
                 if (CollectionUtils.isNotEmpty(regionIdList)){
                     deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                    // 若没有查询出设备，则增加一个-1表示该区域下无设备
+                    if (CollectionUtils.isEmpty(deviceIdList)) {
+                        deviceIdList = Collections.singletonList(-1L);
+                    }
                 }else {
                     deviceIdList = new ArrayList<>();
                     deviceIdList.add(regionId);
@@ -352,6 +360,7 @@ public class UPatrolDataResultController {
             }
 
             Map<String, Object> resultMap = new HashMap<>(4);
+            Page<CruiseResultAnalyzeInfo> page = PageMethod.startPage(pageNum, pageSize, true, null, true);
             List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormal(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
