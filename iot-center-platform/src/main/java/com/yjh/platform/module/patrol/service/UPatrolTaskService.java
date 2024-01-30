@@ -3833,9 +3833,9 @@ public class UPatrolTaskService {
 
         Set<String> instanceIds;
         if (desc) {
-            instanceIds = redisTemplate.opsForZSet().reverseRange(key, start, end);
+            instanceIds = redisTemplate.opsForZSet().reverseRange(key, start, end-1);
         } else {
-            instanceIds = redisTemplate.opsForZSet().range(key, start, end);
+            instanceIds = redisTemplate.opsForZSet().range(key, start, end-1);
         }
 
         if (CollectionUtils.isNotEmpty(instanceIds)) {
@@ -3845,7 +3845,7 @@ public class UPatrolTaskService {
         return Collections.emptySet();
     }
 
-    /**
+    /**2
      * 获取所有未执行的点位，即分数小于10的点位
      * @param taskId
      * @return
