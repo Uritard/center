@@ -8,6 +8,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
@@ -18,7 +19,6 @@ import com.yjh.platform.module.task.entity.CruiseResultDetail;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +81,8 @@ public class UPatrolDataResultController {
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视结果分析--测点查询2失败描述：", e);
@@ -106,12 +108,8 @@ public class UPatrolDataResultController {
 
         try {
 
-            if (Objects.isNull(startTime) || "".equals(startTime)){
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)){
-                endTime = null;
-            }
+            DateTimeUtil.checkDate(startTime, endTime);
+
             List<Long> deviceIdList = new ArrayList<>();
             List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
             if (regionId == null){
@@ -135,7 +133,9 @@ public class UPatrolDataResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
-        }catch (Exception e) {
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视报表失败描述：", e);
         }
@@ -158,12 +158,7 @@ public class UPatrolDataResultController {
 
         Result result = new Result();
         try {
-            if (Objects.isNull(startTime) || "".equals(startTime)){
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)){
-                endTime = null;
-            }
+            DateTimeUtil.checkDate(startTime, endTime);
             List<Long> deviceIdList = new ArrayList<>();
             if (regionId == null){
                 //查询该regionId的子节点
@@ -182,7 +177,9 @@ public class UPatrolDataResultController {
             List<Map<String, Object>> cruiseResultAnalyzeInfoList = uPatrolDataResultService.exportCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");
             uPatrolDataResultService.createCruiseDataReport(userId, cruiseResultAnalyzeInfoList, typeString);
-        }catch (Exception e) {
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视报表失败描述：", e);
         }
@@ -209,21 +206,16 @@ public class UPatrolDataResultController {
             }else{
                 logsRecord.LogsSend(request,"1","巡检点结果列表","根据用户传递的参数查询巡检点结果信息");
             }
+            DateTimeUtil.checkDate(startTime, endTime);
+
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            if (Objects.isNull(startTime) || "".equals(startTime)){
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)){
-                endTime = null;
-            }
-            uPatrolDataResultService.checkDate(startTime, endTime);
             List<CruiseResultAnalyzeInfo>  list = uPatrolDataResultService.selectCruiseDataResultByList(cruiseType, cType, deviceMeteIds, meteType,meterType,endTime, startTime);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
@@ -242,13 +234,7 @@ public class UPatrolDataResultController {
                                    @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
         try {
-            if (Objects.isNull(startTime) || "".equals(startTime)){
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)){
-                endTime = null;
-            }
-            uPatrolDataResultService.checkDate(startTime, endTime);
+            DateTimeUtil.checkDate(startTime, endTime);
             result.setData(uPatrolDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteIds, startTime, endTime,meteType,meterType));
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
@@ -279,7 +265,9 @@ public class UPatrolDataResultController {
                 resultMap.put("list", list);
                 result.setData(resultMap);
             }
-        }catch (Exception e) {
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("cameraId查询：", e);
         }
@@ -297,14 +285,7 @@ public class UPatrolDataResultController {
         @RequestParam(value = "startTime", required = false) String startTime, HttpServletRequest request) {
         Result result = new Result();
         try {
-
-            if (Objects.isNull(startTime) || "".equals(startTime)) {
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)) {
-                endTime = null;
-            }
-            uPatrolDataResultService.checkDate(startTime, endTime);
+            DateTimeUtil.checkDate(startTime, endTime);
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");
             uPatrolDataResultService.cruiseDataReport(cruiseType, cType, deviceMeteIds, meteType, meterType, endTime, startTime, userId);
 
@@ -335,13 +316,7 @@ public class UPatrolDataResultController {
             }else{
                 logsRecord.LogsSend(request,"1","审核异常点位","根据用户传递的参数获取审核异常点位信息");
             }
-            if (StringUtils.isEmpty(startTime)) {
-                startTime = null;
-            }
-            if (StringUtils.isEmpty(endTime)) {
-                endTime = null;
-            }
-            uPatrolDataResultService.checkDate(startTime, endTime);
+            DateTimeUtil.checkDate(startTime, endTime);
 
             List<Long> deviceIdList = null;
             if (regionId != null){
@@ -389,13 +364,7 @@ public class UPatrolDataResultController {
             }else{
                 logsRecord.LogsSend(request,"1","审核异常点位详细","根据用户传递的参数获取审核异常点位详细信息");
             }
-            if (StringUtils.isEmpty(startTime)) {
-                startTime = null;
-            }
-            if (StringUtils.isEmpty(endTime)) {
-                endTime = null;
-            }
-            uPatrolDataResultService.checkDate(startTime, endTime);
+            DateTimeUtil.checkDate(startTime, endTime);
 
             Map<String, Object> resultMap = new HashMap<>(4);
             List<CruiseResultDetail> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectIdentifyAbnormalByMeteId(cruiseType, deviceMeteId, endTime, startTime);

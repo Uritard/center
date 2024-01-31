@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.entity.TIotDeviceWarn;
@@ -126,6 +128,8 @@ public class TIotDeviceWarnController {
                          @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         Result result = new Result();
         try {
+            DateTimeUtil.checkDate(startTime, endTime);
+
             QueryWrapper<TIotDeviceWarn> queryWrapper = new QueryWrapper<>();
             if (StringUtils.isNotBlank(pointName)) {
                 queryWrapper.like("point_name", pointName);
@@ -152,6 +156,9 @@ public class TIotDeviceWarnController {
             resultMap.put("list", tIotDeviceWarnList);
             result.setData(resultMap);
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException e) {
+            result.setCode(e.getCode(), e.getMessage());
+            log.error("日志统计失败：", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询物联设备测点失败：", e);

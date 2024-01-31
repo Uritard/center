@@ -1,8 +1,11 @@
 package com.yjh.platform.common.utils;
 
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TCruiseTaskCron;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1434,5 +1437,25 @@ public class DateTimeUtil {
         calendar.set(Calendar.MILLISECOND, 0);
 
         return calendar.getTime();
+    }
+
+    public static boolean checkDate(String startTime, String endTime) {
+        if (StringUtils.isAnyEmpty(startTime, endTime)) {
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "日期不可以为空");
+        }
+        Date start = DateTimeUtil.parse(startTime);
+        Date end = DateTimeUtil.parse(endTime);
+        return checkDate(start, end);
+    }
+
+    public static boolean checkDate(Date start, Date end) {
+        if (Objects.isNull(start) || Objects.isNull(end)) {
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "日期不可以为空");
+        }
+        Date toEnd = DateUtils.addMonths(start, 3);
+        if (DateUtils.truncatedCompareTo(toEnd, end, Calendar.DAY_OF_MONTH) < 0) {
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "日期间隔不可以大于3个月");
+        }
+        return true;
     }
 }
