@@ -254,19 +254,6 @@ public class UPatrolDataResultService {
         return dataSetParse(meteIds, group);
     }
 
-    public boolean checkDate(String startTime, String endTime) {
-        if (StringUtils.isAnyEmpty(startTime, endTime)) {
-            return true;
-        }
-        Date start = DateTimeUtil.parse(startTime);
-        Date toEnd = DateUtils.addMonths(start, 3);
-        Date end = DateTimeUtil.parse(endTime);
-        if (DateUtils.truncatedCompareTo(toEnd, end, Calendar.DAY_OF_MONTH) < 0) {
-            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "日期间隔不可以大于3个月");
-        }
-        return true;
-    }
-
     private List<KeyValue<String, List<List<String>>>> dataSetParse(List<Long> meteIds, Map<Long, List<BrokenLineInfo>> group) {
         List<KeyValue<String, List<List<String>>>> dataset = new ArrayList<>();
         Map<Long, KeyValue<String, List<List<String>>>> kvMap = new HashMap<>(8);

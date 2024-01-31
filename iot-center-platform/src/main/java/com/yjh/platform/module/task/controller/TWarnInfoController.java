@@ -9,6 +9,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
@@ -216,11 +217,15 @@ public class TWarnInfoController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            DateTimeUtil.checkDate(startTime, endTime);
+
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfoDetail> list = tWarnInfoService.selectWarnByPage(warnLevel, confMode, alarmSource,startTime,endTime,deviceName,meteName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有告警失败描述：", e);
@@ -249,14 +254,16 @@ public class TWarnInfoController {
             }else{
                 logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
             }
+            DateTimeUtil.checkDate(startTime, endTime);
+
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfoDetail> list = tWarnInfoService.warnConfirm(warnLevel, warnId, confMode,startTime,endTime,deviceName,defectType,meteName,alarmSource);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        }catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
-            log.error("日志统计失败：" + e);
+        } catch (BusinessException e) {
+            result.setCode(e.getCode(), e.getMessage());
+            log.error("日志统计失败：", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询所有告警失败描述：", e);

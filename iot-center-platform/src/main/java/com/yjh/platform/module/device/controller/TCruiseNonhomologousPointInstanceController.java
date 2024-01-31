@@ -6,6 +6,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -176,11 +177,15 @@ public class TCruiseNonhomologousPointInstanceController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            DateTimeUtil.checkDate(tCruiseNonhomologousWarnInfo.getStartTime(), tCruiseNonhomologousWarnInfo.getEndTime());
+
             Page page = PageHelper.startPage(tCruiseNonhomologousWarnInfo.getPageNum()!=null?tCruiseNonhomologousWarnInfo.getPageNum():1, tCruiseNonhomologousWarnInfo.getPageSize()!=null?tCruiseNonhomologousWarnInfo.getPageSize():0,true,null,true);
             List<TCruiseNonhomologousWarnInfo> list = tCruiseNonhomologousPointInstanceService.selectWarnByPage(tCruiseNonhomologousWarnInfo);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("非同源告警分页查询失败描述：", e);

@@ -8,6 +8,7 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
@@ -69,12 +70,8 @@ public class UPatrolResultController {
             }else{
                 logsRecord.LogsSend(request,"1","查询巡检任务结果数据","根据用户传递的参数分页查询巡检任务结果信息");
             }
-            if (Objects.isNull(startDate) || "".equals(startDate)){
-                startDate = null;
-            }
-            if (Objects.isNull(endDate) || "".equals(endDate)){
-                endDate = null;
-            }
+            DateTimeUtil.checkDate(startDate, endDate);
+
             List<Long> deviceIdList = new ArrayList<>();
             if (regionId == null){
                 deviceIdList =  null;
@@ -97,7 +94,9 @@ public class UPatrolResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        }catch (Exception e) {
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
@@ -219,12 +218,7 @@ public class UPatrolResultController {
                 logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
             }
 
-            if (Objects.isNull(startTime) || "".equals(startTime)){
-                startTime = null;
-            }
-            if (Objects.isNull(endTime) || "".equals(endTime)){
-                endTime = null;
-            }
+            DateTimeUtil.checkDate(startTime, endTime);
             List<Long> deviceIdList = new ArrayList<>();
             if (regionId == null){
                 List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
@@ -242,6 +236,8 @@ public class UPatrolResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
