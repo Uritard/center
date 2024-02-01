@@ -198,8 +198,8 @@
             <when test="recordId != null and -1 == recordId">a.record_id = null,</when>
             <when test="recordId != null and -1 != recordId">a.record_id = #{recordId,jdbcType=BIGINT},</when>
         </choose>
-        <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
-        <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
+        a.channel_num_light = #{channelNumLight},
+        a.channel_num_inferad = #{channelNumInferad},
         <if test="imageSize != null ">a.image_size = #{imageSize},</if>
         <if test="lightChannelId != null">a.light_channel_id = #{lightChannelId},</if>
         <if test="infraredChannelId != null">a.infrared_channel_id = #{infraredChannelId},</if>
