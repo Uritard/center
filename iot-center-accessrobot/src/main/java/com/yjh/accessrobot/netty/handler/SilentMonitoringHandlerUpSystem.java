@@ -69,7 +69,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         String alarmLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
         String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("origin_id"));
 
-        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(presetOriginId));
+        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(presetOriginId), sendCode);
         if(map==null){
             log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,presetOriginId);
             return;

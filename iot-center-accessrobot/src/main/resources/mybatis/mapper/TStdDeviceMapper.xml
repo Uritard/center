@@ -262,6 +262,7 @@
     and d.device_id = b.device_id and e.custom_id = b.custom_id
     AND b.device_mete_id = e.device_mete_id
     and a.origin_id = #{originId}
+    and a.edge_code = #{edgeCode}
     </select>
 
     <delete id="deleteAllMete">
