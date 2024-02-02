@@ -147,7 +147,7 @@ public class RedisUtil {
 
     public static Set<String> redisScan(String key) {
         return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
+            Set<String> keys = Sets.newLinkedHashSet();
 
             JedisCommands commands = (JedisCommands) connection.getNativeConnection();
             MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;

@@ -25,6 +25,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -66,7 +67,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -3825,7 +3825,7 @@ public class UPatrolTaskService {
     }
 
     public Set<String> queryTaskKeys(String taskId, boolean desc) {
-        return queryTaskKeys(taskId, 0, -1, desc);
+        return queryTaskKeys(taskId, 0, 0, desc);
     }
 
     public Set<String> queryTaskKeys(String taskId, int start, int end, boolean desc) {
@@ -3833,15 +3833,17 @@ public class UPatrolTaskService {
 
         Set<String> instanceIds;
         if (desc) {
-            instanceIds = redisTemplate.opsForZSet().reverseRange(key, start, end-1);
+            instanceIds = redisTemplate.opsForZSet().reverseRange(key, start, end - 1);
         } else {
-            instanceIds = redisTemplate.opsForZSet().range(key, start, end-1);
+            instanceIds = redisTemplate.opsForZSet().range(key, start, end - 1);
         }
 
         if (CollectionUtils.isNotEmpty(instanceIds)) {
-            return instanceIds.stream().map(s->PATROL_TASK_PREFIX + taskId + ":" + s).collect(Collectors.toCollection(LinkedHashSet::new));
+            return instanceIds.stream().map(s -> PATROL_TASK_PREFIX + taskId + ":" + s).collect(Collectors.toCollection(LinkedHashSet::new));
+        } else if(Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+            Set<String> tasKeys = RedisUtil.redisScan(PATROL_TASK_PREFIX + taskId + ":*");
+            return end > 0 ? CommonUtils.subSet(tasKeys, start, end) : tasKeys;
         }
-
         return Collections.emptySet();
     }
 

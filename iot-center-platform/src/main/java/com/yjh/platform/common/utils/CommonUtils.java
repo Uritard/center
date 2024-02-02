@@ -1,6 +1,7 @@
 package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author tt
@@ -604,5 +606,17 @@ public class CommonUtils {
             return true;
         }
         return o1 != null && o1.equals(o2);
+    }
+
+    public static <T> Set<T> subSet(Set<T> sets, int start, int end) {
+        try {
+            if (CollectionUtils.isEmpty(sets) || end < start) {
+                return sets;
+            }
+            return sets.stream().skip(start).limit((end - start)).collect(Collectors.toCollection(LinkedHashSet::new));
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return sets;
+        }
     }
 }
