@@ -458,4 +458,17 @@ public class TRobotInfoController {
         }
         return result;
     }
+
+    @ApiOperation("根绝名称查询机器人或无人机信息")
+    @GetMapping("selectRobotOrDroneByName")
+    public Result selectRobotOrDroneByName(@RequestParam(value = "name", required = false) String name){
+        Result result = new Result();
+        try {
+            result.setData(tRobotInfoService.selectRobotOrDroneByName(name));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

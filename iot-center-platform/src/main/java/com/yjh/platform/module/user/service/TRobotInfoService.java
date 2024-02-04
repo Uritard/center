@@ -688,6 +688,9 @@ public class TRobotInfoService{
         List<AreaInfo> list = tRobotInfoDao.selectMapNodeTree();
         return TreesUtil.assembleTrees(list);
     }
+    public List<TRobotInfo> selectRobotOrDroneByName(String name) {
+        return tRobotInfoDao.selectRobotOrDroneByName(name);
+    }
 
     public void filter(List<AreaInfo> areaInfoList, String name, String infoType) {
         Iterator<AreaInfo> it = areaInfoList.iterator();
