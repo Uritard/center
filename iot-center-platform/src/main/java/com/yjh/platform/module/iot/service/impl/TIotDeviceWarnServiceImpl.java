@@ -46,20 +46,26 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         String robotCode = iotWarn.get("robotCode");
         String channelNum = iotWarn.get("type_device_num");
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
+        if (Objects.isNull(tRobotInfo)) {
+            log.error("未找到 robotCode={} 的机器人信息", robotCode);
+            return false;
+        }
         String ip;
         if (StringUtils.isNotBlank(tRobotInfo.getRobotIp())) {
             ip = tRobotInfo.getRobotIp();
         } else {
+            log.error("机器人未配置ip");
             return false;
         }
         if (StringUtils.isBlank(channelNum)){
             log.error("type_device_num is null");
             return false;
         }
+        String flag = "deleteFlag";
         TIotDeviceWarn tIotDeviceWarn = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
         if (Objects.nonNull(tIotDeviceWarn)) {
-            if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, "deleteFlag"))) {
-                Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, "deleteFlag"));
+            if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
+                Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, flag));
                 tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
                 tIotDeviceWarn.setDeleteFlag(deleteFlag);
                 this.updateById(tIotDeviceWarn);
@@ -73,7 +79,11 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 tIotDeviceWarn.setRobotCode(robotCode);
                 tIotDeviceWarn.setChannelNum(channelNum);
                 tIotDeviceWarn.setAlarmContent(MapUtils.getString(iotWarn, "value"));
-                tIotDeviceWarn.setDeleteFlag(1L);
+                long deleteFlag = 1L;
+                if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
+                    deleteFlag = Long.parseLong(MapUtils.getString(iotWarn, flag));
+                }
+                tIotDeviceWarn.setDeleteFlag(deleteFlag);
                 this.save(tIotDeviceWarn);
             } else {
                 log.warn("该设备未找到,告警不入库!");
@@ -131,6 +141,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 item.put("patroldevice_name", tRobotInfo.getRobotName());
                 item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
                 item.put("type_device_num", tdw.getChannelNum());
+                item.put("alarm_content", tdw.getAlarmContent());
                 item.put("delete_flag", 2);
                 item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
                 itemList.add(item);
