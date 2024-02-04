@@ -119,8 +119,8 @@
         LEFT JOIN t_cruise_point_instance d on b.node_id = d.instance_id
         left join t_robot_inspection e on d.cruise_id = e.inspection_id
         where a.wiring_diagram_id = #{wiringDiagramId}
-        <if test="inspectionType != null and inspectionType == 2"> and a.equipment_id in (
-             select distinct  device_id from t_std_devicemete where inspection_type = 2
+        <if test="inspectionType != null"> and a.equipment_id in (
+             select distinct  device_id from t_std_devicemete where inspection_type = #{inspectionType}
             )</if>
     </select>
 
