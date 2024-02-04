@@ -141,7 +141,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 item.put("patroldevice_name", tRobotInfo.getRobotName());
                 item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
                 item.put("type_device_num", tdw.getChannelNum());
-                item.put("alarm_content", tdw.getAlarmContent());
+                item.put("value", tdw.getAlarmContent());
                 item.put("delete_flag", 2);
                 item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
                 itemList.add(item);
