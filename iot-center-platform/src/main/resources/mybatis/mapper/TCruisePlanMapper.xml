@@ -294,7 +294,6 @@
         a.cruise_id,
         a.cruise_name,
         b.device_name,
-        k.dict_note AS custom_name,
         j.mete_name AS instance_name,
         (
         CASE
