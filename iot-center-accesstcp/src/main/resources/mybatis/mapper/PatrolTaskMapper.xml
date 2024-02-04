@@ -29,12 +29,13 @@
         from u_patrol_task a
         left join sys_user u on a.create_user_id = u.user_id
         left join t_dict_business b on a.task_type = b.dict_code and b.col_name="plan_type"
-        where a.task_id = a.task_code and a.plan_id is not null
+        where a.task_id = a.task_code and a.plan_id is not null and a.end_time > #{endTime, jdbcType=TIMESTAMP}
     </select>
 
-    <select id="selectInstanceId" resultType="java.lang.Long">
-        SELECT a.instance_id
+    <select id="selectInstanceId" resultType="com.yjh.accesstcp.module.device.entity.UPatrolPlanAttr">
+        SELECT a.instance_id, b.device_id, b.device_mete_id, b.device_point_id, a.point_type
         from u_patrol_task_attr a
+        left join t_std_devicemete b on a.device_mete_id=b.device_mete_id
         where a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 

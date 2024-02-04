@@ -2,9 +2,11 @@ package com.yjh.accesstcp.module.device.dao;
 
 import com.yjh.accesstcp.module.device.entity.AInterfaceTaskInfo;
 import com.yjh.accesstcp.module.device.entity.SysLogs;
+import com.yjh.accesstcp.module.device.entity.UPatrolPlanAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +18,9 @@ import java.util.Map;
 @Repository
 public interface PatrolTaskDao {
 
-    List<Map<String,Object>> selectTaskInfo();
+    List<Map<String,Object>> selectTaskInfo(@Param(value = "endTime") Date endTime);
 
-    List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
+    List<UPatrolPlanAttr> selectInstanceId(@Param(value = "taskId") String taskId);
 
     HashMap<String,Object> countInstanceLoss(@Param(value = "startTime")String startTime,
                                              @Param(value = "endTime")String endTime );

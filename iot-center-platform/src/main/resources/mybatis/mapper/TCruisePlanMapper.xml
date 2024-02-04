@@ -289,6 +289,7 @@
         a.device_mete_id,
         a.station_id,
         j.custom_id,
+        j.mete_type,
         a.station_name,
         a.cruise_id,
         a.cruise_name,
@@ -306,7 +307,7 @@
         ELSE '其他'
         END
         ) AS cruise_device_name,
-        i.dict_note AS cruise_type_name,
+        a.cruise_type,
         a.identify_type
         FROM
         t_cruise_point_instance a
@@ -316,11 +317,7 @@
         LEFT JOIN t_camera_preset f ON a.cruise_id = f.preset_id
         LEFT JOIN t_camera_info g ON f.camera_id = g.camera_id
         LEFT JOIN t_voice_device h ON a.cruise_id = h.voice_device_id
-        LEFT JOIN t_dict_business i ON i.dict_code = a.cruise_type
-        AND i.col_name = "cruise_type"
         LEFT JOIN t_std_devicemete j ON j.device_mete_id = a.device_mete_id
-        LEFT JOIN t_dict_business k ON k.dict_code = j.custom_id
-        AND k.col_name = "custom_type"
         WHERE 1 = 1
         AND a.device_id IN
         <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">

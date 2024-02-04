@@ -142,6 +142,8 @@ public class RobotService {
 
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
 
+    public static final Map<String, String> SYNC_MODE_CACHE =  new ConcurrentHashMap<>(16);
+
     /**
      * 需要密码校验的巡视设备控制命令
      */
@@ -401,8 +403,9 @@ public class RobotService {
      * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean feignRobotTransfer(String robotCode) {
-        String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+    public boolean feignRobotTransfer(String robotCode, String userId) {
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+        String robotStatus = tRobotInfo.getRobotStatus();
         if (StringUtils.equals(OFF_LINE, robotStatus)) {
             log.error("==========该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备==========");
             throw new BusinessException("该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备！");
@@ -417,6 +420,8 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+        SYNC_MODE_CACHE.put(robotCode, userId);
+        Constant.sendProcess(robotCode, tRobotInfo.getRobotName(), 1, "模型同步开始");
         return true;
     }
 
@@ -427,7 +432,7 @@ public class RobotService {
      * @param command 类型
      * @return boolean
      */
-    public boolean feignEdgeTransfer(String edgeCode, String command) {
+    public boolean feignEdgeTransfer(String edgeCode, String command, String userId) {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, 1);
         if (CollectionUtils.isNotEmpty(stdRegionList)) {
             String edgeStatus = stdRegionList.get(0).getEdgeStatus();
@@ -445,6 +450,8 @@ public class RobotService {
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
             log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
+            SYNC_MODE_CACHE.put(edgeCode, userId);
+            Constant.sendProcess(edgeCode, stdRegionList.get(0).getRegionName(), 1, "模型同步开始");
             return true;
         } else {
             throw new BusinessException("当前节点编码不匹配,请检查后下发！");
@@ -599,11 +606,21 @@ public class RobotService {
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
         boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
 
-        Long robotId = isEdge ? 1 : tRobotInfoDao.selectRobotIdByCode(nodeCode);
-
+        Long robotId = 1L;
+        String title;
+        String desc = "";
+        int state = 1;
+        if (isEdge) {
+            title = stdRegionList.get(0).getRegionName();
+        } else {
+            TRobotInfo robotInfo = tRobotInfoDao.selectRobotInfoByCode(nodeCode);
+            robotId = robotInfo.getRobotId();
+            title = robotInfo.getRobotName();
+        }
         if (MapUtils.isEmpty(map)) {
             return;
         }
+
         try {
             log.info("map=={}", map);
             for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -618,6 +635,7 @@ public class RobotService {
                     }
                     switch (k) {
                         case "device_file_path":
+                            desc = "点位模型";
                             if (isEdge) {
                                 syncModelUpdate("1", v.toString(), nodeCode);
                             } else {
@@ -634,6 +652,7 @@ public class RobotService {
                             }
                             break;
                         case "robot_file_path":
+                            desc = "机器人模型";
                             // Robot Model Info
                             if (isEdge) {
                                 dealRobotFile(filePath, nodeCode, Constant.ROBOT);
@@ -642,55 +661,75 @@ public class RobotService {
                             }
                             break;
                         case "property_file_path":
+                            desc = "属性信息模型";
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
                             break;
                         case "operation_ticket_file_path":
+                            desc = "操作票模型";
                             //操作票信息
                             addRobotSelfTask(mapList, nodeCode);
                             break;
                         case "map_node_file_path":
+                            desc = "地图点模型";
                             // Map Nodes 地图信息添加
                             addMapNodes(mapList, robotId);
                             break;
                         case "region_file_path":
+                            desc = "区域模型";
                             dealRegionFile(filePath, nodeCode);
                             break;
                         case "map_file_path":
+                            desc = "地图模型";
                             dealMapFile(filePath, nodeCode);
                             break;
                         case "host_file_path":
+                            desc = "地图模型";
                             dealHostFilePath(filePath, nodeCode);
                             break;
                         case "video_file_path":
+                            desc = "相机模型";
                             dealCameraFile(filePath, nodeCode);
                             break;
                         case "drone_file_path":
+                            desc = "无人机模型";
                             dealRobotFile(filePath, nodeCode, Constant.DRONE);
                             break;
                         case "voice_file_path":
+                            desc = "声纹模型";
                             dealVoiceFile(filePath, nodeCode);
                             break;
                         case "record_file_path":
+                            desc = "录像机模型";
                             dealRecordFile(filePath, nodeCode);
                             break;
                         case "overhaularea_file_path":
+                            desc = "检修区域模型";
                             dealMaintenanceFilePath(filePath, nodeCode);
                             break;
                         case "source_file_path":
+                            desc = "设备资源信息配置";
                             dealSourceFile(filePath, nodeCode);
                             break;
                         default:
+                            desc = "模型未定义";
+                            state = 0;
                             log.warn("模型解析未定义，{}: {}", k, filePath);
                             break;
                     }
                 } catch (DocumentException e) {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
+                    Constant.sendProcess(nodeCode, title, 0, desc + "同步失败");
                 }
+                Constant.sendProcess(nodeCode, title, state, state == 1 ? desc + "同步完成" : desc);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("处理机器人返回的模型文件异常: ", e);
+            Constant.sendProcess(nodeCode, title, 0, desc + "同步失败");
+        } finally {
+            SYNC_MODE_CACHE.remove(nodeCode);
         }
+        Constant.sendProcess(nodeCode, title, 1, "模型同步完成");
     }
     /**
      * 机器人模型文件信息处理
@@ -1607,11 +1646,7 @@ public class RobotService {
                 robotConfirmMsg.put("confirmMapList", JSONArray.parseArray(robotConfirmMsg.get("confirmMapList").toString()));
                 String jsons = JSON.toJSONString(robotConfirmMsg);
                 log.info("确认消息生成-前端推送：" + jsons);
-                try {
-                    Constant.postUrl(Constant.WEBSOCKET_URL, jsons);
-                } catch (IOException | URISyntaxException e) {
-                    log.error(e.getMessage(), e);
-                }
+                Constant.postUrl(Constant.WEBSOCKET_URL, jsons);
                 flag = true;
             }
             if (flag) {

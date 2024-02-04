@@ -78,4 +78,12 @@ public class InstanceTree implements Serializable {
     @ApiModelProperty(value = "红外相机名称")
     private String inferadName;
 
+
+    @ApiModelProperty(value = "巡视测点类型")
+    private String meteType;
+
+
+    @ApiModelProperty(value = "巡视测点类型名称")
+    private String meteTypeName;
+
 }

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/uPatrolResult/v1")
-@Api(value = "/uPatrolResult")
+@Api(value = "/uPatrolResult", tags = {"新的巡检结果接口"})
 public class UPatrolResultController {
 
     @Autowired
@@ -139,6 +139,8 @@ public class UPatrolResultController {
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
                                      @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                     @RequestParam(value = "meteType", required = false) Integer meteType,
+                                     @RequestParam(value = "meterType", required = false) Integer meterType,
                                      @RequestParam(value = "instanceName",required = false) String instanceName,
                                      @RequestParam(value = "startTime",required = false) String startTime,
                                      @RequestParam(value = "endTime",required = false) String endTime,
@@ -184,7 +186,8 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,instanceName,startTime,endTime,deviceIdList,customId,isWarn);
+            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType, cruiseResult,deviceType,
+                    meteType,meterType,instanceName,startTime,endTime,deviceIdList,customId,isWarn);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
@@ -284,9 +287,10 @@ public class UPatrolResultController {
     @Logs(title = "审核任务",content = "一键审核",logType = 5, authority = "1235")
     public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
         String userId = request.getHeader("userId");
+        String token = request.getHeader("token");
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,request));
+            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,token,request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);

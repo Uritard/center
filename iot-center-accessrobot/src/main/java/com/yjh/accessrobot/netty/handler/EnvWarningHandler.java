@@ -75,11 +75,17 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         envWarn.put("deviceName", MapUtils.getString(envWarnMap, "device_name"));
         envWarn.put("deleteFlag", MapUtils.getString(envWarnMap, "delete_flag"));
         envWarn.put("deleteTime", MapUtils.getString(envWarnMap, "delete_time"));
+        Long robotId = robotService.selectRobotIdByCode(robotCode);
 
-        try {
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarnMap, Result.class);
-        } catch (Exception e) {
-            log.error("调用platform出错：{}", e.getMessage(), e);
+        //告警屏蔽处理
+        AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
+        robotService.needPopAlarm(robotId, value, isWarn);
+        if (isWarn.get()) {
+            try {
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarn, Result.class);
+            } catch (Exception e) {
+                log.error("调用platform出错：{}", e.getMessage(), e);
+            }
         }
 
         if (Constant.upEnvDevice() && Constant.upSystemFlag()) {

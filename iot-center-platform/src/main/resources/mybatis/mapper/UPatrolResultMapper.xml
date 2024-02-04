@@ -471,6 +471,10 @@
 
         <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
+        <if test="meteType != null and meteType != -1">and q.mete_type = #{meteType, jdbcType=INTEGER}</if>
+
+        <if test="meterType != null and meterType != -1">and q.meter_type = #{meterType, jdbcType=INTEGER}</if>
+
         <if test="instanceName != null and instanceName != ''">and b.instance_name like
             concat('%',#{instanceName, jdbcType=VARCHAR},'%')
         </if>

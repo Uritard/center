@@ -120,4 +120,7 @@ public interface TWarnInfoDao {
      */
     List<WarnStatistical> countPollOrInvadeWarnByStationOnMonth(@Param("nearDays") Integer nearDays, @Param("alarmSource") Integer alarmSource);
 
+    int batchUpDate(@Param(value = "list") List<Long> warnIdList, @Param("userId") String userId);
+
+    List<TWarnInfo> selectCruiseInfoByTaskAndInstanceIds(@Param("taskId")String taskId, @Param("instanceIds") List<String> instanceIds);
 }

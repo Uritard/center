@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.*;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -648,7 +649,8 @@ public class PatrolResultHandler {
 
                 if (warnFlag == 1){
                     Map<String, String> warnMap = new HashMap<>(16);
-                    String warnName = "warnInfo:" + cruiseResultMap.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
+                    String warnPrefix = "warnInfo:" + cruiseResultMap.get("taskId");
+                    String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
 
                     warnMap.put("deviceId", String.valueOf(cruiseResultMap.get("deviceId")));
                     warnMap.put("customId", tStdDevicemete.getCustomId());
@@ -682,7 +684,7 @@ public class PatrolResultHandler {
                             warnMap.put("outRange", "--");
                             warnMap.put("warnContent", meteName + ":" + resultDesc + "--" + DictConvertUtil.DICT.covertToDict("alarmLevel", String.valueOf(tStdDevicemete.getAlarmLevel())));
                             log.info("warnMap=={}", warnMap);
-                            redisTemplate.opsForHash().putAll(warnName, warnMap);
+                            RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
 
                             cruiseResultMap.put("isWarn", "1");
                             // cruiseResultMap.put("resultNum", resultStringValue);
@@ -779,7 +781,7 @@ public class PatrolResultHandler {
 
                             log.info("warnMap=={}", warnMap);
                             // 将告警信息放入redis
-                            redisTemplate.opsForHash().putAll(warnName, warnMap);
+                            RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
 
                             cruiseResultMap.put("isWarn", "1");
                             if (isTemDif) {
@@ -795,14 +797,14 @@ public class PatrolResultHandler {
                             break;
                     }
 
-                    Map<String, String> warningMsg = redisTemplate.opsForHash().entries(warnName);
+                    Map<String, String> warningMsg = redisTemplate.opsForHash().entries(warnPrefix + ":" + tempKey);
                     log.info("warnMsg==={}", warningMsg);
                     if (!warningMsg.isEmpty()) {
                         TWarnInfo tWarnInfo =  getWarnInfo(warningMsg);
                         analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
                         // 告警推送
-                        Map<String, String> infoMap = new HashMap<>(5);
+                        Map<String, String> infoMap = new HashMap<>(8);
                         infoMap.put("alarmLevel", String.valueOf(tWarnInfo.getWarnLevel()));
                         infoMap.put("flag", "warn");
                         infoMap.put("defectModel", String.valueOf(tWarnInfo.getDefectModel()));
@@ -893,7 +895,8 @@ public class PatrolResultHandler {
             String meteName = tStdDevicemete.getMeteName();
 
             Map<String, String> warnMap = new HashMap<>();
-            String warnName = "warnInfo:" + cruiseResultMap.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
+            String warnPrefix = "warnInfo:" + cruiseResultMap.get("taskId");
+            String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
 
             warnMap.put("deviceId", String.valueOf(cruiseResultMap.get("deviceId")));
             warnMap.put("customId", tStdDevicemete.getCustomId());
@@ -920,7 +923,7 @@ public class PatrolResultHandler {
             warnMap.put("outRange", String.valueOf(outRang));
 
             log.info("warnMap=={}", warnMap);
-            redisTemplate.opsForHash().putAll(warnName, warnMap);
+            RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
 
             // 巡视结果告警处理
             cruiseResultMap.put("isWarn", "1");
@@ -1080,12 +1083,8 @@ public class PatrolResultHandler {
             Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
             StringBuilder retVal  = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
             log.info("value: {}, defectMap=={}", retVal, JSON.toJSONString(defectMap));
-            String defectInfoKey = "defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp;
-            redisTemplate.opsForHash().putAll(defectInfoKey, defectMap);
-            redisTemplate.expire(defectInfoKey, 3, TimeUnit.DAYS);
-            // String defectKey = "defect:" + msgId + ":" + redisKeyTemp;
-            // redisTemplate.opsForHash().putAll(defectKey, defectMap);
-            // redisTemplate.expire(defectKey, 3, TimeUnit.DAYS);
+            RedisUtil.setHashGroupAndExpire("defectInfo:" + cruiseResultMap.get("taskId"), redisKeyTemp, defectMap, 7);
+
             processResultToUpSystem.addDefect(msgId, defectMap);
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
@@ -1191,6 +1190,7 @@ public class PatrolResultHandler {
             tDefectInfo.setConfMode(NumberUtils.toInt(defectMap.get("confMode")));
             tDefectInfo.setImagePath(defectMap.get("imagePath"));
             tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
+            tDefectInfo.setTaskId(defectMap.get("taskId"));
         }catch (Exception e){
             log.error("缺陷info信息组装异常：", e);
         }
@@ -1230,6 +1230,7 @@ public class PatrolResultHandler {
             defectMap.put("instanceName", cruiseResultMap.get("instanceName"));
             defectMap.put("cruiseType", cruiseResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", cruiseResultMap.get("cruiseTime"));
+            defectMap.put("taskId", cruiseResultMap.get("taskId"));
         }catch (Exception e){
             log.error("缺陷map信息组装异常：" , e);
         }

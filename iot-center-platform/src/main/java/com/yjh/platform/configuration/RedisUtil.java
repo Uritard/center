@@ -168,4 +168,15 @@ public class RedisUtil {
             return keys;
         });
     }
+
+    public static boolean setHashGroupAndExpire(String prefex, String suffixKey, Map<String, String> valueMap, int expire) {
+        String infoKey = suffixKey;
+        if (StringUtils.isNotEmpty(prefex)) {
+            infoKey = prefex + ":" + suffixKey;
+            redisTemplate.opsForList().rightPush(prefex, infoKey);
+        }
+        redisTemplate.opsForHash().putAll(infoKey, valueMap);
+        redisTemplate.expire(infoKey, expire, TimeUnit.DAYS);
+        return true;
+    }
 }

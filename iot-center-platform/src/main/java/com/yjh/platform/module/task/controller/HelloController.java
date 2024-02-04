@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
@@ -1018,5 +1019,21 @@ public class HelloController {
         }
 
         return result;
+    }
+
+    @PostMapping(value="sendWebSocket")
+    public Result sendWebSocket(@RequestBody JSONObject params) {
+        try {
+            Map<String, Object> jasonMap = new HashMap<>(4);
+            jasonMap.put("type", params.getString("type"));
+            jasonMap.put("title", params.getString("title"));
+            jasonMap.put("desc", params.getString("desc"));
+            jasonMap.put("status", params.getString("status"));
+            log.info("发送给前端的消息 —— 巡视报告下载:{}", jasonMap);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, params.getString("userId"));
+        } catch (Exception e) {
+            log.error("webSocket发送异常", e);
+        }
+        return new Result();
     }
 }

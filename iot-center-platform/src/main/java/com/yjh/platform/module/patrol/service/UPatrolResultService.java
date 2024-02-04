@@ -100,22 +100,26 @@ public class UPatrolResultService {
         return resultExpandList;
     }
 
-    public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, String instanceName,
-        String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
+    public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, Integer meteType, Integer meterType,
+                                                       String instanceName, String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
         List<CruiseResultDetail> cruiseResultDetailList =
-                uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, instanceName, startTime, endTime, deviceIdList,
+                uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, meteType, meterType, instanceName, startTime, endTime, deviceIdList,
                     customId, isWarn);
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
-            .add("abnormalType", "cruiseAbnormal", "abnormalType").add("identifyResult").add("alarmLevel").add("meteKind");
+                .add("abnormalType", "cruiseAbnormal", "abnormalType")
+                .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind");
         DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
 
-            String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
-            cruiseResultDetailList.forEach(c -> {
-                if (StringUtils.isBlank(c.getEdgeName())) {
-                    c.setEdgeName(currentEdge);
-                }
-            });
+        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        cruiseResultDetailList.forEach(c -> {
+            if (StringUtils.isBlank(c.getEdgeName())) {
+                c.setEdgeName(currentEdge);
+            }
+            if (StringUtils.isNotBlank(c.getMeterTypeName())) {
+                c.setMeteTypeName(c.getMeteTypeName() + "-" + c.getMeterTypeName());
+            }
+        });
         return cruiseResultDetailList;
     }
 
@@ -293,7 +297,7 @@ public class UPatrolResultService {
         if (checkedSize == cruiseManualReviewList.size()) {
             result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
             //自动生成巡视报告
-            Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+            Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             log.info("开始生成巡视报告=={}", progress);
         }
         return result2;
@@ -525,7 +529,7 @@ public class UPatrolResultService {
         return map;
     }
 
-    public int manualReviewTask(String taskId, String userId, HttpServletRequest request) {
+    public int manualReviewTask(String taskId, String userId, String token, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
@@ -554,7 +558,7 @@ public class UPatrolResultService {
         List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
         processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
         //自动生成巡视报告
-        Integer progress = reportManageService.reportCheckGenerate(taskId, null);
+        Integer progress = reportManageService.reportCheckGenerate(taskId, userId + "_" + token, false);
         log.info("开始生成巡视报告=={}", progress);
         return result + reviewList.size();
     }

@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.service;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -659,39 +660,27 @@ public class SendToUpSystemServices {
 
     public String createTaskModel(String path, String stationCode) throws Exception {
         //任务模型
-        List<Map<String, Object>> list = patrolTaskDao.selectTaskInfo();
+        boolean standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+        String stationName = getStationName();
+        List<Map<String, Object>> list = patrolTaskDao.selectTaskInfo(DateUtil.dateSecond());
         //CronExpression expression;
         for (Map<String, Object> item : list) {
             String taskId = item.get("task_code").toString();
-            List<Long> instanceIdList = patrolTaskDao.selectInstanceId(taskId);
+            List<UPatrolPlanAttr> instanceIdList = patrolTaskDao.selectInstanceId(taskId);
             item.put("station_code", stationCode);
-            item.put("station_name", getStationName());
-            item.put("device_list", instanceIdList.toString().replaceFirst("\\[", "").replace("]", "").replace(" ", ""));
+            item.put("station_name", stationName);
+            String deviceList;
+            if (standardPoints) {
+                deviceList = instanceIdList.stream().map(UPatrolPlanAttr::getDevicePointId).collect(Collectors.joining(","));
+            } else {
+                deviceList = instanceIdList.stream().map(UPatrolPlanAttr::getInstanceId).map(String::valueOf).collect(Collectors.joining(","));
+            }
+
+            item.put("device_list", deviceList);
 
             // 填充任务模型中时间相关字段
             fillTaskModelField(item);
-//            if(!"".equals(item.get("time"))){
-//                //计算 todo 内容不完整
-//                String time = item.get("time").toString();
-//                //SimpleDateFormat s = new SimpleDateFormat("HH:mm:ss");
-//                //String s = Pattern.compile("[^0-9]").matcher(str).replaceAll("");
-//
-//                    item.put("cycle_month", "");
-//                    item.put("cycle_week","");
-//                    item.put("cycle_execute_time","");
-//
-//                item.put("cycle_start_time",simpleDateFormat.format(new Date()));
-//                item.put("cycle_end_time","2025-01-01 00:00:00");
-//                item.put("interval_number","1");
-//                item.put("interval_type","2");
-//                item.put("interval_execute_time","00:00:00");
-//                item.put("interval_start_time",simpleDateFormat.format(new Date()));
-//                item.put("interval_end_time","2025-01-01 00:00:00");
-//                item.put("station_name",stationName);
-//                item.put("station_code",stationCode);
-//                item.put("invalid_start_time","");
-//                item.put("invalid_end_time","");
-//            }
+
         }
         return CreateModeXMLUtil.createXmlFile(list, path, "task_model.xml", "Task_Model");
 
@@ -1357,7 +1346,7 @@ public class SendToUpSystemServices {
      * @param map map
      */
     private void fillTaskModelField(Map<String, Object> map) {
-        if (map == null || map.size() == 0) {
+        if (MapUtils.isEmpty(map)) {
             return;
         }
 
@@ -1367,11 +1356,11 @@ public class SendToUpSystemServices {
             timeStr = timeObj.toString();
         }
 
-        if (org.springframework.util.StringUtils.isEmpty(timeStr)) {
+        if (StringUtils.isEmpty(timeStr)) {
             return;
         }
 
-        Integer taskType = getTaskType(timeStr);
+        int taskType = getTaskType(timeStr);
         switch (taskType) {
             case 1:
                 processIntervalHourTask(map);
@@ -1385,6 +1374,11 @@ public class SendToUpSystemServices {
             default:
                 break;
         }
+        if (-1 != taskType) {
+            map.put("fixed_start_time", "");
+        }
+        map.remove("end_time");
+        map.remove("time");
     }
 
     /**
@@ -1395,7 +1389,7 @@ public class SendToUpSystemServices {
      * @return result
      */
     private Integer getTaskType(String timeStr) {
-        if (org.springframework.util.StringUtils.isEmpty(timeStr)) {
+        if (StringUtils.isEmpty(timeStr)) {
             return -1;
         }
 
@@ -1462,13 +1456,14 @@ public class SendToUpSystemServices {
      */
     private void processCycleDate(String timeStr, Map<String, Object> map) {
         String[] arr = timeStr.split(" ");
-        if (arr == null || arr.length != 6) {
+        if (arr.length != 6) {
             return;
         }
-
-        map.put("cycle_execute_time", arr[2]);
-        map.put("cycle_month", arr[4]);
-        map.put("cycle_week", arr[5]);
+        String hour = StringUtils.substringBefore(arr[2], ",");
+        String executeTime = StringUtils.leftPad(hour, 2, "0") + ":" + StringUtils.leftPad(arr[1], 2, "0") + ":" + StringUtils.leftPad(arr[0], 2, "0");
+        map.put("cycle_execute_time", executeTime);
+        map.put("cycle_month", "*".equals(arr[4]) ? "1,2,3,4,5,6,7,8,9,10,11,12" : arr[4]);
+        map.put("cycle_week", "*".equals(arr[5]) ? "1,2,3,4,5,6,7" : arr[5]);
     }
 
     /**
@@ -1478,13 +1473,13 @@ public class SendToUpSystemServices {
      * @return result
      */
     private String getExecuteTime(Map<String, Object> map) {
-        Object startTimeObj = map.get("fixed_start_time");
-        if (startTimeObj == null) {
+        String startTimeObj = MapUtils.getString(map, "fixed_start_time");
+        if (StringUtils.isEmpty(startTimeObj)) {
             return "";
         }
 
-        String[] arr = startTimeObj.toString().split(" ");
-        if (arr == null || arr.length != 2) {
+        String[] arr = startTimeObj.split(" ");
+        if (arr.length != 2) {
             return "";
         }
 
@@ -1497,7 +1492,7 @@ public class SendToUpSystemServices {
      * @param map map
      */
     private void processIntervalDayTask(Map<String, Object> map) {
-        String timeStr = map.get("time").toString();
+        String timeStr = MapUtils.getString(map, "time");
         String intervalNumber = getIntervalDay(timeStr);
         String executeTime = getExecuteTime(map);
         map.put("interval_execute_time", executeTime);
@@ -1529,7 +1524,7 @@ public class SendToUpSystemServices {
      * @param map map
      */
     private void processCycleTask(Map<String, Object> map) {
-        String timeStr = map.get("time").toString();
+        String timeStr = MapUtils.getString(map, "time");
         processCycleDate(timeStr, map);
         map.put("cycle_start_time", map.get("fixed_start_time"));
         map.put("cycle_end_time", map.get("end_time"));

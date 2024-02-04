@@ -100,5 +100,12 @@ public class TCruisePlanAttrDetail implements Serializable {
     @ApiModelProperty(value = "绑定行为")
     private String behavior;
 
+    @ApiModelProperty(value = "巡视测点类型")
+    private String meteType;
+
+
+    @ApiModelProperty(value = "巡视测点类型名称")
+    private String meteTypeName;
+
 
 }

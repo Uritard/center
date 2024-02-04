@@ -10,6 +10,8 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -23,6 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Enumeration;
 import java.util.List;
@@ -30,6 +33,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.yjh.accessrobot.module.command.service.RobotService.SYNC_MODE_CACHE;
 
 /**
  * @author YJH
@@ -282,19 +287,67 @@ public class Constant {
         return port;
     }
 
+    public static String postUrl(String url, String json) {
+        String result = null;
+        try {
+            result = postUrl(url, json, null);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return result;
+    }
+
+    public static void sendProcess(String key, String title, Integer status, String desc) {
+        if (SYNC_MODE_CACHE.containsKey(key)) {
+            sendProcess(title + "模型同步", status, desc, SYNC_MODE_CACHE.get(key));
+        }
+    }
+
+    /**
+     * 向前端推送 desc的进度值
+     *
+     * @param title 标识
+     * @param status 成功 1  失败 0
+     * @param desc 进程描述
+     */
+    public static void sendProcess(String title, Integer status, String desc, String userId) {
+        if (StringUtils.isNotBlank(userId)) {
+            try {
+                Map<String, Object> jasonMap = new HashMap<>(4);
+                jasonMap.put("type", "popProcess");
+                jasonMap.put("status", status);
+                jasonMap.put("title", title);
+                jasonMap.put("desc", desc);
+                String json = JSON.toJSONString(jasonMap);
+                postUrl(Constant.WEBSOCKET_URL, json, userId);
+            } catch (IOException e) {
+                log.error("向前端推送进度值错误", e);
+            }
+        }
+    }
 
     //请求webSocket发送方法
-    public static String postUrl(String url, String json) throws IOException, URISyntaxException {
-        System.out.println("webSocketUrl="+url+",json="+json);
+    public static String postUrl(String url, String json, String userId) throws IOException {
+        System.out.println("webSocketUrl=" + url + ",json=" + json);
         CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(url).setParameter("json", json).build();
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
-        CloseableHttpResponse response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, "UTF-8");
+        String result = "";
+        try {
+            URIBuilder uriBuilder = new URIBuilder(url).setParameter("json", json);
+            if (userId != null) {
+                uriBuilder.addParameter("userId", userId);
+            }
+            URI uri = uriBuilder.build();
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+            CloseableHttpResponse response = client.execute(httpPost);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return result;
     }
 
     public static void modelUpload(String type){

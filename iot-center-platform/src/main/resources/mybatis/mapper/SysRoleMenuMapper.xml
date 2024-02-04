@@ -15,7 +15,9 @@
         <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
         <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
         <result column="up_id" jdbcType="BIGINT" property="upId" />
-        <result column="role_id" jdbcType="BIGINT" property="roleId" />
+        <result column="element_code" jdbcType="VARCHAR" property="elementCode" />
+        <result column="menu_type" jdbcType="INTEGER" property="menuType" />
+        <result column="sys_state" jdbcType="INTEGER" property="sysState" />
         <collection property="childrenList" select="selectTreeMenu" column="{parentId=menu_id}"/>
     </resultMap>
     <!-- 通用查询结果列 -->
@@ -28,13 +30,16 @@
             sm.up_id as up_id,
             sm.menu_code as menu_code,
             sm.menu_name as menu_name,
-               sm.role_id as role_id
+            sm.role_id as role_id,
+            sm.element_code,
+            sm.menu_type,
+            sm.sys_state
         FROM
             `sys_menu` sm
         WHERE
             sm.state = 1
           AND sm.up_id = #{parentId,jdbcType=BIGINT}
-        ORDER BY sm.menu_id
+        ORDER BY sm.sort, sm.menu_id
     </select>
 
 
@@ -138,11 +143,14 @@
     </insert>
 
     <select id="selectByRoleId" parameterType="java.lang.Long" resultType="java.lang.String">
-        select
-        a.menu_code
-        from sys_role_menu a
-        where
-        <if test="roleId != null and roleId != ''"> a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        SELECT a.menu_code
+        FROM
+            sys_role_menu a
+        LEFT JOIN sys_menu sm ON a.menu_code = sm.menu_code
+        WHERE
+            sm.state = 1
+        <if test="roleId != null and roleId != ''"> AND a.role_id = #{roleId, jdbcType=BIGINT}</if>
+        <if test="menuType != null and menuType != -1"> AND sm.menu_type = #{menuType, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectOtherRoleHave" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.MenuForHave">

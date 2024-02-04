@@ -265,6 +265,19 @@
         </set>
         where a.origin_id = #{originId} and a.edge_code = #{edgeCode}
     </update>
+    <update id="batchUpDate">
+        update t_warn_info a
+        set
+            a.deal_type = 286,
+            a.deal_info = '批量审核',
+            a.deal_person_id = #{userId},
+            a.deal_time = now()
+        where a.warn_id in(
+        <foreach collection="list" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         select a.warn_id,
@@ -1239,5 +1252,14 @@
         </if>
         group by
         b.up_region_id
+    </select>
+
+    <select id="selectCruiseInfoByTaskAndInstanceIds"
+            resultType="com.yjh.platform.module.task.entity.TWarnInfo">
+        SELECT warn_id, warn_type, warn_name, warn_content, defect_model, instance_id, task_id, deal_type, deal_info FROM t_warn_info
+        WHERE task_id = #{taskId, jdbcType=VARCHAR} AND instance_id IN
+        <foreach collection="instanceIds" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=VARCHAR}
+        </foreach>
     </select>
 </mapper>

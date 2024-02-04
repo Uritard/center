@@ -12,6 +12,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -282,7 +283,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @return Map<String, String>
      */
     private Map<String, String> putWarnToRedis(String taskId, TWarnInfo warnInfo, Map<String, String> cruiseMap) {
-        String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+        String warnPrefix = "warnInfo:" + taskId;
+        String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
         Map<String, String> warnMap = new HashMap<>(16);
         try {
             warnMap.put("deviceId", String.valueOf(warnInfo.getDeviceId()));
@@ -306,7 +308,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("cruiseType", cruiseMap.get("cruiseType"));
             warnMap.put("cruiseTime", threadMap.get("time"));
             log.info("warnMap==={}", warnMap);
-            redisTemplate.opsForHash().putAll(warnName, warnMap);
+            RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
         } catch (Exception e) {
             log.error("将告警信息放入redis异常：", e);
         }

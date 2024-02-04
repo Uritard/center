@@ -37,6 +37,9 @@ public class UPatrolPlanAttr implements Serializable {
     @ApiModelProperty(value = "巡检点实例名称")
     private String instanceName;
 
+    @ApiModelProperty(value = "标准测点ID(对上级系统)")
+    private String devicePointId;
+
     @ApiModelProperty(value = "巡检点ID(机器人上报的点位id)")
     private Long positionId;
 
