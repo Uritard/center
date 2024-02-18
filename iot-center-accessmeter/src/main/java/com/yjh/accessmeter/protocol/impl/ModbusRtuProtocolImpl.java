@@ -15,13 +15,15 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
-import com.yjh.accessmeter.protocol.*;
+import com.yjh.accessmeter.protocol.ISensorProtocol;
+import com.yjh.accessmeter.protocol.ProtocolEnum;
+import com.yjh.accessmeter.protocol.ProtocolListener;
+import com.yjh.accessmeter.protocol.ProtocolType;
 import com.yjh.accessmeter.protocol.entity.ModbusExtend;
 import com.yjh.accessmeter.protocol.entity.ResultMete;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,6 +67,10 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
 
             for (IotDevicePoint point : devicePoints) {
                 ModbusExtend ext = JSON.parseObject(point.getExtend(), ModbusExtend.class);
+                if (ext == null) {
+                    LOGGER.error("点位没有配置额外参数： {}", point);
+                    continue;
+                }
                 int dataType = ext.getDataType() == null || ext.getDataType() == 0 ? DataType.TWO_BYTE_INT_SIGNED : ext.getDataType();
                 batch.addLocator(NumberUtils.toInt(point.getChannelNum()), BaseLocator.holdingRegister(ext.getSlaveId(), ext.getStart(), dataType));
             }

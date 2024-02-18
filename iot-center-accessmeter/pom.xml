@@ -83,6 +83,16 @@
             <version>4.1</version>
         </dependency>
         <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.8.21</version>
+        </dependency>
+        <dependency>
             <groupId>com.yjh.commons</groupId>
             <artifactId>jcommons-modbus</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -98,6 +108,12 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
         </dependency>
 
 

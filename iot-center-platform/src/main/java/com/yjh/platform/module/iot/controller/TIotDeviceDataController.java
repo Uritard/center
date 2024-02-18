@@ -134,9 +134,8 @@ public class TIotDeviceDataController {
         return result;
     }
 
-    @ApiOperation(value = "新增物联设备结果配置")
+    @ApiOperation(value = "物联设备结果存入redis")
     @RequestMapping(value = "/addToRedis", method = RequestMethod.POST)
-    @Logs(title = "新增物联设备结果配置", content = "新增物联设备结果配置", logType = 2)
     public Result addToRedis(@RequestBody List<IotDeviceDataEx> dataList) {
         Result result = new Result();
         try {

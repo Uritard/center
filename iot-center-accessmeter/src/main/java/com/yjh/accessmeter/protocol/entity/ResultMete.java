@@ -18,6 +18,10 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ResultMete {
     /**
+     * 物联设备Id
+     */
+    private Long iotDeviceId;
+    /**
      * 返回地址
      */
     private String address;
@@ -29,6 +33,10 @@ public class ResultMete {
      * 结果值
      */
     private String value;
+    /**
+     * 状态
+     */
+    private String status;
     /**
      * 原始数据
      */
