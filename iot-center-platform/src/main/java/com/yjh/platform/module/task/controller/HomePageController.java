@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -94,10 +95,11 @@ public class HomePageController {
 
     @ApiOperation(value = "告警级别数据")
     @RequestMapping(value = "/countByAlarmLevel", method = RequestMethod.GET)
-    public Result countByAlarmLevel() {
+    public Result countByAlarmLevel(@RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
+                                    @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate) {
         Result result = new Result();
         try {
-            result.setData(homePageService.countByAlarmLevel());
+            result.setData(homePageService.countByAlarmLevel(startDate, endDate));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
