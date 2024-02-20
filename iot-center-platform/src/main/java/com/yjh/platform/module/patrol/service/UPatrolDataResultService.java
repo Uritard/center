@@ -222,7 +222,8 @@ public class UPatrolDataResultService {
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataResultByList(cruiseType, cType,
             splitToLong(deviceMeteIds), meteType, meterType, endTime, startTime);
         DictConvertUtil.optional("cruiseType").add("identifyResult")
-            .add("cruiseResult").add("meteType").add("meterType").covertToDict(cruiseResultAnalyzeInfoList);
+            .add("cruiseResult").add("meteType").add("meterType")
+                .add("planType", "taskType", "cTypeName").covertToDict(cruiseResultAnalyzeInfoList);
 
         for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
             if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
