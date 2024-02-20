@@ -539,7 +539,11 @@
 			FROM
 
 				t_warn_info
-			WHERE warn_type != '507' or warn_type is null
+			WHERE 1 = 1
+            and (warn_type != '507' or warn_type is null)
+            <if test="startDate != null and endData != null">
+                and warn_time between #{startDate} and #{endDate}
+            </if>
 		   ) a
         GROUP BY
             a.alarm_level

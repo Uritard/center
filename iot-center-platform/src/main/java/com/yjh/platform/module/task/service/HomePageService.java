@@ -170,8 +170,8 @@ public class HomePageService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> countByAlarmLevel() {
-        return tDefectInfoDao.countByAlarmLevel();
+    public List<Map<String, Object>> countByAlarmLevel(Date startDate, Date endDate) {
+        return tDefectInfoDao.countByAlarmLevel(startDate, endDate);
     }
 
     public List<Map<String, Object>> countAllByAlarmLevelOnMonth(Integer type) {
