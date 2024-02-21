@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
@@ -19,6 +20,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
@@ -231,7 +233,14 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     groupData.forEach((k, v) -> {
                         Map<String, String> valMap =
                             v.stream().collect(Collectors.toMap(IotDeviceDataEx::getChannelNum, TIotDeviceData::getValue));
-                        valMap.put("time", DateTimeUtil.format(v.get(0).getCreateTime()));
+                        IotDeviceDataEx ex = v.get(0);
+                        valMap.put("time", DateTimeUtil.format(ex.getCreateTime()));
+                        if (!CommonUtils.isEmptyOrNullstr(ex.getState())) {
+                            int state = v.stream().mapToInt(e-> NumberUtils.toInt(e.getState())).max().orElse(0);
+                            valMap.put("state", String.valueOf(state));
+                        }
+
+                        valMap.put("type", ex.getType());
                         String key = "EnvDevice:" + k;
                         operations.opsForHash().putAll(key, valMap);
                     });

@@ -25,4 +25,7 @@ public class IotDeviceDataEx extends IotDeviceData{
 
     private Integer controllable;
 
+    private String state;
+
+    private String type;
 }

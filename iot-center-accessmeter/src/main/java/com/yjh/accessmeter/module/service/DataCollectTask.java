@@ -15,6 +15,7 @@ import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import com.yjh.accessmeter.protocol.entity.ResultMete;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -50,7 +51,7 @@ public class DataCollectTask implements Runnable {
         try {
             log.info("开始数据采集，devices: {}", JSON.toJSONString(devices.keySet()));
             Map<String, List<IotDevice>> deviceGroup =
-                devices.values().stream().collect(Collectors.groupingBy(d -> d.getIp() + ":" + d.getPort()));
+                devices.values().stream().collect(Collectors.groupingBy(d -> d.getProtocolModel() + ":" + d.getIp() + ":" + d.getPort()));
             for (List<IotDevice> des : deviceGroup.values()) {
                 asyncExecutor.execute(() -> collectMeter(des));
             }
@@ -61,22 +62,36 @@ public class DataCollectTask implements Runnable {
 
     public void collectMeter(List<IotDevice> devices) {
         List<IotDeviceDataEx> deviceDataList = new ArrayList<>();
+
+        List<IotDevicePoint> partBatchCollectPoints = new ArrayList<>();
+        List<IotDevice> batchDevice = new ArrayList<>();
         for (IotDevice device : devices) {
             try {
                 List<IotDevicePoint> devicePoints = iotDeviceDao.selectPointByDeviceId(device.getId());
 
                 ProtocolEnum protocolEnum = ProtocolEnum.getEnum(device.getProtocolModel());
-                ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(protocolEnum);
-                if (sensorProtocol == null) {
-                    log.warn("协议类型无需主动建立连接或未实现，请检查协议是否正确: {}, device: {}", protocolEnum, device);
-                    continue;
-                }
-                List<ResultMete> resultMetes = sensorProtocol.send(device, devicePoints);
+                if (ProtocolEnum.ENV_TERMINAL == protocolEnum) {
+                    batchDevice.add(device);
+                    partBatchCollectPoints.addAll(devicePoints);
+                } else {
+                    List<ResultMete> resultMetes = protocolCollect(device, devicePoints);
 
-                // 结果处理预备入库
-                resultParseToInsert(deviceDataList, device, devicePoints, resultMetes);
+                    // 结果处理预备入库
+                    resultParseToInsert(deviceDataList, device, devicePoints, resultMetes);
+                }
             } catch (Exception e) {
                 log.error("采集设备数据失败: {}", device, e);
+            }
+        }
+        // 批量设备处理，多个设备接入一个环控主机，适用使用一个环控主机采集数据的情况
+        if (!partBatchCollectPoints.isEmpty()) {
+            try {
+                List<ResultMete> resultMetes = protocolCollect(batchDevice.get(0), partBatchCollectPoints);
+
+                // 结果处理预备入库
+                resultParseToInsert(deviceDataList, batchDevice, partBatchCollectPoints, resultMetes);
+            } catch (Exception e) {
+                log.error("采集设备数据失败: {}", batchDevice, e);
             }
         }
         if (!deviceDataList.isEmpty()) {
@@ -91,16 +106,41 @@ public class DataCollectTask implements Runnable {
         }
     }
 
+    public List<ResultMete> protocolCollect(IotDevice device, List<IotDevicePoint> devicePoints) {
+        ProtocolEnum protocolEnum = ProtocolEnum.getEnum(device.getProtocolModel());
+        ISensorProtocol sensorProtocol = SensorProtocolFactory.CREATE.createProtocol(protocolEnum);
+        if (sensorProtocol == null) {
+            log.warn("协议类型无需主动建立连接或未实现，请检查协议是否正确: {}, device: {}", protocolEnum, device);
+            return Collections.emptyList();
+        }
+        return sensorProtocol.send(device, devicePoints);
+    }
+
     /**
      * 采集结果处理
      */
     private void resultParseToInsert(List<IotDeviceDataEx> deviceDataList, IotDevice device, List<IotDevicePoint> devicePoints,
         List<ResultMete> resultMetes) {
+        if (CollectionUtils.isEmpty(resultMetes)) {
+            log.error("未采集到任何数据， device: {}", device);
+        }
+
         IotDeviceDataEx baseData = new IotDeviceDataEx();
-        baseData.setIp(device.getIp()).setPort(device.getPort()).setDeviceId(device.getDeviceId()).setAddress(device.getAddress())
-            .setControllable(device.getControllable()).setUpRegionName(device.getUpRegionName()).setIotDeviceId(device.getId())
-            .setIotDeviceName(device.getDeviceName()).setUnit(device.getUnit()).setPointId(0L).setPointName(device.getDeviceName())
-            .setUpRegionId(device.getUpRegionId()).setIotDeviceType(device.getIotDeviceType()).setCreateTime(new Date());
+        baseData.setIp(device.getIp())
+                .setPort(device.getPort())
+                .setDeviceId(device.getDeviceId())
+                .setAddress(device.getAddress())
+                .setControllable(device.getControllable())
+                .setUpRegionName(device.getUpRegionName())
+                .setType(String.valueOf(device.getIotDeviceType()))
+                .setIotDeviceId(device.getId())
+                .setIotDeviceName(device.getDeviceName())
+                .setUnit(device.getUnit())
+                .setPointId(0L)
+                .setPointName(device.getDeviceName())
+                .setUpRegionId(device.getUpRegionId())
+                .setIotDeviceType(device.getIotDeviceType())
+                .setCreateTime(new Date());
 
         if (devicePoints.isEmpty()) {
             baseData.setValue(Optional.ofNullable(resultMetes.get(0)).map(ResultMete::getValue).map(String::valueOf).orElse(""));
@@ -123,6 +163,53 @@ public class DataCollectTask implements Runnable {
                 }
             });
         }
+    }
+
+    /**
+     * 多个设备批量采集结果处理
+     */
+    private void resultParseToInsert(List<IotDeviceDataEx> deviceDataList, List<IotDevice> batchDevice, List<IotDevicePoint> devicePoints,
+        List<ResultMete> resultMetes) {
+        if (CollectionUtils.isEmpty(resultMetes)) {
+            log.error("未采集到任何数据, pointSize: {}", devicePoints.size());
+        }
+
+        Map<Long, IotDevice> deviceMap =
+            batchDevice.stream().collect(Collectors.toMap(IotDevice::getId, Function.identity(), (e1, e2) -> e1));
+
+        Date createTime = new Date();
+        Map<String, IotDevicePoint> pointMap = devicePoints.stream()
+                                                           .collect(Collectors.toMap(p -> p.getIotDeviceId() + "_" + p.getChannelNum(),
+                                                               Function.identity(), (e1, e2) -> e1));
+        resultMetes.forEach(m -> {
+            String chanNum = m.getChannle();
+            IotDevicePoint point = pointMap.get(m.getIotDeviceId() + "_" + chanNum);
+            IotDevice device = deviceMap.get(m.getIotDeviceId());
+
+            IotDeviceDataEx data = new IotDeviceDataEx();
+            data.setIp(device.getIp())
+                .setPort(device.getPort())
+                .setDeviceId(device.getDeviceId())
+                .setAddress(device.getAddress())
+                .setControllable(device.getControllable())
+                .setUpRegionName(device.getUpRegionName())
+                .setType(String.valueOf(device.getIotDeviceType()))
+                .setIotDeviceId(device.getId())
+                .setIotDeviceName(device.getDeviceName())
+                .setUnit(device.getUnit())
+                .setUpRegionId(device.getUpRegionId())
+                .setIotDeviceType(device.getIotDeviceType())
+                .setCreateTime(createTime);
+
+            data.setState(m.getStatus()).setValue(m.getValue());
+            data.setChannelNum(chanNum);
+            if (point != null) {
+                data.setPointId(point.getId()).setPointName(point.getPointName()).setUnit(point.getUnit());
+                deviceDataList.add(data);
+            } else {
+                log.error("查询到数据 Channle 不匹配: {}, {}", m, device);
+            }
+        });
     }
 
     public void addDevice(IotDevice device) {

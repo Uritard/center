@@ -43,7 +43,7 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 
         scheduler.setPoolSize(4);
-        scheduler.setThreadNamePrefix("scheduling-platform-");
+        scheduler.setThreadNamePrefix("scheduling-meter-");
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         return scheduler;
@@ -56,11 +56,11 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
     @Bean(name = "asyncExecutor")
     public ThreadPoolTaskExecutor asyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setQueueCapacity(100);
+        executor.setCorePoolSize(32);
+        executor.setQueueCapacity(10000);
 //        executor.setKeepAliveSeconds(600);
-        executor.setMaxPoolSize(20);
-        executor.setThreadNamePrefix("taskExecutor-platform-");
+        executor.setMaxPoolSize(32);
+        executor.setThreadNamePrefix("taskExecutor-meter-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
@@ -73,9 +73,7 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (throwable, method, objects) -> {
-            log.error("异步任务执行出现异常, message {}, emthod {}, params {}", throwable, method, objects);
-        };
+        return (throwable, method, objects) -> log.error("异步任务执行出现异常, message {}, emthod {}, params {}", throwable, method, objects);
     }
 
 }
