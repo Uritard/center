@@ -61,7 +61,12 @@ public class TMeterService {
         }
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<TMeter> tMeterList = tMeterDao.selectByUpRegionId(list,meterName);
-        this.setPower(tMeterList, true);
+        tMeterList.forEach(t -> {
+            //获取该电表最近的一次的数据
+            TMeter log = tMeterLogDao.selectPowerDifferenceValue(t.getId());
+            //计算原始值 和 耗电量 = 两次采集差值 * 系数
+            setPower(t, log, true);
+        });
         Map<String, Object> resultMap = new HashMap<>(2);
         resultMap.put("count", page.getTotal());
         resultMap.put("list", tMeterList);
@@ -70,53 +75,37 @@ public class TMeterService {
         return result;
     }
 
-    public void setPower(List<TMeter> tMeterList, Boolean flag) {
-        tMeterList.forEach(tMeter -> {
-            int mc = Integer.parseInt(StringUtils.isNotBlank(tMeter.getMagnificationCoefficient()) ? tMeter.getMagnificationCoefficient() : "1");
-            String totalPositivePower = StringUtils.isNotBlank(tMeter.getTotalPositivePower()) ? tMeter.getTotalPositivePower() : "0";
-            tMeter.setTotalPositivePower(getMeterRealNum(Double.parseDouble(totalPositivePower), flag));
-            tMeter.setTotalPositivePowerLast(getMeterRealNum(Double.parseDouble(totalPositivePower) * mc, flag));
-            String totalPositiveReactivePower = StringUtils.isNotBlank(tMeter.getTotalPositiveReactivePower()) ? tMeter.getTotalPositiveReactivePower() : "0";
-            tMeter.setTotalPositiveReactivePower(getMeterRealNumKvarh(Double.parseDouble(totalPositiveReactivePower), flag));
-            tMeter.setTotalPositiveReactivePowerLast(getMeterRealNumKvarh(Double.parseDouble(totalPositiveReactivePower) * mc, flag));
-            String totalNegativePositivePower = StringUtils.isNotBlank(tMeter.getTotalNegativePositivePower()) ? tMeter.getTotalNegativePositivePower() : "0";
-            tMeter.setTotalNegativePositivePower(getMeterRealNumKvarh(Double.parseDouble(totalNegativePositivePower), flag));
-            tMeter.setTotalNegativePositivePowerLast(getMeterRealNumKvarh(Double.parseDouble(totalNegativePositivePower) * mc, flag));
-        });
+    public void setPower(TMeter tMeter, TMeter log, Boolean flag) {
+        int mc = StringUtils.isNotBlank(tMeter.getMagnificationCoefficient()) ? Integer.parseInt(tMeter.getMagnificationCoefficient()) : 1;
+        //正向有功 采集值
+        tMeter.setTotalPositivePower(getMeterRealNum(tMeter.getTotalPositivePower(), 1, flag, 1));
+        //正向有功 耗电量
+        tMeter.setTotalPositivePowerLast(getMeterRealNum(log.getTotalPositivePowerDifferenceValue(), mc, flag, 1));
+        //正向无功 采集值
+        tMeter.setTotalPositiveReactivePower(getMeterRealNum(tMeter.getTotalPositiveReactivePower(), 1, flag, 2));
+        //正向无功 耗电量
+        tMeter.setTotalPositiveReactivePowerLast(getMeterRealNum(log.getTotalPositiveReactivePowerDifferenceValue(), mc, flag, 2));
+        //反向无功 采集值
+        tMeter.setTotalNegativePositivePower(getMeterRealNum(tMeter.getTotalNegativePositivePower(), 1, flag, 2));
+        //反向无功 耗电量
+        tMeter.setTotalNegativePositivePowerLast(getMeterRealNum(log.getTotalNegativePositivePowerDifferenceValue(), mc, flag, 2));
     }
-
-    public String getMeterRealNum(Double num, Boolean flag) {
+    /**
+     *
+     * @param value 值  空值转为 0
+     * @param mc 倍率
+     * @param flag ture 加单位  false不加单位
+     * @param type 单位类型 1 kwh  2 kvarh
+     * @return
+     */
+    public String getMeterRealNum(String value, int mc, Boolean flag, int type) {
+        Double num = StringUtils.isNotBlank(value) ? Double.parseDouble(value) : 0;
+        num = num * mc;
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String res;
-        double million = 1000000L;
-        double billion = 1000000000L;
-        if (num > billion && flag) {
-            num = num / billion;
-            res = decimalFormat.format(num) + "gwh";
-        } else if (num > million && flag) {
-            num = num / million;
-            res = decimalFormat.format(num) + "mwh";
-        } else if (flag) {
-            res = decimalFormat.format(num) + "kwh";
-        } else {
-            res = decimalFormat.format(num);
-        }
-        return res;
-    }
-
-    public String getMeterRealNumKvarh(Double num, Boolean flag) {
-        DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-        String res;
-        double million = 1000000L;
-        double billion = 1000000000L;
-        if (num > billion && flag) {
-            num = num / billion;
-            res = decimalFormat.format(num) + "gvarh";
-        } else if (num > million && flag) {
-            num = num / million;
-            res = decimalFormat.format(num) + "mvarh";
-        } else if (flag) {
-            res = decimalFormat.format(num) + "kvarh";
+        if (flag) {
+            String unit = type == 1 ? "kwh" : "kvarh";
+            res = decimalFormat.format(num) + unit;
         } else {
             res = decimalFormat.format(num);
         }
@@ -161,7 +150,7 @@ public class TMeterService {
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
-        this.setPower(list, false);
+        list.forEach(t -> setPower(t, t, false));
         return list.stream().map(e -> {
             TMeterVo tMeterVo = new TMeterVo();
             BeanUtils.copyProperties(e, tMeterVo);

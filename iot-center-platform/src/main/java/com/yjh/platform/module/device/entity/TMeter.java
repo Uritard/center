@@ -149,4 +149,14 @@ public class TMeter implements Serializable {
      */
     private String totalPositivePowerDifferenceValue;
 
+    /**
+     * 正向无功总电量与上一次的差值
+     */
+    private String totalPositiveReactivePowerDifferenceValue;
+
+    /**
+     * 反向无功总电量与上一次的差值
+     */
+    private String totalNegativePositivePowerDifferenceValue;
+
 }

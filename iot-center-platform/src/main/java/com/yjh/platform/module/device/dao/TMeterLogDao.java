@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.dao;
 
 import com.yjh.platform.module.device.entity.TMeter;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface TMeterLogDao {
     int deleteExpireData();
 
     List<TMeter> list(TMeter tMeter);
+
+    TMeter selectPowerDifferenceValue(@Param(value = "id") Long id);
 }

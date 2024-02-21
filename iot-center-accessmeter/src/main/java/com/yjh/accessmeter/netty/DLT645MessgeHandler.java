@@ -96,34 +96,29 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         String powerTotalString = dlt645Message.getValue();
         //数据入库
         tMeter.setCollectPowerTime(new Date());
+        //查询上一次的
+        TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
         if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL)
                 || Arrays.equals(dataType, Constant.DATA_TYPE_POSITVICE_POWER_TOTAL_2007)) {
             log.info("采集到--正向有功--电能:{}", powerTotalString);
             tMeter.setTotalPositivePower(powerTotalString);
-            ctx.channel().attr(Constant.tMeterAttributeKey).set(tMeter);
-            //查询上一次的
-            TMeter lastMeter = tMeterDao.selectByPrimaryKey(tMeter.getId());
-            // 记录电表历史
-            Float value = 0f;
-            try {
-                value = Float.parseFloat(tMeter.getTotalPositivePower()) - Float.parseFloat(lastMeter.getTotalPositivePower());
-                if (value < 0) {
-                    value = 0f;
-                }
-            } catch (Exception e) {
-                log.info("计算电表差值出错！", e);
-            }
+            Float value = getPowerDifferenceValue(tMeter.getTotalPositivePower(), lastMeter.getTotalPositivePower());
             tMeter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+            ctx.channel().attr(Constant.tMeterAttributeKey).set(tMeter);
             platformProxy.uploadMeterInfo(tMeter);
         } else if (Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL)
                 || Arrays.equals(dataType, Constant.DATA_TYPE_POSITIVE_REACTIVE_POWER_TOTAL_2007)) {
             log.info("采集到--正向无功--电能:{}", powerTotalString);
             tMeter.setTotalPositiveReactivePower(powerTotalString);
+            Float value = getPowerDifferenceValue(tMeter.getTotalPositiveReactivePower(), lastMeter.getTotalPositiveReactivePower());
+            tMeter.setTotalPositiveReactivePowerDifferenceValue(String.valueOf(value));
             ctx.channel().attr(Constant.tMeterAttributeKey).set(tMeter);
         } else if (Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL)
                 || Arrays.equals(dataType, Constant.DATA_TYPE_NEGATIVE_REACTIVE_POWER_TOTAL_2007)) {
             log.info("采集到--反向无功--电能:{}", powerTotalString);
             tMeter.setTotalNegativePositivePower(powerTotalString);
+            Float value = getPowerDifferenceValue(tMeter.getTotalNegativePositivePower(), lastMeter.getTotalNegativePositivePower());
+            tMeter.setTotalNegativePositivePowerDifferenceValue(String.valueOf(value));
             ctx.channel().attr(Constant.tMeterAttributeKey).set(tMeter);
         }else {
             log.info("数据类型未定义: {} ", dataType);
@@ -133,6 +128,20 @@ public class DLT645MessgeHandler extends ChannelInboundHandlerAdapter {
         log.info("tMeter {}", tMeter);
         String key = tMeter.getIp() + tMeter.getPort();
         dynamicTask.startDelay(key, () -> tMeterLogDao.insert(ctx.channel().attr(Constant.tMeterAttributeKey).get()), 12 * 1000);
+    }
+
+    private Float getPowerDifferenceValue(String value, String lastValue) {
+        // 记录电表历史
+        float res = 0f;
+        try {
+            res = Float.parseFloat(value) - Float.parseFloat(lastValue);
+            if (res < 0) {
+                res = 0f;
+            }
+        } catch (Exception e) {
+            log.info("计算电表差值出错！", e);
+        }
+        return res;
     }
 
     @Override
