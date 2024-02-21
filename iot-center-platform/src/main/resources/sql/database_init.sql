@@ -2709,6 +2709,8 @@ CREATE TABLE `t_meter_log` (
 `update_person` varchar(20) NOT NULL COMMENT '更新人',
 `is_deleted` int DEFAULT '0' COMMENT '是否删除 0 未删除 2 已删除',
 `total_positive_power_difference_value` varchar(256) DEFAULT '0' COMMENT '正向有功总电量与上一次的差值',
+`total_positive_reactive_power_difference_value` varchar(255) DEFAULT '0' COMMENT '正向无功总电量与上一次的差值',
+`total_negative_positive_power_difference_value` varchar(255) DEFAULT '0' COMMENT '反向无功总电量与上一次的差值',
 `magnification_coefficient` int DEFAULT '1' COMMENT '电表耗电量计算系数',
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电表历史记录';
