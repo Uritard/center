@@ -201,7 +201,7 @@ public class Constant {
     /**
      * 发送方唯一标识
      */
-    public static String sendCode;
+    private static String sendCode;
 
     /**
      * 获取发送方唯一标识
@@ -217,27 +217,9 @@ public class Constant {
     }
 
     /**
-     * 是否向上级推送环控设备数据
-     */
-    public static Boolean upEnvDevice;
-
-    /**
-     * 是否向上级推送环控设备数据
-     */
-    public static boolean upEnvDevice() {
-        try {
-            upEnvDevice = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:upEnvDevice", "content"));
-            log.warn("upEnvDevice is {}", upEnvDevice);
-        } catch (Exception e) {
-            upEnvDevice = false;
-        }
-        return upEnvDevice;
-    }
-
-    /**
      * 变电站名称
      */
-    public static String stationCode;
+    private static String stationCode;
 
     /**
      * 获取变电站名称
@@ -252,7 +234,7 @@ public class Constant {
         return stationCode;
     }
 
-    public static Boolean handlerNew;
+    private static Boolean handlerNew;
 
     /**
      * handlerNew
@@ -270,7 +252,7 @@ public class Constant {
     /**
      * robot服务监听端口
      */
-    public static Integer port;
+    private static Integer port;
 
     /**
      * robot服务监听端口
@@ -285,6 +267,10 @@ public class Constant {
             }
         }
         return port;
+    }
+
+    public static void setPort(int port) {
+        Constant.port = port;
     }
 
     public static String postUrl(String url, String json) {
@@ -414,7 +400,7 @@ public class Constant {
         return ip;
     }
 
-    public static String upSystemFlag;
+    private static String upSystemFlag;
     /**
      * 上级系统连接开关 1开 0关
      * @return

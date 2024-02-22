@@ -13,7 +13,7 @@ import java.util.Objects;
  * @Author tt
  * @Date 2019/9/17
  **/
-@Component
+@Component("springBeanUtils")
 public class SpringBeanUtils implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;

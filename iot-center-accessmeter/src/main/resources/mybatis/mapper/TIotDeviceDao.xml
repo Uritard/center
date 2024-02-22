@@ -107,4 +107,10 @@
             )
         </foreach>
     </insert>
+
+    <select id="getSystemConfig" resultType="java.lang.String">
+        SELECT config_value FROM system_config
+            WHERE config_type =#{configType, jdbcType=VARCHAR} and config_key =#{configKey, jdbcType=VARCHAR}
+            limit 1
+    </select>
 </mapper>

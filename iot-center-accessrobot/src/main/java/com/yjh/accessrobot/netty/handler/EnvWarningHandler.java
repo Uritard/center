@@ -54,12 +54,19 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         RobotServerHandler.send(envWarningProtocol, sendCode);
         log.info("巡视主机给机器人{}响应了", sendCode);
 
-        Map<String, String> envWarn = new HashMap<>(13);
-        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
+        Map<String, String> envWarn = new HashMap<>(32);
         Map<String, Object> envWarnMap = xmlBaseModel.getItems().get(0);
+
+        String deviceIp = MapUtils.getString(envWarnMap, "deviceId");
+        if (StringUtils.isNotEmpty(deviceIp)) {
+            envWarn.put("deviceIp", deviceIp);
+        } else {
+            String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
+            envWarn.put("robotCode", robotCode);
+        }
+
         envWarn.put("patrolDeviceName", MapUtils.getString(envWarnMap, "patroldevice_name"));
         envWarn.put("patrolDeviceCode", MapUtils.getString(envWarnMap, "patroldevice_code"));
-        envWarn.put("robotCode", robotCode);
         envWarn.put("time", MapUtils.getString(envWarnMap, "time"));
         String value = MapUtils.getString(envWarnMap, "value");
         String valueType = MapUtils.getString(envWarnMap, "value_type");
@@ -75,25 +82,14 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         envWarn.put("deviceName", MapUtils.getString(envWarnMap, "device_name"));
         envWarn.put("deleteFlag", MapUtils.getString(envWarnMap, "delete_flag"));
         envWarn.put("deleteTime", MapUtils.getString(envWarnMap, "delete_time"));
-        Long robotId = robotService.selectRobotIdByCode(robotCode);
 
-        //告警屏蔽处理
-        AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-        robotService.needPopAlarm(robotId, value, isWarn);
-        if (isWarn.get()) {
-            try {
-                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarn, Result.class);
-            } catch (Exception e) {
-                log.error("调用platform出错：{}", e.getMessage(), e);
-            }
-        }
+        //告警处理
+        StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ENV_ALARM_PROCESS, envWarn, Result.class);
 
-        if (Constant.upEnvDevice() && Constant.upSystemFlag()) {
-            log.info("向上级推送环控告警" + xmlBaseModel.getItems());
-            Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
-            map.put("list", Collections.singletonList(xmlBaseModel));
-            Constant.mapToOtherServer(map, Constant.TCP_URL);
-        }
+    }
+
+    void transeDeviceIp(Map<String, String> envWarn, Map<String, Object> envWarnMap) {
+
     }
 
     @Override

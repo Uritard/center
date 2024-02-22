@@ -77,6 +77,8 @@ public class Constant {
     public static final int ADDRESS = 6;
     public static final AttributeKey<TMeter> tMeterAttributeKey =AttributeKey.valueOf("TMeter");
 
+    public static String meterWarnAddr = "127.0.0.1:8087";
+
     /**
      * 数据标识数组
      */

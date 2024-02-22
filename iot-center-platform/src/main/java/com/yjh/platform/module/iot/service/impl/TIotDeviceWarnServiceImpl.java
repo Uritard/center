@@ -18,6 +18,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,37 +44,36 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean robotIotWarn(Map<String, String> iotWarn) {
-        String robotCode = iotWarn.get("robotCode");
         String channelNum = iotWarn.get("type_device_num");
-        TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
-        if (Objects.isNull(tRobotInfo)) {
-            log.error("未找到 robotCode={} 的机器人信息", robotCode);
+        String robotCode = iotWarn.get("robotCode");
+
+        String ip = getDeviceIp(iotWarn, robotCode);
+        if (StringUtils.isEmpty(ip)) {
+            log.error("未获取到有效的ip信息");
             return false;
         }
-        String ip;
-        if (StringUtils.isNotBlank(tRobotInfo.getRobotIp())) {
-            ip = tRobotInfo.getRobotIp();
-        } else {
-            log.error("机器人未配置ip");
-            return false;
-        }
+
         if (StringUtils.isBlank(channelNum)){
             log.error("type_device_num is null");
             return false;
         }
+
         String flag = "deleteFlag";
         TIotDeviceWarn tIotDeviceWarn = getBaseMapper().selectIdByIpAndNum(ip, channelNum);
         if (Objects.nonNull(tIotDeviceWarn)) {
+            iotWarn.put("deviceId", String.valueOf(tIotDeviceWarn.getIotDeviceId()));
             if (StringUtils.isNotBlank(MapUtils.getString(iotWarn, flag))) {
                 Long deleteFlag = Long.valueOf(MapUtils.getString(iotWarn, flag));
                 tIotDeviceWarn.setDeleteTime(DateTimeUtil.getDate(iotWarn.get("deleteTime")));
                 tIotDeviceWarn.setDeleteFlag(deleteFlag);
                 this.updateById(tIotDeviceWarn);
+                uploadWarn(iotWarn);
                 return true;
             }
         } else {
             tIotDeviceWarn = getBaseMapper().selectDeviceByIpAndNum(ip, channelNum);
             if (Objects.nonNull(tIotDeviceWarn)) {
+                iotWarn.put("deviceId", String.valueOf(tIotDeviceWarn.getIotDeviceId()));
                 tIotDeviceWarn.setCreateTime(new Date());
                 tIotDeviceWarn.setAlarmTime(DateTimeUtil.getDate(iotWarn.get("alarmTime")));
                 tIotDeviceWarn.setRobotCode(robotCode);
@@ -93,18 +93,10 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
 
         //告警屏蔽判断
         AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
-        List<AlarmShield> alarmShieldList = alarmShieldDao.selectAlarmShield(tIotDeviceWarn.getPointId(), tIotDeviceWarn.getAlarmContent());
-        if (alarmShieldList.size() > 0) {
-            alarmShieldList.forEach(alarmShield -> {
-                Date now = new Date();
-                Date endTime = alarmShield.getEndTime();
-                if (alarmShield.getEnable() == 1 && now.before(endTime)) {
-                    log.info("告警屏蔽：{}", alarmShield);
-                    isWarn.set(false);
-                }
-            });
-        }
-        if (isWarn.get()) {
+        alarmShieldCheck(tIotDeviceWarn, isWarn);
+        if (Boolean.TRUE.equals(isWarn.get())) {
+            uploadWarn(iotWarn);
+
             Map<String, String> jasonMaps = new HashMap<>(16);
             jasonMaps.put("type", "alarmPopUp");
             jasonMaps.put("warnLevel", "132");
@@ -118,13 +110,47 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         return true;
     }
 
+    @Nullable
+    private String getDeviceIp(Map<String, String> iotWarn, String robotCode) {
+        String ip = iotWarn.get("deviceIp");
+        if (StringUtils.isEmpty(ip)) {
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
+            if (Objects.isNull(tRobotInfo)) {
+                log.error("未找到 robotCode={} 的机器人信息", robotCode);
+                return null;
+            }
+
+            if (StringUtils.isNotBlank(tRobotInfo.getRobotIp())) {
+                ip = tRobotInfo.getRobotIp();
+            } else {
+                log.error("机器人未配置ip");
+                return null;
+            }
+            iotWarn.put("deviceIp", ip);
+        }
+        return ip;
+    }
+
+    private void alarmShieldCheck(TIotDeviceWarn tIotDeviceWarn, AtomicReference<Boolean> isWarn) {
+        List<AlarmShield> alarmShieldList = alarmShieldDao.selectAlarmShield(tIotDeviceWarn.getPointId(), tIotDeviceWarn.getAlarmContent());
+        if (!alarmShieldList.isEmpty()) {
+            alarmShieldList.forEach(alarmShield -> {
+                Date now = new Date();
+                Date endTime = alarmShield.getEndTime();
+                if (alarmShield.getEnable() == 1 && now.before(endTime)) {
+                    log.info("告警屏蔽：{}", alarmShield);
+                    isWarn.set(false);
+                }
+            });
+        }
+    }
+
     @Override
     public TWarnInfoDetail selectIotDeviceWarn(Long warnId) {
         return getBaseMapper().selectIotDeviceWarn(warnId);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean update(TIotDeviceWarn tIotDeviceWarn) {
         tIotDeviceWarn.setDeleteTime(new Date());
         boolean flag = this.updateById(tIotDeviceWarn);
@@ -153,6 +179,27 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
             });
         }
         return flag;
+    }
+
+    private void uploadWarn(Map<String, String> iotWarn) {
+        if (Constant.definedExtensions() && Constant.upSystemFlag()) {
+            ThreadPoolUtil.COMMON_POOL.addThread(() -> {
+                log.info("向上级推送环控告警 {}", iotWarn);
+
+                Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
+                List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
+                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                List<Map<String, Object>> itemList = new ArrayList<>();
+                Map<String, Object> item = new HashMap<>(iotWarn);
+
+                itemList.add(item);
+                xmlBaseModel.setItems(itemList);
+                xmlBaseModel.setType("22");
+                xmlBaseModelList.add(xmlBaseModel);
+                map.put("list", xmlBaseModelList);
+                Constant.otherServer(map, Constant.TCP_URL);
+            });
+        }
     }
 }
 

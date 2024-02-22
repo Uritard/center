@@ -413,7 +413,7 @@ public class RobotService {
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(Constant.sendCode())
                 .setReceiveCode(robotCode)
-                .setCode(Constant.stationCode)
+                .setCode(Constant.stationCode())
                 .setTime(DateTimeUtil.format(new Date()))
                 .setType("61")
                 .setCommand("1");
@@ -1215,7 +1215,7 @@ public class RobotService {
         List<Map<String, Object>> itemList = new ArrayList<>();
         String onlineCode = String.valueOf(resMap.get("online_code"));
         List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(onlineCode, 1);
-        String stationId = CollectionUtils.isNotEmpty(tStdRegionList) ? tStdRegionList.get(0).getStationId() : Constant.stationCode;
+        String stationId = CollectionUtils.isNotEmpty(tStdRegionList) ? tStdRegionList.get(0).getStationId() : Constant.stationCode();
         resMap.remove("online_code");
         itemList.add(resMap);
         XMLBaseModel xmlBaseModel =
@@ -1827,7 +1827,7 @@ public class RobotService {
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(Constant.sendCode())
                 .setReceiveCode(map.get("robotCode"))
-                .setCode(Constant.stationCode)
+                .setCode(Constant.stationCode())
                 .setType("121")
                 .setCommand(map.get("command"))
                 .setItems(items);
@@ -3136,17 +3136,20 @@ public class RobotService {
      * @param sendCode
      * @return
      */
-    public String selectRobotOrEdgeRobot(XMLBaseModel xmlBaseModel, String sendCode){
+    public String selectRobotOrEdgeRobot(XMLBaseModel xmlBaseModel, String sendCode) {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(sendCode, 1);
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
         boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
-        if (isEdge){
-            if (xmlBaseModel.getItems().get(0).containsKey("nest_code")){
-                String nestNum = xmlBaseModel.getItems().get(0).get("nest_code").toString();
+        if (isEdge) {
+            Map<String, Object> itemMap = xmlBaseModel.getItems().get(0);
+            if (itemMap.containsKey("nest_code")) {
+                String nestNum = MapUtils.getString(itemMap, "nest_code");
                 sendCode = tRobotInfoDao.selectRobotCodeByNestNum(nestNum);
-            }else {
-                String robotNum = xmlBaseModel.getItems().get(0).get("patroldevice_code").toString();
-                String sendCodeItem = tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, sendCode).getRobotCode();
+            } else if (itemMap.containsKey("patroldevice_code")) {
+                String robotNum = MapUtils.getString(itemMap, "patroldevice_code");
+                String sendCodeItem = Optional.ofNullable(tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, sendCode))
+                                              .map(TRobotInfo::getRobotCode)
+                                              .orElse(null);
                 sendCode = StringUtils.isNotEmpty(sendCodeItem) ? sendCodeItem : sendCode;
             }
         }
@@ -3245,7 +3248,7 @@ public class RobotService {
                         this.start(future, address, map);
                     }
                 }
-                Constant.port = Integer.valueOf(port);
+                Constant.setPort(Integer.parseInt(port));
             }
         } catch (Exception e) {
             log.error("更新Robot服务端口失败", e);

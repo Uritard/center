@@ -13,6 +13,7 @@ import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@DependsOn("springBeanUtils")
 public class SensorCollectService {
     @Resource
     private ThreadPoolTaskScheduler taskScheduler;
