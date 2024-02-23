@@ -271,12 +271,13 @@
             a.deal_type = 286,
             a.deal_info = '批量审核',
             a.deal_person_id = #{userId},
-            a.deal_time = now()
+            a.deal_time = now(),
+            a.conf_mode = 275
         where a.warn_id in(
         <foreach collection="list" item="id" separator=",">
             #{id}
         </foreach>
-        )
+        ) and a.conf_mode != 275
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
