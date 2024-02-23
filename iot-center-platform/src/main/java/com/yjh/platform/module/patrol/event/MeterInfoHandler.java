@@ -78,11 +78,25 @@ public class MeterInfoHandler {
                     log.info("数值小于0！{}",meterInfo);
                     continue;
                 }
+                //正向有功与上一次的差值
                 Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
                 if (value < 0 || value > 100){
                     value = 0f;
                 }
                 meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
+                //正向无功与上一次的差值
+                value = NumberUtils.toFloat(meterInfo.get("totalPositiveReactivePower")) - NumberUtils.toFloat(meter.getTotalPositiveReactivePower());
+                if (value < 0 || value > 100){
+                    value = 0f;
+                }
+                meter.setTotalPositiveReactivePowerDifferenceValue(String.valueOf(value));
+                //反向无功与上一次的差值
+                value = NumberUtils.toFloat(meterInfo.get("totalNegativePositivePower")) - NumberUtils.toFloat(meter.getTotalNegativePositivePower());
+                if (value < 0 || value > 100){
+                    value = 0f;
+                }
+                meter.setTotalNegativePositivePowerDifferenceValue(String.valueOf(value));
+
                 meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
                 meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
                 meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
@@ -163,6 +177,8 @@ public class MeterInfoHandler {
             item.put("totalNegativePositivePower", meter.getTotalNegativePositivePower());
             item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
             item.put("totalPositivePowerDifferenceValue", meter.getTotalPositivePowerDifferenceValue());
+            item.put("totalNegativePositivePowerDifferenceValue", meter.getTotalNegativePositivePowerDifferenceValue());
+            item.put("totalPositiveReactivePowerDifferenceValue", meter.getTotalPositiveReactivePowerDifferenceValue());
             item.put("magnificationCoefficient", meter.getMagnificationCoefficient());
             itemList.add(item);
 

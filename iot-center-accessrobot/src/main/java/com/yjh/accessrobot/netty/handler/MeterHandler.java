@@ -79,6 +79,8 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
                 tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
+                tMeter.setTotalNegativePositivePowerDifferenceValue(MapUtils.getString(item,"totalNegativePositivePowerDifferenceValue"));
+                tMeter.setTotalPositiveReactivePowerDifferenceValue(MapUtils.getString(item,"totalPositiveReactivePowerDifferenceValue"));
                 tMeter.setMagnificationCoefficient(MapUtils.getIntValue(item,"magnificationCoefficient", 1));
                 updateMeterList.add(tMeter);
             } else {
@@ -96,6 +98,8 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
                 tMeter.setCollectPowerTime(DateTimeUtil.parse(MapUtils.getString(item,"collectPowerTime")));
                 tMeter.setTotalPositivePowerDifferenceValue(MapUtils.getString(item,"totalPositivePowerDifferenceValue"));
+                tMeter.setTotalNegativePositivePowerDifferenceValue(MapUtils.getString(item,"totalNegativePositivePowerDifferenceValue"));
+                tMeter.setTotalPositiveReactivePowerDifferenceValue(MapUtils.getString(item,"totalPositiveReactivePowerDifferenceValue"));
                 tMeter.setMagnificationCoefficient(MapUtils.getIntValue(item,"magnificationCoefficient", 1));
                 addMeterList.add(tMeter);
             }
