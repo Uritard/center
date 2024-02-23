@@ -543,7 +543,7 @@ public class TStdDeviceService{
                 //  MySQL 8.0
 //                List<Long> regionList  = tStdDeviceDao.selectUpIdByRegionList(upRegionList);
 
-                List<Long> regionList = getRegionIdByLeafNode(new HashSet<>(upRegionList));
+                List<Long> regionList = tStdRegionDao.selectAllUpRegion(region.getRegionId().toString());
 
                 Collections.reverse(regionList);
                 regionList.remove(-1L);

@@ -326,6 +326,8 @@
          update_person,
          is_deleted,
         total_positive_power_difference_value,
+        total_positive_reactive_power_difference_value,
+        total_negative_positive_power_difference_value,
         magnification_coefficient
          )
         values
@@ -347,6 +349,8 @@
             '0',
             0,
             #{tMeter.totalPositivePowerDifferenceValue,jdbcType=VARCHAR},
+            #{tMeter.totalPositiveReactivePowerDifferenceValue,jdbcType=VARCHAR},
+            #{tMeter.totalNegativePositivePowerDifferenceValue,jdbcType=VARCHAR},
             #{tMeter.magnificationCoefficient,jdbcType=INTEGER}
             )
         </foreach>
