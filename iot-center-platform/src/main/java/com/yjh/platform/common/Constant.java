@@ -411,6 +411,28 @@ public class Constant {
         return ftpsFilePath;
     }
 
+
+    /**
+     * 是否使用自定义的扩展协议
+     * 巡视系统自定义协议扩展，非标准协议，送检时建议关闭
+     */
+    private static Boolean selfDefinedExtensions;
+
+    /**
+     * 是否使用自定义的扩展协议
+     */
+    public static boolean definedExtensions() {
+        if (null == selfDefinedExtensions) {
+            try {
+                selfDefinedExtensions = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:selfDefinedExtensions", "content"));
+                log.info("upEnvDevice is {}", selfDefinedExtensions);
+            } catch (Exception e) {
+                selfDefinedExtensions = true;
+            }
+        }
+        return selfDefinedExtensions;
+    }
+
     public static void refreshSwitchCach() {
         packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
@@ -420,6 +442,7 @@ public class Constant {
         endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
         logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
         ftpsFilePath = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
+        selfDefinedExtensions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:selfDefinedExtensions", "content"));
     }
 
     /**

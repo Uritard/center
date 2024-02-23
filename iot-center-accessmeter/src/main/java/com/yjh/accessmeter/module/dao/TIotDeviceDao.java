@@ -32,4 +32,6 @@ public interface TIotDeviceDao {
     int insertData(IotDeviceData deviceData);
 
     int batchInsertData(@Param("list") List<IotDeviceDataEx> deviceDataList);
+
+    String getSystemConfig(@Param("configType") String type, @Param("configKey") String key);
 }

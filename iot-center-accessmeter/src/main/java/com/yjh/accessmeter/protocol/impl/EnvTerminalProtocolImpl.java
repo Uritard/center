@@ -5,9 +5,12 @@
 package com.yjh.accessmeter.protocol.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.accessmeter.common.Constant;
 import com.yjh.accessmeter.common.utils.XmlUtil;
+import com.yjh.accessmeter.logs.SpringBeanUtils;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
+import com.yjh.accessmeter.module.service.SensorListenerService;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.ProtocolListener;
@@ -16,9 +19,13 @@ import com.yjh.accessmeter.protocol.entity.DataItem;
 import com.yjh.accessmeter.protocol.entity.EnvBase;
 import com.yjh.accessmeter.protocol.entity.EnvData;
 import com.yjh.accessmeter.protocol.entity.ResultMete;
+import com.yjh.accessmeter.protocol.impl.transport.ServerListener;
+import com.yjh.accessmeter.protocol.impl.transport.TcpServerManager;
 import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
 import io.netty.channel.ChannelFuture;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -38,10 +45,14 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
 
     private volatile boolean inited = false;
 
+    private static ChannelFuture serverFuture;
+
     @Override
     public ISensorProtocol init(List<IotDevice> devices) {
 
         try {
+            initServerBind();
+
             TcpShortManager shortManager = TcpShortManager.INSTANSE;
 
             devices.forEach(d -> {
@@ -58,6 +69,17 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
         }
         inited = true;
         return this;
+    }
+
+    public void initServerBind() {
+        try {
+            SensorListenerService listenerService = SpringBeanUtils.getBean(SensorListenerService.class);
+            if (listenerService != null && serverFuture == null) {
+                serverFuture = listenerService.initServerBind();
+            }
+        } catch (Exception e) {
+            LOGGER.error("绑定端口失败", e);
+        }
     }
 
     @Override

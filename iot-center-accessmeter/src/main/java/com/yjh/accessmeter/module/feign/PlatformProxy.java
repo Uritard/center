@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -27,4 +28,8 @@ public interface PlatformProxy {
     @ApiOperation(value = "物联设备信息入redis和上报")
     @RequestMapping(value = "/tIotDeviceData/v1/addToRedis", method = RequestMethod.POST)
     void uploadToRedis(@RequestBody List<IotDeviceDataEx> deviceDataList);
+
+    @ApiOperation(value = "物联设备信息告警上报")
+    @RequestMapping(value = "/tIotDeviceWarn/v1/robotIotWarn", method = RequestMethod.POST)
+    void uploadIotWarn(@RequestBody Map<String, String> iotWarn);
 }

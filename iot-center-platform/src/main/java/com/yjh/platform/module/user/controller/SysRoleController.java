@@ -153,8 +153,10 @@ public class SysRoleController {
     public Result selectRelationMenu(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
-            List<String> list = sysRoleService.selectRelationMenu(roleId);
-            result.setData(list);
+            if (roleId != -1) {
+                List<String> list = sysRoleService.selectRelationMenu(roleId);
+                result.setData(list);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

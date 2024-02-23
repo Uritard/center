@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class SysUserService {
 
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
-    public static final Long MANAGER_BUILT_IN = 10001L;
+    public static final long MANAGER_BUILT_IN = 10001L;
 
 //    @Resource
 //    private RedisAndYxsjUtil redisAndYxsjUtil;
@@ -453,9 +454,11 @@ public class SysUserService {
         String appKey = sysUserLogin.getAppkey();
 
         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 1);
-        if (!sysRoleMenuList.contains("0602") && MANAGER_BUILT_IN != sysUserLogin.getUserId()) {
+        if (MANAGER_BUILT_IN == sysUserLogin.getUserId()) {
+            sysRoleMenuList.add("0600");
             sysRoleMenuList.add("0602");
         }
+        sysRoleMenuList = sysRoleMenuList.stream().distinct().collect(Collectors.toList());
         List<String> subMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 2);
         SysUserSelect sysUserSelect = new SysUserSelect();
         BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
