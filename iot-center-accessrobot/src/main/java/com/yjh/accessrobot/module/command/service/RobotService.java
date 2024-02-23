@@ -609,7 +609,7 @@ public class RobotService {
         Long robotId = 1L;
         String title;
         String desc = "";
-        int state = 1;
+        String result = "";
         if (isEdge) {
             title = stdRegionList.get(0).getRegionName();
         } else {
@@ -628,6 +628,10 @@ public class RobotService {
                 Object v = entry.getValue();
                 String filePath = filePathPrefix + File.separator + v;
                 try {
+                    //操作模型单独不解析,和巡检点位进行合并解析
+                    if ("operation_device_file_path".equals(k)) {
+                        continue;
+                    }
                     List<Map<String, Object>> mapList = new ArrayList<>();
                     if (!"map_file_path".equals(k) && !"source_file_path".equals(k)) {
                         XMLBaseModel model = getXmlMessage(filePath);
@@ -712,8 +716,7 @@ public class RobotService {
                             dealSourceFile(filePath, nodeCode);
                             break;
                         default:
-                            desc = "模型未定义";
-                            state = 0;
+                            desc = k + " 该模型未定义";
                             log.warn("模型解析未定义，{}: {}", k, filePath);
                             break;
                     }
@@ -721,7 +724,8 @@ public class RobotService {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
                     Constant.sendProcess(nodeCode, title, 0, desc + "同步失败");
                 }
-                Constant.sendProcess(nodeCode, title, state, state == 1 ? desc + "同步完成" : desc);
+                result = result + (!desc.contains("该模型未定义") ? desc + "同步完成" : desc) + ";";
+                Constant.sendProcess(nodeCode, title, 1, result);
             }
         } catch (Exception e) {
             log.error("处理机器人返回的模型文件异常: ", e);
@@ -729,7 +733,6 @@ public class RobotService {
         } finally {
             SYNC_MODE_CACHE.remove(nodeCode);
         }
-        Constant.sendProcess(nodeCode, title, 1, "模型同步完成");
     }
     /**
      * 机器人模型文件信息处理
