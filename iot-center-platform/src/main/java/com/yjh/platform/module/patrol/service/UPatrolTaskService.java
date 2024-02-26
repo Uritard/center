@@ -1991,7 +1991,6 @@ public class UPatrolTaskService {
             log.warn("任务已经结束，不可重复终止！taskState: {}", uPatrolResult.getTaskState());
             return;
         }
-        uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
 
         // 下级任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
@@ -2004,7 +2003,14 @@ public class UPatrolTaskService {
             robotTaskStatesMap.put("robotCodeList", robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
-
+        if (uPatrolResult.getTaskType() == SINGLE_DEVICE_PATROL ||
+                uPatrolResult.getTaskType() == EMERGENCY_PATROL ||
+                uPatrolResult.getTaskType() == OPERATION_ORDER_PATROL){
+            //操作类任务终止 等待机器人上报任务结束 不更新任务状态
+            log.info("操作类任务终止！");
+            return;
+        }
+        uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
         updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {
 
