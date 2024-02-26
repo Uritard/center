@@ -1,5 +1,6 @@
 package com.yjh.platform.module.iot.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -17,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <功能描述>
@@ -150,4 +153,27 @@ public class TIotDeviceController {
         }
         return result;
     }
+
+    @ApiOperation(value = "智能环境设备控制")
+    @PostMapping(value = "/envDeviceControl")
+    @Logs(title = "智能环境设备控制",content = "根据用户传递的参数控制智能环境设备",logType = 5, authority = "1235")
+    public Result envDeviceControl(@RequestBody Map<String, Object> map) {
+        log.info("智能环境设备控制");
+        Result result = new Result();
+        try {
+            if (MapUtils.isNotEmpty(map)) {
+                return tIotDeviceService.envDeviceControl(map);
+            } else {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
+                return result;
+            }
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("智能环境设备控制异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
 }

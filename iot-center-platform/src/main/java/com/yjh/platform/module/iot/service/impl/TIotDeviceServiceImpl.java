@@ -24,6 +24,7 @@ import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -279,6 +280,18 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         } catch (Exception e) {
             log.info("上报物联设备出错！", e);
         }
+    }
+
+    @Override
+    public Result envDeviceControl(Map<String, Object> map) {
+
+        String robotCode = MapUtils.getString(map, "robotCode");
+        if (StringUtils.isNotEmpty(robotCode)) {
+            log.info("robotCode is [{}], send msg to robot {}", robotCode, map);
+            return serviceRestTemplate.postForObject(Constant.ENV_DEVICE_CONTROL_URL, map, Result.class);
+        }
+
+        return new Result();
     }
 
 }

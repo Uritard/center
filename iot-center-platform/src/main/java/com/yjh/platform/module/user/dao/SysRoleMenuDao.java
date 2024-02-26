@@ -1,11 +1,13 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.user.entity.MenuForHave;
 import com.yjh.platform.module.user.entity.SysRoleMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yjh.platform.module.user.entity.SystemMenuTreeNode;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +34,6 @@ public interface SysRoleMenuDao {
     List<String> selectByRoleId(@Param(value = "roleId") Long roleId, @Param(value = "menuType") Integer menuType);
     List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
     List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId);
+
+    List<Map<String, String>> selectMenuFirstChild();
 }

@@ -81,6 +81,15 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 data.setValue(ValueUtil.getOrDefault(value,""));
                 data.setCreateTime(DateTimeUtil.parse(map.get("time")));
                 data.setState(ValueUtil.getOrDefault(map.get("state"),"0"));
+
+                // 如果值是状态量，则将 0,1 状态量通过unit配置的参数转成汉字
+                if (StringUtils.contains(data.getUnit(), ":")) {
+                    Map<String, String> valueMap = Arrays.stream(StringUtils.split(data.getUnit(), ","))
+                                                         .map(e -> StringUtils.split(e, ":"))
+                                                         .collect(Collectors.toMap(s -> s[0], s -> s[1], (e1, e2) -> e1));
+                    data.setValue(valueMap.getOrDefault(data.getValue(), ""));
+                    data.setUnit("");
+                }
             }
         });
         return tIotDeviceList;

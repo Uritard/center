@@ -357,7 +357,6 @@ public class RobotController {
      */
     @ApiOperation(value = "智能环境设备控制")
     @PostMapping(value = "/envDeviceControl")
-    @Logs(title = "智能环境设备控制",content = "根据用户传递的参数控制智能环境设备",logType = 5, authority = "1235")
     public Result envDeviceControl(@RequestBody JSONObject jsonObject) {
         log.info("智能环境设备控制");
         Result result = new Result();

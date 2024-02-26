@@ -2024,7 +2024,7 @@ CREATE TABLE `t_std_region` (
   `commissioning_time` varchar(32) DEFAULT NULL COMMENT '投运时间',
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`region_id`) USING BTREE,
+  PRIMARY KEY (`region_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=700002 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
 
 -- ----------------------------
