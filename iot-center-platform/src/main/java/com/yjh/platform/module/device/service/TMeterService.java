@@ -62,9 +62,8 @@ public class TMeterService {
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<TMeter> tMeterList = tMeterDao.selectByUpRegionId(list,meterName);
         tMeterList.forEach(t -> {
-            //获取该电表最近的一次的数据
+            //获取该电表最近的一次数据 (昨天的)耗电量 =  采集时间的第一次采集数据 - 采集时间前一天的第一次采集数据
             TMeter log = tMeterLogDao.selectPowerDifferenceValue(t.getId());
-            //计算原始值 和 耗电量 = 两次采集差值 * 系数
             setPower(t, log, true);
         });
         Map<String, Object> resultMap = new HashMap<>(2);

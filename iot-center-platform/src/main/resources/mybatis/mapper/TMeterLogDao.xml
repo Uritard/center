@@ -37,11 +37,31 @@
     </select>
     <select id="selectPowerDifferenceValue" resultType="com.yjh.platform.module.device.entity.TMeter">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM t_meter_log
-        WHERE meter_id = #{id, jdbcType=INTEGER}
-        ORDER BY create_time desc
-        LIMIT 1;
+            b.total_positive_power - a.total_positive_power AS totalPositivePowerDifferenceValue,
+            b.total_positive_reactive_power - a.total_positive_reactive_power AS totalPositiveReactivePowerDifferenceValue,
+            b.total_negative_positive_power - a.total_negative_positive_power AS totalNegativePositivePowerDifferenceValue
+        FROM (
+                 SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power
+                 FROM t_meter_log,
+                      (SELECT
+                           collect_power_time AS lastTime,
+                           id
+                       FROM t_meter
+                       WHERE id = #{id, jdbcType=INTEGER}
+                      )c
+                 WHERE meter_id = c.id AND create_time >= c.lastTime  LIMIT 1
+             ) b,
+             (
+                 SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power
+                 FROM t_meter_log a,
+                      (SELECT
+                           DATE_FORMAT(DATE_FORMAT(DATE_SUB(collect_power_time, INTERVAL 1 DAY),'%Y-%m-%d'),'%Y-%m-%d %H:%i:%s') AS lastTime,
+                           id
+                       FROM t_meter
+                       WHERE id = #{id, jdbcType=INTEGER}
+                      )d
+                 WHERE meter_id = d.id AND create_time >= d.lastTime  LIMIT 1
+             ) a
     </select>
 
     <delete id="deleteExpireData">
