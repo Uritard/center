@@ -14,6 +14,7 @@ import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
+import com.yjh.platform.module.device.entity.CruiseOfPatrolDevice;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -35,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -48,6 +48,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -94,7 +95,7 @@ public class TCruiseTaskResultService {
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
     private final static Cache<String, List<CruiseInspectResult>> CRUISE_TIMER_CACHE = CacheUtil.newTimedCache(5*60*1000);
-    private final static Cache<String, List<CruiseCountOfType>> CRUISE_COUNT_TIMER_CACHE = CacheUtil.newTimedCache(5*60*1000);
+    private final static Cache<String, List<CruiseOfPatrolDevice>> CRUISE_PATROL_TIMER_CACHE = CacheUtil.newTimedCache(5*60*1000);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseTaskResult tCruiseTaskResult) {
@@ -386,19 +387,19 @@ public class TCruiseTaskResultService {
             return null;
         });
         if (!CollectionUtils.isEmpty(warnMapList)) {
-            List<String> instanceIds = warnMapList.stream().map(e -> e.get("instanceId")).collect(Collectors.toList());
-            List<TWarnInfo> warnInfos = tWarnInfoDao.selectCruiseInfoByTaskAndInstanceIds(taskId, instanceIds);
-            Map<String, TWarnInfo> warnInfoMap = warnInfos.stream().collect(Collectors.toMap(e -> taskId + '_' + e.getInstanceId(), Function.identity(), (a, b) -> a));
+//            List<String> instanceIds = warnMapList.stream().map(e -> e.get("instanceId")).collect(Collectors.toList());
+//            List<TWarnInfo> warnInfos = tWarnInfoDao.selectCruiseInfoByTaskAndInstanceIds(taskId, instanceIds);
+//            Map<String, TWarnInfo> warnInfoMap = warnInfos.stream().collect(Collectors.toMap(e -> taskId + '_' + e.getInstanceId(), Function.identity(), (a, b) -> a));
             //表计告警
             for (Map<String, String> warnMap : warnMapList) {
                 String instanceId = warnMap.get("instanceId");
-                TWarnInfo tWarnInfo = warnInfoMap.get(taskId + '_' + instanceId);
+//                TWarnInfo tWarnInfo = warnInfoMap.get(taskId + '_' + instanceId);
                 RealTimeWarn realTimeWarn = new RealTimeWarn();
                 realTimeWarn.setDeviceName(warnMap.get("deviceName"));
                 realTimeWarn.setInstanceName(warnMap.get("instanceName"));
                 realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", warnMap.get("cruiseType")));
                 realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", warnMap.get("warnLevel")));
-                String cruiseTime = warnMap.get("cruiseTime");
+                String cruiseTime = warnMap.get("warnTime");
                 if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                     realTimeWarn.setCruiseTime(new Date());
                 }else {
@@ -406,13 +407,8 @@ public class TCruiseTaskResultService {
                 }
                 realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
                 realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
-                if (tWarnInfo != null) {
-                    realTimeWarn.setWarnId(tWarnInfo.getWarnId());
-                    realTimeWarn.setDefectModel(tWarnInfo.getDefectModel());
-                    realTimeWarn.setWarnType(tWarnInfo.getWarnType());
-                    realTimeWarn.setDealType(tWarnInfo.getDealType());
-                    realTimeWarn.setDealInfo(tWarnInfo.getDealInfo());
-                }
+                realTimeWarn.setWarnId(warnMap.get("warnId"));
+                realTimeWarn.setDefectModel(warnMap.get("defectModel"));
                 realTimeWarns.add(realTimeWarn);
             }
         }
@@ -430,7 +426,7 @@ public class TCruiseTaskResultService {
             realTimeWarn.setInstanceName(defectMap.get("instanceName"));
             realTimeWarn.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", defectMap.get("cruiseType")));
             realTimeWarn.setWarnLevelName(DictConvertUtil.DICT.covertToDict("alarmLevel", defectMap.get("defectLevel")));
-            String cruiseTime = defectMap.get("cruiseTime");
+            String cruiseTime = defectMap.get("defectTime");
             if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
@@ -438,6 +434,8 @@ public class TCruiseTaskResultService {
             }
             realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
             realTimeWarn.setAlarmContent(defectMap.get("defectContent"));
+            realTimeWarn.setWarnId(defectMap.get("warnId"));
+            realTimeWarn.setDefectModel(defectMap.get("defectModel"));
             realTimeWarns.add(realTimeWarn);
         }
 
@@ -474,14 +472,89 @@ public class TCruiseTaskResultService {
         }
 
         try {
-            List<CruiseCountOfType> typeCountList = CRUISE_COUNT_TIMER_CACHE.get(taskId, ()-> uPatrolResultDao.selectCruiseCountByType(taskId));
-            List<CruiseCountOfType> filterCountList = typeCountList.stream().filter(c -> c.getCount() > 0).collect(Collectors.toList());
-            rateAndTaskInfo.put("typeCount", filterCountList);
+            //巡视类型个数 完成数/总数
+            List<CruiseCountOfType> typeCountList = new ArrayList<>();
+            //各个设备的任务进度
+            List<Map<String, Object>> detailRateList = new ArrayList<>();
+            //查询各个设备的对应点位
+            List<CruiseOfPatrolDevice> patrolDeviceInstanceList = CRUISE_PATROL_TIMER_CACHE.get(taskId, () -> uPatrolResultDao.selectCruiseInstanceByPatrol(taskId));
+            //根据巡视类型分组
+            Map<Integer, List<CruiseOfPatrolDevice>> cruiseOfPatrolDeviceMap = patrolDeviceInstanceList.stream().collect(Collectors.groupingBy(CruiseOfPatrolDevice::getCruiseType));
+            //从缓存中获取各个巡视类的完成数
+            String subsetKey = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId + UPatrolTaskService.SUBSET;
+            //机器人
+            List<CruiseOfPatrolDevice> robotList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.ROBOT.getCode());
+            if (CollectionUtils.isNotEmpty(robotList)) {
+                patrolDeviceAdvance(robotList, subsetKey, CruiseConstant.TypeEnum.ROBOT.getDesc(), detailRateList, typeCountList);
+            }
+            //无人机
+            List<CruiseOfPatrolDevice> droneList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.UAV.getCode());
+            if (CollectionUtils.isNotEmpty(droneList)) {
+                patrolDeviceAdvance(droneList, subsetKey, CruiseConstant.TypeEnum.UAV.getDesc(), detailRateList, typeCountList);
+            }
+            //可见光
+            List<CruiseOfPatrolDevice> videoList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.VIDEO.getCode());
+            if (CollectionUtils.isNotEmpty(videoList)) {
+                patrolDeviceAdvance(videoList, subsetKey, CruiseConstant.TypeEnum.VIDEO.getDesc(), detailRateList, typeCountList);
+            }
+            //红外
+            List<CruiseOfPatrolDevice> infraredList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.INFRARED.getCode());
+            if (CollectionUtils.isNotEmpty(infraredList)) {
+                patrolDeviceAdvance(infraredList, subsetKey, CruiseConstant.TypeEnum.INFRARED.getDesc(), detailRateList, typeCountList);
+            }
+            //声纹
+            List<CruiseOfPatrolDevice> voiceList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.VOICE.getCode());
+            if (CollectionUtils.isNotEmpty(voiceList)) {
+                patrolDeviceAdvance(voiceList, subsetKey, CruiseConstant.TypeEnum.VOICE.getDesc(), detailRateList, typeCountList);
+            }
+            rateAndTaskInfo.put("typeCount", typeCountList);
+            rateAndTaskInfo.put("detailRateList", detailRateList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
         return rateAndTaskInfo;
+    }
+
+    private void patrolDeviceAdvance(List<CruiseOfPatrolDevice> list, String subsetKey, String typeName, List<Map<String, Object>> detailRateList, List<CruiseCountOfType> typeCountList) {
+        if (typeName.equals(CruiseConstant.TypeEnum.ROBOT.getDesc()) || typeName.equals(CruiseConstant.TypeEnum.UAV.getDesc())) {
+            AtomicInteger count = new AtomicInteger();
+            Map<String, List<CruiseOfPatrolDevice>> robotDeviceMap = list.stream().collect(Collectors.groupingBy(CruiseOfPatrolDevice::getRobotName));
+            robotDeviceMap.forEach((k, v) -> {
+                List<String> robotStrList = v.stream().map(CruiseOfPatrolDevice::getInstanceId).collect(Collectors.toList());
+                String value = (String) redisTemplate.opsForHash().get(subsetKey, k);
+                int robotCount = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+                count.set(robotCount + count.get());
+                Map<String, Object> map = getProgressMap(robotCount, robotStrList.size());
+                map.put("deviceName", k);
+                detailRateList.add(map);
+            });
+            typeCountList.add(getCruiseCountOfType(typeName, count.get(), list.size()));
+        } else {
+            List<String> insIdList = list.stream().map(CruiseOfPatrolDevice::getInstanceId).collect(Collectors.toList());
+            String value = (String) redisTemplate.opsForHash().get(subsetKey, typeName);
+            int finishCount = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+            Map<String, Object> map = getProgressMap(finishCount, insIdList.size());
+            map.put("deviceName", typeName);
+            detailRateList.add(map);
+            typeCountList.add(getCruiseCountOfType(typeName, finishCount, insIdList.size()));
+        }
+    }
+
+    private CruiseCountOfType getCruiseCountOfType(String typeName, Integer finishCount, Integer count){
+        CruiseCountOfType cruiseCountOfType = new CruiseCountOfType();
+        cruiseCountOfType.setCruiseTypeName(typeName);
+        cruiseCountOfType.setCount(count);
+        cruiseCountOfType.setFinishCount(finishCount);
+        return cruiseCountOfType;
+    }
+
+    private Map<String, Object> getProgressMap(int finishCount, int all) {
+        Map<String, Object> map = new HashMap<>(2);
+        float progressF = (float) finishCount / all;
+        String progress = CommonUtils.percentFormat(Math.min(progressF, 1.0F), "#.####");
+        map.put("percentage", progress);
+        return map;
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

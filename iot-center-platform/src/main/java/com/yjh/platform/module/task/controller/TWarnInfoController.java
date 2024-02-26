@@ -508,6 +508,7 @@ public class TWarnInfoController {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("进行告警处理发生错误:", e);
         }
+        result.setMessage("批量审核完成");
         return result;
     }
 

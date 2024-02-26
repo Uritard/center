@@ -468,6 +468,9 @@ public class SysUserService {
         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
         mapResult.put("systemName",systemNameMap.get("content"));
         mapResult.put("systemLevel", Constant.getLevelEdge());
+        Map<String,String> stationList = redisTemplate.opsForHash().entries("t_sys_param:stationList");
+        String stationListStr = stationList.get("content");
+        mapResult.put("stationList", stationListStr);
         String userId = String.valueOf(sysUserLogin.getUserId());
         Map<String, Object> mapAccount = new HashMap<>();
         Map<String, Object> mapAppKey = new HashMap<>();

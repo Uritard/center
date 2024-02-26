@@ -307,6 +307,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("instanceName", cruiseMap.get("instanceName"));
             warnMap.put("cruiseType", cruiseMap.get("cruiseType"));
             warnMap.put("cruiseTime", threadMap.get("time"));
+            warnMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
             log.info("warnMap==={}", warnMap);
             RedisUtil.setHashGroupAndExpire(warnPrefix, tempKey, warnMap, 7);
         } catch (Exception e) {
