@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
+import com.yjh.platform.module.device.entity.CruiseOfPatrolDevice;
 import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.patrol.entity.NonhomologousInfo;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
@@ -218,4 +219,6 @@ public interface UPatrolResultDao {
                                                  @Param(value = "endTime") String endTime);
 
     List<OperationTaskRecordResult> queryOperationResult(@Param(value = "taskId")String taskId);
+
+    List<CruiseOfPatrolDevice> selectCruiseInstanceByPatrol(@Param(value = "taskId") String taskId);
 }

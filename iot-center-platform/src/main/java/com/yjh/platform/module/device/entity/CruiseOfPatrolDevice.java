@@ -8,20 +8,25 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+/**
+ * <功能描述>
+ *
+ * @author YIJIAHE
+ * @date 2024/2/19
+ * @since [产品/模块版本] （可选）
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "获取当前任务下各种巡视方式下的巡检点个数", description = "不同巡视方式下的巡检点个数")
-public class CruiseCountOfType implements Serializable {
+@ApiModel(value = "获取当前任务下各种巡视设备的巡检点", description = "不同巡视设备下的巡检点")
+public class CruiseOfPatrolDevice implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "巡检方式ID")
-    private String cruiseType;
+    private String instanceId;
     @ApiModelProperty(value = "巡检方式名称")
-    private String cruiseTypeName;
+    private Integer cruiseType;
     @ApiModelProperty(value = "巡检点数量")
-    private Integer count;
-    @ApiModelProperty(value = "完成的巡检点数量")
-    private Integer finishCount;
+    private String robotName;
 }

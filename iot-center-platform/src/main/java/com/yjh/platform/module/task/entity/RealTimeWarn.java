@@ -33,14 +33,8 @@ public class RealTimeWarn {
     @ApiModelProperty(value = "告警内容")
     private String alarmContent;
     @ApiModelProperty(value = "告警id")
-    private Long warnId;
+    private String warnId;
     @ApiModelProperty(value = "缺陷类型")
-    private Integer defectModel;
-    @ApiModelProperty(value = "告警类型")
-    private Integer warnType;
-    @ApiModelProperty(value = "缺陷类型")
-    private Integer dealType;
-    @ApiModelProperty(value = "告警类型")
-    private String dealInfo;
+    private String defectModel;
 
 }

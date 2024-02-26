@@ -1249,6 +1249,7 @@
         f.person_check,
         f.identify_result,
         f.cruise_type,
+        f.cruise_device_name,
         f.origpic as ori_img,
         b.custom_id,
         b.custom_name as componentName,
@@ -1472,6 +1473,20 @@
         WHERE
             1 = 1
           and d.task_id =  #{taskId}
+    </select>
+    <select id="selectCruiseInstanceByPatrol" resultType="com.yjh.platform.module.device.entity.CruiseOfPatrolDevice">
+        SELECT
+            a.instance_id,
+            a.cruise_type,
+            f.robot_name
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN u_patrol_task_attr c ON a.instance_id = c.instance_id
+        LEFT JOIN u_patrol_task d ON c.task_id = d.task_code
+        LEFT JOIN t_robot_inspection e on a.cruise_id  = e.inspection_id
+        LEFT JOIN t_robot_info f ON e.robot_id = f.robot_id
+        WHERE
+            d.task_id = #{taskId}
     </select>
 
 </mapper>

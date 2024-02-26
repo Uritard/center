@@ -97,6 +97,7 @@ public class UPatrolTaskService {
     public static final String TASK_RETRY_PREFIX = "taskRetry:";
     public static final String INTERVAL = "interval_";
     public static final String TASK_ALL = "--ALL";
+    public static final String SUBSET = "--subset";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -2372,6 +2373,34 @@ public class UPatrolTaskService {
             }
             endOnece = true;
         }
+        Map<Integer, List<Map<String, String>>> cruiseTypeListMap = cruiseResultList.stream().collect(Collectors.groupingBy(c -> Integer.parseInt(c.get("cruiseType"))));
+        String subsetKey = PATROL_SUMMARY_PREFIX + taskId + SUBSET;
+        Map<String, String> subsetMap = new HashMap<>(2);
+        //计算机器人和无人机
+        List<Map<String, String>> robotAndDroneList = cruiseTypeListMap.get(TypeEnum.ROBOT.getCode());
+        if (cruiseTypeListMap.containsKey(TypeEnum.UAV.getCode())) {
+            robotAndDroneList.addAll(cruiseTypeListMap.get(TypeEnum.UAV.getCode()));
+        }
+        if (CollectionUtils.isNotEmpty(robotAndDroneList)) {
+            setSubsetMap(robotAndDroneList, subsetKey, TypeEnum.ROBOT.getDesc(), subsetMap);
+        }
+        //计算可见光
+        List<Map<String, String>> videoList = cruiseTypeListMap.get(TypeEnum.VIDEO.getCode());
+        if (CollectionUtils.isNotEmpty(videoList)) {
+            setSubsetMap(videoList, subsetKey, TypeEnum.VIDEO.getDesc(), subsetMap);
+        }
+        //计算红外
+        List<Map<String, String>> infraredList = cruiseTypeListMap.get(TypeEnum.INFRARED.getCode());
+        if (CollectionUtils.isNotEmpty(infraredList)) {
+            setSubsetMap(infraredList, subsetKey, TypeEnum.INFRARED.getDesc(), subsetMap);
+        }
+        //计算声纹
+        List<Map<String, String>> voiceList = cruiseTypeListMap.get(TypeEnum.VOICE.getCode());
+        if (CollectionUtils.isNotEmpty(voiceList)) {
+            setSubsetMap(voiceList, subsetKey, TypeEnum.VOICE.getDesc(), subsetMap);
+        }
+        redisTemplate.opsForHash().putAll(subsetKey, subsetMap);
+        redisTemplate.expire(subsetKey, 7, TimeUnit.DAYS);
 
         redisTemplate.opsForHash().putAll(strForCountAll, resultCountsMap);
         redisTemplate.expire(strForCountAll, 7, TimeUnit.DAYS);
@@ -2392,6 +2421,23 @@ public class UPatrolTaskService {
             return abnormalCounts;
         }
         return -1;
+    }
+
+    private void setSubsetMap(List<Map<String, String>> list, String subsetKey, String typeName, Map<String, String> subsetMap) {
+        if (typeName.equals(TypeEnum.ROBOT.getDesc())) {
+            Map<String, List<Map<String, String>>> patrolDeviceMap = list.stream().collect(Collectors.groupingBy(p -> p.get("cruiseDeviceName")));
+            patrolDeviceMap.forEach((k, v) -> {
+                String value = (String) redisTemplate.opsForHash().get(subsetKey, k);
+                int finishNum = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+                finishNum = finishNum + v.size();
+                subsetMap.put(k, String.valueOf(finishNum));
+            });
+        } else {
+            String value = (String) redisTemplate.opsForHash().get(subsetKey, typeName);
+            int finishNum = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+            finishNum = finishNum + list.size();
+            subsetMap.put(typeName, String.valueOf(finishNum));
+        }
     }
 
     /**

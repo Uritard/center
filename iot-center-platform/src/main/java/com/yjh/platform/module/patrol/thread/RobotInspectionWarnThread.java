@@ -239,6 +239,7 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("instanceName", tCruiseTaskResultMap.get("instanceName"));
             warnMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
             warnMap.put("cruiseTime", ValueUtil.getOrDefault(tCruiseTaskResultMap.get("time"),DateTimeUtil.format(new Date())));
+            warnMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
         }catch (Exception e){
             log.error("组装告警map异常：", e);
         }
@@ -267,6 +268,7 @@ public class RobotInspectionWarnThread implements Runnable{
             defectMap.put("cruiseType", tCruiseTaskResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", tCruiseTaskResultMap.get("cruiseTime"));
             defectMap.put("taskId", taskId);
+            defectMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
         }catch (Exception e){
             log.error("组装缺陷map异常：" , e);
         }
