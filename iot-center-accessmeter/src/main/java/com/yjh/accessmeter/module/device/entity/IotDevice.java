@@ -120,4 +120,8 @@ public class IotDevice {
     public int hashCode() {
         return new HashCodeBuilder().append(id).toHashCode();
     }
+
+    public String getInetAddr() {
+        return this.ip + ":" + this.port;
+    }
 }

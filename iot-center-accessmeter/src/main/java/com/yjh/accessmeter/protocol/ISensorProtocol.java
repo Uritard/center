@@ -4,6 +4,7 @@
 
 package com.yjh.accessmeter.protocol;
 
+import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.protocol.entity.ResultMete;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -29,9 +31,20 @@ public interface ISensorProtocol {
 
     boolean isInit();
 
+    /**
+     * 同步数据采集
+     */
     List<ResultMete> send(IotDevice device, List<IotDevicePoint> devicePoints);
 
+    /**
+     * 异步数据采集
+     */
     void sendAsync(IotDevice device, ProtocolListener listener);
+
+    /**
+     * 控制指令下发
+     */
+    Result sendControl(IotDevice device, Map<String, Object> params);
 
     default String round(String numberStr, int scale) {
         BigDecimal decimal;

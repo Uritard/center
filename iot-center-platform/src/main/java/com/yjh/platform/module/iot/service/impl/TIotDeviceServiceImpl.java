@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -62,6 +63,11 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
     @Qualifier("serviceRestTemplate")
     private RestTemplate serviceRestTemplate;
 
+    private static final String DEVICE_ADD = "/add?id={0}";
+    private static final String DEVICE_UPDATE = "/update?id={0}";
+    private static final String DEVICE_DELETE = "/delete?id={0}";
+    private static final String DEVICE_CONTROL = "/envDeviceControl";
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean save(TIotDevice iotDevice) {
@@ -87,7 +93,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         // 15 s后将设备加入到采集列表中，并触发一次采集
         String scheduleTaskId = "IotDevice_" + iotDevice.getId();
         ScheduledMapConfig.schedule(scheduleTaskId, 15, iotDevice, device -> {
-            Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/add?id={0}", Result.class, device.getId());
+            Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_ADD, Result.class, device.getId());
             log.info("add device collect, {}", result);
         });
         ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
@@ -149,7 +155,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             }
         }
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/update?id={0}", Result.class, iotDevice.getId());
+        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_UPDATE, Result.class, iotDevice.getId());
         log.info("update device collect, {}", result);
         ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return ret;
@@ -173,7 +179,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         String scheduleTaskId = "IotDevice_" + id;
         ScheduledMapConfig.remove(scheduleTaskId);
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + "/delete?id={0}", Result.class, id);
+        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_DELETE, Result.class, id);
         if (!(Optional.ofNullable(result).orElseThrow(() -> new BusinessException(ResultCodeEnum.CODE10001, "调用接口删除数据采集失败"))
             .isSuccess())) {
             throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());
@@ -286,12 +292,18 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
     public Result envDeviceControl(Map<String, Object> map) {
 
         String robotCode = MapUtils.getString(map, "robotCode");
-        if (StringUtils.isNotEmpty(robotCode)) {
-            log.info("robotCode is [{}], send msg to robot {}", robotCode, map);
-            return serviceRestTemplate.postForObject(Constant.ENV_DEVICE_CONTROL_URL, map, Result.class);
+        try {
+            if (StringUtils.isNotEmpty(robotCode)) {
+                log.info("robotCode is [{}], send msg to robot {}", robotCode, map);
+                return serviceRestTemplate.postForObject(Constant.ENV_DEVICE_CONTROL_URL, map, Result.class);
+            } else {
+                return serviceRestTemplate.postForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_CONTROL, map, Result.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new BusinessException("控制设备失败");
         }
 
-        return new Result();
     }
 
 }

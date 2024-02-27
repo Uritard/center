@@ -5,14 +5,21 @@
 package com.yjh.accessmeter.module.service;
 
 import com.yjh.accessmeter.common.result.BusinessException;
+import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
+import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
+import com.yjh.accessmeter.protocol.entity.EnvAction;
+import com.yjh.accessmeter.protocol.impl.EnvTerminalProtocolImpl;
+import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -91,7 +98,7 @@ public class SensorCollectService {
     public boolean add(Long id) {
         IotDevice device = iotDeviceDao.selectByPrimaryKey(id);
         if (device == null) {
-            log.info("没有查到设备配置 id:{}", id);
+            log.error("没有查到设备配置 id:{}", id);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
         }
         return add(device, true);
@@ -153,7 +160,7 @@ public class SensorCollectService {
     public boolean update(Long id) {
         IotDevice device = iotDeviceDao.selectByPrimaryKey(id);
         if (device == null) {
-            log.info("没有查到设备配置 id:{}", id);
+            log.error("没有查到设备配置 id:{}", id);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
         }
         log.info("更新数据采集 device:{}", device);
@@ -164,7 +171,7 @@ public class SensorCollectService {
     public void collect(Long id) {
         IotDevice device = iotDeviceDao.selectByPrimaryKey(id);
         if (device == null) {
-            log.info("没有查到设备配置 id:{}", id);
+            log.error("没有查到设备配置 id:{}", id);
             throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
         }
 
@@ -174,4 +181,20 @@ public class SensorCollectService {
         }
     }
 
+    public Result envDeviceControl(Map<String, Object> map) {
+        long iotDeviceId = MapUtils.getLongValue(map, "iotDeviceId");
+        IotDevice device = iotDeviceDao.selectByPrimaryKey(iotDeviceId);
+        if (device == null) {
+            log.error("没有查到设备配置 id:{}", iotDeviceId);
+            throw new BusinessException(ResultCodeEnum.CODE10005.getCode(), "没有查到设备配置");
+        }
+        ISensorProtocol sensorProtocol =
+            SensorProtocolFactory.CREATE.createProtocol(ProtocolEnum.getEnum(device.getProtocolModel()));
+        if (sensorProtocol == null || !sensorProtocol.isInit()) {
+            log.error("协议不支持控制指令下发 device:{}", device);
+            return new Result(ResultCodeEnum.CODE10009.getCode(), "协议不支持");
+        }
+
+        return sensorProtocol.sendControl(device, map);
+    }
 }
