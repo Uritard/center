@@ -508,16 +508,18 @@
             a.camera_name as cameraName,
             a.channel_num as channelNum,
             TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1 AS commissioDay,
-            COUNT(DISTINCT TO_DAYS(updr.cruise_time)) AS cruiseDay,
-            IFNULL(CONCAT(CONVERT(COUNT(DISTINCT TO_DAYS(updr.cruise_time)) / (TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1) * 100, DECIMAL(15, 3)), '%'), '0.000%') AS cruisePercent,
-            SUM(IF (updr.cruise_result = 247, 1, 0)) AS lossNum,
-            COUNT(updr.cruise_data_id) as totalNum,
-            IFNULL(CONCAT(CONVERT(SUM(IF (updr.cruise_result = 247, 1, 0)) / COUNT(updr.cruise_data_id) * 100, DECIMAL(15, 3)), '%'), '0.000%') as lossPercent
+            COUNT(d.cruise_time) AS cruiseDay,
+            IFNULL(CONCAT(CONVERT(COUNT(d.cruise_time) / (TO_DAYS(NOW()) - TO_DAYS(a.commission_date) + 1) * 100, DECIMAL(15, 3)), '%'), '0.000%') AS cruisePercent
         FROM
             t_camera_info a
-                LEFT JOIN t_camera_preset tcp ON a.camera_id = tcp.camera_id
-                LEFT JOIN t_cruise_point_instance tcpi ON tcp.preset_id = tcpi.cruise_id
-                LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id  AND updr.cruise_time IS NOT NULL AND a.commission_date <![CDATA[<=]]> updr.createtime
+        LEFT JOIN (
+            SELECT  DATE_FORMAT(cruise_time,'%Y-%m-%d') as cruise_time,
+                cruise_device_id
+            FROM
+                u_patrol_data_result
+            WHERE cruise_device_id is not NULL and cruise_type in(229,230)
+            GROUP BY DATE_FORMAT(cruise_time,'%Y-%m-%d'),cruise_device_id
+        ) d ON d.cruise_device_id = a.camera_id  AND a.commission_date <![CDATA[<=]]> d.cruise_time
         WHERE
             1 = 1
         AND a.commission_date IS NOT NULL
