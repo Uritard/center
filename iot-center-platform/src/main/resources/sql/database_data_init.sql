@@ -438,8 +438,8 @@ INSERT INTO `t_dict_business` VALUES ('300111', '225', 'unit', 'A', '0', '单位
 INSERT INTO `t_dict_business` VALUES ('300112', '226', 'unit', '℃', '0', '单位名称', '1');
 INSERT INTO `t_dict_business` VALUES ('300113', '227', 'unit', '%H', '0', '单位名称', '1');
 INSERT INTO `t_dict_business` VALUES ('300114', '228', 'cruise_type', '机器人', '0', '巡检方式', '3');
-INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '可见光', '0', '巡检方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300116', '230', 'cruise_type', '红外', '0', '巡检方式', '2');
+INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '视频-可见光', '0', '巡检方式', '1');
+INSERT INTO `t_dict_business` VALUES ('300116', '230', 'cruise_type', '视频-红外', '0', '巡检方式', '2');
 INSERT INTO `t_dict_business` VALUES ('300117', '231', 'cruise_type', '在线监控', '0', '巡检方式', '6');
 INSERT INTO `t_dict_business` VALUES ('300118', '232', 'cruise_type', '声纹', '0', '巡检方式', '5');
 INSERT INTO `t_dict_business` VALUES ('300119', '233', 'alarm_type', '智能预警', '0', '告警类型', '1');
