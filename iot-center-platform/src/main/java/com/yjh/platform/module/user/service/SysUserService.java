@@ -460,10 +460,14 @@ public class SysUserService {
         }
         sysRoleMenuList = sysRoleMenuList.stream().distinct().collect(Collectors.toList());
         List<String> subMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 2);
+        List<Map<String, String>> menuFirstChildList = sysRoleMenuDao.selectMenuFirstChild();
+        Map<String, String> menuFirstChild =
+            menuFirstChildList.stream().collect(Collectors.toMap(e -> e.get("code"), e -> e.get("first_child"), (e1, e2) -> e1));
         SysUserSelect sysUserSelect = new SysUserSelect();
         BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
         mapResult.put("roleMenuList", sysRoleMenuList);
         mapResult.put("subMenuList", subMenuList);
+        mapResult.put("menuFirstChild", menuFirstChild);
         mapResult.put("sysUserLogin", sysUserSelect);
         Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
         mapResult.put("systemName",systemNameMap.get("content"));

@@ -1,10 +1,12 @@
 package com.yjh.platform.module.iot.service;
 
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author YIJIAHE
@@ -16,4 +18,6 @@ public interface TIotDeviceService extends IService<TIotDevice> {
     List<AreaInfo> selectDevTree(String level, Long id, String name);
 
     void deviceUpload();
+
+    Result envDeviceControl(Map<String, Object> map);
 }

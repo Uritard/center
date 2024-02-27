@@ -165,4 +165,23 @@
         WHERE a.role_id != #{roleId, jdbcType=BIGINT}
         and (c.menu_level != 1 or c.menu_code = '0001')
     </select>
+
+    <select id="selectMenuFirstChild" resultType="java.util.Map">
+        SELECT
+        pa.menu_code AS code ,
+        sm.menu_name AS first_child
+        FROM
+        sys_menu sm
+        RIGHT JOIN sys_role_menu a ON
+        a.menu_code = sm.menu_code
+        LEFT JOIN sys_menu pa ON
+        sm.up_id = pa.menu_id
+        WHERE
+        sm.state = 1
+        AND sm.menu_type = 2
+        GROUP BY
+        pa.menu_code
+        ORDER BY
+        sm.sort
+    </select>
 </mapper>

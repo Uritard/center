@@ -18,9 +18,14 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class EnvResult extends EnvBase{
+public class EnvResult extends EnvBase {
+    public static final String SUCCESS = "1";
     /**
      * 结果 1成功 2失败
      */
     String value;
+
+    public boolean isSuccess() {
+        return SUCCESS.equals(this.value);
+    }
 }

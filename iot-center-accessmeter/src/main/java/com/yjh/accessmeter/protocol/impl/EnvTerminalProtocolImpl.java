@@ -6,6 +6,9 @@ package com.yjh.accessmeter.protocol.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessmeter.common.Constant;
+import com.yjh.accessmeter.common.result.BusinessException;
+import com.yjh.accessmeter.common.result.Result;
+import com.yjh.accessmeter.common.result.ResultCodeEnum;
 import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.logs.SpringBeanUtils;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
@@ -15,14 +18,12 @@ import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.ProtocolListener;
 import com.yjh.accessmeter.protocol.ProtocolType;
-import com.yjh.accessmeter.protocol.entity.DataItem;
-import com.yjh.accessmeter.protocol.entity.EnvBase;
-import com.yjh.accessmeter.protocol.entity.EnvData;
-import com.yjh.accessmeter.protocol.entity.ResultMete;
+import com.yjh.accessmeter.protocol.entity.*;
 import com.yjh.accessmeter.protocol.impl.transport.ServerListener;
 import com.yjh.accessmeter.protocol.impl.transport.TcpServerManager;
 import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
 import io.netty.channel.ChannelFuture;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -31,7 +32,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <功能描述>
@@ -46,6 +49,9 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
     private volatile boolean inited = false;
 
     private static ChannelFuture serverFuture;
+
+    public static final Map<String, String> DEVICE_STATION_MAP = new ConcurrentHashMap<>(32);
+    public static final String DEFAULT_STATION = "000001";
 
     @Override
     public ISensorProtocol init(List<IotDevice> devices) {
@@ -107,7 +113,8 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
                 Map<String, IotDevicePoint> pointMap = msgTypeGroup.computeIfAbsent(key, k -> new HashMap<>(16));
                 pointMap.put(d.getChannelNum(), d);
             }
-            station = StringUtils.defaultIfEmpty(station, "0001");
+            station = StringUtils.defaultIfEmpty(station, DEFAULT_STATION);
+            DEVICE_STATION_MAP.put(device.getInetAddr(), station);
 
             return sendMsg(device, msgTypeGroup, station);
         } catch (Exception e) {
@@ -165,6 +172,46 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
     @Override
     public void sendAsync(IotDevice device, ProtocolListener listener) {
 
+    }
+
+    @Override
+    public Result sendControl(IotDevice device, Map<String, Object> params) {
+        Result result = new Result();
+        try {
+            int status = MapUtils.getIntValue(params, "deviceStatus");
+            String deviceStatus = status == 2 ? "off" : "on";
+            String deviceAttr = MapUtils.getString(params, "deviceAttr");
+
+            EnvAction action = new EnvAction();
+            EnvAction.Action act = new EnvAction.Action();
+            act.setTextValue(deviceStatus);
+            if (StringUtils.isNotEmpty(deviceAttr)) {
+                act.addAttr("attr1", deviceAttr);
+            }
+            String stationId = DEVICE_STATION_MAP.getOrDefault(device.getInetAddr(), DEFAULT_STATION);
+            action.setAction(act).setPIndex(MapUtils.getString(params, "deviceId")).setType("set").setMsgType("0003").setStationId(stationId);
+
+            String msgXml = XmlUtil.createXmlString("root", action);
+
+            String response = TcpShortManager.INSTANSE.sendAndGet(msgXml, device);
+            if (StringUtils.isEmpty(response)) {
+                LOGGER.error("发送控制指令失败，没有返回消息！！！");
+                result.setMessage(ResultCodeEnum.CODE10001.getCode(), "设备响应超时");
+            } else {
+                Document document = DocumentHelper.parseText(response);
+
+                Element rootElt = document.getRootElement();
+                EnvResult dataResult = XmlUtil.parseObject(rootElt, EnvResult.class);
+                if (!dataResult.isSuccess()) {
+                    result.setMessage(ResultCodeEnum.CODE10001.getCode(), "控制设备失败");
+                }
+                result.setData(dataResult.getValue());
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.CODE10001.getCode(), "发送控制指令失败");
+            throw new BusinessException("发送控制消息失败");
+        }
+        return result;
     }
 
 }

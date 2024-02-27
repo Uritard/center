@@ -11,12 +11,11 @@ import com.yjh.accessmeter.module.service.SensorCollectService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -91,6 +90,27 @@ public class IotDeviceCollectController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("采集设备数据失败", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "智能环境设备控制")
+    @PostMapping(value = "/envDeviceControl")
+    public Result envDeviceControl(@RequestBody Map<String, Object> map) {
+        log.info("智能环境设备控制");
+        Result result = new Result();
+        try {
+            if (MapUtils.isNotEmpty(map)) {
+                return sensorCollectService.envDeviceControl(map);
+            } else {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
+                return result;
+            }
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("智能环境设备控制异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         }
         return result;
     }

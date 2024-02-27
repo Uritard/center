@@ -13,6 +13,8 @@ import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
+import com.yjh.accessmeter.common.result.Result;
+import com.yjh.accessmeter.common.result.ResultCodeEnum;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDevicePoint;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
@@ -100,6 +102,12 @@ public class ModbusRtuProtocolImpl implements ISensorProtocol {
     @Override
     public void sendAsync(IotDevice device, ProtocolListener listener) {
 
+    }
+
+    @Override
+    public Result sendControl(IotDevice device, Map<String, Object> params) {
+
+        return new Result(ResultCodeEnum.CODE10009.getCode(), "协议不支持");
     }
 
     private ModbusMaster master(IotDevice device) {
