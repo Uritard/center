@@ -248,8 +248,9 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                             int state = v.stream().mapToInt(e-> NumberUtils.toInt(e.getState())).max().orElse(0);
                             valMap.put("state", String.valueOf(state));
                         }
-
-                        valMap.put("type", ex.getType());
+                        if (StringUtils.isNotEmpty(ex.getType())){
+                            valMap.put("type", ex.getType());
+                        }
                         String key = "EnvDevice:" + k;
                         operations.opsForHash().putAll(key, valMap);
                     });
@@ -259,6 +260,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
 
             iotDeviceDataUpload(dataList);
         } catch (Exception e) {
+            log.info("data:{}",dataList);
             log.error(e.getMessage(), e);
         }
         return true;

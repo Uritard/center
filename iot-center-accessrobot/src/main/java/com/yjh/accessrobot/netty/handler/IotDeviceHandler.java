@@ -64,7 +64,7 @@ public class IotDeviceHandler implements MessageHandlerStrategy, InitializingBea
         List<TIotDeviceData> updateDeviceList = new ArrayList<>();
         List<TIotDeviceData> insertDevicePointList = new ArrayList<>();
         List<TIotDeviceData> allDevicePointList = new ArrayList<>();
-        List<TStdRegion> regionList = tStdRegionDao.selectAll();
+        List<TStdRegion> regionList = tStdRegionDao.selectByRegionCodeAndState(sendCode,null);
         for (Map<String, Object> item : xmlBaseModel.getItems()) {
             Long upRegionId = isContains(regionList, ValueUtil.Object2String(item.get("upRegionId"), "-1"));
             if (upRegionId == null) {
