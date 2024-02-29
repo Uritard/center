@@ -30,7 +30,7 @@ public class WarnSubService {
             List<String> subWarnTypeList = Arrays.asList(warnSub.getSubWarnType().split(","));
             if (SubWarnTypeEnum.SYSTEM.getTypeCode().equals(type) && subWarnTypeList.contains(type)) {
                 return true;
-            } else if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
+            } else if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && subWarnTypeList.contains(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
                 List<String> subWarnLevelList = Arrays.asList(warnSub.getSubWarnLevel().split(","));
                 return subWarnLevelList.contains(level);
             }
