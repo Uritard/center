@@ -501,20 +501,23 @@ public class UPatrolTaskService {
         for (TCruisePointInstanceNameDetail item : detailList) {
             UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
             uPatrolDataResult.setTaskId(task.getTaskId())
-                    .setDeviceId(item.getDeviceId())
-                    .setDeviceName(item.getDeviceName())
-                    .setInstanceId(item.getInstanceId())
-                    .setInstanceName(item.getInstanceName())
-                    .setCruiseId(item.getCruiseId())
-                    .setCruiseName(item.getCruiseName())
-                    .setCruiseStatus(253)
-                    .setCustomId(item.getCustomId())
-                    .setCustomName(item.getCustomName())
-                    .setDevicePointId(item.getDevicePointId())
-                    .setIsWarn(0)
-                    .setDeviceMeteId(item.getDeviceMeteId())
-                    .setDeviceMeteName(item.getDeviceMeteName())
-                    .setCruiseType(item.getCruiseType()).setCreatetime(now);
+                .setDeviceId(item.getDeviceId())
+                .setDeviceName(item.getDeviceName())
+                .setInstanceId(item.getInstanceId())
+                .setInstanceName(item.getInstanceName())
+                .setCruiseId(item.getCruiseId())
+                .setCruiseName(item.getCruiseName())
+                .setCruiseStatus(253)
+                .setCustomId(item.getCustomId())
+                .setCustomName(item.getCustomName())
+                .setDevicePointId(item.getDevicePointId())
+                .setIsWarn(0)
+                .setDeviceMeteId(item.getDeviceMeteId())
+                .setDeviceMeteName(item.getDeviceMeteName())
+                .setCruiseDeviceId(item.getCruiseDeviceId())
+                .setCruiseDeviceName(item.getCruiseDeviceName())
+                .setCruiseType(item.getCruiseType())
+                .setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
             map.put("edgeCode", edgeCode);
@@ -1038,17 +1041,34 @@ public class UPatrolTaskService {
         if (1 == check) {
             //这个点 没有做
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-            String rname = cruiseTypeEnum.getDesc();
 
-            result.put("cruiseStatus", String.valueOf(CRUISE_STATE_OMIT));//执行遗漏
-            result.put("resultNum", "-1");
-            String desc = taskState == CruiseConstant.TASK_STATE_TIMEOUT ? AbnormalResDescEnum.TASK_TIMEOUT.getDesc(): rname + "任务异常";
+            // 下级上报终止状态忽略，上报结束或超时状态遗漏
+            int status;
+            String desc;
+            int cruiseAbnormal;
+            switch (taskState){
+                case TASK_STATE_INTERRUPT:
+                    status = CRUISE_STATE_IGNORE;
+                    cruiseAbnormal = CRUISE_ABNORMAL_INTERRUPT;
+                    desc = AbnormalResDescEnum.TERMINATION_OF_TASK.getDesc();
+                    break;
+                case TASK_STATE_TIMEOUT:
+                    status = CRUISE_STATE_OMIT;
+                    cruiseAbnormal = CRUISE_ABNORMAL_TIMEOUT;
+                    desc = AbnormalResDescEnum.TASK_TIMEOUT.getDesc();
+                    break;
+                default:
+                    status = CRUISE_STATE_OMIT;
+                    cruiseAbnormal = CRUISE_ABNORMAL_DATAABNORMAL;
+                    desc = cruiseTypeEnum.getDesc() + "任务异常";
+            }
             result.put("resultDesc", desc);
-            result.put("cruiseAbnormal", String.valueOf(taskState == CruiseConstant.TASK_STATE_TIMEOUT ? CruiseConstant.CRUISE_ABNORMAL_TIMEOUT : CruiseConstant.CRUISE_ABNORMAL_INTERRUPT));//任务终止
+            result.put("cruiseAbnormal", String.valueOf(cruiseAbnormal));//任务终止
+            result.put("cruiseStatus", String.valueOf(status));
+            result.put("resultNum", "-1");
             result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
             result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
             result.put("cruiseTime",DateTimeUtil.format(new Date()));
-
             String instanceKey = cruiseResultKey + instanceId;
             redisTemplate.opsForHash().putAll(instanceKey, result);
 
