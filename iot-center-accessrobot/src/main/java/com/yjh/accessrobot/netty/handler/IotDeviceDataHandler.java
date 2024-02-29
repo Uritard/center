@@ -59,7 +59,7 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
 
         List<TIotDeviceData> deviceDataList = tStdDeviceMapper.selectIotDeviceByEdgeCode(sendCode);
         List<TIotDeviceData> insertDataList = new ArrayList<>();
-        List<TStdRegion> regionList = tStdRegionDao.selectAll();
+        List<TStdRegion> regionList = tStdRegionDao.selectByRegionCodeAndState(sendCode,null);
         for (Map<String, Object> item : xmlBaseModel.getItems()) {
             Long upRegionId = isContains(regionList, ValueUtil.Object2String(item.get("upRegionId"), "-1"));
             if (upRegionId == null) {
