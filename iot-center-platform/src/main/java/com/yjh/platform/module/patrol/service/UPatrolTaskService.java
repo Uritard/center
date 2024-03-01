@@ -2167,13 +2167,15 @@ public class UPatrolTaskService {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "-1");
-                    m.put("resultDesc", AbnormalResDescEnum.ROBOT_OFFLINE.getDesc());
+                    String desc = TypeEnum.UAV.getCode() == cruiseType ? AbnormalResDescEnum.DRONE_OFFLINE.getDesc() : AbnormalResDescEnum.ROBOT_OFFLINE.getDesc();
+                    m.put("resultDesc", desc);
                     // 巡检数据状态，执行失败
                     m.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
                     if (robotOfflineMap.get(robotId) == 4) {
-                        m.put("resultDesc", AbnormalResDescEnum.ROBOT_OVERHAUL.getDesc());
+                        desc = TypeEnum.UAV.getCode() == cruiseType ? AbnormalResDescEnum.DRONE_OVERHAUL.getDesc() : AbnormalResDescEnum.ROBOT_OVERHAUL.getDesc();
+                        m.put("resultDesc", desc);
                         m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
                         // 巡检数据状态，忽略
                         m.put("cruiseStatus", String.valueOf(CRUISE_STATE_IGNORE));
@@ -2396,13 +2398,15 @@ public class UPatrolTaskService {
         Map<Integer, List<Map<String, String>>> cruiseTypeListMap = cruiseResultList.stream().collect(Collectors.groupingBy(c -> Integer.parseInt(c.get("cruiseType"))));
         String subsetKey = PATROL_SUMMARY_PREFIX + taskId + SUBSET;
         Map<String, String> subsetMap = new HashMap<>(2);
-        //计算机器人和无人机
-        List<Map<String, String>> robotAndDroneList = cruiseTypeListMap.get(TypeEnum.ROBOT.getCode());
-        if (cruiseTypeListMap.containsKey(TypeEnum.UAV.getCode())) {
-            robotAndDroneList.addAll(cruiseTypeListMap.get(TypeEnum.UAV.getCode()));
+        //计算机器人
+        List<Map<String, String>> robotList = cruiseTypeListMap.get(TypeEnum.ROBOT.getCode());
+        if (CollectionUtils.isNotEmpty(robotList)) {
+            setSubsetMap(robotList, subsetKey, TypeEnum.ROBOT.getDesc(), subsetMap);
         }
-        if (CollectionUtils.isNotEmpty(robotAndDroneList)) {
-            setSubsetMap(robotAndDroneList, subsetKey, TypeEnum.ROBOT.getDesc(), subsetMap);
+        //计算无人机
+        List<Map<String, String>> droneList = cruiseTypeListMap.get(TypeEnum.UAV.getCode());
+        if (CollectionUtils.isNotEmpty(droneList)) {
+            setSubsetMap(droneList, subsetKey, TypeEnum.UAV.getDesc(), subsetMap);
         }
         //计算可见光
         List<Map<String, String>> videoList = cruiseTypeListMap.get(TypeEnum.VIDEO.getCode());
@@ -2444,7 +2448,7 @@ public class UPatrolTaskService {
     }
 
     private void setSubsetMap(List<Map<String, String>> list, String subsetKey, String typeName, Map<String, String> subsetMap) {
-        if (typeName.equals(TypeEnum.ROBOT.getDesc())) {
+        if (typeName.equals(TypeEnum.ROBOT.getDesc()) || typeName.equals(TypeEnum.UAV.getDesc())) {
             Map<String, List<Map<String, String>>> patrolDeviceMap = list.stream().collect(Collectors.groupingBy(p -> p.get("cruiseDeviceName")));
             patrolDeviceMap.forEach((k, v) -> {
                 String value = (String) redisTemplate.opsForHash().get(subsetKey, k);

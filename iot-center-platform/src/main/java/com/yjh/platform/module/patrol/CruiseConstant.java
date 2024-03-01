@@ -278,9 +278,17 @@ public interface CruiseConstant {
          */
         ROBOT_OFFLINE("机器人离线,未执行"),
         /**
+         * 无人机离线,未执行
+         */
+        DRONE_OFFLINE("无人机离线,未执行"),
+        /**
          * 机器人处于检修状态,未执行
          */
         ROBOT_OVERHAUL("机器人处于检修状态,未执行"),
+        /**
+         * 无人机处于检修状态,未执行
+         */
+        DRONE_OVERHAUL("无人机处于检修状态,未执行"),
         /**
          * 设备操作任务中
          */
