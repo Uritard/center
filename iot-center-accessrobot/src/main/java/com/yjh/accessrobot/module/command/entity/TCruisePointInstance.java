@@ -135,6 +135,11 @@ public class TCruisePointInstance implements Serializable {
      */
     private String originId;
 
+    /**
+     * 巡视设备ID
+     */
+    private String cruiseDeviceId;
+
     private Integer pageNum=1;
 
     private Integer pageSize=0;

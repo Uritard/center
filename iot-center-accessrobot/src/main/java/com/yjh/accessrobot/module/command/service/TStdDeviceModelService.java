@@ -109,17 +109,19 @@ public class TStdDeviceModelService {
                             finalDeviceAttrList.add(tStdDeviceAttr);
                         }
 
+                        JSONArray posArray = JSON.parseArray(MapUtils.getString(device, "video_pos"));
                         long cruiseId;
                         int cruiseType;
+                        String cruiseDeviceId;
                         switch (String.valueOf(device.get("data_type"))) {
                             case "1":
                                 //视频
                                 //构建 t_camera_preset
-                                JSONArray cameraArray = JSONArray.parseArray(device.get("video_pos").toString());
-                                String cameraOriginId = JSON.parseObject(cameraArray.get(0).toString()).get("device_code").toString();
+                                String cameraOriginId = posArray.getJSONObject(0).getString("device_code");
                                 TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
-                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, cameraArray, tCameraInfo.getCameraId());
-                                cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
+                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posArray, tCameraInfo.getCameraId());
+                                cruiseDeviceId = String.valueOf(tCameraInfo.getCameraId());
+                                cruiseId = posArray.getJSONObject(0).getLongValue("device_pos");
                                 cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
                                 finalCameraPresetList.add(tCameraPreset);
                                 break;
@@ -127,18 +129,18 @@ public class TStdDeviceModelService {
                             case "4":
                                 //机器人、无人机
                                 //构建 t_robot_inspection
-                                JSONArray robotArray = JSONArray.parseArray(device.get("video_pos").toString());
                                 String keyPos = "2".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
-                                cruiseId = Long.parseLong(JSON.parseObject(robotArray.get(0).toString()).get(keyPos).toString());
+                                cruiseId = posArray.getJSONObject(0).getLongValue(keyPos);
                                 cruiseType = "2".equals(device.get("data_type")) ? 228 : 524;
-                                TRobotInspection tRobotInspection = createRobotInspection(edgeCode, cruiseId, device, tRobotInfoList, robotArray);
+                                TRobotInspection tRobotInspection = createRobotInspection(edgeCode, cruiseId, device, tRobotInfoList, posArray);
+                                cruiseDeviceId = String.valueOf(tRobotInspection.getRobotId());
                                 finalRobotInspectionList.add(tRobotInspection);
                                 break;
                             case "8":
                                 //声纹
-                                JSONArray voiceArray = JSONArray.parseArray(device.get("video_pos").toString());
-                                boolean voiceFlag = JSON.parseObject(voiceArray.get(0).toString()).containsKey("voice_pos");
-                                cruiseId = voiceFlag ? Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("voice_pos").toString()) : Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("device_pos").toString());
+                                boolean voiceFlag = posArray.getJSONObject(0).containsKey("voice_pos");
+                                cruiseId = voiceFlag ? posArray.getJSONObject(0).getLongValue("voice_pos") : posArray.getJSONObject(0).getLongValue("device_pos");
+                                cruiseDeviceId = String.valueOf(cruiseId);
                                 cruiseType = 232;
                                 break;
                             default:
@@ -155,7 +157,7 @@ public class TStdDeviceModelService {
                         }
                         finalStdDeviceMeteList.add(tStdDeviceMete);
                         //构建 t_cruise_point_instance
-                        TCruisePointInstance tCruisePointInstance = createCruisePointInstance(edgeCode, cruiseId, cruiseType, device, tStdDevice, tStdDeviceMete);
+                        TCruisePointInstance tCruisePointInstance = createCruisePointInstance(edgeCode, cruiseId, cruiseType, cruiseDeviceId, device, tStdDevice, tStdDeviceMete);
                         newCruisePointInstances.add(tCruisePointInstance);
 
                     });
@@ -237,7 +239,7 @@ public class TStdDeviceModelService {
      * @param tStdDeviceMete
      * @return
      */
-    private TCruisePointInstance createCruisePointInstance(String edgeCode, long cruiseId, int cruiseType,
+    private TCruisePointInstance createCruisePointInstance(String edgeCode, long cruiseId, int cruiseType, String cruiseDeviceId,
                                                            Map<String, Object> device, TStdDevice tStdDevice,
                                                            TStdDeviceMete tStdDeviceMete) {
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
@@ -251,6 +253,7 @@ public class TStdDeviceModelService {
         tCruisePointInstance.setOriginId(String.valueOf(device.get("device_id")));
         tCruisePointInstance.setEdgeCode(edgeCode);
         tCruisePointInstance.setCruiseType(cruiseType);
+        tCruisePointInstance.setCruiseDeviceId(cruiseDeviceId);
         return tCruisePointInstance;
     }
 
@@ -382,13 +385,13 @@ public class TStdDeviceModelService {
                                              Long cameraId) {
         TCameraPreset tCameraPreset = new TCameraPreset();
         tCameraPreset.setEdgeCode(edgeCode);
-        long cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
+        long cruiseId = MapUtils.getLongValue(device, "preset_id");
         tCameraPreset.setOriginId(String.valueOf(cruiseId));
         tCameraPreset.setCameraId(cameraId);
         tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
                 : String.valueOf(device.get("device_name")));
-        tCameraPreset.setPresetNum(objToInt(device.getOrDefault("preset_num", 1)));
+        tCameraPreset.setPresetNum(cameraArray.getJSONObject(0).getIntValue("device_pos"));
         tCameraPreset.setPresetType(objToInt(device.getOrDefault("preset_type", 1)));
         tCameraPreset.setPresetPtz(String.valueOf(device.getOrDefault("preset_ptz", "")));
 //        tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
@@ -491,8 +494,8 @@ public class TStdDeviceModelService {
      * @return 直接入库的数据
      */
     private List<TRobotInspection> dealRobotInspection(List<TRobotInspection> oldList, List<TRobotInspection> newList, String edgeCode) {
-        Map<String, TRobotInspection> oldMap = oldList.stream().collect(Collectors.toMap(TRobotInspection::getOriginId, Function.identity()));
-        Map<String, TRobotInspection> newMap = newList.stream().collect(Collectors.toMap(TRobotInspection::getOriginId, Function.identity()));
+        Map<String, TRobotInspection> oldMap = oldList.stream().collect(Collectors.toMap(TRobotInspection::getOriginId, Function.identity(), (e1, e2) -> e1));
+        Map<String, TRobotInspection> newMap = newList.stream().collect(Collectors.toMap(TRobotInspection::getOriginId, Function.identity(), (e1, e2) -> e1));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
         if (CollectionUtils.isNotEmpty(updateIdSet)) {
             newList.stream().filter(t ->
@@ -569,8 +572,8 @@ public class TStdDeviceModelService {
                     case 230:
                     case 229:
                         tCruisePointInstance.setCruiseId(insertCameraPresetList.stream().filter(tCameraPreset ->
-                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tCameraPreset.getOriginId()))
-                                .collect(Collectors.toList()).get(0).getPresetId());
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(String.valueOf(tCameraPreset.getPresetNum())) && tCruisePointInstance.getCruiseDeviceId().equals(String.valueOf(tCameraPreset.getCameraId())))
+                            .findFirst().map(TCameraPreset::getPresetId).orElse(null));
                         break;
                     case 228:
                     case 524:
