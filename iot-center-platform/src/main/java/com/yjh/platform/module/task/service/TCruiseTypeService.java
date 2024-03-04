@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.task.entity.TCruiseType;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 
@@ -252,7 +253,13 @@ public class TCruiseTypeService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTypeDetail> select(Integer subType) {
-        return tCruiseTypeDao.select(subType);
+        List<TCruiseTypeDetail> list = tCruiseTypeDao.select(subType);
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
+        return list;
     }
 
     @Transactional(rollbackFor = Exception.class)

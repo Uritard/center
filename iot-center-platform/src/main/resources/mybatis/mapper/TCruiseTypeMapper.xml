@@ -52,14 +52,7 @@
         select
         a.sub_type,
         a.instance_id,
-        (CASE
-        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
-        WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
-        WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
-        WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
-        WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
-        WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
-        END) AS instance_name,
+        h.mete_name AS instance_name,
         (
         CASE
         WHEN b.cruise_type = '228' or b.cruise_type = '524'
@@ -74,19 +67,16 @@
         b.device_id,
         d.device_name,
         h.custom_id,
-        i.dict_note AS custom_name,
         b.cruise_type,
-        e.dict_note AS cruise_type_name
+        h.mete_type
         FROM t_cruise_type a
         JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id
-        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_robot_info j ON f.robot_id = j.robot_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_camera_info k ON g.camera_id = k.camera_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
-        LEFT JOIN t_dict_business i ON i.dict_code = h.custom_id AND i.col_name = "custom_type"
         LEFT JOIN t_voice_device l ON b.cruise_id = l.voice_device_id
         where 1 = 1 and a.remark = 1
         <if test="subType != null"> and a.sub_type = #{subType, jdbcType=INTEGER}</if>
