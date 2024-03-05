@@ -30,5 +30,9 @@ public class TCruiseTypeDetail extends TCruiseType{
     private String cruiseTypeName;
 
     private String cruiseDeviceName;
+
+    private Integer meteType;
+
+    private String meteTypeName;
 }
 
