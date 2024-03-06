@@ -302,21 +302,6 @@ public class SysUserController {
         return result;
     }
 
-    @ApiOperation(value = "根据用户ID查询关联菜单权限")
-    @RequestMapping(value = "/selectRelationMenu", method = RequestMethod.GET)
-    @Logs(title = "根据用户ID查询关联菜单权限", content = "根据用户传递的参数查询角色关联菜单权限", logType = 1)
-    public Result selectRelationMenu(@RequestParam(value = "userId", required = true) Long userId) {
-        Result result = new Result();
-        try {
-            List<String> list = sysUserService.selectRelationMenu(userId);
-            result.setData(list);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询关联菜单权限失败描述：", e);
-        }
-        return result;
-    }
-
     @ApiOperation(value = "根据用户ID查询关联区域设备权限")
     @RequestMapping(value = "/selectRelationAuthor", method = RequestMethod.GET)
     @Logs(title = "根据用户ID查询关联区域设备权限", content = "根据用户传递的参数查询角色关联设备权限", logType = 1)

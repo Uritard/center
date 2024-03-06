@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +31,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -153,7 +153,6 @@ public class SysUserService {
             if (!"1234".equals(userRole)) {
                 //权限不够；
                 throw new BusinessException(10008, "用户无权限");
-                //return -1;
             }
         }
 
@@ -165,7 +164,8 @@ public class SysUserService {
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
         }
-        if (!roleId.equals(sysUserCurrent.getRoleId())) {
+        if (!Objects.equals(roleId, sysUserCurrent.getRoleId())) {
+            sysRoleMenuDao.deleteByUserId(sysUser.getUserId());
             logsRecord.LoginLogsSend(request, "22", "权限修改", userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息(" + Constant.YHJS.get(String.valueOf(sysUserCurrent.getRoleId())) + "修改为" + Constant.YHJS.get(String.valueOf(roleId)) + ")", userName, String.valueOf(userId), 1);
         } else {
             logsRecord.LoginLogsSend(request, "18", "用户修改信息", userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息", userName, String.valueOf(userId), 1);
@@ -453,13 +453,20 @@ public class SysUserService {
         String userName = sysUserLogin.getUserName();
         String appKey = sysUserLogin.getAppkey();
 
-        List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 1);
+        List<String> sysRoleMenuList = sysRoleMenuDao.selectByUserId(sysUserLogin.getUserId(), 1);
+        List<String> subMenuList;
+        if (CollectionUtils.isEmpty(sysRoleMenuList)) {
+            sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 1);
+            subMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 2);
+        } else {
+            subMenuList = sysRoleMenuDao.selectByUserId(sysUserLogin.getUserId(), 2);
+        }
         if (MANAGER_BUILT_IN == sysUserLogin.getUserId()) {
             sysRoleMenuList.add("0600");
+            sysRoleMenuList.add("0601");
             sysRoleMenuList.add("0602");
         }
         sysRoleMenuList = sysRoleMenuList.stream().distinct().collect(Collectors.toList());
-        List<String> subMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId(), 2);
         List<Map<String, String>> menuFirstChildList = sysRoleMenuDao.selectMenuFirstChild();
         Map<String, String> menuFirstChild =
             menuFirstChildList.stream().collect(Collectors.toMap(e -> e.get("code"), e -> e.get("first_child"), (e1, e2) -> e1));
@@ -555,11 +562,6 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public SysOrg selectRelationOrg(Long userId) {
         return this.sysUserDao.selectRelationOrg(userId);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public List<String> selectRelationMenu(Long userId) {
-        return this.sysUserDao.selectRelationMenu(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)

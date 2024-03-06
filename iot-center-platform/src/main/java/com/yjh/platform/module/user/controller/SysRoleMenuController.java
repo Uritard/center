@@ -198,6 +198,40 @@ public class SysRoleMenuController {
         return result;
     }
 
+    @ApiOperation(value = "根据用户ID查询菜单权限信息")
+    @GetMapping(value = "/roleRelationMenu")
+    @Logs(title = "根据用户ID查询对应菜单信息",content = "根据用户ID查询对应菜单信息",logType = 1,authority = "1234")
+    public Result roleRelationMenu(@RequestParam(value = "userId") Long userId) {
+        Result result = new Result();
+        try {
+            Map<String, Object> map = sysRoleMenuService.roleRelationMenu(userId);
+            result.setData(map);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 
+
+    @ApiOperation(value = "修改用户菜单权限")
+    @RequestMapping(value = "/updateUserMenuRight", method = RequestMethod.POST)
+    @Logs(title = "修改用户菜单权限",content = "根据用户传递的参数修改用户菜单", logType = 3, authority = "1234")
+    public Result updateRoleMenuRight(@RequestBody Map<String, Object> req) {
+        Result result = new Result();
+        try {
+            result.setData(sysRoleMenuService.updateRoleMenuRight(req));
+        } catch (BusinessException e) {
+            result.setCode(209,e.getMessage());
+        }catch (Exception e) {
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_sys_role_name") != -1) {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), "业务描述");
+            } else {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
+            }
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 
 }

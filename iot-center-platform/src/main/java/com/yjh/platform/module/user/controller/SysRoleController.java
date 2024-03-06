@@ -226,7 +226,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "修改角色区域设备权限")
     @RequestMapping(value = "/updateRoleDeviceRight", method = RequestMethod.POST)
-    @Logs(title = "修改角色区域设备权限",content = "根据用户传递的参数修改角色区域树的设备权限",logType = 3)
+    @Logs(title = "修改角色区域设备权限",content = "根据用户传递的参数修改角色区域树的设备权限",logType = 3, authority = "1234")
     public Result updateRoleDeviceRight(@RequestBody Map<String, Object> req) {
         Result result = new Result();
         try {
@@ -240,7 +240,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "修改角色菜单权限")
     @RequestMapping(value = "/updateRoleMenuRight", method = RequestMethod.POST)
-    @Logs(title = "修改角色菜单权限",content = "根据用户传递的参数修改角色菜单",logType = 3)
+    @Logs(title = "修改角色菜单权限",content = "根据用户传递的参数修改角色菜单", logType = 3, authority = "1234")
     public Result updateRoleMenuRight(@RequestBody Map<String, Object> req) {
         Result result = new Result();
         try {
@@ -301,8 +301,6 @@ public class SysRoleController {
         }
         return result;
     }
-
-
 
 
 }

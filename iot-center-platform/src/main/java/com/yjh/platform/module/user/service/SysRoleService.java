@@ -1,18 +1,22 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -268,45 +272,38 @@ public class SysRoleService{
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
         List<String> listStringChecked = (List<String>) req.get("checked");
         List<String> listStringHalfChecked = (List<String>) req.get("halfChecked");
-        {
-            //判断角色互斥
-            List<String> listThisHave = new ArrayList<>();
-            listThisHave.addAll(listStringChecked);
-            listThisHave.addAll(listStringHalfChecked);
-            List<MenuForHave> listOtherHave= sysRoleMenuDao.selectOtherRoleHave(roleId);
-            if(listThisHave != null && listThisHave.size()>0){
-                for(MenuForHave item: listOtherHave){
-                    if(listThisHave.contains(item.getMenuCode())){
-                        //本次设置的权限与其他角色的权限重复
-                        throw new BusinessException(209,"菜单："+item.getMenuName()+"与其他角色重复");
-                    }
+
+        //判断角色互斥
+        List<String> listThisHave = menuOverlayCheck(roleId, listStringChecked, listStringHalfChecked);
+
+        // 判断权限范围是否缩小，若缩小则删除用户所属被取消权限
+        List<String> oldRoleMenus = sysRoleMenuDao.selectByRoleId(roleId, null);
+        List<String> removed = ListUtils.removeAll(oldRoleMenus, listThisHave);
+        if (CollectionUtils.isNotEmpty(removed)) {
+            sysRoleMenuDao.deleteMenuCodes(removed);
+        }
+
+        return batchInsertMenu(listStringChecked, listStringHalfChecked, roleId, null);
+    }
+
+    /**
+     * 判断角色互斥
+     */
+    public List<String> menuOverlayCheck(Long roleId, List<String> listStringChecked, List<String> listStringHalfChecked) {
+
+        List<String> listThisHave =
+            CollectionUtils.isEmpty(listStringHalfChecked) ? listStringChecked : ListUtils.sum(listStringChecked, listStringHalfChecked);
+        List<MenuForHave> listOtherHave = sysRoleMenuDao.selectOtherRoleHave(roleId);
+        if (CollectionUtils.isNotEmpty(listOtherHave)) {
+            for (MenuForHave item : listOtherHave) {
+                if (listThisHave.contains(item.getMenuCode())) {
+                    //本次设置的权限与其他角色的权限重复
+                    throw new BusinessException(209, "菜单：" + item.getMenuName() + "与其他角色重复");
                 }
             }
         }
-        sysRoleMenuDao.deleteByRoleId(roleId);
-        List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
-        if (listStringChecked.size()>0) {
-            for (String menuCodeChecked:listStringChecked) {
-                SysRoleMenu sysRoleMenu = new SysRoleMenu();
-                sysRoleMenu.setMenuCode(menuCodeChecked);
-                sysRoleMenu.setRoleId(roleId);
-                sysRoleMenu.setElementCode("checked");
-                sysRoleMenuList.add(sysRoleMenu);
-            }
-        }
-        if (listStringHalfChecked.size()>0) {
-            for (String menuCodeHalfchecked:listStringHalfChecked) {
-                SysRoleMenu sysRoleMenu = new SysRoleMenu();
-                sysRoleMenu.setMenuCode(menuCodeHalfchecked);
-                sysRoleMenu.setRoleId(roleId);
-                sysRoleMenu.setElementCode("halfChecked");
-                sysRoleMenuList.add(sysRoleMenu);
-            }
-        }
-        if (sysRoleMenuList.size()>0) return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
-        return 0;
+        return listThisHave;
     }
-
 
     public List<Long>selectCheckedMonitorDeviceByRole(Long roleId){
         return sysRoleDao.selectMonitorDeviceIdByRoleId(roleId);
@@ -346,6 +343,38 @@ public class SysRoleService{
         return new ArrayList<>();
     }
 
+    public int batchInsertMenu(List<String> listStringChecked, List<String> listStringHalfChecked, Long roleId, Long userId) {
+
+        if (userId != null && userId != -1) {
+            sysRoleMenuDao.deleteByUserId(userId);
+        } else {
+            sysRoleMenuDao.deleteByRoleId(roleId);
+        }
+
+        List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(listStringChecked)) {
+            addRoleMenu(sysRoleMenuList, listStringChecked, "checked", roleId, userId);
+        }
+        if (CollectionUtils.isNotEmpty(listStringHalfChecked)) {
+            addRoleMenu(sysRoleMenuList, listStringHalfChecked, "halfChecked", roleId, userId);
+        }
+        if (!sysRoleMenuList.isEmpty()) {
+            return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
+        }
+        return 0;
+    }
+
+    private static void addRoleMenu(List<SysRoleMenu> sysRoleMenuList, List<String> listStringHalfChecked, String halfChecked, Long roleId,
+        Long userId) {
+        for (String menuCodeHalfchecked : listStringHalfChecked) {
+            SysRoleMenu sysRoleMenu = new SysRoleMenu();
+            sysRoleMenu.setMenuCode(menuCodeHalfchecked);
+            sysRoleMenu.setRoleId(roleId);
+            sysRoleMenu.setElementCode(halfChecked);
+            sysRoleMenu.setUserId(userId);
+            sysRoleMenuList.add(sysRoleMenu);
+        }
+    }
 
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<String> selectRelationMenu(Long roleId) {

@@ -52,6 +52,11 @@ public class SysRoleMenu implements Serializable {
     @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
     private Long roleId;
 
+    @Max(value=999999999999999999L)
+    @ApiModelProperty(value = "用户id")
+    @TableField(value = "user_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long userId;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
