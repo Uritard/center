@@ -5,6 +5,7 @@ import com.yjh.platform.common.annotation.ExcelExtend;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -46,7 +47,7 @@ public class TCameraInfoExcel implements Serializable {
     @ExcelProperty(value = "IP")
     private String cameraIp;
 
-    @ExcelProperty(value = "端口")
+    @ExcelProperty(value = "服务端口")
     private Integer port;
 
     private Integer recordId;
@@ -54,7 +55,7 @@ public class TCameraInfoExcel implements Serializable {
     @ExcelProperty(value = "录像机")
     private String recordName;
 
-    @ExcelProperty(value = "红外测温端口")
+    @ExcelProperty(value = "RTSP端口")
     @ExcelExtend
     private Integer infreadPort;
 
@@ -94,6 +95,9 @@ public class TCameraInfoExcel implements Serializable {
     @ExcelProperty(value = "是否可控")
     @ExcelExtend(require = true, convent = "Str")
     private String isControlStr;
+
+    @ExcelProperty(value = "相机使用类型")
+    private String useTypeStr;
 
     @ExcelProperty(value = "投运时间")
     @ExcelExtend
