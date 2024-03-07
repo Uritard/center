@@ -36,4 +36,11 @@ public interface SysRoleMenuDao {
     List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId);
 
     List<Map<String, String>> selectMenuFirstChild();
+
+    List<SystemMenuTreeNode> selectRoleMenuTree(@Param("parentId")Long parentId, @Param("roleId")Long roleId);
+
+    List<String> selectByUserId(@Param(value = "userId") Long userId, @Param(value = "menuType") Integer menuType);
+    int deleteByUserId(@Param(value = "userId") Long userId);
+
+    int deleteMenuCodes(@Param("codeList") List<String> codeList);
 }

@@ -20,6 +20,19 @@
         <result column="sys_state" jdbcType="INTEGER" property="sysState" />
         <collection property="childrenList" select="selectTreeMenu" column="{parentId=menu_id}"/>
     </resultMap>
+    <resultMap id="roleTreeMap" type="com.yjh.platform.module.user.entity.SystemMenuTreeNode">
+        <id column="menu_id" jdbcType="BIGINT" property="menuId" />
+        <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
+        <result column="up_id" jdbcType="BIGINT" property="upId" />
+        <result column="role_id" jdbcType="BIGINT" property="roleId" />
+        <result column="element_code" jdbcType="VARCHAR" property="elementCode" />
+        <result column="menu_type" jdbcType="INTEGER" property="menuType" />
+        <result column="sys_state" jdbcType="INTEGER" property="sysState" />
+        <result column="belong_role" jdbcType="BIGINT" property="belongRole" />
+        <collection property="childrenList" select="selectRoleMenuTree" column="{parentId=menu_id,roleId=role_id}"/>
+    </resultMap>
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         rp_id, menu_code, sort, element_code, role_id
@@ -66,7 +79,7 @@
 
     <delete id="deleteByRoleId" parameterType="java.lang.Long">
         delete from sys_role_menu
-        where role_id = #{roleId, jdbcType=BIGINT}
+        where user_id is null and role_id = #{roleId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleMenu">
@@ -131,14 +144,16 @@
         menu_code,
         sort,
         element_code,
-        role_id
+        role_id,
+        user_id
         )values
         <foreach item="SysRoleMenu" collection="list" separator=",">
             (#{SysRoleMenu.rpId, jdbcType=BIGINT},
             #{SysRoleMenu.menuCode, jdbcType=VARCHAR},
             #{SysRoleMenu.sort, jdbcType=INTEGER},
             #{SysRoleMenu.elementCode, jdbcType=VARCHAR},
-            #{SysRoleMenu.roleId, jdbcType=BIGINT})
+            #{SysRoleMenu.roleId, jdbcType=BIGINT},
+            #{SysRoleMenu.userId, jdbcType=BIGINT})
         </foreach>
     </insert>
 
@@ -184,4 +199,51 @@
         ORDER BY
         sm.sort
     </select>
+
+    <select id="selectRoleMenuTree" resultMap="roleTreeMap">
+        SELECT
+        sm.menu_id as menu_id,
+        sm.up_id as up_id,
+        sm.menu_code as menu_code,
+        sm.menu_name as menu_name,
+        sr.role_id as role_id,
+        sm.element_code,
+        sm.menu_type,
+        sm.sys_state,
+        sm.role_id as belong_role
+        FROM
+        `sys_menu` sm
+        RIGHT JOIN sys_role_menu sr ON sm.menu_code = sr.menu_code AND sr.user_id is null
+        WHERE
+        sm.state = 1
+        AND sm.up_id = #{parentId,jdbcType=BIGINT} AND sr.role_id = #{roleId, jdbcType=BIGINT}
+        ORDER BY sm.sort, sm.menu_id
+    </select>
+
+
+    <select id="selectByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT a.menu_code
+        FROM
+        sys_role_menu a
+        LEFT JOIN sys_menu sm ON a.menu_code = sm.menu_code
+        WHERE
+        sm.state = 1
+        <if test="userId != null and userId != -1"> AND a.user_id = #{userId, jdbcType=BIGINT}</if>
+        <if test="menuType != null and menuType != -1"> AND sm.menu_type = #{menuType, jdbcType=INTEGER}</if>
+    </select>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete from sys_role_menu
+        where user_id = #{userId, jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteMenuCodes" parameterType="java.lang.Long">
+        delete from sys_role_menu
+        where user_id is not null and menu_code in (
+        <foreach collection="codeList" item="menuCode" separator=",">
+            #{menuCode, jdbcType=VARCHAR}
+        </foreach>
+        )
+    </delete>
+
 </mapper>

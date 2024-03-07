@@ -172,7 +172,7 @@
     </update>
 
     <select id="selectVersion" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.Version">
-        select * from t_version where system_type = #{type, jdbcType=INTEGER}
+        select * from t_version where system_type = #{type, jdbcType=INTEGER} order by create_time desc
     </select>
     <select id="getUsedLogCapacity" resultType="java.lang.Integer">
         SELECT

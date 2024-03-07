@@ -14,5 +14,6 @@ public class SystemMenuTreeNode {
     private String elementCode;
     private int menuType;
     private int sysState;
+    private Long belongRole;
     private List<SystemMenuTreeNode> childrenList;
 }
