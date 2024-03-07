@@ -598,7 +598,8 @@ public class TCameraInfoService {
                 tCameraInfo.setVendorId(t.getVendorId());
                 tCameraInfo.setLongitude(t.getLongitude());
                 tCameraInfo.setLatitude(t.getLatitude());
-                tCameraInfo.setIsControl("云台球机".equals(t.getIsControlStr()) ? 1 : 0);
+                tCameraInfo.setIsControl(t.getIsControl());
+                tCameraInfo.setUseType("监控".equals(t.getUseTypeStr()) ? 2 : 1);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
                 tCameraInfo.setCameraChannelId(t.getCameraChannelId());
                 tCameraInfos.add(tCameraInfo);

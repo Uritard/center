@@ -615,7 +615,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id, camera_channel_id)
+        ,origin_id, camera_channel_id, use_type)
         values
         <foreach collection="list" item="TCameraInfo" separator=",">
             (
@@ -629,7 +629,7 @@
             ,#{TCameraInfo.cameraType,jdbcType=INTEGER},#{TCameraInfo.isControl,jdbcType=INTEGER},#{TCameraInfo.latitude,jdbcType=VARCHAR}
             ,#{TCameraInfo.longitude,jdbcType=VARCHAR},#{TCameraInfo.address,jdbcType=VARCHAR},#{TCameraInfo.unit,jdbcType=VARCHAR}
             ,#{TCameraInfo.createTime,jdbcType=TIMESTAMP},#{TCameraInfo.commissionDate,jdbcType=TIMESTAMP},#{TCameraInfo.edgeCode,jdbcType=VARCHAR}
-            ,#{TCameraInfo.originId,jdbcType=VARCHAR},#{TCameraInfo.cameraChannelId, jdbcType=VARCHAR}
+            ,#{TCameraInfo.originId,jdbcType=VARCHAR},#{TCameraInfo.cameraChannelId, jdbcType=VARCHAR},#{TCameraInfo.useType, jdbcType=INTEGER}
             )
         </foreach>
     </insert>
