@@ -263,7 +263,7 @@ public class MessageThread {
                 List<TCruiseTaskAdd> taskList = new ArrayList<>();
                 // 解析报文 根据device_level转化
                 list.stream().forEach(item -> {
-                    TCruiseTaskAdd tCruiseTaskAdd = buildTaskInfo(item, item.get("device_level").toString(), sendToUpSystemServices, redisTemplate);
+                    TCruiseTaskAdd tCruiseTaskAdd = buildTaskInfo(item, item.get("device_level").toString(), sendToUpSystemServices, redisTemplate, false);
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     log.info("101任务组装好发送platform:{}", tCruiseTaskAdd);
                     taskList.add(tCruiseTaskAdd);
@@ -303,7 +303,7 @@ public class MessageThread {
                 List<TCruiseTaskAdd> taskList = new ArrayList<>();
                 // 解析报文 根据device_level转化
                 list.stream().forEach(item -> {
-                    TCruiseTaskAdd tCruiseTaskAdd = buildTaskInfo(item, item.get("device_level").toString(), sendToUpSystemServices, redisTemplate);
+                    TCruiseTaskAdd tCruiseTaskAdd = buildTaskInfo(item, item.get("device_level").toString(), sendToUpSystemServices, redisTemplate, true);
                     String taskId = item.get("task_code").toString();
                     boolean isRobotFlag = false;
                     boolean isEdgeFlag = false;
@@ -454,9 +454,9 @@ public class MessageThread {
         }
     }
 
-    private static TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String device_level, SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate) {
+    private static TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String device_level, SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate, Boolean isLingAge) {
         String edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
-        TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, false, edgeLevel);
+        TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, isLingAge, edgeLevel);
         String deviceList = item.get("device_list").toString();
         List<String> instanceIds = new ArrayList<>();
         switch (device_level) {
@@ -552,7 +552,9 @@ public class MessageThread {
         }
         String level;
         //联动任务立即执行
+        log.info("linkage:{}", linkage);
         if (linkage) {
+            log.info("配置联动任务立即任务");
             level = (String) redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
