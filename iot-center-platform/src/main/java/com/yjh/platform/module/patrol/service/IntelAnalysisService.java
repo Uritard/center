@@ -83,8 +83,6 @@ public class IntelAnalysisService {
     /**
      * webSocket请求地址
      */
-    @Value("${system.webSocket.url}")
-    private String syncWebsocketUrl;
 
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -622,7 +620,7 @@ public class IntelAnalysisService {
                 jasonMaps.put("path", defectResultRealImg);
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
-                postUrl(syncWebsocketUrl, json);
+                postUrl(Constant.WEBSOCKET_URL, json);
             }catch (Exception e){
                 log.error("算法测试发送websocket异常：", e);
             }
@@ -682,7 +680,7 @@ public class IntelAnalysisService {
                 jasonMaps.put("path", defectResultRealImg);
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
-                postUrl(syncWebsocketUrl, json);
+                postUrl(Constant.WEBSOCKET_URL, json);
             }catch (Exception e){
                 log.info("算法测试发送websocket异常：", e);
             }
@@ -731,7 +729,7 @@ public class IntelAnalysisService {
             log.info("发送给前端的消息：{}", json);
 
             try {
-                postUrl(syncWebsocketUrl, json);
+                postUrl(Constant.WEBSOCKET_URL, json);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
@@ -1361,7 +1359,7 @@ public class IntelAnalysisService {
         String json = JSON.toJSONString(jasonMaps);
         log.info("发送给前端的消息：{}", json);
 
-        postUrl(syncWebsocketUrl, json);
+        postUrl(Constant.WEBSOCKET_URL, json);
     }
 
 }

@@ -10,13 +10,16 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,8 +136,18 @@ public class AnalysisController {
             // 缺陷和判别
             analysis.setAnalyseType(type);
         }
+        // 判别该点为本级系统的点还是下级系统的
+        TCruisePointInstance instance = analyseDataOperateService.selectPointInstance(analysis.getInstanceId());
+        Long presetId = instance.getCruiseid();
+        String presetImgPath = SysParamConfig.getSysContent("presetImgPath");
+        if (StringUtils.isNotEmpty(instance.getEdgeCode())) {
+            String stationId = (String)redisTemplate.opsForHash().get("region:" + instance.getEdgeCode(), "stationId");
+            analysis.setReferenceImage(presetImgPath + "/" + stationId + "/" + presetId + "/" + presetId + ".jpg");
+        } else {
+            analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
+        }
 
-        analysis.setPicModelPath("");
+        analysis.setPicModelPath(SysParamConfig.getSysContent("picModelPath") + "/" + presetId);
         analysis.setIsAi(0);
         List<Analysis> analysisList = new ArrayList<>();
         analysisList.add(analysis);

@@ -37,5 +37,7 @@ public class TCruisePointInstance implements Serializable {
     @ApiModelProperty(value = "设备所属区域")
     private Integer regionId;
 
+    private String originId;
+    private String edgeCode;
 
 }
