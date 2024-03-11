@@ -37,8 +37,6 @@ public class SecondLevelSilentTaskScheduled {
     private TCameraPresetService tCameraPresetService;
     @Autowired
     private ApplicationProperties applicationProperties;
-    @Value("${spring.websocket.send.url}")
-    private String syncWebsocketUrl;
     @Autowired
     private TWarnInfoService tWarnInfoDao;
     @Autowired
@@ -84,7 +82,7 @@ public class SecondLevelSilentTaskScheduled {
 
             log.info("静默数据 ---------------- " + ip + ":" + port);
             HttpAysncClientUtil.HttpAysncInit(user, password);
-            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, applicationProperties, syncWebsocketUrl, tWarnInfoDao,alarmShieldService);
+            SilentAlarmThread silentAlarmThread = new SilentAlarmThread(ip, port, presetId, cameraId, redisTemplate, tCameraPresetService, applicationProperties, tWarnInfoDao,alarmShieldService);
             Thread thread = new Thread(silentAlarmThread);
             thread.setDaemon(true);
             thread.start();

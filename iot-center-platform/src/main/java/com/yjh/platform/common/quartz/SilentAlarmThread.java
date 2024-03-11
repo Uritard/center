@@ -10,12 +10,12 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
-import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -36,7 +36,7 @@ import java.util.*;
  * @author quzhihui
  * @date 2022/8/30 - 14:11
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class SilentAlarmThread implements Runnable {
     private static final int XML = 1;
     private static final int JSON = 2;
@@ -58,7 +58,6 @@ public class SilentAlarmThread implements Runnable {
       private String eventType;
     private String filePath;
     private String eventState;
-    private String syncWebsocketUrl;
 
     /**
      * 调用海康 接口
@@ -85,7 +84,7 @@ public class SilentAlarmThread implements Runnable {
 
     public SilentAlarmThread(String ip, String port, String presetId, String cameraId, RedisTemplate redisTemplate,
                              TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties,
-                             String syncWebsocketUrl,TWarnInfoService tWarnInfoDao,AlarmShieldService alarmShieldService) {
+                             TWarnInfoService tWarnInfoDao,AlarmShieldService alarmShieldService) {
         this.ip = ip;
         this.port = port;
         this.presetId = presetId;
@@ -93,7 +92,6 @@ public class SilentAlarmThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.tCameraPresetService = tCameraPresetService;
         this.applicationProperties = applicationProperties;
-        this.syncWebsocketUrl = syncWebsocketUrl;
         this.tWarnInfoDao=tWarnInfoDao;
         this.alarmShieldService = alarmShieldService;
     }
