@@ -20,7 +20,6 @@ public class HeartBeatJob {
     @Autowired
     private MqttUtilsServer mqttUtilsServer;
 
-    private HeartMessageInfo heartMsg;
     @Autowired
     private ApplicationProperties applicationProperties;
 
@@ -28,12 +27,14 @@ public class HeartBeatJob {
 
     @Scheduled(cron = " */30 * * * * ?")
     public void heartTest() {
-        initMssageInfo();
-        mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttHeartTopic(), heartMsg,1);
+        if (applicationProperties.getManagerMqttConfig().isEnable()) {
+            HeartMessageInfo heartMsg = initMssageInfo();
+            mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttHeartTopic(), heartMsg, 1);
+        }
     }
 
-    private void initMssageInfo() {
-        heartMsg = new HeartMessageInfo();
+    private HeartMessageInfo initMssageInfo() {
+        HeartMessageInfo heartMsg = new HeartMessageInfo();
         heartMsg.setMsgType(HEART);
         heartMsg.setProvinceName(encode(applicationProperties.getManagerMqttConfig().getMqttProvinceName()));
         heartMsg.setCityName(encode(applicationProperties.getManagerMqttConfig().getMqttCityName()));
@@ -43,6 +44,8 @@ public class HeartBeatJob {
         heartMsg.setSectionIp(applicationProperties.getManagerMqttConfig().getMqttSectionIp());
         heartMsg.setNodeId(applicationProperties.getManagerMqttConfig().getMqttNodeId());
         heartMsg.setVoltLevel(applicationProperties.getManagerMqttConfig().getVoltLevel());
+
+        return heartMsg;
     }
 
     private String encode(String str){

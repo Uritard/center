@@ -1513,7 +1513,7 @@ public class UPatrolTaskService {
      * @param state 状态
      */
     private void sendTaskStateToUp(UPatrolTask task, Integer state) {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -1713,7 +1713,7 @@ public class UPatrolTaskService {
         }
 
         // 只有来源为本级系统的删除命令需要上报上级系统
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         if (!Constant.isUpSystem() && StringUtils.equals(Constant.getLevelEdge(), source)) {

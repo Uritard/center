@@ -903,7 +903,7 @@ public class DataDealThread implements Runnable {
 
                 }
 
-                if(reponseMessage != null && !"".equals(reponseMessage) && Constant.managerSystemFlag()){
+                if(reponseMessage != null && !"".equals(reponseMessage) && applicationProperties.getManagerMqttConfig().isEnable()){
                     try{
                         //jeff: 每一次算法返回响应处理结束后，上传告警图片信息并发送告警信息到算法管理平台
                         Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警

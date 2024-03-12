@@ -1,10 +1,5 @@
 package com.yjh.platform.module.patrol.thread;
 
-import cn.hutool.core.comparator.IndexedComparator;
-import cn.hutool.core.compiler.CompilerUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.stream.CollectorUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -12,8 +7,8 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -23,15 +18,9 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
-import com.yjh.platform.module.task.dao.TCruiseTriphaseRuleDao;
-import com.yjh.platform.module.task.entity.TCruiseTriphaseRule;
-import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.keyvalue.MultiKey;
-import org.apache.commons.collections4.*;
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -42,14 +31,11 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -66,6 +52,7 @@ public class NonhomologousWarnThread implements Runnable{
     private final int isResult;
     private final NonhomologousWarnDao nonhomologousWarnDao;
     private final TRobotInspectionDao tRobotInspectionDao;
+    private final ApplicationProperties applicationProperties;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -80,6 +67,7 @@ public class NonhomologousWarnThread implements Runnable{
         this.isResult = isResult;
         this.nonhomologousWarnDao = StaticContextAccessor.getBean(NonhomologousWarnDao.class);
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
+        this.applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
     }
 
     @Override
@@ -764,7 +752,7 @@ public class NonhomologousWarnThread implements Runnable{
 
     private void warnToUpSystem(Map<String,Object> warn, String alarmType, String taskId,
                                 String instanceId){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         try {

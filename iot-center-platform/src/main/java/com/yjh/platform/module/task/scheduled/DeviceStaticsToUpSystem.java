@@ -86,7 +86,7 @@ public class DeviceStaticsToUpSystem {
     }
 
     private void sendInfoToUpSystem(List<Map<String, Object>> infoMaps) {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();

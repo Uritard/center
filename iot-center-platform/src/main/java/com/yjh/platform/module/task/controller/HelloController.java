@@ -12,6 +12,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -297,10 +298,11 @@ public class HelloController {
     TCruiseResultDao tCruiseResultDao;
     @Autowired
     TCruiseTaskResultDao tCruiseTaskResultDao;
-
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return null;
         }
         //任务状态上报站端
@@ -672,7 +674,7 @@ public class HelloController {
     }
 
     private void warnToUpSystem(String warnContent,String warnType,String taskId,String instanceId){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         try {

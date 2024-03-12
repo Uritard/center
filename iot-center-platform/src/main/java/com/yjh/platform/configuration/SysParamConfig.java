@@ -5,6 +5,7 @@
 package com.yjh.platform.configuration;
 
 import cn.hutool.core.io.FileUtil;
+import com.yjh.platform.common.Constant;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -135,6 +136,8 @@ public class SysParamConfig {
         for (Map<String, String> sys : sysParamList) {
             SYS_PARAM_CACHE_MAP.put(sys.get("paramCode"), sys.get("content"));
         }
+
+        Constant.apiPermissions = Boolean.parseBoolean(SYS_PARAM_CACHE_MAP.get("springInterfaceApi"));
     }
 
     public static String getSysContent(String paramCode) {

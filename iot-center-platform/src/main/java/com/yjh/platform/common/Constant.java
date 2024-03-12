@@ -117,8 +117,15 @@ public class Constant {
     public static final String TCP_UPLOAD_FILE = "http://iot-center-accesstcp/sendToUpSystem/v1/uploadFile";
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
+
+    private static boolean upSystemFlag;
+
+    public static void setUpSystem(boolean upSystemFlag) {
+        Constant.upSystemFlag = upSystemFlag;
+    }
+
     public static void modelUpload(String type){
-        if (upSystemFlag()) {
+        if (upSystemFlag) {
             try {
                 Map<String, Object> param = new HashMap<>();
                 param.put("type", type);
@@ -495,7 +502,7 @@ public class Constant {
         }
     };
 
-    public static Boolean apiPermissions=false;
+    public static Boolean apiPermissions = false;
 
 
     public static String filePath;
@@ -622,41 +629,6 @@ public class Constant {
 
     public final static Map<String,Integer> threePhaseMap = new ConcurrentHashMap();
     public final static Map<String,Integer> threePhaseCountMap = new ConcurrentHashMap();
-
-
-    public static String upSystemFlag;
-    /**
-     * 上级系统连接开关 1开 0关
-     * @return
-     */
-    public static boolean upSystemFlag() {
-        if (upSystemFlag == null) {
-            try {
-                upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-                log.info("upSystemFlag is {}", upSystemFlag);
-            } catch (Exception e) {
-                upSystemFlag = "1";
-            }
-        }
-        return "1".equals(upSystemFlag);
-    }
-
-    public static String managerSystemFlag;
-    /**
-     * 算法平台连接开关 1开 0关
-     * @return
-     */
-    public static boolean managerSystemFlag() {
-        if (managerSystemFlag == null) {
-            try {
-                managerSystemFlag = redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag").toString();
-                log.info("algorithmServerFlag is {}", managerSystemFlag);
-            } catch (Exception e) {
-                managerSystemFlag = "1";
-            }
-        }
-        return "1".equals(managerSystemFlag);
-    }
 
     public final static String envKey="EnvDevice:";
 

@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TSysParamDao;
@@ -38,6 +39,8 @@ public class TSysParamService{
     private SysParamConfig sysParamConfig;
     @Autowired
     private TCameraPresetService tCameraPresetService;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -272,7 +275,7 @@ public class TSysParamService{
     }
 
     public void syncCommissioningTimeToUpSystem() {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         String commissioningTime = redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content").toString();

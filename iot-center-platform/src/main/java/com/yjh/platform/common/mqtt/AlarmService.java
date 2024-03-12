@@ -1,20 +1,20 @@
 package com.yjh.platform.common.mqtt;
 
-import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.mqtt.PostMsgBody.PostBodyMsg;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.AlarmMqttMsg;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.configuration.ApplicationProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Component
+@Slf4j
 public class AlarmService {
     public static final String HEART = "heart";
     @Autowired
@@ -53,12 +53,17 @@ public class AlarmService {
      * @param alarm 告警具体内推，再这里根据alarm拼装mqqt的告警消息postBodyMsg
      */
     public void PushMsg(Alarm alarm) {
-        AlarmMqttMsg alarmMqttMsg = getMessgerInfo();
-        System.out.println("cityname---:" + alarmMqttMsg.getCity_name());
-        alarmMqttMsg.addAlarm(alarm);
-        postBodyMsg.setObject(alarmMqttMsg);
+        PushMsg(Collections.singletonList(alarm));
+    }
 
-        mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttTopic(), alarmMqttMsg, 1);
+    public void PushMsg(List<Alarm> alarms) {
+        if (applicationProperties.getManagerMqttConfig().isEnable()) {
+            AlarmMqttMsg alarmMqttMsg = getMessgerInfo();
+            log.info("cityname---: {}", alarmMqttMsg.getCity_name());
+            alarmMqttMsg.addAllAlarm(alarms);
+            postBodyMsg.setObject(alarmMqttMsg);
 
+            mqttUtilsServer.pushMsg(applicationProperties.getManagerMqttConfig().getMqttTopic(), alarmMqttMsg, 2);
+        }
     }
 }

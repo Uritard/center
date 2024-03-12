@@ -2,11 +2,11 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,11 +23,13 @@ public class MeterInfoUpload {
 
     @Autowired
     private TMeterDao tMeterDao;
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     //定时将电表信息上传给上级系统
 //    @Scheduled(cron = "0 */30 * * * ?")
     public void uploadMeteInfo(){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         List<TMeter> meterList = tMeterDao.selectAll();
