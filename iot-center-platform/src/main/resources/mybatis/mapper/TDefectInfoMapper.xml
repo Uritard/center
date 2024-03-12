@@ -143,7 +143,7 @@
         <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
         <if test="defectTime != null ">a.defect_time = #{defectTime, jdbcType=TIMESTAMP},</if>
         <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
-        <if test="defectName != null ">a.defect_name = #{defectName},</if>
+        <if test="defectName != null  and defectName != ''">a.defect_name = #{defectName},</if>
         <if test="defectContent != null">a.defect_content = #{defectContent},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
