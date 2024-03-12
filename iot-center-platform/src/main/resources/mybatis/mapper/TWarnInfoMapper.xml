@@ -910,13 +910,13 @@
         FROM (
               (select count(conf_mode = 275 or null) as processed
                from t_warn_info
-               where warn_time between #{startTime} and #{endTime}) a,
+               where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) a,
               (select count(conf_mode = 275 or null) as processed
                from t_defect_info
                where defect_time between #{startTime} and #{endTime}) b,
               (select count(conf_mode = 276 or null) as untreated
                from t_warn_info
-               where warn_time between #{startTime} and #{endTime}) d,
+               where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) d,
               (select count(conf_mode = 276 or null) as untreated
                from t_defect_info
                where defect_time between #{startTime} and #{endTime}) e
