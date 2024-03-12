@@ -1468,10 +1468,11 @@ group by camera_id
 		t_std_region
 		WHERE
 		region_id IN (
-		SELECT DISTINCT
+		SELECT
 		up_region_id
 		FROM
 		t_iot_device
+		WHERE up_region_id IS NOT NULL
 		)
 		<if test="name != null and name != ''">and region_name like concat('%', #{name}, '%')</if>
 		UNION ALL
@@ -1487,9 +1488,11 @@ group by camera_id
 		cte
 		UNION ALL
 		SELECT
-		up_region_id
+		e.up_region_id
 		FROM
-		t_iot_device
+		t_iot_device e
+		join cte on e.up_region_id = cte.region_id
+		WHERE e.up_region_id IS NOT NULL
 		)
 	</select>
 
