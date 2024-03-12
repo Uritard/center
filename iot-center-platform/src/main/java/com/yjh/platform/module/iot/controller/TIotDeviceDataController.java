@@ -86,7 +86,7 @@ public class TIotDeviceDataController {
 
     @ApiOperation(value = "查询物联设备结果曲线")
     @RequestMapping(value = "/selectIotLine", method = RequestMethod.GET)
-    @Logs(title = "查询物联设备结果曲线", content = "查询物联设备结果曲线", logType = 1)
+    @Logs(title = "查询物联设备结果曲线", content = "查询物联设备结果曲线", logType = 1, authority = "1235")
     public Result selectIotLine(@RequestParam(value = "iotDeviceId") Long iotDeviceId,
                                 @RequestParam(value = "startTime") String startTime,
                                 @RequestParam(value = "endTime") String endTime) {
@@ -105,7 +105,7 @@ public class TIotDeviceDataController {
 
     @ApiOperation(value = "查询物联设备结果")
     @RequestMapping(value = "/selectIotData", method = RequestMethod.GET)
-    @Logs(title = "查询物联设备结果", content = "查询物联设备结果", logType = 1)
+    @Logs(title = "查询物联设备结果", content = "查询物联设备结果", logType = 1, authority = "1235")
     public Result selectIotData(@RequestParam(value = "upRegionId", required = false) Long upRegionId) {
         Result result = new Result();
         try {

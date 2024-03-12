@@ -247,7 +247,7 @@ public class UPatrolDataResultController {
 
     @ApiOperation(value = "根据cameraId分页查询")
     @RequestMapping(value = "/selectByCameraId",method = RequestMethod.GET)
-    @Logs(title = "根据cameraId分页查询",content = "根据cameraId分页查询",logType = 1)
+    @Logs(title = "根据cameraId分页查询",content = "根据cameraId分页查询",logType = 1, authority = "1235")
     public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                    @RequestParam(value = "endDate", required = false) String endDate,
                                    @RequestParam(value = "startDate", required = false) String startDate,

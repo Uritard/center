@@ -42,7 +42,7 @@ public class TMeterController {
 
     @ApiOperation(value = "查询电表信息")
     @RequestMapping(value = "/query", method = RequestMethod.GET)
-    @Logs(title = "查询电表信息", content = "根据用户传递的参数查询电表信息", logType = 2, authority = "1235")
+    @Logs(title = "查询电表信息", content = "根据用户传递的参数查询电表信息", logType = 1, authority = "1234,1235")
     public Result query(@RequestParam(value = "upRegionId", required = false) Long upRegionId,
                         @RequestParam(value = "meterName", required = false) String meterName,
                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -119,7 +119,7 @@ public class TMeterController {
 
     @ApiOperation(value = "电量记录历史")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @Logs(title = "电量记录历史", content = "电量记录历史", logType = 2, authority = "1234")
+    @Logs(title = "查询电量历史记录", content = "根据用户传递的参数查询电量历史记录", logType = 1, authority = "1235")
     public Result list(@RequestBody TMeter tMeter) {
         Result result = new Result();
         try {
