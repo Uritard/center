@@ -1590,7 +1590,7 @@ public class RobotService {
                 map.put("invalid_end_time", Optional.ofNullable(item.getInvalidEndTime()).orElse(""));
                 map.put("isenable", Optional.ofNullable(item.getIsenable()).orElse("0"));
                 map.put("creator", Optional.ofNullable(item.getCreator()).orElse("1"));
-                map.put("create_time", Optional.ofNullable(item.getCreator()).orElse(DateTimeUtil.format(new Date())));
+                map.put("create_time", Optional.ofNullable(item.getCreateTime()).orElse(DateTimeUtil.format(new Date())));
                 mapList.add(map);
                 taskItemMap.put("type", NORMAL_TASK.getType());
                 taskItemMap.put("mapList", mapList);

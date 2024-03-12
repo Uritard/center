@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -49,15 +50,10 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给下级响应
-        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send(operationProtocol, sendCode);
-        log.info("本级系统给下级{}响应了", sendCode);
-
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> nestOperationList = new ArrayList<>();
-        xmlBaseModel.getItems().forEach(res -> {
+
+        for (Map<String, Object> res : xmlBaseModel.getItems()) {
             Map<String, String> nestOperationMap = new HashMap<>(16);
             nestOperationMap.put("nestName", res.get("nest_name").toString());
             nestOperationMap.put("nestCode", res.get("nest_code").toString());
@@ -66,14 +62,53 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
             nestOperationMap.put("value", res.get("value").toString());
             nestOperationMap.put("valueUnit", res.get("value_unit").toString());
             nestOperationMap.put("unit", res.get("unit").toString());
+            if (!unitCheck(nestOperationMap)) {
+                continue;
+            }
             nestOperationList.add(nestOperationMap);
-        });
+        }
+        log.info("nestOperationList: {}", JSON.toJSONString(nestOperationList));
 
-        for (int i = 0; i < nestOperationList.size(); i++) {
-            String nestOperation =  "nestOperation:" + robotCode + ":" + nestOperationList.get(i).get("type");
-            redisTemplate.opsForHash().putAll(nestOperation, nestOperationList.get(i));
+        //完全解析完成的算成功  否则失败 返回 500给下级
+        boolean isFull = xmlBaseModel.getItems().size() == nestOperationList.size();
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send(operationProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
+
+        for (Map<String, String> stringStringMap : nestOperationList) {
+            String nestOperation = "nestOperation:" + robotCode + ":" + stringStringMap.get("type");
+            redisTemplate.opsForHash().putAll(nestOperation, stringStringMap);
             redisTemplate.expire(nestOperation, 7, TimeUnit.DAYS);
         }
+    }
+
+    private static boolean unitCheck(Map<String, String> weatherMap) {
+        String type = weatherMap.get("type");
+        String unit = weatherMap.get("unit");
+        String value = weatherMap.get("value");
+        String valueUnit = weatherMap.get("valueUnit");
+
+        if (StringUtils.isNotBlank(type)) {
+            switch (type) {
+                //电池电量
+                case "1":
+                    return "%".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                //电池电压
+                case "4":
+                    return StringUtils.equalsAnyIgnoreCase(unit, "v", "kv", "伏", "千伏", "伏特") && valueUnit.equals(value + unit);
+                //舱内温度
+                case "5":
+                    return StringUtils.equalsAnyIgnoreCase(unit, "℃", "℉", "摄氏度", "华氏度") && valueUnit.equals(value + unit);
+                //舱内湿度
+                case "6":
+                    return StringUtils.equalsAnyIgnoreCase(unit, "%RH", "%") && valueUnit.equals(value + unit);
+                //其他
+                default:
+                    return false;
+            }
+        }
+        return false;
     }
 
     @Override
