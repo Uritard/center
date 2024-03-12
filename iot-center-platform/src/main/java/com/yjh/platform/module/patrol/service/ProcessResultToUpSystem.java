@@ -187,6 +187,9 @@ public class ProcessResultToUpSystem {
                     if (StringUtils.isNotEmpty(tagPath)){
                         tagPath = "alarm/" + tagPath;
                     }
+                    if (tWarnInfo.getWarnTime() != null){
+                        xmlItem.put("time",DateTimeUtil.format(tWarnInfo.getWarnTime()));
+                    }
                     resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif, edgeCode);
                 }
                 if (Constant.logUpLv3()) {
