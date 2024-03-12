@@ -724,6 +724,7 @@ public class SendToUpSystemServices {
         host.put("use_unit", "亿嘉和");
         host.put("device_source", "亿嘉和");
         host.put("commissioning_time", productionDate);
+        host.put("production_date", productionDate);
         host.put("production_code", "001");
         host.put("istransport", "");
         host.put("use_mode", "");
