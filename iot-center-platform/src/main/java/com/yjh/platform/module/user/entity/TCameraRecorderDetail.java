@@ -25,4 +25,5 @@ public class TCameraRecorderDetail {
     @ApiModelProperty(value = "服务器名称")
     private String recordName;
 
+    private String deviceChannel;
 }
