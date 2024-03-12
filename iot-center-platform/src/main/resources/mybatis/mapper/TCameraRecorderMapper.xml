@@ -224,7 +224,8 @@
     <select id="selectIdAndName"  resultType="com.yjh.platform.module.user.entity.TCameraRecorderDetail">
         select
         a.record_id,
-        a.record_name
+        a.record_name,
+        a.device_channel
         from t_camera_recorder a
     </select>
     <select id="selectRecorderIdByPmsId" resultType="java.lang.Long">

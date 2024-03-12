@@ -12,6 +12,12 @@ import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import com.yjh.platform.module.video.service.CameraConService;
+import com.yjh.video.api.CameraVendor;
+import com.yjh.video.api.entity.RecordEntity;
+import com.yjh.video.api.entity.response.DeviceStatusResp;
+import com.yjh.video.api.result.Result;
+import com.yjh.video.api.service.IRecordService;
+import com.yjh.video.api.service.VideoServiceFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +34,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lqh
@@ -220,16 +227,26 @@ public class SystemInfoService {
     private List<Map<String, Object>> recordInfoList(List<TCameraRecorderDetail> list, boolean needCache) {
         String nvrFreeMin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:nvrFreeMin", "content"));
         List<Map<String, Object>>  reList = new ArrayList<>();
+
+        Map<String, Boolean> deviceStatusRespMap = recordStatus(list);
+
         for (TCameraRecorderDetail item : list) {
             Map<String, Object> map = null;
-            if (needCache) {
-                String jsonStr = (String)redisTemplate.opsForValue().get("recorderInfo:" + item.getRecordId());
-                if (StringUtils.isNotEmpty(jsonStr)) {
-                    map = JSON.parseObject(jsonStr);
+            if (deviceStatusRespMap.getOrDefault(item.getDeviceChannel(), false)) {
+                if (needCache) {
+                    String jsonStr = (String)redisTemplate.opsForValue().get("recorderInfo:" + item.getRecordId());
+                    if (StringUtils.isNotEmpty(jsonStr)) {
+                        map = JSON.parseObject(jsonStr);
+                    }
                 }
-            }
-            if (map == null) {
-                map = cameraConService.getNVRStoreAndChanle(item.getRecordId());
+                if (map == null) {
+                    map = cameraConService.getNVRStoreAndChanle(item.getRecordId());
+                }
+            } else {
+                log.info("NVR 不在线: {}", item);
+                map = new HashMap<>(4);
+                map.put("errorMessage", "录像机不在线");
+                map.put("status", "离线");
             }
 
             if (map.get("freeTotal") != null && map.get("capacityTotal") != null) {
@@ -253,6 +270,24 @@ public class SystemInfoService {
 
         RECORDER_INFO_CACHE.put(RECORDER_KEY, reList);
         return reList;
+    }
+
+    private Map<String, Boolean> recordStatus(List<TCameraRecorderDetail> list) {
+        List<String> deviceList = list.stream().map(TCameraRecorderDetail::getDeviceChannel).collect(Collectors.toList());
+
+        IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
+        RecordEntity build = RecordEntity.builder().deviceIdList(deviceList).build();
+        Result<List<DeviceStatusResp>> deviceStatusRespResult = iRecordService.queryNVRStatus(build);
+
+        Map<String, Boolean> deviceStatusRespMap;
+        if (deviceStatusRespResult.isSuccess()) {
+            List<DeviceStatusResp> deviceStatusRespList = deviceStatusRespResult.getData();
+            deviceStatusRespMap = deviceStatusRespList.stream()
+                .collect(Collectors.toMap(DeviceStatusResp::getDeviceId, DeviceStatusResp::getOnLine, (e1, e2) -> e1));
+        } else {
+            deviceStatusRespMap = Collections.emptyMap();
+        }
+        return deviceStatusRespMap;
     }
 
     public Object getLogsStorageInfo(HttpServletRequest request, Long userId) {
