@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TStdDevice;
@@ -43,6 +44,9 @@ public class TStdDeviceController {
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private TIotDeviceService tIotDeviceService;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
 
     private Logger log = LoggerFactory.getLogger(TStdDeviceController.class);
 
@@ -523,7 +527,7 @@ public class TStdDeviceController {
     @Logs(title = "导出模型文件",content = "导出模型文件",logType = 9)
     public Result downloadModel(@RequestParam(value="type")String type){
         Result result=new Result();
-        if (Constant.upSystemFlag()) {
+        if (applicationProperties.getUpSystemFtps().isEnable()) {
             try{
                 Map<String,Object> map = new HashMap<>();
                 map.put("type",type);

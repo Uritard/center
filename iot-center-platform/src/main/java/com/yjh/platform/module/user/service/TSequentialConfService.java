@@ -314,7 +314,7 @@ public class TSequentialConfService {
     }
 
     public void sequentialRecHandler(Map<String, Object> param, String meteId, List<Map<String, Object>> list) {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         String edgeLevel = Constant.getLevelEdge();

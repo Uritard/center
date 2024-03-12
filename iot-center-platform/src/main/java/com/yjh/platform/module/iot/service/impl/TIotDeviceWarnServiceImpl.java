@@ -6,9 +6,10 @@ import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.module.iot.dao.TIotDeviceWarnMapper;
 import com.yjh.platform.module.iot.entity.TIotDeviceWarn;
 import com.yjh.platform.module.iot.service.TIotDeviceWarnService;
-import com.yjh.platform.module.iot.dao.TIotDeviceWarnMapper;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.TWarnInfoDetail;
 import com.yjh.platform.module.user.dao.AlarmShieldDao;
@@ -37,7 +38,8 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
 
     @Resource
     private TRobotInfoDao tRobotInfoDao;
-
+    @Resource
+    private ApplicationProperties applicationProperties;
     @Resource
     private AlarmShieldDao alarmShieldDao;
 
@@ -154,7 +156,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     public Boolean update(TIotDeviceWarn tIotDeviceWarn) {
         tIotDeviceWarn.setDeleteTime(new Date());
         boolean flag = this.updateById(tIotDeviceWarn);
-        if (flag && Constant.upSystemFlag()) {
+        if (flag && applicationProperties.getUpSystemFtps().isEnable()) {
             ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                 Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
                 TIotDeviceWarn tdw = getBaseMapper().selectById(tIotDeviceWarn.getId());
@@ -182,7 +184,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     }
 
     private void uploadWarn(Map<String, String> iotWarn) {
-        if (Constant.definedExtensions() && Constant.upSystemFlag()) {
+        if (Constant.definedExtensions() && applicationProperties.getUpSystemFtps().isEnable()) {
             ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                 log.info("向上级推送环控告警 {}", iotWarn);
 

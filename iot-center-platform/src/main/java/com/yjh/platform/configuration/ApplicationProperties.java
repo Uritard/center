@@ -86,6 +86,10 @@ public class ApplicationProperties {
         private Integer port;
         private String userName;
         private String password;
+
+        public boolean isEnable() {
+            return "1".equals(flag);
+        }
     }
 
     @Data
@@ -105,6 +109,11 @@ public class ApplicationProperties {
         private String mqttNodeId;
         private Integer voltLevel;
         private String managerServerFtpsRemotePath;
+        private boolean managerSystemFlag;
+
+        public boolean isEnable() {
+            return managerSystemFlag;
+        }
     }
 
     @Data
@@ -170,8 +179,6 @@ public class ApplicationProperties {
     @Accessors(chain = true)
     public static class OtherConfig{
 
-        //接口权限开关
-        private Boolean springInterfaceApi;
         //是否调用调用算法组相机偏移校验功能
         private Boolean cameraPresetSecondCheck;
         //非同源趋势对比支持汉字
@@ -233,12 +240,13 @@ public class ApplicationProperties {
                 .setMqttHeartTopic(redisMap.get("mqttHeartTopic"))
                 .setMqttProvinceName(redisMap.get("mqttProvinceName"))
                 .setMqttCityName(redisMap.get("mqttCityName"))
-                .setMqttStationName(redisMap.get("mqttSectionName"))
+                .setMqttStationName(redisMap.get("mqttStationName"))
                 .setMqttSectionName(redisMap.get("mqttSectionName"))
                 .setMqttSectionIp(redisMap.get("mqttSectionIp"))
                 .setMqttNodeId(redisMap.get("mqttNodeId"))
-                .setVoltLevel(ValueUtil.toInteger(redisMap.get("mqttNodeId"),220))
-                .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"));
+                .setVoltLevel(ValueUtil.toInteger(redisMap.get("voltLevel"),220))
+                .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"))
+                .setManagerSystemFlag("1".equals(redisMap.get("managerSystemFlag")));
         this.managerMqttConfig = managerMqttConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"sequentialConfig");
@@ -259,14 +267,13 @@ public class ApplicationProperties {
         this.audioConfig = audioConfig;
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
-        otherConfig.setSpringInterfaceApi(ValueUtil.toBoolean(redisMap.get("springInterfaceApi"),false))
-                .setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
+        otherConfig.setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
                 .setStationCode((String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
 
-        Constant.apiPermissions= this.getOtherConfig().getSpringInterfaceApi();
         Constant.nonhomologousWarn = this.getOtherConfig().getNonhomologousWarn();
+        Constant.setUpSystem(this.getUpSystemFtps().isEnable());
 
         log.info("系统配置: {}", this);
     }

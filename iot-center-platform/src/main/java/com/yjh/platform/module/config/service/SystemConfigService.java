@@ -145,7 +145,7 @@ public class SystemConfigService {
                         isChange = false;
                         break;
                 }
-                if (isChange && Constant.upSystemFlag()){
+                if (isChange && applicationProperties.getUpSystemFtps().isEnable()){
                     Constant.getToOtherServer(Constant.UPDATE_TCP_CONTENT);
                 }
             }
@@ -197,7 +197,7 @@ public class SystemConfigService {
                 if (updateFlag) {
                     log.info("voiceMqtt 配置已修改：{}",applicationProperties.getAudioConfig());
                     voiceMqtt.shutdown();
-                    voiceMqtt = new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd());
+                    voiceMqtt.resetServer(applicationProperties.getAudioConfig().getAudioMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd(), true);
                 }
             }
         }catch (Exception e){
@@ -228,13 +228,19 @@ public class SystemConfigService {
                             updateFlag = true;
                         }
                         break;
+                    case "managerSystemFlag":
+                        if (applicationProperties.getManagerMqttConfig().isEnable() != ("1".equals(systemConfig.getConfigValue()))) {
+                            applicationProperties.getManagerMqttConfig().setManagerSystemFlag("1".equals(systemConfig.getConfigValue()));
+                            updateFlag = true;
+                        }
+                        break;
                     default:
                         break;
                 }
                 if (updateFlag) {
                     log.info("algorithmMqtt 配置已修改：{}",applicationProperties.getManagerMqttConfig());
                     algorithmMqtt.shutdown();
-                    algorithmMqtt = new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd());
+                    algorithmMqtt.resetServer(applicationProperties.getManagerMqttConfig().getMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd(), applicationProperties.getManagerMqttConfig().isEnable());
                 }
             }
         }catch (Exception e){

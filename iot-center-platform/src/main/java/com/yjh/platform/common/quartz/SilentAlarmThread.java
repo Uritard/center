@@ -499,7 +499,7 @@ public class SilentAlarmThread implements Runnable {
      *
      */
     private void alarmToUpSystem(Map<String, Object> map, TWarnInfo tWarnInfo, String monitorType) {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         if (tWarnInfo != null) {

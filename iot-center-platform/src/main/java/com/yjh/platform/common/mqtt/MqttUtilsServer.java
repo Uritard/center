@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * MQTT服务类
  *
@@ -19,20 +21,36 @@ public class MqttUtilsServer {
     private String serverClientId;
     private String user;
     private String pwd;
+    private boolean enable;
 
     private MqttClient mqttClient;
 
-    public MqttUtilsServer(String host, String serverClientId, String user, String pwd) {
+    public MqttUtilsServer(String host, String serverClientId, String user, String pwd, boolean enable) {
         log.info("start init mqttserver");
         this.host = host;
         this.serverClientId = serverClientId;
         this.user = user;
         this.pwd = pwd;
+        this.enable = enable;
+        initClient(host, serverClientId, user, pwd, false);
+    }
+
+    public void resetServer(String host, String serverClientId, String user, String pwd, boolean enable) {
+        log.info("resetServer init mqttserver");
+        this.host = host;
+        this.serverClientId = serverClientId;
+        this.user = user;
+        this.pwd = pwd;
+        this.enable = enable;
         initClient(host, serverClientId, user, pwd, false);
     }
 
     private void initClient(String host, String serverClientId, String user, String pwd, boolean sync) {
         try {
+            if(!this.enable) {
+                log.warn("mqtt 未启动， {}", host);
+                return;
+            }
             this.mqttClient = new MqttClient(host, serverClientId, new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             options.setCleanSession(false);
@@ -99,7 +117,7 @@ public class MqttUtilsServer {
         message.setQos(qos);
         message.setRetained(true);
         String jsonStr = JSONUtil.toJSONString(msg);
-        byte[] msgBytes = jsonStr.getBytes();
+        byte[] msgBytes = jsonStr.getBytes(StandardCharsets.UTF_8);
         message.setPayload(msgBytes);
         try {
             log.info("发送MQTT消息, 话题:{}, 消息:{},发送给：{}", topic, jsonStr,host);

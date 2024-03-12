@@ -29,12 +29,12 @@ public class MQTTConfig {
 
     @Bean("algorithmMqtt")
     public MqttUtilsServer getAlgorithmMQTTServer() {
-        return new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd());
+        return new MqttUtilsServer(applicationProperties.getManagerMqttConfig().getMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd(), applicationProperties.getManagerMqttConfig().isEnable());
     }
 
     @Bean("voiceMqtt")
     public MqttUtilsServer getVoiceMQTTServer() {
-        return new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd());
+        return new MqttUtilsServer(applicationProperties.getAudioConfig().getAudioMqttHost(), getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd(), true);
     }
 
     /**

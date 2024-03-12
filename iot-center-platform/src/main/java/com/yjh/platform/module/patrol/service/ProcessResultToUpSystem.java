@@ -95,7 +95,7 @@ public class ProcessResultToUpSystem {
      * @param tWarnInfo 告警信息
      */
     public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
-        if (Constant.fastTurbo() || !Constant.upSystemFlag()) {
+        if (Constant.fastTurbo() || !applicationProperties.getUpSystemFtps().isEnable()) {
             // 压测模式，结果不上报上级系统
             return null;
         }
@@ -568,7 +568,7 @@ public class ProcessResultToUpSystem {
         List<String> diffList = DISTING_MAP.remove(msgId);
         // Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
         Long instanceId = MapUtils.getLong(cruiseResultMap, "instanceId");
-        if(CollectionUtils.isNotEmpty(diffList) && Constant.managerSystemFlag()){
+        if(CollectionUtils.isNotEmpty(diffList) && applicationProperties.getManagerMqttConfig().isEnable()){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
@@ -658,7 +658,7 @@ public class ProcessResultToUpSystem {
 //        }
 
         List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
-        if(CollectionUtils.isNotEmpty(defectList) && Constant.managerSystemFlag()) {
+        if(CollectionUtils.isNotEmpty(defectList) && applicationProperties.getManagerMqttConfig().isEnable()) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
@@ -745,7 +745,7 @@ public class ProcessResultToUpSystem {
      */
     @Async
     public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, boolean all){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return null;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -800,7 +800,7 @@ public class ProcessResultToUpSystem {
      */
     @Async
     public void reviewAlarmToUpSystem(List<Long> warnIdList ,boolean defect){
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel();

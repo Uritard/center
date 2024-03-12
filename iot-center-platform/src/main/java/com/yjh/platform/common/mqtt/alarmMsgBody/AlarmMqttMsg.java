@@ -23,4 +23,11 @@ public class AlarmMqttMsg {
         }
         alarm.add(alm);
     }
+
+    public void addAllAlarm(List<Alarm> alms){
+        if(alarm == null){
+            alarm = new ArrayList<>();
+        }
+        alarm.addAll(alms);
+    }
 }

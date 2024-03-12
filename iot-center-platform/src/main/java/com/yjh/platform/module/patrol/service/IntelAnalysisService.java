@@ -30,12 +30,12 @@ import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
-import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -49,7 +49,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -297,7 +296,7 @@ public class IntelAnalysisService {
         log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
         String flagId = response.getRequestId().split("#")[1];
         // 正常的巡视多了接口会阻塞，所以放在线程池
-        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || flagId.contains( "presetCheck")){
+        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666", "presetCheck"}, flagId)){
             picResAnalyse(response);
         }else {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
@@ -571,168 +570,186 @@ public class IntelAnalysisService {
         }
     }
 
-    private void algorithmTestHandle(PicAnalyseResponse response){
+    private void algorithmTestHandle(PicAnalyseResponse response) {
         //判断是缺陷还是判别
-        String analyseType = response.getResultsList().get(0).getResults().get(0).getType();
+        List<AnalyseResult> resultsList = response.getResultsList();
+
         String yearMonth = new SimpleDateFormat("yyyyMM").format(new Date());
         String nowTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
-        if (StringUtils.isEmpty(analyseType)){
+        if (CollectionUtils.isEmpty(resultsList)) {
             log.info("没有识别出来任何缺陷");
             return;
         }
-        // 判别
-        if("tx_pb".equals(analyseType) || Objects.isNull(analyseType)){
+        List<String> meterTypeList = analyseDataOperateDao.selectAlgorithmType();
 
-            String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
-            //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+origpcimagename;
+        List<Alarm> alarms = new ArrayList<>();
+        for (AnalyseResult analyseResult : resultsList) {
+            String objectId = analyseResult.getObjectId();
+            Long instanceId = NumberUtils.toLong(objectId);
+            Map<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
 
-            String resImageUrl = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(),
-                    response.getResultsList().get(0).getResults().get(0).getResImageUrl());
-            log.info("resImageUrl:"+resImageUrl);
+            String bayName = nameMap.getOrDefault("upRegionName", "测试1#主变间隔");
+            String deviceName = nameMap.getOrDefault("deviceName", "测试35kV侧避雷器");
+            String pointName = nameMap.getOrDefault("meteName", "测试泄漏电流表");
 
-            resImageUrl = resImageUrl.replace("//","/");
-            log.info("home路径："+resImageUrl);
+            String imageBaseName = nowTime + "_" + bayName + "_" + deviceName + "_" + pointName + "_";
+            String origpcimagename = imageBaseName + "原图.jpg";
 
-            String imgF = nowTime+"_测试间隔_测试设备_测试测点_判别告警.jpg";
-            //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgF;
+            List<AnalyseResultItem> results = analyseResult.getResults();
+            List<Different> differentList = new ArrayList<>();
+            List<Defect> defectList = new ArrayList<>();
+            Alarm alarmDetail = new Alarm();
 
-            String imgBase =nowTime+ "_测试间隔_测试设备_测试测点_判别基准.jpg";
-            //拼接算法管理平台分析告警结果图片地址
-            String remoteBaseFilePath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgBase;
-
-            //基准图
-            String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(Long.valueOf(response.getResultsList().get(0).getObjectId()));
-            String basePath = imageNormalUrlPath.replaceAll(SysParamConfig.getSysContent("presetRealImgPath"),
-                    SysParamConfig.getSysContent("presetImgPath"))
-                    .replace("//","/");
-            log.info("判别基准："+basePath);
-            Alarm alarmDetail=new Alarm();
-
-            try {
-                String defectResultRealImg = resImageUrl.replaceAll(
-                    SysParamConfig.getSysContent("judgeResultImg"),
-                    SysParamConfig.getSysContent("judgeResultRealImg") + "/");
-                Map<String, Object> jasonMaps = new HashMap<>(16);
-                jasonMaps.put("type", "algorithmTest");
-                jasonMaps.put("path", defectResultRealImg);
-                String json = JSON.toJSONString(jasonMaps);
-                log.info("发送给前端的消息：{}", json);
-                postUrl(Constant.WEBSOCKET_URL, json);
-            }catch (Exception e){
-                log.error("算法测试发送websocket异常：", e);
-            }
-
-            List<Different> differentList=new ArrayList<>();
-            for (AnalyseResultItem item :response.getResultsList().get(0).getResults()){
-                Different different = new Different();
-                different.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
-                different.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
-                different.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
-                different.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
-
-                differentList.add(different);
-            }
-            alarmDetail.setDifferent(differentList);
-            alarmDetail.setBay_name("测试间隔");
-            alarmDetail.setDevice_name("测试设备");
-            alarmDetail.setPoint_name("测试测点");
+            alarmDetail.setBay_name(bayName);
+            alarmDetail.setDevice_name(deviceName);
+            alarmDetail.setPoint_name(pointName);
             alarmDetail.setTime(DateTimeUtil.format(new Date()));
-            //图片原图
-            alarmDetail.setPic_raw(remoteorigfilepath);
-            alarmDetail.setPic_diff_base(remoteBaseFilePath);
-            alarmDetail.setPic_different(remotefilepath);
             alarmDetail.setPic_height(1080);
             alarmDetail.setPic_width(1920);
-            log.info("判别消息：{}",alarmDetail);
 
-            ftpsService.uploadFile("原图",Constant.algorithmTestPicPath,remoteorigfilepath);
-            ftpsService.uploadFile("基准",basePath,remoteBaseFilePath);
-            ftpsService.uploadFile("结果",resImageUrl,remotefilepath);
+            for (AnalyseResultItem item : results) {
+                String analyseType = item.getType();
+                if ("tx_pb".equals(analyseType) || Objects.isNull(analyseType)) {
+                    if ("0".equals(item.getValue())) {
+                        log.info("图像没有差异：{}", item);
+                        break;
+                    }
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    log.info("resImageUrl:{}", resImageUrl);
 
-            alarmService.PushMsg(alarmDetail);
-            log.info("发送算法管理平台结束");
+                    resImageUrl = resImageUrl.replace("//", "/");
+                    log.info("home路径：{}", resImageUrl);
+
+                    String imgF = imageBaseName + "判别告警.jpg";
+                    //拼接算法管理平台分析告警结果图片地址
+                    String remotefilepath =
+                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                            + imgF;
+
+                    String imgBase = imageBaseName + "判别基准.jpg";
+                    //拼接算法管理平台分析告警结果图片地址
+                    String remoteBaseFilePath =
+                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                            + imgBase;
+
+                    //基准图
+                    String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(instanceId);
+                    String basePath = imageNormalUrlPath.replaceAll(SysParamConfig.getSysContent("presetRealImgPath"),
+                        SysParamConfig.getSysContent("presetImgPath")).replace("//", "/");
+                    log.info("判别基准：{}", basePath);
+
+                    String remoteorigfilepath =
+                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                            + origpcimagename;
+
+                    try {
+                        String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("judgeResultImg"),
+                            SysParamConfig.getSysContent("judgeResultRealImg") + "/");
+                        Map<String, Object> jasonMaps = new HashMap<>(16);
+                        jasonMaps.put("type", "algorithmTest");
+                        jasonMaps.put("path", defectResultRealImg);
+                        String json = JSON.toJSONString(jasonMaps);
+                        log.info("发送给前端的消息：{}", json);
+                        postUrl(Constant.WEBSOCKET_URL, json);
+                    } catch (Exception e) {
+                        log.error("算法测试发送websocket异常：", e);
+                    }
+
+                    Different different = new Different();
+                    different.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
+                    different.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
+                    different.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
+                    different.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
+                    differentList.add(different);
+
+                    //图片原图
+                    alarmDetail.setPic_raw(remoteorigfilepath);
+                    alarmDetail.setPic_diff_base(remoteBaseFilePath);
+                    alarmDetail.setPic_different(remotefilepath);
+
+                    ftpsService.uploadFile("原图", Constant.algorithmTestPicPath, remoteorigfilepath);
+                    ftpsService.uploadFile("基准", basePath, remoteBaseFilePath);
+                    ftpsService.uploadFile("结果", resImageUrl, remotefilepath);
+                } else if (!meterTypeList.contains(analyseType)) {
+                    if ("0".equals(item.getValue())) {
+                        log.info("没有缺陷：{}", item);
+                        break;
+                    }
+                    String remoteorigfilepath =
+                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                            + origpcimagename;
+
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    String imgF = imageBaseName + "缺陷告警.jpg";
+                    //拼接算法管理平台分析告警结果图片地址
+                    String remotefilepath =
+                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                            + imgF;
+
+                    try {
+                        String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("defectResultImg") + "/",
+                            SysParamConfig.getSysContent("defectResultRealImg"));
+                        Map<String, Object> jasonMaps = new HashMap<>(16);
+                        jasonMaps.put("type", "algorithmTest");
+                        jasonMaps.put("path", defectResultRealImg);
+                        String json = JSON.toJSONString(jasonMaps);
+                        log.info("发送给前端的消息：{}", json);
+                        postUrl(Constant.WEBSOCKET_URL, json);
+                    } catch (Exception e) {
+                        log.info("算法测试发送websocket异常：", e);
+                    }
+
+                    Defect defect = new Defect();
+                    defect.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
+                    defect.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
+                    defect.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
+                    defect.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
+                    int confidence = (int)(item.getConf() * 100);
+                    defect.setConfidence(confidence);
+                    defect.setDesc(
+                        item.getDesc() + "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + "," + defect.getY2()
+                            + ";" + "置信度 " + confidence + "%)");
+                    defect.setType(item.getType());
+                    defectList.add(defect);
+
+                    //图片原图
+                    alarmDetail.setPic_raw(remoteorigfilepath);
+                    alarmDetail.setPic_defect(remotefilepath);
+
+                    ftpsService.uploadFile("原图", Constant.algorithmTestPicPath, remoteorigfilepath);
+                    ftpsService.uploadFile("结果图", resImageUrl, remotefilepath);
+                } else {
+                    String value = item.getValue();
+                    Map<String, Object> jasonMaps = new HashMap<>(16);
+                    jasonMaps.put("type", "algorithmTest");
+                    jasonMaps.put("value", value);
+                    String json = JSON.toJSONString(jasonMaps);
+                    log.info("发送给前端的消息：{}", json);
+
+                    try {
+                        postUrl(Constant.WEBSOCKET_URL, json);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+            }
+            if (!differentList.isEmpty()) {
+                alarmDetail.setDifferent(differentList);
+            }
+            if (!defectList.isEmpty()) {
+                alarmDetail.setDefect(defectList);
+            }
+
+            log.info("告警管理平台消息：{}", JSON.toJSONString(alarmDetail));
+
+            if (!differentList.isEmpty() || !defectList.isEmpty()) {
+                alarms.add(alarmDetail);
+            }
         }
-        List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(analyseType);
 
-        // 缺陷
-        if (list.isEmpty()){
-
-            String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
-            //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+origpcimagename;
-
-            String resImageUrl = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(),
-                    response.getResultsList().get(0).getResults().get(0).getResImageUrl());
-            String imgF = nowTime +"_测试间隔_测试设备_测试测点_缺陷告警.jpg";
-            //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+imgF;
-
-            Alarm alarmDetail=new Alarm();
-
-            try {
-                String defectResultRealImg = resImageUrl.replaceAll(SysParamConfig.getSysContent("defectResultImg")+"/",
-                    SysParamConfig.getSysContent("defectResultRealImg"));
-                Map<String, Object> jasonMaps = new HashMap<>(16);
-                jasonMaps.put("type", "algorithmTest");
-                jasonMaps.put("path", defectResultRealImg);
-                String json = JSON.toJSONString(jasonMaps);
-                log.info("发送给前端的消息：{}", json);
-                postUrl(Constant.WEBSOCKET_URL, json);
-            }catch (Exception e){
-                log.info("算法测试发送websocket异常：", e);
-            }
-
-            List<Defect> defectList1=new ArrayList<>();
-            for (AnalyseResultItem item :response.getResultsList().get(0).getResults()){
-                Defect defect= new Defect();
-                defect.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
-                defect.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
-                defect.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
-                defect.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
-                int confidence = (int)(item.getConf() * 100);
-                defect.setConfidence(confidence);
-                defect.setDesc(item.getDesc()+"(坐标位置 "+defect.getX1()+","+
-                        defect.getY1()+","+
-                        defect.getX2()+","+
-                        defect.getY2()+";"+
-                        "置信度 "+ confidence
-                        +"%)");
-                defect.setType(item.getType());
-                defectList1.add(defect);
-            }
-            alarmDetail.setDefect(defectList1);
-            alarmDetail.setBay_name("测试间隔");
-            alarmDetail.setDevice_name("测试设备");
-            alarmDetail.setPoint_name("测试测点");
-            alarmDetail.setTime(DateTimeUtil.format(new Date()));
-            //图片原图
-            alarmDetail.setPic_raw(remoteorigfilepath);
-            alarmDetail.setPic_defect(remotefilepath);
-            alarmDetail.setPic_height(1080);
-            alarmDetail.setPic_width(1920);
-            log.info("缺陷测试消息：{}",alarmDetail);
-
-            ftpsService.uploadFile("原图", Constant.algorithmTestPicPath,remoteorigfilepath);
-            ftpsService.uploadFile("结果图",resImageUrl,remotefilepath);
-
-            alarmService.PushMsg(alarmDetail);
-            log.info("发送算法管理平台结束");
-        }else {
-            String value = response.getResultsList().get(0).getResults().get(0).getValue();
-            Map<String, Object> jasonMaps = new HashMap<>(16);
-            jasonMaps.put("type", "algorithmTest");
-            jasonMaps.put("value", value);
-            String json = JSON.toJSONString(jasonMaps);
-            log.info("发送给前端的消息：{}", json);
-
-            try {
-                postUrl(Constant.WEBSOCKET_URL, json);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+        if (!alarms.isEmpty()) {
+            alarmService.PushMsg(alarms);
         }
     }
 
@@ -1099,7 +1116,7 @@ public class IntelAnalysisService {
      * @param tWarnInfoList 告警数据
      */
     private void alarmToUpSystem(Map<String, Object> map, List<TWarnInfo> tWarnInfoList) {
-        if (!Constant.upSystemFlag()) {
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
         String edgeCode = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content");

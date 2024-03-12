@@ -190,7 +190,7 @@ public class Constant {
      */
     public static boolean apiPermissions() {
         try {
-            apiPermissions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:otherConfig", "springInterfaceApi"));
+            apiPermissions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:springInterfaceApi", "content"));
             log.warn("apiPermissions is {}", apiPermissions);
         } catch (Exception e) {
             apiPermissions = false;
