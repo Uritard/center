@@ -754,7 +754,7 @@ select *from (
         b.dict_note as type,
         COUNT(1) AS count
         FROM t_robot_info a
-        LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code AND b.col_name = 'robot_type'
+        LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code OR a.drone_type = b.dict_code
         WHERE 1=1 and is_use = 166
         <if test="list!=null and list.size>0">
             and a.up_region_id IN

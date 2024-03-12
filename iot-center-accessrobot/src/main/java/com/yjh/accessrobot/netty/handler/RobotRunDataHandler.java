@@ -56,17 +56,13 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
 
         if ("1".equals(onlineStatus)) {
             // 给下级响应
-            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(sendCode));
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(false, sendCode));
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, sendCode);
             log.info("本级系统给下级{}响应了", sendCode);
             return;
         }
-        // 给下级响应
-        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send(operationProtocol, sendCode);
-        log.info("本级系统给下级{}响应了", sendCode);
+
 
         List<Map<String, String>> robotOperationList = new ArrayList<>();
 
@@ -86,15 +82,22 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             robotOperationMap.put("valueUnit", res.get("value_unit").toString());
             robotOperationMap.put("unit", res.get("unit").toString());
             if (!unitCheck(robotOperationMap)) {
-                break;
+                continue;
             }
             robotOperationList.add(robotOperationMap);
         }
         log.info("robotOperationList: {}", JSON.toJSONString(robotOperationList));
 
-        for (int i = 0; i < robotOperationList.size(); i++) {
-            String robotOperation = "RobotOperation:" + robotCode + ":" + robotOperationList.get(i).get("type");
-            redisTemplate.opsForHash().putAll(robotOperation, robotOperationList.get(i));
+        //完全解析完成的算成功  否则失败 返回 500给下级
+        boolean isFull = xmlBaseModel.getItems().size() == robotOperationList.size();
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send(operationProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
+
+        for (Map<String, String> stringStringMap : robotOperationList) {
+            String robotOperation = "RobotOperation:" + robotCode + ":" + stringStringMap.get("type");
+            redisTemplate.opsForHash().putAll(robotOperation, stringStringMap);
             redisTemplate.expire(robotOperation, 7, TimeUnit.DAYS);
         }
     }
@@ -114,37 +117,30 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             switch (type) {
                 //水平速度
                 case "1":
+                //垂直速度
+                case "4":
                     return StringUtils.equalsAnyIgnoreCase(unit, "m/s", "cm/s", "米/秒", "厘米/秒") && valueUnit.equals(value + unit);
                 //行驶里程
                 case "2":
+                //飞行距离
+                case "5":
+                //飞行高度
+                case "6":
                     return StringUtils.equalsAnyIgnoreCase(unit, "km", "m", "cm", "千米", "米", "厘米") && valueUnit.equals(value + unit);
                 //电池电量
                 case "3":
                     return "%".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
-                //垂直速度
-                case "4":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "m/s", "cm/s", "米/秒", "厘米/秒") && valueUnit.equals(value + unit);
-                //飞行距离
-                case "5":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "km", "m", "cm", "千米", "米", "厘米") && valueUnit.equals(value + unit);
-                //飞行高度
-                case "6":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "m", "cm", "米", "厘米") && valueUnit.equals(value + unit);
                 //飞行时长
                 case "7":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "h", "m", "min", "小时", "分钟") && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "h", "m", "min", "s", "小时", "分钟", "秒") && valueUnit.equals(value + unit);
                 //云台俯仰角
                 case "8":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
-                //云台俯仰角
                 case "9":
-                    return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
-                //云台俯仰角
                 case "10":
                     return StringUtils.equalsAnyIgnoreCase(unit, "°", "度") && valueUnit.equals(value + unit);
-                //云台俯仰角
+                //充电电流
                 case "11":
-                    return "A".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
+                    return StringUtils.equalsAnyIgnoreCase(unit, "A", "mA") && valueUnit.equals(value + unit);
                 //其他
                 default:
                     return false;

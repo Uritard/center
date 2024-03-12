@@ -95,7 +95,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
         log.info("下级的状态数据是：" + robotStatusList);
         if (!changeOnline && "1".equals(onlineStatus)) {
             // 给下级响应
-            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(sendCode));
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(false, sendCode));
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, sendCode);
             log.info("本级系统给下级{}响应了", sendCode);

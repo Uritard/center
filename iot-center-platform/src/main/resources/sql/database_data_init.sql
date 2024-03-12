@@ -508,7 +508,7 @@ INSERT INTO `t_dict_business` VALUES ('300175', '291', 'device_type', '干式电
 INSERT INTO `t_dict_business` VALUES ('300176', '292', 'device_type', '串联补偿装置', '11', '设备类型', '27');
 INSERT INTO `t_dict_business` VALUES ('300177', '293', 'device_type', '母线及绝缘子', '12', '设备类型', '26');
 INSERT INTO `t_dict_business` VALUES ('300178', '294', 'device_type', '穿墙套管', '13', '设备类型', '7');
-INSERT INTO `t_dict_business` VALUES ('300179', '295', 'device_type', '电力电缆', '0', '设备类型', '8');
+INSERT INTO `t_dict_business` VALUES ('300179', '295', 'device_type', '电力电缆', '31', '设备类型', '8');
 INSERT INTO `t_dict_business` VALUES ('300180', '296', 'device_type', '消弧线圈', '14', '设备类型', '9');
 INSERT INTO `t_dict_business` VALUES ('300181', '297', 'device_type', '高频阻波器', '15', '设备类型', '19');
 INSERT INTO `t_dict_business` VALUES ('300182', '298', 'device_type', '耦合电容器', '16', '设备类型', '20');

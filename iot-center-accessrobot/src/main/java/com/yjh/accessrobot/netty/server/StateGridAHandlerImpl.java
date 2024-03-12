@@ -129,7 +129,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         } catch (Exception e) {
             log.error("处理机器人响应消息错误:", e);
             String responseMsgXmlString = PlatformXMLUtil.generateXml(
-                    RobotServerHandler.sendMessageForCommandThree(false, xmlBaseModel.getSendCode()));
+                    RobotServerHandler.sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
             byte[] responseMsgProtocol = PlatformPacketUtil
                     .createPacket(Constant.sendSessionId, sendSessionId, false, responseMsgXmlString);
             RobotServerHandler.send(responseMsgProtocol, xmlBaseModel.getSendCode());

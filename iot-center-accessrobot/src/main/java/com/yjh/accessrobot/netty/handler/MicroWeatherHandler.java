@@ -63,17 +63,12 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         String onlineStatus = String.valueOf(redisTemplate.opsForValue().get("onlineStatus:"+ robotCode));
         if ("1".equals(onlineStatus)) {
             // 给下级响应
-            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThreeFlase(sendCode));
+            String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(false, sendCode));
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, sendCode);
             log.info("本级系统给下级{}响应了", sendCode);
             return;
         }
-
-        String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
-        RobotServerHandler.send(weatherProtocol, sendCode);
-        log.info("本级系统给下级{}响应了", sendCode);
 
         List<Map<String, String>> weatherList = new ArrayList<>();
         Map<String, String> info = new HashMap<>();
@@ -91,47 +86,34 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             weatherMap.put("unit", MapUtils.getString(res,"unit"));
             weatherMap.put("value", MapUtils.getString(res,"value"));
             weatherMap.put("valueUnit", MapUtils.getString(res,"value_unit"));
-
+            if (!unitCheck(weatherMap)) {
+                continue;
+            }
             weatherList.add(weatherMap);
             // 2022过检 环境类型修改
             // 1:环境温度 2:环境湿度 3:=风速 4:=雨量 5:=风向 6:=气压 7:=氧气 8:=SF6
             String weatherType = weatherMap.get("type");
             if ("1".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("temperature", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("temperatureUnit", "℃");
                 info.put("temperatureUnit",weatherMap.get("unit"));
             }
             if ("2".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("humidity", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("humidityUnit", "%");
                 info.put("humidityUnit", weatherMap.get("unit"));
             }
             if ("3".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("windSpeed", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("windSpeedUnit", "m/s");
                 info.put("windSpeedUnit", weatherMap.get("unit"));
             }
             if ("4".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("precipitation", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("precipitationUnit", "mm");
                 info.put("precipitationUnit", weatherMap.get("unit"));
             }
             if ("5".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 if ("".equals(weatherMap.get("value")) || null == weatherMap.get("value")) {
                     info.put("windDirection", "--");
                 } else {
@@ -140,25 +122,16 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 // info.put("precipitationUnit","mm");
             }
             if ("6".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("airPressure", decimalFormat.format(NumberUtils.toDouble(weatherMap.get("value"))));
 //                    info.put("airPressureUnit", "kPa");
                 info.put("airPressureUnit", weatherMap.get("unit"));
             }
             if ("7".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("oxygen", weatherMap.get("value"));
 //                    info.put("oxygenUnit", "ppm");
                 info.put("oxygenUnit", weatherMap.get("unit"));
             }
             if ("8".equals(weatherType)) {
-                if (!unitCheck(weatherMap)) {
-                    return;
-                }
                 info.put("sf6", weatherMap.get("value"));
                 info.put("sf6Unit", weatherMap.get("unit"));
             }
@@ -235,10 +208,16 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             platformProxy.insertEnvData(envDeviceStatusList);
         }
 
+        //完全解析完成的算成功  否则失败 返回 500给下级
+        boolean isFull = xmlBaseModel.getItems().size() == weatherList.size();
+        String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
+        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
+        RobotServerHandler.send(weatherProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
-        for (int i = 0; i < weatherList.size(); i++) {
-            String robotWeather = "RobotWeather:" + robotCode + ":" + weatherList.get(i).get("type");
-            redisTemplate.opsForHash().putAll(robotWeather, weatherList.get(i));
+        for (Map<String, String> stringStringMap : weatherList) {
+            String robotWeather = "RobotWeather:" + robotCode + ":" + stringStringMap.get("type");
+            redisTemplate.opsForHash().putAll(robotWeather, stringStringMap);
             redisTemplate.expire(robotWeather, 7, TimeUnit.DAYS);
         }
         System.out.println("微气象数据测试一波++++++++" + info);
