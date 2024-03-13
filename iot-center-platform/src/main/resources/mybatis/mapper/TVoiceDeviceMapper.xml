@@ -421,4 +421,8 @@
         )
         )
     </select>
+
+    <select id="selectHaveIns" resultType="java.lang.Long">
+        select instance_id from t_cruise_point_instance where cruise_id = #{voiceDeviceId}
+    </select>
 </mapper>
