@@ -23,10 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -79,15 +76,15 @@ public class TMeterService {
         //正向有功 采集值
         tMeter.setTotalPositivePower(getMeterRealNum(tMeter.getTotalPositivePower(), 1, flag, 1));
         //正向有功 耗电量
-        tMeter.setTotalPositivePowerLast(getMeterRealNum(log.getTotalPositivePowerDifferenceValue(), mc, flag, 1));
+        tMeter.setTotalPositivePowerLast(getMeterRealNum(Objects.nonNull(log) ? log.getTotalPositivePowerDifferenceValue() : "", mc, flag, 1));
         //正向无功 采集值
         tMeter.setTotalPositiveReactivePower(getMeterRealNum(tMeter.getTotalPositiveReactivePower(), 1, flag, 2));
         //正向无功 耗电量
-        tMeter.setTotalPositiveReactivePowerLast(getMeterRealNum(log.getTotalPositiveReactivePowerDifferenceValue(), mc, flag, 2));
+        tMeter.setTotalPositiveReactivePowerLast(getMeterRealNum(Objects.nonNull(log) ? log.getTotalPositiveReactivePowerDifferenceValue() : "", mc, flag, 2));
         //反向无功 采集值
         tMeter.setTotalNegativePositivePower(getMeterRealNum(tMeter.getTotalNegativePositivePower(), 1, flag, 2));
         //反向无功 耗电量
-        tMeter.setTotalNegativePositivePowerLast(getMeterRealNum(log.getTotalNegativePositivePowerDifferenceValue(), mc, flag, 2));
+        tMeter.setTotalNegativePositivePowerLast(getMeterRealNum(Objects.nonNull(log) ? log.getTotalNegativePositivePowerDifferenceValue() : "", mc, flag, 2));
     }
     /**
      *
