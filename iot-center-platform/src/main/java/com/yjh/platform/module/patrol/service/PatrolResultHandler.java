@@ -1177,6 +1177,7 @@ public class PatrolResultHandler {
             tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
             tDefectInfo.setDefectTime(DateTimeUtil.parse(defectMap.get("defectTime")));
             tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+            tDefectInfo.setDefectName(defectMap.get("defectContent"));
             tDefectInfo.setDefectContent(defectMap.get("defectContent"));
             tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
             tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));
