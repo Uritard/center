@@ -62,6 +62,12 @@ public class TCfgDataCurrentService {
     private CameraConService cameraConService;
 
     public static String meteValues(String commintValue){
+        if("合位".equals(commintValue)){
+            return "1";
+        }
+        if("分位".equals(commintValue)){
+            return "0";
+        }
         if("返回".equals(commintValue)){
             return "1";
         }
@@ -261,7 +267,7 @@ public class TCfgDataCurrentService {
                         log.error(e.getMessage(), e);
                     }
 
-                    if (StringUtils.equals("false", sum)) {
+                    if (!StringUtils.equalsIgnoreCase("true", sum)) {
                         log.info("不满足触发条件");
                         break;
                     }

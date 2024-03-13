@@ -143,7 +143,12 @@ public class SendToUpSystemController {
     public Result modelUpload(@RequestParam(value = "type") String type) {
         Result result = new Result();
         try {
-           sendToUpSystemService.creatFile(type);
+            String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+            if (!"1".equals(flag)) {
+                sendToUpSystemService.creatFile(type);
+            } else {
+                log.error("上级系统连接开关为空或者没开！{}",flag);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);
