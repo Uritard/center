@@ -3,6 +3,7 @@ package com.yjh.platform.module.video.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.video.convert.CameraPlayLogConverter;
@@ -42,6 +43,7 @@ public class CameraPlayLogController {
 
     @ApiOperation(value = "查询播放记录")
     @RequestMapping(value = "/queryCameraPlayLogForPage", method = RequestMethod.POST)
+    @Logs(title = "查询相机播放记录", content = "根据用户传递的参数查询相机播放记录列表", logType = 1, authority = "1235")
     public Result queryCameraPlayLogForPage(@RequestBody CameraPlayLogVO cameraPlayLogVO) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();

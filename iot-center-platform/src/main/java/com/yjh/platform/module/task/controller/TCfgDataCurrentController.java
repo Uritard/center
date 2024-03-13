@@ -137,7 +137,7 @@ public class TCfgDataCurrentController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询实时数据",content = "根据用户传递的参数分页查询实时数据",logType = 1)
+    @Logs(title = "查询实时数据",content = "根据用户传递的参数分页查询实时数据",logType = 1, authority = "1235")
     public Result selectByPage(@RequestParam(value = "meteName",required = false) String meteName,
                                @RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
                                @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,

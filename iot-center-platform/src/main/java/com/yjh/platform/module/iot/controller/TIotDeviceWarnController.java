@@ -117,7 +117,7 @@ public class TIotDeviceWarnController {
 
     @ApiOperation(value = "查询物联设备告警")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询物联设备告警", content = "查询物联设备告警", logType = 1, authority = "1234")
+    @Logs(title = "查询物联设备告警", content = "查询物联设备告警", logType = 1, authority = "1235")
     public Result select(@RequestParam(value = "pointName", required = false) String pointName,
                          @RequestParam(value = "startTime", required = false) String startTime,
                          @RequestParam(value = "endTime", required = false) String endTime,
