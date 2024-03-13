@@ -32,7 +32,7 @@ public class SourceFileThread implements Runnable{
         String path = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
         FileUtil.createDirectory(path);
         String fileName = "source_file_model.cime";
-        File file = new File(path + fileName);
+        File file = new File(path, fileName);
         try (FileWriter fileWriter = new FileWriter(file); BufferedWriter out = new BufferedWriter(fileWriter)){
             out.write(data);
             out.flush();

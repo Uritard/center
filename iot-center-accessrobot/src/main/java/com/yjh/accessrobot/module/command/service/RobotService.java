@@ -2974,14 +2974,12 @@ public class RobotService {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
             reader.close();
             String data = stringBuilder.toString();
-            String regex = "\\#.*?(是|否)";
+            String regex = "\\#.*?(是|否|不是)";
             Matcher matcher = Pattern.compile(regex).matcher(data);
             List<SYAllInfo> list = new LinkedList<>();
             while (matcher.find()) {
                 String str = matcher.group();
-                str = str.replaceAll("\\t", " ");
-
-                String[] strArray = str.split("\\s+");
+                String[] strArray = str.split(" *\\t *");
                 if ("".equals(strArray[0])) {
                     strArray = Arrays.copyOfRange(strArray, 1, strArray.length);
                 }

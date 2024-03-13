@@ -297,22 +297,17 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 //设备资源信息配置文件生成与上传
                 SourceFileThread sourceFileThread = new SourceFileThread(data, redisTemplate);
                 TaskExecutePool.getInstance().execute(sourceFileThread);
-                String regex;
-                if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
-                    regex ="\\#.*?(是|否)";
-                }else {
-                    regex = "\\#.*?(是|不是)";
-                }
+                String regex = "\\#.*?(是|否|不是)";
                 Matcher matcher = Pattern.compile(regex).matcher(data);
                 List<SYAllInfo> list = new LinkedList<>();
                 while (matcher.find()){
                     String str = matcher.group();
-                    str = str.replaceAll("\\t"," ");
+                    // str = str.replaceAll("\\t"," ");
 
-                    String[]strArray = str.split("\\s+");
-                    if("".equals(strArray[0])){
+                    String[] strArray = str.split(" *\\t *");
+                    /*if("".equals(strArray[0])){
                         strArray= Arrays.copyOfRange(strArray,1,strArray.length);
-                    }
+                    }*/
                     //取数据
                     SYAllInfo syAllInfo = new SYAllInfo();
                     syAllInfo.setStationId(strArray[1]);

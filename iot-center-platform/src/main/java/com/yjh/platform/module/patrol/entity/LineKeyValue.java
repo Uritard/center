@@ -63,7 +63,11 @@ public class LineKeyValue<K, V> extends AbstractKeyValue<K, V> {
         return (getKey() == null ? 0 : getKey().hashCode());
     }
 
-    public static <K, V> AbstractKeyValue<K, V> parse(String stringValue, Class<K> keyClass, Class<V> valClass) {
+    public static <K, V> LineKeyValue<K, V> of(K key, V value) {
+        return new LineKeyValue<>(key, value);
+    }
+
+    public static <K, V> LineKeyValue<K, V> parse(String stringValue, Class<K> keyClass, Class<V> valClass) {
         String key = stringValue;
         String value = null;
         if (StringUtils.contains(stringValue, "=")) {

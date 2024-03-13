@@ -2,10 +2,13 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -34,6 +38,8 @@ public class TUnionTaskService{
     private TUnionTaskAttrDao TUnionTaskAttrDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     private Logger log = LoggerFactory.getLogger(TUnionTaskService.class);
 
@@ -159,15 +165,30 @@ public class TUnionTaskService{
 
         log.info("linkageCruiseDevice: {}", JSON.toJSONString(list));
 
+        Map<Long, TRobotInfo> allRobot = null;
+
         LinkageInformation info = TUnionTaskAttrDao.linkageInformation(taskId);
+        Set<LineKeyValue<String, String>> cruiseDeviceSet = new LinkedHashSet<>();
         for (Map<String, Object> li : list) {
             if (li.get("camera_id") != null) {
+                String cameraId = MapUtils.getString(li, "camera_id");
+                String cameraName = (String) redisTemplate.opsForHash().get("camera_info:" + cameraId, "cameraName");
+                cruiseDeviceSet.add(LineKeyValue.of(cameraId, cameraName));
                 info.setTaskCameraId(MapUtils.getLongValue(li, "camera_id"));
             }
             if (li.get("robot_id") != null) {
-                info.setTaskRobotId(MapUtils.getLongValue(li, "robot_id"));
+                if (allRobot == null) {
+                    allRobot = tRobotInfoDao.selectAll();
+                }
+                Long robotId = MapUtils.getLong(li, "robot_id");
+                String robotName = Optional.ofNullable(allRobot.get(robotId)).map(TRobotInfo::getRobotName).orElse("机器人视频");
+                cruiseDeviceSet.add(LineKeyValue.of(robotId+"9901", robotName));
+                info.setTaskRobotId(robotId);
             }
         }
+        Map<String, String> taskCameras = cruiseDeviceSet.stream()
+            .collect(Collectors.toMap(LineKeyValue::getKey, LineKeyValue::getValue, (u, v) -> u, LinkedHashMap::new));
+        info.setTaskCameras(taskCameras);
 
         return info;
     }
