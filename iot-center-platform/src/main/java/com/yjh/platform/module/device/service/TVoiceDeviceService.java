@@ -86,6 +86,10 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long voiceDeviceId) {
+        List<Long> insList = tVoiceDeviceDao.selectHaveIns(voiceDeviceId);
+        if (!insList.isEmpty()){
+           throw new BusinessException("该声纹设备已绑定巡视点！");
+        }
         VoiceDeviceAllInfoDetail voiceDeviceInfoDetail = this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
         this.tVoiceDeviceDao.deleteConf(voiceDeviceInfoDetail.getConfigId());
         String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);

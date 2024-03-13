@@ -57,4 +57,6 @@ public interface TVoiceDeviceDao {
     List<VoiceDevice> getTreeByName(@Param(value = "deviceList") List<VoiceDeviceAllInfo> deviceList,
                                     @Param(value = "regionList") List<Long> regionList);
 
+    List<Long> selectHaveIns(@Param(value = "voiceDeviceId") Long voiceDeviceId);
+
 }
