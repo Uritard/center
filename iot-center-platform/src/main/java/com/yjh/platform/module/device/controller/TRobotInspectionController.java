@@ -269,7 +269,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人树")
     @RequestMapping(value = "/robotTree", method = RequestMethod.GET)
-    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235,1237")
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235,1234")
     public Result robotTree(@RequestParam(value = "robotType", required = false) Integer robotType,
                             HttpServletRequest request) {
         Result result = new Result();
