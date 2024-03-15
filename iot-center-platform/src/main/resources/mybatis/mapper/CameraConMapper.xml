@@ -184,6 +184,8 @@
     <select id="selectByRecordId" parameterType="java.lang.Long"
             resultType="com.yjh.platform.module.video.entity.RecorderConInfo">
         select a.record_id,
+               a.edge_code,
+               a.origin_id,
                a.record_name,
                a.record_ip,
                a.protocol,

@@ -119,12 +119,12 @@
         select
             a.*
         from u_patrol_task a
-        LEFT JOIN u_patrol_result b ON a.task_id = b.task_id
+        RIGHT JOIN u_patrol_result b ON a.task_id = b.task_id
         where a.task_code = #{taskCode}
         <if test="executeTime != null">
         and a.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
         </if>
-        order by a.start_time desc
+        order by a.start_time desc, a.create_time desc
             limit 1
     </select>
 

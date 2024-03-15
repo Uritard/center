@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author YC
@@ -69,5 +69,5 @@ public class LinkageInformation {
     private long taskRobotId;
 
     @ApiModelProperty(value = "巡视相机，包括高清相机和机器人")
-    private Map<String, String> taskCameras;
+    private List<?> taskCameras;
 }
