@@ -156,7 +156,7 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
                     ResultMete mete = new ResultMete();
                     mete.setIotDeviceId(point.getIotDeviceId())
                         .setChannle(item.getPIndex())
-                        .setValue(item.getTextValue())
+                        .setValue(StringUtils.defaultIfEmpty(item.getTextValue(), item.getStatus()))
                         .setStatus(item.getStatus());
                     resultMeteList.add(mete);
                 }

@@ -159,7 +159,7 @@ public enum TcpServerManager {
 
     }
 
-    private static class MessageHandler implements Runnable {
+    private class MessageHandler implements Runnable {
 
         private final ChannelHandlerContext ctx;
         private final ServerListener listener;
@@ -175,6 +175,8 @@ public enum TcpServerManager {
         @Override
         public void run() {
             String result = listener.dispatch(ctx, message);
+
+            LOGGER.info("返回报文: {}", result);
             ctx.channel().writeAndFlush(result);
         }
     }

@@ -12,6 +12,7 @@ import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.logs.SpringBeanUtils;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
+import com.yjh.accessmeter.protocol.entity.EnvBase;
 import com.yjh.accessmeter.protocol.entity.EnvData;
 import com.yjh.accessmeter.protocol.entity.EnvResult;
 import com.yjh.accessmeter.protocol.entity.EnvWarn;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,31 +83,36 @@ public class SensorListenerService {
                 Document document = DocumentHelper.parseText(message);
 
                 Element rootElt = document.getRootElement();
-                EnvWarn envWarn = XmlUtil.parseObject(rootElt, EnvWarn.class);
-                result.setType(envWarn.getType()).setMsgType(envWarn.getMsgType()).setStationId(envWarn.getStationId());
+                EnvBase envBase = XmlUtil.parseObject(rootElt, EnvBase.class);
+                List<EnvWarn> warnList = XmlUtil.parseArray(rootElt, EnvWarn.class);
+                result.setType(envBase.getType()).setMsgType(envBase.getMsgType()).setStationId(envBase.getStationId());
 
                 InetSocketAddress inetSocketAddress = (InetSocketAddress)ctx.channel().remoteAddress();
 
                 String ip = inetSocketAddress.getHostName();
-                String pindex = envWarn.getPIndex();
 
-                Map<String, String> envWarnMap = new HashMap<>(8);
-                String now = DateUtil.now();
-                envWarnMap.put("deviceIp", ip);
-                envWarnMap.put("time", now);
-                String warnType = envWarn.getWarningType();
-                String value = systemManagerService.getWarnName(warnType);
-                envWarnMap.put("value", value);
-                envWarnMap.put("valueType", warnType);
-                envWarnMap.put("type", warnType);
-                envWarnMap.put("warnLevel", envWarn.getWaringLevel());
-                envWarnMap.put("sn", envWarn.getMsgId());
-                envWarnMap.put("device_num", pindex);
-                envWarnMap.put("type_device_num", pindex);
-                envWarnMap.put("alarmTime", now);
+                for (EnvWarn warn : warnList) {
+                    Map<String, String> envWarnMap = new HashMap<>(8);
 
-                log.info("收到告警信息: {}", JSON.toJSONString(envWarnMap));
-                platformProxy.uploadIotWarn(envWarnMap);
+                    String pindex = warn.getPIndex();
+                    String now = DateUtil.now();
+                    envWarnMap.put("deviceIp", ip);
+                    envWarnMap.put("time", now);
+                    String warnType = warn.getWarningType();
+                    String value = systemManagerService.getWarnName(warnType);
+                    envWarnMap.put("value", value);
+                    envWarnMap.put("valueType", warnType);
+                    envWarnMap.put("type", warnType);
+                    envWarnMap.put("warnLevel", warn.getWaringLevel());
+                    envWarnMap.put("sn", warn.getMsgId());
+                    envWarnMap.put("device_num", pindex);
+                    envWarnMap.put("type_device_num", pindex);
+                    envWarnMap.put("alarmTime", now);
+
+                    log.info("收到告警信息: {}", JSON.toJSONString(envWarnMap));
+                    platformProxy.uploadIotWarn(envWarnMap);
+                }
+
                 result.setValue("1");
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
