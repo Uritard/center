@@ -205,7 +205,6 @@ public class TUnionTaskService{
             if (!redisInfoMap.isEmpty()){
                 if (Objects.nonNull(redisInfoMap.get("cruiseResult")) &&
                         ("246".equals(redisInfoMap.get("cruiseResult")) || "247".equals(redisInfoMap.get("cruiseResult")))){
-                    log.info("redisInfoMap==={}", redisInfoMap);
                     lmd.setResultDesc(redisInfoMap.get("resultDesc"));
                     lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
 //                    lmd.setEndTime(redisInfoMap.get("endTime"));

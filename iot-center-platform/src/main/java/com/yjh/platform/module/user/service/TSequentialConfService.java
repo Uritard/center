@@ -58,10 +58,10 @@ public class TSequentialConfService {
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TSequentialConf tSequentialConf) {
-        List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
-        if (CollectionUtils.isNotEmpty(cameraIdList) && cameraIdList.contains(tSequentialConf.getCameraId())) {
-            return -1;
-        }
+//        List<Long> cameraIdList = tSequentialConfDao.selectCameraId();
+//        if (CollectionUtils.isNotEmpty(cameraIdList) && cameraIdList.contains(tSequentialConf.getCameraId())) {
+//            return -1;
+//        }
         tSequentialConf.setCfgMeteId(tSequentialConf.getCfgDeviceId());
         if (tSequentialConfDao.selectByPrimaryId(tSequentialConf.getCfgDeviceId()) != null) {
             return tSequentialConfDao.update(tSequentialConf);
@@ -275,17 +275,17 @@ public class TSequentialConfService {
 
         Map<String, Object> param = new HashMap<>(4);
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
+        String absPath = "absPath";
         if (StringUtils.equals("true", flag)) {
             // 收到变位信号停止录视频
             try {
-                String filePath;
                 //等3s再停止录像
                 Thread.sleep(3000);
-                filePath = cameraConService.stopRecord(ValueUtil.toLong(list.get(0).get("cameraId")));
-                log.info("视频结果: {}", filePath);
-                if (StringUtils.isNotEmpty(filePath)) {
-                    param.put("picPath", filePath);
+                Map<String, String> record = cameraConService.stopRecord(ValueUtil.toLong(list.get(0).get("cameraId")));
+                if (Objects.nonNull(record) && record.containsKey(absPath) && StringUtils.isNotEmpty(record.get(absPath))) {
+                    param.put("picPath", record.get(absPath));
                     param.put("fileType", "4");
+                    log.info("视频结果: {}", record.get(absPath));
                 } else {
                     throw new BusinessException("一键顺控-变位信号-录像地址为空");
                 }
@@ -297,8 +297,8 @@ public class TSequentialConfService {
             try {
                 Thread.sleep(1000);
                 Map<String, String> re = cameraConService.capturePicture("sequence", null, NumberUtils.toLong(String.valueOf(list.get(0).get("cameraId"))), null);
-                if (StringUtils.isEmpty(re.get("absPath"))) {
-                    param.put("picPath", re.get("absPath"));
+                if (StringUtils.isEmpty(re.get(absPath))) {
+                    param.put("picPath", re.get(absPath));
                     param.put("fileType", "2");
                 } else {
                     throw new BusinessException("一键顺控-变位信号-抓图地址为空");
