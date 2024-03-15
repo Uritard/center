@@ -5,6 +5,7 @@
 package com.yjh.accessmeter.common.utils;
 
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +18,7 @@ import org.dom4j.io.XMLWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -67,6 +65,46 @@ public class XmlUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> List<T> parseArray(Element root, Class<T> cls) {
+
+        List<T> list = new ArrayList<>();
+        try {
+            Map<String, Field> fieldMap = ReflectUtil.getFieldMap(cls);
+
+            T instance = cls.newInstance();
+            for (Element ele : root.elements()) {
+                String name = ele.getName();
+                Field field = fieldMap.get(name);
+                if (field == null) {
+                    continue;
+                }
+                String text = ele.getText();
+                if (List.class.isAssignableFrom(field.getType())) {
+                    // 获取字段的泛型信息
+                    Class<?> listGenericType = getListClass(field);
+                    List<Object> objList = (List)ReflectUtil.getFieldValue(instance, field);
+                    if (objList == null) {
+                        objList = new ArrayList<>();
+                        ReflectUtil.setFieldValue(instance, field, objList);
+                    }
+                    Object child = parseChildObj(ele, listGenericType, text);
+                    objList.add(child);
+                } else {
+                    Object val = ReflectUtil.getFieldValue(instance, field);
+                    if (Objects.nonNull(val)) {
+                        list.add(instance);
+                        instance = cls.newInstance();
+                    }
+                    ReflectUtil.setFieldValue(instance, field, text);
+                }
+            }
+            list.add(instance);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return list;
     }
 
     /**
@@ -138,7 +176,7 @@ public class XmlUtil {
             for (Field f : fields) {
                 String name = f.getName();
                 Object v = ReflectUtil.getFieldValue(obj, f);
-                if (v == null) {
+                if (v == null || ModifierUtil.hasModifier(f, ModifierUtil.ModifierType.FINAL, ModifierUtil.ModifierType.STATIC)) {
                     continue;
                 }
                 if (v instanceof List) {

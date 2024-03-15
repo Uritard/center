@@ -258,11 +258,13 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 }
             });
 
-            iotDeviceDataUpload(dataList);
         } catch (Exception e) {
             log.info("data:{}",dataList);
             log.error(e.getMessage(), e);
         }
+
+        iotDeviceDataUpload(dataList);
+
         return true;
     }
 
@@ -290,7 +292,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 item.put("value", tIotDeviceData.getValue());
                 item.put("unit", tIotDeviceData.getUnit());
                 item.put("upRegionId", tIotDeviceData.getUpRegionId());
-                item.put("createTime", DateTimeUtil.format(new Date()));
+                item.put("createTime", DateTimeUtil.format(tIotDeviceData.getCreateTime()));
                 item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
                 item.put("channelNum", tIotDeviceData.getChannelNum());
                 item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());

@@ -1,11 +1,15 @@
 package com.yjh.platform.module.iot.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @Author: lqh
  * @Date: 2023/12/19
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class IotDeviceDataEx extends TIotDeviceData{
 
