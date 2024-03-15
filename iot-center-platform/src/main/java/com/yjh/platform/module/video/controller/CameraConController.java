@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author tt
@@ -684,10 +685,10 @@ public class CameraConController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            String path = cameraConService.stopRecord(cameraId);
-            log.info("service返回值："+path + ";" + userId);
-            if(null!=path) {
-                result.setData(path);
+            Map<String, String> record = cameraConService.stopRecord(cameraId);
+            if(Objects.nonNull(record) && record.containsKey("filePath")) {
+                log.info("service返回值："+ record.get("filePath") + ";" + userId);
+                result.setData(record.get("filePath"));
             } else {
                 result.setData("结束录制失败");
             }

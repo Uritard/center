@@ -1960,10 +1960,10 @@ public class CameraConService {
      *
      * @param cameraId 摄像头id
      */
-    public String stopRecord(long cameraId) throws Exception{
+    public Map<String, String> stopRecord(long cameraId) throws Exception{
         if ( !recordCameraMap.contains(cameraId)){
             log.info("相机：{}没有开始录制，不用结束！",cameraId);
-            return "";
+            return null;
         }
         String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
         String videoRealPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoRealPath", "content"));
@@ -1995,9 +1995,10 @@ public class CameraConService {
         }
         Map<String, String> jasonMap = new HashMap<>(3);
         jasonMap.put("type", "recordFilePath");
-        jasonMap.put("filePath", videoRealPath+result.getData().getRecordUrl());
+        jasonMap.put("filePath", videoRealPath + result.getData().getRecordUrl());
+        jasonMap.put("absPath", videoPath + result.getData().getRecordUrl());
         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-        return videoRealPath+result.getData().getRecordUrl();
+        return jasonMap;
     }
 
     public List<Map<String, Object>> robotStartRealPlayAll() {
