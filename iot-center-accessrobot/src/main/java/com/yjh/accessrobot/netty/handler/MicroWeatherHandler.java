@@ -230,6 +230,11 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         MessageHandlerStrategyFactory.register(HandlerEnum.MICRO_WEATHER_DATA.getCode(), this);
     }
 
+    /**
+     * 只校验type=1~8的
+     * @param weatherMap
+     * @return
+     */
     private static boolean unitCheck(Map<String,String> weatherMap) {
         String type = weatherMap.get("type");
         String unit = weatherMap.get("unit");
@@ -264,10 +269,10 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     return "ppm".equalsIgnoreCase(unit) && valueUnit.equals(value + unit);
                 //其他
                 default:
-                    return false;
+                    return true;
             }
 
         }
-        return false;
+        return true;
     }
 }
