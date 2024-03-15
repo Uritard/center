@@ -63,4 +63,9 @@ public class RecorderConInfo implements Serializable {
     @ApiModelProperty(value = "设备ID")
     private String deviceChannel;
 
+    @ApiModelProperty(value = "节点编码")
+    private String edgeCode;
+
+    @ApiModelProperty(value = "原始ID")
+    private String originId;
 }

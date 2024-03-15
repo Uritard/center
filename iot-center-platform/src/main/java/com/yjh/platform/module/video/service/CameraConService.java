@@ -1050,13 +1050,20 @@ public class CameraConService {
             return channleStatusMap;
         }
 
-        RecordFileEntity entity =
+        RecordFileEntity.Builder entityBuilder =
             RecordFileEntity.builder().ip(conInfo.getRecordIp()).port(conInfo.getHttpPort()).deviceId(conInfo.getDeviceChannel())
-                .userName(conInfo.getIdentityManager()).password(conInfo.getIdentityCode()).build();
+                .userName(conInfo.getIdentityManager()).password(conInfo.getIdentityCode());
 
         IRecordService recordService = VideoServiceFactory.loadSnapService(cameraVendor(conInfo.getVendorId()), IRecordService.class);
         try {
-            Result<List<RecordInfo>> listResult = recordService.recordAllFiles(entity);
+            List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
+            String cameraChannels = cameraConInfoMap.stream()
+                .filter(cameraStatusInfo -> StringUtils.isNotEmpty(cameraStatusInfo.getDeviceChannel()))
+                .map(CameraStatusInfo::getDeviceChannel)
+                .collect(Collectors.joining());
+            entityBuilder.channelIds(cameraChannels);
+
+            Result<List<RecordInfo>> listResult = recordService.recordAllFiles(entityBuilder.build());
 
             if (listResult.isSuccess()) {
                 BaseEntity baseEntity =
@@ -1081,7 +1088,7 @@ public class CameraConService {
                 log.error("获取存储文件失败: {}", JSON.toJSONString(listResult));
             }
         } catch (Exception e) {
-            log.error("获取NVR信息失败：{}", entity, e);
+            log.error("获取NVR信息失败：{}", entityBuilder.build(), e);
         }
         channleStatusMap.put("errorMessage", "录像机不在线");
         channleStatusMap.put("status", "离线");
@@ -1134,7 +1141,12 @@ public class CameraConService {
         long timeRecord = 0L;
         long timeDefect = 0L;
         Date preEndTime = null;
+        boolean first = true;
         for (RecordItem item : itemList) {
+            if (first) {
+                chanInfoMap.put("channel", item.getDeviceId());
+                chanInfoMap.put("chanName", item.getName());
+            }
             Date startTime = DateTimeUtil.parse(item.getStartTime());
             Date endTime = DateTimeUtil.parse(item.getEndTime());
 
@@ -1220,6 +1232,11 @@ public class CameraConService {
 
                 // 查询通道信息
                 List<RecordItem> chanInfoList = recordInfo.getData().getRecordList();
+                long max = chanInfoList.stream().mapToLong(item->{
+                    long duration = DateTimeUtil.parse(item.getEndTime(), new Date()).getTime() - DateTimeUtil.parse(item.getStartTime(), new Date()).getTime();
+                    item.setDuration(duration);
+                    return duration;
+                }).max().orElse(60*60*1000L);
                 for (RecordItem item : chanInfoList) {
                     Map<String, String> map = Maps.newHashMap();
                     map.put("fileName", item.getFilePath());
@@ -1227,7 +1244,8 @@ public class CameraConService {
                     map.put("endTime", item.getEndTime());
                     String size = item.getFileSize();
                     if (StringUtils.isEmpty(size)) {
-                        size = "1013M";
+                        int t = (int)(Math.min((double)item.getDuration() /max * 1.25, 1.0) * 1013);
+                        size = t + "M";
                     } else if(NumberUtils.isCreatable(size)){
                         size = CommonUtils.fileSpace(NumberUtils.toLong(size));
                     }

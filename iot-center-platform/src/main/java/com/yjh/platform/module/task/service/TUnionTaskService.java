@@ -186,9 +186,9 @@ public class TUnionTaskService{
                 info.setTaskRobotId(robotId);
             }
         }
-        Map<String, String> taskCameras = cruiseDeviceSet.stream()
-            .collect(Collectors.toMap(LineKeyValue::getKey, LineKeyValue::getValue, (u, v) -> u, LinkedHashMap::new));
-        info.setTaskCameras(taskCameras);
+
+        List<LineKeyValue<String, String>> l = new ArrayList<>(cruiseDeviceSet);
+        info.setTaskCameras(l);
 
         return info;
     }
