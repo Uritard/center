@@ -598,7 +598,7 @@ public class TCameraInfoService {
                 tCameraInfo.setVendorId(t.getVendorId());
                 tCameraInfo.setLongitude(t.getLongitude());
                 tCameraInfo.setLatitude(t.getLatitude());
-                tCameraInfo.setIsControl(t.getIsControl());
+                tCameraInfo.setIsControl("枪机".equals(t.getIsControlStr()) ? 0 : 1);
                 tCameraInfo.setUseType("监控".equals(t.getUseTypeStr()) ? 2 : 1);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
                 tCameraInfo.setCameraChannelId(t.getCameraChannelId());

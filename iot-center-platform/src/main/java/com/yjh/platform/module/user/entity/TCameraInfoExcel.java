@@ -97,6 +97,7 @@ public class TCameraInfoExcel implements Serializable {
     private String isControlStr;
 
     @ExcelProperty(value = "相机使用类型")
+    @ExcelExtend
     private String useTypeStr;
 
     @ExcelProperty(value = "投运时间")

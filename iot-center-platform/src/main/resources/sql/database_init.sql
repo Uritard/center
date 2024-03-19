@@ -385,6 +385,7 @@ CREATE TABLE `sys_role_menu` (
   `sort` int(9) DEFAULT '1' COMMENT '菜单排序',
   `element_code` varchar(255) DEFAULT '' COMMENT '元素编码列表',
   `role_id` bigint(20) DEFAULT '1' COMMENT '角色id',
+  `user_id` bigint(20) NULL COMMENT '用户id',
   PRIMARY KEY (`rp_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=210000 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色菜单表';
 
