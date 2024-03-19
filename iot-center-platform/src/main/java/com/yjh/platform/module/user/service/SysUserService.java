@@ -467,7 +467,10 @@ public class SysUserService {
             sysRoleMenuList.add("0602");
         }
         sysRoleMenuList = sysRoleMenuList.stream().distinct().collect(Collectors.toList());
-        List<Map<String, String>> menuFirstChildList = sysRoleMenuDao.selectMenuFirstChild();
+        List<Map<String, String>> menuFirstChildList = sysRoleMenuDao.selectMenuFirstChild(sysUserLogin.getUserId());
+        if (CollectionUtils.isEmpty(menuFirstChildList)) {
+            menuFirstChildList = sysRoleMenuDao.selectMenuFirstChild(null);
+        }
         Map<String, String> menuFirstChild =
             menuFirstChildList.stream().collect(Collectors.toMap(e -> e.get("code"), e -> e.get("first_child"), (e1, e2) -> e1));
         SysUserSelect sysUserSelect = new SysUserSelect();

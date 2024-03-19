@@ -35,7 +35,7 @@ public interface SysRoleMenuDao {
     List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
     List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId);
 
-    List<Map<String, String>> selectMenuFirstChild();
+    List<Map<String, String>> selectMenuFirstChild(@Param(value = "userId") Long userId);
 
     List<SystemMenuTreeNode> selectRoleMenuTree(@Param("parentId")Long parentId, @Param("roleId")Long roleId);
 

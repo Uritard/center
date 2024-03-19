@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,6 +57,8 @@ public enum TcpShortManager {
             bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
                      // .option(ChannelOption.SO_KEEPALIVE, false)
                      // .option(ChannelOption.TCP_NODELAY, true)
+                     // .option(ChannelOption.SO_TIMEOUT, 5000)
+                     .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 15000)
                      .handler(new EnvTerminalClientChannelInitializer());
 
         } catch (Exception e) {
@@ -75,12 +78,13 @@ public enum TcpShortManager {
     }
 
     public String sendAndGet(String msgXml, IotDevice device) {
-        LOGGER.info("报文发送: {}", msgXml);
         String response = null;
         try {
             Channel channel = connect(device).channel();
             ChannelFuture future = null;
 
+            SocketAddress remoteAdds = channel.remoteAddress();
+            LOGGER.info("channel: {} 报文发送: {}", remoteAdds, msgXml);
             synchronized (channel) {
                 future = channel.writeAndFlush(msgXml);
                 channel.wait(3500);
@@ -88,7 +92,7 @@ public enum TcpShortManager {
             future.channel().closeFuture().sync();
 
             response = future.channel().attr(TcpShortManager.RESPONSE_KEY).get();
-            LOGGER.info("收到报文: {}", response);
+            LOGGER.info("channel: {} 收到报文: {}", remoteAdds, response);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -117,7 +121,7 @@ public enum TcpShortManager {
                     return;
                 }
 
-                LOGGER.info("收到返回消息: {}", buffer);
+                LOGGER.info("收到返回消息[{}]: {}", ctx.channel().remoteAddress(), buffer);
                 Channel channel = ctx.channel();
                 channel.attr(RESPONSE_KEY).set(buffer.toString());
                 buffer = new StringBuffer();
@@ -149,9 +153,9 @@ public enum TcpShortManager {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             //channel在线处理，都会触发这个方法
-            String remoteAdds = ctx.channel().remoteAddress().toString();
+            // String remoteAdds = ctx.channel().remoteAddress().toString();
 
-            LOGGER.info("客户端注册成功: {}", remoteAdds);
+            LOGGER.info("客户端注册成功: {}", ctx.channel());
         }
 
         @Override

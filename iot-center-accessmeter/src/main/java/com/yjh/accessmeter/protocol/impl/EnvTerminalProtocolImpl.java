@@ -5,7 +5,6 @@
 package com.yjh.accessmeter.protocol.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.accessmeter.common.Constant;
 import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
@@ -19,22 +18,19 @@ import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.ProtocolListener;
 import com.yjh.accessmeter.protocol.ProtocolType;
 import com.yjh.accessmeter.protocol.entity.*;
-import com.yjh.accessmeter.protocol.impl.transport.ServerListener;
-import com.yjh.accessmeter.protocol.impl.transport.TcpServerManager;
 import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
 import io.netty.channel.ChannelFuture;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <功能描述>
@@ -55,33 +51,37 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
 
     @Override
     public ISensorProtocol init(List<IotDevice> devices) {
-
+        inited = true;
         try {
             initServerBind();
 
             TcpShortManager shortManager = TcpShortManager.INSTANSE;
 
-            devices.forEach(d -> {
-                try {
-                    ChannelFuture future = shortManager.connect(d);
-                    future.channel().closeFuture().sync();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            });
-
+            devices.stream()
+                .collect(Collectors.toMap(d -> d.getIp() + d.getPort(), Function.identity(), (d1, d2) -> d1))
+                .forEach((k, v) -> {
+                    try {
+                        ChannelFuture future = shortManager.connect(v);
+                        future.channel().closeFuture().sync();
+                        LOGGER.info("初始化成功: {}", v);
+                    } catch (Exception e) {
+                        Thread.currentThread().interrupt();
+                        LOGGER.error("初始化异常 {}", v, e);
+                    }
+                });
         } catch (Exception e) {
             LOGGER.error("初始化异常", e);
         }
-        inited = true;
         return this;
     }
 
-    public void initServerBind() {
+    public synchronized void initServerBind() {
         try {
-            SensorListenerService listenerService = SpringBeanUtils.getBean(SensorListenerService.class);
-            if (listenerService != null && serverFuture == null) {
-                serverFuture = listenerService.initServerBind();
+            if (serverFuture == null) {
+                SensorListenerService listenerService = SpringBeanUtils.getBean(SensorListenerService.class);
+                if (listenerService != null) {
+                    serverFuture = listenerService.initServerBind();
+                }
             }
         } catch (Exception e) {
             LOGGER.error("绑定端口失败", e);
