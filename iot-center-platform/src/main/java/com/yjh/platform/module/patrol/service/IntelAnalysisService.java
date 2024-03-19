@@ -358,7 +358,7 @@ public class IntelAnalysisService {
                 boolean flag = StringUtils.equals("398", algorithmType)
                         && !generateMapFormat().isEmpty()
                         && generateMapFormat().containsKey(devicePointId);
-                if (Boolean.TRUE.equals(flag) && falseDataCruiseList.isEmpty()){
+                if (Boolean.TRUE.equals(flag)){
                     AnalysePatrolTaskResult taskResult = new AnalysePatrolTaskResult();
                     taskResult.setTaskId(taskId);
                     taskResult.setInstanceId(instanceId);
