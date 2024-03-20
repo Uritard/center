@@ -5,6 +5,7 @@ import com.alibaba.excel.read.metadata.ReadSheet;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -229,6 +230,7 @@ public class TCameraRecorderController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
 //    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数分页查询录像服务器信息",logType = 1,authority = "1234")
+    @AuthorityCheck(content = "根据用户传递的参数查询标准设备测点", authority = "1234,1235")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "vendorId", required = false) Integer vendorId,
