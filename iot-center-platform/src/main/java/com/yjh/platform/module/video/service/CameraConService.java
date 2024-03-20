@@ -1957,6 +1957,8 @@ public class CameraConService {
      * @param cameraId 摄像头id
      */
     public void startRecord(long cameraId) throws Exception{
+        //先播放视频
+        this.startRealPlay(cameraId);
         //保存文件地址
         String videoPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:videoPath", "content"));
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);

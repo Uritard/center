@@ -222,10 +222,10 @@ public class TSequentialConfController {
 
     @ApiOperation(value = "手动干预一键顺控结果")
     @GetMapping(value = "/sequentialResult")
-    public Result sequentialResult(@RequestParam(value = "resultNum", required = false) Integer resultNum){
+    public Result sequentialResult(@RequestParam(value = "resultDesc", required = false) Integer resultDesc){
         Result result=new Result();
         try {
-            result.setData(tSequentialConfService.setSequentialResult(resultNum));
+            result.setData(tSequentialConfService.setSequentialResult(resultDesc));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
