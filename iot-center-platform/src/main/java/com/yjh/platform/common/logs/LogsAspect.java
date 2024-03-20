@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,8 @@ public class LogsAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Annotation[][] paramAnnotations = signature.getMethod().getParameterAnnotations();
         Object[] args = joinPoint.getArgs();
-        Logs annotation = signature.getMethod().getAnnotation(Logs.class);
+        Logs logsAnnotation = signature.getMethod().getAnnotation(Logs.class);
+        AuthorityCheck authorityCheckAnnotation = signature.getMethod().getAnnotation(AuthorityCheck.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
         String userId = "99999", userName = null, serviceId = null, ip = null,userRole=null;
@@ -83,139 +85,178 @@ public class LogsAspect {
         }
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         log.info("ttIp: "+ip);
-        Object result = null;
-        if (annotation != null) {
-            String contentStr = annotation.content();
-            String title = annotation.title();
-            String codeName = annotation.codeName();
-            String replyStr = null;
-            if(StringUtils.isNotEmpty(codeName)){
-                JSONObject parameters = getRequestParams(request, args, paramAnnotations);
-                String kind = parameters.getString(codeName);
-                boolean isDrone = ("droneType".equals(codeName) && StringUtils.isNotEmpty(kind)) || ("type".equals(codeName) && "2".equals(kind));
-                if (isDrone) {
-                    replyStr = "无人机";
-                }
-                if (replyStr != null) {
-                    contentStr = contentStr.replace("机器人", replyStr);
-                    title = title.replace("机器人", replyStr);
-                }
-            }
+        if (logsAnnotation != null) {
+            return logsAnnotationHandle(joinPoint, paramAnnotations, args, logsAnnotation, params, content, userId, userName, ip, userRole, request);
+        }
+        if (authorityCheckAnnotation != null) {
+            Result re = authorityCheckAnnotationHandle(authorityCheckAnnotation, params, content, userId, userName, ip, userRole);
+            if (re != null) return re;
+        }
+        return joinPoint.proceed();
 
-            content.append(contentStr);
-            //处理导出模型文件
-            if ("导出模型文件".equals(title)) {
-                JSONObject parameters = getRequestParams(request,args,paramAnnotations);
-                String modelName = ModelTypeEnum.exportMap().get(parameters.getString("type"));
-                if (StringUtils.isNotBlank(modelName)) {
-                    content.append("-").append(modelName);
-                }
-            }
+    }
 
-            params.set("userId", userId);
-            params.set("userName", userName);
-            params.set("requestOrigin", request.getRequestURL());
-            params.set("requestPath", request.getRequestURI());
-            params.set("requestMethod", request.getMethod());
-            if(Constant.apiPermissions){
-                try {
-                    if (StringUtils.isNotEmpty(annotation.authority())) {
-                        String ans = annotation.authority();
-                        if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
-                            //todo 越权访问入日志
-                            params.set("logType", "24");
-                            params.set("ip", ip);
-                            params.set("title", "用户越权访问");
-                            params.set("state", 3);
-                            Map<String, String> jsonMap = new HashMap<>(8);
-                            jsonMap.put("type", "alarmPopUp");
-                            jsonMap.put("ip", ip);
-                            jsonMap.put("warningInfo", "越权访问告警！！！");
-                            jsonMap.put("userId", userId);
-                            jsonMap.put("logType", "24");
-                            jsonMap.put("userName", userName);
-                            jsonMap.put("title", annotation.title());
-                            jsonMap.put("content", String.valueOf(content));
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
-                            content.append(";用户").append(userName).append("存在越权访问!");
-                            params.set("content", content.toString());
-                            if (!"修改系统用户数据".equals(annotation.title()) && !"删除系统用户数据".equals(annotation.title())) {
-                                post(params);
-                            }
-                            Result re = new Result();
-                            re.setCode(209, "此用户无权限");
-                            return re;
-                        }
-                    }
-
-                }catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-
-
+    @Nullable
+    private Result authorityCheckAnnotationHandle(AuthorityCheck authorityCheckAnnotation, MultiValueMap<String, Object> params, StringBuilder content, String userId, String userName, String ip, String userRole) {
+        String contentStr = authorityCheckAnnotation.content();
+        content.append(contentStr);
+        if(Constant.apiPermissions){
             try {
-//                serviceId = logsConfig.getName();
-                params.set("logType", annotation.logType());
-                params.set("ip", ip);
-                params.set("title", title);
-                params.set("state", 1);
-            } catch (Exception e) {
+                if (StringUtils.isNotEmpty(authorityCheckAnnotation.authority())) {
+                    String ans = authorityCheckAnnotation.authority();
+                    if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
+                        // 越权访问入日志
+                        params.set("logType", "24");
+                        params.set("ip", ip);
+                        params.set("title", "用户越权访问");
+                        params.set("state", 3);
+                        Map<String, String> jsonMap = new HashMap<>(8);
+                        jsonMap.put("type", "alarmPopUp");
+                        jsonMap.put("ip", ip);
+                        jsonMap.put("warningInfo", "越权访问告警！！！");
+                        jsonMap.put("userId", userId);
+                        jsonMap.put("logType", "24");
+                        jsonMap.put("userName", userName);
+                        jsonMap.put("title", String.valueOf(content));
+                        jsonMap.put("content", String.valueOf(content));
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                        content.append(";用户").append(userName).append("存在越权访问!");
+                        params.set("content", content.toString());
+                        if (!"修改系统用户数据".equals(content) && !"删除系统用户数据".equals(content)) {
+                            post(params);
+                        }
+                        Result re = new Result();
+                        re.setCode(209, "此用户无权限");
+                        return re;
+                    }
+                }
+
+            }catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
-            try {
-                // 记录操作日志...谁..在什么时间..做了什么事情..
-                result = joinPoint.proceed();
-                params.set("content", content.toString());
-                boolean flag = true;
-                switch (title){
-                    case "修改系统用户数据":
-                    case "删除系统用户数据":
-                    case "新增任务":
-                    case "删除任务":
-                    case "任务启动":
-                    case "任务暂停":
-                    case "任务恢复":
-                    case "任务终止":
-                    case "新增预案":
-                    case "删除预案":
-                    case "修改预案":
-                    case "审核任务":
-                        flag =false;
-                        break;
-                    default:
-                        break;
-                }
-                if (flag) {
-                    if (result != null && result instanceof Result && !((Result)result).isSuccess()) {
-                        params.set("state", 2);
-                    }
-                    post(params);
-                }
-                return result;
-            } catch (BusinessException e) {
-                params.set("state", 2);
-                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
-                post(params);
-                throw e;
-            } catch (Throwable e) {
-                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
-                params.set("state", 3);
-                post(params);
-                throw e;
+        }
+        return null;
+    }
+
+    @Nullable
+    private Object logsAnnotationHandle(ProceedingJoinPoint joinPoint, Annotation[][] paramAnnotations, Object[] args, Logs logsAnnotation, MultiValueMap<String, Object> params, StringBuilder content, String userId, String userName, String ip, String userRole, HttpServletRequest request) throws Throwable {
+        Object result;
+        String contentStr = logsAnnotation.content();
+        String title = logsAnnotation.title();
+        String codeName = logsAnnotation.codeName();
+        String replyStr = null;
+        if(StringUtils.isNotEmpty(codeName)){
+            JSONObject parameters = getRequestParams(request, args, paramAnnotations);
+            String kind = parameters.getString(codeName);
+            boolean isDrone = ("droneType".equals(codeName) && StringUtils.isNotEmpty(kind)) || ("type".equals(codeName) && "2".equals(kind));
+            if (isDrone) {
+                replyStr = "无人机";
+            }
+            if (replyStr != null) {
+                contentStr = contentStr.replace("机器人", replyStr);
+                title = title.replace("机器人", replyStr);
             }
         }
+
+        content.append(contentStr);
+        //处理导出模型文件
+        if ("导出模型文件".equals(title)) {
+            JSONObject parameters = getRequestParams(request, args, paramAnnotations);
+            String modelName = ModelTypeEnum.exportMap().get(parameters.getString("type"));
+            if (StringUtils.isNotBlank(modelName)) {
+                content.append("-").append(modelName);
+            }
+        }
+
+        params.set("userId", userId);
+        params.set("userName", userName);
+        params.set("requestOrigin", request.getRequestURL());
+        params.set("requestPath", request.getRequestURI());
+        params.set("requestMethod", request.getMethod());
+        if(Constant.apiPermissions){
+            try {
+                if (StringUtils.isNotEmpty(logsAnnotation.authority())) {
+                    String ans = logsAnnotation.authority();
+                    if (StringUtils.isNotEmpty(userRole) && !ans.contains(userRole)) {
+                        // 越权访问入日志
+                        params.set("logType", "24");
+                        params.set("ip", ip);
+                        params.set("title", "用户越权访问");
+                        params.set("state", 3);
+                        Map<String, String> jsonMap = new HashMap<>(8);
+                        jsonMap.put("type", "alarmPopUp");
+                        jsonMap.put("ip", ip);
+                        jsonMap.put("warningInfo", "越权访问告警！！！");
+                        jsonMap.put("userId", userId);
+                        jsonMap.put("logType", "24");
+                        jsonMap.put("userName", userName);
+                        jsonMap.put("title", logsAnnotation.title());
+                        jsonMap.put("content", String.valueOf(content));
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                        content.append(";用户").append(userName).append("存在越权访问!");
+                        params.set("content", content.toString());
+                        if (!"修改系统用户数据".equals(logsAnnotation.title()) && !"删除系统用户数据".equals(logsAnnotation.title())) {
+                            post(params);
+                        }
+                        Result re = new Result();
+                        re.setCode(209, "此用户无权限");
+                        return re;
+                    }
+                }
+
+            }catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+
+
         try {
-            return joinPoint.proceed();
-        } catch (Throwable e) {
-            serviceId = logsConfig.getName();
-            params.set("logType", annotation.logType());
+//                serviceId = logsConfig.getName();
+            params.set("logType", logsAnnotation.logType());
             params.set("ip", ip);
-            params.set("title", "内部接口错误");
+            params.set("title", title);
+            params.set("state", 1);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        try {
+            // 记录操作日志...谁..在什么时间..做了什么事情..
+            result = joinPoint.proceed();
+            params.set("content", content.toString());
+            boolean flag = true;
+            switch (title){
+                case "修改系统用户数据":
+                case "删除系统用户数据":
+                case "新增任务":
+                case "删除任务":
+                case "任务启动":
+                case "任务暂停":
+                case "任务恢复":
+                case "任务终止":
+                case "新增预案":
+                case "删除预案":
+                case "修改预案":
+                case "审核任务":
+                    flag =false;
+                    break;
+                default:
+                    break;
+            }
+            if (flag) {
+                if (result != null && result instanceof Result && !((Result)result).isSuccess()) {
+                    params.set("state", 2);
+                }
+                post(params);
+            }
+            return result;
+        } catch (BusinessException e) {
+            params.set("state", 2);
+            params.set("content", content.toString() + "；错误信息：" + e.getMessage());
+            post(params);
+            throw e;
+        } catch (Throwable e) {
+            params.set("content", content.toString() + "；异常信息：" + e.getMessage());
             params.set("state", 3);
-            params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
-            params.set("userId", userId);
-            params.set("userName", userName);
             post(params);
             throw e;
         }
@@ -225,26 +266,10 @@ public class LogsAspect {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                System.out.println("platformLogAdd...");
                 serviceRestTemplate.postForObject(LOG_URL, params, String.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        }
-    }
-
-    private static String getStackMsg(Throwable e) {
-        try {
-            System.out.println("platformStack");
-            StringBuffer sb = new StringBuffer();
-            sb.append(e.getMessage() + "\n");
-            StackTraceElement[] stackArray = e.getStackTrace();
-            for (StackTraceElement element : stackArray) {
-                sb.append(element.toString() + "\n");
-            }
-            return sb.toString();
-        } catch (Exception e1) {
-            return "";
         }
     }
 
