@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -124,7 +125,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数查询系统测点模版",logType = 1)
+    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数查询系统测点模版",logType = 1, authority = "1234")
     public Result select(@RequestParam(value = "modelId", required = false) Long modelId,
                             @RequestParam(value = "modelName", required = false) String modelName,
                             @RequestParam(value = "deviceType", required = false) Integer deviceType,
@@ -176,7 +177,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "根据模版的设备类型查询对应的初始测点信息")
     @RequestMapping(value = "/selectMeteByDeviceType", method = RequestMethod.GET)
-    @Logs(title = "根据模版的设备类型查询对应的初始测点信息",content = "根据模版的设备类型查询对应的初始测点信息",logType = 1)
+    @Logs(title = "根据模版的设备类型查询对应的初始测点信息",content = "根据模版的设备类型查询对应的初始测点信息",logType = 1, authority = "1234")
     public Result selectMeteByDeviceType(@RequestParam(value = "deviceType") Integer deviceType) {
         Result result = new Result();
         try {
@@ -243,7 +244,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "新建模板")
     @RequestMapping(value = "/addModel",method = RequestMethod.POST)
-    @Logs(title = "新建模板",content = "根据用户传递的参数新增数据",logType = 2)
+    @Logs(title = "新建模板",content = "根据用户传递的参数新增数据",logType = 2, authority = "1234")
     public Result addModel(@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
@@ -261,7 +262,7 @@ public class TStdMetemodelController {
 
    @ApiOperation(value = "查看当前模板信息")
    @RequestMapping(value = "/selectModel",method = RequestMethod.GET)
-   @Logs(title = "查看当前模板信息",content = "查看当前模板信息",logType = 1)
+   @Logs(title = "查看当前模板信息",content = "查看当前模板信息",logType = 1, authority = "1234")
     public Result selectModel(@RequestParam(value = "modelId")Long modelId){
         Result result=new Result();
        try{
@@ -316,7 +317,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
-//    @Logs(title = "导入模板",content = "导入标准点位库",logType = 8)
+    @AuthorityCheck(content = "点位导入", authority = "1234")
     public Result upload (HttpServletRequest request, @RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {

@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -189,17 +190,15 @@ public class SysUserService {
             throw new BusinessException(500, "验证码错误");
         } else {
             String ip = String.valueOf(request.getHeader("HTTP_X_FORWARDED_FOR"));
-            if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
+            if (!userMap.isEmpty() && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
-                Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-                Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
-                Map<String, String> loginNum = redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
+                String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
+                String lockTimes = (String)redisTemplate.opsForHash().get("t_sys_param:lockTime", "content");
+                int loginNum = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:loginErrorNum", "content"));
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
-                Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
-                String isUkey = uKeymap.get("content");
-                String isDecode = enmap.get("content");
-                int lockTimeOne=Integer.valueOf(lockTimes.get("content"));
+                String isUkey = (String) redisTemplate.opsForHash().get("t_sys_param:isUkey", "content");
+                int lockTimeOne = NumberUtils.toInt(lockTimes);
                 if ("true".equals(isDecode)) {
                     userName = demo.decryptIdentifier(userMap.get("userName"), userMap.get("identifier"));
                     password = demo.decryptIdentifier(userMap.get("pCode"), userMap.get("identifier"));
@@ -292,7 +291,7 @@ public class SysUserService {
                         Calendar calendarOne = Calendar.getInstance();
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < Integer.valueOf(lockTimes.get("content")) * 60) { //如果锁定时间小于1200S
+                        if (lockTime < lockTimeOne * 60) { //如果锁定时间小于1200S
                             long surplusTime=(lockTime/60+1)!=(lockTimeOne+1)?(lockTime/60+1):lockTimeOne;
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                             //   mapResult.put("errorCount", "账户已被锁定！");
@@ -349,7 +348,7 @@ public class SysUserService {
                     if (sysUser.getState().intValue() == 2) {
                         if (num == null) {
                             // 特殊情况下 null 会为空
-                            num = Integer.valueOf(loginNum.get("content"));
+                            num = loginNum;
                             redisTemplate.opsForValue().set(key, num);
                         }
                         String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -361,7 +360,7 @@ public class SysUserService {
                         Calendar calendarOne = Calendar.getInstance();
                         calendarOne.setTime(sysUserLogin.getLockTime());
                         Long lockTime = DateTimeUtil.sencondsBetween(calendarOne, calendar);
-                        if (lockTime < Integer.valueOf(lockTimes.get("content")) * 60) { //如果锁定时间小于1200S
+                        if (lockTime < lockTimeOne * 60) { //如果锁定时间小于1200S
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             sendToWs(ip, userId, userName);
@@ -390,7 +389,7 @@ public class SysUserService {
                         if (num == null) { //第一次访问错误
                             redisTemplate.opsForValue().set(key, 1);
                             num = 1;
-                        } else if (num + 1 == Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
+                        } else if (num + 1 == loginNum) {//超过10次账户锁定
                             SysUserSelect sysUserSelect = new SysUserSelect();
                             BeanUtils.copyProperties(sysUserList.get(0), sysUserSelect);
                             redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserSelect);
@@ -410,7 +409,7 @@ public class SysUserService {
                             mapResult.put("info","账户已被锁定，剩余锁定时间"+lockTimeOne+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             return mapResult;
-                        } else if (num + 1 > Integer.valueOf(loginNum.get("content"))) {
+                        } else if (num + 1 > loginNum) {
                             redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserList.get(0));
                             SysUser user = new SysUser();
                             user.setState(2);

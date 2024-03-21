@@ -242,7 +242,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "根据设备类型查询mete")
     @RequestMapping(value = "/selectByDeviceType", method = RequestMethod.GET)
-    @Logs(title = "查询系统测点",content = "根据设备类型查询测点",logType = 1)
+    @Logs(title = "查询系统测点",content = "根据设备类型查询测点",logType = 1, authority = "1234")
     public Result selectByDeviceType(@RequestParam(value = "deviceType", required = true) Integer deviceType) {
         Result result = new Result();
         try {
@@ -259,7 +259,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "设备类型树")
     @RequestMapping(value = "/deviceTypeTree", method = RequestMethod.GET)
-    @Logs(title = "查询设备类型树",content = "查询设备类型树",logType = 1)
+    @Logs(title = "查询设备类型树",content = "查询设备类型树",logType = 1, authority = "1234")
     public Result deviceTypeTree() {
         Result result = new Result();
         try {

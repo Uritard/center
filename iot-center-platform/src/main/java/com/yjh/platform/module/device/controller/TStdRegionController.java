@@ -202,6 +202,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "巡视系统区域树")
     @RequestMapping(value = "/cruiseTree", method = RequestMethod.GET)
+    @Logs(title = "巡视系统区域树",content = "查询巡视系统区域树", logType = 1, authority = "1234")
     public Result cruiseTree() {
         Result result = new Result();
         try {

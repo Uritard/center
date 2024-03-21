@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.service.DictAreaService;
 import io.swagger.annotations.Api;
@@ -25,6 +26,7 @@ public class DictAreaController {
 
     @ApiOperation(value = "获取省市区编码")
     @GetMapping("/getDictDataByDictCode")
+    @Logs(title = "获取省市区编码", content = "根据父节点获取省市区编码", logType = 1, authority = "1234")
     public Result getDictDataByDictCode(@RequestParam("parentId") String parentId) {
         return new Result(dictAreaService.getDictAreaByParentId(parentId));
     }

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.controller;
 
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.service.SysRoleMenuService;
@@ -182,7 +183,7 @@ public class SysRoleMenuController {
 
     @ApiOperation(value = "根据角色查询菜单权限树")
     @GetMapping(value = "/selectRoleMenuTree")
-//    @Logs(title = "根据角色查询菜单权限树",content = "根据角色查询菜单权限树",logType = 2)
+    @AuthorityCheck(content = "查询所有权限列表", authority = "1234")
     public Result selectRoleMenuTree() {
         Result result = new Result();
         try {

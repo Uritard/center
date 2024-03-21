@@ -1,8 +1,9 @@
 package com.yjh.platform.module.user.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.mysql.jdbc.StringUtils;
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.module.user.service.TDictBusinessService;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 
@@ -13,7 +14,6 @@ import java.util.List;
 import io.swagger.annotations.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
@@ -24,8 +24,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author tt
@@ -36,13 +35,14 @@ import javax.annotation.PostConstruct;
 @Api(value = "/tDictBusiness", description = "业务字典表操作接口")
 public class TDictBusinessController {
 
-    @Autowired
     private final TDictBusinessService tDictBusinessService;
+    private final LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TDictBusinessController.class);
 
-    public TDictBusinessController(TDictBusinessService tDictBusinessService) {
+    public TDictBusinessController(TDictBusinessService tDictBusinessService, LogsRecord logsRecord) {
         this.tDictBusinessService = tDictBusinessService;
+        this.logsRecord = logsRecord;
     }
 
     @ApiOperation(value = "插入")
@@ -140,13 +140,18 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "分页查询，根据dictNote模糊查找")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询业务字典信息",content = "根据用户传递的参数分页查询业务字典信息",logType = 1,authority = "1234")
-    public Result selectByPage(@RequestBody TDictBusiness tDictBusiness
-                              ) {
+    @AuthorityCheck(content = "查询/导出业务字典信息", authority = "1234")
+    public Result selectByPage(@RequestBody TDictBusiness tDictBusiness, HttpServletRequest request) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>(4);
         try {
-            Page page = PageHelper.startPage(tDictBusiness.getPageNum()!=null?tDictBusiness.getPageNum():1, tDictBusiness.getPageSize()!=null?tDictBusiness.getPageSize():0,true,null,true);
+            int pageSize = tDictBusiness.getPageSize() != null ? tDictBusiness.getPageSize() : 0;
+            if (pageSize == 0) {
+                logsRecord.LogsSend(request, "9", "导出业务字典", "业务字典信息导出");
+            } else {
+                logsRecord.LogsSend(request, "1", "查询业务字典信息", "根据用户传递的参数分页查询业务字典信息");
+            }
+            Page page = PageHelper.startPage(tDictBusiness.getPageNum()!=null?tDictBusiness.getPageNum():1, pageSize,true,null,true);
             List<TDictBusiness> list = tDictBusinessService.selectByPage(tDictBusiness);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

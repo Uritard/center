@@ -3,7 +3,9 @@ package com.yjh.platform.module.user.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -51,6 +53,8 @@ public class TSysParamController {
     private AbstractVideoCruise abstractVideoCruise;
     @Autowired
     private TCameraPresetService tCameraPresetService;
+    @Autowired
+    private LogsRecord logsRecord;
 
 
     private Logger log = LoggerFactory.getLogger(TSysParamController.class);
@@ -61,7 +65,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增系统参数", content = "根据用户传递的参数新增系统参数", logType = 2)
+    @Logs(title = "新增系统参数", content = "根据用户传递的参数新增系统参数", logType = 2, authority = "1234")
     public Result insert(@Validated @RequestBody TSysParam tSysParam) {
 
         Result result = new Result();
@@ -78,7 +82,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Logs(title = "删除系统参数", content = "根据用户传递的参数删除系统参数", logType = 4)
+    @Logs(title = "删除系统参数", content = "根据用户传递的参数删除系统参数", logType = 4, authority = "1234")
     public Result delete(@RequestParam(value = "paramId", required = true) Integer paramId) {
         Result result = new Result();
         try {
@@ -167,7 +171,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询系统参数", content = "根据用户传递的参数分页查询系统参数", logType = 1,authority = "1234")
+    @AuthorityCheck(content = "查询/导出系统参数信息", authority = "1234")
     public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
                                @RequestParam(value = "paramCode", required = false) String paramCode,
                                @RequestParam(value = "paramType", required = false) String paramType,
@@ -175,10 +179,15 @@ public class TSysParamController {
                                @RequestParam(value = "content", required = false) String content,
                                @RequestParam(value = "remark", required = false) String remark,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            if (pageSize == 0) {
+                logsRecord.LogsSend(request, "9", "导出系统参数", "系统参数信息导出");
+            } else {
+                logsRecord.LogsSend(request, "1", "查询系统参数", "根据用户传递的参数分页查询系统参数");
+            }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<TSysParam> list = tSysParamService.selectByPage(paramId, paramCode, paramType, paramName, content, remark);
             resultMap.put("count", page.getTotal());
@@ -220,6 +229,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "查询系统版本")
     @RequestMapping(value = "/selectVersion", method = RequestMethod.GET)
+    @Logs(title = "查询系统版本", content = "查询系统版本信息")
     public Result selectVersion() {
         Result result = new Result();
         try {
@@ -233,6 +243,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "查询算法版本")
     @RequestMapping(value = "/algorithmVersion", method = RequestMethod.GET)
+    @Logs(title = "查询算法版本", content = "查询算法版本信息")
     public Result algorithmVersion() {
         Result result = new Result();
         try {
@@ -263,9 +274,9 @@ public class TSysParamController {
         return result;
     }
 
-    @ApiOperation(value = "查询系统参数")
+    @ApiOperation(value = "业务员修改系统参数")
     @RequestMapping(value = "/updateByCode", method = RequestMethod.GET)
-    @Logs(title = "查询系统参数", content = "根据用户传递的参数分页查询系统参数", logType = 1)
+    @Logs(title = "业务员修改系统参数", content = "业务员修改指定系统参数[{paramCode}]", logType = 3, authority = "1235", codeName="paramCode")
     public Result updateByCode(@RequestParam(value = "paramCode") String paramCode,
                                @RequestParam(value = "content") String content) {
         Result result = new Result();

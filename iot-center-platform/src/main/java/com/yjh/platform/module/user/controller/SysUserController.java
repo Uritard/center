@@ -1,44 +1,40 @@
 package com.yjh.platform.module.user.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.mysql.jdbc.StringUtils;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.configuration.UserManager;
-import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
 
-import com.yjh.platform.common.result.ResultCodeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
-
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -135,7 +131,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1)
+    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1, authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -150,7 +146,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户状态查询")
     @RequestMapping(value = "/selectByUserState", method = RequestMethod.GET)
-    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1)
+    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1, authority = "1234")
     public Result selectByUserState(@RequestParam(value = "state", required = true) Integer state) {
         Result result = new Result();
         try {
@@ -165,7 +161,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户名查询")
     @RequestMapping(value = "/selectByUserName", method = RequestMethod.GET)
-    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1)
+    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1, authority = "1234")
     public Result selectByUserName(@RequestParam(value = "userName", required = true) String userName) {
         Result result = new Result();
         try {
@@ -189,10 +185,9 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1)
+    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数查询系统用户信息", logType = 1, authority = "1234")
     public Result select(@RequestParam(value = "userId", required = false) Long userId,
                          @RequestParam(value = "userName", required = false) String userName,
-                         @RequestParam(value = "password", required = false) String password,
                          @RequestParam(value = "trueName", required = false) String trueName,
                          @RequestParam(value = "userType", required = false) Integer userType,
                          @RequestParam(value = "sex", required = false) Integer sex,
@@ -219,11 +214,10 @@ public class SysUserController {
             String isDecode = map.get("content");
             if ("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
-                password = Demo.decrypt(password);
-                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, null, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
                 result.setData(list);
             } else {
-                List<SysUserSelect> list = sysUserService.select(userId, userName, password, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
+                List<SysUserSelect> list = sysUserService.select(userId, userName, null, trueName, userType, sex, eMail, workNo, faceId, fingerId, voiceId, state, userTitle, creatorId, appkey, imageUrl, roleId, orgId, userStatus, createTime, updateTime, invalidTime, lastLogin);
 
                 result.setData(list);
             }
@@ -289,7 +283,7 @@ public class SysUserController {
 
     @ApiOperation(value = "根据用户ID查询关联的组织结构信息")
     @RequestMapping(value = "/selectRelationOrg", method = RequestMethod.GET)
-    @Logs(title = "根据用户ID查询关联的组织结构信息", content = "根据用户传递的参数查询角色关联组织机构", logType = 1)
+    @Logs(title = "根据用户ID查询关联的组织结构信息", content = "根据用户传递的参数查询角色关联组织机构", logType = 1, authority = "1234")
     public Result selectRelationOrg(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
         try {
@@ -298,21 +292,6 @@ public class SysUserController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
-        }
-        return result;
-    }
-
-    @ApiOperation(value = "根据用户ID查询关联区域设备权限")
-    @RequestMapping(value = "/selectRelationAuthor", method = RequestMethod.GET)
-    @Logs(title = "根据用户ID查询关联区域设备权限", content = "根据用户传递的参数查询角色关联设备权限", logType = 1)
-    public Result selectRelationAuthor(@RequestParam(value = "userId", required = true) Long userId) {
-        Result result = new Result();
-        try {
-            List<AreaInfo> list = sysUserService.selectRelationAuthor(userId);
-            result.setData(list);
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询关联区域设备权限失败描述：", e);
         }
         return result;
     }
@@ -370,7 +349,7 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-  //  @Logs(title = "新增用户", content = "根据用户传递的参数新增数据", logType = 2)
+    @AuthorityCheck(content = "新增用户", authority = "1234")
     public Result insertUser(@Validated @RequestBody SysUser sysUser,HttpServletRequest request) {
 
         Result result = new Result();
@@ -576,7 +555,6 @@ public class SysUserController {
     }
 
     @RequestMapping(value = "/updateVerfiCode", method = RequestMethod.POST)
-    //@Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
     public Result updateVerfiCode(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
@@ -719,7 +697,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
-    @Logs(title = "账号锁定用户信息查询", content = "账号锁定用户信息查询", logType = 1)
+    @Logs(title = "账号锁定用户信息查询", content = "账号锁定用户信息查询", logType = 1, authority = "1234,1236")
     public Result lockUserInfo() {
         Result result = new Result();
         try {
@@ -742,7 +720,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号密码到期用户信息")
     @RequestMapping(value = "/passUserInfo", method = RequestMethod.GET)
-    @Logs(title = "账号密码到期用户信息查询", content = "账号密码到期用户信息查询", logType = 1)
+    @Logs(title = "账号密码到期用户信息查询", content = "账号密码到期用户信息查询", logType = 1, authority = "1234,1236")
     public Result passUserInfo() {
         Result result = new Result();
         try {
@@ -802,6 +780,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户绑定")
     @RequestMapping(value = "/userBind", method = RequestMethod.POST)
+    @AuthorityCheck(content = "用户绑定", authority = "1234")
     public Result userBind(@Validated @RequestBody SysKey sysKey, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -818,7 +797,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户绑定获取")
     @RequestMapping(value = "/userBindList", method = RequestMethod.GET)
-    @Logs(title = "查询用户绑定", content = "根据用户传递的用户ID查询用户绑定的 IP 或 UKEY 信息", logType = 1)
+    @Logs(title = "查询用户绑定", content = "根据用户传递的用户ID查询用户绑定的 IP 或 UKEY 信息", logType = 1, authority = "1234")
     public Result userBind(@RequestParam(value = "userId") Long userId, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -832,6 +811,7 @@ public class SysUserController {
 
     @ApiOperation(value = "删除用户绑定")
     @RequestMapping(value = "/userBindDel", method = RequestMethod.POST)
+    @AuthorityCheck(content = "删除用户绑定", authority = "1234")
     public Result userBindDel(@RequestParam(value = "keyId") Long keyId, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -862,6 +842,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户设置常用功能")
     @RequestMapping(value = "/setCommonMenu", method = RequestMethod.POST)
+    @Logs(title = "用户设置常用功能", content = "根据用户选择更改用户常用功能设置", logType = 3, authority = "1235")
     public Result setCommonMenu(@RequestBody List<CommonMenu> list, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -877,6 +858,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户查询常用功能")
     @RequestMapping(value = "/selectCommonMenu", method = RequestMethod.GET)
+    @Logs(title = "用户查询常用功能", content = "查询用户常用功能项目", logType = 1, authority = "1235")
     public Result selectCommonMenu(@RequestParam(value = "userId") Long userId) {
         Result result = new Result();
         try {
@@ -890,6 +872,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户查询常用功能配置查询")
     @RequestMapping(value = "/selectCommonMenuConf", method = RequestMethod.GET)
+    @Logs(title = "用户查询常用功能配置查询", content = "查询所有可配置的用户常用功能项目", logType = 1, authority = "1235")
     public Result selectCommonMenuConf() {
         Result result = new Result();
         try {
