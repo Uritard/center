@@ -542,7 +542,7 @@
 				t_warn_info
 			WHERE 1 = 1
             and (warn_type != '507' or warn_type is null)
-            <if test="startDate != null and endData != null">
+            <if test="startDate != null and endDate != null">
                 and warn_time between #{startDate} and #{endDate}
             </if>
 		   ) a
