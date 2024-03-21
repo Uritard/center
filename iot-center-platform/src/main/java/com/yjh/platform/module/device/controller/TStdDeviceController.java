@@ -363,7 +363,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "巡视设备树查询")
     @RequestMapping(value = "/selectPatrolDeviceTree", method = RequestMethod.GET)
-    @Logs(title = "巡视设备树查询",content = "巡视设备树查询",logType = 1)
+    @Logs(title = "巡视设备树查询",content = "巡视设备树查询",logType = 1, authority = "1234")
     public Result selectPatrolDeviceTree(@RequestParam(value = "name", required = false) String name) {
         Result result = new Result();
         try {

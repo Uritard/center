@@ -33,7 +33,7 @@ public class DevicePermissionController {
 
     @PostMapping(value = "/insert")
     @ApiOperation(value = "插入")
-    @Logs(title = "插入用户权限数据",content = "插入用户权限数据",logType = 2)
+    @Logs(title = "插入用户权限数据",content = "插入用户权限数据",logType = 2, authority = "1234")
     public Result insert(@RequestBody DevicePermissionCommand devicePermissionCommand) {
         Result result = new Result();
         try {
@@ -50,7 +50,7 @@ public class DevicePermissionController {
 
     @GetMapping(value = "/getSelectedByUserId/{userId}")
     @ApiOperation(value = "查询")
-    @Logs(title = "查询用户权限数据",content = "查询用户权限数据",logType = 2)
+    @Logs(title = "查询用户权限数据",content = "查询用户权限数据",logType = 1, authority = "1234")
     public Result getSelectedByUserId(@PathVariable("userId")Long id) {
         Result result = new Result();
         try {

@@ -386,9 +386,9 @@ public class TCameraPresetController {
         return result;
     }
 
-    @ApiOperation(value = "查询预置位配置信息")
+    @ApiOperation(value = "查询预置位类型信息")
     @GetMapping(value = "/selectSilentConf")
-    @Logs(title = "查询预置位配置信息",content = "根据用户传递的参数查询预置位配置信息",logType = 1)
+    @Logs(title = "查询预置位类型信息",content = "根据用户传递的参数查询预置位类型信息",logType = 1, authority = "1234")
     public Result selectSilentConf() {
         Result result = new Result();
         try {
@@ -402,7 +402,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "更新预置位配置信息")
     @PostMapping(value = "/updateSilentConf")
-//    @Logs(title = "修改新增预置位配置信息",content = "根据用户传递的参数修改预置配置位信息",logType = 3,authority = "1234")
+    @Logs(title = "修改预置位静默配置信息",content = "根据用户传递的参数修改预置位静默配置信息",logType = 3,authority = "1234")
     public Result updateSilentConf(@Validated @RequestBody SilentConf silentConf) {
         Result result = new Result();
         try {

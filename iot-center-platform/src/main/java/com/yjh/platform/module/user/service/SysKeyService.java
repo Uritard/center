@@ -64,6 +64,7 @@ public class SysKeyService {
             SysKey sk = sysKeyDao.selectBySerialNum(sysKey.getSerialNum());
             if (sk != null) {
                 log.error("Ukey 重复绑定, {}, {}", sk.getUserId(), sk.getSerialNum());
+                logsRecord.LoginLogsSend(request, "28", "用户绑定", userName + "对用户" + name + "绑定Ukey失败，Ukey 重复", userName, String.valueOf(userIds), 2);
                 throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "每个 UKey 只可绑定一个用户！");
             }
             String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");

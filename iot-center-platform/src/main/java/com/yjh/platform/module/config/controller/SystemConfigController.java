@@ -1,5 +1,6 @@
 package com.yjh.platform.module.config.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -38,6 +39,7 @@ public class SystemConfigController {
 
     @ApiOperation(value = "查询系统配置")
     @PostMapping(value = "/select")
+    @Logs(title = "查询系统配置", content = "查询所有系统配置", logType = 1,authority = "1234")
     public Result select(){
         Result result = new Result();
         try {
@@ -54,6 +56,7 @@ public class SystemConfigController {
 
     @ApiOperation(value = "修改系统配置")
     @PostMapping(value = "/update")
+    @Logs(title = "修改系统配置", content = "根据用户传递的参数修改系统配置", logType = 3,authority = "1234")
     public Result update( @RequestBody List<SystemConfig> systemConfig){
         Result result = new Result();
         try {

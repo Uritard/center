@@ -43,9 +43,9 @@ public class SysRoleController {
         this.sysRoleService = sysRoleService;
     }
 
-    @ApiOperation(value = "插入用户")
-    @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    @Logs(title = "新增角色数据",content = "根据用户传递的参数新增角色数据",logType = 2)
+    @ApiOperation(value = "插入角色")
+    @RequestMapping(value = "/addRole", method = RequestMethod.POST)
+    @Logs(title = "新增角色数据",content = "根据用户传递的参数新增角色数据",logType = 2, authority = "1234")
     public Result insert(@Validated @RequestBody  SysRole sysRole) {
 
         Result result = new Result();
@@ -62,7 +62,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Logs(title = "删除角色数据",content = "根据用户传递的参数删除角色数据",logType = 4)
+    @Logs(title = "删除角色数据",content = "根据用户传递的参数删除角色数据",logType = 4, authority = "1234")
     public Result delete(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -79,7 +79,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @Logs(title = "修改角色数据",content = "根据用户传递的参数修改角色数据",logType = 3)
+    @Logs(title = "修改角色数据",content = "根据用户传递的参数修改角色数据",logType = 3, authority = "1234")
     public Result update(@Validated @RequestBody SysRole sysRole) {
         Result result = new Result();
         try {
@@ -96,7 +96,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询角色数据",content = "根据用户传递的参数查询角色信息",logType = 1)
+    @Logs(title = "查询角色数据",content = "根据用户传递的参数查询角色信息",logType = 1, authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -130,7 +130,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询角色数据",content = "根据用户传递的参数分页查询角色信息",logType = 1)
+    @Logs(title = "查询角色数据",content = "根据用户传递的参数分页查询角色信息",logType = 1, authority = "1234")
     public Result selectByPage(@RequestBody SysRole sysRole ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -166,7 +166,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的区域信息")
     @RequestMapping(value = "/selectRelationRegion", method = RequestMethod.GET)
-    @Logs(title = "根据角色ID查询关联的区域信息",content = "根据用户传递的参数查询角色id关联的区域信息",logType = 1)
+    @Logs(title = "根据角色ID查询关联的区域信息",content = "根据用户传递的参数查询角色id关联的区域信息",logType = 1, authority = "1234")
     public Result selectRelationRegion(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -290,7 +290,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色Id查询用户信息")
     @RequestMapping(value = "/selectUserByRoleId", method = RequestMethod.POST)
-    @Logs(title = "根据角色Id查询用户信息",content = "根据角色Id查询用户信息",logType = 1)
+    @Logs(title = "根据角色Id查询用户信息",content = "根据角色Id查询用户信息",logType = 1, authority = "1234")
     public Result selectUserByRoleId(@RequestBody CommonByIdReq commonByIdReq){
         Result result = new Result();
         try{

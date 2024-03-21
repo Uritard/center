@@ -70,7 +70,6 @@ public class LogsAspect {
         Logs logsAnnotation = signature.getMethod().getAnnotation(Logs.class);
         AuthorityCheck authorityCheckAnnotation = signature.getMethod().getAnnotation(AuthorityCheck.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        StringBuilder content = new StringBuilder("");
         String userId = "99999", userName = null, serviceId = null, ip = null,userRole=null;
         HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -86,10 +85,10 @@ public class LogsAspect {
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         log.info("ttIp: "+ip);
         if (logsAnnotation != null) {
-            return logsAnnotationHandle(joinPoint, paramAnnotations, args, logsAnnotation, params, content, userId, userName, ip, userRole, request);
+            return logsAnnotationHandle(joinPoint, paramAnnotations, args, logsAnnotation, params, userId, userName, ip, userRole, request);
         }
         if (authorityCheckAnnotation != null) {
-            Result re = authorityCheckAnnotationHandle(authorityCheckAnnotation, params, content, userId, userName, ip, userRole);
+            Result re = authorityCheckAnnotationHandle(authorityCheckAnnotation, params, userId, userName, ip, userRole);
             if (re != null) return re;
         }
         return joinPoint.proceed();
@@ -97,7 +96,8 @@ public class LogsAspect {
     }
 
     @Nullable
-    private Result authorityCheckAnnotationHandle(AuthorityCheck authorityCheckAnnotation, MultiValueMap<String, Object> params, StringBuilder content, String userId, String userName, String ip, String userRole) {
+    private Result authorityCheckAnnotationHandle(AuthorityCheck authorityCheckAnnotation, MultiValueMap<String, Object> params, String userId, String userName, String ip, String userRole) {
+        StringBuilder content = new StringBuilder();
         String contentStr = authorityCheckAnnotation.content();
         content.append(contentStr);
         if(Constant.apiPermissions){
@@ -139,12 +139,13 @@ public class LogsAspect {
     }
 
     @Nullable
-    private Object logsAnnotationHandle(ProceedingJoinPoint joinPoint, Annotation[][] paramAnnotations, Object[] args, Logs logsAnnotation, MultiValueMap<String, Object> params, StringBuilder content, String userId, String userName, String ip, String userRole, HttpServletRequest request) throws Throwable {
+    private Object logsAnnotationHandle(ProceedingJoinPoint joinPoint, Annotation[][] paramAnnotations, Object[] args, Logs logsAnnotation, MultiValueMap<String, Object> params, String userId, String userName, String ip, String userRole, HttpServletRequest request) throws Throwable {
         Object result;
         String contentStr = logsAnnotation.content();
         String title = logsAnnotation.title();
         String codeName = logsAnnotation.codeName();
         String replyStr = null;
+        StringBuilder content = new StringBuilder();
         if(StringUtils.isNotEmpty(codeName)){
             JSONObject parameters = getRequestParams(request, args, paramAnnotations);
             String kind = parameters.getString(codeName);
@@ -155,6 +156,10 @@ public class LogsAspect {
             if (replyStr != null) {
                 contentStr = contentStr.replace("机器人", replyStr);
                 title = title.replace("机器人", replyStr);
+            } else {
+                String repl = "{" + codeName + "}";
+                contentStr = StringUtils.replace(contentStr, repl, kind);
+                title = StringUtils.replace(title, repl, kind);
             }
         }
 
@@ -209,9 +214,7 @@ public class LogsAspect {
             }
         }
 
-
         try {
-//                serviceId = logsConfig.getName();
             params.set("logType", logsAnnotation.logType());
             params.set("ip", ip);
             params.set("title", title);

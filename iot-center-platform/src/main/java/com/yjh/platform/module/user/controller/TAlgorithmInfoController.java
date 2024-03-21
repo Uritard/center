@@ -1,17 +1,17 @@
 package com.yjh.platform.module.user.controller;
 
 import com.mysql.jdbc.StringUtils;
+import com.yjh.platform.common.logs.AuthorityCheck;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
@@ -22,6 +22,7 @@ import com.yjh.platform.common.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author tt
@@ -32,13 +33,14 @@ import org.slf4j.LoggerFactory;
 @Api(value = "/tAlgorithmInfo", description = "算法表操作接口")
 public class TAlgorithmInfoController {
 
-    @Autowired
     private final TAlgorithmInfoService tAlgorithmInfoService;
+    private final LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TAlgorithmInfoController.class);
 
-    public TAlgorithmInfoController(TAlgorithmInfoService tAlgorithmInfoService) {
+    public TAlgorithmInfoController(TAlgorithmInfoService tAlgorithmInfoService, LogsRecord logsRecord) {
         this.tAlgorithmInfoService = tAlgorithmInfoService;
+        this.logsRecord = logsRecord;
     }
 
     @ApiOperation(value = "插入")
@@ -174,12 +176,18 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询算法信息",content = "根据用户传递的参数对应查询算法信息",logType = 1,authority = "1234")
-    public Result selectByPage(@RequestBody TAlgorithmInfo tAlgorithmInfo
-                               ) {
+    // @Logs(title = "查询算法信息",content = "根据用户传递的参数对应查询算法信息",logType = 1,authority = "1234")
+    @AuthorityCheck(content = "查询/导出算法信息", authority = "1234")
+    public Result selectByPage(@RequestBody TAlgorithmInfo tAlgorithmInfo, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            int pageSize = tAlgorithmInfo.getPageSize() != null ? tAlgorithmInfo.getPageSize() : 0;
+            if (pageSize == 0) {
+                logsRecord.LogsSend(request, "9", "导出算法信息", "算法字典信息导出");
+            } else {
+                logsRecord.LogsSend(request, "1", "查询算法信息", "根据用户传递的参数分页查询算法字典信息");
+            }
             Page page = PageHelper.startPage(tAlgorithmInfo.getPageNum()!=null?tAlgorithmInfo.getPageNum():1, tAlgorithmInfo.getPageSize()!=null?tAlgorithmInfo.getPageSize():0,true,null,true);
             List<TAlgorithmInfo> list = tAlgorithmInfoService.selectByPage(tAlgorithmInfo);
             resultMap.put("count", page.getTotal());
@@ -194,7 +202,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    @Logs(title = "批量插入算法信息",content = "根据用户传递的参数批量插入算法信息",logType = 2)
+    @Logs(title = "批量插入算法信息",content = "根据用户传递的参数批量插入算法信息",logType = 2, authority = "1234")
     public Result batchInsert(  @RequestBody List<TAlgorithmInfo> list) {
         Result result = new Result();
         try {
