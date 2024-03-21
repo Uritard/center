@@ -168,7 +168,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     }
 
     private String lineName(String pointName, String unit, String value) {
-        if (StringUtils.contains(unit, ":")) {
+        if (StringUtils.isNotEmpty(unit)) {
             return pointName + "(" + unit +")";
         } else if (!StringUtils.equals(conventResult(value), value)) {
             return pointName + "(0:正常/开启,1:异常/关闭)";
