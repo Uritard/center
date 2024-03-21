@@ -100,6 +100,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("iot_device_id", iotDeviceId);
         queryWrapper.between("create_time", startTime, endTime);
+        queryWrapper.orderByAsc("create_time");
         List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
 
         List<List<String>> line = new ArrayList<>();
@@ -115,7 +116,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         int idx = 1;
         // 解析成时间对应数组，数组内对应不同巡视设备的巡视值
         for (TIotDeviceData vb : tIotDeviceList) {
-            KeyValue<String, String> cruiseDevice = new LineKeyValue<>(String.valueOf(vb.getPointId()), vb.getPointName());
+            String lineName = lineName(vb.getPointName(), vb.getUnit(), vb.getValue());
+            KeyValue<String, String> cruiseDevice = new LineKeyValue<>(String.valueOf(vb.getPointId()), lineName);
             Date time = vb.getCreateTime();
             // 获取巡视设备序号，若不存在，则表示需新增一个巡视设备编号
             Integer dex = deviceMap.get(cruiseDevice);
@@ -165,14 +167,24 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         return line;
     }
 
+    private String lineName(String pointName, String unit, String value) {
+        if (StringUtils.contains(unit, ":")) {
+            return pointName + "(" + unit +")";
+        } else if (!StringUtils.equals(conventResult(value), value)) {
+            return pointName + "(0:正常/开启,1:异常/关闭)";
+        } else {
+            return pointName;
+        }
+    }
+
     private String conventResult(String value) {
         switch (value) {
             case "正常":
             case "开启":
-                return "1";
+                return "0";
             case "异常":
             case "关闭":
-                return "-1";
+                return "1";
             default:
                 return value;
         }

@@ -156,7 +156,7 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
                     ResultMete mete = new ResultMete();
                     mete.setIotDeviceId(point.getIotDeviceId())
                         .setChannle(item.getPIndex())
-                        .setValue(StringUtils.defaultIfEmpty(item.getTextValue(), item.getStatus()))
+                        .setValue(conventResult(item.getPIndex(), item.getTextValue(), item.getStatus()))
                         .setStatus(item.getStatus());
                     resultMeteList.add(mete);
                 }
@@ -167,6 +167,16 @@ public class EnvTerminalProtocolImpl implements ISensorProtocol {
         });
 
         return resultMeteList;
+    }
+
+    private String conventResult(String pIndex, String value, String status) {
+        String type = StringUtils.substring(pIndex, 4, 6);
+        switch (type) {
+            case "06":
+                return !"0".equals(status) ? "-" + status : StringUtils.defaultIfEmpty(value, status);
+            default:
+                return StringUtils.defaultIfEmpty(value, status);
+        }
     }
 
     @Override
