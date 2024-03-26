@@ -1,11 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 
-import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.KeepWatchJob;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -551,7 +547,7 @@ public class TCameraInfoService {
     }
 
     public void startKeepWatch(){
-        KeepWatchJob keepWatchJob = new KeepWatchJob(redisTemplate,tCameraInfoDao,tCameraPresetDao);
+        KeepWatchJob keepWatchJob = new KeepWatchJob(redisTemplate,tCameraInfoDao,tCameraPresetDao, cameraConService);
         Thread thread = new Thread(keepWatchJob);
         thread.setDaemon(true);
         thread.start();

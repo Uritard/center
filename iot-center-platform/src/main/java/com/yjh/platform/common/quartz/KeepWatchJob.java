@@ -1,11 +1,11 @@
 package com.yjh.platform.common.quartz;
 
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -21,24 +21,22 @@ import java.util.Map;
 @Slf4j
 public class KeepWatchJob implements Runnable {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
 
-    @Autowired
-    private TCameraInfoDao tCameraInfoDao;
+    private final TCameraInfoDao tCameraInfoDao;
 
-    @Autowired
-    private TCameraPresetDao tCameraPresetDao;
+    private final TCameraPresetDao tCameraPresetDao;
 
-    @Autowired
-    private CameraConService cameraConService;
+    private final CameraConService cameraConService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public KeepWatchJob(RedisTemplate redisTemplate, TCameraInfoDao tCameraInfoDao, TCameraPresetDao tCameraPresetDao) {
+    public KeepWatchJob(RedisTemplate redisTemplate, TCameraInfoDao tCameraInfoDao, TCameraPresetDao tCameraPresetDao,
+        CameraConService cameraConService) {
         this.tCameraInfoDao = tCameraInfoDao;
         this.redisTemplate = redisTemplate;
         this.tCameraPresetDao = tCameraPresetDao;
+        this.cameraConService = cameraConService;
     }
 
     @Override
@@ -72,7 +70,13 @@ public class KeepWatchJob implements Runnable {
                                 moveMap.put("presetId", preset.getPresetId());
                                 moveMap.put("cameraId", preset.getCameraId());
                                 log.info("守望时间：" + new Date());
-                                new Thread(() -> cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId())).start();
+                                ThreadPoolUtil.COMMON_POOL.addThread(()->{
+                                    try {
+                                        cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId());
+                                    } catch (Exception e) {
+                                        log.error(e.getMessage(), e);
+                                    }
+                                });
                                 map.put("lastTime", simpleDateFormat.format(new Date()));
                                 redisTemplate.opsForHash().putAll(str, map);
                             }
