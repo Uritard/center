@@ -286,16 +286,17 @@ public class TCfgDataCurrentService {
                         String json = JSON.toJSONString(map);
                         log.info("发送给前端的联动预置位消息{}", json);
                         // 将摄像机转到预置位
-                        ThreadPoolUtil.COMMON_POOL.addThread(new Runnable() {
-                            @Override
-                            public void run() {
+                        ThreadPoolUtil.COMMON_POOL.addThread(() -> {
+                            try {
                                 String str = "camera_info:" + rule.getCameraId();
-                                Map<String, String> map = redisTemplate.opsForHash().entries(str);
-                                if ("0".equals(map.get("state"))) {
+                                Map<String, String> map1 = redisTemplate.opsForHash().entries(str);
+                                if ("0".equals(map1.get("state"))) {
                                     cameraConService.moveToPresetForTask(rule.getPresetId(), rule.getCameraId());
-                                    map.put("lastTime",DateTimeUtil.format(new Date()));
-                                    redisTemplate.opsForHash().putAll(str,map);
+                                    map1.put("lastTime",DateTimeUtil.format(new Date()));
+                                    redisTemplate.opsForHash().putAll(str, map1);
                                 }
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
                             }
                         });
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);

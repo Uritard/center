@@ -144,7 +144,7 @@ public class SendToUpSystemController {
         Result result = new Result();
         try {
             String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-            if (!"1".equals(flag)) {
+            if ("1".equals(flag)) {
                 sendToUpSystemService.creatFile(type);
             } else {
                 log.error("上级系统连接开关为空或者没开！{}",flag);
