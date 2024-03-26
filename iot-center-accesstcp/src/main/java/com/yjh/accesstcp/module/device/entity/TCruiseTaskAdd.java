@@ -139,4 +139,10 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "是否可用")
     private String isenable;
 
+    @ApiModelProperty(value = "不可用开始时间")
+    private String invalidStartTime;
+
+    @ApiModelProperty(value = "不可用开始时间")
+    private String invalidEndTime;
+
 }

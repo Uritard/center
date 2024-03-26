@@ -1181,6 +1181,12 @@ public class UPatrolTaskService {
                 return "";
             }
 
+            //周期任务 删除单个时间节点的任务不给机器人下发命令 目前机器人都不支持单个任务的删除
+            if (!isenable && !"-1".equals(invalidTime) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
+                log.info("周期任务删除单个时间节点的任务不给机器人下发命令！");
+                return "";
+            }
+
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             log.info("robotCode : {}", robotCode);
             if (scheduledByLocal(task.getDateType())) {
