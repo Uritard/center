@@ -26,6 +26,7 @@ import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
+import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -50,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -109,6 +112,9 @@ public class IntelAnalysisService {
     private HttpAnalyticsServiceImpl analyticsService;
     @Autowired
     private AlarmShieldService alarmShieldService;
+
+    private List<String> TASK_RESULT = new ArrayList<>();
+    private final String TASK_INTEL_ANALYSIS_RESULT="TASK_INTEL_ANALYSIS_RESULT:";
 
     /**
      * 巡视主机请求图像分析--功能
@@ -294,6 +300,11 @@ public class IntelAnalysisService {
 
     public void picAnalyseRetNotify(PicAnalyseResponse response){
         log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
+        response = checkIsIn(response);
+        if (response == null){
+            log.info("本测点结果算法已经返回过，本次返回的结果不正确，本次结果不处理！");
+            return;
+        }
         String flagId = response.getRequestId().split("#")[1];
         // 正常的巡视多了接口会阻塞，所以放在线程池
         if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666", "presetCheck"}, flagId)){
@@ -302,6 +313,33 @@ public class IntelAnalysisService {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
             ThreadPoolUtil.PATROL_POOL.addThread(analyseThread);
         }
+    }
+
+    private PicAnalyseResponse checkIsIn(PicAnalyseResponse response){
+        String taskId = response.getRequestId().split("#")[1];
+        String key = TASK_INTEL_ANALYSIS_RESULT+taskId;
+        Boolean isIn = redisTemplate.boundSetOps(key).isMember(response.getRequestId());
+        if (isIn){
+            //这个条结果算法已经返回过结果
+            List<AnalyseResult> analyseResults = response.getResultsList();
+            //找到返回结果中出现非2000的结果说明本次返回的结果是不可用的
+            boolean isOkResult = true;
+            for (AnalyseResult analyseResult: analyseResults){
+                for (AnalyseResultItem analyseResultItem : analyseResult.getResults()){
+                    if (!"2000".equals(analyseResultItem.getCode())){
+                        isOkResult = false;
+                        break;
+                    }
+                }
+            }
+            if (!isOkResult){
+                return  null;
+            }
+        } else {
+            redisTemplate.boundSetOps(key).add(response.getRequestId());
+            redisTemplate.boundSetOps(key).expire(2, TimeUnit.DAYS);
+        }
+        return response;
     }
 
     /**
