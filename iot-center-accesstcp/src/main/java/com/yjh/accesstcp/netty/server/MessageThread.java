@@ -276,7 +276,7 @@ public class MessageThread {
                     } else {
                         Map<String, Object> param = new HashMap<>(2);
                         param.put("taskId", tCruiseTaskAdd.getTaskId());
-                        param.put("startTime", "-1");
+                        param.put("startTime", getInvalidTime(tCruiseTaskAdd.getInvalidStartTime(), tCruiseTaskAdd.getInvalidEndTime()));
                         param.put("source", "");
                         re = Constant.otherServerPost(param, Constant.TASK_DELETE_URL);
                     }
@@ -454,6 +454,24 @@ public class MessageThread {
         }
     }
 
+    /**
+     * 不可用时间计算
+     * @param invalidStartTime
+     * @param invalidEndTime
+     * @return
+     */
+    private static String getInvalidTime(String invalidStartTime, String invalidEndTime) {
+        if (StringUtils.isNotBlank(invalidStartTime) && StringUtils.isNotBlank(invalidEndTime)) {
+            if (invalidStartTime.equals(invalidEndTime)) {
+                return invalidStartTime;
+            } else {
+                return "-1";
+            }
+        } else {
+            return "-1";
+        }
+    }
+
     private static TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String device_level, SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate, Boolean isLingAge) {
         String edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
         TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, isLingAge, edgeLevel);
@@ -531,6 +549,8 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
         tCruiseTaskAdd.setIsenable(item.getOrDefault("isenable", "").toString());
+        tCruiseTaskAdd.setInvalidStartTime(item.getOrDefault("invalid_start_time", "").toString());
+        tCruiseTaskAdd.setInvalidEndTime(item.getOrDefault("invalid_end_time", "").toString());
 
         String priority = item.getOrDefault("priority", "").toString();
 

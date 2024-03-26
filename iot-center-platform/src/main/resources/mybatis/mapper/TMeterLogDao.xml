@@ -43,6 +43,7 @@
             AND create_time &lt;= #{endTime}
         </if>
         GROUP BY lastTime
+        ORDER BY create_time
         ) b LEFT JOIN
         (
         SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power,
@@ -56,6 +57,7 @@
             AND create_time &lt;= #{endTime}
         </if>
         GROUP BY lastTime
+        ORDER BY create_time
         ) a ON b.lastTime = DATE_ADD(a.lastTime,INTERVAL 1 DAY)
     </select>
     <select id="selectPowerDifferenceValue" resultType="com.yjh.platform.module.device.entity.TMeter">
@@ -72,7 +74,7 @@
                        FROM t_meter
                        WHERE id = #{id, jdbcType=INTEGER}
                       )c
-                 WHERE meter_id = c.id AND create_time &gt;= c.lastTime  LIMIT 1
+                 WHERE meter_id = c.id AND create_time &gt;= c.lastTime ORDER BY create_time LIMIT 1
              ) b,
              (
                  SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power
@@ -84,7 +86,7 @@
                        FROM t_meter
                        WHERE id = #{id, jdbcType=INTEGER}
                       )d
-                 WHERE meter_id = d.id AND create_time &lt;= d.collectTime AND create_time &gt;= d.lastTime LIMIT 1
+                 WHERE meter_id = d.id AND create_time &lt;= d.collectTime AND create_time &gt;= d.lastTime ORDER BY create_time LIMIT 1
              ) a
     </select>
 
