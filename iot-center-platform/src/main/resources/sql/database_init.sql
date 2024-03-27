@@ -2350,6 +2350,7 @@ CREATE TABLE `u_patrol_data_result` (
   `result_pic` varchar(255) DEFAULT '' COMMENT 'FIR文件存储路径',
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
   `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
+  `all_file_path` varchar(512) DEFAULT NULL COMMENT '一个点有多个结果，存储多个结果的文件',
   PRIMARY KEY (`cruise_data_id`) USING BTREE,
   KEY `task_id_index` (`task_id`) USING BTREE,
   KEY `index_device_mete_id` (`device_mete_id`) USING BTREE,

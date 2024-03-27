@@ -126,4 +126,7 @@ public class CruiseResultAnalyzeInfo implements Serializable {
 
     @ApiModelProperty(value = "计数")
     private Integer count;
+
+    @ApiModelProperty(value = "一个点有多个结果，存储多个结果的文件")
+    private String allFilePath;
 }

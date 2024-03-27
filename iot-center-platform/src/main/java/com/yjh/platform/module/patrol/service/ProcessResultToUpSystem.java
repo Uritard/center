@@ -170,17 +170,22 @@ public class ProcessResultToUpSystem {
 
                 xmlItem.put("task_patrolled_id", taskPatrolledId);
                 xmlItem.put("unit", cruiseResultMap.getOrDefault("unit", ""));
+                // todo 处理单点多结果
+
                 // 文件后缀
                 String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
                 fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+                String tagBasePath = StringUtils.isEmpty(String.valueOf(xmlItem.getOrDefault("file_type", ""))) ? "" : stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                        8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat ;
                 String tagPath = StringUtils.isEmpty(String.valueOf(xmlItem.getOrDefault("file_type", ""))) ? "" : stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
                         8) + "/" + taskCode + typeAndPathName.get("fileNamePath") + instanceId + "_" + edgeCode + "_" + simpleDateFormat + fileExt;
 
                 Map<String, String> resMap;
+                String allFilePath = cruiseResultMap.getOrDefault("allFilePath", "");
                 if (Objects.isNull(tWarnInfo)) {
                     xmlBaseModel.setType("61");
-                    resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
+                    resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath,allFilePath,tagBasePath);
                 } else {
                     xmlBaseModel.setType("62");
                     String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
@@ -190,12 +195,14 @@ public class ProcessResultToUpSystem {
                     if (tWarnInfo.getWarnTime() != null){
                         xmlItem.put("time",DateTimeUtil.format(tWarnInfo.getWarnTime()));
                     }
-                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif, edgeCode);
+                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath, isTemdif, edgeCode,allFilePath,tagBasePath);
                 }
                 if (Constant.logUpLv3()) {
                     log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
                 }
-                analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
+                if(StringUtils.isEmpty(allFilePath)){
+                    analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
+                }
 
                 xmlItems.add(xmlItem);
             }
@@ -304,7 +311,22 @@ public class ProcessResultToUpSystem {
      * @return Map<String, String>
      */
     private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem,
-                                                 String tagPath, String isTemdif, String edgeCode) {
+                                                 String tagPath, String isTemdif, String edgeCode,String allFilePath,String tagBasePath) {
+        if (StringUtils.isNotEmpty(allFilePath)){
+            String[] allFilePathList = allFilePath.split(",");
+            String filePath = "";
+            for (String path : allFilePathList){
+                String fileExt = StringUtils.substringAfterLast(path, ".");
+                fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
+                tagPath = tagBasePath + fileExt;
+                String picPath = replaceResultImgPath(path, false);
+                //文件上报放在这里
+                analyseDataOperateService.uploadFileToUpFtps(picPath,tagPath);
+                filePath = filePath+","+tagPath;
+            }
+            tagPath = filePath.replaceFirst(",","");
+        }
+
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
         log.info("imagePath=={}", imagePath);
@@ -374,7 +396,23 @@ public class ProcessResultToUpSystem {
      * @param tagPath
      * @return Map<String, String>
      */
-    private Map<String, String> packageCruiseResultInfo(String taskId, String instanceId, Map<String, String> cruiseResultMap, Map<String, Object> xmlItem, String tagPath) {
+    private Map<String, String> packageCruiseResultInfo(String taskId, String instanceId, Map<String, String> cruiseResultMap,
+                                                        Map<String, Object> xmlItem, String tagPath,String allFilePath,String tagBasePath) {
+        if (StringUtils.isNotEmpty(allFilePath)){
+            String[] allFilePathList = allFilePath.split(",");
+            String filePath = "";
+            for (String path : allFilePathList){
+                String fileExt = StringUtils.substringAfterLast(path, ".");
+                fileExt = StringUtils.isEmpty(fileExt) ? "" : "." + fileExt;
+                tagPath = tagBasePath + fileExt;
+                String picPath = replaceResultImgPath(path, false);
+                //文件上报放在这里
+                analyseDataOperateService.uploadFileToUpFtps(picPath,tagPath);
+                filePath = filePath+","+tagPath;
+            }
+            tagPath = filePath.replaceFirst(",","");
+        }
+
         Map<String, String> resultPathMap = new HashMap<>(8);
         String picPath = String.valueOf(redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "picpath"));
         log.info("picPath=={}", picPath);

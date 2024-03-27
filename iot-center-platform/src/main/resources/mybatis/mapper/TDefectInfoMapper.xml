@@ -695,7 +695,7 @@
     <select id="countAllByAlarmType" resultType="java.util.Map">
         SELECT
             SUM(a.count) AS count,
-	        '巡检告警' AS alarmSource
+	        '机器人' AS alarmSource
         FROM
             (
             SELECT
@@ -703,43 +703,55 @@
             FROM
             t_warn_info
             WHERE
-            alarm_source != 689
+            alarm_source = 279 AND conf_mode = 276
             AND (
             warn_type != '507'
             OR warn_type IS NULL
             )
-            AND DATEDIFF(now(), warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
             UNION ALL
             SELECT
             COUNT(*) AS count
             FROM
             t_defect_info
-            WHERE DATEDIFF(now(), defect_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            where alarm_source = 279 AND conf_mode = 276
             ) a
         UNION ALL
         SELECT
             SUM(b.count) AS count,
-		    '监控告警' AS alarmSource
+		    '监控' AS alarmSource
         FROM
             (
             SELECT
-            count(*) AS count
+            COUNT(*) AS count
             FROM
-            t_robot_alarm
-            WHERE DATEDIFF(now(), alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            t_warn_info
+            WHERE
+            alarm_source IN(280,281) AND conf_mode = 276
+            AND (
+            warn_type != '507'
+            OR warn_type IS NULL
+            )
             UNION ALL
             SELECT
-            count(*) AS count
-            FROM t_iot_device_warn a
-            WHERE DATEDIFF(now(), alarm_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            COUNT(*) AS count
+            FROM
+            t_defect_info
+            where alarm_source IN(280,281)  AND conf_mode = 276
             ) b
         UNION ALL
         SELECT
             count(*) AS count,
-		    '入侵告警' AS alarmSource
+		    '入侵' AS alarmSource
         FROM
             t_warn_info
         WHERE
-            alarm_source = 689 AND DATEDIFF(now(), warn_time) <![CDATA[<=]]> #{nearDays,jdbcType=INTEGER}
+            alarm_source = 689 AND conf_mode = 276
+        UNION ALL
+        SELECT
+            count(*) AS count,
+		    '物联设备' AS alarmSource
+        FROM
+            t_iot_device_warn
+        WHERE delete_flag = 1
     </select>
 </mapper>

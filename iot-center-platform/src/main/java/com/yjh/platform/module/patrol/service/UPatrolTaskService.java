@@ -2625,6 +2625,12 @@ public class UPatrolTaskService {
                 if (CRUISE_STATE_DONE != cruiseStatus) {
                     taskWaitCounts++;
                 }
+
+                //判断是否是多结果
+                String allFilePath = redisInfoMap.get("allFilePath");
+                if (StringUtils.isNotEmpty(allFilePath)){
+                    uPatrolDataResult.setAllFilePath(allFilePath);
+                }
             }
 
             if (CollectionUtils.isNotEmpty(missInstanceMapList) && Constant.missedPointRetry()) {

@@ -72,7 +72,7 @@ public interface TDefectInfoDao {
 
     List<Map<String,Object>> countAllByAlarmLevel(@Param("nearDays")Integer nearDays);
 
-    List<Map<String, Object>> countAllByAlarmType(@Param("nearDays")Integer nearDays);
+    List<Map<String, Object>> countAllByAlarmType();
 
     int batchUpDate(@Param(value = "list") List<Long> warnIdList, @Param(value = "userId") String userId);
 

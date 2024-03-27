@@ -658,6 +658,14 @@ public class CameraConService {
                     command = "zoomout";
                     zoomSpeed = speed;
                     break;
+                case 13:
+                    command = "focusin";
+                    zoomSpeed = speed;
+                    break;
+                case 14:
+                    command = "focusout";
+                    zoomSpeed = speed;
+                    break;
                 case 25:
                     command = "upleft";
                     verticalSpeed = speed;

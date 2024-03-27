@@ -92,6 +92,7 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
+            tCruiseTaskResultMap.put("allFilePath", infoMap.getOrDefault("allFilePath", ""));
             tCruiseTaskResultMap.put("confirmPicPath", infoMap.getOrDefault("confirmRelativePath", ""));
             tCruiseTaskResultMap.put("origConfirmPicPath", infoMap.getOrDefault("confirmAbsolutePath", ""));
             if ("3".equals(robotPatrolTaskResult.getFileType())) {
