@@ -124,12 +124,12 @@ public class HomePageController {
         return result;
     }
 
-    @ApiOperation(value = "根据巡检,监控,入侵分类查询告警")
+    @ApiOperation(value = "根据机器人(机器人巡检),监控(视频巡检),入侵(静默监视),物联设备分类查询告警")
     @RequestMapping(value = "/countAllByAlarmType", method = RequestMethod.GET)
-    public Result countAllByAlarmType(@RequestParam(value = "type", defaultValue = "2") Integer type) {
+    public Result countAllByAlarmType() {
         Result result = new Result();
         try {
-            result.setData(homePageService.countAllByAlarmType(type));
+            result.setData(homePageService.countAllByAlarmType());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -139,13 +139,12 @@ public class HomePageController {
         return result;
     }
 
-    @ApiOperation(value = "按站所统计近一月的所有巡检,监控,入侵告警个数")
+    @ApiOperation(value = "按站所统计所有机器人(机器人巡检),监控(视频巡检),入侵(静默监视),物联设备告警个数")
     @GetMapping(value = "/countWarnByStationOnMonth")
-    public Result countWarnByStationOnMonth(@RequestParam(value = "alarmSource", required = false, defaultValue = "") String alarmSource,
-                                            @RequestParam(value = "type", defaultValue = "2") Integer type){
+    public Result countWarnByStationOnMonth(@RequestParam(value = "alarmSource", required = false, defaultValue = "") String alarmSource){
         Result result = new Result();
         try {
-            result.setData(homePageService.countWarnByStationOnMonth(alarmSource, type));
+            result.setData(homePageService.countWarnByStationOnMonth(alarmSource));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("统计告警数据失败描述：", e);

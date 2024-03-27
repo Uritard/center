@@ -347,88 +347,115 @@ public class PatrolResultHandler {
         String descConfirmFilePath = "";
         String descConfirmRelativeUrl = "";
 
-        try {
-            // 文件路径
-            String filePath = robotPatrolTaskResult.getFilePath();
+        String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
+        String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
+
+        String[] filePathList = robotPatrolTaskResult.getFilePath().split(",");
+        String[] fileTypeList = robotPatrolTaskResult.getFileType().split(",");
+        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getConfirmFilePath())){
             //待确认文件名称
             String confirmFilePath = robotPatrolTaskResult.getConfirmFilePath();
-            if (StringUtils.isEmpty(filePath)) {
+            String confirmTemporaryFilePath = ftpsFilePath + "/" + confirmFilePath;
+            log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
+            String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
+            descConfirmFilePath = developAbsoluteUrl + "/CCD/" + confirmFileName;
+            descConfirmRelativeUrl = developRelativeUrl + "/CCD/" + confirmFileName;
+            FileUtil.copyFileUsingStream(confirmTemporaryFilePath, descConfirmFilePath);
+            infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
+            infoMap.put("confirmAbsolutePath", descConfirmFilePath);
+        }
+
+        try {
+            if (filePathList.length >= 1) {
+                String firstImgAbsFilePath = "";
+                String firstImgRealFilePath = "";
+                String allFilePath = "";
+                for (int i = 0;i < filePathList.length;i++) {
+                    // 文件路径  处理多个文件  如果有多个图片 取第一个图片
+
+                    String filePath = filePathList[i];
+                    String temporaryFilePath = ftpsFilePath + "/" + filePath;
+                    log.info("temporaryFilePath==={}", temporaryFilePath);
+                    String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+
+                    // 1.红外 2.可见光 3.音频 4.视频 50.局放
+//                    String fileType = robotPatrolTaskResult.getFileType();
+
+                    switch (fileTypeList[i]) {
+                        case "1":
+                            descFilePath = developAbsoluteUrl + "/FIR/" + fileName;
+                            descRelativeUrl = developRelativeUrl + "/FIR/" + fileName;
+                            isAlarm = true;
+                            if (firstImgRealFilePath.isEmpty()){
+                                firstImgRealFilePath = descRelativeUrl;
+                                firstImgAbsFilePath = descFilePath;
+                            }
+                            break;
+                        case "2":
+                        case "5":
+                            descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
+                            descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
+                            isAlarm = true;
+                            if (firstImgRealFilePath.isEmpty()){
+                                firstImgRealFilePath = descRelativeUrl;
+                                firstImgAbsFilePath = descFilePath;
+                            }
+                            break;
+                        case "3":
+                            if (instance != null && instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
+                                String voicePath = (String) redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
+                                String voiceUrl = (String) redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content");
+                                String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                                String voiceAbsPath = "/" + instance.getCruiseId() + "/1/" + timeAfterTem + "/" + fileName;
+                                descFilePath = voicePath + voiceAbsPath;
+                                // descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                                descRelativeUrl = voiceUrl + voiceAbsPath;
+                            } else {
+                                descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                                descRelativeUrl = developRelativeUrl + "/Audio/" + fileName;
+                            }
+                            break;
+                        case "4":
+                            descFilePath = developAbsoluteUrl + "/Video/" + fileName;
+                            descRelativeUrl = developRelativeUrl + "/Video/" + fileName;
+                            break;
+                        case "50":
+                            descFilePath = developAbsoluteUrl + "/Txt/" + fileName;
+                            descRelativeUrl = developRelativeUrl + "/Txt/" + fileName;
+                            break;
+                        default:
+                            descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
+                            descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
+                            break;
+                    }
+
+                    FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
+                    allFilePath = allFilePath+ ","+descRelativeUrl;
+                }
+                if (!firstImgRealFilePath.isEmpty()){
+                    infoMap.put("relativePath", firstImgRealFilePath);
+                    infoMap.put("absolutePath", firstImgAbsFilePath);
+                } else {
+                    infoMap.put("relativePath", descRelativeUrl);
+                    infoMap.put("absolutePath", descFilePath);
+                }
+                if (filePathList.length > 1){
+                    infoMap.put("allFilePath",allFilePath.replaceFirst(",",""));
+                }
+
+                if (isAlarm) {
+                    isAlarmMap.put("relativePath", descRelativeUrl);
+                    isAlarmMap.put("absolutePath", descFilePath);
+                }
+            } else {
                 infoMap.put("relativePath", descRelativeUrl);
                 infoMap.put("absolutePath", descFilePath);
                 infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
                 infoMap.put("confirmAbsolutePath", descConfirmFilePath);
                 isAlarmMap.put("relativePath", descRelativeUrl);
                 isAlarmMap.put("absolutePath", descFilePath);
-                return isAlarmMap;
             }
-            String temporaryFilePath = ftpsFilePath + "/" + filePath;
-            String confirmTemporaryFilePath = ftpsFilePath + "/" + confirmFilePath;
-            log.info("temporaryFilePath==={}", temporaryFilePath);
-            log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
-            String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
-            String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
-
-            // 1.红外 2.可见光 3.音频 4.视频 50.局放
-            String fileType = robotPatrolTaskResult.getFileType();
-            String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
-            String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
-
-
-            switch (fileType) {
-                case "1":
-                    descFilePath = developAbsoluteUrl + "/FIR/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/FIR/" + fileName;
-                    isAlarm = true;
-                    break;
-                case "2":
-                case "5":
-                    descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
-                    descConfirmFilePath = developAbsoluteUrl + "/CCD/" + confirmFileName;
-                    descConfirmRelativeUrl = developRelativeUrl + "/CCD/" + confirmFileName;
-                    isAlarm = true;
-                    break;
-                case "3":
-                    if (instance != null && instance.getCruiseType() == TypeEnum.VOICE.getCode()) {
-                        String voicePath = (String) redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content");
-                        String voiceUrl = (String) redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content");
-                        String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-                        String voiceAbsPath = "/" + instance.getCruiseId() + "/1/" + timeAfterTem + "/" + fileName;
-                        descFilePath = voicePath + voiceAbsPath;
-                        // descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
-                        descRelativeUrl = voiceUrl + voiceAbsPath;
-                    } else {
-                        descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
-                        descRelativeUrl = developRelativeUrl + "/Audio/" + fileName;
-                    }
-                    break;
-                case "4":
-                    descFilePath = developAbsoluteUrl + "/Video/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/Video/" + fileName;
-                    break;
-                case "50":
-                    descFilePath = developAbsoluteUrl + "/Txt/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/Txt/" + fileName;
-                    break;
-                default:
-                    descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
-                    descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
-                    break;
-            }
-
-            FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
-            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getConfirmFilePath())) {
-                FileUtil.copyFileUsingStream(confirmTemporaryFilePath, descConfirmFilePath);
-                infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
-                infoMap.put("confirmAbsolutePath", descConfirmFilePath);
-            }
-            infoMap.put("relativePath", descRelativeUrl);
-            infoMap.put("absolutePath", descFilePath);
-            if (isAlarm) {
-                isAlarmMap.put("relativePath", descRelativeUrl);
-                isAlarmMap.put("absolutePath", descFilePath);
-            }
-        } catch (Exception e) {
+        }catch (Exception e) {
             log.error("下级系统的文件处理异常：", e);
         }
         return isAlarmMap;

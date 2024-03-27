@@ -41,6 +41,7 @@
         <result column="mete_type" jdbcType="VARCHAR" property="meteType" />
         <result column="meter_type" jdbcType="INTEGER" property="meterType" />
         <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
+        <result column="all_file_path" jdbcType="VARCHAR" property="allFilePath" />
     </resultMap>
 
     <resultMap id="cruiseDataReport" type="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
@@ -756,7 +757,8 @@
         fir_date,
         result_pic,
         points,
-        voice_path
+        voice_path,
+        all_file_path
         )values
         <foreach collection="list" item="uPatrolDataResult" separator=",">
             (
@@ -803,7 +805,8 @@
             #{uPatrolDataResult.firDate, jdbcType=TIMESTAMP},
             #{uPatrolDataResult.resultPic, jdbcType=VARCHAR},
             #{uPatrolDataResult.points, jdbcType=VARCHAR},
-            #{uPatrolDataResult.voicePath, jdbcType=VARCHAR}
+            #{uPatrolDataResult.voicePath, jdbcType=VARCHAR},
+            #{uPatrolDataResult.allFilePath, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -905,6 +908,7 @@
         tsd.up_region_name   AS up_region_name,
         tsd.up_region_id     AS region_id,
         max(e.cruise_time) as cruise_time,
+        e.all_file_path,
         count(*) as count
         FROM u_patrol_data_result e
         RIGHT JOIN t_std_devicemete a ON a.device_mete_id = e.device_mete_id
@@ -972,6 +976,7 @@
         q.is_temdif,
         b.voice_path,
         b.custom_name,
+        b.all_file_path,
         b.device_point_id
         FROM u_patrol_data_result b
         LEFT JOIN t_std_devicemete q on q.device_mete_id = b.device_mete_id

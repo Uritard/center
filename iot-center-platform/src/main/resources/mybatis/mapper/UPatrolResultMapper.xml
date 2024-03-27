@@ -455,7 +455,8 @@
         conf.f_value as fValue,
         region.region_name  as  edge_name,
         b.custom_name,
-        b.device_point_id
+        b.device_point_id,
+        b.all_file_path
         FROM u_patrol_data_result b
         LEFT JOIN t_std_device n on n.device_id = b.device_id
         LEFT JOIN t_std_devicemete q on q.device_mete_id = b.device_mete_id

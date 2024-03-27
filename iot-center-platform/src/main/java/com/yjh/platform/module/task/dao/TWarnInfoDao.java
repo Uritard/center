@@ -106,19 +106,18 @@ public interface TWarnInfoDao {
 
     List<WarnStatistical> countDefectByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
 
-    List<WarnStatistical> countMonByStationOnMonth(Integer nearDays);
+    List<WarnStatistical> countIotByStationOnMonth();
 
-    List<WarnStatistical> countAllByStationOnMonth(Integer nearDays);
+    List<WarnStatistical> countAllByStationOnMonth();
 
     Integer countByTaskId(@Param("taskId")String taskId);
 
     /**
      *
-     * @param nearDays 最近天数
-     * @param alarmSource 巡检：1  入侵 ：2
+     * @param list
      * @return
      */
-    List<WarnStatistical> countPollOrInvadeWarnByStationOnMonth(@Param("nearDays") Integer nearDays, @Param("alarmSource") Integer alarmSource);
+    List<WarnStatistical> countPollOrInvadeWarnByStationOnMonth(@Param("list") List<Integer> list);
 
     int batchUpDate(@Param(value = "list") List<Long> warnIdList, @Param("userId") String userId);
 

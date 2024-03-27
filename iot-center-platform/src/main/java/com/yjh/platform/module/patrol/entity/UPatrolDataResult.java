@@ -158,5 +158,8 @@ public class UPatrolDataResult implements Serializable {
     @ApiModelProperty(value = "声纹文件地址")
     private String voicePath;
 
+    @ApiModelProperty(value = "一个点有多个结果，存储多个结果的文件")
+    private String allFilePath;
+
 
 }

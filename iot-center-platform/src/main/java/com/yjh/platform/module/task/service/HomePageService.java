@@ -180,35 +180,37 @@ public class HomePageService {
     }
 
 
-    public List<Map<String, Object>> countAllByAlarmType(Integer type) {
-        Integer nearDays = warnInfoService.nearDays(type);
-        return tDefectInfoDao.countAllByAlarmType(nearDays);
+    public List<Map<String, Object>> countAllByAlarmType() {
+        return tDefectInfoDao.countAllByAlarmType();
     }
 
-
-    public String[][] countWarnByStationOnMonth(String alarmSource, Integer type) {
-        Integer nearDays = warnInfoService.nearDays(type);
+    public String[][] countWarnByStationOnMonth(String alarmSource) {
         List<WarnStatistical> alarmList = new ArrayList<>();
-        //静默告警字典值
+        List<Integer> source = new ArrayList<>();;
         if (StringUtils.isNotBlank(alarmSource)) {
             switch (alarmSource) {
-                case "巡检":
-                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(nearDays, 1);
-                    List<WarnStatistical> defectList = tWarnInfoDao.countDefectByStationOnMonth(null, nearDays);
-                    alarmList.addAll(defectList);
+                case "机器人":
+                    source.add(279);
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(source);
                     break;
                 case "监控":
-                    alarmList = tWarnInfoDao.countMonByStationOnMonth(nearDays);
+                    source.add(280);
+                    source.add(281);
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(source);
                     break;
                 case "入侵":
-                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(nearDays, 2);
+                    source.add(689);
+                    alarmList = tWarnInfoDao.countPollOrInvadeWarnByStationOnMonth(source);
+                    break;
+                case "物联设备":
+                    alarmList = tWarnInfoDao.countIotByStationOnMonth();
                     break;
                 default:
-                    alarmList = tWarnInfoDao.countAllByStationOnMonth(nearDays);
+                    alarmList = tWarnInfoDao.countAllByStationOnMonth();
                     break;
             }
         } else {
-            alarmList = tWarnInfoDao.countAllByStationOnMonth(nearDays);
+            alarmList = tWarnInfoDao.countAllByStationOnMonth();
         }
 
         List<TStdRegion> list = tStdRegionDao.selectStations();
