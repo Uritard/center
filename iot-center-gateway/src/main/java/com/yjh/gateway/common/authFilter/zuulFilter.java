@@ -136,6 +136,9 @@ public class zuulFilter extends ZuulFilter {
                                 !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
                                 !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
                                 !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
+                                && !url.contains("/systemInfo/v1/getLogsStorage") && !url.contains("/systemInfo/v1/getNVRInfo")
+                                && !url.contains("/systemInfo/v1/getServices") && !url.contains("/tSysParam/v1/selectQuery")
+                                && !url.contains("/tWarnInfo/v1/SelectCurrentUnion")
                         ) {
                             redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             if ("true".equals(isLogin)) {
