@@ -13,7 +13,6 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -68,7 +67,9 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             taskResult.setUnit(String.valueOf(item.get("unit")));
             taskResult.setTime(String.valueOf(item.get("time")));
             taskResult.setRecognitionType(String.valueOf(item.get("recognition_type")));
+            taskResult.setFileType(String.valueOf(item.get("file_type")));
             taskResult.setRectangle(String.valueOf(item.get("rectangle")));
+            taskResult.setFilePath(String.valueOf(item.get("file_path")));
             taskResult.setTaskPatrolledId(String.valueOf(item.get("task_patrolled_id")));
             taskResult.setDataType(String.valueOf(item.get("data_type")));
             taskResult.setValid(Objects.nonNull(item.get("valid")) ? String.valueOf(item.get("valid")) : "");
@@ -77,19 +78,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             taskResult.setAbnormalType((String)item.get("abnormal_type"));
             taskResult.setConfirmFilePath(Objects.nonNull(item.get("confirm_file_path")) ? String.valueOf(item.get("confirm_file_path")) : "");
             taskResult.setOperationType(Objects.nonNull(item.get("operation_type")) ? String.valueOf(item.get("operation_type")) : "");
-
-            //上传多个文件时 取第一个图片
-            String[] filePathList = MapUtils.getString(item,"file_path","").split(",");
-            String[] typeList = MapUtils.getString(item,"file_type","").split(",");
-            taskResult.setFilePath(filePathList[0]);
-            taskResult.setFileType(typeList[0]);
-            for (int i = 0;i < typeList.length;i++){
-                if ("5".equals(typeList[i]) || "2".equals(typeList[i]) || "1".equals(typeList[i])){
-                    taskResult.setFilePath(filePathList[i]);
-                    taskResult.setFileType(typeList[i]);
-                    break;
-                }
-            }
             resultList.add(taskResult);
         }
         log.info("The resultList to platform is=={}", resultList);
