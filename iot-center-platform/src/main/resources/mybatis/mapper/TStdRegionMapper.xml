@@ -260,6 +260,24 @@
         FROM t_robot_info c WHERE c.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
         #{upRegionId, jdbcType=BIGINT}</foreach>
         )
+        UNION all(
+        SELECT
+        d.voice_device_id
+        FROM t_voice_device d WHERE d.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        )
+        UNION all(
+        SELECT
+        e.id
+        FROM t_iot_device e WHERE e.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        )
+        UNION all(
+        SELECT
+        f.id
+        FROM t_meter f WHERE f.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
+        #{upRegionId, jdbcType=BIGINT}</foreach>
+        )
     </select>
 
     <select id="selectIsIn" resultType="com.yjh.platform.module.device.entity.TStdRegion">

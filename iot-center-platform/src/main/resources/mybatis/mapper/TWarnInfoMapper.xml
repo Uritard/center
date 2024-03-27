@@ -938,7 +938,7 @@
               (
                   SELECT count(*) AS countNum
                   FROM t_warn_info
-                  WHERE conf_mode = 276
+                  WHERE conf_mode = 276 AND (warn_type != '507' OR warn_type IS NULL)
               ) a,
               (
                   SELECT count(*) AS countNum
