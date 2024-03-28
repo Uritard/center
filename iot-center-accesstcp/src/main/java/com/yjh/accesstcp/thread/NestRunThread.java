@@ -52,30 +52,19 @@ public class NestRunThread implements Runnable{
                     if (!Objects.equals("drone", device.get("type"))){
                         continue;
                     }
+                    String patrolDeviceCode = MapUtils.getString(device, "robot_code");
                     //电池电量
-                    Map<String, Object> mapForSpeed = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":1");
-                    Map<String, Object> map1 = createMap(1, mapForSpeed);
-                    list.add(map1);
+                    addNestItem(list, device, 1);
                     //电池使用状态
-                    Map<String, Object> mapForMileage = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":2");
-                    Map<String, Object> map2 = createMap(2, mapForMileage);
-                    list.add(map2);
+                    addNestItem(list, device, 2);
                     //电池状态
-                    Map<String, Object> mapForCell = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":3");
-                    Map<String, Object> map3 = createMap(3, mapForCell);
-                    list.add(map3);
+                    addNestItem(list, device, 3);
                     //电池电压
-                    Map<String, Object> mapForHeadPitchAngle = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":4");
-                    Map<String, Object> map8 = createMap(4, mapForHeadPitchAngle);
-                    list.add(map8);
+                    addNestItem(list, device, 4);
                     //舱内温度
-                    Map<String, Object> mapForHeadRollAngle = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":5");
-                    Map<String, Object> map9 = createMap(5, mapForHeadRollAngle);
-                    list.add(map9);
+                    addNestItem(list, device, 5);
                     //舱内湿度
-                    Map<String, Object> mapForHeadYawAngle = redisTemplate.opsForHash().entries("nestOperation:" + device.get("robot_code") + ":6");
-                    Map<String, Object> map10 = createMap(6, mapForHeadYawAngle);
-                    list.add(map10);
+                    addNestItem(list, device, 6);
 
                     sendToUpSystemServices.sendResponse(0L, "10004","",Constant.stationCode(),list, true);
 
@@ -86,6 +75,15 @@ public class NestRunThread implements Runnable{
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    private void addNestItem(List<Map<String, Object>> list, Map<String, Object> device, Integer type) {
+        String patrolDeviceCode = MapUtils.getString(device, "robot_code");
+        Map<String, Object> mapForRedis = redisTemplate.opsForHash().entries("nestOperation:" + patrolDeviceCode + ":" + type);
+        mapForRedis.put("nestName", device.get("nest_name"));
+        mapForRedis.put("nestCode", device.get("nest_code"));
+        Map<String, Object> map = createMap(type, mapForRedis);
+        list.add(map);
     }
 
     private void sendStatus(Map<String, Object> device) {
@@ -107,8 +105,8 @@ public class NestRunThread implements Runnable{
             stateMap = new HashMap<>(8);
             stateMap.put("value", valueDef);
         }
-        stateMap.put("patrolDeviceCode", device.get("robot_num"));
-        stateMap.put("patrolDeviceName", device.get("robot_name"));
+        stateMap.put("nestCode", device.get("nest_name"));
+        stateMap.put("nestName", device.get("nest_code"));
         Map<String, Object> mapUp = createMap(type, stateMap, nowTime);
         list.add(mapUp);
     }
@@ -118,6 +116,9 @@ public class NestRunThread implements Runnable{
     }
 
     public Map<String, Object> createMap(Integer type, Map<String, Object> mapForRedis, String nowTime){
+        if (MapUtils.isEmpty(mapForRedis)) {
+            return Collections.emptyMap();
+        }
         Map<String, Object> map = new HashMap<>(16);
         map.put("nest_name", Optional.ofNullable(mapForRedis.get("nestName")).orElse(""));
         map.put("nest_code", Optional.ofNullable(mapForRedis.get("nestCode")).orElse(""));
@@ -127,9 +128,11 @@ public class NestRunThread implements Runnable{
             map.put("module_no", Optional.ofNullable(mapForRedis.get("moduleNo")).orElse(""));
         }
         map.put("type", type);
-        map.put("value", Optional.ofNullable(mapForRedis.get("value")).orElse("0"));
-        map.put("unit", Optional.ofNullable(mapForRedis.get("unit")).orElse(""));
-        map.put("value_unit", Optional.ofNullable(mapForRedis.get("valueUnit")).orElse(""));
+        String value = (String)Optional.ofNullable(mapForRedis.get("value")).orElse("1");
+        map.put("value", value);
+        String unit = (String)Optional.ofNullable(mapForRedis.get("unit")).orElse("");
+        map.put("unit", unit);
+        map.put("value_unit", value + unit);
         return map;
     }
 }

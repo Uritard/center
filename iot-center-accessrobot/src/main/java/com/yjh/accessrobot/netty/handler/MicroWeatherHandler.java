@@ -257,7 +257,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     return "mm".equals(unit) && valueUnit.equals(value + unit);
                 //风向
                 case "5":
-                    return "".equals(unit) && valueUnit.equals(value);
+                    return valueUnit.equals(value+unit);
                 //气压
                 case "6":
                     return ("Pa".equalsIgnoreCase(unit)||"kPa".equalsIgnoreCase(unit)||"hPa".equalsIgnoreCase(unit)) && valueUnit.equals(value + unit);
