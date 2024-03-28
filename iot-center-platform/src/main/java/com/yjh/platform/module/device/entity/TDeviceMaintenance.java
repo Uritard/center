@@ -47,6 +47,9 @@ public class TDeviceMaintenance implements Serializable {
     @TableField(value = "device_ids",updateStrategy = FieldStrategy.IGNORED)
     private String deviceIds;
 
+    @ApiModelProperty(value = "同步code")
+    private String configCode;
+
     @Max(value=99)
     @ApiModelProperty(value = "是否使用，0-不使用，1-使用")
     private Integer isValid;

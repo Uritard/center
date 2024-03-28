@@ -7,9 +7,8 @@ import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import com.yjh.platform.module.device.service.TDeviceMaintenanceService;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
 
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import io.swagger.annotations.*;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.result.BusinessException;
@@ -52,6 +50,7 @@ public class TDeviceMaintenanceController {
     public Result add(@Validated @RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
+            tDeviceMaintenance.setConfigCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
             result.setData(tDeviceMaintenanceService.add(tDeviceMaintenance));
             //有变动 同步模型
             if (Constant.updateSyncModel()) {
