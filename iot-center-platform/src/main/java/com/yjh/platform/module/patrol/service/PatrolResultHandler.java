@@ -702,7 +702,7 @@ public class PatrolResultHandler {
                             int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultStringValue, stateZero, stateOne, alarmState);
                             if (warnRuleFlag != 1) {
                                 log.info("Alarm value is not reached(遥信)");
-                                break;
+                                return cruiseResultMap;
                             }
                             log.info("Alarm value is reached(遥信)");
                             warnMap.put("warnLevel", String.valueOf(tStdDevicemete.getAlarmLevel()));
@@ -721,7 +721,7 @@ public class PatrolResultHandler {
                             // 如果不是数字 不用判断是否告警了
                             if (!NumberUtils.isCreatable(resultStringValue)) {
                                 log.info("Data non-numeric===={}", resultStringValue);
-                                break;
+                                return cruiseResultMap;
                             }
                             Float resultValueMeter = NumberUtils.toFloat(resultStringValue);
                             Map<String, String> initInfo = new HashMap<>(16);
@@ -753,7 +753,7 @@ public class PatrolResultHandler {
 
                             if (warnRuleMeter == 0) {
                                 log.info("Alarm value is not reached(遥测)");
-                                break;
+                                return cruiseResultMap;
                             }
 
                             log.info("Alarm value is reached(遥测)");
