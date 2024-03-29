@@ -403,7 +403,9 @@
         ELSE
         'robot'
         END
-        ) AS type
+        ) AS type,
+        nest_name,
+        nest_code
         FROM
         t_robot_info a
         WHERE

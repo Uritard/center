@@ -105,7 +105,7 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
                     return StringUtils.equalsAnyIgnoreCase(unit, "%RH", "%") && valueUnit.equals(value + unit);
                 //其他
                 default:
-                    return false;
+                    return valueUnit.equals(value + unit);
             }
         }
         return false;
