@@ -80,6 +80,7 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
+        tDeviceMaintenance.setConfigCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
         return this.add(tDeviceMaintenance);
     }
 
@@ -162,7 +163,7 @@ public class TDeviceMaintenanceService{
         params.put("start_time",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
         params.put("end_time",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
         params.put("device_level",tDeviceMaintenance.getDeviceLevel());
-        params.put("config_code", tDeviceMaintenance.getMaintenanceId());
+        params.put("config_code", tDeviceMaintenance.getConfigCode());
         params.put("coordinate_pixel", tDeviceMaintenance.getCoordinatePixel());
         params.put("online_code", onlineCode);
         Result result = sendPostRequest(params);
@@ -435,14 +436,14 @@ public class TDeviceMaintenanceService{
         List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
         List<Long> cruisePoints = getCruisePoints(deviceList, deviceLevel);
         TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
-        tDeviceMaintenance.setMaintenanceId(Long.valueOf(configCode));
+        tDeviceMaintenance.setConfigCode(configCode);
         tDeviceMaintenance.setMaintenanceStart(DateTimeUtil.getDate(startTime));
         tDeviceMaintenance.setMaintenanceStop(DateTimeUtil.getDate(stopTime));
         tDeviceMaintenance.setDeviceLevel(deviceLevel);
         tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
         createMaintenance(tDeviceMaintenance, cruisePoints, deviceIdLst , 0);
         //删除检修区域
-        tDeviceMaintenanceDao.deleteByDeviceIdList(StringUtils.join(deviceIdLst.toArray(), ","), "检修区域" + startTime);
+        tDeviceMaintenanceDao.deleteByConfigCode(configCode);
     }
 
     /**
@@ -459,6 +460,7 @@ public class TDeviceMaintenanceService{
         String endTime = item.get("end_time").toString();
         String deviceLevel = item.get("device_level").toString();
         String coordinatePixel = item.get("coordinate_pixel").toString();
+        String configCode = item.get("config_code").toString();
 
         List<DeviceAndInstance> lists = new ArrayList<>();
         cruisePoints.forEach(insItem -> {
@@ -476,6 +478,7 @@ public class TDeviceMaintenanceService{
         tDeviceMaintenance.setDeviceLevel(deviceLevel);
         tDeviceMaintenance.setDeviceAndInstanceList(lists);
         tDeviceMaintenance.setCoordinatePixel(coordinatePixel);
+        tDeviceMaintenance.setConfigCode(configCode);
         this.add(tDeviceMaintenance);
     }
 

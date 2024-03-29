@@ -268,7 +268,7 @@
     </select>
 
     <resultMap id="maintenanceMap" type="com.yjh.accesstcp.module.device.entity.MaintenanceModel">
-        <id column="maintenance_id" property="configCode"/>
+        <result column="config_code" property="configCode"/>
         <result column="is_valid" property="enable"/>
         <result column="maintenance_start" property="startTime"/>
         <result column="maintenance_stop" property="endTime"/>
@@ -283,6 +283,7 @@
             maintenance_id,
             maintenance_name,
             IF(device_level=3 or device_level=4, instance_ids,device_ids) AS device_ids,
+            config_code,
             is_valid ,
             DATE_FORMAT(maintenance_start, '%Y-%m-%d %H:%i:%s') as maintenance_start,
             DATE_FORMAT(maintenance_stop, '%Y-%m-%d %H:%i:%s') as maintenance_stop,
