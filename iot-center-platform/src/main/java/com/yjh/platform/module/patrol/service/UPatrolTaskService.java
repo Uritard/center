@@ -2030,15 +2030,18 @@ public class UPatrolTaskService {
             robotTaskStatesMap.put("robotCodeList", robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
+        Integer defaultTime = 15;
         if (uPatrolResult.getTaskType() == SINGLE_DEVICE_PATROL ||
                 uPatrolResult.getTaskType() == EMERGENCY_PATROL ||
                 uPatrolResult.getTaskType() == OPERATION_ORDER_PATROL){
             //操作类任务终止 等待机器人上报任务结束 不更新任务状态
             log.info("操作类任务终止！");
-            return;
+            //在3分钟后将任务置为任务终止
+            defaultTime = 3*60;
+        } else {
+            uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
+            updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         }
-        uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
-        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {
 
             Set<String> tasKeys = queryTaskUndoneKeys(taskId);
@@ -2053,7 +2056,7 @@ public class UPatrolTaskService {
             log.info("tasKeys size: {}", tasKeys.size());
 
             // 暂停15秒等待未接收数据完成接收
-            ScheduledMapConfig.schedule(15, taskId, tid -> {
+            ScheduledMapConfig.schedule(defaultTime, taskId, tid -> {
                 List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
                     tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                     return null;
