@@ -57,7 +57,7 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         Map<String, String> envWarn = new HashMap<>(32);
         Map<String, Object> envWarnMap = xmlBaseModel.getItems().get(0);
 
-        String deviceIp = MapUtils.getString(envWarnMap, "deviceId");
+        String deviceIp = MapUtils.getString(envWarnMap, "device_ip");
         if (StringUtils.isNotEmpty(deviceIp)) {
             envWarn.put("deviceIp", deviceIp);
         } else {

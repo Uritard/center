@@ -1,5 +1,6 @@
 package com.yjh.platform.module.iot.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Maps;
@@ -192,8 +193,8 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
                 XMLBaseModel xmlBaseModel = new XMLBaseModel();
                 List<Map<String, Object>> itemList = new ArrayList<>();
-                Map<String, Object> item = new HashMap<>(iotWarn);
-
+                Map<String, Object> item = new HashMap<>(iotWarn.size());
+                iotWarn.forEach((k,v) -> item.put(StrUtil.toUnderlineCase(k), v));
                 itemList.add(item);
                 xmlBaseModel.setItems(itemList);
                 xmlBaseModel.setType("22");
