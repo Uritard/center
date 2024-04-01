@@ -132,8 +132,7 @@ public class Constant {
     /**
      * platform接收机器人/无人机/摄像机等巡视统计信息接口
      */
-    public static final String CRUISE_DEVICE_STATICS_PROCESS = "http://iot-center-platform/uPatrolDataResult/v1" +
-            "/dealDeviceStaticsInfo";
+    public static final String CRUISE_DEVICE_STATICS_PROCESS = "http://iot-center-platform/uPatrolDataResult/v1/dealDeviceStaticsInfo";
 
     public static<T> Result otherServerList(List<T> list, String url){
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
