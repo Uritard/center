@@ -34,7 +34,7 @@ public class UPatrolDeviceStaticsService {
         statisticInfoList.forEach(statisticInfo -> {
             DeviceStaticsInfo deviceStaticsInfo;
             //若结果集中已存在待处理信息，取出继续处理
-            if (statisticMap.keySet().contains(statisticInfo.get("patroldevice_code"))) {
+            if (statisticMap.containsKey(statisticInfo.get("patroldevice_code"))) {
                 deviceStaticsInfo = statisticMap.get(statisticInfo.get("patroldevice_code"));
             }
             //不存在则新建对象
@@ -48,24 +48,25 @@ public class UPatrolDeviceStaticsService {
                 statisticMap.put(statisticInfo.get("patroldevice_code"),deviceStaticsInfo);
             }
             //处理上报信息
+            String value = statisticInfo.get("value");
             switch (statisticInfo.get("type")) {
                 case StatisticType.DURATION:
-                    deviceStaticsInfo.setDuration("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setDuration(value);
                     break;
                 case StatisticType.OFF_LINE_COUNT:
-                    deviceStaticsInfo.setOfflineCount("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setOfflineCount(value);
                     break;
                 case StatisticType.NORMAL_DAY:
-                    deviceStaticsInfo.setNormalDay("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setNormalDay(value);
                     break;
                 case StatisticType.COMMISSION_DAY:
-                    deviceStaticsInfo.setCommissionDays("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setCommissionDays(value);
                     break;
                 case StatisticType.CRUISE_PERCENT:
-                    deviceStaticsInfo.setCruisePercent("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setCruisePercent(value);
                     break;
                 case StatisticType.INTACT_PERCENT:
-                    deviceStaticsInfo.setIntactPercent("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    deviceStaticsInfo.setIntactPercent(value);
                     break;
             }
         });

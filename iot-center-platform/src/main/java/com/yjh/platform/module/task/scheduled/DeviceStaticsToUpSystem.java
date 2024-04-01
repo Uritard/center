@@ -212,96 +212,100 @@ public class DeviceStaticsToUpSystem {
             deviceStaticsInfo = redisTemplate.opsForHash().entries("deviceStaticsInfo:" + key + ":" + device.get(key).toString());
         }
         for (int type = 1; type < 7; type++) {
-            Map<String, Object> infoMap = new HashMap<>(16);
-            switch (type) {
-                case 1:
-                    // 累积在线时长总和
-                    if (!device.containsKey("robotId")) {
+            try {
+                Map<String, Object> infoMap = new HashMap<>(16);
+                switch (type) {
+                    case 1:
+                        // 累积在线时长总和
+                        if (!device.containsKey("robotId")) {
+                            break;
+                        }
+                        deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
+                        infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : deviceStaticsInfo.get("duration").toString());
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "分");
+                        dealFuncInfo(device, reportDate, type, infoMap);
                         break;
-                    }
-                    deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
-                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : deviceStaticsInfo.get("duration").toString());
-                    infoMap.put("value_unit", "1");
-                    infoMap.put("unit", "分");
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                case 2:
-                    // 累积离线次数总和
-                    if (!device.containsKey("robotId")) {
+                    case 2:
+                        // 累积离线次数总和
+                        if (!device.containsKey("robotId")) {
+                            break;
+                        }
+                        deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
+                        infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("off_line_count")) ? 0 : Integer.parseInt(deviceStaticsInfo.get("off_line_count").toString()));
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "次");
+                        dealFuncInfo(device, reportDate, type, infoMap);
                         break;
-                    }
-                    deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
-                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("off_line_count")) ? 0 : Integer.parseInt(deviceStaticsInfo.get("off_line_count").toString()));
-                    infoMap.put("value_unit", "1");
-                    infoMap.put("unit", "次");
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                case 3:
-                    // 累计连续正常运行天数
-                    if (!device.containsKey("robotId")) {
-                        break;
-                    }
-                    Integer NormalDays = uPatrolDeviceStaticsDao.selectNormalDays(device.get("patrolDeviceCode").toString());
-                    if (NormalDays == null ) {
-                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
-                        NormalDays = NumberUtils.toInt((String) result.get("commission_days"));
-                    }
-                    infoMap.put("value", NormalDays);
-                    infoMap.put("value_unit", "1");
-                    infoMap.put("unit", "天");
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                case 4:
-                    // 正常巡检天数
-                    if (device.containsKey("robotId")) {
-                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
-                        infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
+                    case 3:
+                        // 累计连续正常运行天数
+                        if (!device.containsKey("robotId")) {
+                            break;
+                        }
+                        Integer NormalDays = uPatrolDeviceStaticsDao.selectNormalDays(device.get("patrolDeviceCode").toString());
+                        if (NormalDays == null ) {
+                            Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                            NormalDays = NumberUtils.toInt((String) result.get("commission_days"));
+                        }
+                        infoMap.put("value", NormalDays);
                         infoMap.put("value_unit", "1");
                         infoMap.put("unit", "天");
-                    }
-                    else if (device.containsKey("cameraId"))  {
-                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
-                        infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
-                        infoMap.put("value_unit", "1");
-                        infoMap.put("unit", "天");
-                    }
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                case 5:
-                    // 巡检出勤率
-                    if (device.containsKey("robotId")) {
-                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
-                        infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
-                        infoMap.put("value_unit", "1");
-                        infoMap.put("unit", "%");
-                    }
-                    else if (device.containsKey("cameraId"))  {
-                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
-                        infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
-                        infoMap.put("value_unit", "1");
-                        infoMap.put("unit", "%");
-                    }
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                case 6:
-                    // 录像完整率
-                    if (!device.containsKey("cameraId")) {
+                        dealFuncInfo(device, reportDate, type, infoMap);
                         break;
-                    }
-                    if (StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))) {
-                        infoMap.put("value", "0");
-                    } else {
-                        infoMap.put("value", deviceStaticsInfo.get("intactPercent").toString().replace("%", ""));
-                    }
-                    infoMap.put("value_unit", "1");
-                    infoMap.put("unit", "%");
-                    dealFuncInfo(device, reportDate, type, infoMap);
-                    break;
-                default:
-                    break;
-            }
-            if (MapUtils.isNotEmpty(infoMap)){
-                infoMaps.add(infoMap);
+                    case 4:
+                        // 正常巡检天数
+                        if (device.containsKey("robotId")) {
+                            Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                            infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
+                            infoMap.put("value_unit", "1");
+                            infoMap.put("unit", "天");
+                        }
+                        else if (device.containsKey("cameraId"))  {
+                            Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
+                            infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
+                            infoMap.put("value_unit", "1");
+                            infoMap.put("unit", "天");
+                        }
+                        dealFuncInfo(device, reportDate, type, infoMap);
+                        break;
+                    case 5:
+                        // 巡检出勤率
+                        if (device.containsKey("robotId")) {
+                            Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                            infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
+                            infoMap.put("value_unit", "1");
+                            infoMap.put("unit", "%");
+                        }
+                        else if (device.containsKey("cameraId"))  {
+                            Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
+                            infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
+                            infoMap.put("value_unit", "1");
+                            infoMap.put("unit", "%");
+                        }
+                        dealFuncInfo(device, reportDate, type, infoMap);
+                        break;
+                    case 6:
+                        // 录像完整率
+                        if (!device.containsKey("cameraId")) {
+                            break;
+                        }
+                        if (StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))) {
+                            infoMap.put("value", "0");
+                        } else {
+                            infoMap.put("value", deviceStaticsInfo.get("intactPercent").toString().replace("%", ""));
+                        }
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "%");
+                        dealFuncInfo(device, reportDate, type, infoMap);
+                        break;
+                    default:
+                        break;
+                }
+                if (MapUtils.isNotEmpty(infoMap)){
+                    infoMaps.add(infoMap);
+                }
+            } catch (Exception e) {
+                log.error("组装巡视设备统计信息失败", e);
             }
         }
     }
