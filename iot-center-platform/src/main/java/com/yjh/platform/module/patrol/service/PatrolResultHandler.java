@@ -180,6 +180,17 @@ public class PatrolResultHandler {
                 log.info("Robot_SPAndIN_Info: 获取 redisvalue： {}", JSONUtil.toJSONString(robotInfoKeyMap));
 
                 String instanceId = robotInfoKeyMap.get("instanceId");
+                String instanceIdInMap = instanceId;
+                if (StringUtils.isNotEmpty(instanceIdInMap)){
+                    String[] strList = instanceIdInMap.split(" ");
+                    instanceIdInMap = strList[0];
+                    if (StringUtils.isNotEmpty(instanceIdInMap)){
+                        instanceIdInMap = instanceId.replace(instanceIdInMap+" ","");
+                        instanceId = strList[0];
+                        redisTemplate.opsForHash().put(redisKey,"instanceId",instanceIdInMap);
+                    }
+
+                }
                 // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
                 TCruisePointInstance instance;
                 if (StringUtils.isEmpty(instanceId)) {

@@ -1365,8 +1365,19 @@ public class RobotService {
             }
             if ("0".equals(isenable)) {
                 for (int i = 0; i < redisInfoList.size(); i++) {
+                    String key = "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode");
+                    Map<String,String> map = redisTemplate.opsForHash().entries(key);
+                    if (!MapUtils.isEmpty(map)){
+                        //判断
+                        String instanceIdInRedis = map.get("instanceId");
+                        String instanceIdInMap = redisInfoList.get(i).get("instanceId");
+                        if (!instanceIdInRedis.contains(instanceIdInMap)){
+                            //不含 加上
+                            redisInfoList.get(i).put("instanceId",instanceIdInRedis+" "+instanceIdInMap);
+                        }
+                    }
                     redisTemplate.opsForHash().putAll(
-                        "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode"),
+                            key,
                         redisInfoList.get(i));
                 }
             }
