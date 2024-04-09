@@ -244,6 +244,7 @@
         a.device_name,
         h.custom_id,
         b.text_desc AS behavior,
+        d.up_region_id AS region_id,
         a.point_type,
         (
         CASE

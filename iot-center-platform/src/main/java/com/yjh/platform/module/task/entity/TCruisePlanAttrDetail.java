@@ -66,7 +66,7 @@ public class TCruisePlanAttrDetail implements Serializable {
     private String areaId;
 
     @ApiModelProperty(value = "巡检区域id")
-    private String cruiseRegionIds;
+    private Long regionId;
 
     @ApiModelProperty(value = "巡视异常类型:0无，1.外观缺陷异常，2.多源对比异常，3.数值越限异常")
     private Integer exceptionType;

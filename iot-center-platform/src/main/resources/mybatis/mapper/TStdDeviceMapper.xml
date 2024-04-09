@@ -880,17 +880,6 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 
 	</select>
 
-	<select id="selectDeviceIdsByRegion" parameterType="java.util.List" resultType="java.lang.Long">
-		SELECT DISTINCT
-		device_id
-		FROM
-		t_std_device
-		WHERE up_region_id IN
-		<foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
-			#{regionIds,jdbcType=BIGINT}
-		</foreach>
-	</select>
-
 	<select id="selectDeviceIdListByRegion" parameterType="java.util.List" resultType="java.lang.Long">
 		SELECT DISTINCT
 		device_id
