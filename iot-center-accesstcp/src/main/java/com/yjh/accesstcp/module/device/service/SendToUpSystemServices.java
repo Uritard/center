@@ -9,11 +9,13 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.Object2Map;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
+import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
@@ -24,16 +26,12 @@ import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import com.yjh.accesstcp.thread.ReContentManager;
 import com.yjh.accesstcp.thread.RegisterManager;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoop;
-import io.netty.channel.EventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -49,7 +47,6 @@ import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -471,6 +468,9 @@ public class SendToUpSystemServices {
 
     public String createRecordFile(String path) throws Exception {
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
+        Result re = Constant.getForObject(Constant.GET_WVP_SERVER_CONFIG);
+        JSONObject obj = (JSONObject) JSON.toJSON(re.getData());
+        tCameraRecorderList.forEach(tCameraRecorder -> tCameraRecorder.setDeviceChannel(String.valueOf(obj.get("username"))));
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = tCameraRecorderList.stream().map((Function<TCameraRecorder, Map<String, Object>>) tCameraRecorder -> {
