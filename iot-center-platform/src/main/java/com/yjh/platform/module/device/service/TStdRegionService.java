@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.service;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
@@ -41,6 +42,8 @@ public class TStdRegionService{
     private Logger log = LoggerFactory.getLogger(TStdRegionService.class);
 
     public final static String LOWER_UP_KEY = "region:lowerUpStation";
+    public final static String UP_REF_KEY = "region:upRef:";
+    public final static String LOW_REF_KEY = "region:lowRef:";
 
     private final static Map<Long,TStdRegion> REGION_MAP = new ConcurrentHashMap<>(32);
 
@@ -200,21 +203,42 @@ public class TStdRegionService{
     }
 
     public int loadRegionIntoRedis() {
-        List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, 1, null);
+        List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
         Set<String> keys = redisTemplate.keys("region:*");
         // 删除所有区域信息重新加载
         if (CollectionUtils.isNotEmpty(keys)) {
             redisTemplate.delete(keys);
         }
         for (TStdRegion item : list) {
-            if (StringUtils.isNotEmpty(item.getRegionCode())) {
+            if (StringUtils.isNotEmpty(item.getRegionCode()) && 1 == item.getState()) {
                 Map<String, String> map = Object2Map.toStringMap(Object2Map.objectToMap(item, true));
                 String str = "region:" + item.getRegionCode();
                 redisTemplate.opsForHash().putAll(str, map);
             }
         }
+        ThreadPoolUtil.COMMON_POOL.addThread(()->regionUpDownRef(list));
         stationDownId();
         return 1;
+    }
+
+    public void regionUpDownRef(List<TStdRegion> list) {
+        log.info("开始加载区域对应上下级关系......");
+        try {
+            for (TStdRegion region : list) {
+                String regionId = region.getRegionId().toString();
+                List<Long> upRegionList = tStdRegionDao.selectAllUpRegion(regionId);
+                List<Long> lowRegionList = tStdRegionDao.selectDownRegion(regionId);
+                if (CollectionUtils.isNotEmpty(upRegionList)) {
+                    redisTemplate.opsForSet().add(UP_REF_KEY + regionId, upRegionList.toArray(new Long[0]));
+                }
+                if (CollectionUtils.isNotEmpty(lowRegionList)) {
+                    redisTemplate.opsForSet().add(LOW_REF_KEY + regionId, lowRegionList.toArray(new Long[0]));
+                }
+            }
+            log.info("区域对应上下级关系加载完成");
+        } catch (Exception e) {
+            log.error("区域对应上下级关系加载失败", e);
+        }
     }
 
     public Map<Long, KeyValue<Long, String>> stationDownId() {

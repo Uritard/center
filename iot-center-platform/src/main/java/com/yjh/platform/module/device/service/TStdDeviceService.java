@@ -22,13 +22,19 @@ import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.PostConstruct;
 
 /**
 * @author tt
@@ -37,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 public class TStdDeviceService{
+
+    public final static String DEVICE_REGION_KEY = "deviceRegion:";
 
     @Autowired
     private TStdDeviceDao tStdDeviceDao;
@@ -63,6 +71,18 @@ public class TStdDeviceService{
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @PostConstruct
+    public void deviceRegion2Redis() {
+        List<TStdDevice> deviceList = select(null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Map<Long, Set<Long>> regionDeviceMap = deviceList.stream()
+            .collect(Collectors.groupingBy(TStdDevice::getUpRegionId, Collectors.mapping(TStdDevice::getDeviceId, Collectors.toSet())));
+
+        regionDeviceMap.forEach((k, v) -> {
+            String key = DEVICE_REGION_KEY + k;
+            redisTemplate.delete(key);
+            redisTemplate.opsForSet().add(key, v.toArray(new Long[0]));
+        });
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public TStdDevice selectByUnionKeys(Long deviceId){
@@ -553,6 +573,60 @@ public class TStdDeviceService{
             }
 
         });
+        return reMap;
+    }
+
+    public Map<Long, Boolean> regionTreeStateForDeviceIds(@NotNull Set<Long> deviceIds, Set<Long> regionIds) {
+        Map<Long, Boolean> reMap = new HashMap<>(64);
+
+        // 根据设备查询所有设备所属区域
+        // List<Long> regionList = tStdDeviceDao.s(deviceIdList.toString());
+
+        Set<Long> allRegions = new TreeSet<>(Comparator.reverseOrder());
+
+        regionIds.forEach(regionId -> {
+            if (regionId != null) {
+
+                // 获取区域所有设备
+                Set<Number> deviceNums = redisTemplate.opsForSet().members(DEVICE_REGION_KEY + regionId);
+                Set<Long> devices = deviceNums.stream().map(Number::longValue).collect(Collectors.toSet());
+                Set<Long> s = SetUtils.difference(devices, deviceIds);
+
+                boolean val = s.isEmpty();
+
+                reMap.compute(regionId, (k, v) -> v == null ? val : v && val);
+
+                Set<Number> upRegionObjs = redisTemplate.opsForSet().members(TStdRegionService.UP_REF_KEY + regionId);
+
+                if (CollectionUtils.isNotEmpty(upRegionObjs)) {
+                    Set<Long> upRegions = upRegionObjs.stream().mapToLong(Number::longValue).collect(HashSet::new, HashSet::add,
+                        AbstractCollection::addAll);
+                    if (!val) {
+                        upRegions.forEach(upRegionId -> reMap.put(upRegionId, false));
+                    } else {
+                        allRegions.addAll(upRegions);
+                    }
+                }
+            }
+        });
+
+        allRegions.forEach(r -> {
+            if (reMap.containsKey(r)) {
+                return;
+            }
+            Set<Number> downIdObjs = redisTemplate.opsForSet().members(TStdRegionService.LOW_REF_KEY + r);
+            Set<Long> checkedRegions = reMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
+            boolean val;
+            if (CollectionUtils.isNotEmpty(downIdObjs)) {
+                Set<Long> downIds = downIdObjs.stream().map(Number::longValue).filter(d->!d.equals(r)).collect(Collectors.toSet());
+                Set<Long> s = SetUtils.difference(downIds, checkedRegions);
+                val = s.isEmpty();
+            } else {
+                val = true;
+            }
+            reMap.compute(r, (k, v) -> v == null ? val : v && val);
+        });
+
         return reMap;
     }
 
@@ -1079,9 +1153,6 @@ public class TStdDeviceService{
         return 1;
     }
 
-    public List<Long> selectDeviceIdsByRegion(List<Long> regionIds){
-        return tStdDeviceDao.selectDeviceIdsByRegion(regionIds);
-    }
     public List<Long> selectDeviceIdListByRegion(List<Long> regionIds){
         return tStdDeviceDao.selectDeviceIdListByRegion(regionIds);
     }

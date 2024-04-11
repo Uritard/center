@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.patrol.service.UPatrolPlanAttrService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.entity.input.CruisePlanReq;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 import io.swagger.annotations.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
@@ -36,19 +36,21 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value = "/tCruisePlan", description = "巡检预案属性表操作接口")
 public class TCruisePlanController {
 
-    @Autowired
     private final TCruisePlanService tCruisePlanService;
-    @Autowired
-    private TCruisePlanAttrService tCruisePlanAttrService;
-    @Autowired
-    private UPatrolPlanAttrService uPatrolPlanAttrService;
-    @Autowired
-    private LogsRecord logsRecord;
+    private final TCruisePlanAttrService tCruisePlanAttrService;
+    private final UPatrolPlanAttrService uPatrolPlanAttrService;
+    private final TStdDeviceService tStdDeviceService;
+    private final LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanController.class);
 
-    public TCruisePlanController(TCruisePlanService tCruisePlanService) {
+    public TCruisePlanController(TCruisePlanService tCruisePlanService, TCruisePlanAttrService tCruisePlanAttrService,
+        UPatrolPlanAttrService uPatrolPlanAttrService, TStdDeviceService tStdDeviceService, LogsRecord logsRecord) {
         this.tCruisePlanService = tCruisePlanService;
+        this.tCruisePlanAttrService = tCruisePlanAttrService;
+        this.uPatrolPlanAttrService = uPatrolPlanAttrService;
+        this.tStdDeviceService = tStdDeviceService;
+        this.logsRecord = logsRecord;
     }
 
     @ApiOperation(value = "新增预案")
@@ -354,11 +356,14 @@ public class TCruisePlanController {
             planDetailMap.put("type", tCruisePlanCount.getType());
             planDetailMap.put("subType", tCruisePlanCount.getSubType());
             List<TCruisePlanAttrDetail> tCruisePlanAttrDetailList = tCruisePlanAttrService.selectByPrimaryId(planId);
-            List<Long> deviceIds = new ArrayList<>();
+            Set<Long> deviceIds = new HashSet<>();
+            Set<Long> regionIds = new HashSet<>();
             for (TCruisePlanAttrDetail tCruisePlanAttrDetail:tCruisePlanAttrDetailList) {
                 deviceIds.add(tCruisePlanAttrDetail.getDeviceId());
+                regionIds.add(tCruisePlanAttrDetail.getRegionId());
             }
-            deviceIds = deviceIds.stream().distinct().collect(Collectors.toList());
+            Map<Long, Boolean> regionCheck = tStdDeviceService.regionTreeStateForDeviceIds(deviceIds, regionIds);
+
             if (tCruisePlanAttrDetailList.size()>0) {
                 if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
             } else {planDetailMap.put("subType", "");}
@@ -366,7 +371,8 @@ public class TCruisePlanController {
                 if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
             } else {planDetailMap.put("subTypeName", "");}
             planDetailMap.put("instanceList", tCruisePlanAttrDetailList);
-            planDetailMap.put("deviceIds", deviceIds);
+            planDetailMap.put("deviceIds", new ArrayList<>(deviceIds));
+            planDetailMap.put("regionCheck", regionCheck);
             result.setData(planDetailMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
