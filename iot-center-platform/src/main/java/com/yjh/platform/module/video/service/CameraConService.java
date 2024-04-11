@@ -2058,4 +2058,9 @@ public class CameraConService {
         }
         return res;
     }
+
+    public Map<String, String> getServerConfig() {
+        IServerConfigService iServerConfigService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IServerConfigService.class);
+        return iServerConfigService.getServerConfig().getData();
+    }
 }

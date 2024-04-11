@@ -699,4 +699,17 @@ public class CameraConController {
         }
         return result;
     }
+
+    @ApiOperation(value = "获取国标服务的配置")
+    @RequestMapping(value = "/getServerConfig", method = RequestMethod.GET)
+    public Result getServerConfig()  {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.getServerConfig());
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("获取国标服务的配置失败",e);
+        }
+        return result;
+    }
 }

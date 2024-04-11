@@ -109,46 +109,19 @@ public class TCameraRecorderService {
         List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
 
         log.info("nvr列表" + tCameraRecorderByDictList);
-        // nvr的ID列表
-        List<String> deviceIdList = tCameraRecorderByDictList.stream()
-                .filter(tCameraRecorderByDict -> tCameraRecorderByDict.getRecordId() != null && tCameraRecorderByDict.getDeviceChannel() != null)
-                .map(TCameraRecorderByDict::getDeviceChannel).distinct().collect(Collectors.toList());
-
-        // nvr id存在则进行nvr状态查询， 反之直接设置nvr状态为未知
-        if (deviceIdList.size() > 0) {
-            IRecordService iRecordService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IRecordService.class);
-            RecordEntity build = RecordEntity.builder().deviceIdList(deviceIdList).build();
-            Result<List<DeviceStatusResp>> deviceStatusRespResult = iRecordService.queryNVRStatus(build);
-
-            //接口调用成功进行状态设置，反之设为未知
-            if (deviceStatusRespResult.isSuccess()) {
-                List<DeviceStatusResp> deviceStatusRespList = deviceStatusRespResult.getData();
-                Map<String, DeviceStatusResp> deviceStatusRespMap = deviceStatusRespList.stream()
-                        .collect(Collectors.toMap(DeviceStatusResp::getDeviceId, deviceStatusResp -> deviceStatusResp));
-
-                // 循环遍历数组进行nvr状态设置
-                for (TCameraRecorderByDict tCameraRecorderByDict : tCameraRecorderByDictList) {
-                    if (tCameraRecorderByDict.getDeviceChannel() == null) {
-                        tCameraRecorderByDict.setRecorderStatus("未知");
-                        continue;
-                    }
-                    DeviceStatusResp deviceStatusResp = deviceStatusRespMap.get(tCameraRecorderByDict.getDeviceChannel());
-                    if (deviceStatusResp != null) {
-                        if (deviceStatusResp.getOnLine()) {
-                            tCameraRecorderByDict.setRecorderStatus("在线");
-                        } else {
-                            tCameraRecorderByDict.setRecorderStatus("离线");
-                        }
-                    } else {
-                        tCameraRecorderByDict.setRecorderStatus("未知");
-                    }
-                }
+        tCameraRecorderByDictList.forEach(recorder -> {
+            Map<String, String> res = cameraConService.getCameraStatus(recorder.getRecordId());
+            if (res.isEmpty()) {
+                recorder.setRecorderStatus("未知");
             } else {
-                tCameraRecorderByDictList.forEach(tCameraRecorderByDict -> tCameraRecorderByDict.setRecorderStatus("未知"));
+                String online = "1";
+                if (res.containsValue(online)) {
+                    recorder.setRecorderStatus("在线");
+                } else {
+                    recorder.setRecorderStatus("离线");
+                }
             }
-        } else {
-            tCameraRecorderByDictList.forEach(tCameraRecorderByDict -> tCameraRecorderByDict.setRecorderStatus("未知"));
-        }
+        });
         log.info("nvr状态列表" + tCameraRecorderByDictList);
         return tCameraRecorderByDictList;
     }
