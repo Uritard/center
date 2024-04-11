@@ -493,8 +493,8 @@ INSERT INTO `t_dict_business` VALUES ('300161', '276', 'conf_mode', '未核查',
 INSERT INTO `t_dict_business` VALUES ('300162', '277', 'conf_mode1', '已确认', '0', '处理状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300163', '278', 'conf_mode2', '已忽略', '0', '处理状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300164', '279', 'alarm_source', '机器人', '0', '告警来源', '3');
-INSERT INTO `t_dict_business` VALUES ('300165', '280', 'alarm_source', '可见光', '0', '告警来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300166', '281', 'alarm_source', '红外', '0', '告警来源', '2');
+INSERT INTO `t_dict_business` VALUES ('300165', '280', 'alarm_source', '视频-可见光', '0', '告警来源', '1');
+INSERT INTO `t_dict_business` VALUES ('300166', '281', 'alarm_source', '视频-红外', '0', '告警来源', '2');
 INSERT INTO `t_dict_business` VALUES ('300167', '282', 'alarm_source', '主辅设备', '0', '告警来源', '7');
 INSERT INTO `t_dict_business` VALUES ('300168', '283', 'defect_level', '危急', '133', '缺陷等级', '1');
 INSERT INTO `t_dict_business` VALUES ('300169', '284', 'defect_level', '一般', '131', '缺陷等级', '1');
