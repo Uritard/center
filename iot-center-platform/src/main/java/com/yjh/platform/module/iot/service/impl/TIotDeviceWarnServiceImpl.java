@@ -8,7 +8,9 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.module.iot.dao.TIotDeviceMapper;
 import com.yjh.platform.module.iot.dao.TIotDeviceWarnMapper;
+import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.entity.TIotDeviceWarn;
 import com.yjh.platform.module.iot.service.TIotDeviceWarnService;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
@@ -43,6 +45,8 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
     private ApplicationProperties applicationProperties;
     @Resource
     private AlarmShieldDao alarmShieldDao;
+    @Resource
+    private TIotDeviceMapper tIotDeviceMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -159,29 +163,45 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         boolean flag = this.updateById(tIotDeviceWarn);
         if (flag && applicationProperties.getUpSystemFtps().isEnable()) {
             ThreadPoolUtil.COMMON_POOL.addThread(() -> {
-                Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
-                TIotDeviceWarn tdw = getBaseMapper().selectById(tIotDeviceWarn.getId());
-                TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(tdw.getRobotCode());
-                List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
-                XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                List<Map<String, Object>> itemList = new ArrayList<>();
-                Map<String, Object> item = Maps.newHashMap();
-                item.put("patroldevice_code", tRobotInfo.getRobotNum());
-                item.put("patroldevice_name", tRobotInfo.getRobotName());
-                item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
-                item.put("type_device_num", tdw.getChannelNum());
-                item.put("value", tdw.getAlarmContent());
-                item.put("delete_flag", 2);
-                item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
-                itemList.add(item);
-                xmlBaseModel.setItems(itemList);
-                xmlBaseModel.setType("22");
-                xmlBaseModelList.add(xmlBaseModel);
-                map.put("list", xmlBaseModelList);
-                Constant.otherServer(map, Constant.TCP_URL);
+                try {
+                    Map<String, List<XMLBaseModel>> map = Maps.newHashMap();
+                    TIotDeviceWarn tdw = getBaseMapper().selectById(tIotDeviceWarn.getId());
+                    List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                    List<Map<String, Object>> itemList = new ArrayList<>();
+                    Map<String, Object> item = Maps.newHashMap();
+                    setDeviceInfo(item, tdw.getRobotCode(), tdw.getIotDeviceId());
+
+                    item.put("alarm_time", DateTimeUtil.getDateTimeString(tdw.getAlarmTime()));
+                    item.put("type_device_num", tdw.getChannelNum());
+                    item.put("value", tdw.getAlarmContent());
+                    item.put("delete_flag", 2);
+                    item.put("delete_time", DateTimeUtil.getDateTimeString(tdw.getDeleteTime()));
+                    itemList.add(item);
+                    xmlBaseModel.setItems(itemList);
+                    xmlBaseModel.setType("22");
+                    xmlBaseModelList.add(xmlBaseModel);
+                    map.put("list", xmlBaseModelList);
+                    Constant.otherServer(map, Constant.TCP_URL);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             });
         }
         return flag;
+    }
+
+    private void setDeviceInfo(Map<String, Object> item, String robotCode, long deviceId) {
+        if (StringUtils.isEmpty(robotCode)) {
+            TIotDevice iotDevice = tIotDeviceMapper.selectById(deviceId);
+            item.put("device_ip", iotDevice.getIp());
+            item.put("patroldevice_code", iotDevice.getDeviceId());
+            item.put("patroldevice_name", iotDevice.getDeviceName());
+        } else {
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
+            item.put("patroldevice_code", tRobotInfo.getRobotNum());
+            item.put("patroldevice_name", tRobotInfo.getRobotName());
+        }
     }
 
     private void uploadWarn(Map<String, String> iotWarn) {

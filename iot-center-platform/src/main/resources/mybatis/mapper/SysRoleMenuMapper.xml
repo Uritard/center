@@ -182,23 +182,26 @@
     </select>
 
     <select id="selectMenuFirstChild" resultType="java.util.Map">
-        SELECT
-        pa.menu_code AS code ,
-        sm.menu_name AS first_child
-        FROM
-        sys_menu sm
-        RIGHT JOIN sys_role_menu a ON
-        a.menu_code = sm.menu_code
-        LEFT JOIN sys_menu pa ON
-        sm.up_id = pa.menu_id
+        SELECT pa.menu_code AS code, sm.menu_name AS first_child, sm.sort
+        FROM sys_menu sm
+        RIGHT JOIN sys_role_menu a ON a.menu_code = sm.menu_code
+        LEFT JOIN sys_menu pa ON sm.up_id = pa.menu_id
+        LEFT JOIN (
+            SELECT pa1.menu_code, MIN(sm1.sort) AS min_sort
+            FROM sys_menu sm1
+            RIGHT JOIN sys_role_menu a1 ON a1.menu_code = sm1.menu_code
+            LEFT JOIN sys_menu pa1 ON sm1.up_id = pa1.menu_id
+            WHERE
+                sm1.state = 1 AND sm1.menu_type = 2 AND pa1.menu_code IS NOT NULL
+                <if test="userId != null and userId != -1"> AND a1.user_id = #{userId, jdbcType=BIGINT}</if>
+                <if test="userId == null or userId == -1"> AND a1.user_id IS NULL</if>
+            GROUP BY pa1.menu_code
+        ) AS tmp ON tmp.menu_code = pa.menu_code AND sm.sort = tmp.min_sort
         WHERE
-        sm.state = 1
-        AND sm.menu_type = 2
-        <if test="userId != null and userId != -1"> AND a.user_id = #{userId, jdbcType=BIGINT}</if>
-        GROUP BY
-        pa.menu_code
-        ORDER BY
-        sm.sort
+            sm.state = 1 AND sm.menu_type = 2 AND pa.menu_code IS NOT NULL
+            <if test="userId != null and userId != -1"> AND a.user_id = #{userId, jdbcType=BIGINT}</if>
+            <if test="userId == null or userId == -1"> AND a.user_id IS NULL</if>
+        GROUP BY pa.menu_code
     </select>
 
     <select id="selectRoleMenuTree" resultMap="roleTreeMap">
