@@ -24,11 +24,12 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
@@ -150,8 +151,16 @@ public class InspectionResultThread implements Runnable{
         String val = robotPatrolTaskResult.getValue();
         // 非模拟工具上来的结果，如果值为空，则结果为异常
         if (StringUtils.isNotEmpty(val)) {
-            tCruiseTaskResultMap.put("resultNum", ResultConvertUtil.convertResult(val));
-            tCruiseTaskResultMap.put("resultDesc", ResultConvertUtil.convertDesc(val, tCruiseTaskResultMap.getOrDefault("unit", "")));
+            //D200局放 单独处理结果
+            String fifty = "50";
+            if (fifty.equals(robotPatrolTaskResult.getFileType()) && tCruiseTaskResultMap.get("origpic").contains(".txt")) {
+                Map<String, String> result = dealJudgment(tCruiseTaskResultMap.get("origpic"));
+                tCruiseTaskResultMap.put("resultNum", result.get("type"));
+                tCruiseTaskResultMap.put("resultDesc", result.get("value"));
+            } else {
+                tCruiseTaskResultMap.put("resultNum", ResultConvertUtil.convertResult(val));
+                tCruiseTaskResultMap.put("resultDesc", ResultConvertUtil.convertDesc(val, tCruiseTaskResultMap.getOrDefault("unit", "")));
+            }
             log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
         } else if (!isSimulationTool) {
             tCruiseTaskResultMap.put("resultNum", "-1");
@@ -171,13 +180,12 @@ public class InspectionResultThread implements Runnable{
         }
         if (StringUtils.isNotEmpty(valid)) {
             switch (valid) {
+                //成功
                 case "1":
-                case "2":
-                    //局放 异常
-                    if ("50".equals(robotPatrolTaskResult.getFileType())){
-                        cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_DISCHARGE);
-                    }
                     break;
+                //分析失败
+                case "2":
+                //采集失败
                 case "0":
                 default:
                     isnormal = false;
@@ -218,6 +226,64 @@ public class InspectionResultThread implements Runnable{
                 break;
         }
         tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
+    }
+
+    /**
+     * D200 判断结果是不是放电
+     * @param filepath 局放 .txt文件路径
+     * @return 只返回放电情况
+     */
+    private Map<String, String> dealJudgment(String filepath) {
+        File file = new File(filepath);
+        Map<String, String> resMap = new HashMap<>(2);
+        if (file.exists()) {
+            List<String[]> list;
+            try (BufferedReader br = Files.newBufferedReader(file.toPath())) {
+                list = br.lines().map(s -> s.split(",")).collect(Collectors.toList());
+            } catch (IOException e) {
+                log.error("readFileList error", e);
+                resMap.put("type", "-1");
+                resMap.put("value", "图谱文件异常");
+                return resMap;
+            }
+            if (list.size() == 0) {
+                log.info("图谱文件data.txt大小为0");
+                resMap.put("type", "-1");
+                resMap.put("value", "图谱文件异常");
+                return resMap;
+            }
+            String[] result = list.get(list.size() - 1);
+            String type = result[result.length - 2];
+            log.info("局放数据：" + type);
+            String value;
+            switch (type) {
+                case "1":
+                    value = "内部放电";
+                    break;
+                case "2":
+                    value = "表面放电";
+                    break;
+                case "3":
+                    value = "悬浮电位";
+                    break;
+                case "4":
+                    value = "电晕放电";
+                    break;
+                case "9":
+                    value = "未采集完";
+                    break;
+                default:
+                    value = "非放电";
+                    break;
+            }
+            resMap.put("type", type);
+            resMap.put("value", value);
+        } else {
+            log.info("图谱文件data.txt不存在");
+            resMap.put("type", "-1");
+            resMap.put("value", "图谱文件不存在");
+        }
+        return resMap;
     }
 
     private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
