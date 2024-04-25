@@ -185,6 +185,7 @@ public class InspectionResultThread implements Runnable{
                     break;
                 //分析失败
                 case "2":
+                    break;
                 //采集失败
                 case "0":
                 default:
