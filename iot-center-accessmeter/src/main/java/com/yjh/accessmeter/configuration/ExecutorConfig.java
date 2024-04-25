@@ -41,11 +41,11 @@ public class ExecutorConfig implements SchedulingConfigurer, AsyncConfigurer {
     @Bean(destroyMethod = "shutdown", name = "taskScheduler")
     public ThreadPoolTaskScheduler taskScheduler(){
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-
-        scheduler.setPoolSize(4);
+        scheduler.setPoolSize(100);
         scheduler.setThreadNamePrefix("scheduling-meter-");
-        scheduler.setAwaitTerminationSeconds(30);
+        scheduler.setAwaitTerminationSeconds(10);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        scheduler.initialize();
         return scheduler;
     }
 
