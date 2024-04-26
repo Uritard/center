@@ -154,7 +154,7 @@ public class InspectionResultThread implements Runnable{
             //D200局放 单独处理结果
             String fifty = "50";
             if (fifty.equals(robotPatrolTaskResult.getFileType()) && tCruiseTaskResultMap.get("origpic").contains(".txt")) {
-                Map<String, String> result = dealJudgment(tCruiseTaskResultMap.get("origpic"));
+                Map<String, String> result = dealJudgment(tCruiseTaskResultMap.get("origpic"), val, tCruiseTaskResultMap.getOrDefault("unit", ""));
                 tCruiseTaskResultMap.put("resultNum", result.get("type"));
                 tCruiseTaskResultMap.put("resultDesc", result.get("value"));
             } else {
@@ -234,7 +234,7 @@ public class InspectionResultThread implements Runnable{
      * @param filepath 局放 .txt文件路径
      * @return 只返回放电情况
      */
-    private Map<String, String> dealJudgment(String filepath) {
+    private Map<String, String> dealJudgment(String filepath, String val, String unit) {
         File file = new File(filepath);
         Map<String, String> resMap = new HashMap<>(2);
         if (file.exists()) {
@@ -281,8 +281,8 @@ public class InspectionResultThread implements Runnable{
             resMap.put("value", value);
         } else {
             log.info("图谱文件data.txt不存在");
-            resMap.put("type", "-1");
-            resMap.put("value", "图谱文件不存在");
+            resMap.put("type", val);
+            resMap.put("value", val + unit);
         }
         return resMap;
     }
