@@ -1335,13 +1335,13 @@ public class RobotService {
         StringJoiner str = new StringJoiner(",");
         // 机器人任务临时信息存放至redis
         log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
-        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable());
+        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable(),item.getCruiseType());
 
         log.info("packageXMLBaseModel参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         packageXMLBaseModel(item, robotCode, taskId, str);
     }
 
-    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList, String isenable) {
+    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList, String isenable,Integer cruiseType) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
         try {
             // 将instanceIdList放缓存，以备后续使用
@@ -1364,6 +1364,15 @@ public class RobotService {
                 redisInfoList.add(redisInfoMap);
             }
             if ("0".equals(isenable)) {
+                if (456 == cruiseType
+                    || 508 == cruiseType
+                        || 509 == cruiseType){
+                    // 操作任务清楚原有缓存
+                    for (int i = 0; i < redisInfoList.size(); i++) {
+                        String key = "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode");
+                        redisTemplate.delete(key);
+                    }
+                }
                 for (int i = 0; i < redisInfoList.size(); i++) {
                     String key = "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode");
                     Map<String,String> map = redisTemplate.opsForHash().entries(key);
