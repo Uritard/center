@@ -2851,3 +2851,17 @@ CREATE TABLE `t_iot_device_warn` (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备告警表';
 
+DROP TABLE IF EXISTS `device_maintenance_info`;
+CREATE TABLE `device_maintenance_info`(
+`id`                 BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+`device_id`          BIGINT (20) DEFAULT '1' COMMENT '设备id',
+`device_name`        VARCHAR(128) DEFAULT '' COMMENT '设备名称',
+`device_type`        INT (11) DEFAULT 1 COMMENT '设备类型',
+`maintenance_type`   INT (11) DEFAULT 1 COMMENT '维护信息类型',
+`maintenance_desc`   VARCHAR(512) DEFAULT '' COMMENT '维护信息描述',
+`create_time`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_time`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+`create_user`        VARCHAR(128) DEFAULT '' COMMENT '创建人',
+`remark`             VARCHAR(255) DEFAULT '' COMMENT '备注',
+PRIMARY KEY (`id`) USING BTREE
+) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '设备维护信息表';
