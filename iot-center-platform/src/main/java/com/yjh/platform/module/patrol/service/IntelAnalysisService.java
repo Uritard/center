@@ -41,6 +41,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -296,6 +297,28 @@ public class IntelAnalysisService {
             return Response.serverError();
         }
         return new Response(code);
+    }
+
+    /**
+     * 请求算法资源信息接口
+     *
+     * @return 算法资源信息
+     */
+    public JSONObject algorithmResource() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            String result = HttpClientUtils.getInstance().getUrl(applicationProperties.getIntelAlgorithmConfig().getAlgorithmResourceUrl(), null);
+            log.info("result==={}", result);
+            if (StringUtils.isEmpty(result)) {
+                jsonObject.put("code", 400);
+            } else {
+                jsonObject = JSONObject.parseObject(result);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            jsonObject.put("code", 500);
+        }
+        return jsonObject;
     }
 
     public void picAnalyseRetNotify(PicAnalyseResponse response){
@@ -1340,6 +1363,25 @@ public class IntelAnalysisService {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * 请求其他服务
+     * @param url
+     * @return String
+     */
+    private String getUtl(String url) {
+        HttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet();
+        httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+        httpGet.setHeader("Accept", "application/json");
+        try {
+            HttpResponse response = client.execute(httpGet);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            log.error("get请求失败", e);
+        }
+        return "";
     }
 
     /**
