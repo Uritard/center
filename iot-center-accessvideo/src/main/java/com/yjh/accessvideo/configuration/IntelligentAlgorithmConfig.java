@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class IntelligentAlgorithmConfig {
     private String analysisUrl;
     private String updateUrl;
+    private String algorithmResourceUrl;
     private String resultIp;
     private String resultPort;
     private String silentMonitorType;
