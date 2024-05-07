@@ -903,6 +903,16 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '2111', '环控设备类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位', '2112', '环控设备类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '2113', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('870', 'cruise_device_type', '机器人', '0', '巡视设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('871', 'cruise_device_type', '无人机', '0', '巡视设备类型', '2');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('872', 'cruise_device_type', '摄像机', '0', '巡视设备类型', '3');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('873', 'cruise_device_type', '录像机', '0', '巡视设备类型', '4');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('874', 'cruise_device_type', '声纹', '0', '巡视设备类型', '5');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('875', 'maintenance_type', '缺陷记录', '0', '维护信息类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('876', 'maintenance_type', '大修记录', '0', '维护信息类型', '2');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('877', 'maintenance_type', '退出再重放记录', '0', '维护信息类型', '3');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('878', 'maintenance_type', '更换记录', '0', '维护信息类型', '4');
+
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
