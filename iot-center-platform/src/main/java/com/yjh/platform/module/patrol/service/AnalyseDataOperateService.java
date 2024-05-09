@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -15,8 +16,10 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -425,7 +428,7 @@ public class AnalyseDataOperateService {
                                         Float highLimit1, Float lowLimit1,
                                         Float highLimit2, Float lowLimit2,
                                         Float highLimit3, Float lowLimit3,
-                                        Float highLimit4, Float lowLimit4){
+                                        Float highLimit4, Float lowLimit4, int alarmRuleType){
        Map<String,Object> resultMap = new HashMap<>(8);
        try {
            int flag = warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2,
@@ -442,7 +445,7 @@ public class AnalyseDataOperateService {
            }
            // 告警信息拼装并返回
            warnInfoSetting(value, valueDesc, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
-                   highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap);
+                   highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap, alarmRuleType);
        }catch (Exception e){
            log.error(e.getMessage(), e);
        }
@@ -455,7 +458,7 @@ public class AnalyseDataOperateService {
                                                Integer alarmLevel, Float highLimit1, Float lowLimit1,
                                                Float highLimit2, Float lowLimit2, Float highLimit3,
                                                Float lowLimit3, Float highLimit4, Float lowLimit4,
-                                               Map<String, Object> resultMap) {
+                                               Map<String, Object> resultMap, int alarmRuleType) {
         Boolean isWarn = false;
         Integer warnLevel = null;
         String warnName = null;
@@ -477,7 +480,8 @@ public class AnalyseDataOperateService {
                 if (value.matches("^[a-zA-Z_\\u4e00-\\u9fa5_\\--]+$")) {
                     break;
                 } else {
-                    int level = warnJudgement(Float.valueOf(value), highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
+                    List<Pair<Float, Float>> limitList = Arrays.asList(Pair.of(lowLimit1, highLimit1), Pair.of(lowLimit2, highLimit2), Pair.of(lowLimit3, highLimit3), Pair.of(lowLimit4, highLimit4));
+                    int level = warnJudgement(NumberUtil.parseFloat(value), alarmRuleType, limitList);
                     log.info("level-------------:" + level);
                     if (level > 0) {
                         isWarn = true;
@@ -587,58 +591,32 @@ public class AnalyseDataOperateService {
      * -------表计识别 数据告警判断 --------
      * @return 返回遥测告警等级或未告警  4:危急  3:严重  2:一般  1:预警  0:正常
      */
-    @Transactional(rollbackFor = Exception.class)
-    public int warnJudgement(Float value,
-                             Float highLimit1, Float lowLimit1,
-                             Float highLimit2, Float lowLimit2,
-                             Float highLimit3, Float lowLimit3,
-                             Float highLimit4, Float lowLimit4) {
-        log.info("value:{},highLimit1:{},lowLimit1:{},highLimit2:{},lowLimit2:{},highLimit3:{},lowLimit3:{},highLimit4:{},lowLimit4:{}",
-                value, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
-        Boolean emergency1 = false;
-        Boolean emergency2 = false;
-        Boolean worse1 = false;
-        Boolean worse2 = false;
-        Boolean general1 = false;
-        Boolean general2 = false;
-        Boolean warns1 = false;
-        Boolean warns2 = false;
+    public int warnJudgement(Float value, int alarmRuleType, List<Pair<Float, Float>> limitList) {
+        log.info("value: {}, alarmRuleType: {}, limitList: {}",
+            value, alarmRuleType, limitList);
 
-        if (Objects.nonNull(lowLimit4)) {
-            emergency1 = value <= lowLimit4;
+        int end = limitList.size() - 1;
+        for (int i = end; i >= 0; i--) {
+            Pair<Float, Float> limit = limitList.get(i);
+            Float left = limit.getLeft();
+            Float right = limit.getRight();
+            if (Objects.nonNull(left) && Objects.nonNull(right)) {
+                boolean inRange = Range.between(left, right).contains(value);
+                boolean isAlarm = (alarmRuleType == 1 && inRange) || (alarmRuleType != 1 && !inRange);
+                if (isAlarm) {
+                    return i + 1;
+                }
+            }else if (left != right && alarmRuleType != 1) {
+                // 使用 != 判断，表示必有一个不为空
+                boolean outLeft = Objects.nonNull(left) && value <= left;
+                boolean outRight = Objects.nonNull(right) && value >= right;
+                if (outRight || outLeft) {
+                    return i + 1;
+                }
+            }
         }
-        if (Objects.nonNull(highLimit4)) {
-            emergency2 = value >= highLimit4;
-        }
-        if (Objects.nonNull(lowLimit3)){
-            worse1 = value <= lowLimit3;
-        }
-        if (Objects.nonNull(highLimit3)) {
-            worse2 = value >= highLimit3;
-        }
-        if (Objects.nonNull(lowLimit2)) {
-            general1 = value <= lowLimit2;
-        }
-        if (Objects.nonNull(highLimit2)){
-            general2 = value >= highLimit2;
-        }
-        if (Objects.nonNull(lowLimit1)){
-            warns1 = value <= lowLimit1;
-        }
-        if (Objects.nonNull(highLimit1)) {
-            warns2 = value >= highLimit1;
-        }
-        if (emergency1 || emergency2) {
-            return 4;
-        } else if (worse1 || worse2) {
-            return 3;
-        } else if (general1 || general2) {
-            return 2;
-        } else if (warns1 || warns2) {
-            return 1;
-        } else {
-            return 0;
-        }
+
+        return 0;
     }
 
     @Transactional(rollbackFor = Exception.class)

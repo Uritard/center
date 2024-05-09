@@ -1830,6 +1830,7 @@ CREATE TABLE `t_std_devicemete` (
   `redundant_type` varchar(50) NOT NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
   `is_temdif` int(5) DEFAULT '0' COMMENT '是否温差任务（0-否；1-是）',
   `alarm_level_string` varchar(64) NULL  DEFAULT '' COMMENT '告警级别list',
+  `alarm_rule_type` int(5) DEFAULT '0' COMMENT '告警规则类型',
   PRIMARY KEY (`device_mete_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8mb4 COMMENT='标准设备测点表';
 

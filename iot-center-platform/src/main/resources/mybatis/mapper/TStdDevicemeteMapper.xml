@@ -46,7 +46,7 @@
     <sql id="Base_Column_List">
         device_mete_id, device_id, device_point_id, custom_id, custom_name, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
-        mete_type, modulus, remark,state_zero,state_one,alarm_state
+        mete_type, modulus, remark,state_zero,state_one,alarm_state,alarm_rule_type
     </sql>
 
 
@@ -94,7 +94,8 @@
             alarm_state,
             is_temdif,
             redundant_type,
-            alarm_level_string
+            alarm_level_string,
+            alarm_rule_type
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
@@ -138,7 +139,8 @@
                 #{alarmState, jdbcType=INTEGER},
                 #{isTemdif, jdbcType=INTEGER},
                 #{redundantType, jdbcType=VARCHAR},
-                #{alarmLevelString,jdbcType=VARCHAR}
+                #{alarmLevelString,jdbcType=VARCHAR},
+                #{alarmRuleType,jdbcType=INTEGER}
         )
     </insert>
 
@@ -185,14 +187,14 @@
         state_one,
         is_temdif,
         alarm_state,
-        redundant_type
-
+        redundant_type,
+        alarm_rule_type
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
             (
             #{TStdMeteModelDetail.deviceMeteId, jdbcType=BIGINT},
             #{deviceId, jdbcType=BIGINT},
-           ifnull(#{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},"00"),
+            ifnull(#{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},"00"),
             #{TStdMeteModelDetail.customType, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.customName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
@@ -231,8 +233,8 @@
             #{TStdMeteModelDetail.stateOne, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.isTemdif, jdbcType=INTEGER},
             ifnull(#{TStdMeteModelDetail.alarmState, jdbcType=INTEGER},"1"),
-            #{TStdMeteModelDetail.redundantType, jdbcType=VARCHAR}
-
+            #{TStdMeteModelDetail.redundantType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmRuleType,jdbcType=INTEGER}
             )
         </foreach>
     </insert>
@@ -291,6 +293,7 @@
         a.redundant_type = #{redundantType},
         a.alarm_level_string = #{alarmLevelString,jdbcType=VARCHAR},
         <if test="isTemdif != null ">a.is_temdif = #{isTemdif},</if>
+        a.alarm_rule_type = #{alarmRuleType,jdbcType=INTEGER},
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
@@ -336,7 +339,8 @@
         a.alarm_state,
         a.is_temdif,
         a.redundant_type,
-        b.device_name
+        b.device_name,
+        a.alarm_rule_type
         from t_std_devicemete a
         left join t_std_device b on a.device_id = b.device_id
         where 1 = 1
@@ -395,7 +399,8 @@
         h.dict_note as unitName,
         a.analyse_type,
         a.is_temdif,
-        l.dict_note as analyseTypeName
+        l.dict_note as analyseTypeName,
+        a.alarm_rule_type
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
         left join t_dict_business f on a.alarm_type= f.dict_code
@@ -459,7 +464,7 @@
         a.device_id,
         a.device_point_id,
         a.custom_id as customType,
-               a.alarm_level_string,
+        a.alarm_level_string,
         a.mete_id,
         a.mete_kind,
         a.meter_type,
@@ -498,7 +503,8 @@
         e.device_name as deviceName,
         e.up_region_id,
         a.analyse_type,
-        a.is_temdif
+        a.is_temdif,
+        a.alarm_rule_type
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
         left join t_dict_business f on a.alarm_type= f.dict_code
@@ -558,15 +564,15 @@
             custom_name,
             mete_id,
             mete_kind,
-        meter_type,
+            meter_type,
             mete_name,
-        appearance_type,
+            appearance_type,
             device_type,
             inspection_type,
             position_type,
-        analyse_type,
-        is_ai,
-        is_judge,
+            analyse_type,
+            is_ai,
+            is_judge,
             unit,
             alarm_note,
             alarm_type,
@@ -587,7 +593,8 @@
             state_zero,
             state_one,
             is_temdif,
-            alarm_state
+            alarm_state,
+            alarm_rule_type
         )values
         <foreach collection="list" item="TStdDevicemete" separator=",">
             (
@@ -598,15 +605,15 @@
                 #{TStdDevicemete.customName, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},
-            #{TStdDevicemete.meterType, jdbcType=INTEGER},
-            #{TStdDevicemete.meteName, jdbcType=VARCHAR},
-            #{TStdDevicemete.appearanceType, jdbcType=INTEGER},
-            #{TStdDevicemete.deviceType, jdbcType=INTEGER},
-            #{TStdDevicemete.inspectionType, jdbcType=INTEGER},
+                #{TStdDevicemete.meterType, jdbcType=INTEGER},
+                #{TStdDevicemete.meteName, jdbcType=VARCHAR},
+                #{TStdDevicemete.appearanceType, jdbcType=INTEGER},
+                #{TStdDevicemete.deviceType, jdbcType=INTEGER},
+                #{TStdDevicemete.inspectionType, jdbcType=INTEGER},
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
-            #{TStdDevicemete.analyseType, jdbcType=INTEGER},
-            #{TStdDevicemete.isAi, jdbcType=VARCHAR},
-            #{TStdDevicemete.isJudge,jdbcType=VARCHAR},
+                #{TStdDevicemete.analyseType, jdbcType=INTEGER},
+                #{TStdDevicemete.isAi, jdbcType=VARCHAR},
+                #{TStdDevicemete.isJudge,jdbcType=VARCHAR},
                 #{TStdDevicemete.unit, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmNote, jdbcType=VARCHAR},
                 #{TStdDevicemete.alarmType, jdbcType=VARCHAR},
@@ -627,7 +634,8 @@
                 #{TStdDevicemete.stateZero, jdbcType=VARCHAR},
                 #{TStdDevicemete.stateOne, jdbcType=VARCHAR},
                 #{TStdDevicemete.isTemdif, jdbcType=INTEGER},
-                #{TStdDevicemete.alarmState, jdbcType=INTEGER}
+                #{TStdDevicemete.alarmState, jdbcType=INTEGER},
+                #{TStdDevicemete.alarmRuleType,jdbcType=INTEGER}
             )
         </foreach>
     </insert>

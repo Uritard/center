@@ -576,6 +576,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     tStdDeviceMete.setIsTemdif(0);
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
+                    tStdDeviceMete.setAlarmRuleType(NumberUtils.toInt(excelEntity.getAlarmRuleType()));
                     totalMete.add(tStdDeviceMete);
                 }
             });

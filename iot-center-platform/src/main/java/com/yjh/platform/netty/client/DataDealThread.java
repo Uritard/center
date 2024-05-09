@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -338,16 +339,10 @@ public class DataDealThread implements Runnable {
                                                     }
                                                     break;
                                                 case "2":
+                                                    List<Pair<Float, Float>> limitList = Arrays.asList(Pair.of(tStdDevicemeteM.getLowLimit1(), tStdDevicemeteM.getHighLimit1()), Pair.of(tStdDevicemeteM.getLowLimit2(), tStdDevicemeteM.getHighLimit2()), Pair.of(tStdDevicemeteM.getLowLimit3(), tStdDevicemeteM.getHighLimit3()), Pair.of(tStdDevicemeteM.getLowLimit4(), tStdDevicemeteM.getHighLimit4()));
                                                     Float resultValueMeter = NumberUtils.toFloat(resultString);
                                                     int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter,
-                                                            tStdDevicemeteM.getHighLimit1(),
-                                                            tStdDevicemeteM.getLowLimit1(),
-                                                            tStdDevicemeteM.getHighLimit2(),
-                                                            tStdDevicemeteM.getLowLimit2(),
-                                                            tStdDevicemeteM.getHighLimit3(),
-                                                            tStdDevicemeteM.getLowLimit3(),
-                                                            tStdDevicemeteM.getHighLimit4(),
-                                                            tStdDevicemeteM.getLowLimit4());
+                                                        tStdDevicemeteM.getAlarmRuleType(), limitList);
                                                     if (warnRuleMeter > 0) {
                                                         warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "数据异常");
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));

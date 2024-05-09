@@ -443,6 +443,7 @@
         q.mete_kind,
         q.meter_type,
         q.mete_type,
+        q.alarm_rule_type,
         b.cruise_id as preset_id,
         k.camera_id,
         b.is_warn,
@@ -853,6 +854,7 @@
         a.modulus,
         a.is_temdif,
         a.remark,
+        a.alarm_rule_type,
         conf.db_value as dBValue,
         conf.f_value as FValue
         from t_cruise_point_instance b left join t_std_devicemete a

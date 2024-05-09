@@ -133,6 +133,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             params.put("lowLimit3", tStdDevicemete.getLowLimit3());
             params.put("highLimit4", tStdDevicemete.getHighLimit4());
             params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+            params.put("alarmRuleType", tStdDevicemete.getAlarmRuleType());
 
             Result result = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.WARN_JUDGE, Result.class, params);
             Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));

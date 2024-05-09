@@ -132,4 +132,11 @@ public class TStdDevicemete implements Serializable {
     @ApiModelProperty(value = "频率限值")
     private Integer fValue;
 
+    /**
+     * 告警规则类型
+     * 0: 上下限
+     * 1: 区间
+     */
+    private int alarmRuleType;
+
 }

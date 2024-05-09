@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
@@ -20,9 +21,9 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -677,6 +678,7 @@ public class PatrolResultHandler {
                 Float highLimit4 = tStdDevicemete.getHighLimit4();
                 Float lowLimit4 = tStdDevicemete.getLowLimit4();
                 String meteName = tStdDevicemete.getMeteName();
+                int alarmRuleType = tStdDevicemete.getAlarmRuleType();
                 int warnFlag = analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1,
                         highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
 
@@ -757,9 +759,8 @@ public class PatrolResultHandler {
                                     initInfo.put("outRange", String.valueOf(abs));
                                 }
                             }
-
-                            int warnRuleMeter = analyseDataOperateService.warnJudgement(Float.valueOf(initInfo.get("valueTemp")), highLimit1, lowLimit1,
-                                    highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
+                            List<Pair<Float, Float>> limitList = Arrays.asList(Pair.of(lowLimit1, highLimit1), Pair.of(lowLimit2, highLimit2), Pair.of(lowLimit3, highLimit3), Pair.of(lowLimit4, highLimit4));
+                            int warnRuleMeter = analyseDataOperateService.warnJudgement(NumberUtil.parseFloat(initInfo.get("valueTemp")), alarmRuleType, limitList);
                             log.info("warnRuleMeter=={}", warnRuleMeter);
 
                             if (warnRuleMeter == 0) {

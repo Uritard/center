@@ -204,6 +204,13 @@ public class TStdDeviceMete implements Serializable {
 
     private String isJudge;
 
+    /**
+     * 告警规则类型
+     * 0: 上下限
+     * 1: 区间
+     */
+    private int alarmRuleType;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
@@ -213,4 +220,5 @@ public class TStdDeviceMete implements Serializable {
     private Integer isBind = 2;//是否绑定 0-否 1-是 2-全部
 
     private Integer bindMultiple = 2;//是否绑定多个 0-否 1-是 2-全部
+
 }

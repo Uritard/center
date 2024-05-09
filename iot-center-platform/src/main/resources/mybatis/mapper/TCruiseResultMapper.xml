@@ -172,7 +172,8 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        a.remark
+        a.remark,
+        a.alarm_rule_type
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
         where b.instance_id=#{instanceId,jdbcType=BIGINT}

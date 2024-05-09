@@ -185,6 +185,13 @@ public class TStdDeviceMete implements Serializable {
     @Max(value = 99999999)
     private Integer alarmState;
 
+    /**
+     * 告警规则类型
+     * 0: 上下限
+     * 1: 区间
+     */
+    private int alarmRuleType;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
