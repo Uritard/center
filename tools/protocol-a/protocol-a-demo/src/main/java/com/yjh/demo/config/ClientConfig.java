@@ -1,15 +1,9 @@
 package com.yjh.demo.config;
 
 import com.yjh.commons.rxbus.RxBus;
-import com.yjh.messager.api.channel.MsgChannel;
-import com.yjh.messager.api.channel.RxBusMsgChannel;
-import com.yjh.messager.api.msg.Msg;
-import com.yjh.messager.api.socket.BaseSocketClient;
 import com.yjh.protocol_a.IdentityProvider;
 import com.yjh.protocol_a.MessageIdGenerator;
 import com.yjh.protocol_a.MessageSender;
-import com.yjh.protocol_a.impl.MessageCodec;
-import com.yjh.protocol_a.impl.PacketCodecFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,19 +21,13 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ClientConfig {
 
-    @Value("${platform.ip}")
-    String platformIp;
-
-    @Value("${platform.port}")
-    int platformPort;
-
-    @Value("${platform.send-code}")
     String sendCode;
 
-    @Value("${platform.receive-code}")
     String receiveCode;
 
     public static boolean sendBatch;
+
+    public static long sessionId = 0l;
 
     @Value("${send.batch:true}")
     public void setSendBatch(boolean sendBatch) {
@@ -55,7 +43,7 @@ public class ClientConfig {
         }
     }
 
-    @Bean
+    @Bean("clientRxBus")
     public RxBus clientRxBus() {
         return new RxBus();
     }
@@ -70,6 +58,7 @@ public class ClientConfig {
         return Executors.newSingleThreadExecutor(Executors.defaultThreadFactory());
     }
 
+/*
     @Bean
     public MsgChannel clientMsgChannel(ExecutorService clientOutboundExecutor, RxBus clientRxBus) {
         return new RxBusMsgChannel(
@@ -79,6 +68,7 @@ public class ClientConfig {
                 clientOutboundExecutor
         );
     }
+*/
 
     @Bean
     public Timer reconnectionTimer() {
@@ -128,5 +118,13 @@ public class ClientConfig {
             RxBus clientRxBus
     ) {
         return new MessageSender(clientMessageIdGenerator, clientIdentityProvider, clientRxBus, msg -> true);
+    }
+
+    public String getSendCode() {
+        return sendCode;
+    }
+
+    public String getReceiveCode() {
+        return receiveCode;
     }
 }

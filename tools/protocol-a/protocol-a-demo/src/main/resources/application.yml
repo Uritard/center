@@ -4,12 +4,20 @@ logging:
     com.yjh: info
   file:
     name: ./logs/ainterface.log
+  charset:
+    console: utf-8
+    file: utf-8
 
 spring:
   application:
     name: demo
   profiles:
     active: prod
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 server:
   servlet:
@@ -18,15 +26,6 @@ server:
         http-only: true
     context-path: /demo
   port: 18088
-
-platform:
-  ip: 127.0.0.1
-  port: 10011
-  send-code: Edge01
-  receive-code: Region01
-
-tcp:
-  port: 10013
 
 send:
   batch: false

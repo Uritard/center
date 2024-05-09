@@ -1,23 +1,12 @@
 package com.yjh.demo.controller;
 
 import com.yjh.demo.entity.MessageParam;
-import com.yjh.demo.handler.DemoServerHandler;
-import com.yjh.demo.util.XmlToMessageUtil;
-import com.yjh.protocol_a.Message;
-import com.yjh.protocol_a.MessageIdGenerator;
-import com.yjh.protocol_a.MessageSender;
-import com.yjh.protocol_a.OutboundMessage;
+import com.yjh.demo.entity.ResultBean;
+import com.yjh.demo.service.ServerService;
+import com.yjh.demo.task.AutomationTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 /**
  * @author zilong
@@ -29,21 +18,36 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class DemoServerController {
+    private final ServerService serverService;
+    private final AutomationTask automationTask;
 
-    private final MessageSender serverMessageSender;
-    private final DemoServerHandler demoServerHandler;
+    @PostMapping(value = "/create")
+    public ResultBean createServer(@RequestParam String station, @RequestParam String platform,
+        @RequestParam(defaultValue = "10011") Integer port, @RequestParam(required = false) String sendCode) {
+        try {
+            String rootTag = automationTask.startProtocolTask(station, platform, true);
+            return serverService.createServer(port, sendCode, rootTag);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return new ResultBean(500, "error");
+        }
+    }
+
+    @PostMapping(value = "/destroy")
+    public ResultBean destroyServer() {
+        serverService.destroy();
+        return new ResultBean(200, "success");
+    }
 
     @PostMapping(value = "/out-msg")
-    public void sendOutMessage(@RequestBody MessageParam xml) {
-        Message message = null;
+    public ResultBean sendOutMessage(@RequestBody MessageParam xml) {
         try {
-            message = XmlToMessageUtil.decode(xml.getXml());
-        }catch (Exception e){
+            serverService.sendMessage(xml.getXml(), xml.getMsgId());
+            return new ResultBean(200, "success");
+        } catch (Exception e) {
             log.error("xml格式有误", e);
+            return new ResultBean(500, "error");
         }
-        OutboundMessage msg = new OutboundMessage(message);
-        msg.setSessionId(demoServerHandler.getSessionId());
-        serverMessageSender.send(msg);
     }
 
 }
