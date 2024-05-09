@@ -202,6 +202,7 @@ public class ReportManageService {
         try {
             // 明细
             List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
+            DictConvertUtil.optional("alarmLevel").add("alarmRuleType").covertToDict(cruiseDataResultDetailList);
             // 更新任务进度
             REPORT_CACHE.put(taskId, 15);
             log.info("查询任务结果完成，{}", taskId);

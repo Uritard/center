@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.entity;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -104,6 +106,82 @@ public class TCruiseDataResultDetail implements Serializable {
      * 部件
      */
     private String componentName;
+    /**
+     * 状态一描述
+     */
+    private String stateZero;
+    /**
+     * 状态二描述
+     */
+    private String stateOne;
+    /**
+     * 告警上限1
+     */
+    private Float highLimit1;
+    /**
+     * 告警下限1
+     */
+    private Float lowLimit1;
+    /**
+     * 告警上限2
+     */
+    private Float highLimit2;
+    /**
+     * 告警下限2
+     */
+    private Float lowLimit2;
+    /**
+     * 告警上限3
+     */
+    private Float highLimit3;
+    /**
+     * 告警下限3
+     */
+    private Float lowLimit3;
+    /**
+     * 告警上限4
+     */
+    private Float highLimit4;
+    /**
+     * 告警下限4
+     */
+    private Float lowLimit4;
+    /**
+     * 测点类型:0-遥信，1-遥测
+     */
+    private Integer meteKind;
+    /**
+     * 告警等级
+     */
+    private Integer alarmLevel;
+    /**
+     * 告警级别
+     */
+    private String alarmLevelName;
+    /**
+     * 告警规则
+     */
+    private Integer alarmRuleType;
+    /**
+     * 告警规则名称
+     */
+    private String alarmRuleTypeName;
+    /**
+     * 告警状态
+     */
+    private Integer alarmState;
+    /**
+     * 测点类型
+     */
+    private Integer meteType;
+    /**
+     * 分贝告警值
+     */
+    private String dbValue;
+    /**
+     * 频率限值
+     */
+    private String fValue;
     /**
      * 数据来源
      */
