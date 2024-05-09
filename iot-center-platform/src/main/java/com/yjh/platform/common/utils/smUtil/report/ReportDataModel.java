@@ -41,7 +41,7 @@ public class ReportDataModel {
      * 详细巡视记录标题
      */
     private static final String[] TASK_PORT_INFO = {
-            "编号", "区域", "间隔", "设备", "部件", "点位", "数据来源", "巡视设备名称", "采集时间", "巡视结果", "点位状态","巡视图像"
+            "编号", "区域", "间隔", "设备", "部件", "点位", "数据来源", "巡视设备名称", "采集时间", "巡视结果", "点位状态", "告警规则", "巡视图像"
     };
 
     /**
@@ -94,58 +94,58 @@ public class ReportDataModel {
         // 变电站
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getStationName()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{Optional.ofNullable(taskVoInfo.getStationName()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 电压等级
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[1]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[1]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{Optional.ofNullable(taskVoInfo.getVoltageClasses()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{Optional.ofNullable(taskVoInfo.getVoltageClasses()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视日期
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[2]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseDate()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{DateTimeUtil.formatYMD(taskVoInfo.getCruiseDate())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{DateTimeUtil.formatYMD(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowCount = rowCount + 2;
         // 变电站类别
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[3]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[3]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{Optional.ofNullable(taskVoInfo.getStationType()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{Optional.ofNullable(taskVoInfo.getStationType()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视任务
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[4]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getTaskName()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{Optional.ofNullable(taskVoInfo.getTaskName()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 环境信息
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[5]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[5]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{Optional.ofNullable(taskVoInfo.getEnvInfo()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{Optional.ofNullable(taskVoInfo.getEnvInfo()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 审核人
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[6]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{Optional.ofNullable(taskVoInfo.getReviewer()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{Optional.ofNullable(taskVoInfo.getReviewer()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowCount = rowCount + 2;
         // 审核时间
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[7]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[7]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getReviewTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{dataFormat(taskVoInfo.getReviewTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{dataFormat(taskVoInfo.getReviewTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowIndex++;
@@ -153,34 +153,34 @@ public class ReportDataModel {
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO[8]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseStartTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{dataFormat(taskVoInfo.getCruiseStartTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{dataFormat(taskVoInfo.getCruiseStartTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 4, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 2, 5, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowCount = rowCount + 2;
         // 巡视结束时间
-        elements.add(new TableCellElement(rowIndex, rowIndex, 5, 5, new String[]{TASK_INFO[9]},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 6, 6, new String[]{TASK_INFO[9]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseEndTime()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{dataFormat(taskVoInfo.getCruiseEndTime())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 7, 12, new String[]{dataFormat(taskVoInfo.getCruiseEndTime())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
-            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 11, new String[]{},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 6, 12, new String[]{},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }
         rowIndex++;
         // 巡视统计
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO2[0]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 11, new String[]{Optional.ofNullable(taskVoInfo.getCruiseStatistics()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 12, new String[]{Optional.ofNullable(taskVoInfo.getCruiseStatistics()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         // 巡视结论
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 1, new String[]{TASK_INFO2[1]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
-        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 11, new String[]{Optional.ofNullable(taskVoInfo.getCruiseConclusion()).orElse("")},
+        elements.add(new TableCellElement(rowIndex, rowIndex, 2, 12, new String[]{Optional.ofNullable(taskVoInfo.getCruiseConclusion()).orElse("")},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         rowIndex++;
         rowCount++;
@@ -342,11 +342,39 @@ public class ReportDataModel {
             // 点位状态
             elements.add(new TableCellElement(rowIndex, rowIndex, 10, 10, new String[]{Optional.ofNullable(detail.getIdentifyResultName()).orElse("")},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+            // 告警规则
+            String warnRule = "";
+            if (Objects.nonNull(detail.getMeteKind())) {
+                if (detail.getMeteKind() == 2) {
+                    warnRule = "告警规则：" + detail.getAlarmRuleTypeName() + "\r\n"
+                            + "预警：" + detail.getLowLimit1() + "/" + detail.getHighLimit1() + " 一般：" + detail.getLowLimit2() + "/" + detail.getHighLimit2() + "\r\n"
+                            + "严重：" + detail.getLowLimit3() + "/" + detail.getHighLimit4() + " 危机：" + detail.getLowLimit3() + "/" + detail.getHighLimit4();
+                } else if (detail.getMeteKind() == 1) {
+                    if (detail.getMeteType() == 223) {
+                        warnRule = "告警规则\r\n"
+                                + "分贝告警值：" + detail.getDbValue() + "\r\n"
+                                + "频率告警值：" + detail.getFValue();
+                    } else {
+                        String state = "";
+                        if (detail.getAlarmState() == 0) {
+                            state = detail.getStateZero();
+                        } else if (detail.getAlarmState() == 1) {
+                            state = detail.getStateOne();
+                        }
+                        warnRule = "告警规则\r\n"
+                                + "告警级别：" + detail.getAlarmLevelName() + "\r\n"
+                                + "告警状态：" + state;
+                    }
+                }
+            }
+            elements.add(new TableCellElement(rowIndex, rowIndex, 11, 11, new String[]{warnRule},
+                    TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
+
             // 巡视图像
             String file = StringUtils.isEmpty(detail.getPicPath()) ? "" : detail.getPicPath();
             String oriFile = downResultPic ? detail.getPicPath() : detail.getOriImg();
             oriFile = CommonUtils.isEmptyOrNullstr(oriFile) ? "" : oriFile;
-            elements.add(new TableCellElement(rowIndex, rowIndex, 11, 11, new String[]{FileUtil.picCompression(file), oriFile},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 12, 12, new String[]{FileUtil.picCompression(file), oriFile},
                     TableCellElement.TYPE_PICTURE));
 
             index = index -mergeCount;
