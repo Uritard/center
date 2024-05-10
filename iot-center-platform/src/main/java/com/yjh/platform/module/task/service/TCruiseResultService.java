@@ -157,6 +157,7 @@ public class TCruiseResultService{
             params.put("lowLimit3",tStdDevicemete.getLowLimit3());
             params.put("highLimit4",tStdDevicemete.getHighLimit4());
             params.put("lowLimit4",tStdDevicemete.getLowLimit4());
+            params.put("alarmRuleType", tStdDevicemete.getAlarmRuleType());
             log.info("params的值是==="+params);
 
             Result result = sendPostRequest(Constant.WARN_JUDGE,params);

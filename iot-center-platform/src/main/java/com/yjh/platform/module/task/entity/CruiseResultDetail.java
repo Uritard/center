@@ -156,5 +156,7 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "一个点有多个结果，存储多个结果的文件")
     private String allFilePath;
 
+    @ApiModelProperty(value = "告警规则类型名称")
+    private String alarmRuleTypeName;
 }
 

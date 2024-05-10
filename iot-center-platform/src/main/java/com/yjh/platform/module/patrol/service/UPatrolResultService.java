@@ -108,7 +108,7 @@ public class UPatrolResultService {
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
                 .add("abnormalType", "cruiseAbnormal", "abnormalType")
-                .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind");
+                .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind").add("alarmRuleType");
         DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
 
         String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
@@ -356,6 +356,7 @@ public class UPatrolResultService {
         params.put("lowLimit3", tStdDevicemete.getLowLimit3());
         params.put("highLimit4", tStdDevicemete.getHighLimit4());
         params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+        params.put("alarmRuleType", tStdDevicemete.getAlarmRuleType());
         log.info("params的值是===" + params);
 
         Result result = sendPostRequest(Constant.WARN_JUDGE, params);

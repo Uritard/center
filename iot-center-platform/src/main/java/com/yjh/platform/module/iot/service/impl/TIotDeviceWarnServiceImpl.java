@@ -92,6 +92,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
                 }
                 tIotDeviceWarn.setDeleteFlag(deleteFlag);
                 this.save(tIotDeviceWarn);
+                uploadWarn(iotWarn);
             } else {
                 log.warn("该设备未找到,告警不入库!");
                 return false;
@@ -102,8 +103,6 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         AtomicReference<Boolean> isWarn = new AtomicReference<>(true);
         alarmShieldCheck(tIotDeviceWarn, isWarn);
         if (Boolean.TRUE.equals(isWarn.get())) {
-            uploadWarn(iotWarn);
-
             Map<String, String> jasonMaps = new HashMap<>(16);
             jasonMaps.put("type", "alarmPopUp");
             jasonMaps.put("warnLevel", "132");

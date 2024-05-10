@@ -182,11 +182,12 @@ public class AnalysisController {
                            @RequestParam Float highLimit1, @RequestParam Float lowLimit1,
                            @RequestParam Float highLimit2, @RequestParam Float lowLimit2,
                            @RequestParam Float highLimit3, @RequestParam Float lowLimit3,
-                           @RequestParam Float highLimit4, @RequestParam Float lowLimit4) {
+                           @RequestParam Float highLimit4, @RequestParam Float lowLimit4,
+                           @RequestParam(defaultValue = "0") int alarmRuleType) {
         Result result = new Result();
         try {
             result.setData(analyseDataOperateService.alarmJudge(value, valueDesc, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
-                    highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4));
+                    highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmRuleType));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("告警判断处理异常:", e);

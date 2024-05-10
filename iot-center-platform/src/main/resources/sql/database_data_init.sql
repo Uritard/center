@@ -903,6 +903,9 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '2111', '环控设备类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位', '2112', '环控设备类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '2113', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('0','alarm_rule_type','上下限','测点告警规则类型', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('1','alarm_rule_type','区间','测点告警规则类型', 2);
+
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
