@@ -30,4 +30,6 @@ public class MessageParam {
     private String keyPw;
 
     private long sleepTime;
+
+    private long msgId = -1;
 }

@@ -1,10 +1,7 @@
 package com.yjh.demo.util;
 
 import com.yjh.protocol_a.Message;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
+import org.dom4j.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,7 +14,7 @@ import java.util.*;
 public class XmlToMessageUtil {
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Message decode(String xmlString) throws Exception {
+    public static Message decode(String xmlString) throws DocumentException {
         Document document = DocumentHelper.parseText(xmlString);
         Element root = document.getRootElement();
 

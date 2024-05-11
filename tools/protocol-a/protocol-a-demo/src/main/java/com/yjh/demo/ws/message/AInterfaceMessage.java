@@ -30,5 +30,6 @@ public class AInterfaceMessage extends BaseMessage implements Msg.Outbound {
     @NoArgsConstructor
     public static final class AInterfaceData {
         String xml;
+        String tips;
     }
 }

@@ -1,18 +1,9 @@
 package com.yjh.demo.config;
 
 import com.yjh.commons.rxbus.RxBus;
-import com.yjh.messager.api.channel.MsgChannel;
-import com.yjh.messager.api.channel.RxBusMsgChannel;
-import com.yjh.messager.api.msg.Msg;
-import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.protocol_a.IdentityProvider;
 import com.yjh.protocol_a.MessageIdGenerator;
-import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.SessionConnectionStateMonitor;
-import com.yjh.protocol_a.impl.IdentityProviderImpl;
-import com.yjh.protocol_a.impl.MessageCodec;
-import com.yjh.protocol_a.impl.PacketCodecFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,10 +17,24 @@ import java.util.concurrent.Executors;
  */
 @Configuration
 public class ServerConfig {
-    @Value("${tcp.port}")
-    int tcpPort;
 
-    @Bean
+    String sendCode;
+
+    String receiveCode;
+
+    public static long sessionId = 0l;
+
+    public ServerConfig setSendCode(String sendCode) {
+        this.sendCode = sendCode;
+        return this;
+    }
+
+    public ServerConfig setReceiveCode(String receiveCode) {
+        this.receiveCode = receiveCode;
+        return this;
+    }
+
+    @Bean("serverRxBus")
     public RxBus serverRxBus() {
         return new RxBus();
     }
@@ -44,7 +49,7 @@ public class ServerConfig {
         return Executors.newSingleThreadExecutor(Executors.defaultThreadFactory());
     }
 
-    @Bean
+    /*@Bean
     public MsgChannel serverMsgChannel(ExecutorService serverOutboundExecutor, RxBus serverRxBus) {
         return new RxBusMsgChannel(
                 serverRxBus,
@@ -52,33 +57,33 @@ public class ServerConfig {
                 new MessageCodec("PatrolHost", true),
                 serverOutboundExecutor
         );
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     public BaseSocketServer socketServer(MsgChannel serverMsgChannel) {
         return new BaseSocketServer(
                 "0.0.0.0", tcpPort, serverMsgChannel, new PacketCodecFactory(), 8
         );
-    }
+    }*/
 
     @Bean
     MessageIdGenerator serverMessageIdGenerator() {
         return new MessageIdGenerator();
     }
 
-    @Bean
+    /*@Bean
     IdentityProvider serverIdentityProvider() {
         return new IdentityProviderImpl("Server001");
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     MessageSender serverMessageSender(
             MessageIdGenerator serverMessageIdGenerator,
             IdentityProvider serverIdentityProvider,
             RxBus serverRxBus
     ) {
         return new MessageSender(serverMessageIdGenerator, serverIdentityProvider, serverRxBus);
-    }
+    }*/
 
     @Bean
     SessionConnectionStateMonitor sessionConnectionStateMonitor(
@@ -89,5 +94,13 @@ public class ServerConfig {
     ) {
         return new SessionConnectionStateMonitor(serverRxBus, serverMsgProcessingExecutor,
                 serverMessageIdGenerator, serverIdentityProvider);
+    }
+
+    public String getSendCode() {
+        return sendCode;
+    }
+
+    public String getReceiveCode() {
+        return receiveCode;
     }
 }
