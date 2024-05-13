@@ -48,6 +48,9 @@ public class Constant {
     public static final String YT="YT";
     public static final String YK="YK";
 
+    public static final String ZERO = "0";
+    public static final String ONE = "1";
+    public static final String TWO = "2";
 
     // 系统属性
     public static final String SYSTEM = "system";
@@ -76,6 +79,8 @@ public class Constant {
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 
     public static AtomicLong sendSessionId = new AtomicLong(0L);//发送会话序列号
+
+    public static AtomicLong sendCloudSessionId = new AtomicLong(0L);//发送会话序列号
     // public static long receiveSessionId = 0L;//接受序列号
 
     public static String Packet = "";
@@ -89,6 +94,11 @@ public class Constant {
     public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/systemSend";
 
     public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
+
+    /**
+     * 请求算法资源信息
+     */
+    public static final String ALGORITHM_RESOURCE_URL = "http://iot-center-platform/analysis/v1/algorithmResource";
 
     /**
      * platform接收一键顺控反馈文件
@@ -140,6 +150,25 @@ public class Constant {
     public static RedisTemplate redisTemplate;
 
     /**
+     * 节点级别
+     */
+    public static String edgeLevel;
+
+
+    /**
+     * 获取节点级别
+     */
+    public static String edgeLevel() {
+        try {
+            edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
+            log.debug("edgeLevel is {}", edgeLevel);
+        } catch (Exception e) {
+            edgeLevel = "";
+        }
+        return edgeLevel;
+    }
+
+    /**
      * 变电站名称
      */
     public static String stationCode;
@@ -150,7 +179,7 @@ public class Constant {
     public static String stationCode() {
         try {
             stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            log.info("stationCode is {}", stationCode);
+            log.debug("stationCode is {}", stationCode);
         } catch (Exception e) {
             stationCode = "";
         }
@@ -165,7 +194,7 @@ public class Constant {
     public static boolean handlerNew() {
         try {
             handlerNew = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew"));
-            log.info("handlerNew is {}", handlerNew);
+            log.debug("handlerNew is {}", handlerNew);
         } catch (Exception e) {
             handlerNew = true;
         }
@@ -177,7 +206,7 @@ public class Constant {
     public static String cruise() {
         try {
             cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
-            log.info("cruise is {}", cruise);
+            log.debug("cruise is {}", cruise);
         } catch (Exception e) {
             cruise = "Client01";
         }
@@ -189,11 +218,23 @@ public class Constant {
     public static String server() {
         try {
             server = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
-            log.info("server is {}", server);
+            log.debug("server is {}", server);
         } catch (Exception e) {
             server = "Server01";
         }
         return server;
+    }
+
+    public static String algorithmServer;
+
+    public static String algorithmServer() {
+        try {
+            algorithmServer = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemAlgorithmReceiveCode","content");
+            log.debug("algorithmServer is {}", algorithmServer);
+        } catch (Exception e) {
+            algorithmServer = "Cloud01";
+        }
+        return algorithmServer;
     }
 
     public static String upSystemFlag;
@@ -206,7 +247,7 @@ public class Constant {
         if (upSystemFlag == null) {
             try {
                 upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-                log.info("upSystemFlag is {}", upSystemFlag);
+                log.debug("upSystemFlag is {}", upSystemFlag);
             } catch (Exception e) {
                 upSystemFlag = "1";
             }
@@ -227,7 +268,7 @@ public class Constant {
         if (upSystemIp == null) {
             try {
                 upSystemIp = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
-                log.info("upSystemIp is {}", upSystemIp);
+                log.debug("upSystemIp is {}", upSystemIp);
             } catch (Exception e) {
                 upSystemIp = "127.0.0.1";
             }
@@ -249,12 +290,74 @@ public class Constant {
         if (upSystemPort == null) {
             try {
                 upSystemPort = Integer.valueOf(redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort").toString());
-                log.info("upSystemPort is {}", upSystemPort);
+                log.debug("upSystemPort is {}", upSystemPort);
             } catch (Exception e) {
                 upSystemPort = 10011;
             }
         }
         return upSystemPort;
+    }
+
+    public static String managerSystemFlag;
+
+    /**
+     * 上级系统算法平台连接开关 1开 0关
+     * @return
+     */
+    public static String managerSystemFlag() {
+        if (managerSystemFlag == null) {
+            try {
+                managerSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag");
+                log.debug("managerSystemFlag is {}", managerSystemFlag);
+            } catch (Exception e) {
+                managerSystemFlag = "1";
+            }
+        }
+        return managerSystemFlag;
+    }
+
+
+    /**
+     * 上级系统算法IP
+     */
+    public static String managerSystemIp;
+
+    /**
+     * 上级系统算法IP
+     * @return 上级系统算法IP
+     */
+    public static String managerSystemIp() {
+        if (managerSystemIp == null) {
+            try {
+                managerSystemIp = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemIp");
+                log.debug("upSystemIp is {}", managerSystemIp);
+            } catch (Exception e) {
+                managerSystemIp = "127.0.0.1";
+            }
+        }
+        return managerSystemIp;
+    }
+
+
+    /**
+     * 上级系统算法端口
+     */
+    public static Integer managerSystemPort;
+
+    /**
+     * 上级系统算法端口
+     * @return 上级系统算法端口
+     */
+    public static Integer managerSystemPort() {
+        if (managerSystemPort == null) {
+            try {
+                managerSystemPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemPort")));
+                log.debug("managerSystemPort is {}", managerSystemPort);
+            } catch (Exception e) {
+                managerSystemPort = 10013;
+            }
+        }
+        return managerSystemPort;
     }
 
 

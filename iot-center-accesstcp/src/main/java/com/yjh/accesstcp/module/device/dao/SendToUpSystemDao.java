@@ -60,4 +60,7 @@ public interface SendToUpSystemDao {
     List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap);
 
     List<String> selectInstanceIdsByComponent(@Param(value = "list") List<DeviceModel> deviceModels);
+
+    HashMap<String, Object> countLabelAccuracy(@Param(value = "startTime") String startTime,
+                                               @Param(value = "endTime") String endTime);
 }

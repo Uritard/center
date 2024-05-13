@@ -105,7 +105,18 @@ public class Constant {
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
         try {
-            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+            re = otherServer(map, url);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        log.info("request: {} \nresult: {}", url, JSON.toJSONString(re));
+        return re;
+    }
+
+    public static<T> Result otherServer(Object obj, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, obj, Result.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -117,6 +128,8 @@ public class Constant {
     public static final String TCP_UPLOAD_FILE = "http://iot-center-accesstcp/sendToUpSystem/v1/uploadFile";
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
+
+    public static final String TCP_SYNC_CLOUD_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/syncSendCloudXml";
 
     private static boolean upSystemFlag;
 

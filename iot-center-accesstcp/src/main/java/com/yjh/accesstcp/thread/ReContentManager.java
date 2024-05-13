@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.thread;
 
+import com.yjh.accesstcp.common.utils.ThreadPoolUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -21,24 +22,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class ReContentManager {
 
-    private final ConcurrentHashMap<String, InternalRunner> runnerMap = new ConcurrentHashMap<String, InternalRunner>();
+    private static final ConcurrentHashMap<InetSocketAddress, InternalRunner> runnerMap = new ConcurrentHashMap<>();
 
-    private final String RE_CONTENT = "reContent";
-
-    public void reContent(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
-        if (Optional.ofNullable(runnerMap.get(RE_CONTENT)).isPresent()) {
-            InternalRunner runner = runnerMap.get(RE_CONTENT);
+    public static void reContent(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
+        if (Optional.ofNullable(runnerMap.get(remoteAddress)).isPresent()) {
+            InternalRunner runner = runnerMap.get(remoteAddress);
             runner.bootstrap = bootstrap;
             return;
         }
         InternalRunner internalRunner = new InternalRunner(remoteAddress, bootstrap, 60000);
-        TaskExecutePool.getInstance().execute(internalRunner);
-        runnerMap.put(RE_CONTENT, internalRunner);
+        ThreadPoolUtil.PATROL_POOL.execute(internalRunner);
+        runnerMap.put(remoteAddress, internalRunner);
     }
 
-    public void terminate() {
-        Optional.ofNullable(runnerMap.get(RE_CONTENT)).ifPresent(InternalRunner::terminate);
-        runnerMap.remove(RE_CONTENT);
+    public static void terminate(InetSocketAddress remoteAddress) {
+        Optional.ofNullable(runnerMap.remove(remoteAddress)).ifPresent(InternalRunner::terminate);
     }
 
     static class InternalRunner implements Runnable {
@@ -78,6 +76,7 @@ public class ReContentManager {
         }
 
         void terminate() {
+            ReContentManager.terminate(remoteAddress);
             keepRunning.set(false);
             synchronized (waiter) {
                 waiter.notifyAll();

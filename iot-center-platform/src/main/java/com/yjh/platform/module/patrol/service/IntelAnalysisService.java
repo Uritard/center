@@ -33,6 +33,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +57,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
@@ -307,16 +307,18 @@ public class IntelAnalysisService {
     public JSONObject algorithmResource() {
         JSONObject jsonObject = new JSONObject();
         try {
-            String result = HttpClientUtils.getInstance().getUrl(applicationProperties.getIntelAlgorithmConfig().getAlgorithmResourceUrl(), null);
+            String url = applicationProperties.getIntelAlgorithmConfig().getAlgorithmResourceUrl();
+            String result = HttpClientUtils.getInstance().getUrl(url, null);
             log.info("result==={}", result);
-            if (StringUtils.isEmpty(result)) {
-                jsonObject.put("code", 400);
-            } else {
+            if (StringUtils.isNotBlank(result)) {
                 jsonObject = JSONObject.parseObject(result);
+                if ("200".equals(jsonObject.getObject("code", String.class))) {
+                    jsonObject.remove("code");
+                    jsonObject.put("network_rtt_avg", SystemInfoUtil.getNetDelay(url) + "ms");
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            jsonObject.put("code", 500);
         }
         return jsonObject;
     }
@@ -1459,4 +1461,79 @@ public class IntelAnalysisService {
         postUrl(Constant.WEBSOCKET_URL, json);
     }
 
+    /**
+     * 算法参数获取
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @return 算法参数
+     */
+    public Object getAlgorithmParams(String type) {
+        List<Map<String,Object>> items = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>(3);
+        map.put("section_id", "500kV江苏变电站区域");
+        String stationCode = SysParamConfig.getSysContent("edgeId");
+        map.put("station_id", stationCode);
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        return re.getData();
+    }
+
+    /**
+     * 算法版本获取接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param algorithmManufacturer 算法厂商 当值为空时， 代表获取所有厂商的算法历史版本
+     * @return 算法版本信息
+     */
+    public Object getAlgorithmVersion(String type, String algorithmManufacturer) {
+        List<Map<String,Object>> items = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>(4);
+        map.put("algorithmManufacturer", algorithmManufacturer);
+        map.put("section_id", "500kV江苏变电站区域");
+        String stationCode = SysParamConfig.getSysContent("edgeId");
+        map.put("station_id", stationCode);
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        return re.getData();
+    }
+
+    /**
+     * 算法版本切换接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param version 算法版本号
+     */
+    public void algorithmVersionChange(String type, String version) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(4);
+        map.put("section_id", "500kV江苏变电站区域");
+        String stationCode = SysParamConfig.getSysContent("edgeId");
+        map.put("station_id", stationCode);
+        map.put("version", version);
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        if (Objects.nonNull(re.getData())) {
+            List<Map<String, Object>> list = Object2List.castListMap(re.getData(), String.class, Object.class);
+            if (CollectionUtils.isNotEmpty(list)) {
+                Map<String, Object> res = list.get(0);
+                String algorithmManufacturer = String.valueOf(res.get("algorithm_manufacturer"));
+                String recordTime = String.valueOf(res.get("record_time"));
+                String algorithmPath = String.valueOf(res.get("algorithm_path"));
+                log.info("算法切换请求完成, 算法厂商：{}, 算法版本ID：{}, 算法版本记录时间：{}, 算法FTPS路径：{}",
+                        algorithmManufacturer, version, recordTime, algorithmPath);
+                String algorithmPathName = StringUtils.substringAfterLast(algorithmPath, "/");
+                //存放到临时文件
+                String localAlgorithmPath = SysParamConfig.getSysContent("tempReflect") + algorithmPathName;
+                ftpsService.downLoadFile(localAlgorithmPath, algorithmPath);
+                //开始算法更新
+                UpdateRequest request = new UpdateRequest()
+                        .setRequestId(String.valueOf(UUID.randomUUID()))
+                        .setAlgorithmPath(localAlgorithmPath);
+                algorithmUpdate(request);
+            }
+        }
+    }
 }

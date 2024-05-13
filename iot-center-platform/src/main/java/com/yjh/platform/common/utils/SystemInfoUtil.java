@@ -1,9 +1,11 @@
 package com.yjh.platform.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.*;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -210,6 +212,27 @@ public class SystemInfoUtil {
             in.close();
         }
         return map;
+    }
+
+    public static Long getNetDelay(String host) {
+        long re = 0;
+        try {
+            InetAddress address = InetAddress.getByName(host);
+            long startTime = System.currentTimeMillis();
+            boolean isReachable = address.isReachable(1);
+            long endTime = System.currentTimeMillis();
+            if (isReachable) {
+                re = endTime - startTime;
+                log.info("成功连接到{}, 网络延迟大约为: {} ms", host, endTime - startTime);
+            } else {
+                log.error("无法连接到 " + host);
+            }
+        } catch (UnknownHostException e) {
+            log.error("未知主机: " + host);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return re;
     }
 
 }

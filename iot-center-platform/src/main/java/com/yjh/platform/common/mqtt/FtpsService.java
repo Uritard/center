@@ -34,6 +34,18 @@ public class FtpsService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void downLoadFile(String filePath,String remoteFileName) {
+        try {
+            FtpsUtil.downloadFile(filePath, remoteFileName, applicationProperties.getManagerSystemFtps().getIp()
+                    , applicationProperties.getManagerSystemFtps().getPort(),
+                    applicationProperties.getManagerSystemFtps().getUserName(),
+                    applicationProperties.getManagerSystemFtps().getPassword());
+        } catch (Exception e) {
+            log.error("下载ftps错误: " + e);
+        }
+    }
+
     public boolean fileExits(String filepath){
         return FtpsUtil.isFTPFileExist(filepath,applicationProperties.getManagerSystemFtps().getIp()
                 , applicationProperties.getManagerSystemFtps().getPort(),

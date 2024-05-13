@@ -6,9 +6,13 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
+import com.yjh.accesstcp.module.device.callback.handler.SyncSendHandler;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
-import com.yjh.accesstcp.netty.server.MessageThread;
+import com.yjh.accesstcp.netty.TCPClientHandler;
+import com.yjh.accesstcp.netty.entiy.MessageHeader;
+import com.yjh.accesstcp.netty.handler.ProtocolEnum;
+import com.yjh.accesstcp.thread.MessageThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.dom4j.Document;
@@ -20,6 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,6 +86,61 @@ public class SendToUpSystemController {
         }
         return result;
     }
+
+    @ApiOperation(value = "发送")
+    @RequestMapping(value = "/sendCloudXml", method = RequestMethod.POST)
+    public Result sendCloudXml(@RequestBody XMLBaseModel xmlBaseModel) {
+
+        Result result = new Result();
+        try {
+            String flag = Constant.managerSystemFlag();
+            if (Objects.isNull(flag) || "0".equals(flag)) {
+                log.error("上级系统算法连接开关为空或者没开！{}", flag);
+            } else {
+                InetSocketAddress inetSocketAddress = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
+                TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
+                if (tcpClientHandler != null) {
+                    tcpClientHandler.send(xmlBaseModel, 0L, true);
+                } else {
+                    log.error("服务未连接，请重试，port: {}", Constant.upSystemPort());
+                    result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+                }
+            }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("发送失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "异步消息同步处理-算法管理平台发送")
+    @RequestMapping(value = "/syncSendCloudXml", method = RequestMethod.POST)
+    public Result syncSendCloudXml(@RequestBody XMLBaseModel xmlBaseModel) {
+
+        Result result = new Result();
+        try {
+            String flag = Constant.managerSystemFlag();
+            if (Objects.isNull(flag) || "0".equals(flag)) {
+                log.error("上级系统算法连接开关为空或者没开！{}", flag);
+            } else {
+                InetSocketAddress inetSocketAddress = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
+                TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
+                if (tcpClientHandler != null) {
+                    long sendSessionId = tcpClientHandler.getSessionId();
+                    SyncSendHandler syncSendHandler = new SyncSendHandler(tcpClientHandler);
+                    result.setData(syncSendHandler.send(xmlBaseModel, sendSessionId, 0L, true));
+                } else {
+                    log.error("服务未连接，请重试，port: {}", Constant.upSystemPort());
+                    result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+                }
+            }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("发送失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "上传文件")
     @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
     public Result uploadFile(@RequestBody Map<String, String> fileMap) {
@@ -210,7 +270,8 @@ public class SendToUpSystemController {
         try {
             Document document = DocumentHelper.parseText(xml);//String转XML
             XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
-            MessageThread.doProcessMessage(xmlRes, 0, null, sendToUpSystemService, null, redisTemplate, null);
+            MessageHeader header =  new MessageHeader();
+            MessageThread.doProcessMessage(ProtocolEnum.IOT, null, xmlRes, header);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

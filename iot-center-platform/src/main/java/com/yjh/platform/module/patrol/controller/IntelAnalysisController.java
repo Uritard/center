@@ -48,12 +48,6 @@ public class IntelAnalysisController {
         return intelAnalysisService.algorithmUpdate(request);
     }
 
-    @ApiOperation(value = "请求算法资源信息接口")
-    @GetMapping(value = "/algorithmResource")
-    public JSONObject algorithmResourceTest(){
-        return intelAnalysisService.algorithmResource();
-    }
-
     @PostMapping(value = "/picAnalyseRetNotify")
     public Response picAnalyseRetNotify(@Valid @RequestBody PicAnalyseResponse response) {
         log.info("< < < < < < 收到分析结果反馈：{}", JSON.toJSONString(response));
@@ -76,9 +70,7 @@ public class IntelAnalysisController {
     public Response algorithmUpdateResult(@Valid @RequestBody UpdateResponse response) {
         try {
             log.info("< < < < < < 收到算法更新结果反馈：{}", JSON.toJSONString(response));
-            if (StringUtils.equals("test666", response.getRequestId())){
-                intelAnalysisService.algorithmUpdateResult(response);
-            }
+            intelAnalysisService.algorithmUpdateResult(response);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             Response.serverError();

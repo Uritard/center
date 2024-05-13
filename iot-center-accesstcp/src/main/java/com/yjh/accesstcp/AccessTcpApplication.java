@@ -1,14 +1,12 @@
 package com.yjh.accesstcp;
 
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
-import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
-import com.yjh.accesstcp.netty.server.NettyClient;
-import com.yjh.accesstcp.thread.ReContentManager;
-import com.yjh.accesstcp.thread.RegisterManager;
+import com.yjh.accesstcp.netty.NettyClient;
+import com.yjh.accesstcp.netty.algorithm.StateGridAlgorithmHandlerImpl;
+import com.yjh.accesstcp.netty.iot.StateGridADecoder;
+import com.yjh.accesstcp.netty.iot.StateGridAHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +16,6 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
@@ -40,16 +37,6 @@ public class AccessTcpApplication implements CommandLineRunner {
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private SendToUpSystemServices sendToUpSystemServices;
-    @Autowired
-    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
-    @Autowired
-    private RegisterManager registerManager;
-    @Autowired
-    private ReContentManager reContentManager;
-
-    private NettyClient nettyClient = new NettyClient();
 
     public static void main(String[] args) {
         SpringApplication.run(AccessTcpApplication.class, args);
@@ -58,11 +45,21 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
+        log.info("local ip is : {}", url);
         Constant.redisTemplate = redisTemplate;
-        if("1".equals(Constant.upSystemFlag())) {
+        //上级系统连接
+        if(Constant.ONE.equals(Constant.upSystemFlag())) {
             InetSocketAddress address = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
-            log.info("accesstcp is running, url is : " + url);
-            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, registerManager, reContentManager);
+            log.info("access tcp is running, address is : " + address.getAddress());
+            NettyClient nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAHandlerImpl());
+            nettyClient.start(address);
+        }
+        //上级系统算法连接
+        if(Constant.ONE.equals(Constant.managerSystemFlag())) {
+            InetSocketAddress address = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
+            log.info("access tcp cloud is running, address is : " + address.getAddress());
+            NettyClient nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAlgorithmHandlerImpl());
+            nettyClient.start(address);
         }
     }
     private static String getLocalIp() throws SocketException {

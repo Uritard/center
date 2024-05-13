@@ -556,4 +556,23 @@
         AND FIND_IN_SET(tcpi.custom_id, #{deviceModel.componentId, jdbcType=VARCHAR})
         </foreach>
     </select>
+    <select id="countLabelAccuracy" resultType="java.util.HashMap">
+        SELECT
+            count(1) AS totalNum,
+            sum(
+                    IF (t.identify_state = 258, 1, 0)
+                ) AS validNum
+        FROM
+            (
+                SELECT
+                    a.identify_state
+                FROM
+                    u_patrol_data_result a
+                        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+                WHERE
+                    b.is_ai = 'on'
+                AND a.identify_state IS NOT NULL
+                AND a.cruise_time BETWEEN #{startTime} and #{endTime}
+            ) t
+    </select>
 </mapper>
