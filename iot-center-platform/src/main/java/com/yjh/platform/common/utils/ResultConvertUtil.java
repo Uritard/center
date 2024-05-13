@@ -4,10 +4,18 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusExEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <功能描述>
@@ -16,9 +24,11 @@ import java.util.Objects;
  * @date 2023/4/21
  * @since [产品/模块版本] （可选）
  */
+@Slf4j
 public class ResultConvertUtil {
 
-    private static final String[] ARR = {"_", "分", "合"};
+    public static final String[] ARR = {"_", "分", "合"};
+    public static final String FIFTY = "50";
 
     public static void main(String[] args) {
 //        String a = " 表计表盘模糊 ";
@@ -62,6 +72,59 @@ public class ResultConvertUtil {
         } else {
             return CommonUtils.getNumberStr(result);
         }
+    }
+
+    /**
+     * D200 判断结果是不是放电
+     * @param filepath 局放 .txt文件路径
+     * @return 只返回放电情况
+     */
+    public static Pair<String, String> dealJudgment(String filepath, String val, String unit) {
+        File file = new File(filepath);
+        Pair<String, String> res;
+        if (file.exists()) {
+            List<String[]> list;
+            try (BufferedReader br = Files.newBufferedReader(file.toPath())) {
+                list = br.lines().map(s -> s.split(",")).collect(Collectors.toList());
+            } catch (IOException e) {
+                log.error("readFileList error", e);
+                return Pair.of("-1", "图谱文件异常");
+            }
+            if (list.size() == 0) {
+                log.info("图谱文件data.txt大小为0");
+                return Pair.of("-1", "图谱文件异常");
+            }
+            String[] result = list.get(list.size() - 1);
+            String type = result[result.length - 2];
+            log.info("局放数据：" + type);
+            String value;
+            switch (type) {
+                case "1":
+                    value = "内部放电";
+                    break;
+                case "2":
+                    value = "表面放电";
+                    break;
+                case "3":
+                    value = "悬浮电位";
+                    break;
+                case "4":
+                    value = "电晕放电";
+                    break;
+                case "9":
+                    value = "未采集完";
+                    break;
+                default:
+                    value = "非放电";
+                    type = "0";
+                    break;
+            }
+            res = Pair.of(type, value + "（" + val + unit + "）");
+        } else {
+            log.info("图谱文件data.txt不存在");
+            res = Pair.of(val, val + unit);
+        }
+        return res;
     }
 
     /**
