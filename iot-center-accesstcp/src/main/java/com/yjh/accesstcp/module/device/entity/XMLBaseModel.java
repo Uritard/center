@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.entity;
 
+import com.yjh.accesstcp.netty.entiy.BaseModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "XMLBaseModel对象", description = "xml封装类")
-public class XMLBaseModel implements Serializable {
+public class XMLBaseModel extends BaseModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(value = "发送方唯一标识")

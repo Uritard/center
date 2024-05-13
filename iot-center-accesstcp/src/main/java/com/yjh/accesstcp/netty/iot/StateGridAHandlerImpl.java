@@ -2,25 +2,27 @@
  * Copyright (c) 2022 Yijiahe Technology Co., Ltd. All rights reserved.
  */
 
-package com.yjh.accesstcp.netty.server;
+package com.yjh.accesstcp.netty.iot;
 
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
-import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
-import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.netty.NettyClient;
+import com.yjh.accesstcp.netty.TCPClientHandler;
 import com.yjh.accesstcp.netty.entiy.Message;
-import com.yjh.accesstcp.thread.RegisterManager;
+import com.yjh.accesstcp.netty.entiy.MessageHeader;
+import com.yjh.accesstcp.netty.handler.ProtocolEnum;
+import com.yjh.accesstcp.thread.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
-import org.springframework.data.redis.core.RedisTemplate;
 
-import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * <功能描述>
@@ -31,26 +33,20 @@ import java.util.Objects;
  */
 public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> implements TCPClientHandler {
 
-    private RedisTemplate redisTemplate;
-    private SendToUpSystemServices sendToUpSystemServices;
-    private RegisterManager registerManager;
+    /**
+     * 发送会话序列号
+     */
+    AtomicLong sessionId = new AtomicLong(0L);
+
     private ChannelHandlerContext ctx;
-    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
 
-    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService, RegisterManager registerManager) {
-        this.redisTemplate = redisTemplate;
-        this.sendToUpSystemServices = sendToUpSystemServices;
-        this.analysisUnionTaskFileService = analysisUnionTaskFileService;
-        this.registerManager =registerManager;
-
-    }
-    private boolean isThreadStart = true;
-
+    private volatile boolean connect = false;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         Document document = null;
         long sendSessionId = msg.getSendSessionId();
         long receiveSessionId = msg.getReceiveSessionId();
+        byte sessionType = msg.getSessionType();
         try {
             String content = new String(msg.getContent(), StandardCharsets.UTF_8);
             log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}", content, sendSessionId, receiveSessionId);
@@ -62,8 +58,9 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {
-            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate, registerManager);
-            // doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
+            MessageHeader header =
+                    new MessageHeader().setSessionId(sendSessionId).setReceiveSessionId(receiveSessionId).setSessionType(sessionType);
+            MessageThread.doProcessMessage(ProtocolEnum.IOT, this, xmlRes, header);
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
         }
 
@@ -87,57 +84,48 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         ctx.close().sync();
         ctx.flush();
         super.channelInactive(ctx);
-        isThreadStart = false;
-        String remoteAdds = ctx.channel().remoteAddress().toString();
-        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
-        TCPClientHandlerHashMap.remove(remotePort);
-        log.error("服务端主动断开连接！");
-        log.info("analysisClientHandlerHashMap: " + TCPClientHandlerHashMap);
-        String serverUrl = remoteAdds.substring(0, remoteAdds.indexOf(":"));
-        log.info("serverUrl: " + serverUrl.substring(1));
+        connect = false;
+        SocketAddress remoteAdds = ctx.channel().remoteAddress();
+        TCPClientHandlerHashMap.remove(remoteAdds);
+        // 暂停心跳发送
+        HeartBeatThead.terminate(getServer());
+        // 暂停运行数据发送
+        RunningThread.terminate(getServer());
+        // 暂停微气象发送
+        WeatherThread.terminate(getServer());
+        // 暂停机巢运行数据发送
+        NestRunThread.terminate(getServer());
+
+        log.error("服务端主动断开连接！{}", remoteAdds);
+        log.info("analysisClientHandlerHashMap: {}", TCPClientHandlerHashMap);
         //使用过程中断线重连
-        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
-            InetSocketAddress remoteAddress = new InetSocketAddress(serverUrl.substring(1), remotePort);
-            doConnect(remoteAddress, Constant.bootstrapHashMap.get(1));
+        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(remoteAdds))) {
+            doConnect(remoteAdds, NettyClient.BOOTSTRAP_MAP.get(remoteAdds));
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //channel在线处理，都会触发这个方法
-
         this.ctx = ctx;
-        sendRegister();//发送注册
-        isThreadStart = true;
+        connect = true;
+        //发送注册
+        sendRegister();
 
-        String remoteAdds = ctx.channel().remoteAddress().toString();
-        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
-        if (TCPClientHandlerHashMap.get(remotePort) == null) {
-            TCPClientHandlerHashMap.put(remotePort, this);
-        }
-        log.info("客户端注册成功: " + ctx.channel().remoteAddress());
-        log.info("客户端注册成功: " + remoteAdds);
+        SocketAddress remoteAdds = ctx.channel().remoteAddress();
+        TCPClientHandlerHashMap.putIfAbsent(remoteAdds, this);
+        log.info("客户端注册成功: {}", remoteAdds);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.info("exceptionCaught:" + cause.toString());
-        if (cause.toString().equals("java.io.IOException: 远程主机强迫关闭了一个现有的连接。") || cause.toString().equals("java.io.IOException: Connection reset by peer")) {
+        if ("java.io.IOException: 远程主机强迫关闭了一个现有的连接。".equals(cause.toString()) || "java.io.IOException: Connection reset by peer".equals(cause.toString())) {
             log.info("ExceptionCaught: Client Disconnect The Connection.");
             ctx.close().sync();
             ctx.flush();
         }
 
-    }
-
-    @Override
-    public boolean getIsThreadStart() {
-        return isThreadStart;
-    }
-
-    @Override
-    public void setIsThreadStart(Boolean status) {
-        this.isThreadStart = status;
     }
 
     @Override
@@ -151,7 +139,22 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
     }
 
     @Override
+    public String getRootName() {
+        return "PatrolHost";
+    }
+
+    @Override
+    public Long getSessionId() {
+        return sessionId.incrementAndGet();
+    }
+
+    @Override
     public ChannelHandlerContext getChannel() {
         return ctx;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return connect;
     }
 }

@@ -13,6 +13,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -173,6 +175,22 @@ public class AnalysisController {
         intelAnalysisService.algorithmUpdate(request);
     }
 
+    @ApiOperation(value = "请求算法资源信息接口")
+    @GetMapping(value = "/algorithmResource")
+    public Result algorithmResourceTest(){
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.algorithmResource());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法参数获取接口错误:", e);
+        }
+        return result;
+    }
+
+
     @ApiOperation(value = "告警判断处理接口")
     @GetMapping(value = "/warnInfo")
     public Result alarmJudge(@RequestParam String value, @RequestParam(value = "valueDesc", required = false) String valueDesc, @RequestParam String stdDeviceMeteName,
@@ -265,6 +283,70 @@ public class AnalysisController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "与算法管理平台交互失败");
             log.info("与算法管理平台交互失败" + e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法参数获取
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @return 算法参数
+     */
+    @ApiOperation(value = "算法参数获取接口")
+    @GetMapping(value = "/getAlgorithmParams")
+    public Result getAlgorithmParams(@RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.getAlgorithmParams(type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法参数获取接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法版本获取接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param algorithmManufacturer 算法厂商 当值为空时， 代表获取所有厂商的算法历史版本
+     * @return 算法版本信息
+     */
+    @ApiOperation(value = "算法版本获取接口")
+    @GetMapping(value = "/getAlgorithmVersion")
+    public Result getAlgorithmVersion(@RequestParam(value = "type") String type,
+                                      @RequestParam(value = "algorithmManufacturer") String algorithmManufacturer) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.getAlgorithmVersion(type, algorithmManufacturer));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法参数获取接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法版本切换接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param version 算法版本号
+     * @return
+     */
+    @ApiOperation(value = "算法版本切换接口")
+    @PostMapping(value = "/algorithmVersionChange")
+    public Result algorithmVersionChange(@RequestParam(value = "type") String type,
+                                         @RequestParam(value = "version") String version) {
+        Result result = new Result();
+        try {
+            intelAnalysisService.algorithmVersionChange(type, version);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法参数获取接口错误:", e);
         }
         return result;
     }

@@ -81,9 +81,9 @@ public class PlatformXMLUtil {
         return xmlBaseModel;
     }
     //生成xml
-    public static String generateXml(XMLBaseModel xmlBaseModel){
+    public static String generateXml(XMLBaseModel xmlBaseModel, String rootName){
         Document document = DocumentHelper.createDocument();
-        Element rss = document.addElement("PatrolHost");//根节点
+        Element rss = document.addElement(rootName);//根节点
         Element childNode1 = rss.addElement("SendCode");//生成子节点（必有）
         childNode1.setText(xmlBaseModel.getSendCode());//子节点内容
 

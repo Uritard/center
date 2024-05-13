@@ -1,4 +1,4 @@
-package com.yjh.accesstcp.netty.server;
+package com.yjh.accesstcp.netty.iot;
 
 import com.yjh.accesstcp.common.utils.ByteUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -62,7 +62,7 @@ public class StateGridADecoder extends ByteToMessageDecoder {
                 tmpBuff[18] = b;
                 System.arraycopy(PlatformPacketUtil.int2Bytes(len), 0, tmpBuff, 19, 4);
 
-                message = new Message(sendSerNo, receiveSerNo, b, len);
+                message = new Message().setSendSessionId(sendSerNo).setReceiveSessionId(receiveSerNo).setSessionType(b).setLength(len);
             }
             int length = message.getLength();
             if (in.readableBytes() < length + 2) {
