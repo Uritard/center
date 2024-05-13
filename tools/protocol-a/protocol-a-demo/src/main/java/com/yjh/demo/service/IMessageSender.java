@@ -6,6 +6,7 @@ package com.yjh.demo.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.yjh.commons.NamedThreadFactory;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.messager.api.msg.BaseMessage;
 import com.yjh.messager.api.msg.Msg;
@@ -16,6 +17,7 @@ import com.yjh.protocol_a.impl.MessageCodec;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +28,9 @@ import java.util.concurrent.TimeUnit;
  * @since [产品/模块版本] （可选）
  */
 public interface IMessageSender {
+    ScheduledThreadPoolExecutor
+        SCHEDULED_THREAD_POOLS = new ScheduledThreadPoolExecutor(4, new NamedThreadFactory("interval-scheduled"));
+
 
     default BaseMessage sendMessage(String xml, long msgId) {
         try {
