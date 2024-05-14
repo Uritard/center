@@ -300,7 +300,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
             warnMap.put("warnLevel", String.valueOf(warnInfo.getWarnLevel()));
             warnMap.put("warnName", warnInfo.getWarnName());
-            warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
+            warnMap.put("warnTime", DateTimeUtil.format(warnInfo.getWarnTime()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
             warnMap.put("outRange", Objects.nonNull(warnInfo.getOutRange()) ? warnInfo.getOutRange() : "");
 

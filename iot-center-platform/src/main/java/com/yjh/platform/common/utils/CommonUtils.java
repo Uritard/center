@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils;
 
+import cn.hutool.core.math.MathUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -617,6 +618,38 @@ public class CommonUtils {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return sets;
+        }
+    }
+
+    public static boolean between(Float value, Float fromInclusive, Float toInclusive) {
+        boolean ifNull = (fromInclusive == null || toInclusive == null) || value == null;
+        if (ifNull) {
+            return false;
+        }
+        if (Objects.isNull(fromInclusive) || Objects.isNull(toInclusive)) {
+            boolean inLeft = Objects.nonNull(fromInclusive) && value >= fromInclusive;
+            boolean inRight = Objects.nonNull(toInclusive) && value <= toInclusive;
+            return inLeft || inRight;
+        } else {
+            double min = Math.min(fromInclusive, toInclusive);
+            double max = Math.max(fromInclusive, toInclusive);
+            return value >= min && value <= max;
+        }
+    }
+
+    public static boolean outRang(Float value, Float fromInclusive, Float toInclusive) {
+        boolean ifNull = (fromInclusive == null && toInclusive == null) || value == null;
+        if (ifNull) {
+            return false;
+        }
+        if (Objects.isNull(fromInclusive) || Objects.isNull(toInclusive)) {
+            boolean outLeft = Objects.nonNull(fromInclusive) && value <= fromInclusive;
+            boolean outRight = Objects.nonNull(toInclusive) && value >= toInclusive;
+            return outRight || outLeft;
+        } else {
+            double min = Math.min(fromInclusive, toInclusive);
+            double max = Math.max(fromInclusive, toInclusive);
+            return value <= min || value >= max;
         }
     }
 }

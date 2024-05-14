@@ -592,25 +592,18 @@ public class AnalyseDataOperateService {
      * @return 返回遥测告警等级或未告警  4:危急  3:严重  2:一般  1:预警  0:正常
      */
     public int warnJudgement(Float value, int alarmRuleType, List<Pair<Float, Float>> limitList) {
-        log.info("value: {}, alarmRuleType: {}, limitList: {}",
-            value, alarmRuleType, limitList);
+        log.info("value: {}, alarmRuleType: {}, limitList: {}", value, alarmRuleType, limitList);
 
         int end = limitList.size() - 1;
         for (int i = end; i >= 0; i--) {
             Pair<Float, Float> limit = limitList.get(i);
             Float left = limit.getLeft();
             Float right = limit.getRight();
-            if (Objects.nonNull(left) && Objects.nonNull(right)) {
-                boolean inRange = Range.between(left, right).contains(value);
-                boolean isAlarm = (alarmRuleType == 1 && inRange) || (alarmRuleType != 1 && !inRange);
+            if (Objects.nonNull(left) || Objects.nonNull(right)) {
+                boolean isAlarm =
+                    (alarmRuleType == 1 && CommonUtils.between(value, left, right)) || (alarmRuleType != 1 && CommonUtils.outRang(value,
+                        left, right));
                 if (isAlarm) {
-                    return i + 1;
-                }
-            }else if (left != right && alarmRuleType != 1) {
-                // 使用 != 判断，表示必有一个不为空
-                boolean outLeft = Objects.nonNull(left) && value <= left;
-                boolean outRight = Objects.nonNull(right) && value >= right;
-                if (outRight || outLeft) {
                     return i + 1;
                 }
             }

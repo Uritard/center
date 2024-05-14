@@ -320,7 +320,16 @@ public class PatrolResultHandler {
             isAlarmMap.put("robotCode", robotPatrolTaskResult.getSendCode());
             isAlarmMap.put("taskCode", taskId);
             isAlarmMap.put("instanceId", instanceId);
-            String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
+
+            String origpic = isAlarmMap.getOrDefault("absolutePath", "");
+            String value;
+            if (ResultConvertUtil.FIFTY.equals(robotPatrolTaskResult.getFileType()) && origpic.contains(".txt")) {
+                Pair<String, String> result = ResultConvertUtil.dealJudgment(origpic, robotPatrolTaskResult.getValue(), "");
+                value = result.getKey();
+            } else {
+                value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
+            }
+
             if ("0".equals(robotPatrolTaskResult.getValid())) {
                 value = CruiseConstant.FAILED_VALUE;
             }
@@ -434,6 +443,7 @@ public class PatrolResultHandler {
                         case "50":
                             descFilePath = developAbsoluteUrl + "/Txt/" + fileName;
                             descRelativeUrl = developRelativeUrl + "/Txt/" + fileName;
+                            isAlarm = true;
                             break;
                         default:
                             descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
