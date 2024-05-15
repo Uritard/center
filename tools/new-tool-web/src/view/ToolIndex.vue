@@ -29,13 +29,13 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="establishClient">创建客户端</el-button>
-          <el-button @click="destroyClient">销毁客户端</el-button>
-          <el-button type="primary" @click="establishServer">创建服务端</el-button>
-          <el-button @click="destroyServer">销毁服务端</el-button>
-          <el-button @click="resetData">重置发送报文</el-button>
-          <el-button @click="resetTextReception">重置接收报文</el-button>
-          <el-button type="primary" @click="gotoBatchTask">并发测试</el-button>
+          <el-button type="primary" size="small" @click="establishClient">创建客户端</el-button>
+          <el-button size="small" @click="destroyClient">销毁客户端</el-button>
+          <el-button size="small" type="primary" @click="establishServer">创建服务端</el-button>
+          <el-button size="small" @click="destroyServer">销毁服务端</el-button>
+          <el-button size="small" @click="resetData">重置发送报文</el-button>
+          <el-button size="small" @click="resetTextReception">重置接收报文</el-button>
+          <el-button size="small" type="primary" @click="gotoBatchTask">并发测试</el-button>
         </el-form-item>
         <el-form-item>
           <span style="color: #FFFFFF; font-size: 16px;">是否自动回复：</span>
@@ -50,27 +50,28 @@
         </el-form-item>
         <br/>
         <el-form-item>
-          <el-button type="primary" @click="startAutoTest">自动检测</el-button>
-          <el-button type="primary" @click="clientSend">客户端发送消息</el-button>
-          <el-button type="primary" @click="severSend">服务端发送消息</el-button>
+          <el-button size="small" type="primary" @click="startAutoTest">自动检测</el-button>
+          <el-button size="small" type="primary" @click="clientSend">客户端发送消息</el-button>
+          <el-button size="small" type="primary" @click="severSend">服务端发送消息</el-button>
+          <label style="color: #FFFFFF; margin:0 15px">MsgId:</label>
+          <el-input style="display: inline-block; width: 200px" v-model="msgId"></el-input>
         </el-form-item>
         <br/>
       </el-form>
     </div>
     <div style="display: flex">
       <div style="display: inline-block; width: 20%;">
-        <div style="height: 500px; width: 100%;">
-          <el-tree ref="messageTree" :data="treeData" height="100%"
-                   @node-click="handleNodeClick"
-                   default-expand-all>
+        <div style="height: 350px; width: 100%;">
+          <el-tree ref="messageTree" :data="treeData" :style="{ maxHeight: '350px', overflow: 'auto' }"
+                   @node-click="handleNodeClick">
           </el-tree>
         </div>
       </div>
       <div style="display: inline-block; width: 79%;">
-        <div style="height: 500px; width: 100%">
+        <div style="height: 350px; width: 100%">
           <el-input
               type="textarea"
-              :rows="20"
+              :rows="16"
               placeholder="请输入报文"
               v-model="textarea">
           </el-input>
@@ -79,7 +80,7 @@
     </div>
 
     <div class="reception">
-      <el-scrollbar style="width: 100%;height: 500px;">
+      <el-scrollbar style="width: 100%;height: 400px;">
         <div v-for="(item, index) in textReceptionList" :key="index" class="text-reception">
           <div v-text="item.name"></div>
           <div v-html="item.tips"></div>
@@ -151,7 +152,8 @@ export default {
       protocolTreeData: [],
       treeData: [],
       serverFlag: '',
-      autoReply: true
+      autoReply: true,
+      msgId: '',
     }
   },
   mounted() {
@@ -166,7 +168,7 @@ export default {
       this.ws_platform.onmessageWS((msgData) => {
         if (msgData == '连接成功') return
         let oo = JSON.parse(msgData);
-        this.textReceptionList.push({name: oo.data.xml, tips: oo.data.tips});
+        this.textReceptionList.unshift({name: oo.data.xml, tips: oo.data.tips});
       })
     },
     autoReplyHandle(val) {
@@ -308,9 +310,7 @@ export default {
         this.$message.error("请先创建客户端")
         return
       }
-      this.$http.windPost('/demo/automation/startAutotest', {
-        server: this.serverFlag
-      }).then(res => {
+      this.$http.windPost('/demo/automation/startAutotest?server=' + this.serverFlag, {}).then(res => {
         if (res.code == 200) {
           this.$message.success('发送成功!!!');
         }
@@ -322,7 +322,8 @@ export default {
         return
       }
       this.$http.windPost(`/demo/demo-client/out-msg`, {
-        xml: this.textarea
+        xml: this.textarea,
+        msgId: this.msgId
       }).then(res => {
         if (res.code == 200)
           this.$message.success('发送成功!!!')
@@ -334,7 +335,8 @@ export default {
         return
       }
       this.$http.windPost(`/demo/demo-server/out-msg`, {
-        xml: this.textarea
+        xml: this.textarea,
+        msgId: this.msgId
       }).then(res => {
         if (res.code == 200)
           this.$message.success('发送成功!!!')
@@ -388,6 +390,7 @@ export default {
 .reception {
   width: 100%;
   height: 50%;
+  margin-top: 5px;
 
   .text-reception {
     white-space: pre-wrap;
@@ -404,5 +407,9 @@ export default {
 
 ::v-deep .el-switch__label {
   color: #FFFFFF;
+}
+
+::v-deep .el-form-item {
+  margin-bottom: 5px;
 }
 </style>

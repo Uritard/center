@@ -1,8 +1,8 @@
 module.exports = {
   lintOnSave: false, // 关闭eslint
   productionSourceMap: false,
-  publicPath: '/',
-  outputDir: '../tools/protocol-a/protocol-a-demo/src/main/resources/static/', // 打包的目录
+  publicPath: './',
+  outputDir: '../protocol-a/protocol-a-demo/src/main/resources/static/', // 打包的目录
   devServer: {
     open: false, // 自动启动浏览器
     host: '0.0.0.0', // localhost
