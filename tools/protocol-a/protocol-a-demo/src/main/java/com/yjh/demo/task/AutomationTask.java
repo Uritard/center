@@ -118,10 +118,12 @@ public class AutomationTask {
                 trees.add(baseTree);
                 String protoKey = protocalType + "_" + proto;
                 List<String> messages = MESSAGE_MAP.get(protoKey);
-                List<BaseTree> children = messages.stream()
-                    .map(m -> new BaseTree(StringUtils.substringAfterLast(m, File.separator)))
-                    .collect(Collectors.toList());
-                baseTree.setChildren(children);
+                if (CollectionUtils.isNotEmpty(messages)) {
+                    List<BaseTree> children = messages.stream()
+                        .map(m -> new BaseTree(StringUtils.substringAfterLast(m, File.separator)))
+                        .collect(Collectors.toList());
+                    baseTree.setChildren(children);
+                }
             }
         }
 
@@ -355,6 +357,9 @@ public class AutomationTask {
             return;
         }
         for (File f : files) {
+            if (f.isFile() && !"xml".equals(FileUtil.extName(f))) {
+                continue;
+            }
             String name = f.getName();
             String pname = StringUtils.isEmpty(parentName) ? name : parentName;
             String nextNname = StringUtils.isEmpty(parentName) ? name : parentName + "_" + name;
@@ -377,7 +382,9 @@ public class AutomationTask {
                     break;
             }
             if (childList != null) {
-                childList.add(name);
+                if (StringUtils.isNotEmpty(name)) {
+                    childList.add(name);
+                }
                 fileList(f, nextNname, level + 1);
             }
         }
