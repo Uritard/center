@@ -197,10 +197,14 @@ export default {
     },
     getProtocolTextTree() {
       this.$http.windGet(`/demo/automation/protocolTree?station=${this.stationType}&platform=${this.platformType}`).then(res => {
+        this.treeData = []
         this.treeData = this.addParentRefs(res.data)
       })
     },
     addParentRefs(treeData, parent = null) {
+      if (treeData.length ==0) {
+        return []
+      }
       return treeData.map((node) => {
         const newNode = {...node, parent};
         if (node.children && Array.isArray(node.children)) {
