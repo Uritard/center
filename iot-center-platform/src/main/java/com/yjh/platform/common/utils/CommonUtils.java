@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -619,4 +620,16 @@ public class CommonUtils {
             return sets;
         }
     }
+
+    public static final String[] COLOR =
+        new String[] {"#F56C6C", "#E6A23C", "#409EFF", "#996600", "#996666", "#999900", "#9999FF", "#3399FF", "#336666", "#333366",
+            "#FFCC66"};
+
+    public static String color(String i) {
+        int j = NumberUtils.toInt(i) % 11;
+        j = j > 0 ? j - 1 : 0;
+
+        return COLOR[j];
+    }
+
 }

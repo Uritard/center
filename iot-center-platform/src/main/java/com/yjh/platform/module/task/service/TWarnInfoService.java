@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
@@ -69,6 +70,8 @@ public class TWarnInfoService{
     private TStdRegionService stdRegionService;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
+    @Autowired
+    private TStdDevicemeteService tStdDevicemeteService;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
 
@@ -200,6 +203,7 @@ public class TWarnInfoService{
                 if (edgeInfo != null) {
                     tWarnInfoDetail.setStationName(edgeInfo.getStationName());
                 }
+                tWarnInfoDetail.setLabelAttriName(tStdDevicemeteService.labelAttriName(tWarnInfoDetail.getLabelAttri()));
             }
         }
         log.info("_________________________________time3________________________________:{}\n",System.currentTimeMillis() -time);
@@ -620,6 +624,7 @@ public class TWarnInfoService{
             stationName = tWarnInfoDao.selectStationNameByThis();
         }
         tWarnInfoDetail.setStationName(stationName);
+        tWarnInfoDetail.setLabelAttriName(tStdDevicemeteService.labelAttriName(tWarnInfoDetail.getLabelAttri()));
         return tWarnInfoDetail;
     }
 

@@ -6,10 +6,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -140,4 +142,7 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "告警屏蔽结束时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
+
+    private String labelAttri;
+    private List<Pair<String, String>> labelAttriName;
 }

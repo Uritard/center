@@ -23,6 +23,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
@@ -88,6 +89,8 @@ public class UPatrolResultService {
     private LogsRecord logsRecord;
     @Autowired
     private TCruiseResultService cruiseResultService;
+    @Autowired
+    private TStdDevicemeteService devicemeteService;
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -119,6 +122,7 @@ public class UPatrolResultService {
             if (StringUtils.isNotBlank(c.getMeterTypeName())) {
                 c.setMeteTypeName(c.getMeteTypeName() + "-" + c.getMeterTypeName());
             }
+            c.setLabelAttriName(devicemeteService.labelAttriName(c.getLabelAttri()));
         });
         return cruiseResultDetailList;
     }
@@ -396,6 +400,7 @@ public class UPatrolResultService {
         warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
         warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
         warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
+        warnInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
         log.info("warnInfo==" + warnInfo);
 
         //判断该点是否已在告警表  声纹测点分开处理

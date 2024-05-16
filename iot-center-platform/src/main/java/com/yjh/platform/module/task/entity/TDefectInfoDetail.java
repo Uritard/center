@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author YC
@@ -69,4 +71,6 @@ public class TDefectInfoDetail implements Serializable {
     @ApiModelProperty(value = "缺陷内容")
     private String defectContent;
 
+    private String labelAttri;
+    private List<Pair<String, String>> labelAttriName;
 }

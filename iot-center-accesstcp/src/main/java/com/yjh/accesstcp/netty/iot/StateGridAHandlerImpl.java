@@ -49,7 +49,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         byte sessionType = msg.getSessionType();
         try {
             String content = new String(msg.getContent(), StandardCharsets.UTF_8);
-            log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}", content, sendSessionId, receiveSessionId);
+            log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}, sessionType: {}", content, sendSessionId, receiveSessionId, sessionType);
             document = DocumentHelper.parseText(content);
         } catch (DocumentException e) {
             log.error("parse xml error", e);

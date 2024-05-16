@@ -35,7 +35,7 @@ public class ModelExcelListener implements ReadListener<ExcelEntity> {
     public void invokeHead(Map<Integer, CellData> map, AnalysisContext analysisContext) {
         List<String> headerList = Arrays.asList("变电站编码", "变电站名称", "区域ID", "区域名称", "间隔ID", "间隔名称", "主设备编码", "设备名称", "设备类型", "测点ID", "测点名称",
             "位置类型", "识别类型", "测点级别", "设备部位", "表计类型", "识别算法", "AI缺陷", "AI判别", "测点类型", "是否告警弹框", "告警上限1", "告警上限2", "告警上限3", "告警上限4", "告警下限1",
-            "告警下限2", "告警下限3", "告警下限4", "单位", "告警级别", "测点类型");
+            "告警下限2", "告警下限3", "告警下限4", "单位", "告警级别", "测点类型", "标签");
         Set<String> importHeaderList = new HashSet<>(map.size());
         map.forEach((integer, cellData) -> {
             importHeaderList.add(cellData.getStringValue());
@@ -86,6 +86,14 @@ public class ModelExcelListener implements ReadListener<ExcelEntity> {
             excelEntity.setInspectionType("2");
         } else {
             excelEntity.setInspectionType("1");
+        }
+
+        if (StringUtils.isNotBlank(excelEntity.getLabelAttris())) {
+            StringJoiner joiner = new StringJoiner(",");
+            for (String s : excelEntity.getLabelAttris().split(",")) {
+                joiner.add(DictConvertUtil.DICT.getDictCode("labelAttri", s));
+            }
+            excelEntity.setLabelAttris(joiner.toString());
         }
 
         switch (excelEntity.getRedundantType()) {

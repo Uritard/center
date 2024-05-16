@@ -758,7 +758,8 @@
         result_pic,
         points,
         voice_path,
-        all_file_path
+        all_file_path,
+        label_attri
         )values
         <foreach collection="list" item="uPatrolDataResult" separator=",">
             (
@@ -806,7 +807,8 @@
             #{uPatrolDataResult.resultPic, jdbcType=VARCHAR},
             #{uPatrolDataResult.points, jdbcType=VARCHAR},
             #{uPatrolDataResult.voicePath, jdbcType=VARCHAR},
-            #{uPatrolDataResult.allFilePath, jdbcType=VARCHAR}
+            #{uPatrolDataResult.allFilePath, jdbcType=VARCHAR},
+            #{uPatrolDataResult.labelAttri, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

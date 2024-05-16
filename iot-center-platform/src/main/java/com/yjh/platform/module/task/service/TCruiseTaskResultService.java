@@ -192,6 +192,7 @@ public class TCruiseTaskResultService {
         inspectResult.setCruiseTypeName(DictConvertUtil.DICT.covertToDict("cruiseType", resultMap.get("cruiseType")));
         inspectResult.setDeviceName(resultMap.get("deviceName"));
         inspectResult.setCruiseStatus(DictConvertUtil.DICT.covertToDict("cruiseDataState", resultMap.get("cruiseStatus")));
+
         if (!CommonUtils.isEmptyOrNullstr(resultMap.get("resultDesc"))) {
             inspectResult.setCruiseResultName(resultMap.get("resultDesc"));
         }

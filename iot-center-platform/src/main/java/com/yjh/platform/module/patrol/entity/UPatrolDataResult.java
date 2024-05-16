@@ -8,9 +8,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -161,5 +163,9 @@ public class UPatrolDataResult implements Serializable {
     @ApiModelProperty(value = "一个点有多个结果，存储多个结果的文件")
     private String allFilePath;
 
+    @ApiModelProperty(value = "标签属性")
+    private String labelAttri;
 
+    @ApiModelProperty(value = "标签属性对应名称和颜色")
+    private List<Pair<String, String>> labelAttriName;
 }

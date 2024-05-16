@@ -1315,6 +1315,7 @@ CREATE TABLE `t_defect_info` (
   `task_id` varchar(512) DEFAULT '' COMMENT '任务ID',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
+  `label_attri`` VARCHAR(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
   PRIMARY KEY (`defect_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='缺陷信息表';
 
@@ -1830,6 +1831,7 @@ CREATE TABLE `t_std_devicemete` (
   `redundant_type` varchar(50) NOT NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
   `is_temdif` int(5) DEFAULT '0' COMMENT '是否温差任务（0-否；1-是）',
   `alarm_level_string` varchar(64) NULL  DEFAULT '' COMMENT '告警级别list',
+  `label_attri` varchar(32) DEFAULT '' COMMENT '标签属性，多个使用','拼接 1-人工关注',
   PRIMARY KEY (`device_mete_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8mb4 COMMENT='标准设备测点表';
 
@@ -2278,6 +2280,7 @@ CREATE TABLE `t_warn_info` (
   `alarm_owner` int(11) DEFAULT NULL COMMENT '告警是用谁的告警规则产生的',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
+  `label_attri`` VARCHAR(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
 
@@ -2351,6 +2354,7 @@ CREATE TABLE `u_patrol_data_result` (
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
   `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
   `all_file_path` varchar(512) DEFAULT NULL COMMENT '一个点有多个结果，存储多个结果的文件',
+  `label_attri` varchar(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
   PRIMARY KEY (`cruise_data_id`) USING BTREE,
   KEY `task_id_index` (`task_id`) USING BTREE,
   KEY `index_device_mete_id` (`device_mete_id`) USING BTREE,

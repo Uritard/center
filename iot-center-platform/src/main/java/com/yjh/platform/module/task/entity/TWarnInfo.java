@@ -10,11 +10,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -158,4 +160,7 @@ public class TWarnInfo implements Serializable {
     private String originId;
 
     private String edgeCode;
+
+    private String labelAttri;
+    private List<Pair<String, String>> labelAttriName;
 }

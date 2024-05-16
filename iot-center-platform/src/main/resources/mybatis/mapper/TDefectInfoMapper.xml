@@ -587,6 +587,7 @@
             f.dict_note as alarm_source_name,
             a.defect_type as defect_model,
             m.dict_note as defect_model_name,
+            a.label_attri,
         b.up_region_name as region_name
         FROM t_defect_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id

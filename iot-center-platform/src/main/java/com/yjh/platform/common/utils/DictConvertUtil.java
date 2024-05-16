@@ -78,8 +78,17 @@ public enum DictConvertUtil {
         if (StringUtils.isEmpty(dictCode) || StringUtils.isEmpty(colName)) {
             return "";
         }
-        String key = colName + ":" + dictCode;
-        return dictMap.getOrDefault(key, "");
+        if (StringUtils.contains(dictCode, ",")) {
+            StringJoiner joiner = new StringJoiner(",");
+            for (String code : dictCode.split(",")) {
+                String val = dictMap.getOrDefault(colName + ":" + code, "");
+                joiner.add(val);
+            }
+            return joiner.toString();
+        } else {
+            String key = colName + ":" + dictCode;
+            return dictMap.getOrDefault(key, "");
+        }
     }
 
     public String getDictCode(String colName, String dictNote) {
