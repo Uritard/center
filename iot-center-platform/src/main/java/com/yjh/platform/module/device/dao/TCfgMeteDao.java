@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.yjh.platform.module.device.entity.SYAllInfo;
 import com.yjh.platform.module.device.entity.TCfgMete;
+import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -54,4 +55,6 @@ public interface TCfgMeteDao {
     int updateForAll(SYAllInfo syAllInfo);
 
     List<String> selectAllEdgeCode(@Param(value = "inputParam") String inputParam);
+
+    List<TCfgDataCurrent> selectByMeteIds(@Param(value = "list") List<Long> list);
 }
