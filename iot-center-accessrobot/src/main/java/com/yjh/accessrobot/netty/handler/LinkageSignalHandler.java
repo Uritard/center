@@ -70,7 +70,7 @@ public class LinkageSignalHandler implements MessageHandlerStrategy, Initializin
             }
         }
         String reXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] reProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, reXmlString);
+        byte[] reProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, reXmlString);
         RobotServerHandler.send(reProtocol, sendCode);
         log.info("巡视主机给机器人{}响应了", sendCode);
     }

@@ -31,7 +31,7 @@ public class RobotConfirmMsgHandler implements MessageHandlerStrategy, Initializ
         String robotCode = xmlBaseModel.getSendCode();
         robotService.updateConfirmMsgForRedis(xmlBaseModel);
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, operationXmlString);
         RobotServerHandler.send(operationProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
     }

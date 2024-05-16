@@ -51,7 +51,7 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
 
         // 给下级响应
         String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, statusXmlString);
         RobotServerHandler.send(statusProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

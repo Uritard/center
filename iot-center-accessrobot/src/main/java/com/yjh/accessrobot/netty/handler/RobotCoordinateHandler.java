@@ -55,7 +55,7 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
 
         // 给下级响应
         String coordinateXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
+        byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, coordinateXmlString);
         RobotServerHandler.send(coordinateProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

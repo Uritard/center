@@ -66,7 +66,7 @@ public class ReviewResultHandler implements MessageHandlerStrategy, Initializing
 
         // 给下级响应
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,sendCode));
-        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
+        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, cruiseResultXmlString);
         RobotServerHandler.send(cruiseResultProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

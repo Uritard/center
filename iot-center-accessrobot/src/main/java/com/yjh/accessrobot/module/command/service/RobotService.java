@@ -523,7 +523,7 @@ public class RobotService {
      * @return byte[]
      */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
-        long sendSessionId = Constant.AtomicSessionId.addAndGet(1);
+        long sendSessionId = Constant.AtomicSessionId.incrementAndGet();
         ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
         log.info("context是<start>{}<end>", context);
         if (context != null) {

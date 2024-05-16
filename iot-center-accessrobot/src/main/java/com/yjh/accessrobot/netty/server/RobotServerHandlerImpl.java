@@ -291,7 +291,7 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             String responseMsgXmlString = PlatformXMLUtil
                     .generateXml(sendMessageForCommandThree(false, xmlBaseModel.getSendCode()));
             byte[] responseMsgProtocol = PlatformPacketUtil
-                    .createPacket(Constant.sendSessionId, sendSessionId, false, responseMsgXmlString);
+                    .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, responseMsgXmlString);
             send(responseMsgProtocol, xmlBaseModel.getSendCode());
             log.info("巡视主机给机器人{}响应了", xmlBaseModel.getSendCode());
         }
@@ -342,7 +342,7 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             Map<String, String> robotStatusMap) {
         String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, robotCode));
         byte[] heartProtocol = PlatformPacketUtil
-                .createPacket(Constant.sendSessionId, sendSessionId, false, heartXmlString);
+                .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, heartXmlString);
         send(heartProtocol, robotCode);
         log.info("maps:{}", maps);
         log.info("robotChannels:{}", robotChannels);

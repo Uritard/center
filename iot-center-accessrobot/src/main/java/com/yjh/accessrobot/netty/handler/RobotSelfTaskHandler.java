@@ -48,7 +48,7 @@ public class RobotSelfTaskHandler implements MessageHandlerStrategy, Initializin
         robotService.addRobotSelfTask(taskModelMapList, xmlBaseModel.getSendCode());
 
         String taskIntoDBXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] taskIntoDBProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskIntoDBXmlString);
+        byte[] taskIntoDBProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, taskIntoDBXmlString);
         RobotServerHandler.send(taskIntoDBProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
     }
