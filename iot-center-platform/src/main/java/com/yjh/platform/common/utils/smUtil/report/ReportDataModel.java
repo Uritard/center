@@ -348,7 +348,7 @@ public class ReportDataModel {
                 if (detail.getMeteKind() == 2) {
                     warnRule = "告警规则：" + detail.getAlarmRuleTypeName() + "\r\n"
                             + "预警：" + detail.getLowLimit1() + "/" + detail.getHighLimit1() + " 一般：" + detail.getLowLimit2() + "/" + detail.getHighLimit2() + "\r\n"
-                            + "严重：" + detail.getLowLimit3() + "/" + detail.getHighLimit4() + " 危机：" + detail.getLowLimit3() + "/" + detail.getHighLimit4();
+                            + "严重：" + detail.getLowLimit3() + "/" + detail.getHighLimit3() + " 危机：" + detail.getLowLimit4() + "/" + detail.getHighLimit4();
                 } else if (detail.getMeteKind() == 1) {
                     if (detail.getMeteType() == 223) {
                         warnRule = "告警规则\r\n"

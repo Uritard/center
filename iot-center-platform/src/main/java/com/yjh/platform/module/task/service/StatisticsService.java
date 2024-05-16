@@ -609,8 +609,8 @@ public class StatisticsService {
             if (mapData.get("channel") != null) {
                 List<Map<String, Object>> chanInfo = (List<Map<String, Object>>) mapData.get("channel");
                 for (Map<String, Object> mapChannel : chanInfo) {
-                    int intactTime = (int) mapChannel.get("intactTime");
-                    int ipChanNum = (int) mapChannel.get("ipChanNum");
+                    int intactTime = mapChannel.containsKey("intactTime") ? (int) mapChannel.get("intactTime") : 0;
+                    int ipChanNum = mapChannel.containsKey("ipChanNum") ? (int) mapChannel.get("ipChanNum") : 0;
                     if (intactTime != 0) {
                         String intactPercent = String.format("%.3f", intactTime / 100d);
                         percentMap.put(ipChanNum, intactPercent + "%");
