@@ -53,7 +53,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
         // 给下级响应
         String roadXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
+        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, roadXmlString);
         RobotServerHandler.send(roadProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

@@ -105,7 +105,7 @@ public class Constant {
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
         try {
-            re = otherServer(map, url);
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

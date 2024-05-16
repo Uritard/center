@@ -50,7 +50,7 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         }
 
         String envWarningXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] envWarningProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, envWarningXmlString);
+        byte[] envWarningProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, envWarningXmlString);
         RobotServerHandler.send(envWarningProtocol, sendCode);
         log.info("巡视主机给机器人{}响应了", sendCode);
 

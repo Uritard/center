@@ -51,7 +51,7 @@ public class ClientService implements IMessageSender {
 
     private volatile long REQ_MSG_ID;
     private final Cache<Long, InboundMessage> REQ_MSG_CACHE =
-        CacheBuilder.newBuilder().expireAfterWrite(Duration.ofSeconds(30)).maximumSize(10000).build();
+        CacheBuilder.newBuilder().expireAfterWrite(Duration.ofMinutes(30)).maximumSize(10000).build();
 
     /**
      *

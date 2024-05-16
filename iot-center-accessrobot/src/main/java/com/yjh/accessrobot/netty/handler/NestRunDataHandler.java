@@ -72,7 +72,7 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
         //完全解析完成的算成功  否则失败 返回 500给下级
         boolean isFull = xmlBaseModel.getItems().size() == nestOperationList.size();
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, operationXmlString);
         RobotServerHandler.send(operationProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

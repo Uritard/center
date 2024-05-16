@@ -9,12 +9,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author tt
@@ -203,6 +205,10 @@ public class TStdDeviceMete implements Serializable {
     private Integer alarmState;
 
     private String isJudge;
+
+    private String labelAttri;
+
+    private List<Pair<String, String>> labelAttriName;
 
     private Integer pageNum = 1;
 

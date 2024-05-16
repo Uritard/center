@@ -26,6 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -117,10 +118,12 @@ public class AutomationTask {
                 trees.add(baseTree);
                 String protoKey = protocalType + "_" + proto;
                 List<String> messages = MESSAGE_MAP.get(protoKey);
-                List<BaseTree> children = messages.stream()
-                    .map(m -> new BaseTree(StringUtils.substringAfterLast(m, File.separator)))
-                    .collect(Collectors.toList());
-                baseTree.setChildren(children);
+                if (CollectionUtils.isNotEmpty(messages)) {
+                    List<BaseTree> children = messages.stream()
+                        .map(m -> new BaseTree(StringUtils.substringAfterLast(m, File.separator)))
+                        .collect(Collectors.toList());
+                    baseTree.setChildren(children);
+                }
             }
         }
 
@@ -171,6 +174,7 @@ public class AutomationTask {
             return;
         }
         try {
+            log.info("自动测试消息: {}, isServer: {}", file, isServer);
             BaseMessage msg = sendMessage(file, isServer, null);
 
             long msgId = (long)msg.getMsgId();
@@ -178,9 +182,7 @@ public class AutomationTask {
             SESSION_MESSAGE_MAP.put(msgId, wait);
 
             synchronized (wait) {
-                while (SESSION_MESSAGE_MAP.containsKey(msgId)) {
-                    wait.wait(15000);
-                }
+                wait.wait(15000);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -194,6 +196,7 @@ public class AutomationTask {
         IMessageSender sender = isServer ? serverService : clientService;
         message.setSendCode(sender.sendCode());
         message.setReceiveCode(sender.receiveCode());
+        message.setTime(LocalDateTime.now());
         BaseMessage msg = sender.sendMessage(message, inboundMessage);
 
         String xml = MessageCodecHandler.encodeXml(sender.getMessageCodec(), message);
@@ -201,8 +204,8 @@ public class AutomationTask {
         // 打印发送日志
         AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
             name + "发送会话序列号：" + msg.getMsgId() + "        " +
-                "接收会话序列号：" + (inboundMessage != null ?inboundMessage.getPacket().getReceiveSessionId():0) + "        " +
-                "会话源标识：0x0" + (inboundMessage != null ? 1:0) + "        " +
+                "接收会话序列号：" + (inboundMessage != null ?inboundMessage.getPacket().getReceiveSessionId() : 0) + "        " +
+                "会话源标识：0x0" + (inboundMessage != null ? 1 : 0) + "        " +
                 "xml内容：\n" + xml, "");
         wsMessageSender.send(new AInterfaceMessage(data));
 
@@ -228,6 +231,8 @@ public class AutomationTask {
             String xml = new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8);
 
             Message message = XmlToMessageUtil.decode(xml);
+            // 判断是否注册，并自动发送心跳
+            scheduleHeart(message);
             String type = message.getType() + "_" + message.getCommand();
             String cmd = protocolType + "_" + type + "_" + retFlag;
             Collection<String> messageFiles = COMMAND_MESSAGE_MAP.get(cmd);
@@ -352,6 +357,9 @@ public class AutomationTask {
             return;
         }
         for (File f : files) {
+            if (f.isFile() && !"xml".equals(FileUtil.extName(f))) {
+                continue;
+            }
             String name = f.getName();
             String pname = StringUtils.isEmpty(parentName) ? name : parentName;
             String nextNname = StringUtils.isEmpty(parentName) ? name : parentName + "_" + name;
@@ -374,7 +382,9 @@ public class AutomationTask {
                     break;
             }
             if (childList != null) {
-                childList.add(name);
+                if (StringUtils.isNotEmpty(name)) {
+                    childList.add(name);
+                }
                 fileList(f, nextNname, level + 1);
             }
         }
@@ -382,6 +392,9 @@ public class AutomationTask {
 
     public void parseXmlFile(File file) {
         try {
+            if (!"xml".equals(FileUtil.extName(file))) {
+                return;
+            }
             Message message = loadMessage(file);
             String type = message.getType() + "_" + message.getCommand();
             int retFlag = StringUtils.contains(file.getName(), "request") ? 0 : 1;
@@ -393,7 +406,7 @@ public class AutomationTask {
             COMMAND_MESSAGE_MAP.computeIfAbsent(cmd, k -> new TreeSet<>()).add(file.getAbsolutePath());
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("解析xml文件失败: {}", file.getAbsolutePath(), e);
         }
     }
 
@@ -427,5 +440,28 @@ public class AutomationTask {
 
     public void autoReply(boolean flag) {
         autoReply = flag;
+    }
+
+    public boolean scheduleHeart(Message message) {
+        if ("251".equals(message.getType()) && "4".equals(message.getCommand())) {
+            List<Map<String, Object>> items = message.getItems();
+            if (CollectionUtils.isNotEmpty(items)) {
+                long heartBeatInterval = 0L;
+                for (Map<String, Object> item : items) {
+                    Object interval = item.get("heart_beat_interval");
+                    if (interval != null) {
+                        heartBeatInterval = NumberUtils.toLong((String)interval);
+                        break;
+                    }
+                }
+
+                if (heartBeatInterval > 0L) {
+                    log.info("增加心跳定时器: {}", heartBeatInterval);
+                    HeartBeatThead.addThread(clientService, heartBeatInterval);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -456,7 +456,8 @@
         region.region_name  as  edge_name,
         b.custom_name,
         b.device_point_id,
-        b.all_file_path
+        b.all_file_path,
+        b.label_attri
         FROM u_patrol_data_result b
         LEFT JOIN t_std_device n on n.device_id = b.device_id
         LEFT JOIN t_std_devicemete q on q.device_mete_id = b.device_mete_id
@@ -495,7 +496,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY b.cruise_time asc, b.instance_id asc
+        ORDER BY FIND_IN_SET('1', b.label_attri) desc, b.cruise_time asc, b.instance_id asc
     </select>
 
     <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"
@@ -854,7 +855,8 @@
         a.is_temdif,
         a.remark,
         conf.db_value as dBValue,
-        conf.f_value as FValue
+        conf.f_value as FValue,
+        a.label_attri
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
         left join t_voice_device v  on b.cruise_id = v.voice_device_id

@@ -2,9 +2,9 @@
 <PatrolHost>
     <SendCode>Up01</SendCode>
     <ReceiveCode>Region01</ReceiveCode>
-    <Type>61</Type>
-    <Code>1</Code>
-    <Time>2024-03-27 20:59:00</Time>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Time>2024-03-26 13:39:29</Time>
     <Items/>
-    <Command>7</Command>
+    <Command>3</Command>
 </PatrolHost>

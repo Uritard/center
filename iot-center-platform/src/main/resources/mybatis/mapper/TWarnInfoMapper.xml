@@ -165,7 +165,8 @@
                                 task_id,
                                 alarm_owner,
                                 origin_id,
-                                edge_code)
+                                edge_code,
+                                label_attri)
         values (#{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
                 #{warnTime, jdbcType=TIMESTAMP},
@@ -195,7 +196,8 @@
                 #{taskId, jdbcType=VARCHAR},
                 #{alarmOwner, jdbcType=INTEGER},
                 #{originId, jdbcType=VARCHAR},
-                #{edgeCode, jdbcType=VARCHAR})
+                #{edgeCode, jdbcType=VARCHAR},
+                #{labelAttri,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -628,6 +630,7 @@
         a.deal_info,
         a.deal_type,
         a.defect_model,
+        a.label_attri,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_warn_info a
@@ -670,6 +673,7 @@
         a.deal_info,
         a.deal_type,
         a.defect_type as defect_model,
+        a.label_attri,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_defect_info a
@@ -977,6 +981,7 @@
         d.high_limit2,
         d.high_limit3,
         d.high_limit4,
+        a.label_attri,
         b.up_region_name as region_name
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id

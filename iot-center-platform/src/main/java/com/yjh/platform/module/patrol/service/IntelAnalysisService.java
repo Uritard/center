@@ -1139,6 +1139,7 @@ public class IntelAnalysisService {
                     TStdDeviceMete tStdDevicemete = tStdDevicemeteService.selectByPrimaryId(tWarnInfo.getStdMeteId());
                     if (Objects.nonNull(tStdDevicemete)) {
                         tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+                        tWarnInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
                     }
                 }
                 analyseDataOperateDao.insertWarnInfo(tWarnInfo);

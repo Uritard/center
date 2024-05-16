@@ -518,6 +518,7 @@ public class UPatrolTaskService {
                 .setCruiseDeviceId(item.getCruiseDeviceId())
                 .setCruiseDeviceName(item.getCruiseDeviceName())
                 .setCruiseType(item.getCruiseType())
+                .setLabelAttri(item.getLabelAttri())
                 .setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
@@ -2617,6 +2618,9 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
                 uPatrolDataResult.setConfirmPicPath(redisInfoMap.get("confirmPicPath"));
                 uPatrolDataResult.setOrigConfirmPicPath(redisInfoMap.get("origConfirmPicPath"));
+                if (!CommonUtils.isEmptyOrNullstr(redisInfoMap.get("labelAttri"))) {
+                    uPatrolDataResult.setLabelAttri(redisInfoMap.get("labelAttri"));
+                }
 
                 uPatrolDataResultList.add(uPatrolDataResult);
                 if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()) {

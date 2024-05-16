@@ -50,7 +50,7 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
 
         // 给下级响应
         String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
+        byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, alarmXmlString);
         RobotServerHandler.send(alarmProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

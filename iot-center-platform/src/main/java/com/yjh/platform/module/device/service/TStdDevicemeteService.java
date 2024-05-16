@@ -14,6 +14,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
@@ -29,8 +30,10 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +109,9 @@ public class TStdDevicemeteService{
             String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
             tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
         }
+        if(ArrayUtils.isNotEmpty(tStdDeviceMeteDetail.getLabelAttris())) {
+            tStdDeviceMeteDetail.setLabelAttri(StringUtils.join(tStdDeviceMeteDetail.getLabelAttris(), ","));
+        }
 
         this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
         //配置算法
@@ -174,6 +180,9 @@ public class TStdDevicemeteService{
         if(StringUtils.isNotBlank(tStdDeviceMeteDetail.getAlarmLevelString())) {
             String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
             tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
+        }
+        if(ArrayUtils.isNotEmpty(tStdDeviceMeteDetail.getLabelAttris())) {
+            tStdDeviceMeteDetail.setLabelAttri(StringUtils.join(tStdDeviceMeteDetail.getLabelAttris(), ","));
         }
         //修改测点配置的算法
         if ((Objects.nonNull(tStdDeviceMeteDetail.getAnalyseType())
@@ -273,11 +282,11 @@ public class TStdDevicemeteService{
             .add("alarmLevel");
         DictConvertUtil.DICT.covertToDict(list,optional);
 
-
         for (TStdDeviceMeteDetail detail : list) {
             if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
                 String analyseName = "on".equals(detail.getIsAi()) ? "缺陷" : "on".equals(detail.getIsJudge()) ? "判别" : "无";
                 detail.setAnalyseTypeName(analyseName);
+                detail.setLabelAttriName(labelAttriName(detail.getLabelAttri()));
             }
         }
 
@@ -307,6 +316,20 @@ public class TStdDevicemeteService{
             }
             tStdDeviceMeteDetail.setRules(rules.toString());
         });
+    }
+
+    public List<Pair<String, String>> labelAttriName(String labelAttri) {
+        String lableNames = DictConvertUtil.DICT.covertToDict("labelAttri", labelAttri);
+        if (StringUtils.isNotEmpty(lableNames)) {
+            List<Pair<String, String>> pairNames = new ArrayList<>();
+            String[] is = labelAttri.split(",");
+            String[] names = lableNames.split(",");
+            for (int i = 0; i < is.length; i++) {
+                pairNames.add(Pair.of(names[i], CommonUtils.color(is[i])));
+            }
+            return pairNames;
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -576,6 +599,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     tStdDeviceMete.setIsTemdif(0);
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
+                    tStdDeviceMete.setLabelAttri(excelEntity.getLabelAttris());
                     totalMete.add(tStdDeviceMete);
                 }
             });

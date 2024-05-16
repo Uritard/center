@@ -222,7 +222,8 @@
             video_path,
             value,
             out_range,
-            task_id
+            task_id,
+            label_attri
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
@@ -250,7 +251,8 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR},
+                #{labelAttri,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -760,7 +762,8 @@
             VALUE,
             out_range,
             link_message,
-            task_id
+            task_id,
+            label_attri
         )values(
                 #{defectId, jdbcType=BIGINT},
                 #{defectLevel, jdbcType=INTEGER},
@@ -789,7 +792,8 @@
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
                 #{linkMessage, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR},
+                #{labelAttri, jdbcType=VARCHAR}
         )
     </insert>
 
