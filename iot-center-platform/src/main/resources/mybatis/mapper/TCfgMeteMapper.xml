@@ -469,4 +469,17 @@
     </update>
 
 
+    <select id="selectByMeteIds" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        SELECT
+            device.device_id,
+            device.device_name,
+            mete.mete_kind
+        FROM
+        t_cfg_device device
+        LEFT JOIN t_cfg_mete mete ON device.device_id = mete.mete_id
+        where device.device_id in
+            <foreach collection="list" item="meteId" separator="," open="(" close=")">
+                #{meteId}
+            </foreach>
+    </select>
 </mapper>
