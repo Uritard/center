@@ -9,7 +9,7 @@ public interface UserInterface {
     String USER_ROLE = "sys_user_role:";
     //用户权限
     String USER_AUTH = "sys_user_auth:";
-    String CREATOR_ID = "creatorId";
+    String CREATOR_ID = "userId";
 
     /**
      * 获取用户ID
