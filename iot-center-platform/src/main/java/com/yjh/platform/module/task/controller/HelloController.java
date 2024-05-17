@@ -1039,6 +1039,17 @@ public class HelloController {
         return new Result();
     }
 
+    @PostMapping(value="/refreshDictCache")
+    public Result refreshDictCache() {
+        try {
+            DictConvertUtil.DICT.loadDict();
+        } catch (Exception e) {
+            log.error("更新字典表缓存失败", e);
+            return new Result(500, "更新字典表缓存失败");
+        }
+        return new Result();
+    }
+
     @Autowired
     private OnLineMonitoringExecuteImpl onLineMonitoringExecute;
 
