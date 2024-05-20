@@ -2,9 +2,9 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -59,7 +59,7 @@ public class ProcessResultToUpSystem {
     private final AnalyseDataOperateService analyseDataOperateService;
     private final FtpsService ftpsService;
     private final ApplicationProperties applicationProperties;
-    private final AlarmService alarmService;
+    private final AlgorithmService algorithmService;
     private final TRobotInfoDao tRobotInfoDao;
 
     private static final String CCD_PATH = "/CCD/";
@@ -71,14 +71,15 @@ public class ProcessResultToUpSystem {
     private static final Map<String, List<Map<String, String>>> DEFECT_MAP = new ConcurrentHashMap<>(128);
     private static final Map<String, List<String>> DISTING_MAP = new ConcurrentHashMap<>(128);
 
+
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
-                                   AlarmService alarmService,ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao) {
+                                   AlgorithmService algorithmService,ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
         this.ftpsService = ftpsService;
-        this.alarmService = alarmService;
+        this.algorithmService = algorithmService;
         this.applicationProperties = applicationProperties;
         this.tRobotInfoDao = tRobotInfoDao;
     }
@@ -601,26 +602,27 @@ public class ProcessResultToUpSystem {
         // msg：判别告警 defect：缺陷告警
         // Set<String> differentList= redisScan( "msg:" + msgId);
         // Set<String> defectList = redisScan("defect:" + msgId);
-        String ftpsRemotePath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath();
+        String ftpsRemotePath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath();
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-
-        List<String> diffList = DISTING_MAP.remove(msgId);
+        boolean normal = true;
         // Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
         Long instanceId = MapUtils.getLong(cruiseResultMap, "instanceId");
-        if(CollectionUtils.isNotEmpty(diffList) && applicationProperties.getManagerMqttConfig().isEnable()){
+        HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
+        Alarm alarmDetail = new Alarm();
+        String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
+
+        // 先取出算法平台返回的resultinfo中的结果图片路径
+        String resultImage;
+        String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
+        String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
+        resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+
+        List<String> diffList = DISTING_MAP.remove(msgId);
+        if(CollectionUtils.isNotEmpty(diffList) && applicationProperties.getManagerAlgorithmConfig().isEnable()){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
-
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
-            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
-
-
-            // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImage;
-            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
-            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
-            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+            normal = false;
 
             String remoteorigfilepath = ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
             //,获取结果路径.并拼接算法管理平台对应远程文件路径
@@ -636,7 +638,7 @@ public class ProcessResultToUpSystem {
             String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
 
             List<Different> defectTempList = new ArrayList<>();
-            Alarm alarmDetail = new Alarm();
+
             for (String resultValue : diffList) {
                 log.info("判别结果：{}",resultValue);
                 Different different = new Different();
@@ -689,7 +691,7 @@ public class ProcessResultToUpSystem {
                 log.info("判别告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
                 ftpsService.uploadFile("判别告警", resultImage, remotefilepath);
             }
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
         }
 
@@ -699,24 +701,15 @@ public class ProcessResultToUpSystem {
 //        }
 
         List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
-        if(CollectionUtils.isNotEmpty(defectList) && applicationProperties.getManagerMqttConfig().isEnable()) {
+        if(CollectionUtils.isNotEmpty(defectList) && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
-
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
-            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
-
-            // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImage;
-            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
-            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
-            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+            normal = false;
 
             //拼接算法管理平台原始图片推送地址
             String remoteorigfilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
             //拼接算法管理平台分析告警结果图片地址
             String remotefilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
-            Alarm alarmDetail = new Alarm();
             List<Defect> defectTempList = new ArrayList<>();
             for (Map<String, String> defectMap : defectList) {
                 // 获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
@@ -771,7 +764,7 @@ public class ProcessResultToUpSystem {
 
             log.info("缺陷与算法主机：origpicpath:{}，remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
             log.info("缺陷与算法主机：resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             log.info("缺陷告警发送算法管理平台结束");
 
         }
@@ -779,6 +772,23 @@ public class ProcessResultToUpSystem {
 //            // 缺陷上报上一级系统  不在这里上报了
 //            defectToUpSystem(cruiseResultMap, defectList);
 //        }
+        //如果正常需要进行正常样本上报
+        if (normal) {
+            String remoteorigfilepath = ftpsRemotePath + "/" + "正常" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            alarmDetail.setBay_name(nameMap.get("upRegionName"));
+            alarmDetail.setDevice_name(deviceName);
+            alarmDetail.setPoint_name(nameMap.get("meteName"));
+            alarmDetail.setTime(DateTimeUtil.format(new Date()));
+            // 原始图片上传
+            ftpsService.uploadFile("正常原图", origPicPath, remoteorigfilepath);
+            if( !ftpsService.fileExits(remoteorigfilepath)){
+                log.info("原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+                ftpsService.uploadFile("正常原图", origPicPath, remoteorigfilepath);
+            }
+            // 原图
+            alarmDetail.setPic_raw(remoteorigfilepath);
+            algorithmService.pushNormalMsg(alarmDetail);
+        }
     }
 
     /**

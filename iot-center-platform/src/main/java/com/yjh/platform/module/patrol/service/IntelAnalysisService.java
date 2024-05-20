@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yjh.commons.ValueUtil;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -26,7 +26,6 @@ import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
-import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -53,7 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -66,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -98,7 +97,7 @@ public class IntelAnalysisService {
     @Autowired
     private FtpsService ftpsService;
     @Autowired
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     @Lazy
     @Autowired
     private TSequentialConfService tSequentialConfService;
@@ -116,6 +115,8 @@ public class IntelAnalysisService {
 
     private List<String> TASK_RESULT = new ArrayList<>();
     private final String TASK_INTEL_ANALYSIS_RESULT="TASK_INTEL_ANALYSIS_RESULT:";
+
+    private final String ALGORITHM_PARAMS = "ALGORITHM_PARAMS:";
 
     /**
      * 巡视主机请求图像分析--功能
@@ -309,12 +310,28 @@ public class IntelAnalysisService {
         try {
             String url = applicationProperties.getIntelAlgorithmConfig().getAlgorithmResourceUrl();
             String result = HttpClientUtils.getInstance().getUrl(url, null);
-            log.info("result==={}", result);
+//            log.info("result==={}", result);
             if (StringUtils.isNotBlank(result)) {
                 jsonObject = JSONObject.parseObject(result);
                 if ("200".equals(jsonObject.getObject("code", String.class))) {
                     jsonObject.remove("code");
                     jsonObject.put("network_rtt_avg", SystemInfoUtil.getNetDelay(url) + "ms");
+                    List<Map<String, String>> versionInfo = new ArrayList<>();
+                    String version1 = String.valueOf(redisTemplate.opsForHash().entries(ALGORITHM_PARAMS + "1").get("version"));
+                    if (StringUtils.isNotBlank(version1)) {
+                        Map<String, String> versionMap = new HashMap<>(2);
+                        versionMap.put("type", "1");
+                        versionMap.put("version", version1);
+                        versionInfo.add(versionMap);
+                    }
+                    String version2 = String.valueOf(redisTemplate.opsForHash().entries(ALGORITHM_PARAMS + "2").get("version"));
+                    if (StringUtils.isNotBlank(version2)) {
+                        Map<String, String> versionMap = new HashMap<>(2);
+                        versionMap.put("type", "2");
+                        versionMap.put("version", version2);
+                        versionInfo.add(versionMap);
+                    }
+                    jsonObject.put("version_info", versionInfo);
                 }
             }
         } catch (Exception e) {
@@ -687,13 +704,13 @@ public class IntelAnalysisService {
                     String imgF = imageBaseName + "判别告警.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remotefilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + imgF;
 
                     String imgBase = imageBaseName + "判别基准.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remoteBaseFilePath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + imgBase;
 
                     //基准图
@@ -703,7 +720,7 @@ public class IntelAnalysisService {
                     log.info("判别基准：{}", basePath);
 
                     String remoteorigfilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + origpcimagename;
 
                     try {
@@ -740,14 +757,14 @@ public class IntelAnalysisService {
                         break;
                     }
                     String remoteorigfilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
                             + origpcimagename;
 
                     String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
                     String imgF = imageBaseName + "缺陷告警.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remotefilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
                             + imgF;
 
                     try {
@@ -812,7 +829,7 @@ public class IntelAnalysisService {
         }
 
         if (!alarms.isEmpty()) {
-            alarmService.PushMsg(alarms);
+            algorithmService.pushAlarmMsg(alarms);
         }
     }
 
@@ -1467,17 +1484,24 @@ public class IntelAnalysisService {
      * @param type <1>:=状态类型 <2>:=缺陷类型
      * @return 算法参数
      */
-    public Object getAlgorithmParams(String type) {
-        List<Map<String,Object>> items = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>(3);
-        map.put("section_id", "500kV江苏变电站区域");
-        String stationCode = SysParamConfig.getSysContent("edgeId");
-        map.put("station_id", stationCode);
+    public Map<String, String> getAlgorithmParams(String type) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(3);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
         map.put("type", type);
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
-        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
-        return re.getData();
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        Map<String, String> prams = new HashMap<>();
+        if (Objects.nonNull(re)) {
+            List<Map<String, String>> res = Object2List.castListMap(re.getData(), String.class, String.class);
+            if (CollectionUtils.isNotEmpty(res)) {
+                prams = res.get(0);
+                redisTemplate.opsForHash().putAll(ALGORITHM_PARAMS + type, prams);
+            }
+        }
+        return prams;
     }
 
     /**
@@ -1490,13 +1514,12 @@ public class IntelAnalysisService {
         List<Map<String,Object>> items = new ArrayList<>();
         Map<String,Object> map = new HashMap<>(4);
         map.put("algorithmManufacturer", algorithmManufacturer);
-        map.put("section_id", "500kV江苏变电站区域");
-        String stationCode = SysParamConfig.getSysContent("edgeId");
-        map.put("station_id", stationCode);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
         map.put("type", type);
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
-        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
         return re.getData();
     }
 
@@ -1508,14 +1531,13 @@ public class IntelAnalysisService {
     public void algorithmVersionChange(String type, String version) {
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> map = new HashMap<>(4);
-        map.put("section_id", "500kV江苏变电站区域");
-        String stationCode = SysParamConfig.getSysContent("edgeId");
-        map.put("station_id", stationCode);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
         map.put("version", version);
         map.put("type", type);
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
-        Result re = Constant.otherServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
         if (Objects.nonNull(re.getData())) {
             List<Map<String, Object>> list = Object2List.castListMap(re.getData(), String.class, Object.class);
             if (CollectionUtils.isNotEmpty(list)) {

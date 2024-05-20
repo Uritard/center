@@ -30,7 +30,7 @@ public class HeartBeatThead {
                     taskScheduler.scheduleAtFixedRate(new InternalRunner(clientHandler), Instant.now(), Duration.ofSeconds(duration));
             RUNNER_MAP.put(clientHandler.getServer(), future);
         } else {
-            log.warn("心跳定时器已添加");
+            log.warn(clientHandler.getServer() + "心跳定时器已添加");
         }
     }
 
@@ -51,9 +51,9 @@ public class HeartBeatThead {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("251").setCommand("2");
                 clientHandler.send(xmlBaseModel, 0, true);
 
-                log.info("--心跳信息已发送--");
+                log.info(clientHandler.getServer() + "--心跳信息已发送--");
             } catch (Exception e) {
-                log.error("心跳发送失败", e);
+                log.error(clientHandler.getServer() + "心跳发送失败", e);
             }
         }
 

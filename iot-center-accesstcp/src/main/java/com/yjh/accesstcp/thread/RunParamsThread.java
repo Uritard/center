@@ -1,5 +1,7 @@
 package com.yjh.accesstcp.thread;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -54,7 +56,8 @@ public class RunParamsThread {
             try {
                 Result re = Constant.getForObject(Constant.ALGORITHM_RESOURCE_URL);
                 List<Map<String,Object>> items = new ArrayList<>();
-                items.add(BeanToMapUtil.convertBean2Map(re.getData()));
+                JSONObject obj = (JSONObject) JSON.toJSON(re.getData());
+                items.add(obj);
                 XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("313").setCode(Constant.stationCode()).setItems(items);
                 clientHandler.send(xmlBaseModel, 0, true);
                 log.info("--算法资源信息已发送--");

@@ -55,7 +55,7 @@ public class MessageThread {
                 clientHandler.normalResponse("400", header.getSessionId());
             }
             CallbackHandlerStrategy callbackHandlerStrategy =
-                    CallbackHandlerStrategyFactory.getStrategyType(header.getReceiveSessionId());
+                    CallbackHandlerStrategyFactory.getStrategyType(clientHandler.getRootName() + header.getReceiveSessionId());
             if (Optional.ofNullable(callbackHandlerStrategy).isPresent()) {
                 callbackHandlerStrategy.handler(clientHandler, xmlBaseModel, header);
             } else {

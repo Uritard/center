@@ -15,6 +15,7 @@ import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import com.yjh.accesstcp.thread.MessageThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
@@ -100,6 +101,9 @@ public class SendToUpSystemController {
                 InetSocketAddress inetSocketAddress = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
                 TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
                 if (tcpClientHandler != null) {
+                    if (StringUtils.isBlank(xmlBaseModel.getCode())){
+                        xmlBaseModel.setCode(Constant.stationCode());
+                    }
                     tcpClientHandler.send(xmlBaseModel, 0L, true);
                 } else {
                     log.error("服务未连接，请重试，port: {}", Constant.upSystemPort());

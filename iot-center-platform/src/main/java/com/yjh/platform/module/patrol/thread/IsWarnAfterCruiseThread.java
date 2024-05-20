@@ -2,9 +2,9 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -50,7 +50,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private RedisTemplate redisTemplate;
     private UPatrolTaskService uPatrolTaskService;
     private FtpsService ftpsService;
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     private PatrolResultHandler patrolResultHandler;
     private ApplicationProperties applicationProperties;
     private TStdRegionDao tStdRegionDao;
@@ -62,7 +62,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         ftpsService = StaticContextAccessor.getBean(FtpsService.class);
-        alarmService = StaticContextAccessor.getBean(AlarmService.class);
+        algorithmService = StaticContextAccessor.getBean(AlgorithmService.class);
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.tStdRegionDao = StaticContextAccessor.getBean(TStdRegionDao.class);
         this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
@@ -226,7 +226,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param warnMap 告警信息
      */
     private void alarmToAmPlatform(Map<String, String> warnMap) {
-        if (!applicationProperties.getManagerMqttConfig().isEnable()) {
+        if (!applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             return;
         }
         try {
@@ -245,13 +245,13 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String origpicpath = cruiseResult2.get("origpic").toString();
             String[] str2 = origpicpath.split("/");
             String origpcimagename = str2[str2.length - 1];
-            String remoteorigfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
+            String remoteorigfilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
             //结果文件
             String resultImagebak = threadMap.get("absolutePath");
             String[] str3 = resultImagebak.split("/");
             //获取结果图名称，然后拼接远程文件全路径
             String resultimagename = str3[str3.length - 1];
-            String remoteresultfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
+            String remoteresultfilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
             //原图  算法管理平台对应的原始文件路径
             alarm.setPic_raw(remoteresultfilepath);
             //机器人分析结果图 算法管理平台对应的原始文件路径
@@ -269,7 +269,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 //判别结果图片
                 ftpsService.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
             }
-            alarmService.PushMsg(alarm);
+            algorithmService.pushAlarmMsg(alarm);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

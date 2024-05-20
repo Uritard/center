@@ -28,6 +28,8 @@ public class TAlgorithmInfoService{
 
     private final static Map<String, TAlgorithmInfo> ALGORITHM_INFO_MAP = new HashMap<>(64);
 
+    private final static Map<String, TAlgorithmInfo> ALGORITHM_NAME_INFO_MAP = new HashMap<>(64);
+
     @PostConstruct
     public void init(){
         algorithmDefectInfoRefresh ();
@@ -129,6 +131,7 @@ public class TAlgorithmInfoService{
             ALGORITHM_INFO_MAP.put("abnormal", new TAlgorithmInfo().setAlgorithmName("图像有差异").setAliasName("abnormal").setDefectLevel(130));
             tAlgorithmInfoList.forEach(info -> {
                 ALGORITHM_INFO_MAP.put(info.getAliasName(), info);
+                ALGORITHM_NAME_INFO_MAP.put(info.getAlgorithmName(), info);
             });
         }
     }
@@ -142,6 +145,21 @@ public class TAlgorithmInfoService{
         String name = def;
         if (info != null && StringUtils.isNotEmpty(info.getAlgorithmName())) {
             name = info.getAlgorithmName();
+        }
+        return name;
+    }
+
+    /**
+     * 根据名称获取标签
+     *
+     * @param aliasDescName 名称
+     * @return 标签
+     */
+    public String getAlgorithmName(String aliasDescName) {
+        TAlgorithmInfo info = ALGORITHM_NAME_INFO_MAP.get(aliasDescName);
+        String name = "";
+        if (info != null && StringUtils.isNotEmpty(info.getAlgorithmName())) {
+            name = info.getAliasName();
         }
         return name;
     }

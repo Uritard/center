@@ -1,8 +1,8 @@
 package com.yjh.platform.module.patrol.controller;
 
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -13,7 +13,6 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -49,7 +47,7 @@ public class AnalysisController {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     @Autowired
     private FtpsService ftpsService;
     @Autowired
@@ -177,7 +175,7 @@ public class AnalysisController {
 
     @ApiOperation(value = "请求算法资源信息接口")
     @GetMapping(value = "/algorithmResource")
-    public Result algorithmResourceTest(){
+    public Result algorithmResource(){
         Result result = new Result();
         try {
             result.setData(intelAnalysisService.algorithmResource());
@@ -185,7 +183,7 @@ public class AnalysisController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("算法参数获取接口错误:", e);
+            log.error("算法资源信息接口错误:", e);
         }
         return result;
     }
@@ -260,10 +258,10 @@ public class AnalysisController {
 
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
-            String remoteImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
-            String remoteBaseImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
-            String remoteDifResultPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
-            String remoteDefectFilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
+            String remoteImgPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            String remoteBaseImgPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
+            String remoteDifResultPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
+            String remoteDefectFilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
             ftpsService.uploadFile("原始图片",path+"/img.jpg",remoteImgPath);  //原始图片上传
             ftpsService.uploadFile("缺陷告警结果图片",path+"/defectResultImg.jpg",remoteDefectFilepath);  //缺陷告警
@@ -278,7 +276,7 @@ public class AnalysisController {
             alarmDetail.setDefect(defectList);
 
             log.info("算法发送测试消息：{} ", alarmDetail);
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             result.setMessage("success");
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "与算法管理平台交互失败");
@@ -324,7 +322,7 @@ public class AnalysisController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("算法参数获取接口错误:", e);
+            log.error("算法版本获取接口错误:", e);
         }
         return result;
     }
@@ -346,7 +344,7 @@ public class AnalysisController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("算法参数获取接口错误:", e);
+            log.error("算法版本切换接口错误:", e);
         }
         return result;
     }

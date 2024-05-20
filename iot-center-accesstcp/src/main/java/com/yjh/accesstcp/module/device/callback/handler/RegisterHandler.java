@@ -95,12 +95,12 @@ public class RegisterHandler implements CallbackHandlerStrategy<XMLBaseModel> {
     }
 
     /**
-     * 根据 sessionId 创建回调
+     * 根据 rootName sessionId 创建回调
      *
-     * @param sessionId sessionId
+     * @param callbackKey rootName + sessionId
      */
-    public void createCallback(Long sessionId) {
-        CallbackHandlerStrategyFactory.createCallback(sessionId, this);
+    public void createCallback(String callbackKey) {
+        CallbackHandlerStrategyFactory.createCallback(callbackKey, this);
     }
 
 }

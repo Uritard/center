@@ -22,20 +22,20 @@ public class CallbackHandlerStrategyFactory {
     /**
      * 缓存所有的策略，当前是无状态的，可以共享策略类对象
      */
-    private static final Map<Long, CallbackHandlerStrategy<? extends BaseModel>> LISTENER = new HashMap<>();
+    private static final Map<String, CallbackHandlerStrategy<? extends BaseModel>> LISTENER = new HashMap<>();
 
     private CallbackHandlerStrategyFactory() {
         // do nothing
     }
 
-    public static CallbackHandlerStrategy<? extends BaseModel> getStrategyType(@NonNull Long sessionId) {
-        log.info("获取 sessionId = {}", sessionId);
-        return LISTENER.remove(sessionId);
+    public static CallbackHandlerStrategy<? extends BaseModel> getStrategyType(@NonNull String callbackKey) {
+        log.info("获取 callbackKey = {}", callbackKey);
+        return LISTENER.remove(callbackKey);
     }
 
 
-    public static void createCallback(@NonNull Long sessionId, CallbackHandlerStrategy<? extends BaseModel> strategy) {
-        log.info("创建 sessionId = {}", sessionId);
-        LISTENER.put(sessionId, strategy);
+    public static void createCallback(@NonNull String callbackKey, CallbackHandlerStrategy<? extends BaseModel> strategy) {
+        log.info("创建 callbackKey = {}", callbackKey);
+        LISTENER.put(callbackKey, strategy);
     }
 }

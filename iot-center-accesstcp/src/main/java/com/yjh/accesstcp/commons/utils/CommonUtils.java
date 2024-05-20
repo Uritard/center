@@ -17,9 +17,7 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.*;
 
 /**
  * @author
@@ -446,4 +444,20 @@ public class CommonUtils {
 
     }
 
+    public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kCalzz, Class<V> vCalzz) {
+        List<Map<K, V>> result = new ArrayList<>();
+        if (obj instanceof List<?>) {
+            for (Object mapObj : (List<?>) obj) {
+                if (mapObj instanceof Map<?, ?>) {
+                    Map<K, V> map = new HashMap<>(16);
+                    for (Map.Entry<?, ?> entry : ((Map<?, ?>) mapObj).entrySet()) {
+                        map.put(kCalzz.cast(entry.getKey()), vCalzz.cast(entry.getValue()));
+                    }
+                    result.add(map);
+                }
+            }
+            return result;
+        }
+        return null;
+    }
 }
