@@ -1,7 +1,10 @@
 package com.yjh.platform.module.maintain.dao;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.maintain.entity.DeviceMaintenanceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author YIJIAHE
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface DeviceMaintenanceInfoMapper extends BaseMapper<DeviceMaintenanceInfo> {
 
+    List<AreaInfo> selectCruiseDeviceTree();
 }
 
 

@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.maintain.entity.DeviceMaintenanceInfo;
 import com.yjh.platform.module.maintain.service.DeviceMaintenanceInfoService;
 import io.swagger.annotations.Api;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <功能描述>
@@ -93,9 +95,10 @@ public class DeviceMaintenanceInfoController {
     @ApiOperation(value = "查询设备维护信息")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @Logs(title = "查询设备维护信息", content = "查询设备维护信息", authority = "1234")
-    public Result select(@RequestParam(value = "deviceName", required = false) String deviceName,
-                         @RequestParam(value = "deviceType", required = false) Integer deviceType,
-                         @RequestParam(value = "maintenanceType", required = false) Integer maintenanceType,
+    public Result select(@RequestParam(value = "deviceId", required = false) String deviceId,
+                         @RequestParam(value = "deviceName", required = false) String deviceName,
+                         @RequestParam(value = "deviceType", required = false, defaultValue = "-1") Integer deviceType,
+                         @RequestParam(value = "maintenanceType", required = false, defaultValue = "-1") Integer maintenanceType,
                          @RequestParam(value = "startTime", required = false) String startTime,
                          @RequestParam(value = "endTime", required = false) String endTime,
                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -103,13 +106,16 @@ public class DeviceMaintenanceInfoController {
         Result result = new Result();
         try {
             QueryWrapper<DeviceMaintenanceInfo> queryWrapper = new QueryWrapper<>();
+            if (StringUtils.isNotBlank(deviceId)) {
+                queryWrapper.eq("device_id", deviceId);
+            }
             if (StringUtils.isNotBlank(deviceName)) {
                 queryWrapper.eq("device_name", deviceName);
             }
-            if (deviceType != -1) {
+            if (Objects.nonNull(deviceType) && deviceType != -1) {
                 queryWrapper.eq("device_type", deviceType);
             }
-            if (maintenanceType != -1) {
+            if (Objects.nonNull(maintenanceType) && maintenanceType != -1) {
                 queryWrapper.eq("maintenance_type", maintenanceType);
             }
             if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
@@ -147,6 +153,24 @@ public class DeviceMaintenanceInfoController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询设备维护信息失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "巡视设备树(机器人 无人机 摄像机 录像机 声纹)查询")
+    @RequestMapping(value = "/selectCruiseDeviceTree", method = RequestMethod.GET)
+    @Logs(title = "巡视设备树查询",content = "巡视设备树查询", authority = "1234")
+    public Result selectCruiseDeviceTree(@RequestParam(value = "name", required = false) String name) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTreeList = deviceMaintenanceInfoService.selectCruiseDeviceTree();
+            if (StringUtils.isNotEmpty(name)) {
+                deviceMaintenanceInfoService.filter(devTreeList, name);
+            }
+            result.setData(devTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("巡视设备树查询失败：", e);
         }
         return result;
     }
