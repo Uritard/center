@@ -3,7 +3,6 @@ package com.yjh.platform.module.config.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.IPUtil;
@@ -41,9 +40,6 @@ public class SystemConfigService {
 
     private final RedisTemplate redisTemplate;
 
-    private MqttUtilsServer algorithmMqtt;
-
-    private MqttUtilsServer voiceMqtt;
 
     @Value("${spring.application.name}")
     private String appName;
@@ -52,14 +48,10 @@ public class SystemConfigService {
 
     public SystemConfigService(SystemConfigDao systemConfigDao,
                                ApplicationProperties applicationProperties,
-                               RedisTemplate redisTemplate,
-                               @Qualifier("voiceMqtt") MqttUtilsServer voiceMqtt,
-                               @Qualifier("algorithmMqtt") MqttUtilsServer algorithmMqtt) {
+                               RedisTemplate redisTemplate) {
         this.systemConfigDao = systemConfigDao;
         this.applicationProperties = applicationProperties;
         this.redisTemplate = redisTemplate;
-        this.voiceMqtt = voiceMqtt;
-        this.algorithmMqtt = algorithmMqtt;
     }
 
     public List<ConfigTreeNode> selectConfigInfo() {
@@ -116,8 +108,6 @@ public class SystemConfigService {
             map.put(systemConfig.getConfigKey(),systemConfig.getConfigValue());
             redisTemplate.opsForHash().putAll(ApplicationProperties.SYSTEM_CONFIG_KEY +systemConfig.getConfigType(),map);
             updateToOtherServer(systemConfig);
-            updateVoiceMqttConfig(systemConfig);
-            updateAlgorithmMqttConfig(systemConfig);
         });
     }
 
@@ -161,91 +151,4 @@ public class SystemConfigService {
             e.printStackTrace();
         }
     }
-
-    private void updateVoiceMqttConfig(SystemConfig systemConfig){
-        try {
-            Boolean updateFlag = false;
-            if ("audioConfig".equals(systemConfig.getConfigType())) {
-                switch (systemConfig.getConfigKey()) {
-                    case "audioTcpServerPort":
-                        if (!applicationProperties.getAudioConfig().getAudioTcpServerPort().equals(Integer.valueOf(systemConfig.getConfigValue()))) {
-                            applicationProperties.getAudioConfig().setAudioTcpServerPort(Integer.valueOf(systemConfig.getConfigValue()));
-                            updateFlag = true;
-                        }
-                        break;
-                    case "audioMqttHost":
-                        if (!applicationProperties.getAudioConfig().getAudioMqttHost().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getAudioConfig().setAudioMqttHost(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    case "audioMqttUser":
-                        if (!applicationProperties.getAudioConfig().getAudioMqttUser().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getAudioConfig().setAudioMqttUser(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    case "audioMqttPwd":
-                        if (!applicationProperties.getAudioConfig().getAudioMqttPwd().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getAudioConfig().setAudioMqttPwd(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                if (updateFlag) {
-                    log.info("voiceMqtt 配置已修改：{}",applicationProperties.getAudioConfig());
-                    voiceMqtt.shutdown();
-                    voiceMqtt.resetServer(applicationProperties.getAudioConfig().getAudioMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getAudioConfig().getAudioMqttUser(), applicationProperties.getAudioConfig().getAudioMqttPwd(), true);
-                }
-            }
-        }catch (Exception e){
-            log.error("重新创建 voiceMqtt 异常 ：",e);
-        }
-    }
-
-    private void updateAlgorithmMqttConfig(SystemConfig systemConfig){
-        try {
-            Boolean updateFlag = false;
-            if ("algorithmMqttConfig".equals(systemConfig.getConfigType())) {
-                switch (systemConfig.getConfigKey()) {
-                    case "mqttHost":
-                        if (!applicationProperties.getManagerMqttConfig().getMqttHost().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getManagerMqttConfig().setMqttHost(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    case "mqttUser":
-                        if (!applicationProperties.getManagerMqttConfig().getMqttUser().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getManagerMqttConfig().setMqttUser(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    case "mqttPwd":
-                        if (!applicationProperties.getManagerMqttConfig().getMqttPwd().equals(systemConfig.getConfigValue())) {
-                            applicationProperties.getManagerMqttConfig().setMqttPwd(systemConfig.getConfigValue());
-                            updateFlag = true;
-                        }
-                        break;
-                    case "managerSystemFlag":
-                        if (applicationProperties.getManagerMqttConfig().isEnable() != ("1".equals(systemConfig.getConfigValue()))) {
-                            applicationProperties.getManagerMqttConfig().setManagerSystemFlag("1".equals(systemConfig.getConfigValue()));
-                            updateFlag = true;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                if (updateFlag) {
-                    log.info("algorithmMqtt 配置已修改：{}",applicationProperties.getManagerMqttConfig());
-                    algorithmMqtt.shutdown();
-                    algorithmMqtt.resetServer(applicationProperties.getManagerMqttConfig().getMqttHost(), IPUtil.getIp() + "#" + appName + "#" + appPort, applicationProperties.getManagerMqttConfig().getMqttUser(), applicationProperties.getManagerMqttConfig().getMqttPwd(), applicationProperties.getManagerMqttConfig().isEnable());
-                }
-            }
-        }catch (Exception e){
-            log.error("重新创建 algorithmMqtt 异常 ：",e);
-        }
-    }
-
 }

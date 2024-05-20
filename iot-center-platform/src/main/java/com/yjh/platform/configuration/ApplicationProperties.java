@@ -53,8 +53,8 @@ public class ApplicationProperties {
     private FtpsConfig intelAnalysisFtps;
     //算法管理平台
     private FtpsConfig managerSystemFtps;
-    //算法管理平台mqtt配置
-    private ManagerMqttConfig managerMqttConfig;
+    //算法管理平台配置
+    private ManagerAlgorithmConfig managerAlgorithmConfig;
     //算法调用配置
     private AlgorithmServerConfig algorithmServerConfig;
     // 分析主机配置
@@ -94,19 +94,13 @@ public class ApplicationProperties {
 
     @Data
     @Accessors(chain = true)
-    public static class ManagerMqttConfig {
-
-        private String mqttHost;
-        private String mqttUser;
-        private String mqttPwd;
-        private String mqttTopic;
-        private String mqttHeartTopic;
-        private String mqttProvinceName;
-        private String mqttCityName;
-        private String mqttStationName;
-        private String mqttSectionName;
-        private String mqttSectionIp;
-        private String mqttNodeId;
+    public static class ManagerAlgorithmConfig {
+        private String provinceName;
+        private String cityName;
+        private String sectionId;
+        private String sectionName;
+        private String stationId;
+        private String stationName;
         private Integer voltLevel;
         private String managerServerFtpsRemotePath;
         private boolean managerSystemFlag;
@@ -233,22 +227,18 @@ public class ApplicationProperties {
         this.managerSystemFtps = managerSystemFtps;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"managerSystem");
-        ApplicationProperties.ManagerMqttConfig managerMqttConfig = new ApplicationProperties.ManagerMqttConfig();
-        managerMqttConfig.setMqttHost(redisMap.get("mqttHost"))
-                .setMqttUser(redisMap.get("mqttUser"))
-                .setMqttPwd(redisMap.get("mqttPwd"))
-                .setMqttTopic(redisMap.get("mqttTopic"))
-                .setMqttHeartTopic(redisMap.get("mqttHeartTopic"))
-                .setMqttProvinceName(redisMap.get("mqttProvinceName"))
-                .setMqttCityName(redisMap.get("mqttCityName"))
-                .setMqttStationName(redisMap.get("mqttStationName"))
-                .setMqttSectionName(redisMap.get("mqttSectionName"))
-                .setMqttSectionIp(redisMap.get("mqttSectionIp"))
-                .setMqttNodeId(redisMap.get("mqttNodeId"))
+        ApplicationProperties.ManagerAlgorithmConfig managerAlgorithmConfig = new ApplicationProperties.ManagerAlgorithmConfig();
+        managerAlgorithmConfig
+                .setProvinceName(redisMap.get("provinceName"))
+                .setCityName(redisMap.get("cityName"))
+                .setSectionId(redisMap.get("sectionId"))
+                .setSectionName(redisMap.get("sectionName"))
+                .setStationId(redisMap.get("stationId"))
+                .setStationName(redisMap.get("stationName"))
                 .setVoltLevel(ValueUtil.toInteger(redisMap.get("voltLevel"),220))
                 .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"))
                 .setManagerSystemFlag("1".equals(redisMap.get("managerSystemFlag")));
-        this.managerMqttConfig = managerMqttConfig;
+        this.managerAlgorithmConfig = managerAlgorithmConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"sequentialConfig");
         ApplicationProperties.SequentialConfig sequentialConfig = new ApplicationProperties.SequentialConfig();

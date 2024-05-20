@@ -871,10 +871,7 @@ public class SendToUpSystemServices {
 
     public List<Map<String, Object>> countLabelAccuracy(String startTime, String endTime) {
         List<Map<String, Object>> result = new ArrayList<>();
-        HashMap<String, Object> map = dealCount(sendToUpSystemDao.countLabelAccuracy(startTime, endTime));
-        String tagType = (String) redisTemplate.opsForHash().entries("systemConfigKey:algorithmSystem").get("defectType");
-        map.put("tag_type", tagType);
-        result.add(map);
+
         return result;
     }
 

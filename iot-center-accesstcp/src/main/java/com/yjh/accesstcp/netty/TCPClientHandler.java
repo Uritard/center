@@ -112,7 +112,7 @@ public interface TCPClientHandler {
         byte[] send = PlatformPacketUtil.createPacket(sendSessionId, 0L, true, xml);
         RegisterHandler registerHandler = SpringBeanUtils.getBean(RegisterHandler.class);
         assert registerHandler != null;
-        registerHandler.createCallback(sendSessionId);
+        registerHandler.createCallback(getRootName() + sendSessionId);
         send(send, xmlBaseModel.getReceiveCode());
     }
 

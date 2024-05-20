@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.patrol.entity.LabelInfo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -149,4 +150,10 @@ public interface StatisticsDao {
   List<Map<String,Object>> selectCamera();
 
   List<Map<String, Object>> selectCameraStaticsInfoByOptimize(@Param(value = "cameraId") Long cameraId);
+
+  Map<String, Object> countWarnAccuracy(@Param(value = "beginTime") String beginTime,
+                                        @Param(value = "endTime") String endTime);
+
+  List<LabelInfo> countLabelAccuracy(@Param(value = "beginTime") String beginTime,
+                                     @Param(value = "endTime") String endTime);
 }

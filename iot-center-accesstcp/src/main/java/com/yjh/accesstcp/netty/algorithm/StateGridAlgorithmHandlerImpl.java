@@ -86,6 +86,8 @@ public class StateGridAlgorithmHandlerImpl extends SimpleChannelInboundHandler<M
         TCPClientHandlerHashMap.remove(remoteAdds);
         // 暂停心跳发送
         HeartBeatThead.terminate(getServer());
+        // 暂停运行参数发送
+        RunParamsThread.terminate(getServer());
 
         log.error("算法平台----服务端主动断开连接！{}", remoteAdds);
         log.info("算法平台----analysisClientHandlerHashMap: {}", TCPClientHandlerHashMap);

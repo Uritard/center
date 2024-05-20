@@ -244,6 +244,20 @@ public class StatisticsController {
     return result;
   }
 
-
+  @ApiOperation(value = "算法可靠性指标统计")
+  @GetMapping(value = "/algorithmStatics")
+  @Logs(title = "算法可靠性指标统计", content = "时间段内算法可靠性指标统计", logType = 1)
+  public Result algorithmStatics(@RequestParam(value = "type") String type,
+                                 @RequestParam(value = "beginTime") String beginTime,
+                                 @RequestParam(value = "endTime") String endTime) {
+    Result result = new Result();
+    try {
+      result.setData(statisticsService.algorithmStatics(type, beginTime, endTime));
+    } catch (Exception e) {
+      log.error("算法可靠性指标统计失败：", e);
+      result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+    }
+    return result;
+  }
 
 }

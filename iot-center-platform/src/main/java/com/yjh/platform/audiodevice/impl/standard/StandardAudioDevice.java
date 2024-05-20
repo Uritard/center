@@ -6,7 +6,6 @@ import com.yjh.platform.audiodevice.impl.AudioFileUtils;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
 import com.yjh.platform.audiodevice.impl.standard.tcp.Packet;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -36,15 +35,14 @@ public class StandardAudioDevice implements AudioDevice {
     private final AtomicBoolean isRecording = new AtomicBoolean(false);
     private final List<Packet> packets = new LinkedList<>();
     private final ReadWriteLock packetsLock = new ReentrantReadWriteLock();
-    private final MqttUtilsServer mqttUtilsServer;
+
     /**
      * 限制一下最大的录音数据，一帧数据差不多是4096个字节，限制单个录音文件不超过100MB
      */
     private final static int MAX_BUFFERED_PACKETS = (100 * 1024 * 1024) / 4096;
 
-    public StandardAudioDevice(String deviceId, MqttUtilsServer mqttUtilsServer) {
+    public StandardAudioDevice(String deviceId) {
         this.deviceId = deviceId;
-        this.mqttUtilsServer = mqttUtilsServer;
     }
 
     public void onAudioData(InboundMessage inboundMessage) {
@@ -100,7 +98,6 @@ public class StandardAudioDevice implements AudioDevice {
     private void sendMqttMsg(Object obj) {
         String topic = "CONTROL/" + deviceId;
         log.info("发送声纹设备控制指令：topic({}), 消息实体({})", topic, obj);
-        mqttUtilsServer.pushMsg(topic, obj, 1);
     }
 
     @Override

@@ -101,6 +101,11 @@ public class Constant {
     public static final String ALGORITHM_RESOURCE_URL = "http://iot-center-platform/analysis/v1/algorithmResource";
 
     /**
+     * 算法可靠性指标统计
+     */
+    public static final String ALGORITHM_STATISTICS_URL = "http://iot-center-platform/statistics/v1/algorithmStatics?type={type}&beginTime={beginTime}&endTime={endTime}";
+
+    /**
      * platform接收一键顺控反馈文件
      */
     public static final String PLATFORM_SEND ="http://iot-center-platform/tSequentialConf/v1/receiveFile";

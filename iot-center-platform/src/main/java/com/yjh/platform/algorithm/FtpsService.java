@@ -1,4 +1,4 @@
-package com.yjh.platform.common.mqtt;
+package com.yjh.platform.algorithm;
 
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
@@ -6,7 +6,6 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
