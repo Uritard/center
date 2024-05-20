@@ -1,5 +1,6 @@
 package com.yjh.platform.module.maintain.service;
 
+import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.maintain.entity.DeviceMaintenanceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -19,4 +20,8 @@ public interface DeviceMaintenanceInfoService extends IService<DeviceMaintenance
      * @return
      */
     Map<String, List<DeviceMaintenanceInfo>> selectLastTime(Long deviceId);
+
+    List<AreaInfo> selectCruiseDeviceTree();
+
+    void filter(List<AreaInfo> devTreeList, String name);
 }

@@ -23,4 +23,33 @@
         exit_replay_record,replacement_record,create_time,
         update_time,create_user,remark
     </sql>
+    <select id="selectCruiseDeviceTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT -1 AS Id, '巡视设备' AS label, 0 AS upId, '' AS upName, '' AS infoType
+        UNION(
+            SELECT dict_code AS Id, dict_note AS label, -1 AS upId, '巡视设备' AS upName, '' AS infoType
+            FROM t_dict_business WHERE col_name = 'cruise_device_type'
+        )
+        UNION(
+            SELECT robot_id AS Id, robot_name AS label, 870 AS upId, '机器人' AS upName, "robot" AS infoType
+            FROM  t_robot_info
+            WHERE drone_type is null
+        )
+        UNION  (
+            SELECT robot_id AS Id, robot_name AS label, 871 AS upId, '无人机' AS upName, "drone" AS infoType
+            FROM  t_robot_info
+            WHERE robot_type is null
+        )
+        UNION  (
+            SELECT camera_id AS Id, camera_name AS label, 872 AS upId, '摄像机' AS upName, "camera" AS infoType
+            FROM t_camera_info
+        )
+        UNION  (
+            SELECT record_id AS Id, record_name AS label, 873 AS upId, '录像机' AS upName, "record" AS infoType
+            FROM t_camera_recorder
+        )
+        UNION ALL (
+            SELECT voice_device_id AS Id, voice_device_name AS label, 874 AS upId, '声纹' AS upName, "voice" AS infoType
+            FROM t_voice_device
+        )
+    </select>
 </mapper>
