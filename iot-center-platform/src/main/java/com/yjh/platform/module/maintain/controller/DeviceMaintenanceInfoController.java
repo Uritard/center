@@ -106,7 +106,7 @@ public class DeviceMaintenanceInfoController {
         Result result = new Result();
         try {
             QueryWrapper<DeviceMaintenanceInfo> queryWrapper = new QueryWrapper<>();
-            if (Objects.nonNull(deviceId)){
+            if (StringUtils.isNotBlank(deviceId)) {
                 queryWrapper.eq("device_id", deviceId);
             }
             if (StringUtils.isNotBlank(deviceName)) {
