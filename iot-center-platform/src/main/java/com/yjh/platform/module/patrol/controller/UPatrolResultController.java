@@ -12,6 +12,7 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolResultService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
@@ -256,9 +257,8 @@ public class UPatrolResultController {
         String userId = request.getHeader("userId");
         Result result = new Result();
         try {
-            List<TWarnInfo> tWarnInfoList = uPatrolResultService.manualReview(cruiseManualReview,userId);
-            result.setData(tWarnInfoList.size());
-            uPatrolResultService.reviewAlarm(tWarnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList()));
+            int review = uPatrolResultService.manualReview(cruiseManualReview,userId);
+            result.setData(review);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -294,6 +294,23 @@ public class UPatrolResultController {
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "审核意见")
+    @PostMapping(value = "/reviewOpinion")
+    @Logs(title = "审核意见",content = "添加审核意见",logType = 5, authority = "1235")
+    public Result reviewOpinion(@RequestBody UPatrolResult reviewResult) {
+
+        Result result = new Result();
+        try {
+            result.setData(uPatrolResultService.reviewOpinion(reviewResult));
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加审核意见失败:", e);
         }
         return result;
     }

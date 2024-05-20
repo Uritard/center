@@ -495,8 +495,7 @@ public class UPatrolTaskService {
                 .setCreateTime(task.getCreateTime())
                 .setTaskCount(detailList.size())
                 .setTaskWait(detailList.size())
-                .setRobotId(task.getRobotId())
-                .setRemark("0");
+                .setRobotId(task.getRobotId());
         uPatrolResultDao.add(uPatrolResult);
 
         if (Constant.logUpLv3()) {

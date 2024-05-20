@@ -189,9 +189,9 @@ public class UpdatePatrolService {
         try (Cursor<UPatrolResult> taskSource = cruiseUpPatrolDao.selectResultCursor()) {
             taskSource.forEach(u -> {
                 u.setAreaId(areaId);
-                if (StringUtils.isNotEmpty(u.getCheckUser())) {
+                /*if (StringUtils.isNotEmpty(u.getCheckUser())) {
                     u.setRemark("1");
-                }
+                }*/
                 taskAttrList.add(u);
                 if (taskAttrList.size() >= PAGE_SIZE) {
                     uPatrolResultDao.batchAdd(taskAttrList);
