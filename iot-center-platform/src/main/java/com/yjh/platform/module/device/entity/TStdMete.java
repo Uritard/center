@@ -179,5 +179,6 @@ public class TStdMete implements Serializable {
     @Length(max = 50, message = "analyseTypeName长度必须小于等于50")
     private String analyseTypeName;
 
-
+    @ApiModelProperty(value = "人工关注")
+    private String labelAttri;
 }

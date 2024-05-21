@@ -74,7 +74,8 @@
             threshold_abs,
             threshold_per,
             modulus,
-            remark
+            remark,
+            label_attri
         )values(
                 #{stdMeteId, jdbcType=BIGINT},
                 #{deviceType, jdbcType=INTEGER},
@@ -105,7 +106,8 @@
                 #{thresholdAbs, jdbcType=NUMERIC},
                 #{thresholdPer, jdbcType=NUMERIC},
                 #{modulus, jdbcType=INTEGER},
-                #{remark, jdbcType=VARCHAR}
+                #{remark, jdbcType=VARCHAR},
+                #{label_attri, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -146,6 +148,7 @@
         a.threshold_per = #{thresholdPer},
         a.modulus = #{modulus, jdbcType=INTEGER},
         <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        a.label_attri = #{labelAttri, jdbcType=VARCHAR}
     </set>
             where a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}
     </update>
@@ -184,7 +187,8 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        a.remark
+        a.remark,
+        a.label_attri
         from t_std_mete a
         where 1 = 1
             and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}
@@ -223,7 +227,8 @@
         a.modulus,
         a.remark,
         a.state_zero,
-        a.state_one
+        a.state_one,
+        a.label_attri
         from t_std_mete a
         where 1 = 1
         <if test="stdMeteId != null and stdMeteId != ''">and a.std_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
@@ -261,6 +266,7 @@
         <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
         <if test="stateZero != null and stateZero != ''">and a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
         <if test="stateOne != null and stateOne != ''">and a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
+        <if test="labelAttri != null and labelAttri != ''">and a.label_attri = #{labelAttri, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMete"
@@ -303,7 +309,8 @@
         a.modulus,
         a.remark,
         a.state_zero,
-        a.state_one
+        a.state_one,
+        a.label_attri
         from t_std_mete a
         left join t_dict_business b on a.device_type = b.dict_code and b.col_name = "device_type"
         left join t_dict_business c on a.mete_type = c.dict_code and c.col_name = "mete_type"
@@ -351,7 +358,8 @@
             threshold_abs,
             threshold_per,
             modulus,
-            remark
+            remark,
+            label_attri
         )values
         <foreach collection="list" item="TStdMete" separator=",">
             (
@@ -384,7 +392,8 @@
                 #{TStdMete.thresholdAbs, jdbcType=NUMERIC},
                 #{TStdMete.thresholdPer, jdbcType=NUMERIC},
                 #{TStdMete.modulus, jdbcType=INTEGER},
-                #{TStdMete.remark, jdbcType=VARCHAR}
+                #{TStdMete.remark, jdbcType=VARCHAR},
+                #{TStdMete.labelAttri, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
