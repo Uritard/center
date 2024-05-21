@@ -45,6 +45,7 @@ public class TCruisePointByPageDetail {
     //private CruisePointType infraredType = new CruisePointType();//红外
     private CruisePointType voiceType = new CruisePointType();//声纹
     private CruisePointType droneType = new CruisePointType();//无人机
+    private CruisePointType linkageType = new CruisePointType();//主辅设备
 
 //    private CruisePointType robotType ;
 //    private CruisePointType cameraType ;

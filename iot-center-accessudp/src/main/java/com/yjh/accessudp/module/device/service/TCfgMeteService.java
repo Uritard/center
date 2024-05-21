@@ -1,12 +1,18 @@
 package com.yjh.accessudp.module.device.service;
 
+import com.yjh.accessudp.commons.utils.DateTimeUtil;
 import com.yjh.accessudp.module.device.dao.TCfgMeteDao;
 import com.yjh.accessudp.module.device.entity.*;
+import com.yjh.accessudp.module.device.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -189,6 +195,47 @@ public class TCfgMeteService {
     @Transactional(rollbackFor = Exception.class)
     public TSysParam selectByParamType(String paramType){
         return this.tCfgMeteDao.selectByParamType(paramType);
+    }
+
+    public void dataCall(List<Long> meteIds, String filePath){
+        try {
+            List<TCfgDataCurrent> meteList = tCfgMeteDao.selectByMeteIds(meteIds);
+
+            filePath = CommonUtil.isWindows() ? "D:\\TestProject\\file\\datacall.cime" : filePath;
+            File cimeFile = new File(filePath);
+            if (cimeFile.delete()) {
+                cimeFile.delete();
+            }
+            if (!cimeFile.exists()) {
+                cimeFile.createNewFile();
+            }
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(cimeFile, true)));
+            bw.write("<!Entity=数据召唤请求\tver='V1.0'\ttime='" + DateTimeUtil.format(new Date()) + "'(文件最新时间)!>\r\n");
+            bw.write("<DeviceInfo::召唤数据信息>\r\n");
+            bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\r\n");
+            for (int i = 0; i < meteList.size(); i++) {
+                bw.write("#" + (i+1) +"\t" +"1"+"\t" +meteList.get(i).getDeviceId() + "\t" + meteList.get(i).getDeviceName() + "\t" + dealMeteKind(meteList.get(i).getMeteKind()) + "\r\n");
+            }
+            bw.write("</DeviceInfo::召唤数据信息>\r\n");
+            bw.flush();
+            bw.close();
+        }catch (Exception e){
+            log.error("生成数据召唤文件失败：",e);
+        }
+    }
+
+    private String dealMeteKind(Integer meteKind){
+        switch (meteKind){
+            case 3:
+                return "遥控";
+            case 1:
+                return "遥信";
+            case 2:
+                return "遥测";
+
+        }
+        return "";
     }
 
 }

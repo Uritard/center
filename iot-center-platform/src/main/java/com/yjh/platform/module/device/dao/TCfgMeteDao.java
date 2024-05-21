@@ -57,4 +57,6 @@ public interface TCfgMeteDao {
     List<String> selectAllEdgeCode(@Param(value = "inputParam") String inputParam);
 
     List<TCfgDataCurrent> selectByMeteIds(@Param(value = "list") List<Long> list);
+
+    List<TCfgMete> selectByIds(@Param(value = "list") List<Long> list);
 }

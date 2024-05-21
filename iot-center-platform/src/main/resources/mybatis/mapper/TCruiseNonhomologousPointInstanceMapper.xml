@@ -210,12 +210,13 @@
 
     <select id="selectCruiseDeviceByInstanceId" resultType="java.lang.String">
         select
-        IFNULL(h.robot_name,j.camera_name) as name
+        IFNULL(IFNULL(f.device_name,h.robot_name),j.camera_name) as name
         from t_cruise_point_instance a
         left join t_robot_inspection g on g.inspection_id = a.cruise_id
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_camera_preset i on i.preset_id = a.cruise_id
         left join t_camera_info j on j.camera_id = i.camera_id
+        left join t_cfg_device f on f.device_id = a.cruise_id
         where a.instance_id = #{instanceId}
     </select>
 

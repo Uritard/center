@@ -2,11 +2,10 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
@@ -60,6 +59,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private CameraConService cameraConService;
+
+    @Autowired
+    private PatrolResultHandler patrolResultHandler;
 
     public static String meteValues(String commintValue){
         if("合位".equals(commintValue)){
@@ -205,6 +207,7 @@ public class TCfgDataCurrentService {
 
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) {
         log.info("【meteMap】:{}", meteMap);
+        patrolResultHandler.linkageResultHandler(Long.valueOf(meteMap));
         // 联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
         List<TCfgUnionRule> unionRules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
@@ -380,5 +383,7 @@ public class TCfgDataCurrentService {
         log.info("【联动任务】:{}", tCruiseTasks);
         return tCruiseTasks;
     }
+
+
 }
 

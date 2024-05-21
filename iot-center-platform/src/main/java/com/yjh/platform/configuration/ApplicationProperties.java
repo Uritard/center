@@ -158,6 +158,10 @@ public class ApplicationProperties {
         private String sequentialFileCharset;
         //顺控是否自定义结果
         private String sequentialResultFlag;
+        //数据召唤文件生成路径
+        private String dataCallPath;
+        //数据召唤文件名称
+        private String dataCallName;
     }
 
     @Data
@@ -186,6 +190,8 @@ public class ApplicationProperties {
         private String nonhomologousWarn;
         //stationCode
         private String stationCode;
+        //结果对应数字
+        private String coverResult;
     }
 
     public void flush(){
@@ -255,7 +261,9 @@ public class ApplicationProperties {
         sequentialConfig.setSequentialVideocfmResult(redisMap.get("sequentialVideocfmResult"))
                 .setSequentialReturnLinkage(redisMap.get("sequentialReturnLinkage"))
                 .setSequentialFileCharset(redisMap.get("sequentialFileCharset"))
-                .setSequentialResultFlag(sequentialResultFlag);
+                .setSequentialResultFlag(sequentialResultFlag)
+                .setDataCallPath(redisMap.get("dataCallPath"))
+                .setDataCallName(redisMap.get("dataCallName"));
         this.sequentialConfig = sequentialConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"audioConfig");
@@ -270,6 +278,7 @@ public class ApplicationProperties {
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
         otherConfig.setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
                 .setStationCode((String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content"))
+                .setCoverResult(redisMap.get("coverResult"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
 

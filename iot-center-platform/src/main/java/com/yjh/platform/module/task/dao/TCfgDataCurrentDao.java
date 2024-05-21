@@ -2,6 +2,8 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+
+import com.yjh.platform.module.patrol.entity.UPatrolTaskAttr;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -33,4 +35,5 @@ public interface TCfgDataCurrentDao {
     List<Long> selectAllMeteId();
     TCfgDataCurrent selectCurrentDataByMeteId(@Param(value = "meteId")Long meteId);
 
+    List<UPatrolTaskAttr> selectTaskByMeteId(@Param(value = "meteId")Long meteId);
 }

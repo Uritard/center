@@ -79,6 +79,8 @@ public class TCruisePointInstanceService{
     private TCameraScreenDao tCameraScreenDao;
     @Resource
     private CameraConService cameraConService;
+    @Autowired
+    private TCfgMeteDao tCfgMeteDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -124,6 +126,8 @@ public class TCruisePointInstanceService{
         String voiceTypeNum = "232";
         //无人机
         String droneTypeNum = "524";
+        //主辅设备
+        String linkageTypeNum = "231";
         if(robotTypeNum.equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
@@ -146,14 +150,12 @@ public class TCruisePointInstanceService{
 //            listAll.get(length).getInfraredType().getList().add(map2);
 //            listAll.get(length).getInfraredType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
-        //在线监控  内容未作
-//        if("231".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
-//            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
-//            Map<Object,Object> map3 = new HashMap<>();
-//            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-//            listAll.get(length).getVoiceType().getList().add(map3);
-//            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
-//        }
+        //主辅设备
+        if(linkageTypeNum.equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
+            listAll.get(length).getLinkageType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            listAll.get(length).getLinkageType().getCruiseIdList().add(tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getLinkageType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
 //        //scada 内容未作
         if(voiceTypeNum.equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
             listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
@@ -421,6 +423,11 @@ public class TCruisePointInstanceService{
 //                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                     List<TRobotInspectionTmp> tRobotInspection = tRobotInspectionDao.selectTRobotInspectionByIds(paramIds);
                     nameMap = tRobotInspection.stream().collect(Collectors.toMap(TRobotInspectionTmp::getInspectionId, TRobotInspectionTmp::getInspectionName));
+                }
+                if (cruiseType == 231) {//主辅设备
+                    //声纹是一个测点对应一个巡视设备
+                    List<TCfgMete> metes = tCfgMeteDao.selectByIds(paramIds);
+                    nameMap = metes.stream().collect(Collectors.toMap(mete -> Long.valueOf(mete.getMeteId()), TCfgMete::getMeteName));
                 }
                 if (cruiseType == 232) {//声纹
                     //声纹是一个测点对应一个巡视设备

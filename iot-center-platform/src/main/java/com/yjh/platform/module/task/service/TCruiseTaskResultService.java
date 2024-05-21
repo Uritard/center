@@ -508,6 +508,11 @@ public class TCruiseTaskResultService {
             if (CollectionUtils.isNotEmpty(voiceList)) {
                 patrolDeviceAdvance(voiceList, subsetKey, CruiseConstant.TypeEnum.VOICE.getDesc(), detailRateList, typeCountList);
             }
+            //主辅设备
+            List<CruiseOfPatrolDevice> linkageList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.ONLINE.getCode());
+            if (CollectionUtils.isNotEmpty(linkageList)) {
+                patrolDeviceAdvance(linkageList, subsetKey, CruiseConstant.TypeEnum.ONLINE.getDesc(), detailRateList, typeCountList);
+            }
             rateAndTaskInfo.put("typeCount", typeCountList);
             rateAndTaskInfo.put("detailRateList", detailRateList);
         } catch (Exception e) {
