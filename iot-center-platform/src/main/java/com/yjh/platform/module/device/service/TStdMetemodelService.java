@@ -290,7 +290,7 @@ public class TStdMetemodelService {
         List<String> name = new ArrayList<>(Arrays.asList("测点id", "设备类型", "识别类型", "测点类型", "测点标准名称", "信号说明", "信号解释",
                 "告警分类", "识别算法", "单位", "有效上限", "有效下限", "告警级别", "告警门限", "告警延时", "状态一", "状态二",
                 "告警上限1", "告警下限1", "告警上限2", "告警下限2", "告警上限3", "告警下限3", "告警上限4", "告警下限4", "告警次数",
-                "绝对阀值", "百分比阀值", "系数", "备注", "测点级别（1 = Ⅰ类 2 = Ⅱ 类型）"));
+                "绝对阀值", "百分比阀值", "系数", "备注", "测点级别（1 = Ⅰ类 2 = Ⅱ 类型）", "人工关注"));
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
            return "/imgs" + returnPath+"/"+fileName;
@@ -910,6 +910,20 @@ public class TStdMetemodelService {
                         return result;
                     }
                     tStdMete.setThresholdPer(BigDecimal.valueOf(NumberUtils.toLong(item)));
+                }
+
+                cell = row.getCell(29-1-1-1-1);
+                if (cell != null) {
+//设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (28) + "列含有特殊字符<br>");
+                        log.error("文件内容不对："+errMsg);
+                        result.setMessage("文件内容不对！");
+                        return result;
+                    }
+                    tStdMete.setLabelAttri(item);
                 }
 
 

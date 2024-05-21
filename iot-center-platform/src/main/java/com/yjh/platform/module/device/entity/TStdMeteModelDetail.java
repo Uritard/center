@@ -58,7 +58,8 @@ public class TStdMeteModelDetail extends TStdDeviceMeteDetail implements Seriali
 
     private Integer pageSize = 0;
 
-
+    @ApiModelProperty(value = "人工关注")
+    private String labelAttri;
 
 
 

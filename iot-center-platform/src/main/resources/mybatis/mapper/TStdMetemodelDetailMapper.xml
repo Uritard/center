@@ -71,7 +71,8 @@
             alarm_cnt,
             threshold_abs,
             threshold_per,
-            modulus
+            modulus,
+            label_attri
         )values(
                 #{modelId, jdbcType=BIGINT},
                 #{meteId, jdbcType=BIGINT},
@@ -101,7 +102,8 @@
                 #{alarmCnt, jdbcType=INTEGER},
                 #{thresholdAbs, jdbcType=NUMERIC},
                 #{thresholdPer, jdbcType=NUMERIC},
-                #{modulus, jdbcType=INTEGER}
+                #{modulus, jdbcType=INTEGER},
+                #{labelAttri, jdbcType=INTEGER}
         )
     </insert>
 
@@ -142,7 +144,8 @@
         a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},
         a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},
         a.modulus = #{modulus, jdbcType=INTEGER},
-        a.redundant_type = #{redundantType,jdbcType=VARCHAR}
+        a.redundant_type = #{redundantType,jdbcType=VARCHAR},
+        a.label_attri = #{labelAttri}
     </set>
         where a.model_id = #{modelId, jdbcType=BIGINT}
         and a.mete_id=#{meteId,jdbcType=BIGINT}
@@ -181,7 +184,8 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
-        a.redundant_type
+        a.redundant_type,
+        a.label_attri
        FROM
 	      t_std_metemodel_detail a
        LEFT JOIN t_dict_business b ON a.custom_id = b.dict_code
@@ -219,7 +223,8 @@
         a.alarm_cnt,
         a.threshold_abs,
         a.threshold_per,
-        a.modulus
+        a.modulus,
+        a.label_attri
         from t_std_metemodel_detail a
         left join t_dict_business b ON a.custom_id = b.dict_code
         left join t_dict_business j on a.analyse_type = j.dict_code and (j.col_name = "analyse_type" or j.col_name = "defect_type")
@@ -252,6 +257,7 @@
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="labelAttri != null "> and a.label_attri = #{labelAttri, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail" resultType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
@@ -294,7 +300,8 @@
         a.threshold_per,
         a.modulus,
         d.model_name,
-        a.redundant_type
+        a.redundant_type,
+        a.label_attri
         FROM
         ((
         (
@@ -347,6 +354,7 @@
         <if test="thresholdAbs != null and thresholdAbs != ''"> and a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC}</if>
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="labelAttri != null "> and a.label_attri = #{labelAttri, jdbcType=VARCHAR}</if>
         ORDER BY model_id,custom_id,mete_kind
     </select>
 
@@ -380,7 +388,8 @@
         alarm_cnt,
         threshold_abs,
         threshold_per,
-        modulus
+        modulus,
+        label_attri
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
             (
@@ -413,6 +422,7 @@
             #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
             #{TStdMeteModelDetail.thresholdPer, jdbcType=NUMERIC},
             #{TStdMeteModelDetail.modulus, jdbcType=INTEGER}
+            #{TStdMeteModelDetail.labelAttri, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -447,7 +457,8 @@
         threshold_abs,
         threshold_per,
         modulus,
-        redundant_type
+        redundant_type,
+        label_attri
         ) SELECT
         #{modelId},
         std_mete_id,
@@ -478,7 +489,8 @@
         threshold_abs,
         threshold_per,
         modulus,
-        redundant_type
+        redundant_type,
+        label_attri
         FROM
         t_std_mete a
         WHERE FIND_IN_SET(a.std_mete_id, #{meteStrList})

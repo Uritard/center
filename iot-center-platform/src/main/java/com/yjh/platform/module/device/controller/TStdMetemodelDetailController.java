@@ -146,10 +146,11 @@ public class TStdMetemodelDetailController {
                          @RequestParam(value = "alarmCnt", required = false) Integer alarmCnt,
                          @RequestParam(value = "thresholdAbs", required = false) BigDecimal thresholdAbs,
                          @RequestParam(value = "thresholdPer", required = false) BigDecimal thresholdPer,
-                         @RequestParam(value = "modulus", required = false) Integer modulus) {
+                         @RequestParam(value = "modulus", required = false) Integer modulus,
+                         @RequestParam(value = "labelAttri", required = false) String labelAttri) {
         Result result = new Result();
         try {
-            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, customTypeName, meteName, meteType, meteKind, analyseType, unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus);
+            List<TStdMeteModelDetail> list = tStdMetemodelDetailService.select(modelId, meteId, customType, customTypeName, meteName, meteType, meteKind, analyseType, unit, alarmNote, alarmExplain, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, labelAttri);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
