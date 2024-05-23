@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.controller;
 import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.algorithm.FtpsService;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -175,6 +177,7 @@ public class AnalysisController {
 
     @ApiOperation(value = "请求算法资源信息接口")
     @GetMapping(value = "/algorithmResource")
+    @Logs(title = "查询算法资源信息",content = "根据用户传递的参数查询算法资源信息",logType = 1,authority = "1234")
     public Result algorithmResource(){
         Result result = new Result();
         try {
@@ -190,10 +193,12 @@ public class AnalysisController {
 
     @ApiOperation(value = "请求系统自检信息接口")
     @GetMapping(value = "/systemCheck")
-    public Result systemCheck(){
+    @Logs(title = "查询系统自检信息",content = "根据用户传递的参数查询系统自检信息",logType = 1,authority = "1234")
+    public Result systemCheck(HttpServletRequest request){
         Result result = new Result();
         try {
-            result.setData(intelAnalysisService.systemCheck());
+            Long userId=Long.valueOf(StringUtils.isBlank(request.getHeader("userId")) ? "10001" : request.getHeader("userId"));
+            result.setData(intelAnalysisService.systemCheck(request, userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
