@@ -13,6 +13,8 @@ import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
+import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
+import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
@@ -22,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ public class PatrolResultHandler {
     private final TCruisePointInstanceDao tCruisePointInstanceDao;
     private final AlarmShieldService alarmShieldService;
     private final ApplicationEventPublisher eventPublisher;
+    private final TCfgDataCurrentDao tCfgDataCurrentDao;
 
     private static final String METER = "meter";
 
@@ -60,7 +62,7 @@ public class PatrolResultHandler {
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
                                UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao, AlarmShieldService alarmShieldServic,
-                               ApplicationEventPublisher eventPublisher) {
+                               ApplicationEventPublisher eventPublisher,TCfgDataCurrentDao tCfgDataCurrentDao) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -70,6 +72,7 @@ public class PatrolResultHandler {
         this.tCruisePointInstanceDao = tCruisePointInstanceDao;
         this.alarmShieldService = alarmShieldServic;
         this.eventPublisher = eventPublisher;
+        this.tCfgDataCurrentDao = tCfgDataCurrentDao;
     }
 
     /**
@@ -1355,5 +1358,38 @@ public class PatrolResultHandler {
                 break;
         }*/
         return alarmSource;
+    }
+
+    public void linkageResultHandler(Long meteId){
+        TCfgDataCurrent tCfgDataCurrent = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);
+        //组装结果
+        List<UPatrolTaskAttr> taskList = tCfgDataCurrentDao.selectTaskByMeteId(meteId);
+        if (taskList.isEmpty()){
+            return;
+        }
+        for (UPatrolTaskAttr task: taskList){
+            String key = PATROL_TASK_PREFIX + task.getTaskId() + ":" + task.getInstanceId();
+            Map<String, String> inspectionMap = redisTemplate.opsForHash().entries(key);
+
+            if (CRUISE_STATE_UN == ValueUtil.toInteger(inspectionMap.get("cruiseStatus"),-1)) {
+                inspectionMap.put("cruiseTime", DateTimeUtil.getDateTimeString());
+                inspectionMap.put("endTime", DateTimeUtil.getDateTimeString());
+                // 未审核
+                inspectionMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+                inspectionMap.put("resultDesc", tCfgDataCurrent.getMeteValue());
+                inspectionMap.put("resultNum", ResultConvertUtil.convertResult(tCfgDataCurrent.getMeteValue(),"主辅监控"));
+                // 巡视结果，正常
+                inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+
+//            CruiseRedisStorage.offer(inspectionMap);
+                //判断告警
+                normalRecognitionHandler(inspectionMap.get("resultNum"), inspectionMap, null);
+
+                uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
+                CruiseRedisStorage.offer(inspectionMap);
+            }
+
+        }
     }
 }

@@ -391,6 +391,7 @@ public class TCruiseResultService{
                     temTask.setRobotPointsCount( Optional.ofNullable(counts.get("228")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
                     temTask.setVoicePointsCount( Optional.ofNullable(counts.get("232")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
                     temTask.setDronePointsCount( Optional.ofNullable(counts.get("524")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
+                    temTask.setLinkagePointsCount( Optional.ofNullable(counts.get("231")).map(m->MapUtils.getLongValue(m, "count")).orElse(0L));
                 }
             }
         }
@@ -409,6 +410,7 @@ public class TCruiseResultService{
             Long robotPoints = 0L;
             Long voicePoints = 0L;
             Long dronePoints = 0L;
+            Long linkagePoints = 0L;
             //遍历key，根据缓存信息判别巡视点类型
             Iterator<String> iterator = instanceKey.iterator();
             while (iterator.hasNext()) {
@@ -428,6 +430,9 @@ public class TCruiseResultService{
                     case "524":
                         dronePoints++;
                         break;
+                    case "231":
+                        linkagePoints++;
+                        break;
                     default:
                         ;
                 }
@@ -438,6 +443,7 @@ public class TCruiseResultService{
             temTask.setCameraCount(cameraCount);
             temTask.setDronePointsCount(dronePoints);
             temTask.setVoicePointsCount(voicePoints);
+            temTask.setLinkagePointsCount(linkagePoints);
         }
     }
 

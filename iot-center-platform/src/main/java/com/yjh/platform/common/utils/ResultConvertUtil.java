@@ -1,5 +1,7 @@
 package com.yjh.platform.common.utils;
 
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.interlanalysis.RecogniseStatusEnum;
@@ -28,9 +30,9 @@ public class ResultConvertUtil {
 //        System.out.println(convertResult(a));
 //        System.out.println(convertResult(b));
 //        System.out.println(convertResult(c));
-       System.out.println(convertQXResult(b));
-        System.out.println(convertResult("机器人任务异常"));
-        System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
+//       System.out.println(convertQXResult(b));
+        System.out.println(convertResult("合位"));
+//        System.out.println(convertBJResult("32.6ABCDEFGHIJKL,MOPQRSTUVWXYZa我-1"));
     }
 
     /**
@@ -104,9 +106,9 @@ public class ResultConvertUtil {
                 return convertQXResult(checkResult);
             case "判别":
                 return convertPBResult(checkResult);
-            default:break;
+            default:
+                return convertOtherResult(checkResult);
         }
-        return "0";
     }
 
     /**
@@ -179,5 +181,27 @@ public class ResultConvertUtil {
             }
         }
         return "0";
+    }
+
+    /**
+     * 结果转换为数值
+     *
+     * @param result 结果
+     * @return resultNum 目标值
+     */
+    public static String convertOtherResult(String result) {
+       String res = SpringBeanUtils.getBean(ApplicationProperties.class).getOtherConfig().getCoverResult();
+
+       String[] resList = res.split(";");
+       for (String resultItem : resList){
+           String[] resultEnum = resultItem.split(",");
+           for (String resultEnumItem : resultEnum){
+               if (resultEnumItem.equals(result)){
+                   return resultEnum[resultEnum.length-1];
+               }
+           }
+       }
+
+       return "-1";
     }
 }

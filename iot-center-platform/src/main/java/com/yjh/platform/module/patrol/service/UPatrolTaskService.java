@@ -29,6 +29,7 @@ import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
@@ -37,9 +38,10 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.event.TaskEndEvent;
+import com.yjh.platform.module.patrol.service.impl.OnLineMonitoringExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
+import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
@@ -153,10 +155,18 @@ public class UPatrolTaskService {
     private String jobName;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private OnLineMonitoringExecuteImpl onLineMonitoringExecute;
+    @Autowired
+    private TCfgDataCurrentDao tCfgDataCurrentDao;
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
 
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
     private static final byte[] LOCK_FLAG = new byte[0];
+
+    private static String linkageId = "000001";
 
     private final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -534,6 +544,9 @@ public class UPatrolTaskService {
                 map.put("cruiseDeviceId", rbtId);
                 map.put("cruiseDeviceName", Optional.ofNullable(allRobot.get(item.getRobotId())).map(TRobotInfo::getRobotName).orElse(""));
                 cruiseDeviceSet.add("robotId_" + item.getRobotId());
+            }else if (TypeEnum.ONLINE.getCode() == item.getCruiseType()){
+                map.put("cruiseDeviceName","主辅监控");
+                cruiseDeviceSet.add(item.getCruiseType() + "_" + linkageId);
             }else {
                 String cameraId = CommonUtils.getValue(item.getCameraId());
                 map.put("cameraId", cameraId);
@@ -2137,6 +2150,7 @@ public class UPatrolTaskService {
         List<Map<String, String>> skipPointList = new ArrayList<>();
         Map<String, List<Map<String, String>>> cruiseGroupMap = new HashMap<>(32);
         Map<Long, Integer> robotOfflineMap = new HashMap<>();
+        List<Long> meteIds = new ArrayList<>();
 
         taskInfoList.forEach(m -> {
             if(MapUtils.isEmpty(m)){
@@ -2234,9 +2248,16 @@ public class UPatrolTaskService {
                         cruiseGroup(cruiseGroupMap, cruiseId, m);
                     }
                     break;
+                case ONLINE: // 主辅设备
+                    String meteId = MapUtils.getString(m, "cruiseId");
+                    if (StringUtils.isEmpty(meteId)) {
+                        log.error("task {} cruise data has no cruiseId, {}", taskId, JSON.toJSONString(m));
+                    } else {
+                        cruiseGroup(cruiseGroupMap, linkageId, m);
+                    }
+                    break;
                 case ROBOT: // 机器人
                 case UAV: // 无人机
-                case ONLINE: // 在线监控
                 default:
                     break;
             }

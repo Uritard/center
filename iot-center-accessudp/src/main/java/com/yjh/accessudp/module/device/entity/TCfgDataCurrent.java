@@ -56,5 +56,7 @@ public class TCfgDataCurrent implements Serializable {
 
     private String meteComment;
 
+    private String deviceName;
+
 
 }

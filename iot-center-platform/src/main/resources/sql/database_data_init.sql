@@ -446,7 +446,7 @@ INSERT INTO `t_dict_business` VALUES ('300113', '227', 'unit', '%H', '0', '单�
 INSERT INTO `t_dict_business` VALUES ('300114', '228', 'cruise_type', '机器人', '0', '巡检方式', '3');
 INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '视频-可见光', '0', '巡检方式', '1');
 INSERT INTO `t_dict_business` VALUES ('300116', '230', 'cruise_type', '视频-红外', '0', '巡检方式', '2');
-INSERT INTO `t_dict_business` VALUES ('300117', '231', 'cruise_type', '在线监控', '0', '巡检方式', '6');
+INSERT INTO `t_dict_business` VALUES ('300117', '231', 'cruise_type', '主辅设备', '0', '巡检方式', '6');
 INSERT INTO `t_dict_business` VALUES ('300118', '232', 'cruise_type', '声纹', '0', '巡检方式', '5');
 INSERT INTO `t_dict_business` VALUES ('300119', '233', 'alarm_type', '智能预警', '0', '告警类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300120', '234', 'alarm_type', '环境预警', '0', '告警类型', '1');
@@ -912,6 +912,9 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('876', 'maintenance_type', '大修记录', '0', '维护信息类型', '2');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('877', 'maintenance_type', '退出再重放记录', '0', '维护信息类型', '3');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('878', 'maintenance_type', '更换记录', '0', '维护信息类型', '4');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('879', 'point_alarm_type', '非同源差值越限报警', '101', '测点告警类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('880', 'point_alarm_type', '非同源状态不一致报警', '102', '测点告警类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('881', 'point_alarm_type', '趋势变化越限报警', '103', '测点告警类型', '1');
 
 -- ----------------------------
 -- Records of t_period_model
@@ -1619,6 +1622,9 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'nonhomologousWarn', '分,合,开,关,储能,非储能,远方,就地', '非同源趋势对比支持汉字', '无', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5,]+$\",\"msg\":\"请输入正确汉字\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'meterWarnAddr', '127.0.0.1:8087', '环控终端告警上报地址', '环控终端告警上报监听地址，127.0.0.1 表示不指定网卡', '{\"rule\":\"^([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])(\\\\.([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])){3}:([0-9]|[1-9]\\\\d{1,3}|[1-5]\\\\d{4}|6[0-4]\\\\d{4}|65[0-4]\\\\d{2}|655[0-2]\\\\d|6553[0-5])$\",\"msg\":\"请输入正确的ip和端口\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'meterWarnType', '1:SF6,2:防盗,3:烟雾,4:温度,5:O3,6:空调,7:液位传感器,8:水泵,9:门禁,10:风机,11:湿度,12:O2,13:CO,14:CO2,15:SO2,16:CH4,17:H2S,18:H2,19:风速,20:液位', '环控终端告警类型', '环控终端告警类型对应说明', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9:,\\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('sequentialConfig', '一键顺控相关配置', 'dataCallPath', '/home/yjh_iot_center/iot-files/sourceFile/', '数据召唤文件生成路径', '数据召唤文件生成路径', '{\"rule\":\"^[_a-zA-Z0-9\\\\-\\\\.]+$\",\"msg\":\"输入字母数字或_-符号\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('sequentialConfig', '一键顺控相关配置', 'dataCallName', 'datacall.cime', '数据召唤文件名称', '数据召唤文件名称', '{\"rule\":\"^[_a-zA-Z0-9\\\\-\\\\.]+$\",\"msg\":\"输入字母数字或_-符号\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '结果对应数字', 'coverResult', '返回,合,降,投入,控合,未储能,联锁,成功,远方,合上,中断,上限,1;启动,分,升,退出,控分,已储能,解锁,失败,本地,断开,恢复,下限,2;停,复归,触发,3;', '其他系统的识别结果转化为数字', '结果按照逗号隔开，最后一个是对应数字，每个分组以;隔开', '{"rule":"^[\\u4e00-\\u9fa5_a-zA-Z0-9:,\\-]+$","msg":"请不要输入特殊字符"}');
 
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'images/renwuguanli.png', 1);
 INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'images/xunshijieguo.png', 2);

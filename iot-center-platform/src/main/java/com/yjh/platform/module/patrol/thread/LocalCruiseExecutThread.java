@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.patrol.thread;
 
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.utils.NumberUtil;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum;
+import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.ONLINE;
 
 /**
  * 任务执行线程
@@ -86,17 +88,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
                     log.error("随机暂停失败", e);
                 }
                 try {
-                    for (Map<String, String> m : cruisePointList) {
-                        int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
-                        if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
-                            skipPoint(m);
-                        } else {
-                            // 执行点位，并判断是否暂停
-                            if (!pointExecut(m)) {
-                                break;
-                            }
-                        }
-                    }
+                    pointExecute(cruisePointList);
                 } catch (Exception e) {
                     log.error("任务执行失败", e);
                 }
@@ -126,9 +118,9 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
     }
 
-    private boolean pointExecut(Map<String, String> inspectionMap) {
-        String taskId = inspectionMap.get("taskId");
-        long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
+    private boolean pointExecute(List<Map<String, String>> inspectionMapList) {
+        String taskId = inspectionMapList.get(0).get("taskId");
+        long insId = MapUtils.getLongValue(inspectionMapList.get(0), "instanceId");
 
         String taskStatus = uPatrolTaskService.taskStatus(taskId);
         if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
@@ -136,6 +128,39 @@ public class LocalCruiseExecutThread<T> implements Runnable {
             // 任务非进行时，停止执行
             return false;
         }
+
+        // 巡检点类型
+        int cruiseType = MapUtils.getIntValue(inspectionMapList.get(0), "cruiseType");
+        CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+
+        if (cruiseTypeEnum == ONLINE){
+            CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
+            execute.execute(inspectionMapList);
+        } else {
+            for (Map<String, String> m : inspectionMapList) {
+                int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
+                if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
+                    skipPoint(m);
+                } else {
+                    // 执行点位，并判断是否暂停
+                    if (!pointExecut(m)) {
+                        break;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean pointExecut(Map<String, String> inspectionMap) {
+        long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
+        String taskStatus = uPatrolTaskService.taskStatus(taskId);
+        if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
+            log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
+            // 任务非进行时，停止执行
+            return false;
+        }
+
 
         // 巡检点类型
         int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");

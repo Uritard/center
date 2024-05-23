@@ -821,6 +821,8 @@ public class NonhomologousWarnThread implements Runnable{
                 patroldeviceJoiner.add((String) warn.get("threeCruiseDeviceName"));
             }
             xmlItem.put("patroldevice_all", patroldeviceJoiner.toString());
+            xmlItem.put("link_point", patroldeviceJoiner.toString());
+
 
             dealImg(xmlItem,insList,taskId);
 
