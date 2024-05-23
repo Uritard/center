@@ -332,7 +332,33 @@ public class IntelAnalysisService {
                         versionInfo.add(versionMap);
                     }
                     jsonObject.put("version_info", versionInfo);
+                    jsonObject.put("province_name", applicationProperties.getManagerAlgorithmConfig().getProvinceName());
+                    jsonObject.put("city_name", applicationProperties.getManagerAlgorithmConfig().getCityName());
+                    jsonObject.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+                    jsonObject.put("section_name", applicationProperties.getManagerAlgorithmConfig().getSectionName());
+                    jsonObject.put("volt_level", applicationProperties.getManagerAlgorithmConfig().getVoltLevel());
+                    jsonObject.put("station_name", applicationProperties.getManagerAlgorithmConfig().getStationName());
+                    jsonObject.put("service_port", applicationProperties.getManagerAlgorithmConfig().isEnable() ? "1" : "0");
                 }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return jsonObject;
+    }
+
+    /**
+     * 请求系统自检信息
+     *
+     * @return 自检信息
+     */
+    public JSONObject systemCheck() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            String url = applicationProperties.getIntelAlgorithmConfig().getSystemCheckUrl();
+            String result = HttpClientUtils.getInstance().getUrl(url, null);
+            if (StringUtils.isNotBlank(result)) {
+                jsonObject = JSONObject.parseObject(result);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1491,7 +1517,7 @@ public class IntelAnalysisService {
         map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
         map.put("type", type);
         items.add(map);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("314").setItems(items);
         Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
         Map<String, String> prams = new HashMap<>();
         if (Objects.nonNull(re)) {
@@ -1510,17 +1536,22 @@ public class IntelAnalysisService {
      * @param algorithmManufacturer 算法厂商 当值为空时， 代表获取所有厂商的算法历史版本
      * @return 算法版本信息
      */
-    public Object getAlgorithmVersion(String type, String algorithmManufacturer) {
+    public List<Map<String, String>> getAlgorithmVersion(String type, String algorithmManufacturer) {
         List<Map<String,Object>> items = new ArrayList<>();
         Map<String,Object> map = new HashMap<>(4);
-        map.put("algorithmManufacturer", algorithmManufacturer);
+        map.put("algorithm_manufacturer", algorithmManufacturer);
         map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
         map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
         map.put("type", type);
         items.add(map);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("315").setItems(items);
         Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
-        return re.getData();
+        if (Objects.nonNull(re)) {
+            List<Map<String, String>> res = Object2List.castListMap(re.getData(), String.class, String.class);
+            res.forEach(m -> m.put("type", type));
+            return res;
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -1536,7 +1567,7 @@ public class IntelAnalysisService {
         map.put("version", version);
         map.put("type", type);
         items.add(map);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType(type).setItems(items);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("316").setItems(items);
         Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
         if (Objects.nonNull(re.getData())) {
             List<Map<String, Object>> list = Object2List.castListMap(re.getData(), String.class, Object.class);

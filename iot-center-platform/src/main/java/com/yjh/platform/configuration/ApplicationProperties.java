@@ -131,6 +131,7 @@ public class ApplicationProperties {
         private String analysisUrl;
         private String updateUrl;
         private String algorithmResourceUrl;
+        private String systemCheckUrl;
         private String resultIp;
         private String resultPort;
         private String presetCheck;

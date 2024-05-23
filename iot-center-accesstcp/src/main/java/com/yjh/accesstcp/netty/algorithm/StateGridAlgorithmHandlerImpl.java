@@ -9,11 +9,14 @@ import com.yjh.accesstcp.netty.entiy.Message;
 import com.yjh.accesstcp.netty.entiy.MessageHeader;
 import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 import com.yjh.accesstcp.thread.*;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
+import org.springframework.stereotype.Component;
 
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2022/7/25
  * @since [产品/模块版本] （可选）
  */
+@Component
+@ChannelHandler.Sharable
 public class StateGridAlgorithmHandlerImpl extends SimpleChannelInboundHandler<Message> implements TCPClientHandler {
 
     /**
