@@ -188,6 +188,21 @@ public class AnalysisController {
         return result;
     }
 
+    @ApiOperation(value = "请求系统自检信息接口")
+    @GetMapping(value = "/systemCheck")
+    public Result systemCheck(){
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.systemCheck());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统自检信息接口错误:", e);
+        }
+        return result;
+    }
+
 
     @ApiOperation(value = "告警判断处理接口")
     @GetMapping(value = "/warnInfo")
