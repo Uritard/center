@@ -3,10 +3,12 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.algorithm.FtpsService;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -55,9 +57,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -352,18 +357,100 @@ public class IntelAnalysisService {
      *
      * @return 自检信息
      */
-    public JSONObject systemCheck() {
-        JSONObject jsonObject = new JSONObject();
+    public Map<String, Object> systemCheck(HttpServletRequest request, Long userId) {
+        Map<String, Object> res = Maps.newHashMap();
+        String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         try {
             String url = applicationProperties.getIntelAlgorithmConfig().getSystemCheckUrl();
             String result = HttpClientUtils.getInstance().getUrl(url, null);
             if (StringUtils.isNotBlank(result)) {
-                jsonObject = JSONObject.parseObject(result);
+                JSONObject json = JSONObject.parseObject(result);
+                if (200 == Integer.parseInt(String.valueOf(json.get("code")))) {
+                    JSONObject data = (JSONObject) json.get("data");
+                    if (data.containsKey("cpu")) {
+                        Map<String, Object> cpuMap = new HashMap<>(2);
+                        cpuMap.put("rate", data.get("cpu"));
+                        int cpuUse = Integer.parseInt(String.valueOf(data.get("cpu")));
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:cpuFreeMin");
+                        double cpuFreeMin = Double.parseDouble(redisMap.get("content"));
+                        if ((100 - cpuUse) < cpuFreeMin) {
+                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                            param.set("logType", "5");
+                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                            param.set("title", "cpu最小空闲报警");
+                            param.set("state", 1);
+                            param.set("userId", userId);
+                            param.set("userName", userName);
+                            param.set("requestOrigin", request.getRequestURL());
+                            param.set("requestPath", request.getRequestURI());
+                            param.set("requestMethod", request.getMethod());
+                            param.set("content", "分析主机cpu最小空闲报警");
+                            LogsAspect logsAspects = new LogsAspect();
+                            logsAspects.post(param);
+                            cpuMap.put("code", "01");
+                        } else {
+                            cpuMap.put("code", "02");
+                        }
+                        res.put("cpu", cpuMap);
+                    }
+                    if (data.containsKey("memory")) {
+                        Map<String, Object> memoryMap = (Map<String, Object>) data.get("memory");
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
+                        double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
+                        int memoryUse = Integer.parseInt(String.valueOf(memoryMap.get("rate")));
+                        if (100 - memoryUse < memoryFreeMin) {
+                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                            param.set("logType", "5");
+                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                            param.set("title", "内存最小空闲报警");
+                            param.set("state", 1);
+                            param.set("userId", userId);
+                            param.set("userName", userName);
+                            param.set("requestOrigin", request.getRequestURL());
+                            param.set("requestPath", request.getRequestURI());
+                            param.set("requestMethod", request.getMethod());
+                            param.set("content", "分析主机内存最小空闲报警");
+                            LogsAspect logsAspects = new LogsAspect();
+                            logsAspects.post(param);
+                            memoryMap.put("code", "01");
+                        } else {
+                            memoryMap.put("code", "02");
+                        }
+                        res.put("memory", memoryMap);
+                    }
+                    if (data.containsKey("disk")) {
+                        Map<String, Object> diskMap = (Map<String, Object>) data.get("disk");
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
+                        double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
+                        int diskUse = Integer.parseInt(String.valueOf(diskMap.get("rate")));
+                        if (100 - diskUse < memoryFreeMin) {
+                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                            param.set("logType", "5");
+                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                            param.set("title", "磁盘最小空闲报警");
+                            param.set("state", 1);
+                            param.set("userId", userId);
+                            param.set("userName", userName);
+                            param.set("requestOrigin", request.getRequestURL());
+                            param.set("requestPath", request.getRequestURI());
+                            param.set("requestMethod", request.getMethod());
+                            param.set("content", "分析主机磁盘最小空闲报警");
+                            LogsAspect logsAspects = new LogsAspect();
+                            logsAspects.post(param);
+                            diskMap.put("code", "01");
+                        } else {
+                            diskMap.put("code", "02");
+                        }
+                        res.put("disk", diskMap);
+                    }
+                    res.put("gpu", data.get("gpu"));
+                    res.put("gpu_memory", data.get("gpu_memory"));
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return jsonObject;
+        return res;
     }
 
     public void picAnalyseRetNotify(PicAnalyseResponse response){
