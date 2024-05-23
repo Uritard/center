@@ -14,6 +14,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ResultConvertUtil;
@@ -198,7 +199,7 @@ public class UPatrolResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfo> manualReview(CruiseManualReview cruiseManualReview, String userId) {
+    public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
         String thisPointType = "表计";
         Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
         if (Objects.nonNull(result)){
@@ -264,7 +265,8 @@ public class UPatrolResultService {
                 tStdDeviceDao.update(tStdDevice);
             }
         }
-        return warnInfoList;
+        reviewAlarm(warnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList()));
+        return result2;
     }
 
     /**
@@ -287,7 +289,7 @@ public class UPatrolResultService {
         int checkedSize = 0;
         Date lastDate = null;
         for (CruiseManualReview cmr : cruiseManualReviewList) {
-            if (cmr.getEvaluationState() == 256) {
+            if (cmr.getEvaluationState() == 256 || cmr.getEvaluationState() == 260) {
                 haS1.add(cmr.getCheckUser());
                 checkedSize++;
                 if (lastDate == null || (cmr.getCheckDate() != null && cmr.getCheckDate().after(lastDate))) {
@@ -299,7 +301,7 @@ public class UPatrolResultService {
 
         int result2 = 0;
         if (checkedSize == cruiseManualReviewList.size()) {
-            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
+            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, null);
             //自动生成巡视报告
             Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             log.info("开始生成巡视报告=={}", progress);
@@ -566,6 +568,17 @@ public class UPatrolResultService {
         Integer progress = reportManageService.reportCheckGenerate(taskId, userId + "_" + token, false);
         log.info("开始生成巡视报告=={}", progress);
         return result + reviewList.size();
+    }
+
+    public int reviewOpinion(UPatrolResult reviewResult) {
+        UPatrolResult result = uPatrolResultDao.selectByPrimaryId(reviewResult.getTaskId());
+        if (Objects.isNull(result)){
+            throw new BusinessException(ResultCodeEnum.CODE10005, "审核任务不存在");
+        }
+        UPatrolResult review = new UPatrolResult();
+        review.setTaskId(reviewResult.getTaskId()).setRemark(reviewResult.getRemark());
+
+        return uPatrolResultDao.update(review);
     }
 
     /**

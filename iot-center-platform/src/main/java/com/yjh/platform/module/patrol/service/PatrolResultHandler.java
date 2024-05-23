@@ -710,7 +710,7 @@ public class PatrolResultHandler {
 
                     warnMap.put("alarmSource", alarmSource);
                     warnMap.put("defectModel", DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
-                    warnMap.put("labelAttri", cruiseResultMap.get("labelAttri"));
+                    warnMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
 
                     switch (meteKind) {
                         case "1":
@@ -956,7 +956,7 @@ public class PatrolResultHandler {
             warnMap.put("warnLevel", DictConvertUtil.DICT.getDictCode("alarmLevel", "一般告警"));
             warnMap.put("warnContent", meteName + alarmPrefix + ":" + resultValue + "--" + "一般告警");
             warnMap.put("outRange", String.valueOf(outRang));
-            warnMap.put("labelAttri", cruiseResultMap.get("labelAttri"));
+            warnMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
 
             // 巡视结果告警处理
             cruiseResultMap.put("isWarn", "1");
@@ -1272,7 +1272,7 @@ public class PatrolResultHandler {
             defectMap.put("cruiseType", cruiseResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", cruiseResultMap.get("cruiseTime"));
             defectMap.put("taskId", cruiseResultMap.get("taskId"));
-            defectMap.put("labelAttri", cruiseResultMap.get("labelAttri"));
+            defectMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
         } catch (Exception e) {
             log.error("缺陷map信息组装异常：", e);
         }

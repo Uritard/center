@@ -1,14 +1,14 @@
 package com.yjh.platform.module.task.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.collections4.KeyValue;
 
-import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -144,5 +144,6 @@ public class TWarnInfoDetail implements Serializable {
     private Date endTime;
 
     private String labelAttri;
-    private List<Pair<String, String>> labelAttriName;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<KeyValue<String, String>> labelAttriName;
 }

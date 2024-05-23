@@ -1,8 +1,6 @@
 package com.yjh.platform.module.device.service;
 
 import cn.hutool.http.HttpStatus;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.HashMultimap;
@@ -30,10 +28,11 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,8 +285,9 @@ public class TStdDevicemeteService{
             if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
                 String analyseName = "on".equals(detail.getIsAi()) ? "缺陷" : "on".equals(detail.getIsJudge()) ? "判别" : "无";
                 detail.setAnalyseTypeName(analyseName);
-                detail.setLabelAttriName(labelAttriName(detail.getLabelAttri()));
             }
+            detail.setLabelAttriName(labelAttriName(detail.getLabelAttri()));
+            detail.setLabelAttris(StringUtils.split(detail.getLabelAttri(), ","));
         }
 
         //填充告警规则信息
@@ -318,14 +318,14 @@ public class TStdDevicemeteService{
         });
     }
 
-    public List<Pair<String, String>> labelAttriName(String labelAttri) {
+    public List<KeyValue<String, String>> labelAttriName(String labelAttri) {
         String lableNames = DictConvertUtil.DICT.covertToDict("labelAttri", labelAttri);
         if (StringUtils.isNotEmpty(lableNames)) {
-            List<Pair<String, String>> pairNames = new ArrayList<>();
+            List<KeyValue<String, String>> pairNames = new ArrayList<>();
             String[] is = labelAttri.split(",");
             String[] names = lableNames.split(",");
             for (int i = 0; i < is.length; i++) {
-                pairNames.add(Pair.of(names[i], CommonUtils.color(is[i])));
+                pairNames.add(new DefaultKeyValue<>(names[i], CommonUtils.color(is[i])));
             }
             return pairNames;
         }
