@@ -15,4 +15,6 @@ public class ModelInfo implements Serializable {
     private Integer height;
     @JsonProperty("width")
     private Integer width;
+    @JsonProperty("name")
+    private String name;
 }
