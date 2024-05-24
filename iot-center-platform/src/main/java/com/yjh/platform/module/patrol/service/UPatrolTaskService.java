@@ -545,6 +545,7 @@ public class UPatrolTaskService {
                 map.put("cruiseDeviceName", Optional.ofNullable(allRobot.get(item.getRobotId())).map(TRobotInfo::getRobotName).orElse(""));
                 cruiseDeviceSet.add("robotId_" + item.getRobotId());
             }else if (TypeEnum.ONLINE.getCode() == item.getCruiseType()){
+                map.put("cruiseDeviceId", linkageId);
                 map.put("cruiseDeviceName","主辅监控");
                 cruiseDeviceSet.add(item.getCruiseType() + "_" + linkageId);
             }else {

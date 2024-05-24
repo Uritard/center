@@ -324,7 +324,7 @@ public class NonhomologousWarnThread implements Runnable{
                                        warn.put("regionName", regionName);
                                        warn.put("customName", customName);
 
-                                       insertNonhomologousWarnInfo(warn, "10");
+                                       insertNonhomologousWarnInfo(warn, "103");
                                    }
                                }
                             }
@@ -405,7 +405,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("regionName", regionName);
                             warn.put("customName", customName);
 
-                            insertNonhomologousWarnInfo(warn, "10");
+                            insertNonhomologousWarnInfo(warn, "103");
                         }
                         break;
                     case "7":
@@ -453,7 +453,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("regionName", regionName);
                             warn.put("customName", customName);
 
-                            insertNonhomologousWarnInfo(warn, "10");
+                            insertNonhomologousWarnInfo(warn, "102");
                         }
                         break;
                     default:
@@ -665,6 +665,7 @@ public class NonhomologousWarnThread implements Runnable{
     }
 
     private boolean insertNonhomologousWarnInfo(Map<String,Object> warn, String alarmType){
+        warn.put("alarmType",alarmType);
         log.info("非同源告警---入库, warnmap==={}", warn);
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");

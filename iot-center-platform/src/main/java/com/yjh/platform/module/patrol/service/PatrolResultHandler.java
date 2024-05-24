@@ -688,6 +688,28 @@ public class PatrolResultHandler {
                 // cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 // cruiseResultMap.put("cruiseAbnormal", "0");
 
+                boolean isSimulationTool = false;
+                String edgeCode = cruiseResultMap.get("edgeCode");
+                if (StringUtils.isNotEmpty(edgeCode)) {
+                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
+                    String robotCode = edgeCode;
+                    if (countRegion != 0) {
+                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
+                    }
+                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
+                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
+                }
+                //检测工具上报的调用算法的需要走非同源逻辑
+                if (isSimulationTool || !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
+                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+                    robotPatrolTaskAlarm.setValue(resultStringValue);
+                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
+                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                }
+
                 if (warnFlag == 1) {
                     Map<String, String> warnMap = new HashMap<>(16);
                     String warnPrefix = "warnInfo:" + cruiseResultMap.get("taskId");
@@ -834,7 +856,7 @@ public class PatrolResultHandler {
                             break;
                     }
 
-                    TWarnInfo tWarnInfo = getWarnInfo(warnMap);
+                    TWarnInfo tWarnInfo = getWarnInfo(warnMap,cruiseResultMap);
                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
                     warnMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
                     log.info("warnMap=={}", warnMap);
@@ -852,27 +874,6 @@ public class PatrolResultHandler {
 
                     // 将产生的告警上送至上一级系统
                     alarmToUpSystem(tWarnInfo, cruiseResultMap);
-                }
-                boolean isSimulationTool = false;
-                String edgeCode = cruiseResultMap.get("edgeCode");
-                if (StringUtils.isNotEmpty(edgeCode)) {
-                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
-                    String robotCode = edgeCode;
-                    if (countRegion != 0) {
-                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
-                    }
-                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
-                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-                }
-                //检测工具上报的调用算法的需要走非同源逻辑
-                if (isSimulationTool || !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
-                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
-                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
-                    robotPatrolTaskAlarm.setValue(resultStringValue);
-                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
-                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
-                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
-                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
                 // } else {
                 //     cruiseResultMap.put("resultNum", resultValue);
@@ -964,7 +965,7 @@ public class PatrolResultHandler {
             // cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
 
             // 告警入库
-            TWarnInfo tWarnInfo = getWarnInfo(warnMap);
+            TWarnInfo tWarnInfo = getWarnInfo(warnMap,cruiseResultMap);
             analyseDataOperateService.insertWarnInfo(tWarnInfo);
             warnMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
             log.info("warnMap=={}", warnMap);
@@ -1027,7 +1028,7 @@ public class PatrolResultHandler {
      * @param warningMsg 缺陷map信息
      * @return TWarnInfo
      */
-    private TWarnInfo getWarnInfo(Map<String, String> warningMsg) {
+    private TWarnInfo getWarnInfo(Map<String, String> warningMsg,Map<String,String> cruiseResultMap) {
         TWarnInfo tWarnInfo = new TWarnInfo();
         try {
             tWarnInfo.setWarnLevel(NumberUtils.toInt(warningMsg.get("warnLevel")));
@@ -1046,6 +1047,7 @@ public class PatrolResultHandler {
             tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
             tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
             tWarnInfo.setLabelAttri(warningMsg.get("labelAttri"));
+            tWarnInfo.setAlarmType(ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1));
         } catch (Exception e) {
             log.error("告警info信息组装异常:", e);
         }

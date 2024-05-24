@@ -163,4 +163,7 @@ public class TWarnInfo implements Serializable {
 
     private String labelAttri;
     private List<Pair<String, String>> labelAttriName;
+
+    //A接口协议告警类型
+    private Integer alarmType;
 }

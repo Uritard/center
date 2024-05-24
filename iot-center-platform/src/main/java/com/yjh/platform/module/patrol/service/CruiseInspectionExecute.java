@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -40,14 +41,14 @@ public interface CruiseInspectionExecute extends InitializingBean {
     boolean execute(Map<String, String> inspectionMap);
 
     /**
-     * 多册测点执行
+     * 多测点执行
      *
      * @param inspectionList 测点数据
      * @return 测点是否已经执行结束，true 表示不需要算法返回，false 表示需要算法返回
      */
     default boolean execute(List<Map<String, String>> inspectionList) {
         log.info("no thing to do !");
-        return true;
+        throw new BusinessException("is not allow here!");
     }
 
     class NullableCruiseExecuteImpl implements CruiseInspectionExecute {
