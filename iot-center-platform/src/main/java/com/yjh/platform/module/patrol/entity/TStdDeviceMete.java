@@ -185,6 +185,9 @@ public class TStdDeviceMete implements Serializable {
     @Max(value = 99999999)
     private Integer alarmState;
 
+    @ApiModelProperty(value = "标签")
+    private String labelAttri;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

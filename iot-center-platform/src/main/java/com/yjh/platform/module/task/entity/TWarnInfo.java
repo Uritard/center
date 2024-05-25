@@ -63,6 +63,8 @@ public class TWarnInfo implements Serializable {
     private Long deviceId;
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
 
     @Length(max = 32,message = "cunstomId长度必须小于等于32")
     @ApiModelProperty(value = "部位ID")
