@@ -8,7 +8,7 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.algorithm.FtpsService;
-import com.yjh.platform.common.logs.LogsAspect;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -57,8 +57,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
@@ -69,7 +67,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -117,6 +114,8 @@ public class IntelAnalysisService {
     private HttpAnalyticsServiceImpl analyticsService;
     @Autowired
     private AlarmShieldService alarmShieldService;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private List<String> TASK_RESULT = new ArrayList<>();
     private final String TASK_INTEL_ANALYSIS_RESULT="TASK_INTEL_ANALYSIS_RESULT:";
@@ -278,6 +277,7 @@ public class IntelAnalysisService {
         param.put("requestHostIp", applicationProperties.getIntelAlgorithmConfig().getResultIp());
         param.put("requestHostPort", applicationProperties.getIntelAlgorithmConfig().getResultPort());
         param.put("requestId", request.getRequestId());
+        param.put("type", request.getType());
 
         String[] split = request.getAlgorithmPath().split("/");
         String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
@@ -374,19 +374,7 @@ public class IntelAnalysisService {
                         Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:cpuFreeMin");
                         double cpuFreeMin = Double.parseDouble(redisMap.get("content"));
                         if ((100 - cpuUse) < cpuFreeMin) {
-                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                            param.set("logType", "5");
-                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                            param.set("title", "cpu最小空闲报警");
-                            param.set("state", 1);
-                            param.set("userId", userId);
-                            param.set("userName", userName);
-                            param.set("requestOrigin", request.getRequestURL());
-                            param.set("requestPath", request.getRequestURI());
-                            param.set("requestMethod", request.getMethod());
-                            param.set("content", "分析主机cpu最小空闲报警");
-                            LogsAspect logsAspects = new LogsAspect();
-                            logsAspects.post(param);
+                            logsRecord.LoginLogsSend(request, "5", "cpu最小空闲报警", "分析主机cpu最小空闲报警", userName, String.valueOf(userId), 1);
                             cpuMap.put("code", "01");
                         } else {
                             cpuMap.put("code", "02");
@@ -399,19 +387,7 @@ public class IntelAnalysisService {
                         double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
                         int memoryUse = Integer.parseInt(String.valueOf(memoryMap.get("rate")));
                         if (100 - memoryUse < memoryFreeMin) {
-                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                            param.set("logType", "5");
-                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                            param.set("title", "内存最小空闲报警");
-                            param.set("state", 1);
-                            param.set("userId", userId);
-                            param.set("userName", userName);
-                            param.set("requestOrigin", request.getRequestURL());
-                            param.set("requestPath", request.getRequestURI());
-                            param.set("requestMethod", request.getMethod());
-                            param.set("content", "分析主机内存最小空闲报警");
-                            LogsAspect logsAspects = new LogsAspect();
-                            logsAspects.post(param);
+                            logsRecord.LoginLogsSend(request, "5", "内存最小空闲报警", "分析主机内存最小空闲报警", userName, String.valueOf(userId), 1);
                             memoryMap.put("code", "01");
                         } else {
                             memoryMap.put("code", "02");
@@ -424,19 +400,7 @@ public class IntelAnalysisService {
                         double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
                         int diskUse = Integer.parseInt(String.valueOf(diskMap.get("rate")));
                         if (100 - diskUse < memoryFreeMin) {
-                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                            param.set("logType", "5");
-                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                            param.set("title", "磁盘最小空闲报警");
-                            param.set("state", 1);
-                            param.set("userId", userId);
-                            param.set("userName", userName);
-                            param.set("requestOrigin", request.getRequestURL());
-                            param.set("requestPath", request.getRequestURI());
-                            param.set("requestMethod", request.getMethod());
-                            param.set("content", "分析主机磁盘最小空闲报警");
-                            LogsAspect logsAspects = new LogsAspect();
-                            logsAspects.post(param);
+                            logsRecord.LoginLogsSend(request, "5", "磁盘最小空闲报警", "分析主机磁盘最小空闲报警", userName, String.valueOf(userId), 1);
                             diskMap.put("code", "01");
                         } else {
                             diskMap.put("code", "02");
@@ -1660,20 +1624,23 @@ public class IntelAnalysisService {
             List<Map<String, Object>> list = Object2List.castListMap(re.getData(), String.class, Object.class);
             if (CollectionUtils.isNotEmpty(list)) {
                 Map<String, Object> res = list.get(0);
-                String algorithmManufacturer = String.valueOf(res.get("algorithm_manufacturer"));
-                String recordTime = String.valueOf(res.get("record_time"));
-                String algorithmPath = String.valueOf(res.get("algorithm_path"));
-                log.info("算法切换请求完成, 算法厂商：{}, 算法版本ID：{}, 算法版本记录时间：{}, 算法FTPS路径：{}",
-                        algorithmManufacturer, version, recordTime, algorithmPath);
-                String algorithmPathName = StringUtils.substringAfterLast(algorithmPath, "/");
-                //存放到临时文件
-                String localAlgorithmPath = SysParamConfig.getSysContent("tempReflect") + algorithmPathName;
-                ftpsService.downLoadFile(localAlgorithmPath, algorithmPath);
-                //开始算法更新
-                UpdateRequest request = new UpdateRequest()
-                        .setRequestId(String.valueOf(UUID.randomUUID()))
-                        .setAlgorithmPath(localAlgorithmPath);
-                algorithmUpdate(request);
+                ThreadPoolUtil.PATROL_POOL.addThread(()->{
+                    String algorithmManufacturer = String.valueOf(res.get("algorithm_manufacturer"));
+                    String recordTime = String.valueOf(res.get("record_time"));
+                    String algorithmPath = String.valueOf(res.get("algorithm_path"));
+                    log.info("算法切换请求完成, 算法厂商：{}, 算法版本ID：{}, 算法版本记录时间：{}, 算法FTPS路径：{}",
+                            algorithmManufacturer, version, recordTime, algorithmPath);
+                    String algorithmPathName = StringUtils.substringAfterLast(algorithmPath, "/");
+                    //存放到临时文件
+                    String localAlgorithmPath = SysParamConfig.getSysContent("tempReflect") + "/" + algorithmPathName;
+                    ftpsService.downLoadFile(localAlgorithmPath, algorithmPath);
+                    //开始算法更新
+                    UpdateRequest request = new UpdateRequest()
+                            .setType(type)
+                            .setRequestId(String.valueOf(UUID.randomUUID()))
+                            .setAlgorithmPath(localAlgorithmPath);
+                    algorithmUpdate(request);
+                });
             }
         }
     }
