@@ -76,13 +76,6 @@ public class Constant {
 
     public static String TIME= "";
 
-    public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
-
-    public static AtomicLong sendSessionId = new AtomicLong(0L);//发送会话序列号
-
-    public static AtomicLong sendCloudSessionId = new AtomicLong(0L);//发送会话序列号
-    // public static long receiveSessionId = 0L;//接受序列号
-
     public static String Packet = "";
 
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();

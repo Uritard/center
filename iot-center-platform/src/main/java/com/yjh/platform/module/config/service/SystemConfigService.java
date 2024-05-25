@@ -11,6 +11,7 @@ import com.yjh.platform.module.config.dao.SystemConfigDao;
 import com.yjh.platform.module.config.entity.ConfigTreeNode;
 import com.yjh.platform.module.config.entity.SystemConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,8 +108,8 @@ public class SystemConfigService {
             Map<String,String> map = new HashMap<>();
             map.put(systemConfig.getConfigKey(),systemConfig.getConfigValue());
             redisTemplate.opsForHash().putAll(ApplicationProperties.SYSTEM_CONFIG_KEY +systemConfig.getConfigType(),map);
-            updateToOtherServer(systemConfig);
         });
+        updateToOtherServer();
     }
 
     public void flushCatch() {
@@ -119,34 +120,10 @@ public class SystemConfigService {
         return systemConfigDao.selectAll();
     }
 
-    private void updateToOtherServer(SystemConfig systemConfig){
+    private void updateToOtherServer() {
         try {
-            //TCP服务配置修改
-            String upSystem = "upSystem";
-            if (upSystem.equals(systemConfig.getConfigType())){
-                boolean isChange;
-                switch (systemConfig.getConfigKey()){
-                    case "upSystemFlag":
-                    case "upSystemIp":
-                    case "upSystemPort":
-                        isChange = true;
-                        break;
-                    default:
-                        isChange = false;
-                        break;
-                }
-                if (isChange && applicationProperties.getUpSystemFtps().isEnable()){
-                    Constant.getToOtherServer(Constant.UPDATE_TCP_CONTENT);
-                }
-            }
-            String robotServerConfig = "robotServerConfig";
-            if (robotServerConfig.equals(systemConfig.getConfigType())){
-                String port = "nettyServerPort";
-                //Robot服务端口修改
-                if (port.equals(systemConfig.getConfigKey())){
-                    Constant.getToOtherServer(Constant.UPDATE_ROBOT_SERVER);
-                }
-            }
+            Constant.getToOtherServer(Constant.UPDATE_TCP_CONTENT);
+            Constant.getToOtherServer(Constant.UPDATE_ROBOT_SERVER);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -111,7 +111,7 @@ public class StateGridAlgorithmHandlerImpl extends SimpleChannelInboundHandler<M
 
         SocketAddress remoteAdds = ctx.channel().remoteAddress();
         TCPClientHandlerHashMap.putIfAbsent(remoteAdds, this);
-        log.info("客户端注册成功: {}", remoteAdds);
+        log.info("算法平台----客户端注册成功: {}", remoteAdds);
     }
 
     @Override

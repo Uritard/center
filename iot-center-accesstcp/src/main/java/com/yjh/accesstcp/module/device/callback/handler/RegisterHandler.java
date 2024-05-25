@@ -56,6 +56,7 @@ public class RegisterHandler implements CallbackHandlerStrategy<XMLBaseModel> {
                 if (CollectionUtils.isEmpty(items)) {
                     return;
                 }
+                INTERVAL_MAP.clear();
                 for (Map<String, Object> item : items) {
                     item.forEach((k, v) -> INTERVAL_MAP.put(k, NumberUtils.toLong((String) v)));
                 }
