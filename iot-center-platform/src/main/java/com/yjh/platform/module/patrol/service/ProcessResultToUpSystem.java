@@ -392,6 +392,43 @@ public class ProcessResultToUpSystem {
         return resultPathMap;
     }
 
+    public static String recognitionTypeToAlarmType(String recognitionType,String isTemdif){
+        String alarmType = "";
+        switch (recognitionType){
+            case "1":
+            case "11":
+            case "12":
+            case "13":
+                //仪表越限报警
+                alarmType = "7";
+                break;
+            case "2":
+                //变位报警
+                alarmType = "10";
+                break;
+            case "3":
+                //外观异常
+                alarmType = "6";
+                break;
+            case "4":
+                if ("0".equals(isTemdif)) {
+                    //超温报警
+                    alarmType = "1";
+                } else {
+                    //温升报警
+                    alarmType = "2";
+                }
+                break;
+            case "5":
+                //声音异常
+                alarmType = "5";
+                break;
+            default:
+                break;
+        }
+        return alarmType;
+    }
+
     /**
      * 组装巡视结果信息
      *

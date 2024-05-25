@@ -17,7 +17,8 @@
             two_cruise_device_name,
             three_cruise_device_name,
             region_name,
-            custom_name
+            custom_name,
+            alarm_type
         )values(
                    #{warnId, jdbcType=VARCHAR},
                    #{deviceName, jdbcType=VARCHAR},
@@ -32,7 +33,8 @@
                    #{twoCruiseDeviceName, jdbcType=VARCHAR},
                    #{threeCruiseDeviceName, jdbcType=VARCHAR},
                    #{regionName, jdbcType=VARCHAR},
-                   #{customName, jdbcType=VARCHAR}
+                   #{customName, jdbcType=VARCHAR},
+                   #{alarmType, jdbcType=INTEGER}
                )
     </insert>
 
