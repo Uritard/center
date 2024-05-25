@@ -64,4 +64,8 @@ public class CruiseManualReview {
     private String sendCode;
     @ApiModelProperty(value = "审核结果数值")
     private String modifyNum;
+    @ApiModelProperty(value = "巡检点实例id集合")
+    private String instanceIds;
+    @ApiModelProperty(value = "人工审核结论")
+    private String remark;
 }

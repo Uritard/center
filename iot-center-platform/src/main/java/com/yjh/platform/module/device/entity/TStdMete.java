@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
+import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -181,4 +182,7 @@ public class TStdMete implements Serializable {
 
     @ApiModelProperty(value = "人工关注")
     private String labelAttri;
+
+    @ApiModelProperty(value = "人工关注标签值集合")
+    private List<String> labelAttris;
 }

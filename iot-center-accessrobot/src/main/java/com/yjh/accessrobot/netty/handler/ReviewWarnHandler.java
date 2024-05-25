@@ -73,16 +73,11 @@ public class ReviewWarnHandler implements MessageHandlerStrategy, InitializingBe
         List<TWarnInfo> warnInfoList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             TWarnInfo tWarnInfo = new TWarnInfo();
-            tWarnInfo.setOriginId((String)item.get("origin_id"));
-            tWarnInfo.setWarnName((String)item.get("warn_name"));
-            tWarnInfo.setWarnLevel(NumberUtils.toInt((String)item.get("warn_level")));
-            tWarnInfo.setWarnContent((String)item.get("warn_content"));
-            tWarnInfo.setDealInfo((String)item.get("deal_info"));
-            tWarnInfo.setDealType(NumberUtils.toInt((String)item.get("deal_type")));
-            tWarnInfo.setOutRange((String)item.get("out_range"));
-            tWarnInfo.setDealPersonId((String)item.get("deal_person_id"));
-            tWarnInfo.setDealTime(DateTimeUtil.parse((String)item.get("deal_time")));
-            tWarnInfo.setDefectModel(NumberUtils.toInt((String)item.get("defect_model")));
+            tWarnInfo.setTaskId((String) item.get("task_patrolled_id"));
+            tWarnInfo.setInstanceIds((String)item.get("device_id"));
+            tWarnInfo.setIsWarn(NumberUtils.toInt((String)item.get("is_alarm")));
+            tWarnInfo.setDealPersonId((String)item.get("confirm_people"));
+            tWarnInfo.setDealTime(DateTimeUtil.parse((String)item.get("confirm_date")));
             tWarnInfo.setEdgeCode(sendCode);
             warnInfoList.add(tWarnInfo);
         }

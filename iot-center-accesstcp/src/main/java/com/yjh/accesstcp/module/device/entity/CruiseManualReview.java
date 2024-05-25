@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.module.command.entity;
+package com.yjh.accesstcp.module.device.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -8,20 +8,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-/**
- * @author YC
- * @date 2020/9/9 - 9:36
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "CruiseManualReview对象", description = "巡视点人工复核表")
 public class CruiseManualReview {
+
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "巡检任务id")

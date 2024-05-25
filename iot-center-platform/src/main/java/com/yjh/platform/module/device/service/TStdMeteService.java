@@ -56,6 +56,7 @@ public class TStdMeteService {
     @Transactional(rollbackFor = Exception.class)
     public List<TStdMeteDetail> selectByPage(Integer deviceType, String meteName) {
         List<TStdMeteDetail> tStdMeteList = tStdMeteDao.selectByPage(deviceType, meteName);
+        tStdMeteList.forEach(tStdMete -> tStdMete.setLabelAttris(Arrays.asList(tStdMete.getLabelAttri().split(","))));
         return tStdMeteList;
     }
 

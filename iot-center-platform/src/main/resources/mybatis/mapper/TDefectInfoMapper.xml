@@ -167,6 +167,17 @@
     </set>
         where a.origin_id = #{originId} and a.edge_code = #{edgeCode}
     </update>
+
+    <update id="updateByDefectType">
+        update t_defect_info a <set>
+        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="isDefect != null ">a.is_defect = #{isDefect, jdbcType=INTEGER},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+        <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+    </set>
+        where a.task_id = #{taskId} and a.instance_id = #{instanceId}
+        <if test="defectType != null "> and a.defect_type = #{defectType, jdbcType=BIGINT}</if>
+    </update>
     <update id="batchUpDate">
         update t_defect_info a
         set

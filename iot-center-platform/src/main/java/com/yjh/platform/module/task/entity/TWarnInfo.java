@@ -163,4 +163,8 @@ public class TWarnInfo implements Serializable {
 
     private String labelAttri;
     private List<KeyValue<String, String>> labelAttriName;
+    /**
+     * 巡检点ID集合
+     */
+    private String instanceIds;
 }

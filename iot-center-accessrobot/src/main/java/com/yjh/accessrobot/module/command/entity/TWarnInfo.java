@@ -148,6 +148,11 @@ public class TWarnInfo implements Serializable {
      */
     private String taskId;
 
+    /**
+     * 巡检点ID集合
+     */
+    private String instanceIds;
+
     private String originId;
 
     private String edgeCode;

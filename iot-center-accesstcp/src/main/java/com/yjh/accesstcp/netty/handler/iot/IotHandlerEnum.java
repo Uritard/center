@@ -50,7 +50,15 @@ public enum IotHandlerEnum implements IHandlerEnum {
     /**
      * 相机预置位图片和ptz信息同步
      */
-    PRESET_SYNC("2023", "presetSync");
+    PRESET_SYNC("2023", "presetSync"),
+    /**
+     * 巡视结果确认
+     */
+    REVIEW_RESULT("67", "reviewResult"),
+    /**
+     * 告警确认
+     */
+    REVIEW_WARN("64", "reviewWarn");
 
 
     IotHandlerEnum(String type, String desc) {
