@@ -16,6 +16,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ResultConvertUtil;
 import com.yjh.platform.common.utils.smUtil.report.FileUtil;
@@ -241,7 +242,7 @@ public class UPatrolResultService {
             uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
         //更新测点信息
         TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate().setDeviceMeteId(afterManualReviewInfo.getDeviceMeteId())
-            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(afterManualReviewInfo.getCruiseTime());
+            .setIdentifyResult(Integer.valueOf(cruiseManualReview.getPersonCheck())).setUpdateTime(cruiseManualReview.getCheckDate());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
@@ -250,7 +251,7 @@ public class UPatrolResultService {
         // 审核结果向上级系统同步
         processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
 
-        int result2 = patrolTaskReview(cruiseManualReview.getTaskId());
+        int result2 = patrolTaskReview(cruiseManualReview.getTaskId(),"");
         //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
         if (Objects.nonNull(tCruisePointInstance)) {
@@ -280,7 +281,7 @@ public class UPatrolResultService {
     /**
      * 对整个任务状态进行判断，修改审核状态，并生成巡视报告
      */
-    private int patrolTaskReview(String taskId) {
+    private int patrolTaskReview(String taskId,String remark) {
         //获取审核后该任务下的巡检点审核信息
         List<CruiseManualReview> cruiseManualReviewList = uPatrolResultDao.selectManualDetail(taskId);
 
@@ -301,7 +302,7 @@ public class UPatrolResultService {
 
         int result2 = 0;
         if (checkedSize == cruiseManualReviewList.size()) {
-            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, null);
+            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, remark);
             //自动生成巡视报告
             Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             log.info("开始生成巡视报告=={}", progress);
@@ -587,24 +588,27 @@ public class UPatrolResultService {
     public int manualReviewTask(List<CruiseManualReview> resultList) {
         // 审核任务
         for (CruiseManualReview review : resultList) {
-            Long originId = review.getInstanceId();
-            TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(String.valueOf(originId), review.getSendCode());
-            log.info("originId: {}, edgeCode: {}, instanceInfo: {}", originId, review.getSendCode(), JSON.toJSONString(insInfo));
-            review.setInstanceId(insInfo.getInstanceId());
-
-            log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
-            uPatrolResultDao.manualReviewByTaskInstance(review);
-
-            //更新测点信息
-            Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(review.getInstanceId());
-            TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-                new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult()).setUpdateTime(review.getCruiseTime());
-            uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
+            String[] taskPatrolledId = review.getTaskResultId().split("_");
+            String[] instanceIds = review.getInstanceIds().split(",");
+            String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
+            String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            review.setTaskId(taskId);
+            for (String instanceId : instanceIds) {
+                review.setInstanceId(Long.valueOf(instanceId));
+                log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
+                uPatrolResultDao.manualReviewByTaskInstance(review);
+                //更新测点信息
+                TStdDeviceMeteUpdate stdDeviceMeteUpdate =
+                        new TStdDeviceMeteUpdate().setDeviceMeteId(Long.valueOf(instanceId)).setIdentifyResult(Integer.valueOf(review.getPersonCheck())).setUpdateTime(review.getCheckDate());
+                uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
+            }
             // 下级系统同步审核信息不对告警进行重新判断
             // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
         }
         // 校验父级是否需要审核并生成巡视报告
-        int result = patrolTaskReview(resultList.get(0).getTaskId());
+        int result = patrolTaskReview(resultList.get(0).getTaskId(),resultList.get(0).getRemark());
         return result + resultList.size();
     }
 
@@ -614,25 +618,21 @@ public class UPatrolResultService {
     public int manualReviewWarn(List<TWarnInfo> tWarnInfoList) {
         int result = 0;
         for (TWarnInfo tWarnInfo : tWarnInfoList) {
-            if (tWarnInfo.getDefectModel() == 0) {
-                tWarnInfo.setDefectModel(Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他")));
-                tWarnInfo.setConfMode(275);
-                result = tWarnInfoDao.updateByEdgeCodeOriginIds(tWarnInfo);
-            } else {
+            String[] taskPatrolledId = tWarnInfo.getTaskId().split("_");
+            String[] instanceIds = tWarnInfo.getInstanceIds().split(",");
+            String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
+            String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            tWarnInfo.setTaskId(taskId);
+            for (String instanceId : instanceIds) {
+                tWarnInfo.setInstanceId(Long.valueOf(instanceId));
+                result = tWarnInfoDao.updateByTaskIdAndInstanceId(tWarnInfo);
                 TDefectInfo tDefectInfo = new TDefectInfo();
-                tDefectInfo.setConfMode(275);
-                tDefectInfo.setOriginId(tWarnInfo.getOriginId());
-                tDefectInfo.setDefectName(tWarnInfo.getWarnName());
-                tDefectInfo.setDefectLevel(tWarnInfo.getWarnLevel());
-                tDefectInfo.setDefectContent(tWarnInfo.getWarnContent());
-                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
-                tDefectInfo.setDealType(tWarnInfo.getDealType());
-                tDefectInfo.setOutRange(tWarnInfo.getOutRange());
-                tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
-                tDefectInfo.setDealTime(tWarnInfo.getDealTime());
-                tDefectInfo.setDefectType(tWarnInfo.getDefectModel());
-                tDefectInfo.setEdgeCode(tWarnInfo.getEdgeCode());
-                result = tDefectInfoDao.updateByEdgeCodeOriginIds(tDefectInfo);
+                tDefectInfo.setTaskId(taskId);
+                tDefectInfo.setInstanceId(Long.valueOf(instanceId));
+                tDefectInfo.setDealType(tWarnInfo.getDefectModel());
+                tDefectInfoDao.updateByDefectType(tDefectInfo);
             }
         }
         return result + tWarnInfoList.size();

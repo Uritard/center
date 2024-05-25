@@ -109,6 +109,14 @@ public class Constant {
      * platform接收一键顺控反馈文件
      */
     public static final String PLATFORM_SEND ="http://iot-center-platform/tSequentialConf/v1/receiveFile";
+    /**
+     * platform接收巡视结果审核
+     */
+    public static final String TASK_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotPatrolTaskReview";
+    /**
+     * platform接收下级系统的告警审核
+     */
+    public static final String WARN_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotWarnReview";
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();

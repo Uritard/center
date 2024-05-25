@@ -59,6 +59,7 @@ public class TStdMeteController {
     public Result add(@Validated @RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
+            tStdMete.setLabelAttri(String.join(",",tStdMete.getLabelAttris()));
             result.setData(tStdMeteService.add(tStdMete));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -92,6 +93,7 @@ public class TStdMeteController {
     public Result update(@Validated @RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
+            tStdMete.setLabelAttri(String.join(",",tStdMete.getLabelAttris()));
             result.setData(tStdMeteService.update(tStdMete));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -233,6 +235,7 @@ public class TStdMeteController {
     public Result batchAdd(@RequestBody List<TStdMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            list.forEach(tStdMete ->tStdMete.setLabelAttri(String.join(",",tStdMete.getLabelAttris())));
             result.setData(tStdMeteService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

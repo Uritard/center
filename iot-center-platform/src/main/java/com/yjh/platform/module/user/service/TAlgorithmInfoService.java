@@ -158,7 +158,7 @@ public class TAlgorithmInfoService{
     public String getAlgorithmName(String aliasDescName) {
         TAlgorithmInfo info = ALGORITHM_NAME_INFO_MAP.get(aliasDescName);
         String name = "";
-        if (info != null && StringUtils.isNotEmpty(info.getAlgorithmName())) {
+        if (info != null && StringUtils.isNotEmpty(info.getAliasName())) {
             name = info.getAliasName();
         }
         return name;

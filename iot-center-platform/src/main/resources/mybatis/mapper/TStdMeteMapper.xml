@@ -107,7 +107,7 @@
                 #{thresholdPer, jdbcType=NUMERIC},
                 #{modulus, jdbcType=INTEGER},
                 #{remark, jdbcType=VARCHAR},
-                #{label_attri, jdbcType=VARCHAR}
+                #{labelAttri, jdbcType=VARCHAR}
         )
     </insert>
 

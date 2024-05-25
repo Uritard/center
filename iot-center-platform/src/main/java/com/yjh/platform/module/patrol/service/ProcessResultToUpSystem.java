@@ -15,14 +15,13 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.entity.TDefectInfo;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
-import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -42,7 +41,8 @@ import redis.clients.jedis.ScanResult;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_SUMMARY_PREFIX;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -61,7 +61,8 @@ public class ProcessResultToUpSystem {
     private final ApplicationProperties applicationProperties;
     private final AlgorithmService algorithmService;
     private final TRobotInfoDao tRobotInfoDao;
-
+    private final UPatrolTaskDao uPatrolTaskDao;
+    private final TAlgorithmInfoService algorithmInfo;
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
@@ -74,7 +75,7 @@ public class ProcessResultToUpSystem {
 
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
-                                   AlgorithmService algorithmService,ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao) {
+                                   AlgorithmService algorithmService, ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao, UPatrolTaskDao uPatrolTaskDao, TAlgorithmInfoService algorithmInfo) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -82,6 +83,8 @@ public class ProcessResultToUpSystem {
         this.algorithmService = algorithmService;
         this.applicationProperties = applicationProperties;
         this.tRobotInfoDao = tRobotInfoDao;
+        this.uPatrolTaskDao = uPatrolTaskDao;
+        this.algorithmInfo = algorithmInfo;
     }
 
     public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
@@ -109,7 +112,7 @@ public class ProcessResultToUpSystem {
             String taskId = Optional.ofNullable(cruiseResultList.get(0).get("taskId")).orElse("");
             UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
             String taskCode = uPatrolTask.getTaskCode();
-            String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
+            String key = PATROL_SUMMARY_PREFIX+taskId;
             String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
             if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
                 taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
@@ -447,7 +450,14 @@ public class ProcessResultToUpSystem {
                 default:
                     break;
             }
-
+            String defectType = resultDesc;
+            StringBuilder sb = new StringBuilder();
+                String[] defects = defectType.split(" ");
+                for (String defect : defects) {
+                    sb.append(algorithmInfo.getAlgorithmName(defect)).append(",");
+                }
+                defectType  = sb.toString();
+            xmlItem.put("defect_type", defectType);
             String resultValue = resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), "");
             if (StringUtils.containsAny(resultDesc, "dB", "Hz")) {
                 resultValue = resultValue.replaceAll("[dBDbFHz:]", "");
@@ -473,8 +483,10 @@ public class ProcessResultToUpSystem {
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
                 valid = "0";
-            } else if("1".equals(MapUtils.getString(cruiseResultMap,"isWarn"))){
-                valid = "1";
+                if (MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") != CRUISE_ABNORMAL_REQUESTFAILED ||
+                        MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") != CRUISE_ABNORMAL_ANALYSEFAILED) {
+                    valid = "2";
+                }
             }
             xmlItem.put("valid", valid);
             xmlItem.put("abnormal_type", cruiseResultMap.get("cruiseAbnormal"));
@@ -810,26 +822,20 @@ public class ProcessResultToUpSystem {
                     log.info("cruiseResultMap=={}", cruiseResultMap);
                     Map<String, Object> xmlItem = new HashMap<>(16);
                     String taskId = cruiseResultMap.getTaskId();
+                    String remark = uPatrolTaskDao.selectForTaskId(taskId).getRemark();
                     String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
-                    String simpleDateFormat = DateTimeUtil.format3(new Date());
-
-                    xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
-                    xmlItem.put("task_code", taskId);
+                    String key = PATROL_SUMMARY_PREFIX+taskId;
+                    String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
+                    xmlItem.put("task_patrolled_id", taskPatrolledId);
                     xmlItem.put("device_id", instanceId);
-                    xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
-                    xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
-                    xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
-                    xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
-                    xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
-                    xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
-                    xmlItem.put("value", cruiseResultMap.getPersonCheck());
-                    xmlItem.put("check_user", cruiseResultMap.getCheckUser());
-                    xmlItem.put("cruise_time", cruiseResultMap.getCruiseTime());
-                    xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                    xmlItem.put("data_update", cruiseResultMap.getPersonCheck());
+                    xmlItem.put("manual_review_conclusi_on", remark);
+                    xmlItem.put("confirm_people", cruiseResultMap.getCheckUser());
+                    xmlItem.put("confirm_date", cruiseResultMap.getCheckDate());
                     xmlItems.add(xmlItem);
                 }
                 xmlBaseModel.setItems(xmlItems);
-                xmlBaseModel.setType("611");
+                xmlBaseModel.setType("67");
                 List<XMLBaseModel> list = new ArrayList<>();
                 list.add(xmlBaseModel);
                 Map<String, List<XMLBaseModel>> map = new HashMap<>();
@@ -862,22 +868,18 @@ public class ProcessResultToUpSystem {
                 if (defect) {
                     List<TDefectInfo> tDefectInfoList = analyseDataOperateDao.selectDefectListByIds(warnIdList);
                     for (TDefectInfo tDefectInfo : tDefectInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getDefectId()), tDefectInfo.getDefectName(),
-                                String.valueOf(tDefectInfo.getDefectLevel()), tDefectInfo.getDefectContent(), tDefectInfo.getDealInfo(),
-                                String.valueOf(tDefectInfo.getDealType()), tDefectInfo.getOutRange(), tDefectInfo.getDealPersonId(),
-                                DateTimeUtil.format(tDefectInfo.getDealTime()), String.valueOf(tDefectInfo.getDefectType())));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(tDefectInfo.getDeviceId()),
+                                String.valueOf(tDefectInfo.getDealPersonId()), String.valueOf(tDefectInfo.getDealTime()), String.valueOf(tDefectInfo.getIsDefect())));
                     }
                 } else {
                     List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
                     for (TWarnInfo tWarnInfo : tWarnInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getWarnId()), tWarnInfo.getWarnName(),
-                                String.valueOf(tWarnInfo.getWarnLevel()), tWarnInfo.getWarnContent(), tWarnInfo.getDealInfo(),
-                                String.valueOf(tWarnInfo.getDealType()), tWarnInfo.getOutRange(), tWarnInfo.getDealPersonId(),
-                                DateTimeUtil.format(tWarnInfo.getDealTime()), ""));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(tWarnInfo.getDeviceId()),
+                                tWarnInfo.getDealPersonId(), String.valueOf(tWarnInfo.getDealTime()), String.valueOf(tWarnInfo.getIsWarn())));
                     }
                 }
                 xmlBaseModel.setItems(xmlItems);
-                xmlBaseModel.setType("711");
+                xmlBaseModel.setType("64");
                 List<XMLBaseModel> list = new ArrayList<>();
                 list.add(xmlBaseModel);
                 Map<String, List<XMLBaseModel>> map = new HashMap<>(1);
@@ -894,21 +896,17 @@ public class ProcessResultToUpSystem {
      * 告警审核xml整理
      * @return
      */
-    public Map<String, Object> getReviewAlarmXml(String warnId, String warnName, String warnLevel, String warnContent,
-                                                 String dealInfo, String dealType, String outRange, String dealPersonId,
-                                                 String dealTime, String dealModel) {
+    public Map<String, Object> getReviewAlarmXml(String taskId, String deviceId, String dealPersonId, String dealTime,
+                                                 String isWarn) {
+
+        String key = PATROL_SUMMARY_PREFIX+taskId;
+        String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
         Map<String, Object> xmlItem = new HashMap<>(11);
-        xmlItem.put("origin_id", warnId);
-        xmlItem.put("warn_name", warnName);
-        xmlItem.put("warn_level", warnLevel);
-        xmlItem.put("warn_time", warnLevel);
-        xmlItem.put("warn_content", warnContent);
-        xmlItem.put("deal_info", dealInfo);
-        xmlItem.put("deal_type", dealType);
-        xmlItem.put("out_range", outRange);
-        xmlItem.put("deal_person_id", dealPersonId);
-        xmlItem.put("deal_time", dealTime);
-        xmlItem.put("defect_model", dealModel);
+        xmlItem.put("task_patrolled_id", taskPatrolledId);
+        xmlItem.put("device_id", deviceId);
+        xmlItem.put("is_alarm", isWarn);
+        xmlItem.put("confirm_people", dealPersonId);
+        xmlItem.put("confirm_date", dealTime);
         return xmlItem;
     }
 

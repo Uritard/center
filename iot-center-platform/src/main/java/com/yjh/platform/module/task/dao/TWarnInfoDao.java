@@ -100,6 +100,8 @@ public interface TWarnInfoDao {
 
     int updateByEdgeCodeOriginIds(TWarnInfo tWarnInfo);
 
+    int updateByTaskIdAndInstanceId(TWarnInfo tWarnInfo);
+
     List<Long> selectWarnIdByTaskId(@Param(value = "taskId") String taskId);
 
     List<WarnStatistical> countWarnByStationOnMonth(@Param(value = "alarmLevel")Integer alarmLevel, @Param("nearDays")Integer nearDays);
