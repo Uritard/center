@@ -24,4 +24,29 @@
         <if test="autoreviewName != null and autoreviewName != ''"> and a.autoreview_name like concat('%',#{autoreviewName, jdbcType=VARCHAR},'%')</if>
         <if test="autoreviewType != null and autoreviewType != ''"> and FIND_IN_SET(#{autoreviewType, jdbcType=VARCHAR}, a.autoreview_type) > 0</if>
     </select>
+
+    <resultMap id="detailMap" type="com.yjh.platform.module.devicemete.entity.TCfgAutoreview">
+        <result column="autoreview_id" property="autoreviewId" />
+        <result column="autoreview_name" property="autoreviewName" />
+        <result column="autoreview_type" property="autoreviewType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <collection property="detail" notNullColumn="autoreview_id" ofType="com.yjh.platform.module.devicemete.entity.TCfgAutoreviewDetail">
+            <id column="detail_id" property="detailId"/>
+            <result column="autoreview_id" property="autoreviewId" />
+            <result column="auto_detail_type" property="autoDetailType"/>
+            <result column="ref_id" property="refId"/>
+            <result column="ref_name" property="refName"/>
+        </collection>
+    </resultMap>
+    <select id="detailList" resultMap="detailMap">
+        select a.autoreview_id, a.autoreview_name, a.autoreview_type, a.create_time, a.update_time, a.create_user,
+          b.detail_id, b.auto_detail_type, b.ref_id, b.ref_name
+        from t_cfg_autoreview a left join t_cfg_autoreview_detail b on a.autoreview_id=b.autoreview_id where 1=1
+        <if test="autoDetailType != null and autoDetailType > 0 ">and b.auto_detail_type = #{autoDetailType, jdbcType=INTEGER}</if>
+        <if test="typeId != null and typeId != ''"> and b.ref_id=#{typeId, jdbcType=VARCHAR}</if>
+        <if test="typeName != null and typeName != ''"> and b.ref_name like concat ('%',#{typeName, jdbcType=VARCHAR},'%')</if>
+        <if test="autoreviewType != null and autoreviewType != ''"> and FIND_IN_SET(#{autoreviewType, jdbcType=VARCHAR}, a.autoreview_type) > 0</if>
+    </select>
 </mapper>

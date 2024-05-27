@@ -167,5 +167,9 @@ public class TAlgorithmInfoService{
     public TAlgorithmInfo getDefectInfo(String aliasName) {
         return ALGORITHM_INFO_MAP.get(aliasName);
     }
+
+    public TAlgorithmInfo getAlgorithmInfo(String aliasDescName) {
+        return ALGORITHM_NAME_INFO_MAP.get(aliasDescName);
+    }
 }
 

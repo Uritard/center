@@ -63,6 +63,9 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
 
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
+
     private String deviceName;
 
     @Length(max = 32, message = "cunstomId长度必须小于等于32")

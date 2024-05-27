@@ -49,6 +49,9 @@ public class TDefectInfo implements Serializable {
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
 
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
+
     @ApiModelProperty(value = "部位ID")
     private String cunstomId;
 

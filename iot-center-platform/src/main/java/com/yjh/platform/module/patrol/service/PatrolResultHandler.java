@@ -55,6 +55,7 @@ public class PatrolResultHandler {
     private final AlarmShieldService alarmShieldService;
     private final ApplicationEventPublisher eventPublisher;
     private final TCfgDataCurrentDao tCfgDataCurrentDao;
+    private final AutoreviewHandler autoreviewHandler;
 
     private static final String METER = "meter";
 
@@ -62,7 +63,8 @@ public class PatrolResultHandler {
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
                                UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao, AlarmShieldService alarmShieldServic,
-                               ApplicationEventPublisher eventPublisher,TCfgDataCurrentDao tCfgDataCurrentDao) {
+                               ApplicationEventPublisher eventPublisher,TCfgDataCurrentDao tCfgDataCurrentDao,
+        AutoreviewHandler autoreviewHandler) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -73,6 +75,7 @@ public class PatrolResultHandler {
         this.alarmShieldService = alarmShieldServic;
         this.eventPublisher = eventPublisher;
         this.tCfgDataCurrentDao = tCfgDataCurrentDao;
+        this.autoreviewHandler = autoreviewHandler;
     }
 
     /**
@@ -1048,6 +1051,10 @@ public class PatrolResultHandler {
             tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
             tWarnInfo.setLabelAttri(warningMsg.get("labelAttri"));
             tWarnInfo.setAlarmType(ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1));
+            tWarnInfo.setDeviceType(cruiseResultMap.getOrDefault("deviceType", ""));
+            autoreviewHandler.autoreviewCheckAlarm(tWarnInfo);
+
+            warningMsg.put("confMode", String.valueOf(tWarnInfo.getConfMode()));
         } catch (Exception e) {
             log.error("告警info信息组装异常:", e);
         }
@@ -1122,10 +1129,8 @@ public class PatrolResultHandler {
             Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
             StringBuilder retVal = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
 
-
-            processResultToUpSystem.addDefect(msgId, defectMap);
-
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
+            processResultToUpSystem.addDefect(msgId, defectMap);
             log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));
             analyseDataOperateService.insertDefectInfo(tDefectInfo);
             defectMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
@@ -1233,6 +1238,11 @@ public class PatrolResultHandler {
             tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
             tDefectInfo.setTaskId(defectMap.get("taskId"));
             tDefectInfo.setLabelAttri(defectMap.get("labelAttri"));
+
+            tDefectInfo.setDeviceType(defectMap.getOrDefault("deviceType", ""));
+            autoreviewHandler.autoreviewCheckDefect(tDefectInfo);
+
+            defectMap.put("confMode", String.valueOf(tDefectInfo.getConfMode()));
         } catch (Exception e) {
             log.error("缺陷info信息组装异常：", e);
         }
@@ -1270,6 +1280,7 @@ public class PatrolResultHandler {
             defectMap.put("value", resultValueItem);
 
             defectMap.put("deviceName", cruiseResultMap.get("deviceName"));
+            defectMap.put("deviceType", cruiseResultMap.getOrDefault("deviceType", ""));
             defectMap.put("instanceName", cruiseResultMap.get("instanceName"));
             defectMap.put("cruiseType", cruiseResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", cruiseResultMap.get("cruiseTime"));

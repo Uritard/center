@@ -12,13 +12,10 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
+import com.yjh.platform.module.patrol.entity.TDefectInfo;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
-import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
-import com.yjh.platform.module.patrol.service.PatrolResultHandler;
-import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
-import com.yjh.platform.module.patrol.service.UPatrolTaskService;
-import com.yjh.platform.module.task.entity.TDefectInfo;
+import com.yjh.platform.module.patrol.service.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TDefectInfoService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
@@ -50,7 +47,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final String taskCode;
     private final TRobotInspectionDao tRobotInspectionDao;
-    private final TCruisePointInstanceDao tCruisePointInstanceDao;
+    private AutoreviewHandler autoreviewHandler;
 
     private Map<String, String> tCruiseTaskResultMap = Collections.EMPTY_MAP;
 
@@ -64,7 +61,7 @@ public class RobotInspectionWarnThread implements Runnable{
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
-        this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
+        this.autoreviewHandler = StaticContextAccessor.getBean(AutoreviewHandler.class);
     }
 
     @Override
@@ -166,11 +163,15 @@ public class RobotInspectionWarnThread implements Runnable{
             tDefectInfo.setOriginId(taskAlarm.getOriginId());
             tDefectInfo.setEdgeCode(taskAlarm.getEdgeCode());
             tDefectInfo.setTaskId(taskId);
+            tDefectInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
+            tDefectInfo.setDeviceType(String.valueOf(tStdDevicemete.getDeviceType()));
+
+            autoreviewHandler.autoreviewCheckDefect(tDefectInfo);
         }catch (Exception e){
             log.error("组装缺陷信息异常：", e);
         }
         log.info("tDefectInfo==={}", tDefectInfo);
-        StaticContextAccessor.getBean(TDefectInfoService.class).insert(tDefectInfo);
+        analyseDataOperateService.insertDefectInfo(tDefectInfo);
         return tDefectInfo;
     }
 
@@ -207,6 +208,8 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
             warnInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
             warnInfo.setWarnLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
+            warnInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
+            warnInfo.setDeviceType(String.valueOf(tStdDevicemete.getDeviceType()));
         }catch (Exception e){
             log.error("组装告警信息异常：", e);
         }
@@ -226,7 +229,7 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("stdMeteId", warnInfo.getStdMeteId().toString());
             warnMap.put("taskId", warnInfo.getTaskId());
             warnMap.put("value", warnInfo.getValue());
-            warnMap.put("confMode", "276");
+            warnMap.put("confMode", String.valueOf(warnInfo.getConfMode()));
             warnMap.put("alarmSource", warnInfo.getAlarmSource().toString());
             warnMap.put("defectModel", warnInfo.getDefectModel().toString());
             warnMap.put("warnLevel", warnInfo.getWarnLevel().toString());
@@ -258,7 +261,7 @@ public class RobotInspectionWarnThread implements Runnable{
             defectMap.put("instanceId", String.valueOf(tDefectInfo.getInstanceId()));
             defectMap.put("customId", tDefectInfo.getCunstomId());
             defectMap.put("stdMeteId", String.valueOf(tDefectInfo.getStdMeteId()));
-            defectMap.put("confMode", "276");
+            defectMap.put("confMode", String.valueOf(tDefectInfo.getConfMode()));
             defectMap.put("alarmSource", String.valueOf(tDefectInfo.getAlarmSource()));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", tDefectInfo.getValue());

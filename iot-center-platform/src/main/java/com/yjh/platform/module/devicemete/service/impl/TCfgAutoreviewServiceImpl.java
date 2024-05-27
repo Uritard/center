@@ -1,7 +1,8 @@
 package com.yjh.platform.module.devicemete.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.devicemete.dao.TCfgAutoreviewMapper;
@@ -61,8 +62,7 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
     @Override
     public List<TCfgAutoreviewDetail> selectDetailList(long autoreviewId, int autoDetailType, String typeId, String typeName) {
 
-        QueryWrapper<TCfgAutoreviewDetail> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
+        LambdaQueryWrapper<TCfgAutoreviewDetail> queryWrapper = Wrappers.lambdaQuery(new TCfgAutoreviewDetail())
             .eq(TCfgAutoreviewDetail::getAutoreviewId, autoreviewId)
             .eq(autoDetailType > 0, TCfgAutoreviewDetail::getAutoDetailType, autoDetailType)
             .eq(StringUtils.isNotEmpty(typeId), TCfgAutoreviewDetail::getRefId, typeId)
@@ -97,7 +97,8 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
         super.updateById(autoreview);
 
         long autoreviewId = autoreview.getAutoreviewId();
-        QueryWrapper<TCfgAutoreviewDetail> delWrapper = new QueryWrapper<>(new TCfgAutoreviewDetail()).eq("autoreview_id", autoreviewId);
+        LambdaQueryWrapper<TCfgAutoreviewDetail> delWrapper =
+            Wrappers.lambdaQuery(new TCfgAutoreviewDetail()).eq(TCfgAutoreviewDetail::getAutoreviewId, autoreviewId);
         autoreviewDetailService.remove(delWrapper);
         detailList.forEach(e -> e.setAutoreviewId(autoreviewId));
         autoreviewDetailService.saveBatch(detailList);
@@ -108,7 +109,8 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean removeAutoreview(long id) {
-        QueryWrapper<TCfgAutoreviewDetail> delWrapper = new QueryWrapper<>(new TCfgAutoreviewDetail()).eq("autoreview_id", id);
+        LambdaQueryWrapper<TCfgAutoreviewDetail> delWrapper =
+            Wrappers.lambdaQuery(new TCfgAutoreviewDetail()).eq(TCfgAutoreviewDetail::getAutoreviewId, id);
         boolean del = autoreviewDetailService.remove(delWrapper);
         log.info("TCfgAutoreviewDetail deleted {} {}.", id, del);
         super.removeById(id);

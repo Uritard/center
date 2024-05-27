@@ -161,6 +161,8 @@ public class UPatrolTaskService {
     private TCfgDataCurrentDao tCfgDataCurrentDao;
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private AutoreviewHandler autoreviewHandler;
 
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
@@ -534,6 +536,7 @@ public class UPatrolTaskService {
             map.put("edgeCode", edgeCode);
             map.put("devicePointId", String.valueOf(item.getDevicePointId()));
             map.put("taskName", task.getTaskName());
+            map.put("deviceType", String.valueOf(item.getDeviceType()));
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
@@ -2347,6 +2350,8 @@ public class UPatrolTaskService {
         try {
             // 压测模式减少非必要消息传输
             if (!Constant.fastTurbo()) {
+                // 结果判断是否自动审核
+                autoreviewHandler.autoreviewCheckResult(cruiseResultList);
                 // 巡视结果上报上一级系统
                 processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
                 //任务状态上报站端

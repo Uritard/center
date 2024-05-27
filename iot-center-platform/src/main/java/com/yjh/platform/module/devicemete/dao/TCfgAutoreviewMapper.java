@@ -21,4 +21,6 @@ public interface TCfgAutoreviewMapper extends BaseMapper<TCfgAutoreview> {
 
     List<TCfgAutoreview> selectByPageMini(IPage<TCfgAutoreview> page, String autoreviewName, String autoreviewType, int autoDetailType,
         String typeId, String typeName);
+
+    List<TCfgAutoreview> detailList(String autoreviewType, int autoDetailType, String typeId, String typeName);
 }
