@@ -69,32 +69,13 @@ public interface TCPClientHandler {
      */
     boolean isConnected();
 
+    /**
+     * 根据地址获取 clientHandler
+     * @param remoteAddress 地址
+     * @return clientHandler
+     */
     static TCPClientHandler getTcpClientHandlerHashMap(SocketAddress remoteAddress) {
         return TCPClientHandlerHashMap.get(remoteAddress);
-    }
-
-
-    /**
-     * 重新连接tcp服务端
-     * @param remoteAddress 地址
-     * @param bootstrap
-     */
-    default void doConnect(SocketAddress remoteAddress, Bootstrap bootstrap) {
-        try {
-            if (bootstrap != null) {
-                bootstrap.remoteAddress(remoteAddress);
-                ChannelFuture f = bootstrap.connect().addListener((ChannelFuture futureListener) -> {
-                    final EventLoop eventLoop = futureListener.channel().eventLoop();
-                    if (!futureListener.isSuccess()) {
-                        //重连
-                        log.info("与服务端" + remoteAddress + "连接失败!主动尝试重连!");
-                        eventLoop.schedule(() -> doConnect(remoteAddress, bootstrap), 60, TimeUnit.SECONDS);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            log.info("------主动连接服务端连接失败------", e);
-        }
     }
 
     /**

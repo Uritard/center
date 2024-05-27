@@ -41,9 +41,9 @@ public class AlgorithmService {
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             xmlBaseModel.setType("312");
             for (Alarm alarm : alarmList) {
-                List<Map<String, Object>> items = getBasicConfig(alarm);
-                Map<String, Object> item = new HashMap<>(16);
-                item.put("pic_defect", alarm.getDefect());
+                List<Map<String, Object>> items = new ArrayList<>();
+                Map<String, Object> item = getBasicConfig(alarm);
+                item.put("pic_defect", alarm.getPic_defect());
                 item.put("pic_different", alarm.getPic_different());
                 item.put("pic_diff_base", alarm.getPic_diff_base());
                 item.put("defect", alarm.getDefect().size());
@@ -67,13 +67,15 @@ public class AlgorithmService {
         if (applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             xmlBaseModel.setType("68");
-            xmlBaseModel.setItems(getBasicConfig(alarm));
+            List<Map<String, Object>> items = new ArrayList<>();
+            Map<String, Object> item = getBasicConfig(alarm);
+            items.add(item);
+            xmlBaseModel.setItems(items);
             Constant.otherObjServer(xmlBaseModel, Constant.TCP_CLOUD_URL);
         }
     }
 
-    public List<Map<String, Object>> getBasicConfig(Alarm alarm) {
-        List<Map<String, Object>> items = new ArrayList<>();
+    public Map<String, Object> getBasicConfig(Alarm alarm) {
         Map<String, Object> item = new HashMap<>(16);
         item.put("province_name", applicationProperties.getManagerAlgorithmConfig().getProvinceName());
         item.put("city_name", applicationProperties.getManagerAlgorithmConfig().getCityName());
@@ -88,8 +90,7 @@ public class AlgorithmService {
         item.put("pic_width", alarm.getPic_width());
         item.put("pic_height", alarm.getPic_height());
         item.put("pic_raw", alarm.getPic_raw());
-        items.add(item);
-        return items;
+        return item;
     }
 
 }

@@ -1759,24 +1759,24 @@ public class SendToUpSystemServices {
             String ip = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
             String port = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
             if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
-                InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                SocketAddress socketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
                 if (!Constant.upSystemFlag().equals(flag)) {
                     //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
                     if (Constant.ONE.equals(flag)) {
-                        this.start(inetSocketAddress, "upSystem");
+                        this.start(socketAddress, "upSystem");
                     } else {
-                        this.stop(inetSocketAddress);
+                        this.stop(socketAddress);
                     }
                     Constant.upSystemFlag = flag;
                 }
                 boolean isChange = Constant.ONE.equals(flag) && !Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port);
                 if (isChange) {
                     //ip 端口修改 变更连接
-                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(inetSocketAddress))) {
-                        this.stop(inetSocketAddress);
-                        this.start(inetSocketAddress, "upSystem");
+                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))) {
+                        this.stop(socketAddress);
+                        this.start(socketAddress, "upSystem");
                     } else {
-                        this.start(inetSocketAddress, "upSystem");
+                        this.start(socketAddress, "upSystem");
                     }
                     Constant.upSystemIp = ip;
                     Constant.upSystemPort = Integer.valueOf(port);
@@ -1787,24 +1787,24 @@ public class SendToUpSystemServices {
             ip = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemIp");
             port = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemPort");
             if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
-                InetSocketAddress managerSystemInetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                SocketAddress managerSystemSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
                 if (!Constant.managerSystemFlag().equals(flag)) {
                     //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
                     if (Constant.ONE.equals(flag)) {
-                        this.start(managerSystemInetSocketAddress, "managerSystem");
+                        this.start(managerSystemSocketAddress, "managerSystem");
                     } else {
-                        this.stop(managerSystemInetSocketAddress);
+                        this.stop(managerSystemSocketAddress);
                     }
                     Constant.managerSystemFlag = flag;
                 }
                 boolean isChange = Constant.ONE.equals(flag) && !Constant.managerSystemIp().equals(ip) || !String.valueOf(Constant.managerSystemPort()).equals(port);
                 if (isChange) {
                     //ip 端口修改 变更连接
-                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(managerSystemInetSocketAddress))) {
-                        this.stop(managerSystemInetSocketAddress);
-                        this.start(managerSystemInetSocketAddress, "managerSystem");
+                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(managerSystemSocketAddress))) {
+                        this.stop(managerSystemSocketAddress);
+                        this.start(managerSystemSocketAddress, "managerSystem");
                     } else {
-                        this.start(managerSystemInetSocketAddress, "managerSystem");
+                        this.start(managerSystemSocketAddress, "managerSystem");
                     }
                     Constant.managerSystemIp = ip;
                     Constant.managerSystemPort = Integer.valueOf(port);
@@ -1819,34 +1819,34 @@ public class SendToUpSystemServices {
     /**
      * 开启连接
      *
-     * @param inetSocketAddress
+     * @param socketAddress
      * @param type 1 上级系统 2算法平台
      */
-    private void start(InetSocketAddress inetSocketAddress, String type){
-        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(inetSocketAddress))){
-            log.info("重新连接 {} ", inetSocketAddress);
-            ReContentManager.reContent(inetSocketAddress, NettyClient.BOOTSTRAP_MAP.get(inetSocketAddress));
+    private void start(SocketAddress socketAddress, String type){
+        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))){
+            log.info("重新连接 {} ", socketAddress);
+            ReContentManager.reContent(socketAddress, NettyClient.BOOTSTRAP_MAP.get(socketAddress));
         } else {
-            log.info("新建连接 {} ", inetSocketAddress);
+            log.info("新建连接 {} ", socketAddress);
             NettyClient nettyClient;
             if ("upSystem".equals(type)) {
                 nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAHandlerImpl());
             } else {
                 nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAlgorithmHandlerImpl());
             }
-            nettyClient.start(inetSocketAddress);
+            nettyClient.start(socketAddress);
         }
     }
 
     /**
      * 关闭连接
      *
-     * @param inetSocketAddress
+     * @param socketAddress
      */
-    private void stop(InetSocketAddress inetSocketAddress) {
-        log.info("关闭连接 {} ", inetSocketAddress);
-        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.remove(inetSocketAddress))) {
-            TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
+    private void stop(SocketAddress socketAddress) {
+        log.info("关闭连接 {} ", socketAddress);
+        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.remove(socketAddress))) {
+            TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(socketAddress);
             try {
                 if (tcpClientHandler != null) {
                     tcpClientHandler.getChannel().close().sync();
@@ -1857,7 +1857,7 @@ public class SendToUpSystemServices {
                 e.printStackTrace();
             }
         }
-        ReContentManager.terminate(inetSocketAddress);
+        ReContentManager.terminate(socketAddress);
     }
 
     public void saveAInterfaceTaskInfo(List<Map<String,Object>> items){

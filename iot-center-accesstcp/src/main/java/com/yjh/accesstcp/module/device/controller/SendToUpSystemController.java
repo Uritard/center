@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,8 +99,8 @@ public class SendToUpSystemController {
             if (Objects.isNull(flag) || "0".equals(flag)) {
                 log.error("上级系统算法连接开关为空或者没开！{}", flag);
             } else {
-                InetSocketAddress inetSocketAddress = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
-                TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
+                SocketAddress socketAddress = new InetSocketAddress(Constant.managerSystemIp(), Constant.managerSystemPort());
+                TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(socketAddress);
                 if (tcpClientHandler != null) {
                     if (StringUtils.isBlank(xmlBaseModel.getCode())){
                         xmlBaseModel.setCode(Constant.stationCode());

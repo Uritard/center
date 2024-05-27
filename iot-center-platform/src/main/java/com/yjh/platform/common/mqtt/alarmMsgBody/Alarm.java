@@ -2,6 +2,7 @@ package com.yjh.platform.common.mqtt.alarmMsgBody;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,7 +17,7 @@ public class Alarm {
      String  pic_defect;
      String  pic_different;
      String  pic_diff_base;
-     List<Defect> defect;
-     List<Different> different;
+     List<Defect> defect = new ArrayList<>();
+     List<Different> different = new ArrayList<>();
 
 }
