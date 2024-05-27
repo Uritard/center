@@ -98,7 +98,7 @@ public class StateGridAlgorithmHandlerImpl extends SimpleChannelInboundHandler<M
         log.info("算法平台----analysisClientHandlerHashMap: {}", TCPClientHandlerHashMap);
         //使用过程中断线重连
         if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(remoteAdds))) {
-            doConnect(remoteAdds, NettyClient.BOOTSTRAP_MAP.get(remoteAdds));
+            ReContentManager.reContent(remoteAdds, NettyClient.BOOTSTRAP_MAP.get(remoteAdds));
         }
     }
 

@@ -1126,8 +1126,8 @@ public class PatrolResultHandler {
             }
             // 缺陷信息存redis
             redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-            Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
             StringBuilder retVal = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
+            Map<String, String> defectMap = getDefectMap(resultImage, retVal.toString(), cruiseResultMap, tStdDevicemete, res.getResultDesc());
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
             processResultToUpSystem.addDefect(msgId, defectMap);

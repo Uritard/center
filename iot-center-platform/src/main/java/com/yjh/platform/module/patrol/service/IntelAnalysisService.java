@@ -1431,9 +1431,10 @@ public class IntelAnalysisService {
                     targetPath = SysParamConfig.getSysContent("defectResultImg") + "/" +sourcePath;
                 }
             }
-            // 图片在ftps上的全路径
-            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
-            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
+            downloadFile(sourcePath, targetPath);
+//            // 图片在ftps上的全路径
+//            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
+//            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
             return targetPath;
         }catch (Exception e){
             log.error("将ftps的文件复制到指定目录异常：", e);
@@ -1565,7 +1566,7 @@ public class IntelAnalysisService {
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> map = new HashMap<>(3);
         map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
-        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
         map.put("type", type);
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("314").setItems(items);
@@ -1592,7 +1593,7 @@ public class IntelAnalysisService {
         Map<String,Object> map = new HashMap<>(4);
         map.put("algorithm_manufacturer", algorithmManufacturer);
         map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
-        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
         map.put("type", type);
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("315").setItems(items);
@@ -1614,7 +1615,7 @@ public class IntelAnalysisService {
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> map = new HashMap<>(4);
         map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
-        map.put("station_id", applicationProperties.getManagerAlgorithmConfig().getStationId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
         map.put("version", version);
         map.put("type", type);
         items.add(map);

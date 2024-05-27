@@ -35,7 +35,7 @@ public class NettyClient {
 
     public static final Map<SocketAddress, Bootstrap> BOOTSTRAP_MAP = new ConcurrentHashMap<>();
 
-    public void start(InetSocketAddress address) {
+    public void start(SocketAddress address) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap().group(group)

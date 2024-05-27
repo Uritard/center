@@ -99,7 +99,6 @@ public class ApplicationProperties {
         private String cityName;
         private String sectionId;
         private String sectionName;
-        private String stationId;
         private String stationName;
         private Integer voltLevel;
         private String managerServerFtpsRemotePath;
@@ -240,7 +239,6 @@ public class ApplicationProperties {
                 .setCityName(redisMap.get("cityName"))
                 .setSectionId(redisMap.get("sectionId"))
                 .setSectionName(redisMap.get("sectionName"))
-                .setStationId(redisMap.get("stationId"))
                 .setStationName(redisMap.get("stationName"))
                 .setVoltLevel(ValueUtil.toInteger(redisMap.get("voltLevel"),220))
                 .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"))
