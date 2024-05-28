@@ -296,6 +296,7 @@ public class TCfgDataCurrentService {
                                 if ("0".equals(map1.get("state"))) {
                                     cameraConService.moveToPresetForTask(rule.getPresetId(), rule.getCameraId());
                                     map1.put("lastTime",DateTimeUtil.format(new Date()));
+                                    map1.put("state","1");
                                     redisTemplate.opsForHash().putAll(str, map1);
                                 }
                             } catch (Exception e) {
