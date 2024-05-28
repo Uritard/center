@@ -175,12 +175,12 @@ public class Constant {
     }
 
     /**
-     * 变电站名称
+     * 变电站编码
      */
     public static String stationCode;
 
     /**
-     * 获取变电站名称
+     * 获取变电站编码
      */
     public static String stationCode() {
         try {
@@ -190,6 +190,24 @@ public class Constant {
             stationCode = "";
         }
         return stationCode;
+    }
+
+    /**
+     * 变电站名称
+     */
+    public static String stationName;
+
+    /**
+     * 获取变电站名称
+     */
+    public static String stationName() {
+        try {
+            stationName = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
+            log.debug("stationName is {}", stationName);
+        } catch (Exception e) {
+            stationName = "";
+        }
+        return stationName;
     }
 
     public static Boolean handlerNew = true;
@@ -207,16 +225,19 @@ public class Constant {
         return handlerNew;
     }
 
-    public static String cruise;
+    /**
+     * 节点编码
+     */
+    public static String edgeCode;
 
-    public static String cruise() {
+    public static String edgeCode() {
         try {
-            cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
-            log.debug("cruise is {}", cruise);
+            edgeCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
+            log.debug("edgeCode is {}", edgeCode);
         } catch (Exception e) {
-            cruise = "Client01";
+            edgeCode = "Client01";
         }
-        return cruise;
+        return edgeCode;
     }
 
     public static String server;

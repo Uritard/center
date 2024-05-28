@@ -19,10 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <功能描述>
@@ -46,6 +43,8 @@ public class DeviceMaintenanceInfoController {
     public Result add(@RequestBody @Validated DeviceMaintenanceInfo deviceMaintenanceInfo) {
         Result result = new Result();
         try {
+            deviceMaintenanceInfo.setStartTime(new Date())
+                    .setRecordCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
             result.setData(deviceMaintenanceInfoService.save(deviceMaintenanceInfo));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
@@ -63,6 +62,9 @@ public class DeviceMaintenanceInfoController {
     public Result update(@RequestBody @Validated DeviceMaintenanceInfo deviceMaintenanceInfo) {
         Result result = new Result();
         try {
+            if (deviceMaintenanceInfo.getMaintenanceStatus() == 1) {
+                deviceMaintenanceInfo.setEndTime(new Date());
+            }
             result.setData(deviceMaintenanceInfoService.updateById(deviceMaintenanceInfo));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
@@ -110,21 +112,21 @@ public class DeviceMaintenanceInfoController {
                 queryWrapper.eq("device_id", deviceId);
             }
             if (StringUtils.isNotBlank(deviceName)) {
-                queryWrapper.eq("device_name", deviceName);
+                queryWrapper.eq("patroldevice_name", deviceName);
             }
             if (Objects.nonNull(deviceType) && deviceType != -1) {
-                queryWrapper.eq("device_type", deviceType);
+                queryWrapper.eq("patroldevice_type", deviceType);
             }
             if (Objects.nonNull(maintenanceType) && maintenanceType != -1) {
                 queryWrapper.eq("maintenance_type", maintenanceType);
             }
             if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
-                queryWrapper.between("create_time", startTime, endTime);
+                queryWrapper.between("start_time", startTime, endTime);
             }
-            queryWrapper.orderByDesc("create_time");
+            queryWrapper.orderByDesc("start_time");
             Page<DeviceMaintenanceInfo> page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<DeviceMaintenanceInfo> deviceMaintenanceInfoList = deviceMaintenanceInfoService.list(queryWrapper);
-            DictConvertUtil.optional("cruiseDeviceType", "deviceType", "deviceTypeName")
+            DictConvertUtil.optional("cruiseDeviceType", "patroldeviceType", "patroldeviceTypeName")
                     .add("maintenanceType").covertToDict(deviceMaintenanceInfoList);
             Map<String, Object> resultMap = new HashMap<>(2);
             resultMap.put("count", page.getTotal());

@@ -63,4 +63,12 @@ public interface SendToUpSystemDao {
 
     HashMap<String, Object> countLabelAccuracy(@Param(value = "startTime") String startTime,
                                                @Param(value = "endTime") String endTime);
+
+    List<Map<String, Object>> selectMaintenanceModel(@Param(value = "stationName") String stationName,
+                                                     @Param(value = "stationCode") String stationCode);
+
+    List<Map<String, Object>> selectLinkageModel();
+
+    List<TCruisePointInstanceMeteDetail> selectAlarmThresholdModel();
+
 }

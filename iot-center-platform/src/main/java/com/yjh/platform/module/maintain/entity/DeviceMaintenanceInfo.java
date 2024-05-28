@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.checkerframework.checker.formatter.qual.Format;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -18,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @TableName(value ="device_maintenance_info")
 @Data
+@Accessors(chain = true)
 public class DeviceMaintenanceInfo implements Serializable {
     /**
      * 主键
@@ -31,20 +33,30 @@ public class DeviceMaintenanceInfo implements Serializable {
     private Long deviceId;
 
     /**
+     * 设备编码
+     */
+    private String patroldeviceCode;
+
+    /**
      * 设备名称
      */
-    private String deviceName;
+    private String patroldeviceName;
 
     /**
      * 设备类型
      */
-    private Integer deviceType;
+    private Integer patroldeviceType;
 
     /**
      * 设备类型名称
      */
     @TableField(exist = false)
-    private String deviceTypeName;
+    private String patroldeviceTypeName;
+
+    /**
+     * 维护记录编码
+     */
+    private String recordCode;
 
     /**
      * 维护信息类型
@@ -52,22 +64,27 @@ public class DeviceMaintenanceInfo implements Serializable {
     private Integer maintenanceType;
 
     /**
-     * 物联设备类型名称
+     * 维护信息类型名称
      */
     @TableField(exist = false)
     private String maintenanceTypeName;
 
     /**
-     * 维护信息描述
+     * 故障级别 1:一般 2:严重
      */
-    private String maintenanceDesc;
+    private Integer faultLevel;
 
     /**
-     * 创建时间
+     * 维护信息描述
+     */
+    private String faultDesc;
+
+    /**
+     * 维护开始时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date startTime;
 
     /**
      * 更新时间
@@ -77,9 +94,26 @@ public class DeviceMaintenanceInfo implements Serializable {
     private Date updateTime;
 
     /**
-     * 创建人
+     * 维护结束时间
      */
-    private String createUser;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+    /**
+     * 维护单位
+     */
+    private String maintenanceUnit;
+
+    /**
+     * 维护人员
+     */
+    private String maintenancePerson;
+
+    /**
+     * 消缺状态 1-已消缺 2-未消缺 3-消缺中
+     */
+    private Integer maintenanceStatus;
 
     /**
      * 备注

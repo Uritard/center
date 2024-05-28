@@ -575,4 +575,60 @@
                 AND a.cruise_time BETWEEN #{startTime} and #{endTime}
             ) t
     </select>
+    <select id="selectMaintenanceModel" resultType="java.util.Map">
+        SELECT
+            #{stationName} AS station_name,
+            #{stationCode} AS station_code,
+            patroldevice_name,
+            patroldevice_code,
+            up_dict AS patroldevice_type,
+            record_code,
+            start_time,
+            end_time,
+            fault_level,
+            fault_desc,
+            maintenance_unit,
+            maintenance_person,
+            maintenance_status
+        FROM
+            `device_maintenance_info` LEFT JOIN t_dict_business ON patroldevice_type = dict_code;
+    </select>
+    <select id="selectLinkageModel" resultType="java.util.Map">
+        SELECT
+            b.device_id AS source_code,
+            b.device_name AS source_name,
+            (
+                CASE (c.mete_kind)
+                    WHEN 1 THEN
+                        '遥信'
+                    WHEN 2 THEN
+                        '遥测'
+                    WHEN 3 THEN
+                        '遥控'
+                    END
+                ) AS source_type,
+            (
+                SELECT
+                    GROUP_CONCAT(f.instance_id)
+                FROM
+                    u_patrol_plan_attr d
+                        LEFT JOIN t_cruise_point_instance f ON f.instance_id = d.instance_id
+                WHERE
+                    d.plan_id = a.plan_id
+            ) AS device_id
+        FROM
+            `t_cfg_union_rule` a
+        LEFT JOIN t_cfg_device b ON a.input_param = b.device_id
+        LEFT JOIN t_cfg_mete c ON b.device_id = c.mete_id
+    </select>
+    <select id="selectAlarmThresholdModel" resultType="com.yjh.accesstcp.module.device.entity.TCruisePointInstanceMeteDetail">
+        SELECT
+            b.*,
+            a.instance_id
+        FROM
+            t_cruise_point_instance a
+                RIGHT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        WHERE
+            b.mete_kind != '' AND b.mete_kind IS NOT NULL
+    </select>
 </mapper>

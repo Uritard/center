@@ -135,7 +135,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
 
     @Override
     public String getCruise() {
-        return Constant.cruise();
+        return Constant.edgeCode();
     }
 
     @Override

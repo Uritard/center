@@ -293,12 +293,33 @@ public class SendToUpSystemServices {
                     }
                     break;
                 case "10":
-                    //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("source_file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //设备资源信息配置文件
+                        String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("source_file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("maintenance_file_path", maintenanceModelTargetPath);
+                    }
+                    list.add(map);
+                    break;
+                case "11":
+                    //联动配置文件
+                    String linkageModelTargetPath = stationCode + "/Model/linkage_model.xml";
+                    uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
+                    map.put("maintenance_file_path", linkageModelTargetPath);
+                    list.add(map);
+                    break;
+                case "12":
+                    //告警阈值模型
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.edgeCode()+ ".xml";
+                    uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
+                    map.put("alarm_threshold_file_path", alarmThresholdTargetPath);
                     list.add(map);
                     break;
                 case "1001":
@@ -418,12 +439,33 @@ public class SendToUpSystemServices {
                     }
                     break;
                 case "10":
-                    //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourceFilePath = stationCode + "/Model/source_file_model.cime";
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("file_path", maintenanceModelTargetPath);
+                    }
+                    list.add(map);
+                    break;
+                case "11":
+                    //联动配置文件
+                    String linkageModelTargetPath = stationCode + "/Model/linkage_model.xml";
+                    uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
+                    map.put("file_path", linkageModelTargetPath);
+                    list.add(map);
+                    break;
+                case "12":
+                    //告警阈值模型
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.edgeCode()+ ".xml";
+                    uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
+                    map.put("file_path", alarmThresholdTargetPath);
                     list.add(map);
                     break;
                 case "1001":
@@ -448,6 +490,23 @@ public class SendToUpSystemServices {
             log.error(e.getMessage(), e);
         }
     }
+
+    private String createAlarmThresholdModel(String path) throws Exception {
+        List<TCruisePointInstanceMeteDetail> meteDetails = sendToUpSystemDao.selectAlarmThresholdModel();
+        List<Map<String, Object>> list = new ArrayList<>();
+        return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.edgeCode() + ".xml", "Alarm_Threshold");
+    }
+
+    private String createLinkageModel(String path) throws Exception {
+        List<Map<String, Object>> list = sendToUpSystemDao.selectLinkageModel();
+        return CreateModeXMLUtil.createXmlFile(list, path, "linkage_model.xml", "Effect_Config");
+    }
+
+    private String createMaintenanceModel(String path) throws Exception {
+        List<Map<String, Object>> list = sendToUpSystemDao.selectMaintenanceModel(Constant.stationName(), Constant.stationCode());
+        return CreateModeXMLUtil.createXmlFile(list, path, "maintenance_model.xml", "Maintenance_Record");
+    }
+
 
     public String createRecordFile(String path) throws Exception {
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
