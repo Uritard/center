@@ -58,7 +58,11 @@ public enum IotHandlerEnum implements IHandlerEnum {
     /**
      * 告警确认
      */
-    REVIEW_WARN("64", "reviewWarn");
+    REVIEW_WARN("64", "reviewWarn"),
+    /**
+     * 标准点位模型下发
+     */
+    DEVICEMODEL_SEND("1104", "meteModelSend");
 
 
     IotHandlerEnum(String type, String desc) {
