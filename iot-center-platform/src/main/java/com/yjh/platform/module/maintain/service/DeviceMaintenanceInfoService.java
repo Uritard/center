@@ -19,7 +19,7 @@ public interface DeviceMaintenanceInfoService extends IService<DeviceMaintenance
      * @param deviceId 设备Id
      * @return
      */
-    Map<String, List<DeviceMaintenanceInfo>> selectLastTime(Long deviceId);
+    List<Map<String, Object>> selectLastTime(Long deviceId);
 
     List<AreaInfo> selectCruiseDeviceTree();
 

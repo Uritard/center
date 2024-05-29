@@ -12,9 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,14 +25,22 @@ public class DeviceMaintenanceInfoServiceImpl extends ServiceImpl<DeviceMaintena
         implements DeviceMaintenanceInfoService {
 
     @Override
-    public Map<String, List<DeviceMaintenanceInfo>> selectLastTime(Long deviceId) {
+    public List<Map<String, Object>> selectLastTime(Long deviceId) {
         QueryWrapper<DeviceMaintenanceInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("device_id", deviceId);
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc("start_time");
         List<DeviceMaintenanceInfo> deviceMaintenanceInfoList = super.list(queryWrapper);
-        DictConvertUtil.optional("cruiseDeviceType", "deviceType", "deviceTypeName")
+        DictConvertUtil.optional("cruiseDeviceType", "patroldeviceType", "patroldeviceTypeName")
                 .add("maintenanceType").covertToDict(deviceMaintenanceInfoList);
-        return deviceMaintenanceInfoList.stream().collect(Collectors.groupingBy(DeviceMaintenanceInfo::getMaintenanceTypeName));
+        Map<String, List<DeviceMaintenanceInfo>> map = deviceMaintenanceInfoList.stream().collect(Collectors.groupingBy(DeviceMaintenanceInfo::getMaintenanceTypeName));
+        List<Map<String, Object>> list = new ArrayList<>();
+        map.forEach((k,v) ->{
+            Map<String, Object> res =  new HashMap<>(2);
+            res.put("name", k);
+            res.put("value",v);
+            list.add(res);
+        });
+        return list;
     }
 
     @Override
