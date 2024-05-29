@@ -938,7 +938,7 @@ public class StatisticsService {
                     if (StringUtils.isNotBlank(label)) {
                         Map<String, Object> labelMap = new HashMap<>(2);
                         labelMap.put("totalNum", v.size());
-                        labelMap.put("validNum", v.stream().filter(t -> t.getIdentifyState() == 258).collect(Collectors.toList()).stream());
+                        labelMap.put("validNum", (int) v.stream().filter(t -> t.getIdentifyState() == 258).count());
                         Map<String, Object> res = dealCount(labelMap);
                         res.put("tag_type", label);
                         result.add(res);
