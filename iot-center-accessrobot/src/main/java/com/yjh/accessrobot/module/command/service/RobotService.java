@@ -3074,7 +3074,12 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
-            List<CameraModel> cameraModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, CameraModel.class)).collect(Collectors.toList());
+            //只解析相机的  录像机的在录像机报文中解析
+            List<CameraModel> cameraModelList = mapList.stream()
+                    .map(JSON::toJSONString)
+                    .map(jsonString -> JSON.parseObject(jsonString, CameraModel.class))
+                    .filter(t -> "10".equals(t.getType()))
+                    .collect(Collectors.toList());
             tCameraInfoService.saveReportData(cameraModelList,edgeCode);
             log.info("摄像机文件处理结束 edgeCode:{}", edgeCode);
         } catch (DocumentException e) {

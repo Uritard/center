@@ -57,12 +57,12 @@
         select
         <include refid="Base_Column_List" />
         from t_camera_info
-        where  camera_id = #{cameraId,jdbcType=BIGINT} 
+        where  camera_id = #{cameraId,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_camera_info
-        where  camera_id = #{cameraId,jdbcType=BIGINT} 
+        where  camera_id = #{cameraId,jdbcType=BIGINT}
     </delete>
     <insert id="insert" keyColumn="camera_id" keyProperty="cameraId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo" useGeneratedKeys="true">
         insert into t_camera_info
@@ -266,7 +266,7 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo">
         update t_camera_info
-        set 
+        set
             camera_name =  #{cameraName,jdbcType=VARCHAR},
             camera_model =  #{cameraModel,jdbcType=INTEGER},
             pms_id =  #{pmsId,jdbcType=VARCHAR},
@@ -299,33 +299,76 @@
             origin_id =  #{originId,jdbcType=VARCHAR},
             camera_channel_id =  #{cameraChannelId,jdbcType=VARCHAR},
             use_type =  #{useType,jdbcType=INTEGER}
-        where   camera_id = #{cameraId,jdbcType=BIGINT} 
+        where   camera_id = #{cameraId,jdbcType=BIGINT}
     </update>
     <select id="selectAll" resultType="com.yjh.accesstcp.module.device.entity.CameraModel">
         select
-        <include refid="Base_Column_List" />,
-        a.camera_name as patroldevice_name,
-        IFNULL(a.camera_channel_id, a.camera_id) as patroldevice_code,
-        b.dict_note as device_model,
-        c.dict_note as manufacturer,
-        a.unit as use_unit,
-        c.dict_note as device_source,
-        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
-        '' as production_code,
-        '' as istransport,
-        if(a.is_control = 1, '11', '10') as use_mode,
-        (CASE
-        WHEN a.camera_type = 205 THEN '1'
-        WHEN a.camera_type = 206 THEN '2'
-        end) as video_mode,
-        a.address as place,
-        '10' as type,
-        '' as patroldevice_info,
-        '' as robots_code,
-        '1' as edge
+            a.camera_id,a.camera_name,a.camera_model,
+            a.pms_id,a.alias_name,a.record_id,
+            a.up_region_id,a.channel_num,a.camera_num,
+            a.sms_id,a.rms_id,a.monitor_id,
+            a.vendor_id,a.stream_type,a.protocol_type,
+            a.url,a.camera_ip,a.port,
+            a.infread_port,a.camera_manager,a.camera_code,
+            a.camera_type,a.is_control,a.latitude,
+            a.longitude,a.address,a.unit,
+            a.create_time,a.commission_date,a.edge_code,
+            a.origin_id,a.camera_channel_id,a.use_type,
+            a.camera_name as patroldevice_name,
+            IFNULL(a.b_camera_channel_id, a.camera_id) as patroldevice_code,
+            b.dict_note as device_model,
+            c.dict_note as manufacturer,
+            a.unit as use_unit,
+            c.dict_note as device_source,
+            DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+            '' as production_code,
+            '' as istransport,
+            if(a.is_control = 1, '11', '10') as use_mode,
+            (CASE
+                 WHEN a.camera_type = 205 THEN '1'
+                 WHEN a.camera_type = 206 THEN '2'
+                end) as video_mode,
+            a.address as place,
+            '10' as type,
+            '' as patroldevice_info,
+            d.b_device_channel as mount_patroldevice_code,
+            '1' as edge
         from t_camera_info a
-        left join t_dict_business b on a.camera_model = b.dict_code
-        left join t_dict_business c on a.vendor_id = c.dict_code
+                 left join t_dict_business b on a.camera_model = b.dict_code
+                 left join t_dict_business c on a.vendor_id = c.dict_code
+                 LEFT JOIN t_camera_recorder d ON a.record_id = d.record_id
+        UNION ALL
+        select
+            '' AS camera_id,'' AS camera_name,'' AS camera_model,
+            '' AS pms_id,'' AS alias_name,'' AS record_id,
+            '' AS up_region_id,'' AS channel_num,'' AS camera_num,
+            '' AS sms_id,'' AS rms_id,'' AS monitor_id,
+            '' AS vendor_id,'' AS stream_type,'' AS protocol_type,
+            '' AS url,'' AS camera_ip,'' AS port,
+            '' AS infread_port,'' AS camera_manager,'' AS camera_code,
+            '' AS camera_type,'' AS is_control,'' AS latitude,
+            '' AS longitude,'' AS address,'' AS unit,
+            null AS create_time,null AS commission_date,'' AS edge_code,
+            '' AS origin_id,'' AS camera_channel_id,'' AS use_type,
+            a.record_name as patroldevice_name,
+            IFNULL(a.b_device_channel, a.record_id) as patroldevice_code,
+            b.dict_note as device_model,
+            c.dict_note as manufacturer,
+            a.unit as use_unit,
+            c.dict_note as device_source,
+            a.commission_date as production_date,
+            '' as production_code,
+            '' as istransport,
+            '' as use_mode,
+            '' as video_mode,
+            '' as place,
+            '11' as type,
+            '' as patroldevice_info,
+            '' as mount_patroldevice_code,
+            '1' as edge
+        from t_camera_recorder a
+                 left join t_dict_business b on a.recorder_model = b.dict_code
+                 left join t_dict_business c on a.vendor_id = c.dict_code
     </select>
 
 

@@ -29,5 +29,5 @@ public class CameraModel extends TCameraInfo {
     private String place;
     private String type;
     private String patroldeviceInfo;
-    private String robotsCode;
+    private String mountPatroldeviceCode;
 }

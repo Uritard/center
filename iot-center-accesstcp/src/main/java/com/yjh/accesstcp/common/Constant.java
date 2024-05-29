@@ -388,6 +388,20 @@ public class Constant {
     }
 
 
+    /**
+     * 使用标准点位下发任务
+     */
+    public static boolean standardPoints() {
+        boolean standardPoints;
+        try {
+            standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+            log.debug("standardPoints is {}", standardPoints);
+        } catch (Exception e) {
+            standardPoints = false;
+        }
+        return standardPoints;
+    }
+
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人
     public static final String ROBOT_TASK_ISSUE_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
