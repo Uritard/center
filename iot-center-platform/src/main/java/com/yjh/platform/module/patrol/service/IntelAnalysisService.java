@@ -426,7 +426,7 @@ public class IntelAnalysisService {
         }
         String flagId = response.getRequestId().split("#")[1];
         // 正常的巡视多了接口会阻塞，所以放在线程池
-        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666", "presetCheck"}, flagId)){
+        if (ArrayUtils.contains(new String[]{"jm", "yjsk", "666666"}, flagId) || StringUtils.endsWith(flagId, "presetCheck")) {
             picResAnalyse(response);
         }else {
             AlgorithmAnalyseThread analyseThread = new AlgorithmAnalyseThread(response, flagId);
