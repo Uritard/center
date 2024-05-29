@@ -19,6 +19,9 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 public class TCruisePointInstanceMeteDetail extends TCruisePointInstance{
 
+    @ApiModelProperty(value = "标注点位Id")
+    private String devicePointId;
+
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     private Integer meteKind;
 
@@ -100,4 +103,12 @@ public class TCruisePointInstanceMeteDetail extends TCruisePointInstance{
     @ApiModelProperty(value = "状态二描述")
     private String stateOne;
 
+    @ApiModelProperty(value = "告警级别")
+    private Integer alarmState;
+
+    @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
+    private Integer isTemdif;
+
+    @ApiModelProperty(value = "识别类型")
+    private String recognitionType;
 }

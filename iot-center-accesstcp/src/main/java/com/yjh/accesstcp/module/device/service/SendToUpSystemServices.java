@@ -492,9 +492,119 @@ public class SendToUpSystemServices {
     }
 
     private String createAlarmThresholdModel(String path) throws Exception {
-        List<TCruisePointInstanceMeteDetail> meteDetails = sendToUpSystemDao.selectAlarmThresholdModel();
         List<Map<String, Object>> list = new ArrayList<>();
+        List<TCruisePointInstanceMeteDetail> meteDetails = sendToUpSystemDao.selectAlarmThresholdModel();
+        meteDetails.forEach(t->{
+            String alarmType = recognitionTypeToAlarmType(t.getRecognitionType(), String.valueOf(t.getIsTemdif()));
+            String alarmDesc = "";
+            //遥信
+            if (t.getMeteKind() == 1 && t.getAlarmLevel() > 130) {
+                int alarmLevel = t.getAlarmLevel() == 131 ? 1 : t.getAlarmLevel() == 132 ? 2 : 3;
+                String alarmState = t.getAlarmState() == 0 ? t.getStateZero() : t.getStateOne();
+                alarmDesc = "告警级别：" + getAlarmLevel(alarmLevel) + ";告警状态：" + alarmState;
+                Map<String, Object> item = getAlarmMap(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
+                list.add(item);
+            }
+            //遥测
+            if (t.getMeteKind() == 2) {
+                if (t.getHighLimit2() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警上限：" + t.getHighLimit2();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit2(), 1, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit2() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警下限：" + t.getLowLimit2();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit2(), 1, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+                if (t.getHighLimit3() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警上限：" + t.getHighLimit3();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit3(), 2, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit3() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警下限：" + t.getLowLimit3();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit3(), 2, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+                if (t.getHighLimit4() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警上限：" + t.getHighLimit4();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit4(), 3, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit4() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警下限：" + t.getLowLimit4();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit4(), 3, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+            }
+        });
         return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.edgeCode() + ".xml", "Alarm_Threshold");
+    }
+
+    private String getAlarmLevel(int alarmLevel) {
+        switch (alarmLevel) {
+            case 2:
+                return "严重";
+            case 3:
+                return "危机";
+            default:
+                return "一般";
+        }
+    }
+
+    public static String recognitionTypeToAlarmType(String recognitionType,String isTemdif){
+        String alarmType = "";
+        switch (recognitionType){
+            case "1":
+            case "11":
+            case "12":
+            case "13":
+                //仪表越限报警
+                alarmType = "7";
+                break;
+            case "2":
+                //变位报警
+                alarmType = "10";
+                break;
+            case "3":
+                //外观异常
+                alarmType = "6";
+                break;
+            case "4":
+                if ("0".equals(isTemdif)) {
+                    //超温报警
+                    alarmType = "1";
+                } else {
+                    //温升报警
+                    alarmType = "2";
+                }
+                break;
+            case "5":
+                //声音异常
+                alarmType = "5";
+                break;
+            default:
+                break;
+        }
+        return alarmType;
+    }
+
+    public Map<String, Object> getAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                           Object value, Integer level, String alarmDesc, String alarmType) {
+        Map<String, Object> item = new HashMap<>(11);
+        item.put("device_id", detail.getInstanceId());
+        item.put("device_name", detail.getMeteName());
+        item.put("defect_type", "");
+        item.put("station_code", Constant.stationCode());
+        item.put("station_name", Constant.stationName());
+        item.put("decide_rule", rule);
+        item.put("decision_value_class", 1);
+        item.put("alarm_desc", alarmDesc);
+        item.put("alarm_type", alarmType);
+        item.put("base_line_value", value);
+        item.put("alarm_level", level);
+        return item;
     }
 
     private String createLinkageModel(String path) throws Exception {
@@ -554,7 +664,7 @@ public class SendToUpSystemServices {
 //        }
         String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
-        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(null, presetRealImgPath,presetImgPath);
+        List<Map<String, Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(), null, presetRealImgPath, presetImgPath);
         String stationName = getStationName();
         list.forEach(item->{
             item.put("station_code",stationCode);
@@ -588,7 +698,9 @@ public class SendToUpSystemServices {
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
             }
-            item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
+            if (!Constant.standardPoints()) {
+                item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
+            }
             item.remove("cruise_type");
             item.remove("camera_id");
             item.remove("preset_num");
@@ -1141,49 +1253,35 @@ public class SendToUpSystemServices {
 
     public String downloadFile(String type) throws Exception {
             String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-            List<Map<String, Object>> list = new ArrayList<>();
-            Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content") + "/" + stationCode + "/Model";
-            list.add(map);
             Map<String,String> mapForMapPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String mapAbsPath = mapForMapPath.get("content");
-            map.put("time", DateTimeUtil.getDateTimeString());
-            map.put("type", type);
             log.info("模型文件路径：" + path);
             switch (type) {
                 case "4":
                     //点位模型
-                    // map.put("device_file_path",createDeviceModel(path));
-                    String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
                     return createDeviceModel(path, stationCode);
                 case "1":
                     //巡视主机模型
-                    String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
                     return createHostModel(path, stationCode);
                 case "2":
                     //机器人模型
-                    String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
                     return createRobotModel(path);
                 case "3":
                     //摄像机模型
-                    String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
                     return createCameraModel(path);
                 case "5":
                     //无人机
-                    String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
                     return createDroneModel(path);
                 case "6":
                     //声纹模型
-                    String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
                     return createVoiceModel(path);
                 case "7":
                     //任务模型
-                    String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
                     return createTaskModel(path, stationCode);
                 case "8":
                     //检修区域模型
-                    String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
                     return createMaintenanceModel(path, stationCode);
                 case "9":
                     List<String> mapFileList = sendToUpSystemDao.selectMapPathAll();
@@ -1203,18 +1301,33 @@ public class SendToUpSystemServices {
                     ZipUtil.compressFiles(dirPath, zipName, ftpFilePathList);
                     return dirPath+zipName;
                 case "10":
-                    String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String fileName = "source_file_model.cime";
-                    List<String> fileList = new ArrayList<>();
-                    fileList.add(sourcePath+fileName);
-                    String sourceDirPath = mapAbsPath + "/Model/";
-                    String sourceZipName = "source_model.zip";
-                    File file = new File(sourcePath+fileName);
-                    if (!file.exists()){
-                        throw new BusinessException("设备资源文件不存在");
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String fileName = "source_file_model.cime";
+                        List<String> fileList = new ArrayList<>();
+                        fileList.add(sourcePath + fileName);
+                        String sourceDirPath = mapAbsPath + "/Model/";
+                        String sourceZipName = "source_model.zip";
+                        File file = new File(sourcePath + fileName);
+                        if (!file.exists()) {
+                            throw new BusinessException("设备资源文件不存在");
+                        }
+                        ZipUtil.compressFiles(sourceDirPath, sourceZipName, fileList);
+                        return sourceDirPath + sourceZipName;
+                    } else {
+                        //10:维护记录文件
+                        String sourceDirPath = createMaintenanceModel(path);
+                        File file = cn.hutool.core.util.ZipUtil.zip(sourceDirPath);
+                        sourceDirPath = file.getPath();
+                        return sourceDirPath;
                     }
-                    ZipUtil.compressFiles(sourceDirPath, sourceZipName, fileList);
-                    return sourceDirPath+sourceZipName;
+                case "11":
+                    //联动配置文件
+                    return createLinkageModel(path);
+                case "12":
+                    //告警阈值模型
+                    return createAlarmThresholdModel(path);
                 default:
                     break;
             }
