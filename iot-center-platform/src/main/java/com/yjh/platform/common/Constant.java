@@ -11,6 +11,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -295,6 +297,29 @@ public class Constant {
             log.error(e.getMessage(), e);
         }
         return result;
+    }
+
+    public static String httpPost(String url, String jsonParam) throws IOException {
+        HttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(jsonParam, StandardCharsets.UTF_8));
+        try {
+            HttpResponse response = client.execute(httpPost);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return "-1";
+    }
+    public static Boolean isWindows(){
+        String os = System.getProperty("os.name");
+        if(os.toLowerCase().startsWith("win")){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**

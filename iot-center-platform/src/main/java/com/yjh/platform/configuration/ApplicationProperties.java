@@ -172,6 +172,15 @@ public class ApplicationProperties {
         private String audioMqttUser;
         //声纹mqtt登录密码
         private String audioMqttPwd;
+        //请求采集声纹数据接口
+        private String voiceprintDataCollectUrl;
+        //请求声纹分析接口
+        private String voiceprintAnalyseUrl;
+        //请求声纹结果反馈ip地址
+        private String requestHostIp;
+        //请求声纹结果返回端口
+        private String requestHostPort;
+
     }
 
     @Data
@@ -261,7 +270,12 @@ public class ApplicationProperties {
                 .setAudioTcpByteOrderLittleEndianEnabled(ValueUtil.toBoolean(redisMap.get("audioTcpByteOrderLittleEndianEnabled"),false))
                 .setAudioMqttHost(redisMap.get("audioMqttHost"))
                 .setAudioMqttUser(redisMap.get("audioMqttUser"))
-                .setAudioMqttPwd(redisMap.get("audioMqttPwd"));
+                .setAudioMqttPwd(redisMap.get("audioMqttPwd"))
+                .setVoiceprintDataCollectUrl(redisMap.get("voiceprintDataCollectUrl"))
+                .setVoiceprintAnalyseUrl(redisMap.get("voiceprintAnalyseUrl"))
+                .setRequestHostIp(redisMap.get("requestHostIp"))
+                .setRequestHostPort(redisMap.get("requestHostPort"))
+        ;
         this.audioConfig = audioConfig;
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
