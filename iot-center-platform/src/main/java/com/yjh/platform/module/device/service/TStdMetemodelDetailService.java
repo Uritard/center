@@ -1,5 +1,7 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.CustomInfo;
 import com.yjh.platform.module.device.entity.MeteModelDetail;
@@ -8,8 +10,14 @@ import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 
 import java.beans.IntrospectionException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -57,12 +65,32 @@ public class TStdMetemodelDetailService{
     @Transactional(rollbackFor = Exception.class)
     public List<TStdMeteModelDetail> selectByPage(TStdMeteModelDetail tStdMeteModelDetail) {
         List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPage(tStdMeteModelDetail);
+        tStdMeteModelDetailList.forEach(item -> {
+            if (StringUtils.isNotEmpty(item.getLabelAttri())){
+                item.setLabelAttris(item.getLabelAttri().split(","));
+                item.setLabelAttriName(labelAttriName(item.getLabelAttri()));
+            }
+        });
         return tStdMeteModelDetailList;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int batchAdd(List<TStdMeteModelDetail> list) {
         return this.tStdMetemodelDetailDao.batchAdd(list);
+    }
+
+    public List<KeyValue<String, String>> labelAttriName(String labelAttri) {
+        String lableNames = DictConvertUtil.DICT.covertToDict("labelAttri", labelAttri);
+        if (StringUtils.isNotEmpty(lableNames)) {
+            List<KeyValue<String, String>> pairNames = new ArrayList<>();
+            String[] is = labelAttri.split(",");
+            String[] names = lableNames.split(",");
+            for (int i = 0; i < is.length; i++) {
+                pairNames.add(new DefaultKeyValue<>(names[i], CommonUtils.color(is[i])));
+            }
+            return pairNames;
+        }
+        return Collections.emptyList();
     }
 
 
