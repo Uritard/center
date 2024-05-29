@@ -55,6 +55,7 @@ public class TStdMetemodelDetailController {
     public Result add(@Validated @RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
+            tStdMeteModelDetail.setLabelAttri(String.join(",",tStdMeteModelDetail.getLabelAttris()));
             result.setData(tStdMetemodelDetailService.add(tStdMeteModelDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -89,7 +90,7 @@ public class TStdMetemodelDetailController {
     public Result update(@Validated @RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
-
+            tStdMeteModelDetail.setLabelAttri(String.join(",",tStdMeteModelDetail.getLabelAttris()));
             result.setData(tStdMetemodelDetailService.update(tStdMeteModelDetail));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -185,6 +186,7 @@ public class TStdMetemodelDetailController {
     public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            list.forEach(tStdMeteModelDetail -> tStdMeteModelDetail.setLabelAttri(String.join(",",tStdMeteModelDetail.getLabelAttris())));
             result.setData(tStdMetemodelDetailService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

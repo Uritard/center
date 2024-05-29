@@ -10,12 +10,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Digits;
@@ -185,4 +187,7 @@ public class TStdMete implements Serializable {
 
     @ApiModelProperty(value = "人工关注标签值集合")
     private List<String> labelAttris;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<KeyValue<String, String>> labelAttriName;
 }
