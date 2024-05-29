@@ -7,6 +7,7 @@ import com.yjh.imitator.common.Result;
 import com.yjh.imitator.config.VoiceProperties;
 import com.yjh.imitator.pojo.Analyse;
 import com.yjh.imitator.pojo.Collect;
+import com.yjh.imitator.pojo.VoiceProp;
 import com.yjh.imitator.pojo.VoiceRequest;
 import com.yjh.imitator.service.impl.VoiceHandleImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,40 +40,46 @@ public class VoiceController {
     @Operation(summary = "声纹数据采集")
     @PostMapping(value = "/voiceprintDataCollect")
     public Result voiceprintDataCollect(@RequestBody VoiceRequest<Collect> body) {
-
-        log.info("========= voiceprintDataCollect params: {}", body);
+        Result result;
+        log.info("========= voiceprintDataCollect params: {}", JsonUtil.toJson(body));
         boolean ret = voiceHandle.addCollect(body);
         if (ret) {
-            return Result.ofSuccess();
+            result = Result.ofSuccess();
         } else {
-            return Result.ofError(500);
+            result = Result.ofError(500);
         }
 
+        log.info("========= voiceprintDataCollect result: {}", JsonUtil.toJson(result));
+        return result;
     }
 
     @Operation(summary = "声纹数据分析")
     @PostMapping(value = "/voiceprintAnalyse")
     public Result voiceprintAnalyse(@RequestBody VoiceRequest<Analyse> body) {
-
-        log.info("========= voiceprintAnalyse params: {}", body);
+        Result result;
+        log.info("========= voiceprintAnalyse params: {}", JsonUtil.toJson(body));
         boolean ret = voiceHandle.addAnalyse(body);
         if (ret) {
-            return Result.ofSuccess();
+            result = Result.ofSuccess();
         } else {
-            return Result.ofError(500);
+            result = Result.ofError(500);
         }
+        log.info("========= voiceprintDataCollect result: {}", JsonUtil.toJson(result));
+        return result;
     }
 
     @Operation(summary = "声纹配置")
     @PostMapping(value = "/voiceProperties")
-    public String voiceProperties(@RequestBody Map<String, Object> body) {
+    public VoiceProp voiceProperties(@RequestBody VoiceProp body) {
 
-        log.info("========= voiceProperties params: {}", body);
+        log.info("========= voiceProperties params: {}", JsonUtil.toJson(body));
         try {
             BeanUtil.copyProperties(body, voiceProperties, CopyOptions.create(VoiceProperties.class, true));
+
+            BeanUtil.copyProperties(voiceProperties, body);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return voiceProperties.toString();
+        return body;
     }
 }
