@@ -34,9 +34,11 @@ public class TCruiseTriphaseRuleService {
         if(checkExist>0){
             throw new BusinessException("该非同源告警规则关联的巡视点已绑定其他非同源告警规则！");
         }else {
-            String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
-            if (!NumberUtils.isParsable(warnThreshold)) {
-                throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+            if (tCruiseTriphaseRule.getTriphaseType() != 3) {
+                String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
+                if (!NumberUtils.isParsable(warnThreshold)) {
+                    throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+                }
             }
             tCruiseTriphaseRule.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceOneId()));
             tCruiseTriphaseRule.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTwoId()));
