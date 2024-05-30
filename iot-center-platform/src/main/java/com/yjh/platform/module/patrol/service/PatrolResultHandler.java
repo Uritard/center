@@ -1127,7 +1127,7 @@ public class PatrolResultHandler {
             // 缺陷信息存redis
             redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
             StringBuilder retVal = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
-            Map<String, String> defectMap = getDefectMap(resultImage, retVal.toString(), cruiseResultMap, tStdDevicemete, res.getResultDesc());
+            Map<String, String> defectMap = getDefectMap(resultImage, val, retVal.toString(), cruiseResultMap, tStdDevicemete, res.getResultDesc());
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
             processResultToUpSystem.addDefect(msgId, defectMap);
@@ -1258,13 +1258,13 @@ public class PatrolResultHandler {
      * @param tStdDevicemete  测点信息
      * @return Map<String, String>
      */
-    private Map<String, String> getDefectMap(String resultImage, String resultValueItem,
+    private Map<String, String> getDefectMap(String resultImage, String val, String resultValueItem,
                                              Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
                                              String resultValue) {
         log.info("resultImage:{},resultValue:{},resultValueItem:{}", resultImage, resultValue, resultValueItem);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
-            TAlgorithmInfo defect = analyseDataOperateService.getAlgorithmDefectInfo(resultValueItem);
+            TAlgorithmInfo defect = analyseDataOperateService.getAlgorithmDefectInfo(val);
             defectMap.put("defectType", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectType).orElse(450).toString());
             defectMap.put("defectModel", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectType).orElse(450).toString());
             defectMap.put("defectLevel", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectLevel).orElse(131).toString());

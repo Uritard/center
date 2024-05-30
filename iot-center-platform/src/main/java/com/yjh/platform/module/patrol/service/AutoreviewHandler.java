@@ -21,12 +21,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * <功能描述>
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 public class AutoreviewHandler {
     private final TCfgAutoreviewMapper autoreviewMapper;
     private final TAlgorithmInfoService algorithmInfoService;
+    private final RedisTemplate redisTemplate;
 
     public static final String AUTOREVIEW_TYPE_CRUISE = "1";
     public static final String AUTOREVIEW_TYPE_ALARM = "2";
@@ -81,9 +84,9 @@ public class AutoreviewHandler {
 
     public void autoreviewCheckResult(List<Map<String, String>> cruiseResultList) {
         // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
-        for (Map<String, String> cruiseResult:cruiseResultList) {
+        for (Map<String, String> cruiseResult : cruiseResultList) {
             Map<Integer, String[]> metes = new HashMap<>();
-            if (MapUtils.getIntValue(cruiseResult,"cruiseResult") != CruiseConstant.CRUISE_RESULT_NORMAL) {
+            if (MapUtils.getIntValue(cruiseResult, "cruiseResult") != CruiseConstant.CRUISE_RESULT_NORMAL) {
                 if (Constant.logUpLv3()) {
                     log.info("结果异常，不进行无需审核判断");
                 }
@@ -91,7 +94,7 @@ public class AutoreviewHandler {
             }
             String resultDesc = cruiseResult.getOrDefault("resultDesc", "");
             List<String> defectType = new ArrayList<>();
-            for (String defect:StringUtils.split(resultDesc)) {
+            for (String defect : StringUtils.split(resultDesc)) {
                 TAlgorithmInfo defectInfo = algorithmInfoService.getAlgorithmInfo(defect);
                 if (defectInfo != null && defectInfo.getDefectType() != null) {
                     defectType.add(String.valueOf(defectInfo.getDefectType()));
@@ -102,13 +105,15 @@ public class AutoreviewHandler {
                 metes.put(1, defectType.toArray(defectType.toArray(new String[0])));
             }
 
-            metes.put(3, new String[]{cruiseResult.getOrDefault("deviceType", "")});
-            metes.put(4, new String[]{cruiseResult.getOrDefault("deviceId", "")});
-            metes.put(5, new String[]{cruiseResult.getOrDefault("deviceMeteId", "")});
+            metes.put(3, new String[] {cruiseResult.getOrDefault("deviceType", "")});
+            metes.put(4, new String[] {cruiseResult.getOrDefault("deviceId", "")});
+            metes.put(5, new String[] {cruiseResult.getOrDefault("deviceMeteId", "")});
             metes.put(6, StringUtils.split(cruiseResult.getOrDefault("labelAttri", ""), ","));
 
             if (autoreviewCheck(metes, AUTOREVIEW_TYPE_CRUISE)) {
+                String redisKeyName = PATROL_TASK_PREFIX + cruiseResult.get("taskId") + ":" + cruiseResult.get("instanceId");
                 cruiseResult.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
+                redisTemplate.opsForHash().put(redisKeyName, "evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
             }
         }
 
@@ -123,12 +128,12 @@ public class AutoreviewHandler {
 
         // 告警类型
         if (warnInfo.getAlarmType() != null && warnInfo.getAlarmType() > 0) {
-            metes.put(2, new String[]{String.valueOf(warnInfo.getAlarmType())});
+            metes.put(2, new String[] {String.valueOf(warnInfo.getAlarmType())});
         }
 
-        metes.put(3, new String[]{warnInfo.getDeviceType()});
-        metes.put(4, new String[]{String.valueOf(warnInfo.getDeviceId())});
-        metes.put(5, new String[]{String.valueOf(warnInfo.getStdMeteId())});
+        metes.put(3, new String[] {warnInfo.getDeviceType()});
+        metes.put(4, new String[] {String.valueOf(warnInfo.getDeviceId())});
+        metes.put(5, new String[] {String.valueOf(warnInfo.getStdMeteId())});
         metes.put(6, StringUtils.split(warnInfo.getLabelAttri(), ","));
 
         if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
@@ -150,12 +155,12 @@ public class AutoreviewHandler {
 
         // 缺陷类型
         if (tDefectInfo.getDefectType() != null && tDefectInfo.getDefectType() > 0) {
-            metes.put(1, new String[]{String.valueOf(tDefectInfo.getDefectType())});
+            metes.put(1, new String[] {String.valueOf(tDefectInfo.getDefectType())});
         }
 
-        metes.put(3, new String[]{tDefectInfo.getDeviceType()});
-        metes.put(4, new String[]{String.valueOf(tDefectInfo.getDeviceId())});
-        metes.put(5, new String[]{String.valueOf(tDefectInfo.getStdMeteId())});
+        metes.put(3, new String[] {tDefectInfo.getDeviceType()});
+        metes.put(4, new String[] {String.valueOf(tDefectInfo.getDeviceId())});
+        metes.put(5, new String[] {String.valueOf(tDefectInfo.getStdMeteId())});
         metes.put(6, StringUtils.split(tDefectInfo.getLabelAttri(), ","));
 
         if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
