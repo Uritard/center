@@ -138,6 +138,7 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.3.0</version>
+            <scope>provided</scope>
         </dependency>
         <!--自定义velocity格式模版需要-->
         <!--<dependency>
@@ -150,6 +151,7 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.27-incubating</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--fastjson-->
@@ -278,7 +280,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!-- The configuration of the plugin -->
                 <configuration>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <!-- Specifies the configuration file of the assembly plugin -->
                     <descriptors>
                         <descriptor>${project.basedir}/package.xml</descriptor>

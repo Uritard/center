@@ -110,10 +110,10 @@ public class TCruiseTaskDelController {
     @Logs(title = "查询周期任务删除记录",content = "根据用户传递的参数查询周期任务删除记录信息",logType = 1)
     public Result select(@RequestParam(value = "taskId", required = false) String taskId,
                          @RequestParam(value = "delTime", required = false) Date delTime,
-                         @RequestParam(value = "createTime", required = false) Date createTime) {
+                         @RequestParam(value = "endTime", required = false) Date endTime) {
         Result result = new Result();
         try {
-            List<TCruiseTaskDel> list = tCruiseTaskDelService.select(taskId, delTime, createTime);
+            List<TCruiseTaskDel> list = tCruiseTaskDelService.select(taskId, delTime, endTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

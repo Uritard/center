@@ -66,9 +66,11 @@ public class TaskSendHandler implements MessageHandlerStrategy<XMLBaseModel>, In
                     if ("0".equals(tCruiseTaskAdd.getIsenable())) {
                         re = Constant.otherServer(map, Constant.TASK_ISSUE_URL);
                     } else {
-                        Map<String, Object> param = new HashMap<>(2);
+                        Map<String, Object> param = new HashMap<>(8);
                         param.put("taskId", tCruiseTaskAdd.getTaskId());
-                        param.put("startTime", getInvalidTime(tCruiseTaskAdd.getInvalidStartTime(), tCruiseTaskAdd.getInvalidEndTime()));
+                        param.put("startTime", tCruiseTaskAdd.getInvalidStartTime());
+                        param.put("endTime", tCruiseTaskAdd.getInvalidEndTime());
+                        param.put("type", tCruiseTaskAdd.getIsenable());
                         param.put("source", "");
                         re = Constant.otherServerPost(param, Constant.TASK_DELETE_URL);
                     }

@@ -148,7 +148,7 @@ public class Constant {
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     //任务删除
-    public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&source={source}";
+    public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&endTime={endTime}&type={type}&source={source}";
     public static final String IOT_DEVICE_UPLOAD_URL = "http://iot-center-platform//tStdDevice/v1/uploadModel?type={type}";
     public static final String GET_WVP_SERVER_CONFIG = "http://iot-center-platform/camera/v1/getServerConfig";
     public static  XMLBaseModel weatherXmlModel = null;

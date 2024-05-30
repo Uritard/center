@@ -26,6 +26,7 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
@@ -242,7 +243,7 @@ public class UPatrolResultService {
             uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
         //更新测点信息
         TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate().setDeviceMeteId(afterManualReviewInfo.getDeviceMeteId())
-            .setIdentifyResult(Integer.valueOf(cruiseManualReview.getPersonCheck())).setUpdateTime(cruiseManualReview.getCheckDate());
+            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(cruiseManualReview.getCruiseTime());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
@@ -290,13 +291,18 @@ public class UPatrolResultService {
         int checkedSize = 0;
         Date lastDate = null;
         for (CruiseManualReview cmr : cruiseManualReviewList) {
-            if (cmr.getEvaluationState() == 256 || cmr.getEvaluationState() == 260) {
-                haS1.add(cmr.getCheckUser());
+            if (cmr.getEvaluationState() == CruiseConstant.EVALUATION_STATE_DONE || cmr.getEvaluationState() == CruiseConstant.EVALUATION_STATE_IGNORE) {
+                if (!CommonUtils.isEmptyOrNullstr(cmr.getCheckUser())) {
+                    haS1.add(cmr.getCheckUser());
+                }
                 checkedSize++;
                 if (lastDate == null || (cmr.getCheckDate() != null && cmr.getCheckDate().after(lastDate))) {
                     lastDate = cmr.getCheckDate();
                 }
             }
+        }
+        if (lastDate == null) {
+            lastDate = new Date();
         }
         String checkUserName = StringUtils.join(haS1, ",");
 
@@ -537,7 +543,7 @@ public class UPatrolResultService {
         return map;
     }
 
-    public int manualReviewTask(String taskId, String userId, String token, HttpServletRequest request) {
+    public int manualReviewTask(String taskId, String remark, String userId, String token, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
@@ -552,10 +558,12 @@ public class UPatrolResultService {
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
         for (CruiseManualReview cmr : reviewList) {
-            haS1.add(cmr.getCheckUser());
+            if (!CommonUtils.isEmptyOrNullstr(cmr.getCheckUser())) {
+                haS1.add(cmr.getCheckUser());
+            }
         }
         String checkUserName = StringUtils.join(haS1, ",");
-        int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, "1");
+        int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, remark);
 
         uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
         tStdDeviceDao.updateByTask(taskId);

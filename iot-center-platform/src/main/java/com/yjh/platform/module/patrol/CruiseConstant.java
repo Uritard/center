@@ -134,7 +134,7 @@ public interface CruiseConstant {
     /**
      * 审核状态，无需审核
      */
-    int EVALUATION_STATE_IGNORE = 257;
+    int EVALUATION_STATE_IGNORE = 338;
 
     /**
      * 审核结果正常

@@ -176,13 +176,12 @@ public class UPatrolTaskController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
-    public Result delete(HttpServletRequest request,
-                         @RequestParam(value = "taskId", required = true) String taskId,
+    public Result delete(HttpServletRequest request, @RequestParam(value = "taskId") String taskId,
         @RequestParam(value = "startTime", required = false) String startTime,
         @RequestParam(value = "source", required = false) String source) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime,source,request));
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId, startTime, null, source, 1, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);
@@ -196,12 +195,14 @@ public class UPatrolTaskController {
     @ApiOperation(value = "上级系统删除")
     @RequestMapping(value = "/upSystemDelete", method = RequestMethod.GET)
     public Result upSystemDelete(HttpServletRequest request,
-                         @RequestParam(value = "taskId", required = true) String taskId,
+                         @RequestParam(value = "taskId") String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime,
-                         @RequestParam(value = "source", required = false) String source) {
+                         @RequestParam(value = "type", defaultValue = "1") int type,
+                         @RequestParam(value = "endTime", required = false) String endTime) {
         Result result = new Result();
         try {
-            result = this.delete(request,taskId,startTime,source);
+            String source = 2 == type ? "-999" : "";
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId, startTime, endTime, source, type, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("上级系统删除任务异常:", e);

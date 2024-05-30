@@ -972,7 +972,8 @@
         d.end_time as cruiseEndTime,
         d.check_user as reviewer,
         d.weather as envInfo,
-        d.check_date as reviewTime
+        d.check_date as reviewTime,
+        d.remark as cruiseConclusion
         from
         u_patrol_result d
         WHERE 1 = 1
