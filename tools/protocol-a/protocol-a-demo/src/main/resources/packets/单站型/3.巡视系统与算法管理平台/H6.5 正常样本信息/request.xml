@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CloudHost>
+<SendCode>Client01</SendCode>
+<ReceiveCode>Server01</ReceiveCode>
+<Type>68</Type>
+<Code>Station01</Code>
+<Command/>
+<Time>2024-01-01 12:00:00</Time>
+<Items>
+<Item province_name="江苏" city_name="南京" section_id="01" section_name="区域01" volt_level="500" station_name="500kV XX 变电站" bay_name="1#主变" main_device_name="110kV侧C相避雷器" device_name="泄漏电流表" time="2024-01-01 12:00:00" pic_width="1920" pic_height="1080" pic_raw="南京/XX 区域/500kVXX桥变电站/正常/202110/20211017_093640_1#主变_110kV侧C相避雷器_泄漏电流表_原图.jpg" />
+</Items>
+</CloudHost>

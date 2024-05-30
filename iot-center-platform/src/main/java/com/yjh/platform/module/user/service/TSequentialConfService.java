@@ -314,9 +314,6 @@ public class TSequentialConfService {
     }
 
     public void sequentialRecHandler(Map<String, Object> param, String meteId, List<Map<String, Object>> list) {
-        if (!applicationProperties.getUpSystemFtps().isEnable()) {
-            return;
-        }
         String edgeLevel = Constant.getLevelEdge();
         //边缘节点:发送结果到区域巡视主机   巡视主机:发给算法进行分析
         if ("1".equals(edgeLevel)) {
@@ -327,14 +324,6 @@ public class TSequentialConfService {
             filePathMap.put("filePath", filePath);
             filePathMap.put("targetPath", stationId + "/" + "videoFile" + "/" + fileName);
             Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
-           /* String videoName = String.valueOf(param.get("fileName"));
-            String videoFilePath = String.valueOf(param.get("voicePath"));
-            log.info("视频文件: {} {}", videoName, videoFilePath);
-            if (StringUtils.isNotEmpty(videoName)) {
-                filePathMap.put("filePath", videoFilePath);
-                filePathMap.put("targetPath", "VideoFile" + "/" + videoName);
-                Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
-            }*/
             //上送视频文件结果
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             List<Map<String, Object>> xmlItems = new ArrayList<>();

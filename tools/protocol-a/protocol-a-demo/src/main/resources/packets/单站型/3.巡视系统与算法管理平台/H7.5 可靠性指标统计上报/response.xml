@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CloudHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Cloud01</ReceiveCode>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Command>3</Command>
+    <Time>2024-05-29 15:46:38</Time>
+    <Items/>
+</CloudHost>
