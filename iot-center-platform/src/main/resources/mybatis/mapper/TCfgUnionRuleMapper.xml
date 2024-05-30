@@ -62,11 +62,11 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCfgUnionRule">
         update t_cfg_union_rule a <set>
         <if test="ruleId != null">a.rule_id = #{ruleId},</if>
-        <if test="planId != null ">a.plan_id = #{planId},</if>
+        a.plan_id = #{planId},
         <if test="ruleName != null ">a.rule_name = #{ruleName},</if>
         <if test="ruleType != null ">a.rule_type = #{ruleType},</if>
         <if test="ruleContent != null ">a.rule_content = #{ruleContent},</if>
-        <if test="ruleDelay != null">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
+        a.rule_delay = #{ruleDelay, jdbcType=INTEGER},
         <if test="description != null ">a.description = #{description},</if>
         <if test="inputParam != null ">a.input_param = #{inputParam},</if>
         a.update_time =CURRENT_TIMESTAMP(),
