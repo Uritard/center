@@ -630,7 +630,7 @@
         low_limit2,
         low_limit3,
         low_limit4,
-        custom_name,edge_code FROM (
+        custom_name,edge_code,label_attri FROM (
         ( SELECT
         a.warn_id,
         a.instance_id,

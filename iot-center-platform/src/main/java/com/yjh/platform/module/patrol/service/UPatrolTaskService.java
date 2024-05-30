@@ -1200,8 +1200,10 @@ public class UPatrolTaskService {
                 return "";
             }
 
+            boolean invalidTaskToRobot = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:invalidTaskToRobot", "content"));
+            boolean notSendRobot = !enable && !"-1".equals(invalidTime) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType() && !invalidTaskToRobot;
             //周期任务 删除单个时间节点的任务不给机器人下发命令 目前机器人都不支持单个任务的删除
-            if (!enable && !"-1".equals(invalidTime) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
+            if (notSendRobot) {
                 log.info("周期任务删除单个时间节点的任务不给机器人下发命令！");
                 return "";
             }
@@ -1737,7 +1739,7 @@ public class UPatrolTaskService {
         //巡视系统需要下发，来源为上级系统的删除需要在上级系统下发
         List<UPatrolTaskAttr> uPatrolPlanAttrList = uPatrolTaskAttrDao.selectByTaskId(taskCode);
 
-        String isenable = "0";
+        String isenable = "1";
         if ("-999".equals(source)) {
             startTime = "-1";
             isenable = "2";
@@ -2876,7 +2878,7 @@ public class UPatrolTaskService {
                     if (listDel.size() > 0) {
                         for (TCruiseTaskDel tCruiseTaskDel : listDel) {
                             long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
-                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getDelTime()).map(Date::getTime).orElse(0L);
+                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getEndTime()).map(Date::getTime).orElse(0L);
                             boolean isDel =
                                 StringUtils.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && (taskEndTime == 0 ?
                                     taskDelTime == taskTime : taskTime >= taskDelTime && taskTime <= taskEndTime);
@@ -3142,7 +3144,7 @@ public class UPatrolTaskService {
                     if (listDel.size() > 0) {
                         for (TCruiseTaskDel tCruiseTaskDel : listDel) {
                             long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
-                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getDelTime()).map(Date::getTime).orElse(0L);
+                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getEndTime()).map(Date::getTime).orElse(0L);
                             boolean isDel =
                                 StringUtils.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && (taskEndTime == 0 ?
                                     taskDelTime == taskTime : taskTime >= taskDelTime && taskTime <= taskEndTime);

@@ -4,7 +4,9 @@
 
 package com.yjh.platform.module.patrol.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.commons.DateUtils;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.devicemete.dao.TCfgAutoreviewMapper;
 import com.yjh.platform.module.devicemete.entity.TCfgAutoreview;
 import com.yjh.platform.module.devicemete.entity.TCfgAutoreviewDetail;
@@ -82,6 +84,9 @@ public class AutoreviewHandler {
         for (Map<String, String> cruiseResult:cruiseResultList) {
             Map<Integer, String[]> metes = new HashMap<>();
             if (MapUtils.getIntValue(cruiseResult,"cruiseResult") != CruiseConstant.CRUISE_RESULT_NORMAL) {
+                if (Constant.logUpLv3()) {
+                    log.info("结果异常，不进行无需审核判断");
+                }
                 continue;
             }
             String resultDesc = cruiseResult.getOrDefault("resultDesc", "");
@@ -164,6 +169,9 @@ public class AutoreviewHandler {
     }
 
     private boolean autoreviewCheck(Map<Integer, String[]> metes, String autoreviewType) {
+        if (Constant.logUpLv3()) {
+            log.info("自动审核判断: {} -- {}", JSON.toJSONString(metes), autoreviewType);
+        }
         List<Map<Integer, Set<String>>> reviewList = loadAutoreviewList(autoreviewType);
         boolean flag = false;
         for (Map<Integer, Set<String>> review : reviewList) {
@@ -177,6 +185,9 @@ public class AutoreviewHandler {
                 }
             }
             if (flag) {
+                if (Constant.logUpLv3()) {
+                    log.info("自动审核命中: {} -- {}", JSON.toJSONString(review), autoreviewType);
+                }
                 return flag;
             }
         }

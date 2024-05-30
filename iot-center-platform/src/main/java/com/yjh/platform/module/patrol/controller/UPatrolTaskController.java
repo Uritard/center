@@ -201,7 +201,7 @@ public class UPatrolTaskController {
                          @RequestParam(value = "endTime", required = false) String endTime) {
         Result result = new Result();
         try {
-            String source = "2".equals(type) ? "-999" : "";
+            String source = 2 == type ? "-999" : "";
             result.setData(uPatrolTaskService.deleteByPrimaryId(taskId, startTime, endTime, source, type, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());

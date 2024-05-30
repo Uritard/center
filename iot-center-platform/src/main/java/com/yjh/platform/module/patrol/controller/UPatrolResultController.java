@@ -286,12 +286,12 @@ public class UPatrolResultController {
     @ApiOperation(value = "一键审核--任务下的所有巡视点")
     @GetMapping(value = "/manualReviewTask")
     @Logs(title = "审核任务",content = "一键审核",logType = 5, authority = "1235")
-    public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
+    public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId, @RequestParam(value = "remark") String remark, HttpServletRequest request){
         String userId = request.getHeader("userId");
         String token = request.getHeader("token");
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,token,request));
+            result.setData(uPatrolResultService.manualReviewTask(taskResultId, remark, userId, token, request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);
