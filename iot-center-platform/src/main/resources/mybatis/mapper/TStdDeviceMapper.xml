@@ -913,7 +913,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		b.device_name AS label,
 		b.up_region_id AS upId,
 		d.region_name AS upName,
-		"device" AS infoType
+		"device" AS infoType,
+		b.device_type AS deviceTypeId
 		FROM
 		t_std_device b
 		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CloudHost>
+<SendCode>Client01</SendCode>
+<ReceiveCode>Server01</ReceiveCode>
+<Type>318</Type>
+<Code>Station01</Code>
+<Command/>
+<Time>2024-01-01 12:00:00</Time>
+<Items>
+<Item commission_time="2023-01-01 00:00:00" report_time="2024-01-01 12:00:00" type="1" total_num="100" valid_num="95" percent="95%" />
+<Item commission_time="2023-01-01 00:00:00" report_time="2024-01-01 12:00:00" type="2" total_num="100" valid_num="95" percent="95%" tag_type="sly_bjbmyw" />
+</Items>
+</CloudHost>
