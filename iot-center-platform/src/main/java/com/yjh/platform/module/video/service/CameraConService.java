@@ -76,6 +76,8 @@ public class CameraConService {
     public void isCameraControlled(Long cameraId) {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
         log.info("camreaStatusMap: {}, camreaStatusMapState: {}", camreaStatusMap, camreaStatusMap.get("state"));
+        Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
+
         if (Objects.nonNull(camreaStatusMap.get("state"))) {
             int state = MapUtils.getIntValue(camreaStatusMap, "state");
             if (1 == state) {
@@ -83,7 +85,7 @@ public class CameraConService {
                     //判断时间问题
                     String lastTime = MapUtils.getString(camreaStatusMap, "lastTime");
                     Date endDate = DateTimeUtil.parse(lastTime);
-                    if (System.currentTimeMillis() - endDate.getTime() > 10 * 60 * 1000) {
+                    if (System.currentTimeMillis() - endDate.getTime() > cameraStateTime * 60 * 1000) {
                         //最后一次操控时间距离现在大于10分钟
                         camreaStatusMap.put("state", "0");
                         redisTemplate.opsForHash().putAll("camera_info", camreaStatusMap);

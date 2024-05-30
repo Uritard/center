@@ -1513,6 +1513,7 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'selfDefinedExtensions', '是否启用自定义协议扩展', 'true', '用于内部系统对接，定义了额外的消息类型', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'missedPointRetry', '是否开启遗漏点位重试', 'false', '此参数用于遗漏点位重试,用于巡视任务对遗漏点位的重新巡视', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'upSystemAlgorithmReceiveCode', '上级系统-上级系统算法平台唯一标识', 'Cloud01', '上级系统算法平台唯一标识', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请输入字母或数字\"}');
+INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'cameraStateTime', '检查相机不可控时间', '10', '单位：分钟；控制相机时，检查最后操作的时间，大于这个时间变为可控', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
 
 -- ----------------------------
 -- Records of t_version
