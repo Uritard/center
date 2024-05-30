@@ -20,7 +20,7 @@ public interface TCruiseTaskDelDao {
     TCruiseTaskDel selectByPrimaryId(@Param(value = "taskId") String taskId);
     List<TCruiseTaskDel> select(@Param(value = "taskId") String taskId,
                                 @Param(value = "delTime") Date delTime,
-                                @Param(value = "createTime") Date createTime);
+                                @Param(value = "endTime") Date endTime);
     List<TCruiseTaskDel> selectByPage(TCruiseTaskDel tCruiseTaskDel);
 
     int batchInsert(List<TCruiseTaskDel> list);

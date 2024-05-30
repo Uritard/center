@@ -41,8 +41,8 @@ public class TCruiseTaskDelService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTaskDel> select(String taskId, Date delTime, Date createTime) {
-        List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, delTime, createTime);
+    public List<TCruiseTaskDel> select(String taskId, Date delTime, Date endTime) {
+        List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, delTime, endTime);
         return tCruiseTaskDelList;
     }
 

@@ -1119,12 +1119,13 @@ public class UPatrolTaskService {
      */
     private String taskToEdgeOrDevice(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd,
         List<TCruisePointInstanceNameDetail> detailList){
-        return taskToEdgeOrDevice(task, tCruiseTaskAdd, detailList, null, true);
+        return taskToEdgeOrDevice(task, tCruiseTaskAdd, detailList, null, null, "0");
     }
 
     private String taskToEdgeOrDevice(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd,
-                                      List<TCruisePointInstanceNameDetail> detailList, String invalidTime, boolean isenable) {
+                                      List<TCruisePointInstanceNameDetail> detailList, String invalidTime, String endTime, String isenable) {
         try {
+            boolean enable = "0".equals(isenable);
             List<TCruisePointInstanceNameDetail> edgeDetailList = detailList.stream()
                     .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
                     .collect(Collectors.toList());
@@ -1153,9 +1154,9 @@ public class UPatrolTaskService {
                         taskInfo.setIfRun(ifFun);
                         taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
                         taskInfo.setEdgeCode(edgeCode);
-                        taskInfo.setIsenable(isenable ? "0" : "1");
-                        if (!isenable) {
-                            packageTaskInvalidTime(taskInfo, task, invalidTime);
+                        taskInfo.setIsenable(isenable);
+                        if (!enable) {
+                            packageTaskInvalidTime(taskInfo, task, invalidTime, endTime);
                         } else {
                             packageTaskProtocolInfo(tCruiseTaskAdd, format, taskInfo, ifFun);
                         }
@@ -1174,7 +1175,7 @@ public class UPatrolTaskService {
 
             // 查询检修区域
             Set<Long> finalOverhaul = new HashSet<>();
-            if (isenable) {
+            if (enable) {
                 List<String> overhaulList = tCruisePointInstanceDao.selectTimeIsIn(new Date());
                 overhaulList.forEach(s -> finalOverhaul.add(NumberUtils.toLong(s)));
             }
@@ -1200,7 +1201,7 @@ public class UPatrolTaskService {
             }
 
             //周期任务 删除单个时间节点的任务不给机器人下发命令 目前机器人都不支持单个任务的删除
-            if (!isenable && !"-1".equals(invalidTime) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
+            if (!enable && !"-1".equals(invalidTime) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
                 log.info("周期任务删除单个时间节点的任务不给机器人下发命令！");
                 return "";
             }
@@ -1232,9 +1233,9 @@ public class UPatrolTaskService {
                     robotTaskInfo.setRobotCode(item);
                     robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
                     robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
-                    robotTaskInfo.setIsenable(isenable ? "0" : "1");
-                    if (!isenable) {
-                        packageTaskInvalidTime(robotTaskInfo, task, invalidTime);
+                    robotTaskInfo.setIsenable(isenable);
+                    if (!enable) {
+                        packageTaskInvalidTime(robotTaskInfo, task, invalidTime, endTime);
                     } else {
                         // 根据任务信息及协议组装任务信息
                         packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
@@ -1475,13 +1476,13 @@ public class UPatrolTaskService {
         }
     }
 
-    private void packageTaskInvalidTime(RobotTaskInstanceInfo taskInfo, UPatrolTask task, String invalidTime) {
-        if (StringUtils.isEmpty(invalidTime) || "-1".equals(invalidTime)) {
-            taskInfo.setInvalidStartTime(format.format(task.getStartTime()));
-            taskInfo.setInvalidEndTime(format.format(task.getEndTime()));
+    private void packageTaskInvalidTime(RobotTaskInstanceInfo taskInfo, UPatrolTask task, String invalidTime, String endTime) {
+        if ("-1".equals(invalidTime)) {
+            taskInfo.setInvalidStartTime(DateTimeUtil.format(task.getStartTime()));
+            taskInfo.setInvalidEndTime(DateTimeUtil.format(task.getEndTime()));
         } else {
             taskInfo.setInvalidStartTime(invalidTime);
-            taskInfo.setInvalidEndTime(invalidTime);
+            taskInfo.setInvalidEndTime(endTime);
         }
     }
 
@@ -1644,39 +1645,53 @@ public class UPatrolTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(String taskId, String startTime,String source,HttpServletRequest request) {
+    public int deleteByPrimaryId(String taskId, String startTime, String endTime, String source, int type, HttpServletRequest request) {
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
         String taskCode = task.getTaskCode();
         if (Optional.ofNullable(request).isPresent() && Objects.nonNull(request.getHeader("userId"))) {
             logsRecord.LogsSend(request, "4", "删除任务", "删除任务-" + task.getTaskName());
         }
+        UPatrolTask taskInit = uPatrolTaskDao.selectTaskByTaskCode(taskCode);
         if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
-            if (!"-1".equals(startTime)) {
+            // source=-999 表示 isenable=2 删除任务
+            boolean delAll = "-1".equals(startTime) || "-999".equals(source);
+            if (!delAll) {
+                Date taskDate;
+                Date endDate;
+                if (StringUtils.isAllEmpty(startTime, endTime)) {
+                    taskDate = taskInit.getStartTime();
+                    startTime = DateTimeUtil.format(taskDate);
+                    endDate = taskInit.getEndTime();
+                    endTime = DateTimeUtil.format(endDate);
+                } else {
+                    if (StringUtils.isNotEmpty(startTime)) {
+                        taskDate = DateTimeUtil.parse(startTime);
+                    } else {
+                        taskDate = new Date();
+                    }
+                    if (StringUtils.isNotEmpty(endTime)) {
+                        endDate = DateTimeUtil.parse(endTime);
+                    } else {
+                        endDate = taskDate;
+                    }
+                }
+
                 TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
                 tCruiseTaskDel.setTaskId(taskId);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
-                try {
-                    Date taskDate = simpleDateFormat.parse(startTime);
-                    tCruiseTaskDel.setDelTime(taskDate);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+                tCruiseTaskDel.setDelTime(taskDate);
+                tCruiseTaskDel.setEndTime(endDate);
                 tCruiseTaskDel.setCreateTime(new Date());
                 log.info("del task single...");
-                deleteTransfer(source, taskCode, taskId, startTime);
+                deleteTransfer(source, taskCode, taskId, startTime, endTime);
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             } else {
-                //判断当前周期任务是否已执行 --by tt 2021.3.10
-                if (StringUtils.isEmpty(task.getDateType())) {
-                    taskId = task.getTaskCode();
-                }
-                //删除整个周期任务
-                log.info("del taskId..." + taskId + ", startTime; " + startTime);
+                // 删除整个周期任务
+                log.info("del taskId...{}, startTime: {}", taskCode, startTime);
                 JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
 
-                log.info("taskMap del..." + Constant.taskMap);
+                log.info("taskMap del...{}", Constant.taskMap);
                 log.info("del task totally...");
-                deleteTransfer(source, taskCode, taskId, startTime);
+                deleteTransfer(source, taskCode, taskId, startTime, endTime);
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
                 //删除初始化的一条
                 uPatrolTaskDao.deleteInitByPrimaryId(taskId);
@@ -1686,7 +1701,7 @@ public class UPatrolTaskService {
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
             JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
         }
-        deleteTransfer(source, taskCode, taskId, startTime);
+        deleteTransfer(source, taskCode, taskId, startTime, endTime);
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         //删除初始化的一条
         uPatrolTaskDao.deleteInitByPrimaryId(taskId);
@@ -1712,16 +1727,21 @@ public class UPatrolTaskService {
 
     /**
      * 任务删除同步
-     * @param source
+     * @param source source=-999 表示 isenable=2 删除任务
      * @param taskCode
      * @param taskId
      * @param startTime
      */
-    public void deleteTransfer(String source, String taskCode, String taskId, String startTime){
+    public void deleteTransfer(String source, String taskCode, String taskId, String startTime, String endTime){
         //边缘节点无需上报或下发
         //巡视系统需要下发，来源为上级系统的删除需要在上级系统下发
         List<UPatrolTaskAttr> uPatrolPlanAttrList = uPatrolTaskAttrDao.selectByTaskId(taskCode);
 
+        String isenable = "0";
+        if ("-999".equals(source)) {
+            startTime = "-1";
+            isenable = "2";
+        }
         // 删除任务向下级同步
         List<Long> instanceIdList = uPatrolPlanAttrList.stream().map(UPatrolTaskAttr::getInstanceId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(instanceIdList)) {
@@ -1732,7 +1752,7 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setIfRun(task.getExecuteType());
             tCruiseTaskAdd.setCycleExecuteTime(task.getDateType());
             // 删除下级和机器人的任务
-            taskToEdgeOrDevice(task, tCruiseTaskAdd, detailList, startTime, false);
+            taskToEdgeOrDevice(task, tCruiseTaskAdd, detailList, startTime, endTime, isenable);
 
         }
 
@@ -1749,6 +1769,7 @@ public class UPatrolTaskService {
             xmlBaseModel.setCommand("102");
             xmlItem.put("taskId", taskId);
             xmlItem.put("startTime", startTime);
+            xmlItem.put("endTime", endTime);
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
             List<XMLBaseModel> list = new ArrayList<>();
@@ -2815,9 +2836,7 @@ public class UPatrolTaskService {
 
         Date dayBefore = new Date();
         Date dayAfter = new Date();
-        Date originTime = new Date();
         try {
-            originTime = secondFormat.parse("2000-01-01 00:00:00");
             dayBefore = secondFormat.parse(map.get("firstDay"));
             dayAfter = secondFormat.parse(map.get("lastDay"));
         } catch (Exception e) {
@@ -2857,8 +2876,12 @@ public class UPatrolTaskService {
                     if (listDel.size() > 0) {
                         for (TCruiseTaskDel tCruiseTaskDel : listDel) {
                             long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
-                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime == taskTime) {
-                                log.info("已删除的任务信息： " + tCruiseTaskCount.getTaskId() + " " + taskDelTime);
+                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getDelTime()).map(Date::getTime).orElse(0L);
+                            boolean isDel =
+                                StringUtils.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && (taskEndTime == 0 ?
+                                    taskDelTime == taskTime : taskTime >= taskDelTime && taskTime <= taskEndTime);
+                            if (isDel) {
+                                log.info("已删除的任务信息： {}  {}  {}", tCruiseTaskCount.getTaskId(), taskDelTime, taskEndTime);
                                 taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
                                 taskCountMapDel.put("taskDelTime", taskDelTime);
                             }
@@ -3119,7 +3142,11 @@ public class UPatrolTaskService {
                     if (listDel.size() > 0) {
                         for (TCruiseTaskDel tCruiseTaskDel : listDel) {
                             long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
-                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime == taskTime) {
+                            long taskEndTime = Optional.ofNullable(tCruiseTaskDel.getDelTime()).map(Date::getTime).orElse(0L);
+                            boolean isDel =
+                                StringUtils.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && (taskEndTime == 0 ?
+                                    taskDelTime == taskTime : taskTime >= taskDelTime && taskTime <= taskEndTime);
+                            if (isDel) {
                                 log.info("已删除的任务信息： " + tCruiseTaskCount.getTaskId() + " " + taskDelTime);
                                 taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
                                 taskCountMapDel.put("taskDelTime", taskDelTime);

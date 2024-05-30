@@ -242,7 +242,7 @@ public class UPatrolResultService {
             uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
         //更新测点信息
         TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate().setDeviceMeteId(afterManualReviewInfo.getDeviceMeteId())
-            .setIdentifyResult(Integer.valueOf(cruiseManualReview.getPersonCheck())).setUpdateTime(cruiseManualReview.getCheckDate());
+            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(cruiseManualReview.getCruiseTime());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
