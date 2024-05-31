@@ -117,7 +117,7 @@ public class UPatrolResultService {
                 .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind");
         DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
 
-        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
         cruiseResultDetailList.forEach(c -> {
             if (StringUtils.isBlank(c.getEdgeName())) {
                 c.setEdgeName(currentEdge);

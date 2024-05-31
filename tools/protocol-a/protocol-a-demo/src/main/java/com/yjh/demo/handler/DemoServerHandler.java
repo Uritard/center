@@ -48,7 +48,7 @@ public class DemoServerHandler extends BaseMessageHandler {
             inboundMessage.getPacket().getSessionType());
         automationTask.setServerReceiveCode(inboundMessage);
         String validStr = automationTask.validMessage(inboundMessage, true);
-        validStr = StringUtils.isEmpty(validStr) ? "<b>校验成功</b>" : "<p style='color:Crimson'>" + validStr + "</p>";
+        validStr = StringUtils.isBlank(validStr) ? "<b>校验成功</b>" : "<p style='color:Crimson'>" + validStr + "</p>";
 
         AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
                 "接收客户端发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +

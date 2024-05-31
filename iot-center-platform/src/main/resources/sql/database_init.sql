@@ -1232,8 +1232,9 @@ DROP TABLE IF EXISTS `t_cruise_task_del`;
 CREATE TABLE `t_cruise_task_del` (
   `task_id` varchar(50) NOT NULL COMMENT '巡检任务UUID',
   `del_time` datetime NOT NULL COMMENT '巡视时间',
+  `end_time` datetime NOT NULL COMMENT '任务不可用结束时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`task_id`,`del_time`) USING BTREE
+  PRIMARY KEY (`task_id`,`del_time`,`end_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='周期任务删除记录表';
 
 -- ----------------------------
@@ -2864,6 +2865,7 @@ CREATE TABLE `t_iot_device_warn` (
 PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物联设备告警表';
 
+DROP TABLE IF EXISTS `device_maintenance_info`;
 CREATE TABLE `device_maintenance_info`
 (
     `id`                 bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -2883,11 +2885,35 @@ CREATE TABLE `device_maintenance_info`
     `maintenance_status` int          DEFAULT '2' COMMENT '消缺状态 1-已消缺 2-未消缺 3-消缺中',
     `remark`             varchar(255) DEFAULT '' COMMENT '备注',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='设备维护信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='设备维护信息表';
 
+DROP TABLE IF EXISTS `t_home_model_config`;
 CREATE TABLE `t_home_model_config` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `user_id` bigint NOT NULL,
     `model_config` json DEFAULT NULL,
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='首页定制表';
+
+DROP TABLE IF EXISTS `t_cfg_autoreview`;
+CREATE TABLE `t_cfg_autoreview` (
+  `autoreview_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '自动审核确认ID',
+  `autoreview_name` varchar(512) COMMENT '自动审核名称',
+  `autoreview_type` varchar(32) COMMENT '自动审核类型，1-巡视结果 2-巡视告警，可多选，使用,分割',
+  `create_time`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time`        datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_user`        VARCHAR(128) DEFAULT '' COMMENT '创建人',
+  PRIMARY KEY (`autoreview_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='自动审核配置表';
+
+DROP TABLE IF EXISTS `t_cfg_autoreview_detail`;
+CREATE TABLE `t_cfg_autoreview_detail` (
+  `detail_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '详细ID，主键',
+  `autoreview_id` bigint(58) NOT NULL COMMENT '无需审核确认ID',
+  `auto_detail_type` int(8) COMMENT '配置类型，1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签',
+  `ref_id` varchar(64) COMMENT '关联id',
+  `ref_name` varchar(64) COMMENT '关联id名称',
+  PRIMARY KEY (`detail_id`) USING BTREE,
+  KEY `detail_autoreview_id` (`autoreview_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='自动审核配置详细表';
+
