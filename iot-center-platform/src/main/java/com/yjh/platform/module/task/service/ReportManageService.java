@@ -84,7 +84,7 @@ public class ReportManageService {
         recordData.setTaskVO(taskVO);
 
         // 报表名称:站所名称+报告名称+当前时间
-        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
         String fileNameTemp = stationName + "-" + reportName;
         String fileName = fileNameTemp + "-" + DateTimeUtil.format3(new Date()) + ".xlsx";
 
@@ -376,7 +376,7 @@ public class ReportManageService {
     public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
         delaCount(taskVO,tCruiseDataResultDetailList);
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setStationName(stationName);
@@ -409,7 +409,7 @@ public class ReportManageService {
             taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
         }
 
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVOtemp.setStationName(stationName);
