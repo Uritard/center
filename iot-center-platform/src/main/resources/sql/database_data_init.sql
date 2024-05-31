@@ -5278,3 +5278,5 @@ INSERT INTO `dict_area` VALUES ('820101', '澳门半岛', '820100');
 INSERT INTO `dict_area` VALUES ('820102', '凼仔', '820100');
 INSERT INTO `dict_area` VALUES ('820103', '路凼城', '820100');
 INSERT INTO `dict_area` VALUES ('820104', '路环', '820100');
+
+INSERT INTO `t_home_model_config` (`id`, `user_id`, `model_config`) VALUES (7, 10002, '[{\"id\": 11, \"name\": \"RegularModel\", \"label\": \"常用模块\", \"width\": 100, \"height\": 32}, {\"id\": 1, \"name\": \"StationOverview\", \"label\": \"站所概览\", \"width\": 100, \"height\": 30}, {\"id\": 2, \"name\": \"RobotInfoOverview\", \"label\": \"设备工况\", \"width\": 100, \"height\": 35}, {\"id\": 3, \"name\": \"VideoCarousel\", \"label\": \"视频轮巡\", \"width\": 100, \"height\": 63}, {\"id\": 9, \"name\": \"ReliabilityModel\", \"label\": \"可靠性指标\", \"width\": 100, \"height\": 35}, {\"id\": 12, \"name\": \"TaskOverview\", \"label\": \"巡视任务\", \"width\": 100, \"height\": 30}, {\"id\": 6, \"name\": \"WarningStatistic\", \"label\": \"告警统计\", \"width\": 100, \"height\": 34}, {\"id\": 7, \"name\": \"DefectStatistic\", \"label\": \"缺陷统计\", \"width\": 100, \"height\": 33}]');

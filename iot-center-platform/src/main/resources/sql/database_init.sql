@@ -1330,6 +1330,7 @@ DROP TABLE IF EXISTS `t_device_maintenance`;
 CREATE TABLE `t_device_maintenance` (
   `maintenance_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '检修ID',
   `maintenance_name` varchar(256) NOT NULL COMMENT '检修名称',
+  `config_code` varchar(64) DEFAULT NULL COMMENT 'config_code上下级系统统一的任务code',
   `device_ids` text COMMENT '设备ID',
   `is_valid` int(2) DEFAULT '1' COMMENT '是否使用，0-不使用，1-使用',
   `maintenance_start` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '开始检修时间',
@@ -2884,4 +2885,9 @@ CREATE TABLE `device_maintenance_info`
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='设备维护信息表';
 
-
+CREATE TABLE `t_home_model_config` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `user_id` bigint NOT NULL,
+    `model_config` json DEFAULT NULL,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
