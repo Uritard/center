@@ -1047,6 +1047,7 @@ CREATE TABLE `t_cruise_nonhomologous_warn` (
   `device_mete_name` varchar(256) DEFAULT NULL COMMENT '测点名称',
   `region_name` varchar(256) DEFAULT NULL COMMENT '区域名称',
   `custom_name` varchar(256) DEFAULT NULL COMMENT '部件名称',
+  `alarm_type` int(11) DEFAULT 0 COMMENT 'A接口协议告警类型',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='非同源告警表';
 
@@ -2285,6 +2286,7 @@ CREATE TABLE `t_warn_info` (
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `label_attri` VARCHAR(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
+  `alarm_type` int(11) DEFAULT 0 COMMENT 'A接口协议告警类型',
   PRIMARY KEY (`warn_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
 
