@@ -179,7 +179,7 @@
         d.picpath as origpic,
         d.person_check,
         b.task_name,
-        b.execute_time as cruiseTime,
+        d.cruise_time as cruiseTime,
         j.device_id,
         j.device_name,
         g.mete_kind,

@@ -798,13 +798,14 @@
     </update>
 
     <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
-        update u_patrol_data_result set
+        update u_patrol_data_result <set>
         <if test="personCheck != null ">person_check = #{personCheck},</if>
         <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         evaluation_state = 256,
         <if test="checkUser != null ">check_user = #{checkUser},</if>
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+    </set>
         where task_id = #{taskId,jdbcType =VARCHAR} and instance_id = #{instanceId,jdbcType =BIGINT}
     </update>
 
