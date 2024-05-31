@@ -45,12 +45,8 @@ public class ReviewWarnHandler  implements MessageHandlerStrategy<XMLBaseModel>,
             tWarnInfo.setEdgeCode(sendCode);
             warnInfoList.add(tWarnInfo);
         }
-        Map<String, List<XMLBaseModel>> xmlMap = new HashMap<>();
-        List<XMLBaseModel> list = new ArrayList<>();
-        list.add(xmlBaseModel);
-        xmlMap.put("list", list);
         log.info("The review warnList to platform is=={}", xmlBaseModel);
-        Result re = Constant.otherServer(xmlMap, Constant.WARN_REVIEW_PROCESS);
+        Result re = Constant.otherServerByList(warnInfoList, Constant.WARN_REVIEW_PROCESS);
         log.info("--响应告警确认--" + re);
         clientHandler.normalResponse("200", header.getSessionId());
     }

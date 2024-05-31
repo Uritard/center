@@ -121,6 +121,16 @@ public class Constant {
         return re;
     }
 
+    public static<T> Result otherServerByList( List<T> list, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
+    }
+
     public static<T> Result otherServerPost(Map<String,Object> map, String url) {
         Result re = new Result();
         try {

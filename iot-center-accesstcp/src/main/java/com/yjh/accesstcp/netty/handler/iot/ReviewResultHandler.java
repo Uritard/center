@@ -4,6 +4,7 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.entity.CruiseManualReview;
+import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.netty.TCPClientHandler;
 import com.yjh.accesstcp.netty.entiy.MessageHeader;
@@ -46,13 +47,10 @@ public class ReviewResultHandler implements MessageHandlerStrategy<XMLBaseModel>
             resultList.add(taskResult);
         }
         log.info("The review resultList to platform is=={}", resultList);
-
-        Map<String, List<XMLBaseModel>> xmlMap = new HashMap<>();
-        List<XMLBaseModel> list = new ArrayList<>();
-        list.add(xmlBaseModel);
-        xmlMap.put("list", list);
+        Map<String, List<CruiseManualReview>> map = new HashMap<>();
+        map.put("list", resultList);
         log.info("The review resultList to platform is=={}", xmlBaseModel);
-        Result re = Constant.otherServer(xmlMap, Constant.TASK_REVIEW_PROCESS);
+        Result re = Constant.otherServerByList(resultList, Constant.TASK_REVIEW_PROCESS);
         log.info("--响应巡视结果确认--" + re);
         clientHandler.normalResponse("200", header.getSessionId());
     }
