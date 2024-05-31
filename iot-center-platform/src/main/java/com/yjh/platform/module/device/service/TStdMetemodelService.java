@@ -287,7 +287,7 @@ public class TStdMetemodelService {
         List<String> name = new ArrayList<>(Arrays.asList("测点id", "设备类型", "识别类型", "测点类型", "测点标准名称", "信号说明", "信号解释",
                 "告警分类", "识别算法", "单位", "有效上限", "有效下限", "告警级别", "告警门限", "告警延时", "状态一", "状态二",
                 "告警上限1", "告警下限1", "告警上限2", "告警下限2", "告警上限3", "告警下限3", "告警上限4", "告警下限4", "告警次数",
-                "绝对阀值", "百分比阀值", "系数", "备注", "测点级别（1 = Ⅰ类 2 = Ⅱ 类型）", "人工关注"));
+                "绝对阀值", "百分比阀值", "系数", "备注", "测点级别（1 = Ⅰ类 2 = Ⅱ 类型）", "测点标签"));
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
            return "/imgs" + returnPath+"/"+fileName;
@@ -458,7 +458,7 @@ public class TStdMetemodelService {
     @Transactional(rollbackFor = Exception.class)
     public Result insertModel(MultipartFile file)   {
         FileInputStream in = null;
-        HSSFWorkbook wb = null;
+        XSSFWorkbook wb = null;
         Result result = new Result();
         List<Integer> insertRetList = new ArrayList<>();
         String pathName = null;
@@ -479,7 +479,7 @@ public class TStdMetemodelService {
             List<TStdMete> meteList = tStdMetemodelDetailDao.selectTSTDMeteAll();
             Map<String, String> nameMap = resultHandler.getMappedResults();
             in = new FileInputStream(pathName);
-            wb = new HSSFWorkbook(in);//创建工作簿
+            wb = new XSSFWorkbook(in);//创建工作簿
             Sheet sheet = wb.getSheetAt(0);//读取第一个工作表
             int total = sheet.getLastRowNum();//获取最后一行num,即总行数，从0开始
             List<TStdMete> tStdMeteList = new ArrayList<>();
