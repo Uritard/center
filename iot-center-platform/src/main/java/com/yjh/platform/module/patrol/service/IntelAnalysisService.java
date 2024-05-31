@@ -202,13 +202,13 @@ public class IntelAnalysisService {
         AnalyseResultItem item = getAnalyseResult(analyseObject);
         analyseResult.setResults(Arrays.asList(item));
         analyseResult.setObjectId(analyseObject.getObjectId());
-        redisTemplate.opsForHash().put("silentMonitorImageUrl", analyseResult.getObjectId(), analyseObject.getImageUrlList().get(0));
+        redisTemplate.opsForHash().put("silentMonitorImageUrl", analyseResult.getObjectId(), analyseObject.getImagePathList().get(0));
         return analyseResult;
     }
 
     private AnalyseResultItem getAnalyseResult(AnalyseObject analyseObject) {
         AnalyseResultItem item = new AnalyseResultItem();
-        item.setResImageUrl(analyseObject.getImageUrlList().get(0));
+        item.setResImageUrl(analyseObject.getImagePathList().get(0));
         item.setCode("2000");
         item.setConf(0.0f);
         item.setDesc("发现异常");
