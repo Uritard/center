@@ -13,1545 +13,3992 @@ File Encoding         : 65001
 Date: 2022-10-19 17:29:46
 */
 
-SET FOREIGN_KEY_CHECKS=0;
+SET
+FOREIGN_KEY_CHECKS=0;
 
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES ('10001', 'manager', '04C147E82E24A1430341A9E9079A8243636411D4D85E1D8DFB0A6DA2DBC7B4362336B49957439E76D972A9087E784C139D9197F6F4E4799F57937B372912AA94A1B8B083252FECB51A571BFDB59BAF6F97E51D975157368AE29E52E83FB6D2E7556C4919D763CD8C9E', '初始帐号', '0', '1', 'tyuio@129.com', '10001', '', '', '', '1', '系统管理员', '0', '', '', '1234', '500001', '0', '2021-03-04 02:07:10', '2022-09-14 17:02:00', '89', '2021-03-04 05:46:18', '2022-10-08 13:52:30');
-INSERT INTO `sys_user` VALUES ('10002', 'business', '042CF19D3E00CB9E6C4D5C15EE385163D277277A8C4F417464B8F0B9C3AFECC74C2658B3C1242C589BD2E9B210A476E2E72EE50BD6AADB126BAF09F82C84E3B19A4E794080A3791DF0B209B02BE889D022F58B692EF559D1CAC9B3676FF251E17CCA0344EC1FD65E61', '普通用户', '0', '1', 'tyuio@129.com', '10002', '', '', '', '1', '', '0', '', '', '1235', '500001', '0', '2021-03-04 02:07:10', '2022-09-14 17:01:36', '90', '2021-03-19 17:07:17', '2022-10-08 14:20:23');
-INSERT INTO `sys_user` VALUES ('10003', 'auditor', '049E7BD475D45189044BA202B6D683B8870E3AB66C4185D474CCC77613E21F6F5A07A0F0AEFA24881134AE7DC37417792286174C15F24946FBC43C6B965499F32645280969BCCB57C6070BAD400D0B7DCA33BF57F05B410AB6F7DD202EA086E5882B14B5DE4B515C86B6F6FA3E', '审计员', '0', '1', 'tyuio@129.com', '10003', '', '', '', '1', '', '1', '', '', '1236', '500001', '0', '2021-03-04 02:07:10', '2022-09-27 11:21:52', '90', '2021-03-05 02:25:43', '2022-09-27 16:27:23');
+INSERT INTO `sys_user`
+VALUES ('10001', 'manager',
+        '04C147E82E24A1430341A9E9079A8243636411D4D85E1D8DFB0A6DA2DBC7B4362336B49957439E76D972A9087E784C139D9197F6F4E4799F57937B372912AA94A1B8B083252FECB51A571BFDB59BAF6F97E51D975157368AE29E52E83FB6D2E7556C4919D763CD8C9E',
+        '初始帐号', '0', '1', 'tyuio@129.com', '10001', '', '', '', '1', '系统管理员', '0', '', '', '1234', '500001',
+        '0', '2021-03-04 02:07:10', '2022-09-14 17:02:00', '89', '2021-03-04 05:46:18', '2022-10-08 13:52:30');
+INSERT INTO `sys_user`
+VALUES ('10002', 'business',
+        '042CF19D3E00CB9E6C4D5C15EE385163D277277A8C4F417464B8F0B9C3AFECC74C2658B3C1242C589BD2E9B210A476E2E72EE50BD6AADB126BAF09F82C84E3B19A4E794080A3791DF0B209B02BE889D022F58B692EF559D1CAC9B3676FF251E17CCA0344EC1FD65E61',
+        '普通用户', '0', '1', 'tyuio@129.com', '10002', '', '', '', '1', '', '0', '', '', '1235', '500001', '0',
+        '2021-03-04 02:07:10', '2022-09-14 17:01:36', '90', '2021-03-19 17:07:17', '2022-10-08 14:20:23');
+INSERT INTO `sys_user`
+VALUES ('10003', 'auditor',
+        '049E7BD475D45189044BA202B6D683B8870E3AB66C4185D474CCC77613E21F6F5A07A0F0AEFA24881134AE7DC37417792286174C15F24946FBC43C6B965499F32645280969BCCB57C6070BAD400D0B7DCA33BF57F05B410AB6F7DD202EA086E5882B14B5DE4B515C86B6F6FA3E',
+        '审计员', '0', '1', 'tyuio@129.com', '10003', '', '', '', '1', '', '1', '', '', '1236', '500001', '0',
+        '2021-03-04 02:07:10', '2022-09-27 11:21:52', '90', '2021-03-05 02:25:43', '2022-09-27 16:27:23');
 
 -- ----------------------------
 -- Records of sys_info_backup
 -- ----------------------------
-INSERT INTO `sys_info_backup` VALUES ('10001', 'manager', '04C147E82E24A1430341A9E9079A8243636411D4D85E1D8DFB0A6DA2DBC7B4362336B49957439E76D972A9087E784C139D9197F6F4E4799F57937B372912AA94A1B8B083252FECB51A571BFDB59BAF6F97E51D975157368AE29E52E83FB6D2E7556C4919D763CD8C9E', '初始帐号', '0', '1', '', '10001', '', '', '', '1', '0', '', '', '', '1234', '500001', '0', 'dd70120f78f045f19c7df1b1a4a97a7df3e26e953ffc81bf5bf76ff8617f00e4', '2021-03-04 02:07:10', '2022-09-14 17:02:00', '90', '2021-03-04 09:59:01', '2021-03-04 05:47:37');
-INSERT INTO `sys_info_backup` VALUES ('10002', 'business', '042CF19D3E00CB9E6C4D5C15EE385163D277277A8C4F417464B8F0B9C3AFECC74C2658B3C1242C589BD2E9B210A476E2E72EE50BD6AADB126BAF09F82C84E3B19A4E794080A3791DF0B209B02BE889D022F58B692EF559D1CAC9B3676FF251E17CCA0344EC1FD65E61', '普通用户', '0', '1', '', '10002', '', '', '', '1', '0', '', '', '', '1235', '500001', '0', '617f00a9fd6435d2d3058bc31a0e5bf18e5b360f88cddbc3f41896315529e198', '2021-03-04 02:07:10', '2022-09-14 17:01:36', '90', '2021-02-24 13:12:04', '2021-03-04 05:47:37');
-INSERT INTO `sys_info_backup` VALUES ('10003', 'auditor', '049E7BD475D45189044BA202B6D683B8870E3AB66C4185D474CCC77613E21F6F5A07A0F0AEFA24881134AE7DC37417792286174C15F24946FBC43C6B965499F32645280969BCCB57C6070BAD400D0B7DCA33BF57F05B410AB6F7DD202EA086E5882B14B5DE4B515C86B6F6FA3E', '审计员', '0', '1', '', '10002', '', '', '', '1', '0', '', '', '', '1236', '500001', '0', 'af1dfa96d037ffd27fea94b9e0fd9b42c1c96f53c63919d75de54cd576c44193', '2021-03-04 02:07:10', '2022-09-27 11:21:52', '90', '2021-02-24 13:12:04', '2021-03-04 05:47:37');
+INSERT INTO `sys_info_backup`
+VALUES ('10001', 'manager',
+        '04C147E82E24A1430341A9E9079A8243636411D4D85E1D8DFB0A6DA2DBC7B4362336B49957439E76D972A9087E784C139D9197F6F4E4799F57937B372912AA94A1B8B083252FECB51A571BFDB59BAF6F97E51D975157368AE29E52E83FB6D2E7556C4919D763CD8C9E',
+        '初始帐号', '0', '1', '', '10001', '', '', '', '1', '0', '', '', '', '1234', '500001', '0',
+        'dd70120f78f045f19c7df1b1a4a97a7df3e26e953ffc81bf5bf76ff8617f00e4', '2021-03-04 02:07:10',
+        '2022-09-14 17:02:00', '90', '2021-03-04 09:59:01', '2021-03-04 05:47:37');
+INSERT INTO `sys_info_backup`
+VALUES ('10002', 'business',
+        '042CF19D3E00CB9E6C4D5C15EE385163D277277A8C4F417464B8F0B9C3AFECC74C2658B3C1242C589BD2E9B210A476E2E72EE50BD6AADB126BAF09F82C84E3B19A4E794080A3791DF0B209B02BE889D022F58B692EF559D1CAC9B3676FF251E17CCA0344EC1FD65E61',
+        '普通用户', '0', '1', '', '10002', '', '', '', '1', '0', '', '', '', '1235', '500001', '0',
+        '617f00a9fd6435d2d3058bc31a0e5bf18e5b360f88cddbc3f41896315529e198', '2021-03-04 02:07:10',
+        '2022-09-14 17:01:36', '90', '2021-02-24 13:12:04', '2021-03-04 05:47:37');
+INSERT INTO `sys_info_backup`
+VALUES ('10003', 'auditor',
+        '049E7BD475D45189044BA202B6D683B8870E3AB66C4185D474CCC77613E21F6F5A07A0F0AEFA24881134AE7DC37417792286174C15F24946FBC43C6B965499F32645280969BCCB57C6070BAD400D0B7DCA33BF57F05B410AB6F7DD202EA086E5882B14B5DE4B515C86B6F6FA3E',
+        '审计员', '0', '1', '', '10002', '', '', '', '1', '0', '', '', '', '1236', '500001', '0',
+        'af1dfa96d037ffd27fea94b9e0fd9b42c1c96f53c63919d75de54cd576c44193', '2021-03-04 02:07:10',
+        '2022-09-27 11:21:52', '90', '2021-02-24 13:12:04', '2021-03-04 05:47:37');
 
 -- ----------------------------
 -- Records of sys_unique_user
 -- ----------------------------
-INSERT INTO `sys_unique_user` VALUES ('1', '02ca04c5316a2afde076d006d31b353e9f18024544d0dc77db08fcdf343b7e63');
-INSERT INTO `sys_unique_user` VALUES ('2', '1f32821865a20decf878e8171563a05c7bcc94b920ca007cbde5eb1a65643acc');
+INSERT INTO `sys_unique_user`
+VALUES ('1', '02ca04c5316a2afde076d006d31b353e9f18024544d0dc77db08fcdf343b7e63');
+INSERT INTO `sys_unique_user`
+VALUES ('2', '1f32821865a20decf878e8171563a05c7bcc94b920ca007cbde5eb1a65643acc');
 
 -- ----------------------------
 -- Records of sys_org
 -- ----------------------------
-INSERT INTO `sys_org` VALUES ('500001', '电网总公司', '1', '-1', '0', '2020-08-11 10:51:22', '0', '0', '', '');
+INSERT INTO `sys_org`
+VALUES ('500001', '电网总公司', '1', '-1', '0', '2020-08-11 10:51:22', '0', '0', '', '');
 
 -- ----------------------------
 -- Records of t_std_region
 
 -- ----------------------------
-insert into `t_std_region` (`region_id`, `region_name`, `sort`, `up_region_id`, `up_region_ids`, `region_code`, `origin_region_id`, `station_id`, `station_name`, `state`, `edge_status`, `region_path`, `longitude`, `latitude`, `voltage_level`, `remark`, `create_time`)
-values('700001','变电总公司','0','-1','','0',NULL,'','','1',NULL,NULL,NULL,NULL,NULL,NULL,'2022-11-03 19:14:32');
+insert into `t_std_region` (`region_id`, `region_name`, `sort`, `up_region_id`, `up_region_ids`, `region_code`,
+                            `origin_region_id`, `station_id`, `station_name`, `state`, `edge_status`, `region_path`,
+                            `longitude`, `latitude`, `voltage_level`, `remark`, `create_time`)
+values ('700001', '变电总公司', '0', '-1', '', '0', NULL, '', '', '1', NULL, NULL, NULL, NULL, NULL, NULL,
+        '2022-11-03 19:14:32');
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
 
-INSERT INTO `sys_role` VALUES ('1234', '管理员', '2020-10-01 12:18:48', '0', '0');
-INSERT INTO `sys_role` VALUES ('1235', '业务员', '2020-08-10 10:50:38', '0', '0');
-INSERT INTO `sys_role` VALUES ('1236', '审计员', '2020-08-10 10:50:50', '0', '0');
+INSERT INTO `sys_role`
+VALUES ('1234', '管理员', '2020-10-01 12:18:48', '0', '0');
+INSERT INTO `sys_role`
+VALUES ('1235', '业务员', '2020-08-10 10:50:38', '0', '0');
+INSERT INTO `sys_role`
+VALUES ('1236', '审计员', '2020-08-10 10:50:50', '0', '0');
 
 -- ----------------------------
 -- Records of sys_role_region
 -- ----------------------------
-INSERT INTO `sys_role_region` VALUES ('1234', '700001', 'checked');
+INSERT INTO `sys_role_region`
+VALUES ('1234', '700001', 'checked');
 
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
 TRUNCATE sys_menu;
-INSERT INTO sys_menu VALUES (1,'首页','0001',-1,'','',1,1,'',1,1,1,'',1,0,1235);
-INSERT INTO sys_menu VALUES (2,'智能巡视','0100',-1,'','',1,1,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (3,'实时监控','0200',-1,'','',1,1,'',1,3,1,'',1,1,NULL);
-INSERT INTO sys_menu VALUES (4,'运维管理','0400',-1,'','',1,1,'',1,8,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (5,'系统管理','0600',-1,'','',1,1,'',1,5,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (7,'一键顺控','0800',-1,'','',1,1,'',1,7,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (8,'智能联动','0300',-1,'','',1,1,'',1,6,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (9,'任务管理','0101',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (10,'巡视监控','0102',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (11,'巡视结果','0103',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (12,'视频监控','0202',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (13,'视频轮巡','0203',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (14,'音频监控','0204',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (16,'机器人监控','0205',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (17,'系统/服务监控','0206',3,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (18,'联动信号','0302',8,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (19,'联动复核','0303',8,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (20,'联动历史','0304',8,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (21,'报表管理','0403',4,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (22,'用户管理','0601',5,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (23,'角色权限','0602',5,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (24,'组织区域','0603',5,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (25,'算法管理','0604',5,'','',1,2,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (26,'设备管理','0605',115,'','',1,2,'',1,1,1,'',1,0,1234);
-INSERT INTO sys_menu VALUES (27,'数据维护','0606',5,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (28,'测点管理','0607',115,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (29,'标准点位库','0608',5,'','',1,2,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (30,'日志管理','0609',5,'','',1,2,'',1,1,1,'',1,0,1236);
-INSERT INTO sys_menu VALUES (31,'主接线图','0610',4,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (35,'视频双确认','0801',7,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (38,'操作类任务','0104',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (39,'操作类任务记录','0105',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (40,'无人机监控','0209',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (41,'可靠性指标','0900',-1,'','',1,1,'',1,9,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (42,'可靠性指标','0901',41,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (43,'三维应用','01000',-1,'','',1,1,'',1,10,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (44,'三维应用','01001',43,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (45,'告警屏蔽管理','0406',4,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (46,'声纹管理','0106',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (48,'告警管理','0107',2,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (50,'物联监控','0211',3,'','',1,2,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (51,'物联管理','0611',115,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (52,'任务配置','0612',115,'','',1,2,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (53,'其他配置','0613',115,'','',1,2,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (54,'一键启动','010101',9,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (55,'巡视结果确认','010301',11,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (56,'巡视结果分析','010302',11,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (57,'巡视报表','010303',11,'','',2,3,'',1,3,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (58,'审核异常点位','010304',11,'','',2,3,'',1,4,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (59,'识别异常点位','010305',11,'','',2,3,'',1,5,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (60,'非同源告警','010306',11,'','',2,3,'',1,6,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (61,'算法测试','010307',11,'','',2,3,'',1,7,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (62,'操作任务记录','010501',39,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (63,'操作任务告警','010502',39,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (64,'巡视告警','010701',48,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (65,'设备告警','010702',48,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (66,'物联设备告警','010703',48,'','',2,3,'',1,3,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (67,'测点预置位','020201',12,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (68,'实时视频','020202',12,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (69,'历史回放','020203',12,'','',2,3,'',1,3,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (70,'频谱分析','020204',12,'','',2,3,'',1,4,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (71,'录像文件查询','020205',12,'','',2,3,'',1,5,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (72,'相机播放记录','020206',12,'','',2,3,'',1,6,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (73,'物联设备监控','021101',50,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (74,'电表监控','021102',50,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (75,'实时联动信号','030201',18,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (76,'历史联动信号','030202',18,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (77,'设备告警屏蔽','040601',45,'','',2,3,'',1,1,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (78,'任务告警屏蔽','040602',45,'','',2,3,'',1,2,1,'',1,1,1235);
-INSERT INTO sys_menu VALUES (79,'组织机构','060301',24,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (80,'场站区域','060302',24,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (81,'场站设备管理','060501',26,'','',2,3,'',1,1,1,'',1,0,1234);
-INSERT INTO sys_menu VALUES (82,'摄像机台账','060504',26,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (83,'录像机台账','060505',26,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (84,'机器人台账','060506',26,'','',2,3,'',1,4,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (85,'无人机台账','060507',26,'','',2,3,'',1,5,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (86,'声纹设备台账','060508',26,'','',2,3,'',1,6,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (87,'业务字典','060601',27,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (88,'系统参数','060602',27,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (89,'系统配置','060603',27,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (90,'预置位配置','060604',27,'','',2,3,'',1,4,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (91,'磁盘清理','060605',27,'','',2,3,'',1,5,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (92,'编码配置','060606',27,'','',2,3,'',1,6,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (93,'设备测点配置','060701',28,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (94,'视频预置位配置','060702',28,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (95,'巡视点关联配置','060703',28,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (96,'操作票关联配置','060704',28,'','',2,3,'',1,4,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (97,'非同源告警配置','060710',28,'','',2,3,'',1,5,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (98,'设备管理','061101',51,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (99,'电表台账','061102',51,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (100,'采集设备可靠性','090101',42,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (101,'巡视点位可靠性','090102',42,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (102,'人工审核可靠性','090103',42,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (103,'巡视任务执行可靠性','090104',42,'','',2,3,'',1,4,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (104,'四遥属性','061201',116,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (105,'联动配置','061202',116,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (106,'一键顺控配置','061203',116,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (107,'检修区域配置','061204',52,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (108,'任务类型配置','061205',52,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (109,'任务优先级配置','061206',52,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (110,'标准点位库','060801',29,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (111,'场站设备模板','060802',29,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (112,'视频轮巡配置','061301',53,'','',2,3,'',1,1,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (113,'主接线图配置','061302',53,'','',2,3,'',1,2,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (114,'设备位置分布配置','061303',53,'','',2,3,'',1,3,1,'',1,1,1234);
-INSERT INTO sys_menu VALUES (115,'配置管理','1100',-1,'','',1,1,'',1,4,1,'',1,0,1234);
-INSERT INTO sys_menu VALUES (116,'信号量配置','1105',115,'','',1,2,'',1,1,1,'',1,1,1234);
+INSERT INTO sys_menu
+VALUES (1, '首页', '0001', -1, '', '', 1, 1, '', 1, 1, 1, '', 1, 0, 1235);
+INSERT INTO sys_menu
+VALUES (2, '智能巡视', '0100', -1, '', '', 1, 1, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (3, '实时监控', '0200', -1, '', '', 1, 1, '', 1, 3, 1, '', 1, 1, NULL);
+INSERT INTO sys_menu
+VALUES (4, '运维管理', '0400', -1, '', '', 1, 1, '', 1, 8, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (5, '系统管理', '0600', -1, '', '', 1, 1, '', 1, 5, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (7, '一键顺控', '0800', -1, '', '', 1, 1, '', 1, 7, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (8, '智能联动', '0300', -1, '', '', 1, 1, '', 1, 6, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (9, '任务管理', '0101', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (10, '巡视监控', '0102', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (11, '巡视结果', '0103', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (12, '视频监控', '0202', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (13, '视频轮巡', '0203', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (14, '音频监控', '0204', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (16, '机器人监控', '0205', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (17, '系统/服务监控', '0206', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (18, '联动信号', '0302', 8, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (19, '联动复核', '0303', 8, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (20, '联动历史', '0304', 8, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (21, '报表管理', '0403', 4, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (22, '用户管理', '0601', 5, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (23, '角色权限', '0602', 5, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (24, '组织区域', '0603', 5, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (25, '算法管理', '0604', 5, '', '', 1, 2, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (26, '设备管理', '0605', 115, '', '', 1, 2, '', 1, 1, 1, '', 1, 0, 1234);
+INSERT INTO sys_menu
+VALUES (27, '数据维护', '0606', 5, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (28, '测点管理', '0607', 115, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (29, '标准点位库', '0608', 5, '', '', 1, 2, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (30, '日志管理', '0609', 5, '', '', 1, 2, '', 1, 1, 1, '', 1, 0, 1236);
+INSERT INTO sys_menu
+VALUES (31, '主接线图', '0610', 4, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (35, '视频双确认', '0801', 7, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (38, '操作类任务', '0104', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (39, '操作类任务记录', '0105', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (40, '无人机监控', '0209', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (41, '可靠性指标', '0900', -1, '', '', 1, 1, '', 1, 9, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (42, '可靠性指标', '0901', 41, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (43, '三维应用', '01000', -1, '', '', 1, 1, '', 1, 10, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (44, '三维应用', '01001', 43, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (45, '告警屏蔽管理', '0406', 4, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (46, '声纹管理', '0106', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (48, '告警管理', '0107', 2, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (50, '物联监控', '0211', 3, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (51, '物联管理', '0611', 115, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (52, '任务配置', '0612', 115, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (53, '其他配置', '0613', 115, '', '', 1, 2, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (54, '一键启动', '010101', 9, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (55, '巡视结果确认', '010301', 11, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (56, '巡视结果分析', '010302', 11, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (57, '巡视报表', '010303', 11, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (58, '审核异常点位', '010304', 11, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (59, '识别异常点位', '010305', 11, '', '', 2, 3, '', 1, 5, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (60, '非同源告警', '010306', 11, '', '', 2, 3, '', 1, 6, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (61, '算法测试', '010307', 11, '', '', 2, 3, '', 1, 7, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (62, '操作任务记录', '010501', 39, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (63, '操作任务告警', '010502', 39, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (64, '巡视告警', '010701', 48, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (65, '设备告警', '010702', 48, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (66, '物联设备告警', '010703', 48, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (67, '测点预置位', '020201', 12, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (68, '实时视频', '020202', 12, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (69, '历史回放', '020203', 12, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (70, '频谱分析', '020204', 12, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (71, '录像文件查询', '020205', 12, '', '', 2, 3, '', 1, 5, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (72, '相机播放记录', '020206', 12, '', '', 2, 3, '', 1, 6, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (73, '物联设备监控', '021101', 50, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (74, '电表监控', '021102', 50, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (75, '实时联动信号', '030201', 18, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (76, '历史联动信号', '030202', 18, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (77, '设备告警屏蔽', '040601', 45, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (78, '任务告警屏蔽', '040602', 45, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1235);
+INSERT INTO sys_menu
+VALUES (79, '组织机构', '060301', 24, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (80, '场站区域', '060302', 24, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (81, '场站设备管理', '060501', 26, '', '', 2, 3, '', 1, 1, 1, '', 1, 0, 1234);
+INSERT INTO sys_menu
+VALUES (82, '摄像机台账', '060504', 26, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (83, '录像机台账', '060505', 26, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (84, '机器人台账', '060506', 26, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (85, '无人机台账', '060507', 26, '', '', 2, 3, '', 1, 5, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (86, '声纹设备台账', '060508', 26, '', '', 2, 3, '', 1, 6, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (87, '业务字典', '060601', 27, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (88, '系统参数', '060602', 27, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (89, '系统配置', '060603', 27, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (90, '预置位配置', '060604', 27, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (91, '磁盘清理', '060605', 27, '', '', 2, 3, '', 1, 5, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (92, '编码配置', '060606', 27, '', '', 2, 3, '', 1, 6, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (93, '设备测点配置', '060701', 28, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (94, '视频预置位配置', '060702', 28, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (95, '巡视点关联配置', '060703', 28, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (96, '操作票关联配置', '060704', 28, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (97, '非同源告警配置', '060710', 28, '', '', 2, 3, '', 1, 5, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (98, '设备管理', '061101', 51, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (99, '电表台账', '061102', 51, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (100, '采集设备可靠性', '090101', 42, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (101, '巡视点位可靠性', '090102', 42, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (102, '人工审核可靠性', '090103', 42, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (103, '巡视任务执行可靠性', '090104', 42, '', '', 2, 3, '', 1, 4, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (104, '四遥属性', '061201', 116, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (105, '联动配置', '061202', 116, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (106, '一键顺控配置', '061203', 116, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (107, '检修区域配置', '061204', 52, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (108, '任务类型配置', '061205', 52, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (109, '任务优先级配置', '061206', 52, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (110, '标准点位库', '060801', 29, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (111, '场站设备模板', '060802', 29, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (112, '视频轮巡配置', '061301', 53, '', '', 2, 3, '', 1, 1, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (113, '主接线图配置', '061302', 53, '', '', 2, 3, '', 1, 2, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (114, '设备位置分布配置', '061303', 53, '', '', 2, 3, '', 1, 3, 1, '', 1, 1, 1234);
+INSERT INTO sys_menu
+VALUES (115, '配置管理', '1100', -1, '', '', 1, 1, '', 1, 4, 1, '', 1, 0, 1234);
+INSERT INTO sys_menu
+VALUES (116, '信号量配置', '1105', 115, '', '', 1, 2, '', 1, 1, 1, '', 1, 1, 1234);
 -- ----------------------------
 -- Records of sys_role_menu
 -- ----------------------------
 TRUNCATE sys_role_menu;
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0001',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0100',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0101',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0102',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0103',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0104',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0200',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0201',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0202',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0203',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0204',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0205',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0206',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0207',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0209',NULL,NULL,-1);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0200',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0206',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('1100',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0605',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060501',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060504',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060505',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060506',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060507',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060508',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0607',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060701',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060702',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060703',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060704',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060710',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0611',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061101',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061102',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0612',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061204',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061205',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061206',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('1105',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061201',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061202',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061203',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0613',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061301',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061302',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('061303',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0600',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0601',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0602',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0603',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060301',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060302',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0606',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060601',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060602',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060603',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060604',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060605',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060606',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0604',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0608',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060801',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('060802',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0900',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0901',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('090101',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('090102',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('090103',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('090104',NULL,'checked',1234);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0001',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0100',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0101',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010101',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0102',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0103',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010301',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010302',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010303',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010304',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010305',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010306',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0104',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0105',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010501',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010502',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0107',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010701',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010702',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('010703',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0200',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0202',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020201',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020202',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020203',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020204',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020205',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('020206',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0203',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0204',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0205',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0209',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0211',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('021101',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('021102',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0300',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0302',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('030201',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('030202',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0303',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0304',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0801',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0400',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0403',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0610',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0406',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('040601',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('040602',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('01001',NULL,'checked',1235);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0600',NULL,'checked',1236);
-INSERT INTO sys_role_menu (menu_code,sort,element_code,role_id) VALUES ('0609',NULL,'checked',1236);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0001', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0100', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0101', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0102', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0103', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0104', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0200', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0201', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0202', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0203', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0204', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0205', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0206', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0207', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0209', NULL, NULL, -1);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0200', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0206', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('1100', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0605', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060501', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060504', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060505', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060506', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060507', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060508', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0607', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060701', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060702', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060703', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060704', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060710', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0611', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061101', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061102', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0612', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061204', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061205', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061206', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('1105', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061201', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061202', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061203', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0613', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061301', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061302', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('061303', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0600', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0601', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0602', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0603', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060301', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060302', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0606', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060601', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060602', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060603', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060604', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060605', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060606', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0604', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0608', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060801', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('060802', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0900', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0901', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('090101', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('090102', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('090103', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('090104', NULL, 'checked', 1234);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0001', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0100', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0101', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010101', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0102', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0103', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010301', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010302', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010303', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010304', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010305', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010306', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0104', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0105', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010501', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010502', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0107', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010701', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010702', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('010703', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0200', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0202', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020201', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020202', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020203', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020204', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020205', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('020206', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0203', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0204', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0205', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0209', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0211', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('021101', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('021102', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0300', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0302', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('030201', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('030202', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0303', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0304', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0801', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0400', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0403', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0610', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0406', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('040601', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('040602', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('01001', NULL, 'checked', 1235);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0600', NULL, 'checked', 1236);
+INSERT INTO sys_role_menu (menu_code, sort, element_code, role_id)
+VALUES ('0609', NULL, 'checked', 1236);
 
 -- ----------------------------
 -- Records of t_algorithm_info
 -- ----------------------------
-INSERT INTO `t_algorithm_info` VALUES ('1000002', '表计识别-指针', 'meter', '', '001', '1', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000003', '表计识别-计数', 'meter', '', '002', '2', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000004', '表计识别-数显', 'meter', '', '003', '3', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000005', '表计识别-油位', 'meter', '', '004', '4', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000011', '表计识别-指示灯', 'light', '', '005', '5', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000007', '表计识别-刀闸', 'isolator', '', '006', '6', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000008', '表计识别-吸湿', 'meter', '', '007', '7', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000009', '表计识别-物体', 'qrcode', '', '008', '8', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000010', '表计识别-红外', 'infrared', '', '009', '9', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000006', '表计识别-开关', 'switch', '', '010', '10', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000012', '声音', 'sound', '', '013', '13', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000013', '缺陷识别', '缺陷识别', '', '011', '398', '0', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000016', '未穿工装', 'wcgz', '', '', '398', '0', '376', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000017', '未穿安全帽', 'wcaqm', '', '', '398', '0', '377', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000018', '人员倒地', 'rydd', '', '', '398', '0', '378', '133');
-INSERT INTO `t_algorithm_info` VALUES ('1000019', '吸烟', 'xy', '', '', '398', '0', '379', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000020', '地面油污', 'sly_dmyw', '', '', '398', '0', '380', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000021', '异物-鸟巢', 'yw_nc', '', '', '398', '0', '381', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000022', '异物-挂空悬浮物', 'yw_gkxfw', '', '', '398', '0', '382', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000023', '表面污秽', 'bmwh', '', '', '398', '0', '383', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000024', '绝缘子-破裂', 'jyz_pl', '', '', '398', '0', '384', '133');
-INSERT INTO `t_algorithm_info` VALUES ('1000025', '绝缘子-裂纹', 'jyz_pl', '', '', '398', '0', '385', '133');
-INSERT INTO `t_algorithm_info` VALUES ('1000026', '呼吸器-硅胶变色', 'hxq_gjbs', '', '', '398', '0', '386', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000027', '呼吸器-硅胶筒破损', 'hxq_gjtps', '', '', '398', '0', '387', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000028', '油位状态-油封异常', 'ywzt_yfyc', '', '', '398', '0', '388', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000029', '表计-表盘模糊', 'bj_bpmh', '', '', '398', '0', '389', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000030', '表计-表盘破损', 'bj_bpps', '', '', '398', '0', '390', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000031', '表计-外壳破损', 'bj_wkps', '', '', '398', '0', '391', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000032', '门窗墙地面损坏', 'mcqdmsh', '', '', '398', '0', '392', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000033', '盖板破损或缺失', 'gbps', '', '', '398', '0', '393', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000034', '构架爬梯未上锁', 'gjptwss', '', '', '398', '0', '394', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000035', '箱门闭合异常', 'xmbhyc', '', '', '398', '0', '395', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000036', '金属锈蚀', 'jsxs', '', '', '398', '0', '396', '131');
-INSERT INTO `t_algorithm_info` VALUES ('1000037', '部件表面油污', 'sly_bjbmyw', '', '', '398', '0', '442', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000039', '越线闯入', 'yxcr', '', '', '398', '0', '444', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000040', '火灾烟雾', 'hzyw', '', '', '398', '0', '445', '133');
-INSERT INTO `t_algorithm_info` VALUES ('1000041', '小动物闯入', 'xdwcr', '', '', '398', '0', '446', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000042', '室内地面积水', 'sndmjs', '', '', '398', '0', '447', '133');
-INSERT INTO `t_algorithm_info` VALUES ('1000043', '压板分', 'kgg_ybf', '', '', '398', '0', '448', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000044', '压板合', 'kgg_ybh', '', '', '398', '0', '449', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000045', '表计读数异常', 'bjdsyc', '', '', '398', '0', '405', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000046', '导体护套破损', 'dthtps', '', '', '398', '0', '678', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000047', '引线断股或松股', 'yxdghsg', '', '', '398', '0', '677', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000048', '未佩戴安全绳', 'wpdaqs', '', '', '398', '0', '679', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000049', '墙面漏水', 'qmls', '', '', '398', '0', '680', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000050', '屋顶漏水', 'wdls', '', '', '398', '0', '681', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000051', '油位指示计异常', 'ywzt_ywzsjyc', '', '', '398', '0', '682', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000052', '呼吸器油封破损', 'hxq_yfps', '', '', '398', '0', '683', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000053', '导线断股', 'dxdg', '', '', '398', '0', '684', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000054', '套管胶合部油污', 'sly_jhbyw', '', '', '398', '0', '685', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000055', '汇控柜凝露', 'hkgnl', '', '', '398', '0', '686', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000056', '膨胀器冲顶', 'pzqcd', '', '', '398', '0', '687', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
-INSERT INTO `t_algorithm_info` VALUES ('1000059', '人员闯入', 'rycr', '', '', '398', '0', '839', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000002', '表计识别-指针', 'meter', '', '001', '1', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000003', '表计识别-计数', 'meter', '', '002', '2', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000004', '表计识别-数显', 'meter', '', '003', '3', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000005', '表计识别-油位', 'meter', '', '004', '4', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000011', '表计识别-指示灯', 'light', '', '005', '5', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000007', '表计识别-刀闸', 'isolator', '', '006', '6', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000008', '表计识别-吸湿', 'meter', '', '007', '7', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000009', '表计识别-物体', 'qrcode', '', '008', '8', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000010', '表计识别-红外', 'infrared', '', '009', '9', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000006', '表计识别-开关', 'switch', '', '010', '10', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000012', '声音', 'sound', '', '013', '13', '1', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000013', '缺陷识别', '缺陷识别', '', '011', '398', '0', '450', '1');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000016', '未穿工装', 'wcgz', '', '', '398', '0', '376', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000017', '未穿安全帽', 'wcaqm', '', '', '398', '0', '377', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000018', '人员倒地', 'rydd', '', '', '398', '0', '378', '133');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000019', '吸烟', 'xy', '', '', '398', '0', '379', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000020', '地面油污', 'sly_dmyw', '', '', '398', '0', '380', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000021', '异物-鸟巢', 'yw_nc', '', '', '398', '0', '381', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000022', '异物-挂空悬浮物', 'yw_gkxfw', '', '', '398', '0', '382', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000023', '表面污秽', 'bmwh', '', '', '398', '0', '383', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000024', '绝缘子-破裂', 'jyz_pl', '', '', '398', '0', '384', '133');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000025', '绝缘子-裂纹', 'jyz_pl', '', '', '398', '0', '385', '133');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000026', '呼吸器-硅胶变色', 'hxq_gjbs', '', '', '398', '0', '386', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000027', '呼吸器-硅胶筒破损', 'hxq_gjtps', '', '', '398', '0', '387', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000028', '油位状态-油封异常', 'ywzt_yfyc', '', '', '398', '0', '388', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000029', '表计-表盘模糊', 'bj_bpmh', '', '', '398', '0', '389', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000030', '表计-表盘破损', 'bj_bpps', '', '', '398', '0', '390', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000031', '表计-外壳破损', 'bj_wkps', '', '', '398', '0', '391', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000032', '门窗墙地面损坏', 'mcqdmsh', '', '', '398', '0', '392', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000033', '盖板破损或缺失', 'gbps', '', '', '398', '0', '393', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000034', '构架爬梯未上锁', 'gjptwss', '', '', '398', '0', '394', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000035', '箱门闭合异常', 'xmbhyc', '', '', '398', '0', '395', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000036', '金属锈蚀', 'jsxs', '', '', '398', '0', '396', '131');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000037', '部件表面油污', 'sly_bjbmyw', '', '', '398', '0', '442', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000039', '越线闯入', 'yxcr', '', '', '398', '0', '444', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000040', '火灾烟雾', 'hzyw', '', '', '398', '0', '445', '133');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000041', '小动物闯入', 'xdwcr', '', '', '398', '0', '446', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000042', '室内地面积水', 'sndmjs', '', '', '398', '0', '447', '133');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000043', '压板分', 'kgg_ybf', '', '', '398', '0', '448', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000044', '压板合', 'kgg_ybh', '', '', '398', '0', '449', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000045', '表计读数异常', 'bjdsyc', '', '', '398', '0', '405', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000046', '导体护套破损', 'dthtps', '', '', '398', '0', '678', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000047', '引线断股或松股', 'yxdghsg', '', '', '398', '0', '677', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000048', '未佩戴安全绳', 'wpdaqs', '', '', '398', '0', '679', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000049', '墙面漏水', 'qmls', '', '', '398', '0', '680', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000050', '屋顶漏水', 'wdls', '', '', '398', '0', '681', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000051', '油位指示计异常', 'ywzt_ywzsjyc', '', '', '398', '0', '682', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000052', '呼吸器油封破损', 'hxq_yfps', '', '', '398', '0', '683', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000053', '导线断股', 'dxdg', '', '', '398', '0', '684', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000054', '套管胶合部油污', 'sly_jhbyw', '', '', '398', '0', '685', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000055', '汇控柜凝露', 'hkgnl', '', '', '398', '0', '686', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000056', '膨胀器冲顶', 'pzqcd', '', '', '398', '0', '687', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000057', '电容器鼓肚', 'drqgd', '', '', '398', '0', '688', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000058', '地面沉降', 'dmcj', '', '', '398', '0', '689', '132');
+INSERT INTO `t_algorithm_info`
+VALUES ('1000059', '人员闯入', 'rycr', '', '', '398', '0', '839', '132');
 -- ----------------------------
 -- Records of t_dict_business
 -- ----------------------------
-INSERT INTO `t_dict_business` VALUES ('300028', '130', 'alarm_level', '预警', '0', '告警等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300029', '131', 'alarm_level', '一般告警', '0', '告警等级', '2');
-INSERT INTO `t_dict_business` VALUES ('300030', '132', 'alarm_level', '严重告警', '0', '告警等级', '3');
-INSERT INTO `t_dict_business` VALUES ('300031', '133', 'alarm_level', '危急告警', '0', '告警等级', '4');
-INSERT INTO `t_dict_business` VALUES ('300032', '135', 'log_level', '一般', '0', '日志类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300033', '136', 'log_level', '重要', '0', '日志类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300034', '137', 'log_level', '关键', '0', '日志类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300035', '139', 'user_state', '正常', '0', '用户状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300036', '140', 'user_state', '锁定', '0', '用户状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300037', '141', 'user_state', '删除', '0', '用户状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300038', '143', 'region_type', '国家', '0', '区域类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300039', '144', 'region_type', '省份、直辖市', '0', '区域类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300040', '145', 'region_type', '运维站', '0', '区域类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300041', '146', 'region_type', '变电站', '0', '区域类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300042', '147', 'region_type', '间隔', '0', '区域类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300043', '1', 'mete_kind', '遥信', '0', '测点类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300044', '2', 'mete_kind', '遥测', '0', '测点类型', '2');
-INSERT INTO `t_dict_business` VALUES ('300045', '3', 'mete_kind', '遥控', '0', '测点类型', '3');
-INSERT INTO `t_dict_business` VALUES ('300046', '4', 'mete_kind', '遥调', '0', '测点类型', '4');
-INSERT INTO `t_dict_business` VALUES ('300047', '154', 'device_type', '断路器', '2', '设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300048', '155', 'robot_position', '室内轮式', '1', '机器人类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300049', '156', 'robot_position', '室外轮式', '2', '机器人类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300050', '157', 'robot_type', 'A200', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300051', '158', 'robot_type', 'SA100', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300052', '159', 'robot_type', 'E100', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300053', '160', 'robot_type', 'E300', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300054', '161', 'robot_type', 'D200', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300055', '162', 'robot_type', 'Z100', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300056', '163', 'robot_factory', '亿嘉和', '0', '机器人厂家', '1');
-INSERT INTO `t_dict_business` VALUES ('300057', '164', 'robot_factory', '大华', '0', '机器人厂家', '1');
-INSERT INTO `t_dict_business` VALUES ('300058', '165', 'robot_use', '已报废', '0', '使用状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300059', '166', 'robot_use', '使用中', '0', '使用状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300060', '167', 'robot_use', '未使用', '0', '使用状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300061', '168', 'recorder_type', '海康', '0', 'NVR类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300062', '169', 'recorder_type', '大华', '0', 'NVR类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300063', '170', 'algorithm_type', '人脸识别', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300064', '171', 'algorithm_type', '生物识别', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300065', '172', 'if_run', '周期执行', '0', '执行方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300066', '173', 'if_run', '立刻执行', '0', '执行方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300067', '174', 'if_run', '定期执行', '0', '执行方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300068', '182', 'device_type', '组合电器', '3', '设备类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300069', '183', 'voltage_level', '超高', '0', '电压等级', '5');
-INSERT INTO `t_dict_business` VALUES ('300070', '184', 'voltage_level', '高', '0', '电压等级', '4');
-INSERT INTO `t_dict_business` VALUES ('300071', '185', 'voltage_level', '中', '0', '电压等级', '3');
-INSERT INTO `t_dict_business` VALUES ('300072', '186', 'voltage_level', '低', '0', '电压等级', '2');
-INSERT INTO `t_dict_business` VALUES ('300073', '187', 'voltage_level', '超低', '0', '电压等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300074', '188', 'device_vendor', 'ABB', '0', '设备厂商', '1');
-INSERT INTO `t_dict_business` VALUES ('300075', '189', 'device_vendor', '施耐德', '0', '设备厂商', '1');
-INSERT INTO `t_dict_business` VALUES ('300076', '190', 'device_vendor', '斯图兹', '0', '设备厂商', '1');
-INSERT INTO `t_dict_business` VALUES ('300077', '191', 'device_vendor', '西门子', '0', '设备厂商', '1');
-INSERT INTO `t_dict_business` VALUES ('300078', '192', 'device_vendor', '大金', '0', '设备厂商', '1');
-INSERT INTO `t_dict_business` VALUES ('300079', '193', 'device_type', '隔离开关', '4', '设备类型', '6');
-INSERT INTO `t_dict_business` VALUES ('300080', '194', 'device_type', '开关柜', '5', '设备类型', '3');
-INSERT INTO `t_dict_business` VALUES ('300081', '195', 'device_type', '电压互感器', '7', '设备类型', '17');
-INSERT INTO `t_dict_business` VALUES ('300082', '196', 'device_type', '电流互感器', '6', '设备类型', '16');
-INSERT INTO `t_dict_business` VALUES ('300083', '197', 'device_type', '避雷器', '8', '设备类型', '2');
-INSERT INTO `t_dict_business` VALUES ('300084', '198', 'device_model', '施耐德空调', '193', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300085', '199', 'device_model', '斯图兹空调', '193', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300086', '200', 'device_model', 'ABB空调', '193', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300087', '201', 'device_model', '海天风机', '194', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300088', '202', 'device_model', '好太太风机', '194', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300089', '203', 'device_model', '舜天新风机', '196', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300090', '204', 'device_model', '三胞新风机', '196', '设备型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300091', '205', 'camera_type', '可见光摄像机', '0', '相机类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300092', '206', 'camera_type', '红外摄像机', '0', '相机类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300093', '207', 'camera_vendor', '海康', '0', '厂家类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300094', '208', 'camera_vendor', '大华', '0', '厂家类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300095', '209', 'camera_vendor', '雄迈', '0', '厂家类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300096', '210', 'protocol_type', 'UDP', '0', '协议类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300097', '211', 'protocol_type', 'TCP', '0', '协议类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300098', '212', 'protocol_type', 'HTTP', '0', '协议类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300099', '213', 'plan_type', '全面巡视', '0', '巡视类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300100', '214', 'plan_type', '例行巡视', '1', '巡视类型', '2');
-INSERT INTO `t_dict_business` VALUES ('300101', '215', 'plan_type', '熄灯巡视', '0', '巡视类型', '3');
-INSERT INTO `t_dict_business` VALUES ('300102', '216', 'plan_type', '特殊巡视', '2', '巡视类型', '4');
-INSERT INTO `t_dict_business` VALUES ('300103', '217', 'plan_type', '专项巡视', '3', '巡视类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300104', '218', 'plan_type', '自定义巡视', '4', '巡视类型', '6');
-INSERT INTO `t_dict_business` VALUES ('300105', '219', 'mete_type', '位置状态识别', '2', '巡视内容', '2');
-INSERT INTO `t_dict_business` VALUES ('300106', '220', 'mete_type', '外观缺陷识别', '3', '巡视内容', '3');
-INSERT INTO `t_dict_business` VALUES ('300107', '221', 'mete_type', '表计读数', '1', '巡视内容', '1');
-INSERT INTO `t_dict_business` VALUES ('300108', '222', 'mete_type', '红外测温', '4', '巡视内容', '4');
-INSERT INTO `t_dict_business` VALUES ('300109', '223', 'mete_type', '声音检测', '5', '巡视内容', '5');
-INSERT INTO `t_dict_business` VALUES ('300110', '224', 'unit', 'V', '0', '单位名称', '1');
-INSERT INTO `t_dict_business` VALUES ('300111', '225', 'unit', 'A', '0', '单位名称', '1');
-INSERT INTO `t_dict_business` VALUES ('300112', '226', 'unit', '℃', '0', '单位名称', '1');
-INSERT INTO `t_dict_business` VALUES ('300113', '227', 'unit', '%H', '0', '单位名称', '1');
-INSERT INTO `t_dict_business` VALUES ('300114', '228', 'cruise_type', '机器人', '0', '巡检方式', '3');
-INSERT INTO `t_dict_business` VALUES ('300115', '229', 'cruise_type', '视频-可见光', '0', '巡检方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300116', '230', 'cruise_type', '视频-红外', '0', '巡检方式', '2');
-INSERT INTO `t_dict_business` VALUES ('300117', '231', 'cruise_type', '主辅设备', '0', '巡检方式', '6');
-INSERT INTO `t_dict_business` VALUES ('300118', '232', 'cruise_type', '声纹', '0', '巡检方式', '5');
-INSERT INTO `t_dict_business` VALUES ('300119', '233', 'alarm_type', '智能预警', '0', '告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300120', '234', 'alarm_type', '环境预警', '0', '告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300121', '235', 'alarm_type', '设备预警', '0', '告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300122', '236', 'alarm_type', '行为预警', '0', '告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300123', '237', 'alarm_type', '其他预警', '0', '告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300124', '238', 'task_state', '任务未开始', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300125', '239', 'task_state', '正在执行', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300126', '240', 'task_state', '执行完成', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300127', '241', 'task_state', '任务暂停', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300128', '242', 'task_state', '任务终止', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300129', '243', 'task_state', '任务异常终止', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300130', '244', 'task_state', '任务超期', '0', '任务状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300131', '245', 'data_state', '数据异常', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300132', '246', 'cruise_result', '正常', '0', '巡视执行结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300133', '247', 'cruise_result', '异常', '0', '巡视执行结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300134', '248', 'abnormal_type', '采集失败', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300135', '249', 'abnormal_type', '数据异常', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300137', '251', 'abnormal_type', '执行超时', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300138', '252', 'cruise_data_state', '已执行', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300139', '253', 'cruise_data_state', '未执行', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300140', '254', 'cruise_data_state', '执行失败', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300141', '255', 'cruise_data_state', '未知', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300142', '256', 'evaluation_state', '已审核', '0', '审核状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300143', '257', 'evaluation_state', '未审核', '0', '审核状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300144', '258', 'identify_state', '识别正确', '0', '识别状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300145', '259', 'identify_state', '识别错误', '0', '识别状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300146', '261', 'identify_result', '正常', '0', '实际结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300147', '262', 'identify_result', '未采集图片', '0', '实际结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300148', '263', 'identify_result', '未识别结果', '0', '实际结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300149', '264', 'identify_result', '数据异常', '0', '实际结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300150', '265', 'is_support', '支持', '0', '是否支持', '1');
-INSERT INTO `t_dict_business` VALUES ('300151', '266', 'is_support', '不支持', '0', '是否支持', '1');
-INSERT INTO `t_dict_business` VALUES ('300152', '267', 'task_type', '日常巡视', '0', '任务来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300153', '268', 'task_type', '红外普测', '0', '任务来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300154', '269', 'task_type', '地电波', '0', '任务来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300155', '270', 'task_type', '机器人监控', '0', '任务来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300156', '271', 'task_type', '机器人本体任务', '0', '任务来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300157', '272', 'data_source', '视频', '0', '数据来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300158', '273', 'data_source', '红外', '0', '数据来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300159', '274', 'data_source', '机器人', '0', '数据来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300160', '275', 'conf_mode', '已核查', '0', '处理状态', '2');
-INSERT INTO `t_dict_business` VALUES ('300161', '276', 'conf_mode', '未核查', '0', '处理状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300162', '277', 'conf_mode1', '已确认', '0', '处理状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300163', '278', 'conf_mode2', '已忽略', '0', '处理状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300164', '279', 'alarm_source', '机器人', '0', '告警来源', '3');
-INSERT INTO `t_dict_business` VALUES ('300165', '280', 'alarm_source', '视频-可见光', '0', '告警来源', '1');
-INSERT INTO `t_dict_business` VALUES ('300166', '281', 'alarm_source', '视频-红外', '0', '告警来源', '2');
-INSERT INTO `t_dict_business` VALUES ('300167', '282', 'alarm_source', '主辅设备', '0', '告警来源', '7');
-INSERT INTO `t_dict_business` VALUES ('300168', '283', 'defect_level', '危急', '133', '缺陷等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300169', '284', 'defect_level', '一般', '131', '缺陷等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300170', '285', 'defect_level', '严重', '132', '缺陷等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300171', '286', 'deal_type', '属实', '0', '是否属实', '1');
-INSERT INTO `t_dict_business` VALUES ('300172', '287', 'deal_type', '不属实', '0', '是否属实', '1');
-INSERT INTO `t_dict_business` VALUES ('300173', '288', 'deal_type1', '确认异常，但在允许范围内', '0', '处理方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300174', '289', 'deal_type1', '确认异常，需要进一步跟踪', '0', '处理方式', '1');
-INSERT INTO `t_dict_business` VALUES ('300175', '291', 'device_type', '干式电抗器', '10', '设备类型', '18');
-INSERT INTO `t_dict_business` VALUES ('300176', '292', 'device_type', '串联补偿装置', '11', '设备类型', '27');
-INSERT INTO `t_dict_business` VALUES ('300177', '293', 'device_type', '母线及绝缘子', '12', '设备类型', '26');
-INSERT INTO `t_dict_business` VALUES ('300178', '294', 'device_type', '穿墙套管', '13', '设备类型', '7');
-INSERT INTO `t_dict_business` VALUES ('300179', '295', 'device_type', '电力电缆', '31', '设备类型', '8');
-INSERT INTO `t_dict_business` VALUES ('300180', '296', 'device_type', '消弧线圈', '14', '设备类型', '9');
-INSERT INTO `t_dict_business` VALUES ('300181', '297', 'device_type', '高频阻波器', '15', '设备类型', '19');
-INSERT INTO `t_dict_business` VALUES ('300182', '298', 'device_type', '耦合电容器', '16', '设备类型', '20');
-INSERT INTO `t_dict_business` VALUES ('300183', '299', 'device_type', '高压熔断器', '17', '设备类型', '21');
-INSERT INTO `t_dict_business` VALUES ('300184', '300', 'device_type', '中性点隔直装置', '18', '设备类型', '30');
-INSERT INTO `t_dict_business` VALUES ('300185', '301', 'device_type', '接地装置', '19', '设备类型', '10');
-INSERT INTO `t_dict_business` VALUES ('300186', '303', 'device_type', '站用变压器', '21', '设备类型', '22');
-INSERT INTO `t_dict_business` VALUES ('300187', '304', 'device_type', '站用交流电源', '22', '设备类型', '24');
-INSERT INTO `t_dict_business` VALUES ('300188', '305', 'device_type', '站用直流电源', '23', '设备类型', '25');
-INSERT INTO `t_dict_business` VALUES ('300189', '306', 'device_type', '设备构架', '24', '设备类型', '11');
-INSERT INTO `t_dict_business` VALUES ('300190', '307', 'device_type', '辅助设施', '25', '设备类型', '12');
-INSERT INTO `t_dict_business` VALUES ('300191', '308', 'device_type', '土建设施', '26', '设备类型', '13');
-INSERT INTO `t_dict_business` VALUES ('300192', '309', 'device_type', '避雷针', '27', '设备类型', '4');
-INSERT INTO `t_dict_business` VALUES ('300193', '310', 'device_type', '二次屏柜', '29', '设备类型', '14');
-INSERT INTO `t_dict_business` VALUES ('300194', '311', 'device_type', '消防系统', '30', '设备类型', '15');
-INSERT INTO `t_dict_business` VALUES ('300195', '312', 'sub_plan_type', '大风', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300196', '313', 'sub_plan_type', '雷暴', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300197', '314', 'sub_plan_type', '雾霾（含毛毛雨、大雾等）', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300198', '315', 'sub_plan_type', '雨后', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300199', '316', 'sub_plan_type', '下雪', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300200', '317', 'sub_plan_type', '气温骤变（含低温天气）', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300201', '318', 'sub_plan_type', '高温', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300202', '319', 'sub_plan_type', '冰雹', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300203', '320', 'sub_plan_type', '覆冰', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300204', '321', 'sub_plan_type', '沙尘暴', '300102', '特殊巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300205', '322', 'sub_plan_type', '红外测温', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300206', '323', 'sub_plan_type', '油位油温表抄录', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300207', '324', 'sub_plan_type', '避雷器表计抄录', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300208', '325', 'sub_plan_type', 'SF6 压力表抄录', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300209', '326', 'sub_plan_type', '液压表抄录', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300210', '327', 'sub_plan_type', '位置状态识别抄录', '300103', '专项巡视', '1');
-INSERT INTO `t_dict_business` VALUES ('300211', '1', 'analyse_type', '指针', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300212', '2', 'analyse_type', '计数', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300213', '3', 'analyse_type', '数显', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300214', '4', 'analyse_type', '油位', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300215', '5', 'analyse_type', '指示灯', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300216', '6', 'analyse_type', '刀闸', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300217', '7', 'analyse_type', '吸湿', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300218', '8', 'analyse_type', '物体', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300219', '9', 'analyse_type', '红外', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300220', '10', 'analyse_type', '开关', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300227', '328', 'device_type', '油浸式变压器', '1', '设备类型', '28');
-INSERT INTO `t_dict_business` VALUES ('300228', '330', 'device_type', '并联电容器组', '9', '设备类型', '29');
-INSERT INTO `t_dict_business` VALUES ('300229', '331', 'device_type', '端子箱及检修电源箱', '20', '设备类型', '32');
-INSERT INTO `t_dict_business` VALUES ('300300', '376', 'defect_model', '未穿工装', '0', '缺陷类型', '3');
-INSERT INTO `t_dict_business` VALUES ('300301', '377', 'defect_model', '未穿安全帽', '0', '缺陷类型', '16');
-INSERT INTO `t_dict_business` VALUES ('300302', '378', 'defect_model', '人员倒地', '0', '缺陷类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300303', '379', 'defect_model', '吸烟', '0', '缺陷类型', '2');
-INSERT INTO `t_dict_business` VALUES ('300304', '380', 'defect_model', '地面油污', '0', '缺陷类型', '4');
-INSERT INTO `t_dict_business` VALUES ('300305', '381', 'defect_model', '异物-鸟巢', '0', '缺陷类型', '33');
-INSERT INTO `t_dict_business` VALUES ('300306', '382', 'defect_model', '异物-挂空悬浮物', '0', '缺陷类型', '41');
-INSERT INTO `t_dict_business` VALUES ('300307', '383', 'defect_model', '绝缘子表面污秽', '0', '缺陷类型', '32');
-INSERT INTO `t_dict_business` VALUES ('300308', '384', 'defect_model', '绝缘子-破裂', '0', '缺陷类型', '34');
-INSERT INTO `t_dict_business` VALUES ('300309', '385', 'defect_model', '绝缘子-裂纹', '0', '缺陷类型', '35');
-INSERT INTO `t_dict_business` VALUES ('300310', '386', 'defect_model', '呼吸器-硅胶变色', '0', '缺陷类型', '42');
-INSERT INTO `t_dict_business` VALUES ('300311', '387', 'defect_model', '呼吸器-硅胶筒破损 ', '0', '缺陷类型', '43');
-INSERT INTO `t_dict_business` VALUES ('300312', '388', 'defect_model', '油位状态-油封异常', '0', '缺陷类型', '44');
-INSERT INTO `t_dict_business` VALUES ('300313', '389', 'defect_model', '表计-表盘模糊', '0', '缺陷类型', '38');
-INSERT INTO `t_dict_business` VALUES ('300314', '390', 'defect_model', '表计-表盘破损', '0', '缺陷类型', '36');
-INSERT INTO `t_dict_business` VALUES ('300315', '391', 'defect_model', '表计-外壳破损', '0', '缺陷类型', '37');
-INSERT INTO `t_dict_business` VALUES ('300316', '392', 'defect_model', '门窗墙地面损坏', '0', '缺陷类型', '31');
-INSERT INTO `t_dict_business` VALUES ('300317', '393', 'defect_model', '盖板破损', '0', '缺陷类型', '13');
-INSERT INTO `t_dict_business` VALUES ('300318', '394', 'defect_model', '构架爬梯未上锁', '0', '缺陷类型', '29');
-INSERT INTO `t_dict_business` VALUES ('300319', '395', 'defect_model', '箱门闭合异常', '0', '缺陷类型', '25');
-INSERT INTO `t_dict_business` VALUES ('300320', '396', 'defect_model', '金属锈蚀', '0', '缺陷类型', '14');
-INSERT INTO `t_dict_business` VALUES ('300322', '398', 'defect_type', '缺陷识别', '0', '算法识别', '1');
-INSERT INTO `t_dict_business` VALUES ('300323', '399', 'robot_position', '室内轨道', '3', '机器人类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300324', '400', 'param_type', '系统服务配置', '0', '参数类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300325', '401', 'param_type', '文件路径配置', '0', '参数类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300326', '402', 'param_type', '安全参数配置', '0', '参数类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300327', '403', 'param_type', '视频参数配置', '0', '参数类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300328', '404', 'param_type', '其他参数配置', '0', '参数类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300329', '405', 'defect_model', '表计读数异常', '0', '缺陷类型', '24');
-INSERT INTO `t_dict_business` VALUES ('300330', '406', 'effective_state', '已生效', '0', '生效状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300331', '407', 'effective_state', '已失效', '0', '生效状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300332', '408', 'effective_state', '未生效', '0', '生效状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300334', '410', 'abnormal_type', '设备检修', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300335', '411', 'abnormal_type', '设备离线', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300336', '412', 'abnormal_type', '任务终止', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300356', '411', 'meter_type', '油位表', '1', '表计类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300357', '412', 'meter_type', '避雷器动作次数表', '2', '表计类型', '9');
-INSERT INTO `t_dict_business` VALUES ('300358', '413', 'meter_type', '泄漏电流表', '3', '表计类型', '7');
-INSERT INTO `t_dict_business` VALUES ('300359', '414', 'meter_type', 'SF6压力表', '4', '表计类型', '6');
-INSERT INTO `t_dict_business` VALUES ('300360', '415', 'meter_type', '液压表', '5', '表计类型', '2');
-INSERT INTO `t_dict_business` VALUES ('300361', '416', 'meter_type', '开关动作次数表', '6', '表计类型', '8');
-INSERT INTO `t_dict_business` VALUES ('300362', '417', 'meter_type', '油温表', '7', '表计类型', '3');
-INSERT INTO `t_dict_business` VALUES ('300363', '418', 'meter_type', '档位表', '8', '表计类型', '4');
-INSERT INTO `t_dict_business` VALUES ('300364', '419', 'meter_type', '气压表', '9', '表计类型', '5');
-INSERT INTO `t_dict_business` VALUES ('300365', '420', 'appearance_type', '电子围栏', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300366', '421', 'appearance_type', '红外对射', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300367', '422', 'appearance_type', '泡沫喷淋', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300368', '423', 'appearance_type', '消防水泵', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300369', '424', 'appearance_type', '消防栓', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300370', '425', 'appearance_type', '消防室', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300371', '426', 'appearance_type', '设备室', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300372', '427', 'appearance_type', '照明灯', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300373', '428', 'appearance_type', '摄像头', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300374', '429', 'appearance_type', '水位线', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300375', '430', 'appearance_type', '排水泵', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300376', '431', 'appearance_type', '沉降监测点', '0', '外观类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300378', '432', 'device_type', '避雷器动作次数表', '28', '设备类型', '31');
-INSERT INTO `t_dict_business` VALUES ('300379', '433', 'mete_type', '闪烁检测', '6', '巡视内容', '6');
-INSERT INTO `t_dict_business` VALUES ('300380', '434', 'camera_model', '索尼HDR-AX2000E', '0', '摄像机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300381', '435', 'camera_model', '索尼HVR-HD1000C', '0', '摄像机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300382', '436', 'camera_model', '索尼HDR-FX1000E', '0', '摄像机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300383', '437', 'camera_model', '索尼HVR-Z5C', '0', '摄像机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300384', '438', 'recorder_model', 'DS-7808N-K1/4P', '0', 'NVR型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300385', '439', 'recorder_model', 'DS-7816N-K1/4P', '0', 'NVR型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300386', '440', 'recorder_model', 'DS-7208HV-S', '0', 'NVR型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300387', '441', 'recorder_model', 'DS-7216HV-S', '0', 'NVR型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300388', '442', 'defect_model', '部件表面油污 ', '0', '缺陷类型', '23');
-INSERT INTO `t_dict_business` VALUES ('300389', '443', 'defect_model', '盖板缺失', '0', '缺陷类型', '7');
-INSERT INTO `t_dict_business` VALUES ('300390', '444', 'defect_model', '越线闯入', '0', '缺陷类型', '8');
-INSERT INTO `t_dict_business` VALUES ('300391', '445', 'defect_model', '火灾烟雾', '0', '缺陷类型', '9');
-INSERT INTO `t_dict_business` VALUES ('300392', '446', 'defect_model', '小动物闯入', '0', '缺陷类型', '15');
-INSERT INTO `t_dict_business` VALUES ('300393', '447', 'defect_model', '室内地面积水', '0', '缺陷类型', '20');
-INSERT INTO `t_dict_business` VALUES ('300394', '448', 'defect_model', '开关柜-压板分', '0', '缺陷类型', '39');
-INSERT INTO `t_dict_business` VALUES ('300395', '449', 'defect_model', '开关柜-压板合', '0', '缺陷类型', '40');
-INSERT INTO `t_dict_business` VALUES ('300396', '450', 'defect_model', '其他', '0', '缺陷类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300401', '455', 'robot_type', 'SI100', '0', '机器人型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300402', '456', 'operation_task', '操作票操作', '0', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300403', '457', 'main_operation_type', '旋钮', '1', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300404', '458', 'main_operation_type', '按钮', '2', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300405', '459', 'main_operation_type', '手车', '3', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300406', '460', 'main_operation_type', '地刀', '4', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300413', '461', 'main_operation_type', '紧急分合闸', '5', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300414', '462', 'main_operation_type', '手车验电', '6', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300415', '463', 'main_operation_type', '机械位判断', '7', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300416', '464', 'main_operation_type', '压板', '8', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300417', '465', 'main_operation_type', '其他', '9', '主操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300418', '466', 'operation_type', '转换开关', '1', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300419', '467', 'operation_type', '控制开关', '2', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300422', '468', 'operation_type', '储能开关', '3', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300423', '469', 'operation_type', '手车旋钮', '4', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300424', '470', 'operation_type', '转换控制开关', '5', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300425', '471', 'operation_type', '电压选择旋钮', '6', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300426', '472', 'operation_type', '手车操作开关', '7', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300427', '473', 'operation_type', '接地刀操作开关', '8', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300428', '474', 'operation_type', '闭锁开关', '9', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300429', '475', 'operation_type', '风机旋钮', '10', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300430', '476', 'operation_type', '加热器旋钮', '11', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300431', '477', 'operation_type', '复归按钮', '12', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300432', '478', 'operation_type', '带电显示器', '13', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300433', '479', 'operation_type', '线路保护装置', '14', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300434', '480', 'operation_type', '手车', '15', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300435', '481', 'operation_type', '地刀', '16', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300436', '482', 'operation_type', '许继_紧急分合闸', '17', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300437', '483', 'operation_type', '西门子_紧急分合闸', '18', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300438', '484', 'operation_type', '华电_紧急分合闸', '19', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300439', '485', 'operation_type', '天灵_紧急分合闸', '20', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300440', '486', 'operation_type', '北辰_紧急分合闸', '21', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300441', '487', 'operation_type', '江苏_紧急分合闸', '22', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300442', '488', 'operation_type', '手车验电装置', '23', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300443', '489', 'operation_type', '地刀机械位判断拍照', '24', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300444', '490', 'operation_type', '断路器开关', '25', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300445', '491', 'operation_type', '压板', '26', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300446', '492', 'operation_type', 'OCR识别', '27', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300447', '493', 'operation_type', '五防逻辑识别', '28', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300448', '494', 'operation_type', '电压转换开关', '29', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300449', '495', 'operation_type', '解锁/联锁控制开关', '30', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300450', '496', 'operation_type', '并列/解锁控制开关', '31', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300451', '497', 'point_alarm_type', '超温告警', '1', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300452', '498', 'point_alarm_type', '温升告警', '2', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300453', '499', 'point_alarm_type', '三相温差告警', '3', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300454', '500', 'point_alarm_type', '三相对比告警', '4', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300455', '501', 'point_alarm_type', '声音异常', '5', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300456', '502', 'point_alarm_type', '外观异常', '6', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300457', '503', 'point_alarm_type', '仪表越限告警', '7', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300458', '504', 'point_alarm_type', '仪表超量程告警', '8', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300459', '505', 'point_alarm_type', '仪表三相对比', '9', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300460', '506', 'point_alarm_type', '变位告警', '10', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300461', '507', 'point_alarm_type', '操作告警', '11', '测点告警类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300462', '508', 'operation_task', '单设备操作', '0', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300463', '509', 'operation_task', '紧急分合闸操作', '0', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300464', '510', 'env_type', '温度', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300465', '511', 'env_type', '湿度', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300466', '512', 'env_type', '风速', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300467', '513', 'env_type', '水泵', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300468', '514', 'env_type', '防盗', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300469', '515', 'env_type', '灯', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300470', '516', 'env_type', '空调', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300471', '517', 'env_type', '门禁', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300472', '518', 'env_type', 'SF6', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300473', '519', 'env_type', 'O3', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300474', '520', 'env_type', '烟雾', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300475', '521', 'env_type', '液位传感器', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300476', '522', 'env_type', '风机', '0', '环控设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300477', '523', 'mete_type', '录像', '105', '巡视内容', '14');
-INSERT INTO `t_dict_business` VALUES ('300478', '524', 'cruise_type', '无人机', '0', '巡检方式', '4');
-INSERT INTO `t_dict_business` VALUES ('300479', '525', 'drone_type', 'q100', null, '无人机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300480', '667', 'voice_type', '声纹传感器', null, '声纹类型', null);
-INSERT INTO `t_dict_business` VALUES ('300481', '668', 'voice_type', '拾音器', null, '声纹类型', null);
-INSERT INTO `t_dict_business` VALUES ('300482', '669', 'voice_model', 'V100', null, '设备型号', null);
-INSERT INTO `t_dict_business` VALUES ('300483', '670', 'voice_model', 'HAN04HD2X', null, '设备型号', null);
-INSERT INTO `t_dict_business` VALUES ('300484', '671', 'voice_factory', '亿嘉和', null, '生产厂家', null);
-INSERT INTO `t_dict_business` VALUES ('300485', '672', 'voice_factory', '快鱼', null, '生产厂家', null);
-INSERT INTO `t_dict_business` VALUES ('300486', '673', 'robot_factory', '大疆', null, '生产厂家', null);
-INSERT INTO `t_dict_business` VALUES ('300487', '674', 'drone_position', '普通无人机', null, '无人机类型', null);
-INSERT INTO `t_dict_business` VALUES ('300488', '678', 'defect_model', '导体护套破损', '0', '缺陷类型', '21');
-INSERT INTO `t_dict_business` VALUES ('300489', '677', 'defect_model', '引线断股或松股', '0', '缺陷类型', '30');
-INSERT INTO `t_dict_business` VALUES ('300490', '679', 'defect_model', '未佩戴安全绳', '0', '缺陷类型', '22');
-INSERT INTO `t_dict_business` VALUES ('300491', '680', 'defect_model', '墙面漏水', '0', '缺陷类型', '10');
-INSERT INTO `t_dict_business` VALUES ('300492', '681', 'defect_model', '屋顶漏水', '0', '缺陷类型', '11');
-INSERT INTO `t_dict_business` VALUES ('300493', '682', 'defect_model', '油位指示计异常', '0', '缺陷类型', '28');
-INSERT INTO `t_dict_business` VALUES ('300494', '683', 'defect_model', '呼吸器油封破损', '0', '缺陷类型', '26');
-INSERT INTO `t_dict_business` VALUES ('300495', '684', 'defect_model', '导线断股', '0', '缺陷类型', '12');
-INSERT INTO `t_dict_business` VALUES ('300496', '685', 'defect_model', '套管胶合部油污', '0', '缺陷类型', '27');
-INSERT INTO `t_dict_business` VALUES ('300497', '686', 'defect_model', '汇控柜凝露', '0', '缺陷类型', '17');
-INSERT INTO `t_dict_business` VALUES ('300498', '687', 'defect_model', '膨胀器冲顶', '0', '缺陷类型', '18');
-INSERT INTO `t_dict_business` VALUES ('300499', '688', 'defect_model', '电容器鼓肚', '0', '缺陷类型', '19');
-INSERT INTO `t_dict_business` VALUES ('300500', '13', 'analyse_type', '声音', '0', '算法类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300501', '689', 'operation_type', '备自投方式切换开关', '32', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300502', '690', 'operation_type', '电压表切换开关', '33', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300503', '691', 'operation_type', '电压并列开关', '34', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300504', '692', 'operation_type', '紧急合闸', '35', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300505', '693', 'operation_type', '手车按钮-进车', '36', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300506', '694', 'operation_type', '手车按钮-退车', '37', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300507', '695', 'operation_type', '地刀按钮-分', '38', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300508', '696', 'operation_type', '地刀按钮-合', '39', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300509', '697', 'operation_type', '断路器按钮-分', '40', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300510', '698', 'operation_type', '断路器按钮-合', '41', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300599', '699', 'mete_type', '局放', '106', '巡视内容', '15');
-INSERT INTO `t_dict_business` VALUES ('300600', '700', 'custom_type', '本体', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300601', '701', 'custom_type', '储油柜', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300602', '702', 'custom_type', '分接开关', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300603', '703', 'custom_type', '冷却系统', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300604', '704', 'custom_type', '操动机构', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300605', '705', 'custom_type', '套管', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300606', '706', 'custom_type', '导电部分', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300607', '707', 'custom_type', '传动部分', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300608', '708', 'custom_type', '绝缘子', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300609', '709', 'custom_type', '引流线', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300610', '710', 'custom_type', '母线', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300611', '711', 'custom_type', '金具', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300612', '712', 'custom_type', '接地箱', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300613', '713', 'custom_type', '支撑构架', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300614', '714', 'custom_type', '非电量保护装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300616', '716', 'custom_type', '汇控柜', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300617', '717', 'custom_type', '基座', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300618', '718', 'custom_type', '机械闭锁及限位部分', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300619', '719', 'custom_type', '引线', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300621', '721', 'custom_type', '放电线圈', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300622', '722', 'custom_type', '避雷器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300623', '723', 'custom_type', '接地引下线', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300624', '724', 'custom_type', '基础构架', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300625', '725', 'custom_type', '整体外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300626', '726', 'custom_type', '二次接线盒', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300627', '727', 'custom_type', '接头', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300628', '728', 'custom_type', '母线及引线', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300629', '729', 'custom_type', '位置指示', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300630', '730', 'custom_type', '压力释放装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300631', '731', 'custom_type', '避雷器表计', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300632', '732', 'custom_type', 'SF6密度继电器（压力表）', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300633', '733', 'custom_type', '储能指示', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300634', '734', 'custom_type', '均压环', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300635', '735', 'custom_type', '标示牌', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300637', '737', 'custom_type', '吸湿器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300638', '738', 'custom_type', '金属膨胀器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300639', '739', 'custom_type', '末屏', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300640', '740', 'custom_type', '引线及接头', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300641', '741', 'custom_type', '端子箱', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300642', '742', 'custom_type', '油温表计', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300643', '743', 'custom_type', '外熔断器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300644', '744', 'custom_type', '油位表计', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300645', '745', 'custom_type', 'MOV本体', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300646', '746', 'custom_type', '电流互感器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300647', '747', 'custom_type', '电阻分压器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300648', '748', 'custom_type', '放电间隙', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300649', '749', 'custom_type', '电流表', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300650', '750', 'custom_type', '电压表', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300651', '751', 'custom_type', '进线断路器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300652', '752', 'custom_type', '分段断路器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300653', '753', 'custom_type', '馈线断路器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300654', '754', 'custom_type', '切换把手', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300655', '755', 'custom_type', '自动转换开关', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300656', '756', 'custom_type', 'UPS装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300657', '757', 'custom_type', '备自投装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300658', '758', 'custom_type', '蓄电池', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300659', '759', 'custom_type', '充电装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300660', '760', 'custom_type', '馈线屏', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300661', '761', 'custom_type', '事故照明屏', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300662', '762', 'custom_type', '爬梯门', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300663', '763', 'custom_type', '排水孔', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300664', '764', 'custom_type', '屏柜外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300665', '765', 'custom_type', '装置外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300666', '766', 'custom_type', '液晶面板', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300667', '767', 'custom_type', '指示灯', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300668', '768', 'custom_type', '表计', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300669', '769', 'custom_type', '压板', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300670', '770', 'custom_type', '空气开关', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300671', '771', 'custom_type', '本体及套管', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300672', '772', 'custom_type', '面板', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300673', '773', 'custom_type', '刀闸位置指示', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300674', '774', 'custom_type', '接地刀闸位置指示', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300675', '775', 'custom_type', '电抗器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300676', '776', 'custom_type', '放电线圈油位表计', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300677', '777', 'custom_type', '围栏外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300678', '778', 'custom_type', '阻尼装置', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300679', '779', 'custom_type', '阀控电抗器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300680', '780', 'custom_type', '支柱绝缘子', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300681', '781', 'custom_type', '平台构架外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300682', '782', 'custom_type', '光纤柱外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300683', '783', 'custom_type', '晶闸管阀外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300684', '784', 'custom_type', '固定钢板外观', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300685', '785', 'custom_type', '电缆本体', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300686', '786', 'custom_type', '终端', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300687', '787', 'custom_type', '运行声音', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300688', '788', 'custom_type', '分接开关档位', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300689', '789', 'custom_type', '电容器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300690', '790', 'custom_type', '互感器', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300691', '791', 'custom_type', '中性点隔离开关', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300692', '792', 'custom_type', '接地开关', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300693', '793', 'custom_type', '消防', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300694', '794', 'custom_type', '安防', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300696', '796', 'voltage_class', '6.6kV', '0', '电压等级', '1');
-INSERT INTO `t_dict_business` VALUES ('300697', '797', 'voltage_class', '10kV', '0', '电压等级', '2');
-INSERT INTO `t_dict_business` VALUES ('300698', '798', 'voltage_class', '20kV', '0', '电压等级', '3');
-INSERT INTO `t_dict_business` VALUES ('300699', '799', 'voltage_class', '35kV', '0', '电压等级', '4');
-INSERT INTO `t_dict_business` VALUES ('300700', '800', 'voltage_class', '110kV', '0', '电压等级', '5');
-INSERT INTO `t_dict_business` VALUES ('300701', '801', 'voltage_class', '220kV', '0', '电压等级', '6');
-INSERT INTO `t_dict_business` VALUES ('300702', '802', 'voltage_class', '330kV', '0', '电压等级', '7');
-INSERT INTO `t_dict_business` VALUES ('300703', '803', 'voltage_class', '500kV', '0', '电压等级', '8');
-INSERT INTO `t_dict_business` VALUES ('300704', '804', 'voltage_class', '750kV', '0', '电压等级', '9');
-INSERT INTO `t_dict_business` VALUES ('300705', '805', 'voltage_class', '800kV', '0', '电压等级', '10');
-INSERT INTO `t_dict_business` VALUES ('300706', '806', 'voltage_class', '1000kV', '0', '电压等级', '11');
-INSERT INTO `t_dict_business` VALUES ('300724', '997', 'alarm_source', '无人机', '0', '告警来源', '4');
-INSERT INTO `t_dict_business` VALUES ('300725', '998', 'alarm_source', '声纹', '0', '告警来源', '5');
-INSERT INTO `t_dict_business` VALUES ('300732', '689', 'defect_model', '地面沉降', '0', '缺陷类型', '6');
-INSERT INTO `t_dict_business` VALUES ('300733', '693', 'partial_dischargr_type', '局放', NULL, '局放类型', 1);
-INSERT INTO `t_dict_business` VALUES ('300734', '690', 'mete_type', '局放地电压检测', '12', '巡视内容', 8);
-INSERT INTO `t_dict_business` VALUES ('300735', '691', 'mete_type', '局放超声波检测', '11', '巡视内容', 7);
-INSERT INTO `t_dict_business` VALUES ('300736', '692', 'mete_type', '局放特高频图谱', '13', '巡视内容', 9);
-INSERT INTO `t_dict_business` VALUES ('300737', '901', 'prioritized_task_type', '站端日常巡视任务', '0', '执行等级配置任务类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300738', '902', 'prioritized_task_type', '上级系统控制任务', '0', '执行等级配置任务类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300739', '903', 'prioritized_task_type', '区域巡视系统控制任务', '0', '执行等级配置任务类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300740', '904', 'prioritized_task_type', '主辅设备联动任务', '0', '执行等级配置任务类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300741', '810', 'robot_type', '模拟机器人', NULL, '机器人类型', '0');
-INSERT INTO `t_dict_business` VALUES ('300742', '811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
-INSERT INTO `t_dict_business` VALUES ('300743', '812', 'device_type', '变电站环境', '32', '设备类型', '23');
-INSERT INTO `t_dict_business` VALUES ('300744', '813', 'recorder_type', '海康超脑', '0', 'NVR类型', '1' );
-INSERT INTO `t_dict_business` VALUES ('300745', '814', 'mete_type', '环境温度检测', '101', '巡视内容', '10');
-INSERT INTO `t_dict_business` VALUES ('300746', '815', 'mete_type', '环境湿度检测', '102', '巡视内容', '11');
-INSERT INTO `t_dict_business` VALUES ('300747', '816', 'mete_type', '氧气浓度检测', '103', '巡视内容', '12');
-INSERT INTO `t_dict_business` VALUES ('300748', '817', 'mete_type', 'SF6浓度检测', '104', '巡视内容', '13');
-INSERT INTO `t_dict_business` VALUES ('300749', '340', 'cruise_data_state', '执行忽略', NULL, '巡检数据状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300750', '341', 'cruise_data_state', '执行遗漏', NULL, '巡检数据状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300751', '342', 'cruise_data_state', '算法分析中', NULL, '巡检数据状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300752', '350', 'abnormal_type', '调用失败', NULL, '巡视异常原因', 0);
-INSERT INTO `t_dict_business` VALUES ('300753', '351', 'abnormal_type', '分析失败', NULL, '巡视异常原因', 0);
-INSERT INTO `t_dict_business` VALUES ('300754', '352', 'abnormal_type', '系统异常', NULL, '巡视异常原因', 0);
-INSERT INTO `t_dict_business` VALUES ('300755', '0', 'back_expire', '未备份', NULL, '备份过期状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300756', '1', 'back_expire', '未过期', NULL, '备份过期状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300757', '2', 'back_expire', '过期删除', NULL, '备份过期状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
-INSERT INTO `t_dict_business` VALUES ('300759', '818', 'camera_vendor', '巨哥', '0', '厂家类型', 1);
-INSERT INTO `t_dict_business` VALUES ('300760', '819', 'camera_vendor', '高德', '0', '厂家类型', 1);
-INSERT INTO `t_dict_business` VALUES ('300761', '821', 'abnormal_type', '操作任务中', NULL, '操作任务中不可下发巡视任务', '0');
-INSERT INTO `t_dict_business` VALUES ('300762', '689', 'alarm_source', '静默监视', '0', '告警来源', '6');
-INSERT INTO `t_dict_business` VALUES ('300765', '830', 'operation_type', '双按钮手车-进车', '42', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300766', '831', 'operation_type', '双按钮手车-退车', '43', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300767', '832', 'operation_type', '双按钮地刀-分', '44', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300768', '833', 'operation_type', '双按钮地刀-和', '45', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300769', '834', 'operation_type', '天灵-顺', '46', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300770', '835', 'operation_type', '轨交_紧急分合闸', '47', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300771', '836', 'operation_type', '轨交_接地刀操作开关', '48', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300772', '837', 'operation_type', '轨交_控制开关', '49', '操作类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300773', '838', 'abnormal_type', '放电', '0', '巡视异常原因', '1');
-INSERT INTO `t_dict_business` VALUES ('300774', '839', 'defect_model', '人员闯入', '0', '缺陷类型', '45');
-INSERT INTO `t_dict_business` VALUES ('300775', '840', 'iot_device_type', '电量表', '1', '物联设备类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300776', '841', 'iot_device_type', '温控器', '1', '物联设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('1', 'protocol_model', 'MODBUS_RTU', 0, '设备连接协议', 1);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2', 'protocol_model', 'MODBUS_TCP', 0, '设备连接协议', 2);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('3', 'protocol_model', 'RS485', 0, '设备连接协议', 3);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('4', 'protocol_model', 'DLT645_97', 0, '设备连接协议', 4);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('5', 'protocol_model', 'DLT645_07', 0, '设备连接协议', 5);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('6', 'protocol_model', '环控终端', 0, '设备连接协议', 6);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('7', 'protocol_model', '机器人', 0, '设备连接协议', 7);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('0','frequency','无','物联设备采集频率', 1);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('5','frequency','5 分钟','物联设备采集频率', 2);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('30','frequency','30 分钟','物联设备采集频率', 3);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('60','frequency','1 小时','物联设备采集频率', 4);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('240','frequency','4 小时','物联设备采集频率', 5);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('850', 'iot_device_type', '温度', '1', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('851', 'iot_device_type', '湿度', '2', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('853', 'iot_device_type', '水泵', '2104', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('854', 'iot_device_type', '防盗', '2105', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('855', 'iot_device_type', '灯', '2106', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('856', 'iot_device_type', '空调', '2107', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('857', 'iot_device_type', '门禁', '2108', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('858', 'iot_device_type', 'SF6', '8', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('859', 'iot_device_type', 'O3', '2110', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('860', 'iot_device_type', '烟雾', '2111', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('861', 'iot_device_type', '液位', '2112', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('862', 'iot_device_type', '风机', '2113', '环控设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('870', 'cruise_device_type', '室外轮式机器人', '1', '巡视设备类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('871', 'cruise_device_type', '室内轮式机器人', '2', '巡视设备类型', '2');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('872', 'cruise_device_type', '挂轨机器人', '3', '巡视设备类型', '3');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('873', 'cruise_device_type', '高清视频', '10', '巡视设备类型', '4');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('874', 'cruise_device_type', '硬盘录像机', '11', '巡视设备类型', '5');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('875', 'cruise_device_type', '无人机', '13', '巡视设备类型', '6');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('876', 'cruise_device_type', '声纹', '14', '巡视设备类型', '7');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('877', 'maintenance_type', '缺陷记录', '0', '维护信息类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('878', 'maintenance_type', '大修记录', '0', '维护信息类型', '2');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('879', 'maintenance_type', '退出再重放记录', '0', '维护信息类型', '3');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('880', 'maintenance_type', '更换记录', '0', '维护信息类型', '4');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('881', 'point_alarm_type', '非同源差值越限报警', '101', '测点告警类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('882', 'point_alarm_type', '非同源状态不一致报警', '102', '测点告警类型', '1');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('883', 'point_alarm_type', '趋势变化越限报警', '103', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300028', '130', 'alarm_level', '预警', '0', '告警等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300029', '131', 'alarm_level', '一般告警', '0', '告警等级', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300030', '132', 'alarm_level', '严重告警', '0', '告警等级', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300031', '133', 'alarm_level', '危急告警', '0', '告警等级', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300032', '135', 'log_level', '一般', '0', '日志类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300033', '136', 'log_level', '重要', '0', '日志类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300034', '137', 'log_level', '关键', '0', '日志类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300035', '139', 'user_state', '正常', '0', '用户状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300036', '140', 'user_state', '锁定', '0', '用户状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300037', '141', 'user_state', '删除', '0', '用户状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300038', '143', 'region_type', '国家', '0', '区域类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300039', '144', 'region_type', '省份、直辖市', '0', '区域类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300040', '145', 'region_type', '运维站', '0', '区域类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300041', '146', 'region_type', '变电站', '0', '区域类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300042', '147', 'region_type', '间隔', '0', '区域类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300043', '1', 'mete_kind', '遥信', '0', '测点类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300044', '2', 'mete_kind', '遥测', '0', '测点类型', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300045', '3', 'mete_kind', '遥控', '0', '测点类型', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300046', '4', 'mete_kind', '遥调', '0', '测点类型', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300047', '154', 'device_type', '断路器', '2', '设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300048', '155', 'robot_position', '室内轮式', '1', '机器人类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300049', '156', 'robot_position', '室外轮式', '2', '机器人类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300050', '157', 'robot_type', 'A200', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300051', '158', 'robot_type', 'SA100', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300052', '159', 'robot_type', 'E100', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300053', '160', 'robot_type', 'E300', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300054', '161', 'robot_type', 'D200', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300055', '162', 'robot_type', 'Z100', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300056', '163', 'robot_factory', '亿嘉和', '0', '机器人厂家', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300057', '164', 'robot_factory', '大华', '0', '机器人厂家', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300058', '165', 'robot_use', '已报废', '0', '使用状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300059', '166', 'robot_use', '使用中', '0', '使用状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300060', '167', 'robot_use', '未使用', '0', '使用状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300061', '168', 'recorder_type', '海康', '0', 'NVR类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300062', '169', 'recorder_type', '大华', '0', 'NVR类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300063', '170', 'algorithm_type', '人脸识别', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300064', '171', 'algorithm_type', '生物识别', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300065', '172', 'if_run', '周期执行', '0', '执行方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300066', '173', 'if_run', '立刻执行', '0', '执行方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300067', '174', 'if_run', '定期执行', '0', '执行方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300068', '182', 'device_type', '组合电器', '3', '设备类型', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300069', '183', 'voltage_level', '超高', '0', '电压等级', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300070', '184', 'voltage_level', '高', '0', '电压等级', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300071', '185', 'voltage_level', '中', '0', '电压等级', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300072', '186', 'voltage_level', '低', '0', '电压等级', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300073', '187', 'voltage_level', '超低', '0', '电压等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300074', '188', 'device_vendor', 'ABB', '0', '设备厂商', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300075', '189', 'device_vendor', '施耐德', '0', '设备厂商', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300076', '190', 'device_vendor', '斯图兹', '0', '设备厂商', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300077', '191', 'device_vendor', '西门子', '0', '设备厂商', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300078', '192', 'device_vendor', '大金', '0', '设备厂商', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300079', '193', 'device_type', '隔离开关', '4', '设备类型', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300080', '194', 'device_type', '开关柜', '5', '设备类型', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300081', '195', 'device_type', '电压互感器', '7', '设备类型', '17');
+INSERT INTO `t_dict_business`
+VALUES ('300082', '196', 'device_type', '电流互感器', '6', '设备类型', '16');
+INSERT INTO `t_dict_business`
+VALUES ('300083', '197', 'device_type', '避雷器', '8', '设备类型', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300084', '198', 'device_model', '施耐德空调', '193', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300085', '199', 'device_model', '斯图兹空调', '193', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300086', '200', 'device_model', 'ABB空调', '193', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300087', '201', 'device_model', '海天风机', '194', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300088', '202', 'device_model', '好太太风机', '194', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300089', '203', 'device_model', '舜天新风机', '196', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300090', '204', 'device_model', '三胞新风机', '196', '设备型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300091', '205', 'camera_type', '可见光摄像机', '0', '相机类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300092', '206', 'camera_type', '红外摄像机', '0', '相机类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300093', '207', 'camera_vendor', '海康', '0', '厂家类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300094', '208', 'camera_vendor', '大华', '0', '厂家类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300095', '209', 'camera_vendor', '雄迈', '0', '厂家类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300096', '210', 'protocol_type', 'UDP', '0', '协议类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300097', '211', 'protocol_type', 'TCP', '0', '协议类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300098', '212', 'protocol_type', 'HTTP', '0', '协议类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300099', '213', 'plan_type', '全面巡视', '0', '巡视类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300100', '214', 'plan_type', '例行巡视', '1', '巡视类型', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300101', '215', 'plan_type', '熄灯巡视', '0', '巡视类型', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300102', '216', 'plan_type', '特殊巡视', '2', '巡视类型', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300103', '217', 'plan_type', '专项巡视', '3', '巡视类型', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300104', '218', 'plan_type', '自定义巡视', '4', '巡视类型', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300105', '219', 'mete_type', '位置状态识别', '2', '巡视内容', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300106', '220', 'mete_type', '外观缺陷识别', '3', '巡视内容', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300107', '221', 'mete_type', '表计读数', '1', '巡视内容', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300108', '222', 'mete_type', '红外测温', '4', '巡视内容', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300109', '223', 'mete_type', '声音检测', '5', '巡视内容', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300110', '224', 'unit', 'V', '0', '单位名称', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300111', '225', 'unit', 'A', '0', '单位名称', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300112', '226', 'unit', '℃', '0', '单位名称', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300113', '227', 'unit', '%H', '0', '单位名称', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300114', '228', 'cruise_type', '机器人', '0', '巡检方式', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300115', '229', 'cruise_type', '视频-可见光', '0', '巡检方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300116', '230', 'cruise_type', '视频-红外', '0', '巡检方式', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300117', '231', 'cruise_type', '主辅设备', '0', '巡检方式', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300118', '232', 'cruise_type', '声纹', '0', '巡检方式', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300119', '233', 'alarm_type', '智能预警', '0', '告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300120', '234', 'alarm_type', '环境预警', '0', '告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300121', '235', 'alarm_type', '设备预警', '0', '告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300122', '236', 'alarm_type', '行为预警', '0', '告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300123', '237', 'alarm_type', '其他预警', '0', '告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300124', '238', 'task_state', '任务未开始', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300125', '239', 'task_state', '正在执行', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300126', '240', 'task_state', '执行完成', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300127', '241', 'task_state', '任务暂停', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300128', '242', 'task_state', '任务终止', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300129', '243', 'task_state', '任务异常终止', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300130', '244', 'task_state', '任务超期', '0', '任务状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300131', '245', 'data_state', '数据异常', '0', '巡检数据状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300132', '246', 'cruise_result', '正常', '0', '巡视执行结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300133', '247', 'cruise_result', '异常', '0', '巡视执行结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300134', '248', 'abnormal_type', '采集失败', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300135', '249', 'abnormal_type', '数据异常', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300137', '251', 'abnormal_type', '执行超时', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300138', '252', 'cruise_data_state', '已执行', '0', '巡检数据状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300139', '253', 'cruise_data_state', '未执行', '0', '巡检数据状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300140', '254', 'cruise_data_state', '执行失败', '0', '巡检数据状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300141', '255', 'cruise_data_state', '未知', '0', '巡检数据状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300142', '256', 'evaluation_state', '已审核', '0', '审核状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300143', '257', 'evaluation_state', '未审核', '0', '审核状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300144', '258', 'identify_state', '识别正确', '0', '识别状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300145', '259', 'identify_state', '识别错误', '0', '识别状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300146', '261', 'identify_result', '正常', '0', '实际结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300147', '262', 'identify_result', '未采集图片', '0', '实际结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300148', '263', 'identify_result', '未识别结果', '0', '实际结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300149', '264', 'identify_result', '数据异常', '0', '实际结果', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300150', '265', 'is_support', '支持', '0', '是否支持', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300151', '266', 'is_support', '不支持', '0', '是否支持', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300152', '267', 'task_type', '日常巡视', '0', '任务来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300153', '268', 'task_type', '红外普测', '0', '任务来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300154', '269', 'task_type', '地电波', '0', '任务来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300155', '270', 'task_type', '机器人监控', '0', '任务来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300156', '271', 'task_type', '机器人本体任务', '0', '任务来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300157', '272', 'data_source', '视频', '0', '数据来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300158', '273', 'data_source', '红外', '0', '数据来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300159', '274', 'data_source', '机器人', '0', '数据来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300160', '275', 'conf_mode', '已核查', '0', '处理状态', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300161', '276', 'conf_mode', '未核查', '0', '处理状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300162', '277', 'conf_mode1', '已确认', '0', '处理状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300163', '278', 'conf_mode2', '已忽略', '0', '处理状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300164', '279', 'alarm_source', '机器人', '0', '告警来源', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300165', '280', 'alarm_source', '视频-可见光', '0', '告警来源', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300166', '281', 'alarm_source', '视频-红外', '0', '告警来源', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300167', '282', 'alarm_source', '主辅设备', '0', '告警来源', '7');
+INSERT INTO `t_dict_business`
+VALUES ('300168', '283', 'defect_level', '危急', '133', '缺陷等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300169', '284', 'defect_level', '一般', '131', '缺陷等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300170', '285', 'defect_level', '严重', '132', '缺陷等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300171', '286', 'deal_type', '属实', '0', '是否属实', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300172', '287', 'deal_type', '不属实', '0', '是否属实', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300173', '288', 'deal_type1', '确认异常，但在允许范围内', '0', '处理方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300174', '289', 'deal_type1', '确认异常，需要进一步跟踪', '0', '处理方式', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300175', '291', 'device_type', '干式电抗器', '10', '设备类型', '18');
+INSERT INTO `t_dict_business`
+VALUES ('300176', '292', 'device_type', '串联补偿装置', '11', '设备类型', '27');
+INSERT INTO `t_dict_business`
+VALUES ('300177', '293', 'device_type', '母线及绝缘子', '12', '设备类型', '26');
+INSERT INTO `t_dict_business`
+VALUES ('300178', '294', 'device_type', '穿墙套管', '13', '设备类型', '7');
+INSERT INTO `t_dict_business`
+VALUES ('300179', '295', 'device_type', '电力电缆', '31', '设备类型', '8');
+INSERT INTO `t_dict_business`
+VALUES ('300180', '296', 'device_type', '消弧线圈', '14', '设备类型', '9');
+INSERT INTO `t_dict_business`
+VALUES ('300181', '297', 'device_type', '高频阻波器', '15', '设备类型', '19');
+INSERT INTO `t_dict_business`
+VALUES ('300182', '298', 'device_type', '耦合电容器', '16', '设备类型', '20');
+INSERT INTO `t_dict_business`
+VALUES ('300183', '299', 'device_type', '高压熔断器', '17', '设备类型', '21');
+INSERT INTO `t_dict_business`
+VALUES ('300184', '300', 'device_type', '中性点隔直装置', '18', '设备类型', '30');
+INSERT INTO `t_dict_business`
+VALUES ('300185', '301', 'device_type', '接地装置', '19', '设备类型', '10');
+INSERT INTO `t_dict_business`
+VALUES ('300186', '303', 'device_type', '站用变压器', '21', '设备类型', '22');
+INSERT INTO `t_dict_business`
+VALUES ('300187', '304', 'device_type', '站用交流电源', '22', '设备类型', '24');
+INSERT INTO `t_dict_business`
+VALUES ('300188', '305', 'device_type', '站用直流电源', '23', '设备类型', '25');
+INSERT INTO `t_dict_business`
+VALUES ('300189', '306', 'device_type', '设备构架', '24', '设备类型', '11');
+INSERT INTO `t_dict_business`
+VALUES ('300190', '307', 'device_type', '辅助设施', '25', '设备类型', '12');
+INSERT INTO `t_dict_business`
+VALUES ('300191', '308', 'device_type', '土建设施', '26', '设备类型', '13');
+INSERT INTO `t_dict_business`
+VALUES ('300192', '309', 'device_type', '避雷针', '27', '设备类型', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300193', '310', 'device_type', '二次屏柜', '29', '设备类型', '14');
+INSERT INTO `t_dict_business`
+VALUES ('300194', '311', 'device_type', '消防系统', '30', '设备类型', '15');
+INSERT INTO `t_dict_business`
+VALUES ('300195', '312', 'sub_plan_type', '大风', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300196', '313', 'sub_plan_type', '雷暴', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300197', '314', 'sub_plan_type', '雾霾（含毛毛雨、大雾等）', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300198', '315', 'sub_plan_type', '雨后', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300199', '316', 'sub_plan_type', '下雪', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300200', '317', 'sub_plan_type', '气温骤变（含低温天气）', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300201', '318', 'sub_plan_type', '高温', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300202', '319', 'sub_plan_type', '冰雹', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300203', '320', 'sub_plan_type', '覆冰', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300204', '321', 'sub_plan_type', '沙尘暴', '300102', '特殊巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300205', '322', 'sub_plan_type', '红外测温', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300206', '323', 'sub_plan_type', '油位油温表抄录', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300207', '324', 'sub_plan_type', '避雷器表计抄录', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300208', '325', 'sub_plan_type', 'SF6 压力表抄录', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300209', '326', 'sub_plan_type', '液压表抄录', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300210', '327', 'sub_plan_type', '位置状态识别抄录', '300103', '专项巡视', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300211', '1', 'analyse_type', '指针', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300212', '2', 'analyse_type', '计数', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300213', '3', 'analyse_type', '数显', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300214', '4', 'analyse_type', '油位', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300215', '5', 'analyse_type', '指示灯', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300216', '6', 'analyse_type', '刀闸', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300217', '7', 'analyse_type', '吸湿', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300218', '8', 'analyse_type', '物体', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300219', '9', 'analyse_type', '红外', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300220', '10', 'analyse_type', '开关', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300227', '328', 'device_type', '油浸式变压器', '1', '设备类型', '28');
+INSERT INTO `t_dict_business`
+VALUES ('300228', '330', 'device_type', '并联电容器组', '9', '设备类型', '29');
+INSERT INTO `t_dict_business`
+VALUES ('300229', '331', 'device_type', '端子箱及检修电源箱', '20', '设备类型', '32');
+INSERT INTO `t_dict_business`
+VALUES ('300300', '376', 'defect_model', '未穿工装', '0', '缺陷类型', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300301', '377', 'defect_model', '未穿安全帽', '0', '缺陷类型', '16');
+INSERT INTO `t_dict_business`
+VALUES ('300302', '378', 'defect_model', '人员倒地', '0', '缺陷类型', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300303', '379', 'defect_model', '吸烟', '0', '缺陷类型', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300304', '380', 'defect_model', '地面油污', '0', '缺陷类型', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300305', '381', 'defect_model', '异物-鸟巢', '0', '缺陷类型', '33');
+INSERT INTO `t_dict_business`
+VALUES ('300306', '382', 'defect_model', '异物-挂空悬浮物', '0', '缺陷类型', '41');
+INSERT INTO `t_dict_business`
+VALUES ('300307', '383', 'defect_model', '绝缘子表面污秽', '0', '缺陷类型', '32');
+INSERT INTO `t_dict_business`
+VALUES ('300308', '384', 'defect_model', '绝缘子-破裂', '0', '缺陷类型', '34');
+INSERT INTO `t_dict_business`
+VALUES ('300309', '385', 'defect_model', '绝缘子-裂纹', '0', '缺陷类型', '35');
+INSERT INTO `t_dict_business`
+VALUES ('300310', '386', 'defect_model', '呼吸器-硅胶变色', '0', '缺陷类型', '42');
+INSERT INTO `t_dict_business`
+VALUES ('300311', '387', 'defect_model', '呼吸器-硅胶筒破损 ', '0', '缺陷类型', '43');
+INSERT INTO `t_dict_business`
+VALUES ('300312', '388', 'defect_model', '油位状态-油封异常', '0', '缺陷类型', '44');
+INSERT INTO `t_dict_business`
+VALUES ('300313', '389', 'defect_model', '表计-表盘模糊', '0', '缺陷类型', '38');
+INSERT INTO `t_dict_business`
+VALUES ('300314', '390', 'defect_model', '表计-表盘破损', '0', '缺陷类型', '36');
+INSERT INTO `t_dict_business`
+VALUES ('300315', '391', 'defect_model', '表计-外壳破损', '0', '缺陷类型', '37');
+INSERT INTO `t_dict_business`
+VALUES ('300316', '392', 'defect_model', '门窗墙地面损坏', '0', '缺陷类型', '31');
+INSERT INTO `t_dict_business`
+VALUES ('300317', '393', 'defect_model', '盖板破损', '0', '缺陷类型', '13');
+INSERT INTO `t_dict_business`
+VALUES ('300318', '394', 'defect_model', '构架爬梯未上锁', '0', '缺陷类型', '29');
+INSERT INTO `t_dict_business`
+VALUES ('300319', '395', 'defect_model', '箱门闭合异常', '0', '缺陷类型', '25');
+INSERT INTO `t_dict_business`
+VALUES ('300320', '396', 'defect_model', '金属锈蚀', '0', '缺陷类型', '14');
+INSERT INTO `t_dict_business`
+VALUES ('300322', '398', 'defect_type', '缺陷识别', '0', '算法识别', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300323', '399', 'robot_position', '室内轨道', '3', '机器人类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300324', '400', 'param_type', '系统服务配置', '0', '参数类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300325', '401', 'param_type', '文件路径配置', '0', '参数类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300326', '402', 'param_type', '安全参数配置', '0', '参数类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300327', '403', 'param_type', '视频参数配置', '0', '参数类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300328', '404', 'param_type', '其他参数配置', '0', '参数类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300329', '405', 'defect_model', '表计读数异常', '0', '缺陷类型', '24');
+INSERT INTO `t_dict_business`
+VALUES ('300330', '406', 'effective_state', '已生效', '0', '生效状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300331', '407', 'effective_state', '已失效', '0', '生效状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300332', '408', 'effective_state', '未生效', '0', '生效状态', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300334', '410', 'abnormal_type', '设备检修', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300335', '411', 'abnormal_type', '设备离线', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300336', '412', 'abnormal_type', '任务终止', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300356', '411', 'meter_type', '油位表', '1', '表计类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300357', '412', 'meter_type', '避雷器动作次数表', '2', '表计类型', '9');
+INSERT INTO `t_dict_business`
+VALUES ('300358', '413', 'meter_type', '泄漏电流表', '3', '表计类型', '7');
+INSERT INTO `t_dict_business`
+VALUES ('300359', '414', 'meter_type', 'SF6压力表', '4', '表计类型', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300360', '415', 'meter_type', '液压表', '5', '表计类型', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300361', '416', 'meter_type', '开关动作次数表', '6', '表计类型', '8');
+INSERT INTO `t_dict_business`
+VALUES ('300362', '417', 'meter_type', '油温表', '7', '表计类型', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300363', '418', 'meter_type', '档位表', '8', '表计类型', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300364', '419', 'meter_type', '气压表', '9', '表计类型', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300365', '420', 'appearance_type', '电子围栏', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300366', '421', 'appearance_type', '红外对射', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300367', '422', 'appearance_type', '泡沫喷淋', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300368', '423', 'appearance_type', '消防水泵', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300369', '424', 'appearance_type', '消防栓', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300370', '425', 'appearance_type', '消防室', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300371', '426', 'appearance_type', '设备室', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300372', '427', 'appearance_type', '照明灯', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300373', '428', 'appearance_type', '摄像头', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300374', '429', 'appearance_type', '水位线', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300375', '430', 'appearance_type', '排水泵', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300376', '431', 'appearance_type', '沉降监测点', '0', '外观类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300378', '432', 'device_type', '避雷器动作次数表', '28', '设备类型', '31');
+INSERT INTO `t_dict_business`
+VALUES ('300379', '433', 'mete_type', '闪烁检测', '6', '巡视内容', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300380', '434', 'camera_model', '索尼HDR-AX2000E', '0', '摄像机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300381', '435', 'camera_model', '索尼HVR-HD1000C', '0', '摄像机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300382', '436', 'camera_model', '索尼HDR-FX1000E', '0', '摄像机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300383', '437', 'camera_model', '索尼HVR-Z5C', '0', '摄像机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300384', '438', 'recorder_model', 'DS-7808N-K1/4P', '0', 'NVR型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300385', '439', 'recorder_model', 'DS-7816N-K1/4P', '0', 'NVR型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300386', '440', 'recorder_model', 'DS-7208HV-S', '0', 'NVR型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300387', '441', 'recorder_model', 'DS-7216HV-S', '0', 'NVR型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300388', '442', 'defect_model', '部件表面油污 ', '0', '缺陷类型', '23');
+INSERT INTO `t_dict_business`
+VALUES ('300389', '443', 'defect_model', '盖板缺失', '0', '缺陷类型', '7');
+INSERT INTO `t_dict_business`
+VALUES ('300390', '444', 'defect_model', '越线闯入', '0', '缺陷类型', '8');
+INSERT INTO `t_dict_business`
+VALUES ('300391', '445', 'defect_model', '火灾烟雾', '0', '缺陷类型', '9');
+INSERT INTO `t_dict_business`
+VALUES ('300392', '446', 'defect_model', '小动物闯入', '0', '缺陷类型', '15');
+INSERT INTO `t_dict_business`
+VALUES ('300393', '447', 'defect_model', '室内地面积水', '0', '缺陷类型', '20');
+INSERT INTO `t_dict_business`
+VALUES ('300394', '448', 'defect_model', '开关柜-压板分', '0', '缺陷类型', '39');
+INSERT INTO `t_dict_business`
+VALUES ('300395', '449', 'defect_model', '开关柜-压板合', '0', '缺陷类型', '40');
+INSERT INTO `t_dict_business`
+VALUES ('300396', '450', 'defect_model', '其他', '0', '缺陷类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300401', '455', 'robot_type', 'SI100', '0', '机器人型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300402', '456', 'operation_task', '操作票操作', '0', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300403', '457', 'main_operation_type', '旋钮', '1', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300404', '458', 'main_operation_type', '按钮', '2', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300405', '459', 'main_operation_type', '手车', '3', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300406', '460', 'main_operation_type', '地刀', '4', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300413', '461', 'main_operation_type', '紧急分合闸', '5', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300414', '462', 'main_operation_type', '手车验电', '6', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300415', '463', 'main_operation_type', '机械位判断', '7', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300416', '464', 'main_operation_type', '压板', '8', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300417', '465', 'main_operation_type', '其他', '9', '主操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300418', '466', 'operation_type', '转换开关', '1', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300419', '467', 'operation_type', '控制开关', '2', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300422', '468', 'operation_type', '储能开关', '3', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300423', '469', 'operation_type', '手车旋钮', '4', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300424', '470', 'operation_type', '转换控制开关', '5', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300425', '471', 'operation_type', '电压选择旋钮', '6', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300426', '472', 'operation_type', '手车操作开关', '7', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300427', '473', 'operation_type', '接地刀操作开关', '8', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300428', '474', 'operation_type', '闭锁开关', '9', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300429', '475', 'operation_type', '风机旋钮', '10', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300430', '476', 'operation_type', '加热器旋钮', '11', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300431', '477', 'operation_type', '复归按钮', '12', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300432', '478', 'operation_type', '带电显示器', '13', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300433', '479', 'operation_type', '线路保护装置', '14', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300434', '480', 'operation_type', '手车', '15', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300435', '481', 'operation_type', '地刀', '16', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300436', '482', 'operation_type', '许继_紧急分合闸', '17', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300437', '483', 'operation_type', '西门子_紧急分合闸', '18', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300438', '484', 'operation_type', '华电_紧急分合闸', '19', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300439', '485', 'operation_type', '天灵_紧急分合闸', '20', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300440', '486', 'operation_type', '北辰_紧急分合闸', '21', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300441', '487', 'operation_type', '江苏_紧急分合闸', '22', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300442', '488', 'operation_type', '手车验电装置', '23', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300443', '489', 'operation_type', '地刀机械位判断拍照', '24', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300444', '490', 'operation_type', '断路器开关', '25', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300445', '491', 'operation_type', '压板', '26', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300446', '492', 'operation_type', 'OCR识别', '27', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300447', '493', 'operation_type', '五防逻辑识别', '28', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300448', '494', 'operation_type', '电压转换开关', '29', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300449', '495', 'operation_type', '解锁/联锁控制开关', '30', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300450', '496', 'operation_type', '并列/解锁控制开关', '31', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300451', '497', 'point_alarm_type', '超温告警', '1', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300452', '498', 'point_alarm_type', '温升告警', '2', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300453', '499', 'point_alarm_type', '三相温差告警', '3', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300454', '500', 'point_alarm_type', '三相对比告警', '4', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300455', '501', 'point_alarm_type', '声音异常', '5', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300456', '502', 'point_alarm_type', '外观异常', '6', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300457', '503', 'point_alarm_type', '仪表越限告警', '7', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300458', '504', 'point_alarm_type', '仪表超量程告警', '8', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300459', '505', 'point_alarm_type', '仪表三相对比', '9', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300460', '506', 'point_alarm_type', '变位告警', '10', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300461', '507', 'point_alarm_type', '操作告警', '11', '测点告警类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300462', '508', 'operation_task', '单设备操作', '0', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300463', '509', 'operation_task', '紧急分合闸操作', '0', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300464', '510', 'env_type', '温度', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300465', '511', 'env_type', '湿度', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300466', '512', 'env_type', '风速', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300467', '513', 'env_type', '水泵', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300468', '514', 'env_type', '防盗', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300469', '515', 'env_type', '灯', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300470', '516', 'env_type', '空调', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300471', '517', 'env_type', '门禁', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300472', '518', 'env_type', 'SF6', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300473', '519', 'env_type', 'O3', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300474', '520', 'env_type', '烟雾', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300475', '521', 'env_type', '液位传感器', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300476', '522', 'env_type', '风机', '0', '环控设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300477', '523', 'mete_type', '录像', '105', '巡视内容', '14');
+INSERT INTO `t_dict_business`
+VALUES ('300478', '524', 'cruise_type', '无人机', '0', '巡检方式', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300479', '525', 'drone_type', 'q100', null, '无人机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300480', '667', 'voice_type', '声纹传感器', null, '声纹类型', null);
+INSERT INTO `t_dict_business`
+VALUES ('300481', '668', 'voice_type', '拾音器', null, '声纹类型', null);
+INSERT INTO `t_dict_business`
+VALUES ('300482', '669', 'voice_model', 'V100', null, '设备型号', null);
+INSERT INTO `t_dict_business`
+VALUES ('300483', '670', 'voice_model', 'HAN04HD2X', null, '设备型号', null);
+INSERT INTO `t_dict_business`
+VALUES ('300484', '671', 'voice_factory', '亿嘉和', null, '生产厂家', null);
+INSERT INTO `t_dict_business`
+VALUES ('300485', '672', 'voice_factory', '快鱼', null, '生产厂家', null);
+INSERT INTO `t_dict_business`
+VALUES ('300486', '673', 'robot_factory', '大疆', null, '生产厂家', null);
+INSERT INTO `t_dict_business`
+VALUES ('300487', '674', 'drone_position', '普通无人机', null, '无人机类型', null);
+INSERT INTO `t_dict_business`
+VALUES ('300488', '678', 'defect_model', '导体护套破损', '0', '缺陷类型', '21');
+INSERT INTO `t_dict_business`
+VALUES ('300489', '677', 'defect_model', '引线断股或松股', '0', '缺陷类型', '30');
+INSERT INTO `t_dict_business`
+VALUES ('300490', '679', 'defect_model', '未佩戴安全绳', '0', '缺陷类型', '22');
+INSERT INTO `t_dict_business`
+VALUES ('300491', '680', 'defect_model', '墙面漏水', '0', '缺陷类型', '10');
+INSERT INTO `t_dict_business`
+VALUES ('300492', '681', 'defect_model', '屋顶漏水', '0', '缺陷类型', '11');
+INSERT INTO `t_dict_business`
+VALUES ('300493', '682', 'defect_model', '油位指示计异常', '0', '缺陷类型', '28');
+INSERT INTO `t_dict_business`
+VALUES ('300494', '683', 'defect_model', '呼吸器油封破损', '0', '缺陷类型', '26');
+INSERT INTO `t_dict_business`
+VALUES ('300495', '684', 'defect_model', '导线断股', '0', '缺陷类型', '12');
+INSERT INTO `t_dict_business`
+VALUES ('300496', '685', 'defect_model', '套管胶合部油污', '0', '缺陷类型', '27');
+INSERT INTO `t_dict_business`
+VALUES ('300497', '686', 'defect_model', '汇控柜凝露', '0', '缺陷类型', '17');
+INSERT INTO `t_dict_business`
+VALUES ('300498', '687', 'defect_model', '膨胀器冲顶', '0', '缺陷类型', '18');
+INSERT INTO `t_dict_business`
+VALUES ('300499', '688', 'defect_model', '电容器鼓肚', '0', '缺陷类型', '19');
+INSERT INTO `t_dict_business`
+VALUES ('300500', '13', 'analyse_type', '声音', '0', '算法类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300501', '689', 'operation_type', '备自投方式切换开关', '32', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300502', '690', 'operation_type', '电压表切换开关', '33', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300503', '691', 'operation_type', '电压并列开关', '34', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300504', '692', 'operation_type', '紧急合闸', '35', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300505', '693', 'operation_type', '手车按钮-进车', '36', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300506', '694', 'operation_type', '手车按钮-退车', '37', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300507', '695', 'operation_type', '地刀按钮-分', '38', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300508', '696', 'operation_type', '地刀按钮-合', '39', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300509', '697', 'operation_type', '断路器按钮-分', '40', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300510', '698', 'operation_type', '断路器按钮-合', '41', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300599', '699', 'mete_type', '局放', '106', '巡视内容', '15');
+INSERT INTO `t_dict_business`
+VALUES ('300600', '700', 'custom_type', '本体', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300601', '701', 'custom_type', '储油柜', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300602', '702', 'custom_type', '分接开关', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300603', '703', 'custom_type', '冷却系统', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300604', '704', 'custom_type', '操动机构', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300605', '705', 'custom_type', '套管', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300606', '706', 'custom_type', '导电部分', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300607', '707', 'custom_type', '传动部分', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300608', '708', 'custom_type', '绝缘子', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300609', '709', 'custom_type', '引流线', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300610', '710', 'custom_type', '母线', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300611', '711', 'custom_type', '金具', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300612', '712', 'custom_type', '接地箱', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300613', '713', 'custom_type', '支撑构架', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300614', '714', 'custom_type', '非电量保护装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300616', '716', 'custom_type', '汇控柜', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300617', '717', 'custom_type', '基座', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300618', '718', 'custom_type', '机械闭锁及限位部分', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300619', '719', 'custom_type', '引线', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300621', '721', 'custom_type', '放电线圈', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300622', '722', 'custom_type', '避雷器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300623', '723', 'custom_type', '接地引下线', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300624', '724', 'custom_type', '基础构架', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300625', '725', 'custom_type', '整体外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300626', '726', 'custom_type', '二次接线盒', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300627', '727', 'custom_type', '接头', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300628', '728', 'custom_type', '母线及引线', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300629', '729', 'custom_type', '位置指示', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300630', '730', 'custom_type', '压力释放装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300631', '731', 'custom_type', '避雷器表计', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300632', '732', 'custom_type', 'SF6密度继电器（压力表）', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300633', '733', 'custom_type', '储能指示', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300634', '734', 'custom_type', '均压环', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300635', '735', 'custom_type', '标示牌', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300637', '737', 'custom_type', '吸湿器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300638', '738', 'custom_type', '金属膨胀器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300639', '739', 'custom_type', '末屏', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300640', '740', 'custom_type', '引线及接头', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300641', '741', 'custom_type', '端子箱', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300642', '742', 'custom_type', '油温表计', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300643', '743', 'custom_type', '外熔断器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300644', '744', 'custom_type', '油位表计', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300645', '745', 'custom_type', 'MOV本体', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300646', '746', 'custom_type', '电流互感器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300647', '747', 'custom_type', '电阻分压器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300648', '748', 'custom_type', '放电间隙', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300649', '749', 'custom_type', '电流表', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300650', '750', 'custom_type', '电压表', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300651', '751', 'custom_type', '进线断路器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300652', '752', 'custom_type', '分段断路器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300653', '753', 'custom_type', '馈线断路器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300654', '754', 'custom_type', '切换把手', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300655', '755', 'custom_type', '自动转换开关', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300656', '756', 'custom_type', 'UPS装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300657', '757', 'custom_type', '备自投装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300658', '758', 'custom_type', '蓄电池', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300659', '759', 'custom_type', '充电装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300660', '760', 'custom_type', '馈线屏', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300661', '761', 'custom_type', '事故照明屏', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300662', '762', 'custom_type', '爬梯门', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300663', '763', 'custom_type', '排水孔', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300664', '764', 'custom_type', '屏柜外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300665', '765', 'custom_type', '装置外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300666', '766', 'custom_type', '液晶面板', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300667', '767', 'custom_type', '指示灯', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300668', '768', 'custom_type', '表计', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300669', '769', 'custom_type', '压板', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300670', '770', 'custom_type', '空气开关', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300671', '771', 'custom_type', '本体及套管', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300672', '772', 'custom_type', '面板', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300673', '773', 'custom_type', '刀闸位置指示', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300674', '774', 'custom_type', '接地刀闸位置指示', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300675', '775', 'custom_type', '电抗器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300676', '776', 'custom_type', '放电线圈油位表计', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300677', '777', 'custom_type', '围栏外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300678', '778', 'custom_type', '阻尼装置', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300679', '779', 'custom_type', '阀控电抗器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300680', '780', 'custom_type', '支柱绝缘子', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300681', '781', 'custom_type', '平台构架外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300682', '782', 'custom_type', '光纤柱外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300683', '783', 'custom_type', '晶闸管阀外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300684', '784', 'custom_type', '固定钢板外观', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300685', '785', 'custom_type', '电缆本体', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300686', '786', 'custom_type', '终端', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300687', '787', 'custom_type', '运行声音', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300688', '788', 'custom_type', '分接开关档位', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300689', '789', 'custom_type', '电容器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300690', '790', 'custom_type', '互感器', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300691', '791', 'custom_type', '中性点隔离开关', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300692', '792', 'custom_type', '接地开关', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300693', '793', 'custom_type', '消防', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300694', '794', 'custom_type', '安防', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300696', '796', 'voltage_class', '6.6kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300697', '797', 'voltage_class', '10kV', '0', '电压等级', '2');
+INSERT INTO `t_dict_business`
+VALUES ('300698', '798', 'voltage_class', '20kV', '0', '电压等级', '3');
+INSERT INTO `t_dict_business`
+VALUES ('300699', '799', 'voltage_class', '35kV', '0', '电压等级', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300700', '800', 'voltage_class', '110kV', '0', '电压等级', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300701', '801', 'voltage_class', '220kV', '0', '电压等级', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300702', '802', 'voltage_class', '330kV', '0', '电压等级', '7');
+INSERT INTO `t_dict_business`
+VALUES ('300703', '803', 'voltage_class', '500kV', '0', '电压等级', '8');
+INSERT INTO `t_dict_business`
+VALUES ('300704', '804', 'voltage_class', '750kV', '0', '电压等级', '9');
+INSERT INTO `t_dict_business`
+VALUES ('300705', '805', 'voltage_class', '800kV', '0', '电压等级', '10');
+INSERT INTO `t_dict_business`
+VALUES ('300706', '806', 'voltage_class', '1000kV', '0', '电压等级', '11');
+INSERT INTO `t_dict_business`
+VALUES ('300724', '997', 'alarm_source', '无人机', '0', '告警来源', '4');
+INSERT INTO `t_dict_business`
+VALUES ('300725', '998', 'alarm_source', '声纹', '0', '告警来源', '5');
+INSERT INTO `t_dict_business`
+VALUES ('300732', '689', 'defect_model', '地面沉降', '0', '缺陷类型', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300733', '693', 'partial_dischargr_type', '局放', NULL, '局放类型', 1);
+INSERT INTO `t_dict_business`
+VALUES ('300734', '690', 'mete_type', '局放地电压检测', '12', '巡视内容', 8);
+INSERT INTO `t_dict_business`
+VALUES ('300735', '691', 'mete_type', '局放超声波检测', '11', '巡视内容', 7);
+INSERT INTO `t_dict_business`
+VALUES ('300736', '692', 'mete_type', '局放特高频图谱', '13', '巡视内容', 9);
+INSERT INTO `t_dict_business`
+VALUES ('300737', '901', 'prioritized_task_type', '站端日常巡视任务', '0', '执行等级配置任务类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300738', '902', 'prioritized_task_type', '上级系统控制任务', '0', '执行等级配置任务类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300739', '903', 'prioritized_task_type', '区域巡视系统控制任务', '0', '执行等级配置任务类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300740', '904', 'prioritized_task_type', '主辅设备联动任务', '0', '执行等级配置任务类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300741', '810', 'robot_type', '模拟机器人', NULL, '机器人类型', '0');
+INSERT INTO `t_dict_business`
+VALUES ('300742', '811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300743', '812', 'device_type', '变电站环境', '32', '设备类型', '23');
+INSERT INTO `t_dict_business`
+VALUES ('300744', '813', 'recorder_type', '海康超脑', '0', 'NVR类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300745', '814', 'mete_type', '环境温度检测', '101', '巡视内容', '10');
+INSERT INTO `t_dict_business`
+VALUES ('300746', '815', 'mete_type', '环境湿度检测', '102', '巡视内容', '11');
+INSERT INTO `t_dict_business`
+VALUES ('300747', '816', 'mete_type', '氧气浓度检测', '103', '巡视内容', '12');
+INSERT INTO `t_dict_business`
+VALUES ('300748', '817', 'mete_type', 'SF6浓度检测', '104', '巡视内容', '13');
+INSERT INTO `t_dict_business`
+VALUES ('300749', '340', 'cruise_data_state', '执行忽略', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300750', '341', 'cruise_data_state', '执行遗漏', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300751', '342', 'cruise_data_state', '算法分析中', NULL, '巡检数据状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300752', '350', 'abnormal_type', '调用失败', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300753', '351', 'abnormal_type', '分析失败', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300754', '352', 'abnormal_type', '系统异常', NULL, '巡视异常原因', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300755', '0', 'back_expire', '未备份', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300756', '1', 'back_expire', '未过期', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300757', '2', 'back_expire', '过期删除', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300758', '3', 'back_expire', '手动删除', NULL, '备份过期状态', 0);
+INSERT INTO `t_dict_business`
+VALUES ('300759', '818', 'camera_vendor', '巨哥', '0', '厂家类型', 1);
+INSERT INTO `t_dict_business`
+VALUES ('300760', '819', 'camera_vendor', '高德', '0', '厂家类型', 1);
+INSERT INTO `t_dict_business`
+VALUES ('300761', '821', 'abnormal_type', '操作任务中', NULL, '操作任务中不可下发巡视任务', '0');
+INSERT INTO `t_dict_business`
+VALUES ('300762', '689', 'alarm_source', '静默监视', '0', '告警来源', '6');
+INSERT INTO `t_dict_business`
+VALUES ('300765', '830', 'operation_type', '双按钮手车-进车', '42', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300766', '831', 'operation_type', '双按钮手车-退车', '43', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300767', '832', 'operation_type', '双按钮地刀-分', '44', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300768', '833', 'operation_type', '双按钮地刀-和', '45', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300769', '834', 'operation_type', '天灵-顺', '46', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300770', '835', 'operation_type', '轨交_紧急分合闸', '47', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300771', '836', 'operation_type', '轨交_接地刀操作开关', '48', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300772', '837', 'operation_type', '轨交_控制开关', '49', '操作类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300773', '838', 'abnormal_type', '放电', '0', '巡视异常原因', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300774', '839', 'defect_model', '人员闯入', '0', '缺陷类型', '45');
+INSERT INTO `t_dict_business`
+VALUES ('300775', '840', 'iot_device_type', '电量表', '1', '物联设备类型', '1');
+INSERT INTO `t_dict_business`
+VALUES ('300776', '841', 'iot_device_type', '温控器', '1', '物联设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('1', 'protocol_model', 'MODBUS_RTU', 0, '设备连接协议', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('2', 'protocol_model', 'MODBUS_TCP', 0, '设备连接协议', 2);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('3', 'protocol_model', 'RS485', 0, '设备连接协议', 3);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('4', 'protocol_model', 'DLT645_97', 0, '设备连接协议', 4);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('5', 'protocol_model', 'DLT645_07', 0, '设备连接协议', 5);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('6', 'protocol_model', '环控终端', 0, '设备连接协议', 6);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('7', 'protocol_model', '机器人', 0, '设备连接协议', 7);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`)
+VALUES ('0', 'frequency', '无', '物联设备采集频率', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`)
+VALUES ('5', 'frequency', '5 分钟', '物联设备采集频率', 2);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`)
+VALUES ('30', 'frequency', '30 分钟', '物联设备采集频率', 3);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`)
+VALUES ('60', 'frequency', '1 小时', '物联设备采集频率', 4);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`)
+VALUES ('240', 'frequency', '4 小时', '物联设备采集频率', 5);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('850', 'iot_device_type', '温度', '1', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('851', 'iot_device_type', '湿度', '2', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('853', 'iot_device_type', '水泵', '2104', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('854', 'iot_device_type', '防盗', '2105', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('855', 'iot_device_type', '灯', '2106', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('856', 'iot_device_type', '空调', '2107', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('857', 'iot_device_type', '门禁', '2108', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('858', 'iot_device_type', 'SF6', '8', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('859', 'iot_device_type', 'O3', '2110', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('860', 'iot_device_type', '烟雾', '2111', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('861', 'iot_device_type', '液位', '2112', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('862', 'iot_device_type', '风机', '2113', '环控设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('870', 'cruise_device_type', '室外轮式机器人', '1', '巡视设备类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('871', 'cruise_device_type', '室内轮式机器人', '2', '巡视设备类型', '2');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('872', 'cruise_device_type', '挂轨机器人', '3', '巡视设备类型', '3');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('873', 'cruise_device_type', '高清视频', '10', '巡视设备类型', '4');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('874', 'cruise_device_type', '硬盘录像机', '11', '巡视设备类型', '5');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('875', 'cruise_device_type', '无人机', '13', '巡视设备类型', '6');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('876', 'cruise_device_type', '声纹', '14', '巡视设备类型', '7');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('877', 'maintenance_type', '缺陷记录', '0', '维护信息类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('878', 'maintenance_type', '大修记录', '0', '维护信息类型', '2');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('879', 'maintenance_type', '退出再重放记录', '0', '维护信息类型', '3');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('880', 'maintenance_type', '更换记录', '0', '维护信息类型', '4');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('881', 'point_alarm_type', '非同源差值越限报警', '101', '测点告警类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('882', 'point_alarm_type', '非同源状态不一致报警', '102', '测点告警类型', '1');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`)
+VALUES ('883', 'point_alarm_type', '趋势变化越限报警', '103', '测点告警类型', '1');
 
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
-INSERT INTO `t_period_model` VALUES ('1056', '0 0 8 1 * ?', '每月巡 1 天（1号）每天巡 1 次（8:00）', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
-INSERT INTO `t_period_model` VALUES ('1057', '0 0 22 ? * 6', '每周巡 1 天（周五）每天巡 1 次（22:00）', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
-INSERT INTO `t_period_model` VALUES ('1063', '0 0 3,6,18 3,6,17,20 * ?', '每月巡 4 天（3号、6号、17号、20号）每天巡 3 次（3:00 、6:00 、18:00 )', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
-INSERT INTO `t_period_model` VALUES ('1064', '0 0 5,8,19,22 ? * 2,4,6', '每周巡 3 天（周一、周三、周五）每天巡 4 次（5:00 、8:00 、19:00 、22:00 )', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
-INSERT INTO `t_period_model` VALUES ('1066', '0 0 1,4,6,16,18 ? * *', '每天巡 5 次（1:00 、4:00 、6:00 、16:00 、18:00 ）', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
+INSERT INTO `t_period_model`
+VALUES ('1056', '0 0 8 1 * ?', '每月巡 1 天（1号）每天巡 1 次（8:00）', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
+INSERT INTO `t_period_model`
+VALUES ('1057', '0 0 22 ? * 6', '每周巡 1 天（周五）每天巡 1 次（22:00）', '2021-02-25 17:36:34', '2021-02-25 17:36:34');
+INSERT INTO `t_period_model`
+VALUES ('1063', '0 0 3,6,18 3,6,17,20 * ?', '每月巡 4 天（3号、6号、17号、20号）每天巡 3 次（3:00 、6:00 、18:00 )',
+        '2021-02-25 17:36:34', '2021-02-25 17:36:34');
+INSERT INTO `t_period_model`
+VALUES ('1064', '0 0 5,8,19,22 ? * 2,4,6', '每周巡 3 天（周一、周三、周五）每天巡 4 次（5:00 、8:00 、19:00 、22:00 )',
+        '2021-02-25 17:36:34', '2021-02-25 17:36:34');
+INSERT INTO `t_period_model`
+VALUES ('1066', '0 0 1,4,6,16,18 ? * *', '每天巡 5 次（1:00 、4:00 、6:00 、16:00 、18:00 ）', '2021-02-25 17:36:34',
+        '2021-02-25 17:36:34');
 
 -- ----------------------------
 -- Records of t_point_type_attr
 -- ----------------------------
-INSERT INTO `t_point_type_attr` VALUES ('466', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('466', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('467', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('467', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('468', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('468', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('469', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('469', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('470', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('470', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('471', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('471', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('472', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('472', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('473', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('473', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('474', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('474', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('475', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('475', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('476', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('476', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('477', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('477', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('478', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('478', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('479', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('479', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('480', '4', '');
-INSERT INTO `t_point_type_attr` VALUES ('480', '5', '');
-INSERT INTO `t_point_type_attr` VALUES ('481', '4', '');
-INSERT INTO `t_point_type_attr` VALUES ('481', '5', '');
-INSERT INTO `t_point_type_attr` VALUES ('482', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('482', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('483', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('483', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('484', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('484', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('485', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('485', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('486', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('486', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('487', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('487', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('488', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('488', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('489', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('489', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('490', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('490', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('491', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('491', '6', '');
-INSERT INTO `t_point_type_attr` VALUES ('492', '3', '');
-INSERT INTO `t_point_type_attr` VALUES ('492', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('466', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('466', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('467', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('467', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('468', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('468', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('469', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('469', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('470', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('470', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('471', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('471', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('472', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('472', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('473', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('473', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('474', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('474', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('475', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('475', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('476', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('476', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('477', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('477', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('478', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('478', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('479', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('479', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('480', '4', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('480', '5', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('481', '4', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('481', '5', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('482', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('482', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('483', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('483', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('484', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('484', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('485', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('485', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('486', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('486', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('487', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('487', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('488', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('488', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('489', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('489', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('490', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('490', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('491', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('491', '6', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('492', '3', '');
+INSERT INTO `t_point_type_attr`
+VALUES ('492', '6', '');
 
 -- ----------------------------
 -- Records of t_robot_camera_rule
 -- ----------------------------
-INSERT INTO `t_robot_camera_rule` VALUES ('1', 'visible_light_camera', '可见光相机', '/colorful/livestream');
-INSERT INTO `t_robot_camera_rule` VALUES ('2', 'infrared_camera', '红外相机', '/infrared/livestream');
-INSERT INTO `t_robot_camera_rule` VALUES ('3', 'usb_camera', 'usb相机', '/tailusb/livestream');
-INSERT INTO `t_robot_camera_rule` VALUES ('4', 'endoscope_camera', '内窥镜相机', '/ptzusb/livestream');
-INSERT INTO `t_robot_camera_rule` VALUES ('5', 'mid_depth_camera', '中台深度相机', '/ptzdepthColorful/livestream');
-INSERT INTO `t_robot_camera_rule` VALUES ('6', 'arm_depth_camera', '手臂深度相机', '/taildepthColorful/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('1', 'visible_light_camera', '可见光相机', '/colorful/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('2', 'infrared_camera', '红外相机', '/infrared/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('3', 'usb_camera', 'usb相机', '/tailusb/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('4', 'endoscope_camera', '内窥镜相机', '/ptzusb/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('5', 'mid_depth_camera', '中台深度相机', '/ptzdepthColorful/livestream');
+INSERT INTO `t_robot_camera_rule`
+VALUES ('6', 'arm_depth_camera', '手臂深度相机', '/taildepthColorful/livestream');
 
 -- ----------------------------
 -- Records of t_std_mete
 -- ----------------------------
-INSERT INTO `t_std_mete` VALUES ('1000000001', '154', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000002', '154', '220', '1', '油位表计-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000003', '154', '221', '1', '油位标记-读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000004', '154', '220', '1', '套管电流互感器-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000005', '154', '219', '1', '位置指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000006', '154', '220', '1', 'SF6密度继电器（压力表）-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000007', '154', '221', '1', 'SF6密度继电器（压力表）-读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000008', '154', '220', '1', '引线及接头-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000009', '154', '220', '1', '均压环-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000010', '154', '220', '1', '套管防雨帽-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000011', '154', '219', '1', '压力表计-读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000012', '154', '221', '2', '储能指示-读数', '6', '6', '', '1', '', '6.000', '6.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000013', '154', '220', '1', '机构箱-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000014', '154', '220', '1', '汇控箱-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000015', '154', '220', '1', '基础构架-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000016', '154', '220', '1', '接地引下线-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000017', '154', '220', '1', '标示牌-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000018', '154', '222', '1', '引线及接头-测温', '', '', '6', '3', '', '67.000', '56.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000019', '154', '220', '1', '本体外观-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000020', '154', '220', '1', '绝缘子-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000021', '154', '220', '1', '整体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000022', '154', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000023', '154', '219', '1', '储能指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000024', '291', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000025', '291', '220', '1', '引线及接头-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000026', '291', '220', '1', '接地引下线-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000027', '291', '220', '1', '绝缘子外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000028', '291', '220', '1', '围栏外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000029', '291', '220', '1', '整体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000030', '291', '220', '1', '基础架构-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000031', '291', '220', '1', '标识牌-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000032', '291', '222', '1', '绝缘子外观-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000033', '291', '222', '1', '引线及接头-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000034', '291', '222', '1', '本体外观-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000035', '331', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000036', '331', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000037', '303', '220', '1', '本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000038', '303', '222', '1', '本体-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000039', '303', '220', '1', '储油柜吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000040', '303', '221', '1', '储油柜-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000041', '303', '220', '1', '储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000042', '303', '220', '1', '气体继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000043', '303', '221', '1', '油温表记-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000044', '303', '220', '1', '油温表记-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000045', '303', '219', '1', '分接档位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000046', '303', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000047', '303', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000048', '303', '220', '1', '套管-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000049', '303', '222', '1', '套管-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000050', '303', '222', '1', '温控器-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000051', '303', '220', '1', '冷却系统风扇-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000052', '306', '220', '1', '本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000053', '306', '220', '1', '基础构架外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000054', '306', '220', '1', '排水孔-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000055', '307', '220', '1', '火灾警报控制器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000056', '307', '220', '1', '消防告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000057', '307', '220', '1', '排油充氮灭火装置控制屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000058', '307', '220', '1', '排油充氮灭火装置消防柜-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000059', '307', '220', '1', '水（泡沫）喷淋系统控制柜-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000060', '307', '220', '1', '安防告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000061', '307', '220', '1', '电子围栏 -外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000062', '307', '220', '1', '电缆通道-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000063', '307', '220', '1', '温湿度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000064', '307', '220', '1', 'SF6浓度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000065', '307', '220', '1', 'O2浓度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000066', '307', '220', '1', 'SF6告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000067', '307', '220', '1', '水浸告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000068', '308', '220', '1', '大门外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000069', '308', '220', '1', '围墙外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000070', '308', '220', '1', '墙面-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000071', '308', '220', '1', '门窗-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000072', '308', '220', '1', '基础架构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000073', '309', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000074', '309', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000075', '309', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000076', '309', '220', '1', '排水孔-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000077', '310', '220', '1', '屏柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000078', '310', '220', '1', '空气开关-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000079', '310', '220', '1', '二次装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000080', '310', '221', '1', '面板表记指示-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000081', '310', '219', '1', '面板切换把手-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000082', '310', '219', '1', '面板压板-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000083', '310', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000084', '311', '220', '1', '主变区域消防管-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000085', '311', '220', '1', '主变区域消防管喷头 -外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000086', '311', '220', '1', '消防感温电缆-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000087', '311', '220', '1', '消防感温电缆接线箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000088', '304', '221', '1', '电流表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000089', '304', '221', '1', '电压表-表记', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000090', '304', '219', '1', '进线断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000091', '304', '219', '1', '分段断路器-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000092', '304', '219', '1', '馈线断路器-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000093', '304', '220', '1', '指示灯-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000094', '304', '220', '1', '切换把手-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000095', '304', '219', '1', '自动转换开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000096', '304', '219', '1', 'UPS 装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000097', '304', '219', '1', '备自投装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000098', '304', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000099', '305', '220', '1', '蓄电池外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000100', '305', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000101', '305', '220', '1', '监控装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000102', '305', '220', '1', '直流输出电压-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000103', '305', '219', '1', '充电模块 -位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000104', '305', '221', '1', '控制母线电压 -表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000105', '305', '221', '1', '动力母线电压-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000106', '305', '219', '1', '交流输入断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000107', '305', '219', '1', '绝缘监测装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000108', '305', '219', '1', '馈线断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000109', '305', '220', '1', '指示灯-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000110', '305', '221', '1', '交流电压表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000111', '305', '221', '1', '直流电压表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000112', '305', '219', '1', '断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000113', '305', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000114', '305', '220', '1', '蓄电池外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000115', '292', '220', '1', '平台设备及本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000116', '292', '220', '1', '电容器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000117', '292', '220', '1', '电流互感器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000118', '292', '220', '1', '电阻分压器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000119', '292', '220', '1', '阻尼电阻-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000120', '292', '220', '1', '晶闸管阀-表记读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000121', '292', '220', '1', '阀控电抗器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000122', '292', '220', '1', '光纤柱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000123', '292', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000124', '292', '222', '1', '电容器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000125', '292', '222', '1', '阀控电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000126', '292', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000127', '292', '220', '1', '支柱绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000128', '292', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000129', '292', '222', '1', '电容器瓷瓶-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000130', '292', '222', '1', '母线-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000131', '292', '222', '1', '电流互感器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000132', '292', '222', '1', '电阻分压器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000133', '292', '222', '1', '阻尼电阻外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000134', '292', '222', '1', '阀控电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000135', '292', '222', '1', '晶闸管阀-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000136', '293', '220', '1', '母线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000137', '293', '222', '1', '母线线夹及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000138', '293', '220', '1', '母线带电显示装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000139', '293', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000140', '293', '220', '1', '金具-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000141', '293', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000142', '293', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000143', '293', '220', '1', '整体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000144', '293', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000145', '293', '222', '1', '母线-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000146', '293', '220', '1', '母线线夹及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000147', '293', '222', '1', '金具-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000148', '293', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000149', '294', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000150', '294', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000151', '294', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000152', '294', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000153', '294', '220', '1', '固定钢板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000154', '294', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000155', '294', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000156', '294', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000157', '294', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000158', '294', '222', '1', '固定钢板-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000159', '295', '220', '1', '电缆本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000160', '295', '220', '1', '电缆终端-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000161', '295', '220', '1', '电缆接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000162', '295', '220', '1', '接地箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000163', '295', '222', '1', '电缆终端-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000164', '295', '222', '1', '电缆本体-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000165', '295', '222', '1', '电缆接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000166', '295', '221', '1', '电缆本体负荷-表记读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000167', '296', '220', '1', '本体引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000168', '296', '222', '1', '本体引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000169', '296', '220', '1', '套管引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000170', '296', '222', '1', '套管引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000171', '296', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000172', '296', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000173', '296', '223', '1', '本体运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000174', '296', '223', '1', '套管运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000175', '296', '220', '1', '本体温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000176', '296', '220', '1', '套管温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000177', '296', '221', '1', '本体温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000178', '296', '221', '1', '套管温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000179', '296', '220', '1', '本体基础框架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000180', '296', '220', '1', '套管基础框架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000181', '296', '220', '1', '吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000182', '296', '220', '1', '储油柜油位表计-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000183', '296', '220', '1', '储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000184', '296', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000185', '296', '220', '1', '端子箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000186', '296', '219', '1', '分接开关档位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000187', '296', '220', '1', '电容器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000188', '296', '222', '1', '电容器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000189', '296', '220', '1', '互感器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000190', '296', '219', '1', '中性点隔离开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000191', '296', '219', '1', '储油柜油位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000192', '296', '222', '1', '互感器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000193', '296', '220', '1', '避雷器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000194', '296', '222', '1', '避雷器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000195', '297', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000196', '297', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000197', '297', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000198', '297', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000199', '297', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000200', '297', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000201', '297', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000202', '298', '220', '1', '本体套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000203', '298', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000204', '298', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000205', '298', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000206', '298', '220', '1', '接地开关-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000207', '298', '219', '1', '接地开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000208', '298', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000209', '298', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000210', '298', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000211', '298', '220', '1', '基础架构-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000212', '298', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000213', '298', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000214', '298', '222', '1', '套管-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000215', '299', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000216', '299', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000217', '299', '220', '1', '本体接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000218', '299', '222', '1', '本体接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000219', '299', '220', '1', '支撑架构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000220', '300', '220', '1', '面板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000221', '300', '219', '1', '面板-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000222', '300', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000223', '300', '219', '1', '刀闸位置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000224', '300', '219', '1', '接地刀闸位置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000225', '300', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000226', '300', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000227', '300', '220', '1', '绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000228', '300', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000229', '301', '220', '1', '接地引下线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000230', '294', '220', '1', '整体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000231', '292', '220', '1', '放电间隙-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000232', '292', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000233', '292', '220', '1', '平台构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000234', '292', '222', '1', '水冷绝缘子-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000235', '328', '220', '1', '本体外观-外观缺陷-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000236', '328', '220', '1', '本体外观-外观缺陷-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000237', '328', '222', '1', '本体外观-红外测温-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000238', '328', '222', '1', '本体外观-红外测温-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000239', '328', '223', '1', '运行声音-声音检测-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000240', '328', '223', '1', '运行声音-声音检测-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000241', '328', '221', '1', '套管油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000242', '328', '220', '1', '套管油位表计-外观异常', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000243', '328', '221', '1', '套管油压表-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000244', '328', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000245', '328', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000246', '328', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000247', '328', '220', '1', '套管末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000248', '328', '222', '1', '套管末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000249', '328', '220', '1', '本体外观-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000250', '328', '222', '1', '本体外观-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000251', '328', '223', '1', '运行声音-声音检测-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000252', '328', '221', '1', '套管油位表计-表计读数-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000253', '328', '220', '1', '套管外观-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000254', '328', '222', '1', '套管外观-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000255', '328', '220', '1', '引线及接头-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000256', '328', '222', '1', '引线及接头-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000257', '328', '219', '1', '分接挡位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000258', '328', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000259', '328', '220', '1', '在线滤油装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000260', '328', '220', '1', '冷却器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000261', '328', '220', '1', '风扇-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000262', '328', '220', '1', '油流继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000263', '328', '219', '1', '油流继电器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000264', '328', '220', '1', '控制箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000265', '328', '219', '1', '控制箱-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000266', '328', '220', '1', '气体继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000267', '328', '220', '1', '温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000268', '328', '221', '1', '温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000269', '328', '220', '1', '压力释放阀-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000270', '328', '220', '1', '压力突变继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000271', '328', '220', '1', '本体吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000272', '328', '221', '1', '本体吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000273', '328', '221', '1', '本体油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000274', '328', '220', '1', '本体储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000275', '328', '220', '1', '调补变吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000276', '328', '221', '1', '调补变吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000277', '328', '221', '1', '调补变油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000278', '328', '220', '1', '调补变储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000279', '328', '220', '1', '分接开关吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000280', '328', '221', '1', '分接开关吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000281', '328', '220', '1', '分接开关油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000282', '328', '221', '1', '分接开关油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000283', '328', '220', '1', '分接开关储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000284', '328', '220', '1', '在线监测装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000285', '328', '220', '1', '外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000286', '328', '220', '1', '排风系统-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000287', '328', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000288', '328', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000289', '328', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000290', '328', '222', '1', '套管外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000291', '328', '220', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000292', '328', '221', '1', '调压次数-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000293', '182', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000294', '182', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000295', '182', '223', '1', '运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000296', '182', '220', '1', '伸缩节-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000297', '182', '220', '1', '盆式绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000298', '182', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000299', '182', '220', '1', 'SF6密度继电器（压力表）-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000300', '182', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000301', '182', '220', '1', '位置指示-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000302', '182', '219', '1', '位置指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000303', '182', '221', '1', '断路压力表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000304', '182', '221', '1', '断路器动作计数器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000305', '182', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000306', '182', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000307', '182', '220', '1', '带电显示器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000308', '182', '221', '1', '带电显示器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000309', '182', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000310', '182', '222', '1', '套管外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000311', '182', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000312', '182', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000313', '182', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000314', '182', '220', '1', '汇控柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000315', '182', '221', '1', '汇控柜环境-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000316', '182', '221', '1', '汇控柜面板-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000317', '182', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000318', '182', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000319', '182', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000320', '182', '221', '1', '压力表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000321', '182', '219', '1', '位置指示-位置状态识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000322', '182', '219', '1', '位置指示-外置状态识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000323', '193', '220', '1', '触头及导电臂-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000324', '193', '222', '1', '触头及导电臂-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000325', '193', '219', '1', '位置指示-外置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000326', '193', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000327', '193', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000328', '193', '220', '1', '导电底座-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000329', '193', '219', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000330', '193', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000331', '193', '220', '1', '传动部分外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000332', '193', '220', '1', '基座-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000333', '193', '220', '1', '基座-外观缺陷-机械闭锁', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000334', '193', '220', '1', '基座-外观缺陷-限位部分', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000335', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-基座', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000336', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-机械闭锁', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000337', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-限位部分', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000338', '193', '220', '1', '操动机构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000339', '193', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000340', '193', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000341', '193', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000342', '193', '220', '1', '五防锁具-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000343', '193', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000344', '193', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000345', '193', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000346', '194', '220', '1', '面板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000347', '194', '221', '1', '面板-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000348', '194', '219', '1', '位置指示-外置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000349', '194', '220', '1', '压力释放装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000350', '194', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000351', '194', '221', '1', 'SF6密度继电器（压力表)-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000352', '194', '221', '1', '储能指示-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000353', '194', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000354', '194', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000355', '196', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000356', '196', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000357', '196', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000358', '196', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000359', '196', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000360', '196', '220', '1', '二次接线盒-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000361', '196', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000362', '196', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000363', '196', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000364', '196', '220', '1', '金属膨胀器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000365', '196', '220', '1', '末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000366', '196', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000367', '196', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000368', '196', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000369', '195', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000370', '195', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000371', '195', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000372', '195', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000373', '195', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000374', '195', '220', '1', '末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000375', '195', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000376', '195', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000377', '195', '220', '1', '二次接线盒-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000378', '195', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000379', '195', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000380', '195', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000381', '195', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000382', '195', '220', '1', '金属膨胀器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000383', '195', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000384', '195', '220', '1', '端子箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000385', '195', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000386', '195', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000387', '197', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000388', '197', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000389', '197', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000390', '197', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000391', '197', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000392', '197', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000393', '197', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000394', '197', '220', '1', '避雷器表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000395', '197', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000396', '197', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000397', '197', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000398', '330', '220', '1', '母线及引线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000399', '330', '220', '1', '母线及引线外观-外观缺陷-引线', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000400', '330', '222', '1', '母线及引线外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000401', '330', '222', '1', '母线及引线外观-红外测温-引线', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000402', '330', '220', '1', '电容器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000403', '330', '222', '1', '电容器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000404', '330', '221', '1', '油温表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000405', '330', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000406', '330', '220', '1', '吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000407', '330', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000408', '330', '220', '1', '外熔断器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000409', '330', '222', '1', '外熔断器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000410', '330', '220', '1', '电抗器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000411', '330', '222', '1', '电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000412', '330', '220', '1', '放电线圈外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000413', '330', '222', '1', '放电线圈外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000414', '330', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000415', '330', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000416', '330', '220', '1', '避雷器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000417', '330', '222', '1', '避雷器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000418', '330', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000419', '330', '220', '1', '接地引下线-外挂缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000420', '330', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000421', '330', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000422', '330', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
-INSERT INTO `t_std_mete` VALUES ('1000000423', '330', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000001', '154', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000002', '154', '220', '1', '油位表计-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000003', '154', '221', '1', '油位标记-读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000004', '154', '220', '1', '套管电流互感器-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000005', '154', '219', '1', '位置指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000006', '154', '220', '1', 'SF6密度继电器（压力表）-缺陷', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000007', '154', '221', '1', 'SF6密度继电器（压力表）-读数', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000008', '154', '220', '1', '引线及接头-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000009', '154', '220', '1', '均压环-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000010', '154', '220', '1', '套管防雨帽-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000011', '154', '219', '1', '压力表计-读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000012', '154', '221', '2', '储能指示-读数', '6', '6', '', '1', '', '6.000', '6.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000013', '154', '220', '1', '机构箱-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000014', '154', '220', '1', '汇控箱-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000015', '154', '220', '1', '基础构架-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000016', '154', '220', '1', '接地引下线-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000017', '154', '220', '1', '标示牌-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000018', '154', '222', '1', '引线及接头-测温', '', '', '6', '3', '', '67.000', '56.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000019', '154', '220', '1', '本体外观-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000020', '154', '220', '1', '绝缘子-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000021', '154', '220', '1', '整体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000022', '154', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000023', '154', '219', '1', '储能指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000024', '291', '220', '1', '本体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000025', '291', '220', '1', '引线及接头-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000026', '291', '220', '1', '接地引下线-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000027', '291', '220', '1', '绝缘子外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000028', '291', '220', '1', '围栏外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000029', '291', '220', '1', '整体外观-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000030', '291', '220', '1', '基础架构-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000031', '291', '220', '1', '标识牌-缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000032', '291', '222', '1', '绝缘子外观-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000033', '291', '222', '1', '引线及接头-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000034', '291', '222', '1', '本体外观-红外', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000035', '331', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000036', '331', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000037', '303', '220', '1', '本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000038', '303', '222', '1', '本体-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000039', '303', '220', '1', '储油柜吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000040', '303', '221', '1', '储油柜-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000041', '303', '220', '1', '储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000042', '303', '220', '1', '气体继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000043', '303', '221', '1', '油温表记-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000044', '303', '220', '1', '油温表记-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000045', '303', '219', '1', '分接档位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000046', '303', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000047', '303', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000048', '303', '220', '1', '套管-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000049', '303', '222', '1', '套管-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000050', '303', '222', '1', '温控器-测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000051', '303', '220', '1', '冷却系统风扇-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000052', '306', '220', '1', '本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000053', '306', '220', '1', '基础构架外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000054', '306', '220', '1', '排水孔-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000055', '307', '220', '1', '火灾警报控制器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000056', '307', '220', '1', '消防告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000057', '307', '220', '1', '排油充氮灭火装置控制屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000058', '307', '220', '1', '排油充氮灭火装置消防柜-外观缺陷', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000059', '307', '220', '1', '水（泡沫）喷淋系统控制柜-外观缺陷', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000060', '307', '220', '1', '安防告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000061', '307', '220', '1', '电子围栏 -外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000062', '307', '220', '1', '电缆通道-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000063', '307', '220', '1', '温湿度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000064', '307', '220', '1', 'SF6浓度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000065', '307', '220', '1', 'O2浓度-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000066', '307', '220', '1', 'SF6告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000067', '307', '220', '1', '水浸告警信号-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000068', '308', '220', '1', '大门外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000069', '308', '220', '1', '围墙外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000070', '308', '220', '1', '墙面-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000071', '308', '220', '1', '门窗-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000072', '308', '220', '1', '基础架构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000073', '309', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000074', '309', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000075', '309', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000076', '309', '220', '1', '排水孔-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000077', '310', '220', '1', '屏柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000078', '310', '220', '1', '空气开关-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000079', '310', '220', '1', '二次装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000080', '310', '221', '1', '面板表记指示-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000081', '310', '219', '1', '面板切换把手-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000082', '310', '219', '1', '面板压板-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000083', '310', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000084', '311', '220', '1', '主变区域消防管-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000085', '311', '220', '1', '主变区域消防管喷头 -外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000086', '311', '220', '1', '消防感温电缆-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000087', '311', '220', '1', '消防感温电缆接线箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000088', '304', '221', '1', '电流表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000089', '304', '221', '1', '电压表-表记', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '', '',
+        '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000090', '304', '219', '1', '进线断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000091', '304', '219', '1', '分段断路器-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000092', '304', '219', '1', '馈线断路器-位置识别', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000093', '304', '220', '1', '指示灯-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000094', '304', '220', '1', '切换把手-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000095', '304', '219', '1', '自动转换开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000096', '304', '219', '1', 'UPS 装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000097', '304', '219', '1', '备自投装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000098', '304', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000099', '305', '220', '1', '蓄电池外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000100', '305', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000101', '305', '220', '1', '监控装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000102', '305', '220', '1', '直流输出电压-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000103', '305', '219', '1', '充电模块 -位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000104', '305', '221', '1', '控制母线电压 -表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000105', '305', '221', '1', '动力母线电压-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000106', '305', '219', '1', '交流输入断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000107', '305', '219', '1', '绝缘监测装置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000108', '305', '219', '1', '馈线断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000109', '305', '220', '1', '指示灯-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000110', '305', '221', '1', '交流电压表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000111', '305', '221', '1', '直流电压表-表计', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000112', '305', '219', '1', '断路器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000113', '305', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000114', '305', '220', '1', '蓄电池外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000115', '292', '220', '1', '平台设备及本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000116', '292', '220', '1', '电容器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000117', '292', '220', '1', '电流互感器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000118', '292', '220', '1', '电阻分压器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000119', '292', '220', '1', '阻尼电阻-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000120', '292', '220', '1', '晶闸管阀-表记读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000121', '292', '220', '1', '阀控电抗器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000122', '292', '220', '1', '光纤柱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000123', '292', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000124', '292', '222', '1', '电容器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000125', '292', '222', '1', '阀控电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000126', '292', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000127', '292', '220', '1', '支柱绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000128', '292', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000129', '292', '222', '1', '电容器瓷瓶-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000130', '292', '222', '1', '母线-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000131', '292', '222', '1', '电流互感器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000132', '292', '222', '1', '电阻分压器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000133', '292', '222', '1', '阻尼电阻外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000134', '292', '222', '1', '阀控电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000135', '292', '222', '1', '晶闸管阀-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000136', '293', '220', '1', '母线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000137', '293', '222', '1', '母线线夹及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000138', '293', '220', '1', '母线带电显示装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000139', '293', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000140', '293', '220', '1', '金具-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000141', '293', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000142', '293', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000143', '293', '220', '1', '整体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000144', '293', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000145', '293', '222', '1', '母线-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000146', '293', '220', '1', '母线线夹及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000147', '293', '222', '1', '金具-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000148', '293', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000149', '294', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000150', '294', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000151', '294', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000152', '294', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000153', '294', '220', '1', '固定钢板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000154', '294', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000155', '294', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000156', '294', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000157', '294', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000158', '294', '222', '1', '固定钢板-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000159', '295', '220', '1', '电缆本体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000160', '295', '220', '1', '电缆终端-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000161', '295', '220', '1', '电缆接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000162', '295', '220', '1', '接地箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000163', '295', '222', '1', '电缆终端-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000164', '295', '222', '1', '电缆本体-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000165', '295', '222', '1', '电缆接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000166', '295', '221', '1', '电缆本体负荷-表记读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000167', '296', '220', '1', '本体引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000168', '296', '222', '1', '本体引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000169', '296', '220', '1', '套管引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000170', '296', '222', '1', '套管引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000171', '296', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000172', '296', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000173', '296', '223', '1', '本体运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000174', '296', '223', '1', '套管运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000175', '296', '220', '1', '本体温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000176', '296', '220', '1', '套管温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000177', '296', '221', '1', '本体温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000178', '296', '221', '1', '套管温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000179', '296', '220', '1', '本体基础框架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000180', '296', '220', '1', '套管基础框架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000181', '296', '220', '1', '吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000182', '296', '220', '1', '储油柜油位表计-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000183', '296', '220', '1', '储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000184', '296', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000185', '296', '220', '1', '端子箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000186', '296', '219', '1', '分接开关档位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000187', '296', '220', '1', '电容器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000188', '296', '222', '1', '电容器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000189', '296', '220', '1', '互感器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000190', '296', '219', '1', '中性点隔离开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000191', '296', '219', '1', '储油柜油位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000192', '296', '222', '1', '互感器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000193', '296', '220', '1', '避雷器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000194', '296', '222', '1', '避雷器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000195', '297', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000196', '297', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000197', '297', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000198', '297', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000199', '297', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000200', '297', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000201', '297', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000202', '298', '220', '1', '本体套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000203', '298', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000204', '298', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000205', '298', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000206', '298', '220', '1', '接地开关-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000207', '298', '219', '1', '接地开关-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000208', '298', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000209', '298', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000210', '298', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000211', '298', '220', '1', '基础架构-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000212', '298', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000213', '298', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000214', '298', '222', '1', '套管-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000215', '299', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000216', '299', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000217', '299', '220', '1', '本体接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000218', '299', '222', '1', '本体接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000219', '299', '220', '1', '支撑架构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000220', '300', '220', '1', '面板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000221', '300', '219', '1', '面板-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000222', '300', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000223', '300', '219', '1', '刀闸位置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000224', '300', '219', '1', '接地刀闸位置-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000225', '300', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000226', '300', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000227', '300', '220', '1', '绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000228', '300', '220', '1', '标示牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000229', '301', '220', '1', '接地引下线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000230', '294', '220', '1', '整体-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000231', '292', '220', '1', '放电间隙-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000232', '292', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000233', '292', '220', '1', '平台构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000234', '292', '222', '1', '水冷绝缘子-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000235', '328', '220', '1', '本体外观-外观缺陷-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000236', '328', '220', '1', '本体外观-外观缺陷-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000237', '328', '222', '1', '本体外观-红外测温-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000238', '328', '222', '1', '本体外观-红外测温-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000239', '328', '223', '1', '运行声音-声音检测-本体', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000240', '328', '223', '1', '运行声音-声音检测-套管', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000241', '328', '221', '1', '套管油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000242', '328', '220', '1', '套管油位表计-外观异常', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000243', '328', '221', '1', '套管油压表-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000244', '328', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000245', '328', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000246', '328', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000247', '328', '220', '1', '套管末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000248', '328', '222', '1', '套管末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000249', '328', '220', '1', '本体外观-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000250', '328', '222', '1', '本体外观-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000251', '328', '223', '1', '运行声音-声音检测-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000252', '328', '221', '1', '套管油位表计-表计读数-调补变', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000253', '328', '220', '1', '套管外观-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000254', '328', '222', '1', '套管外观-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000255', '328', '220', '1', '引线及接头-外观缺陷-调补变', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000256', '328', '222', '1', '引线及接头-红外测温-调补变', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000257', '328', '219', '1', '分接挡位-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000258', '328', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000259', '328', '220', '1', '在线滤油装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000260', '328', '220', '1', '冷却器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000261', '328', '220', '1', '风扇-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000262', '328', '220', '1', '油流继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000263', '328', '219', '1', '油流继电器-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000264', '328', '220', '1', '控制箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000265', '328', '219', '1', '控制箱-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000266', '328', '220', '1', '气体继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000267', '328', '220', '1', '温度表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000268', '328', '221', '1', '温度表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000269', '328', '220', '1', '压力释放阀-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000270', '328', '220', '1', '压力突变继电器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000271', '328', '220', '1', '本体吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000272', '328', '221', '1', '本体吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000273', '328', '221', '1', '本体油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000274', '328', '220', '1', '本体储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000275', '328', '220', '1', '调补变吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000276', '328', '221', '1', '调补变吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000277', '328', '221', '1', '调补变油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000278', '328', '220', '1', '调补变储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000279', '328', '220', '1', '分接开关吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000280', '328', '221', '1', '分接开关吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000281', '328', '220', '1', '分接开关油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000282', '328', '221', '1', '分接开关油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000283', '328', '220', '1', '分接开关储油柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000284', '328', '220', '1', '在线监测装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000285', '328', '220', '1', '外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000286', '328', '220', '1', '排风系统-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000287', '328', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000288', '328', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000289', '328', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000290', '328', '222', '1', '套管外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000291', '328', '220', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000292', '328', '221', '1', '调压次数-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000293', '182', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000294', '182', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000295', '182', '223', '1', '运行声音-声音检测', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000296', '182', '220', '1', '伸缩节-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000297', '182', '220', '1', '盆式绝缘子-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000298', '182', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000299', '182', '220', '1', 'SF6密度继电器（压力表）-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000300', '182', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000301', '182', '220', '1', '位置指示-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000302', '182', '219', '1', '位置指示-位置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000303', '182', '221', '1', '断路压力表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000304', '182', '221', '1', '断路器动作计数器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000305', '182', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000306', '182', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000307', '182', '220', '1', '带电显示器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000308', '182', '221', '1', '带电显示器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000309', '182', '220', '1', '套管外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000310', '182', '222', '1', '套管外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000311', '182', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000312', '182', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000313', '182', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000314', '182', '220', '1', '汇控柜外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000315', '182', '221', '1', '汇控柜环境-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000316', '182', '221', '1', '汇控柜面板-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000317', '182', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000318', '182', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000319', '182', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000320', '182', '221', '1', '压力表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000321', '182', '219', '1', '位置指示-位置状态识别', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000322', '182', '219', '1', '位置指示-外置状态识别', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000323', '193', '220', '1', '触头及导电臂-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000324', '193', '222', '1', '触头及导电臂-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000325', '193', '219', '1', '位置指示-外置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000326', '193', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000327', '193', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000328', '193', '220', '1', '导电底座-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000329', '193', '219', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000330', '193', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000331', '193', '220', '1', '传动部分外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000332', '193', '220', '1', '基座-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000333', '193', '220', '1', '基座-外观缺陷-机械闭锁', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000334', '193', '220', '1', '基座-外观缺陷-限位部分', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000335', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-基座', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000336', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-机械闭锁', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000337', '193', '220', '1', '机械闭锁及限位部分-外观缺陷-限位部分', '', '', '', '1', '', '1.000', '1.000',
+        '131', '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000338', '193', '220', '1', '操动机构外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000339', '193', '220', '1', '机构箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000340', '193', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000341', '193', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000342', '193', '220', '1', '五防锁具-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000343', '193', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000344', '193', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000345', '193', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000346', '194', '220', '1', '面板-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000347', '194', '221', '1', '面板-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000348', '194', '219', '1', '位置指示-外置状态', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000349', '194', '220', '1', '压力释放装置-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000350', '194', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000351', '194', '221', '1', 'SF6密度继电器（压力表)-表计读数', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000352', '194', '221', '1', '储能指示-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000353', '194', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000354', '194', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000355', '196', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000356', '196', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000357', '196', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000358', '196', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000359', '196', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000360', '196', '220', '1', '二次接线盒-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000361', '196', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000362', '196', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000363', '196', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000364', '196', '220', '1', '金属膨胀器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000365', '196', '220', '1', '末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000366', '196', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000367', '196', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000368', '196', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000369', '195', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000370', '195', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000371', '195', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000372', '195', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000373', '195', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000374', '195', '220', '1', '末屏-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000375', '195', '222', '1', '末屏-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000376', '195', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000377', '195', '220', '1', '二次接线盒-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000378', '195', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000379', '195', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000380', '195', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000381', '195', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000382', '195', '220', '1', '金属膨胀器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000383', '195', '221', '1', 'SF6密度继电器（压力表）-表计读数', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000384', '195', '220', '1', '端子箱-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000385', '195', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000386', '195', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000387', '197', '220', '1', '引线及接头-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000388', '197', '222', '1', '引线及接头-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000389', '197', '220', '1', '均压环-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000390', '197', '220', '1', '本体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000391', '197', '222', '1', '本体外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000392', '197', '220', '1', '基础构架-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000393', '197', '220', '1', '接地引下线-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000394', '197', '220', '1', '避雷器表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000395', '197', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000396', '197', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000397', '197', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000398', '330', '220', '1', '母线及引线外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000399', '330', '220', '1', '母线及引线外观-外观缺陷-引线', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000400', '330', '222', '1', '母线及引线外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000401', '330', '222', '1', '母线及引线外观-红外测温-引线', '', '', '', '1', '', '1.000', '1.000', '131',
+        '1', '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000',
+        '0.0000', '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000402', '330', '220', '1', '电容器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000403', '330', '222', '1', '电容器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000404', '330', '221', '1', '油温表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000405', '330', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000406', '330', '220', '1', '吸湿器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000407', '330', '221', '1', '吸湿器-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000408', '330', '220', '1', '外熔断器-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000409', '330', '222', '1', '外熔断器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000410', '330', '220', '1', '电抗器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000411', '330', '222', '1', '电抗器-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000412', '330', '220', '1', '放电线圈外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000413', '330', '222', '1', '放电线圈外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1',
+        '1', '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000',
+        '1', '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000414', '330', '220', '1', '油位表计-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000415', '330', '221', '1', '油位表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000416', '330', '220', '1', '避雷器外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000417', '330', '222', '1', '避雷器外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000418', '330', '221', '1', '避雷器表计-表计读数', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000419', '330', '220', '1', '接地引下线-外挂缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000420', '330', '220', '1', '绝缘子外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000421', '330', '220', '1', '整体外观-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000422', '330', '220', '1', '标识牌-外观缺陷', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1', '',
+        '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1', '',
+        '1');
+INSERT INTO `t_std_mete`
+VALUES ('1000000423', '330', '222', '1', '绝缘子外观-红外测温', '', '', '', '1', '', '1.000', '1.000', '131', '1', '1',
+        '', '', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1.000', '1', '0.0000', '0.0000', '1',
+        '', '1');
 
 
 -- ----------------------------
 -- Records of t_sys_param
 -- ----------------------------
-INSERT INTO `t_sys_param` VALUES ('100002', '402', 'nvrFreeMin', '录像机最小空闲报警', '65', '单位:百分比', '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100001', '403', 'videoRunningTime', '视频轮巡视频播放时间', '1', '单位 分钟', '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100015', '401', 'picModelPath', '模板图片路径', '/home/yjh_iot_center/iot-picture/model-picture/sync/Template/BigImg', '模板图片路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100016', '401', 'reportReflect', '报表绝对路径', '/home/yjh_iot_center/iot-files/reportFiles', '报表绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100017', '401', 'tempReflect', '临时文件绝对路径', '/home/yjh_iot_center/iot-files/temporaryFiles', '临时文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100018', '401', 'reportRelative', '报表相对路径', '/files/reportFiles', '报表相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100019', '401', 'unionDeviceInfoPath', '联动设备配置文件路径', '/home/yjh_iot_center/ftps/linkage', '联动设备配置文件路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100020', '401', 'meteModelPath', '临时文件相对路径', '/files/temporaryFiles', '临时文件相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100021', '401', 'ftpsFilePath', 'ftps服务器存储文件路径', '/home/yjh_iot_center/ftps', 'ftps服务器存储文件路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100026', '401', 'zipTargetPath', '标定文件导入路径', '/home/yjh_iot_center/iot-picture/zip', '标定文件导入路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100027', '404', 'waitTime', '等待时间', '10000', '摄像头转到预置位等待的时间 单位 毫秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100028', '404', 'tasksAreTime', '任务超期', '30', '任务超期时间 单位 分钟', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2})$\",\"msg\":\"请输入0-999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100031', '404', 'confirmExpireTime', '二次确认超时时间', '60000', '单位:毫秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,5})$\",\"msg\":\"请输入0-999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100032', '404', 'stationVoltageGrade', '首页-变电站电压等级', '500', '单位 KV', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100033', '404', 'fromWhatClass', '首页-所属班所', '1', '所属班所', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100034', '404', 'allPeople', '首页-所有的人员', '66', '所有的人', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100035', '404', 'workPeople', '首页-工作的人', '50', '在工作的人', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100036', '404', 'allCar', '首页-所有的车', '65', '所有的车', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100037', '404', 'workCar', '首页-工作的车', '11', '在工作的车', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100044', '402', 'logoutTime', '用户不操作退出登录时间', '20', '用户不操作退出登录时间，范围：0~30 单位：分钟', '{\"rule\":\"^([1-9]|[12]\\\\d|30)$\",\"msg\":\"用户不操作退出登录时间应大于0且小于等于30分钟！\"}');
-INSERT INTO `t_sys_param` VALUES ('100049', '402', 'cpuFreeMin', 'CPU最小空闲报警', '24', '单位:百分比', '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100050', '402', 'DiskFreeMin', '硬盘最小空闲报警', '26', '单位:百分比', '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100051', '402', 'MemoryFreeMin', '内存最小空闲报警', '30', '单位:百分比', '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100054', '402', 'secureVerify', '安全标记', 'true', 'manager:cpuFreeMin,DiskFreeMin,MemoryFreeMin', null);
-INSERT INTO `t_sys_param` VALUES ('100057', '404', 'commissioningTime', '首页-投运时间', '2022-07-31', '系统的投运时间', '{\"rule\":\"^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$\",\"msg\":\"请输入正确时间格式（YYYY-MM-dd）\"}');
-INSERT INTO `t_sys_param` VALUES ('100058', '401', 'robotPicModelPath', '机器人标定文件路径', '/home/yjh_iot_center/iot-picture/model-picture/sync/RobotTemplate/BigImg', '机器人标定文件路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100061', '404', 'cleanTime', '顺控步骤清除时间', '120', '单位：秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100067', '402', 'voiceFileRecordTime', '音频文件分段时长', '2', '单位：分钟', '{\"rule\":\"^([12345])$\",\"msg\":\"请输入1-5的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100068', '402', 'loginErrorNum', '登录错误次数', '10', '登录错误次数', '{\"rule\":\"^(\\\\d|10)$\",\"msg\":\"登录错误次数为1-10次\"}');
-INSERT INTO `t_sys_param` VALUES ('100069', '402', 'lockTime', '登录锁定时间', '20', '登录锁定时间时间123', '{\"rule\":\"^([2-9]\\\\d|[1-9]\\\\d{2,4})$\",\"msg\":\"登录锁定时间至少为20分钟，最大99999\"}');
-INSERT INTO `t_sys_param` VALUES ('100071', '402', 'isLogin', '账户是否只能一处登录', 'false', '账户是否只能一处登录', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100072', '404', 'noLogTime', '不写入日志-操作时间', '2021-03-03 00:00:00~2021-03-04 00:00:00', '在这个时间段内，用户的操作将补写入日志。（格式：yyyy-MM-dd HH:mm:ss~yyyy-MM-dd HH:mm:ss 示例:2021-03-03 00:00:00~2021-03-04 00:00:00）', '{\"rule\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2}~\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2}$\",\"msg\":\"请输入正确的时间格式\"}');
-INSERT INTO `t_sys_param` VALUES ('100073', '404', 'noLogType', '不写入日志-操作类型', '查询', '用户执行此操作时，将不写入日志。（操作类型包括：查询，新增，修改，删除，执行等）（多个操作类型以-隔开。示列1：查询。示例2：查询-修改）', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
-INSERT INTO `t_sys_param` VALUES ('100081', '404', 'isCheckByFour', '检测-是否开启', 'false', '专为检测使用（4个一组）', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100082', '404', 'checkWaitTimeByFour', '检测-等待时间', '30', '检测专用，等待时间（单位秒）', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100083', '404', 'isCheckByOne', '检测-是否开启（1个点）', 'false', '是否开启，一个点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100084', '404', 'checkWaitTimeByOne', '检测-等待时间（1个点）', '10', '等待时间，单位：秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100094', '404', 'zipFileSize', '采集文件大小限制', '20', '采集文件大小超过此限制，禁止下载。（单位：M）(默认值为20)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2})$\",\"msg\":\"请输入0-999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100095', '404', 'keepWatchTime', '摄相机回到守望位置时间', '10', '检测专用，摄像机在时间内未收到控制摄像机请求， 应自动回归守望位（默认10），单位分钟', '{\"rule\":\"^(\\\\d|[1-9]\\\\d)$\",\"msg\":\"请输入0-99的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100096', '404', 'stationName', '变电站名称', '江苏变电站-巡视系统', '变电站名称', '{"rule":"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]{1,18}$","msg":"请不要输入特殊字符，长度不超过18"}');
-INSERT INTO `t_sys_param` VALUES ('100098', '404', 'voiceDeviceTime', '声纹设备录音时长', '60', '单位：秒', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100099', '404', 'isIntelDefectAnalysis', '是否开启调用智能分析主机缺陷接口', 'true', '是否开启调用智能分析主机接口', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100100', '404', 'stationType', '变电站类别', 'HGIS站', '变电站类别', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
-INSERT INTO `t_sys_param` VALUES ('100101', '404', 'isIntelAlgorithmAnalysis', '是否开启调用智能分析主机表计接口', 'true', '是否开启调用智能分析主机表计接口', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100102', '401', 'distinguishReferencePath', '电科院判别基准图存储位置', '/home/yjh_iot_center/iot-picture/presets/distinguish', '电科院判别基准图存储位置', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100103', '404', 'isEPRI', '判别基准图是否采用电科院提供', 'true', '判别基准图是否采用电科院提供', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100104', '404', 'isSilentTask', '是否开启静默任务', 'false', '是否开启静默任务', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100106', '404', 'packetLog', '声纹TCP日志', 'false', '是否打印声纹TCP包日志信息', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100107', '404', 'voiceChtype', '声纹接收声道设置', '0', '0：默认多声道支持 1：强制单声道，多个通道输出多个文件 -1：强制单声道，多个通道声音写入到一个文件 -2：强制单声道，通道1写完写通道2', '{\"rule\":\"^-?[0-9]\",\"msg\":\"请输入-9~9的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100108', '404', 'voiceByteReverse', '声纹采样前后字节反转', 'false', '500 声纹接口采样需前后反转', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100109', '404', 'sequentialFlag', '一键顺控是否采用自定义结果', 'false', '一键顺控是否采用自定义结果', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100110', '404', 'sequentialResult', '一键顺控自定义结果', '2', '1-分位2-合位-3分位异常-4合位异常', '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1~4的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100111', '404', 'isWatermarkToInfrared', '是否给红外添加水印', 'true', '是否给红外添加水印', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100112', '404', 'tempReflectClear', '是否清理临时文件', 'true', '临时文件使用后是否立刻删除，true表示立刻删除', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100115', '404', 'loginKeepByWs', 'WebSocket登录状态保持', 'true', '使用WebSocket判断用户是否离线，更敏感', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100116', '404', 'voiceNeedEncoding', '声纹是否有格式编码', 'true', '220标准中声纹没有 Encoding 字段', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100119', '404', 'adcode', '地图adcode', '500101', '地图adcode，阿里云数据可视化平台获取', '{\"rule\":\"^([1-9]\\\\d{5})$\",\"msg\":\"请输入6位整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100121', '404', 'upSystemReceiveCode', '上级系统-上级系统唯一标识', '3000', '上级系统唯一标识', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请输入字母或数字\"}');
-INSERT INTO `t_sys_param` VALUES ('100122', '404', 'sourceFilePath', '设备资源信息配置文件绝对路径', '/home/yjh_iot_center/iot-files/sourceFile/', '设备资源信息配置文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100123', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100124', '404', 'ftpsTurbo', 'ftps 服务加速', 'true', '开启则视频服务和业务服务之间不通过 ftps 传输文件', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100125', '404', 'analysisTurbo', '分析主机分析服务加速', 'false', '开启使用新逻辑减少IO，提升分析速度', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100128', '404', 'deviceMaintenance', '检修区域检测', 'false', '检修区域检测项', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100129', '404', 'defectAnalyseType', 'AI判别传入的AnalyseType', 'tx_pb', 'AI判别传入的AnalyseType', '{\"rule\":\"^(tx_pb|tx_yzwpy)$\",\"msg\":\"只能填 tx_pb或 tx_yzwpy\"}');
-INSERT INTO `t_sys_param` VALUES ('100130', '404', 'silentMonitorAnalyseMap', '静默监视AI判别传入的AnalyseType映射关系', '1|drqgd,2|dxdg,3|pzqcd,4|yxdghsg,5|sly_bjbmyw,6|xdwcr,7|hzyw,8|sly_dmyw', '静默监视AI判别传入的AnalyseType映射关系', '{\"rule\":\"^[_a-zA-Z0-9# \\\\|,]+$\",\"msg\":\"请不要输入特殊字符\"}');
-INSERT INTO `t_sys_param` VALUES ('100131', '404', 'isInfraredAnalysis', '红外结果是否需要算法分析', 'false', '红外测温的结果是否需要调用算法分析', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100132', '404', 'standardPoints', '是否使用标准点位ID', 'false', '标准点位ID，巡视主机和边缘节点使用统一的点位ID，不使用自增ID，此情况一个测点只可以绑定一个巡视设备，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100133', '404', 'fastTurbo', '是否启用极速模式', 'false', '极速模式，减少日志和不必要消息上报，开启后会影响问题定位，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false', '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100136', '404', 'robotTaskStatusUp', '机器人任务状态上报开关', 'true', '机器人任务状态上报开关', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100140', '404', 'linkMete', '是否自动绑定同步机器人测点', 'true', '此参数用于控制在机器人台账中，进行巡视点位同步时，是否自动新建测点并进行绑定', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100141', '404', 'cameraServicePort', '海康相机服务端口', '8000', '海康相机服务端口(用作语音对讲)', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-INSERT INTO `t_sys_param` VALUES ('100142', '404', 'droneOpen', '无人机任务启动报文开关', 'true', '针对普宙无人机不支持周期任务，需要额外发送启动命令，开启后会额外发送一条任务启动报文，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100143', '404', 'isPcmEncode', '语音对讲音频编码是否为pcm', 'true', '语音对讲音频编码是否为pcm，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` VALUES ('100144', '404', 'cameraConfigPath', '相机设备参数备份位置', '/home/yjh_iot_center/iot-files/cameraConfig/', '相机设备参数备份位置', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'cleanContinue', '是否继续未完成的磁盘清理任务', 'false', '服务重启后继续执行没有执行完成的磁盘清理任务，此操作会导致备份不完整', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'logLevel', '打印日志级别', '2', '调试使用，级别越高打印日志越详细，范围 1-4', '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1-4的整数\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'logoImage', 'logo', 'logo/logo_gw_text.png', '首页logo', '');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'loginLogoImage', 'loginLogo', 'logo/login_title_2.png', '登录页logo路径', '');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'hostIp', '映射ip', '172.24.39.9', '映射ip', NULL);
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'zmlHostIp', 'ZMLip', '172.24.39.9:1935', 'ZMLip端口', NULL);
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'gbCode', '国标编码', '3201140049', '国标编码', NULL);
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'downResultPic', '任务报告下载算法分析图', 'false', '任务报告下载的大图下载算法分析后图片还是原图，true是算法分析后图片，false是原图', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false', '任务报告按站所拆分视图，站所为区域根节点下第一层节点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'selfDefinedExtensions', '是否启用自定义协议扩展', 'true', '用于内部系统对接，定义了额外的消息类型', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'missedPointRetry', '是否开启遗漏点位重试', 'false', '此参数用于遗漏点位重试,用于巡视任务对遗漏点位的重新巡视', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'upSystemAlgorithmReceiveCode', '上级系统-上级系统算法平台唯一标识', 'Cloud01', '上级系统算法平台唯一标识', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请输入字母或数字\"}');
-INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'cameraStateTime', '检查相机不可控时间', '10', '单位：分钟；控制相机时，检查最后操作的时间，大于这个时间变为可控', '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100002', '402', 'nvrFreeMin', '录像机最小空闲报警', '65', '单位:百分比',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100001', '403', 'videoRunningTime', '视频轮巡视频播放时间', '1', '单位 分钟',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100015', '401', 'picModelPath', '模板图片路径',
+        '/home/yjh_iot_center/iot-picture/model-picture/sync/Template/BigImg', '模板图片路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100016', '401', 'reportReflect', '报表绝对路径', '/home/yjh_iot_center/iot-files/reportFiles', '报表绝对路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100017', '401', 'tempReflect', '临时文件绝对路径', '/home/yjh_iot_center/iot-files/temporaryFiles',
+        '临时文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100018', '401', 'reportRelative', '报表相对路径', '/files/reportFiles', '报表相对路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100019', '401', 'unionDeviceInfoPath', '联动设备配置文件路径', '/home/yjh_iot_center/ftps/linkage',
+        '联动设备配置文件路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100020', '401', 'meteModelPath', '临时文件相对路径', '/files/temporaryFiles', '临时文件相对路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100021', '401', 'ftpsFilePath', 'ftps服务器存储文件路径', '/home/yjh_iot_center/ftps',
+        'ftps服务器存储文件路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100026', '401', 'zipTargetPath', '标定文件导入路径', '/home/yjh_iot_center/iot-picture/zip',
+        '标定文件导入路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100027', '404', 'waitTime', '等待时间', '10000', '摄像头转到预置位等待的时间 单位 毫秒',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100028', '404', 'tasksAreTime', '任务超期', '30', '任务超期时间 单位 分钟',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2})$\",\"msg\":\"请输入0-999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100031', '404', 'confirmExpireTime', '二次确认超时时间', '60000', '单位:毫秒',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,5})$\",\"msg\":\"请输入0-999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100032', '404', 'stationVoltageGrade', '首页-变电站电压等级', '500', '单位 KV',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100033', '404', 'fromWhatClass', '首页-所属班所', '1', '所属班所',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100034', '404', 'allPeople', '首页-所有的人员', '66', '所有的人',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100035', '404', 'workPeople', '首页-工作的人', '50', '在工作的人',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100036', '404', 'allCar', '首页-所有的车', '65', '所有的车',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100037', '404', 'workCar', '首页-工作的车', '11', '在工作的车',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100044', '402', 'logoutTime', '用户不操作退出登录时间', '20', '用户不操作退出登录时间，范围：0~30 单位：分钟',
+        '{\"rule\":\"^([1-9]|[12]\\\\d|30)$\",\"msg\":\"用户不操作退出登录时间应大于0且小于等于30分钟！\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100049', '402', 'cpuFreeMin', 'CPU最小空闲报警', '24', '单位:百分比',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100050', '402', 'DiskFreeMin', '硬盘最小空闲报警', '26', '单位:百分比',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100051', '402', 'MemoryFreeMin', '内存最小空闲报警', '30', '单位:百分比',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d|100)$\",\"msg\":\"请输入0-100的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100054', '402', 'secureVerify', '安全标记', 'true', 'manager:cpuFreeMin,DiskFreeMin,MemoryFreeMin', null);
+INSERT INTO `t_sys_param`
+VALUES ('100057', '404', 'commissioningTime', '首页-投运时间', '2022-07-31', '系统的投运时间',
+        '{\"rule\":\"^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$\",\"msg\":\"请输入正确时间格式（YYYY-MM-dd）\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100058', '401', 'robotPicModelPath', '机器人标定文件路径',
+        '/home/yjh_iot_center/iot-picture/model-picture/sync/RobotTemplate/BigImg', '机器人标定文件路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100061', '404', 'cleanTime', '顺控步骤清除时间', '120', '单位：秒',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100067', '402', 'voiceFileRecordTime', '音频文件分段时长', '2', '单位：分钟',
+        '{\"rule\":\"^([12345])$\",\"msg\":\"请输入1-5的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100068', '402', 'loginErrorNum', '登录错误次数', '10', '登录错误次数',
+        '{\"rule\":\"^(\\\\d|10)$\",\"msg\":\"登录错误次数为1-10次\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100069', '402', 'lockTime', '登录锁定时间', '20', '登录锁定时间时间123',
+        '{\"rule\":\"^([2-9]\\\\d|[1-9]\\\\d{2,4})$\",\"msg\":\"登录锁定时间至少为20分钟，最大99999\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100071', '402', 'isLogin', '账户是否只能一处登录', 'false', '账户是否只能一处登录',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100072', '404', 'noLogTime', '不写入日志-操作时间', '2021-03-03 00:00:00~2021-03-04 00:00:00',
+        '在这个时间段内，用户的操作将补写入日志。（格式：yyyy-MM-dd HH:mm:ss~yyyy-MM-dd HH:mm:ss 示例:2021-03-03 00:00:00~2021-03-04 00:00:00）',
+        '{\"rule\":\"^\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2}~\\\\d{4}-\\\\d{2}-\\\\d{2} \\\\d{2}:\\\\d{2}:\\\\d{2}$\",\"msg\":\"请输入正确的时间格式\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100073', '404', 'noLogType', '不写入日志-操作类型', '查询',
+        '用户执行此操作时，将不写入日志。（操作类型包括：查询，新增，修改，删除，执行等）（多个操作类型以-隔开。示列1：查询。示例2：查询-修改）',
+        '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100081', '404', 'isCheckByFour', '检测-是否开启', 'false', '专为检测使用（4个一组）',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100082', '404', 'checkWaitTimeByFour', '检测-等待时间', '30', '检测专用，等待时间（单位秒）',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100083', '404', 'isCheckByOne', '检测-是否开启（1个点）', 'false', '是否开启，一个点',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100084', '404', 'checkWaitTimeByOne', '检测-等待时间（1个点）', '10', '等待时间，单位：秒',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,3})$\",\"msg\":\"请输入0-9999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100094', '404', 'zipFileSize', '采集文件大小限制', '20',
+        '采集文件大小超过此限制，禁止下载。（单位：M）(默认值为20)',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2})$\",\"msg\":\"请输入0-999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100095', '404', 'keepWatchTime', '摄相机回到守望位置时间', '10',
+        '检测专用，摄像机在时间内未收到控制摄像机请求， 应自动回归守望位（默认10），单位分钟',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d)$\",\"msg\":\"请输入0-99的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100096', '404', 'stationName', '变电站名称', '江苏变电站-巡视系统', '变电站名称',
+        '{"rule":"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]{1,18}$","msg":"请不要输入特殊字符，长度不超过18"}');
+INSERT INTO `t_sys_param`
+VALUES ('100098', '404', 'voiceDeviceTime', '声纹设备录音时长', '60', '单位：秒',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100099', '404', 'isIntelDefectAnalysis', '是否开启调用智能分析主机缺陷接口', 'true',
+        '是否开启调用智能分析主机接口', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100100', '404', 'stationType', '变电站类别', 'HGIS站', '变电站类别',
+        '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100101', '404', 'isIntelAlgorithmAnalysis', '是否开启调用智能分析主机表计接口', 'true',
+        '是否开启调用智能分析主机表计接口', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100102', '401', 'distinguishReferencePath', '电科院判别基准图存储位置',
+        '/home/yjh_iot_center/iot-picture/presets/distinguish', '电科院判别基准图存储位置',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100103', '404', 'isEPRI', '判别基准图是否采用电科院提供', 'true', '判别基准图是否采用电科院提供',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100104', '404', 'isSilentTask', '是否开启静默任务', 'false', '是否开启静默任务',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100106', '404', 'packetLog', '声纹TCP日志', 'false', '是否打印声纹TCP包日志信息',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100107', '404', 'voiceChtype', '声纹接收声道设置', '0',
+        '0：默认多声道支持 1：强制单声道，多个通道输出多个文件 -1：强制单声道，多个通道声音写入到一个文件 -2：强制单声道，通道1写完写通道2',
+        '{\"rule\":\"^-?[0-9]\",\"msg\":\"请输入-9~9的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100108', '404', 'voiceByteReverse', '声纹采样前后字节反转', 'false', '500 声纹接口采样需前后反转',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100109', '404', 'sequentialFlag', '一键顺控是否采用自定义结果', 'false', '一键顺控是否采用自定义结果',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100110', '404', 'sequentialResult', '一键顺控自定义结果', '2', '1-分位2-合位-3分位异常-4合位异常',
+        '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1~4的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100111', '404', 'isWatermarkToInfrared', '是否给红外添加水印', 'true', '是否给红外添加水印',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100112', '404', 'tempReflectClear', '是否清理临时文件', 'true', '临时文件使用后是否立刻删除，true表示立刻删除',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100115', '404', 'loginKeepByWs', 'WebSocket登录状态保持', 'true', '使用WebSocket判断用户是否离线，更敏感',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100116', '404', 'voiceNeedEncoding', '声纹是否有格式编码', 'true', '220标准中声纹没有 Encoding 字段',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100119', '404', 'adcode', '地图adcode', '500101', '地图adcode，阿里云数据可视化平台获取',
+        '{\"rule\":\"^([1-9]\\\\d{5})$\",\"msg\":\"请输入6位整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100121', '404', 'upSystemReceiveCode', '上级系统-上级系统唯一标识', '3000', '上级系统唯一标识',
+        '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请输入字母或数字\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100122', '404', 'sourceFilePath', '设备资源信息配置文件绝对路径', '/home/yjh_iot_center/iot-files/sourceFile/',
+        '设备资源信息配置文件绝对路径',
+        '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100123', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100124', '404', 'ftpsTurbo', 'ftps 服务加速', 'true', '开启则视频服务和业务服务之间不通过 ftps 传输文件',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100125', '404', 'analysisTurbo', '分析主机分析服务加速', 'false', '开启使用新逻辑减少IO，提升分析速度',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100128', '404', 'deviceMaintenance', '检修区域检测', 'false', '检修区域检测项',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100129', '404', 'defectAnalyseType', 'AI判别传入的AnalyseType', 'tx_pb', 'AI判别传入的AnalyseType',
+        '{\"rule\":\"^(tx_pb|tx_yzwpy)$\",\"msg\":\"只能填 tx_pb或 tx_yzwpy\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100130', '404', 'silentMonitorAnalyseMap', '静默监视AI判别传入的AnalyseType映射关系',
+        '1|drqgd,2|dxdg,3|pzqcd,4|yxdghsg,5|sly_bjbmyw,6|xdwcr,7|hzyw,8|sly_dmyw',
+        '静默监视AI判别传入的AnalyseType映射关系',
+        '{\"rule\":\"^[_a-zA-Z0-9# \\\\|,]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100131', '404', 'isInfraredAnalysis', '红外结果是否需要算法分析', 'false',
+        '红外测温的结果是否需要调用算法分析', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100132', '404', 'standardPoints', '是否使用标准点位ID', 'false',
+        '标准点位ID，巡视主机和边缘节点使用统一的点位ID，不使用自增ID，此情况一个测点只可以绑定一个巡视设备，true或false',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100133', '404', 'fastTurbo', '是否启用极速模式', 'false',
+        '极速模式，减少日志和不必要消息上报，开启后会影响问题定位，true或false',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100135', '404', 'updateSyncModel', '是否启用修改同步模型', 'false',
+        '修改同步模型，开启后修改模型会立即向上同步对应模型，true或false',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100136', '404', 'robotTaskStatusUp', '机器人任务状态上报开关', 'true', '机器人任务状态上报开关',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100140', '404', 'linkMete', '是否自动绑定同步机器人测点', 'true',
+        '此参数用于控制在机器人台账中，进行巡视点位同步时，是否自动新建测点并进行绑定',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100141', '404', 'cameraServicePort', '海康相机服务端口', '8000', '海康相机服务端口(用作语音对讲)',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100142', '404', 'droneOpen', '无人机任务启动报文开关', 'true',
+        '针对普宙无人机不支持周期任务，需要额外发送启动命令，开启后会额外发送一条任务启动报文，true或false',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100143', '404', 'isPcmEncode', '语音对讲音频编码是否为pcm', 'true', '语音对讲音频编码是否为pcm，true或false',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`
+VALUES ('100144', '404', 'cameraConfigPath', '相机设备参数备份位置', '/home/yjh_iot_center/iot-files/cameraConfig/',
+        '相机设备参数备份位置', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'cleanContinue', '是否继续未完成的磁盘清理任务', 'false',
+        '服务重启后继续执行没有执行完成的磁盘清理任务，此操作会导致备份不完整',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'logLevel', '打印日志级别', '2', '调试使用，级别越高打印日志越详细，范围 1-4',
+        '{\"rule\":\"^[1-4]\",\"msg\":\"请输入1-4的整数\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'logoImage', 'logo', 'logo/logo_gw_text.png', '首页logo', '');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'loginLogoImage', 'loginLogo', 'logo/login_title_2.png', '登录页logo路径', '');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'hostIp', '映射ip', '172.24.39.9', '映射ip', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'zmlHostIp', 'ZMLip', '172.24.39.9:1935', 'ZMLip端口', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'gbCode', '国标编码', '3201140049', '国标编码', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'downResultPic', '任务报告下载算法分析图', 'false',
+        '任务报告下载的大图下载算法分析后图片还是原图，true是算法分析后图片，false是原图',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false',
+        '任务报告按站所拆分视图，站所为区域根节点下第一层节点',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'selfDefinedExtensions', '是否启用自定义协议扩展', 'true', '用于内部系统对接，定义了额外的消息类型',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'missedPointRetry', '是否开启遗漏点位重试', 'false',
+        '此参数用于遗漏点位重试,用于巡视任务对遗漏点位的重新巡视',
+        '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES ('404', 'upSystemAlgorithmReceiveCode', '上级系统-上级系统算法平台唯一标识', 'Cloud01',
+        '上级系统算法平台唯一标识', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"请输入字母或数字\"}');
+INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`)
+VALUES (404, 'cameraStateTime', '检查相机不可控时间', '10',
+        '单位：分钟；控制相机时，检查最后操作的时间，大于这个时间变为可控',
+        '{\"rule\":\"^(\\\\d|[1-9]\\\\d{1,2}|1[0-7]\\\\d{1,2}|1800)$\",\"msg\":\"请输入0-9999的整数\"}');
 
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
 TRUNCATE t_version;
-INSERT INTO `t_version` VALUES ('1', '1', '1.0.1.200806_relase', '巡视主机初始版本，具备巡视主机主要功能。', '巡视主机初始版本，具备巡视主机主要功能。', '2020-08-06 08:08:08');
-INSERT INTO `t_version` VALUES ('2', '1', '1.5.6.210412_relase', '巡视主机特高压检测版本，满足特高压检测要求。', '修复若干BUG\n巡视主机特高压检测版本，满足特高压检测要求。', '2021-04-12 14:08:27');
-INSERT INTO `t_version` VALUES ('3', '1', '1.5.8.210608_relase', '巡视主机商用版本，增加用户定制需求。', '修复若干BUG\n巡视主机商用版本，增加用户定制需求。', '2021-06-18 10:08:38');
-INSERT INTO `t_version` VALUES ('4', '1', '2.0.1.220506_RC', '巡视主机新500kv检测版本，添加新500kv检测要求', '1.修复个别BUG\n2.巡检功能逻辑优化\n3.数据采集功能优化\n4.视频播放功能优化\n5.配置逻辑优化', '2022-05-06 09:09:11');
-INSERT INTO `t_version` VALUES ('5', '2', '1.1.1.220422_beta', '增加用户定制需求，性能优化', '1.修复个别BUG\n2.增加用户定制需求\n3.性能优化，提高检测精度', '2022-04-22 14:09:11');
-INSERT INTO `t_version` VALUES ('6', '2', '1.1.1.220610_beta', '巡视系统检测版本，添加500kv检测要求，增加检测类型', '1.修复若干BUG\n2.检测接口优化修改\n3.图片传输方式修改\n4.性能优化，增加检测类型，提高检测精度\n5.配置逻辑优化', '2022-06-10 16:22:53');
-INSERT INTO `t_version` VALUES ('7', '1', '2.1.1.221031_beta', '协议拓展，满足220kv巡视系统协议和功能要求', '1.修复大量BUG\n2.巡检任务逻辑优化，提升视频任务效率\n3.性能优化，提升大数据量下系统性能\n4.增加国产化操作系统和aarch64架构支持\n5.配置逻辑优化，简化配置项', '2022-10-23 14:23:22');
-INSERT INTO `t_version` VALUES ('8', '2', '2.0.0.221031_beta', '性能提升，增加检查类型，增加arm架构适配', '1.修复若干BUG\n2.性能优化，增加检测类型，提高检测精度\n5.增加国产化操作系统和aarch64架构支持', '2022-10-23 15:19:37');
-INSERT INTO `t_version` VALUES ('9', '1', '2.5.5.230928_relase', '软件易用性改造，相机兼容，上级系统对接修改', '1.修复大量BUG，优化redis调用性能\n2.支持GB28181协议，国标相机接入，大华相机适配\n3.易用性优化，提升软件易用性5.增加主接线图功能', '2023-09-28 10:41:24');
-INSERT INTO `t_version` VALUES ('10', '2', '2.1.0.230928_relase', '性能提升，增加检查类型', '1.修复若干BUG\n2.性能优化，增加识别类型，提高检测精度\n3.表计识别增加去模板化能力', '2023-09-28 15:36:41');
-INSERT INTO `t_version` VALUES ('11', '1', '3.2.5.240131_relase', '接入操作类型机器人，接入环境传感器', '1.修复若干BUG\n2.支持D200操作机器人接入\n3.支持机器人多传感器接入5.其他商业化定制功能', '2024-01-31 14:02:44');
-INSERT INTO `t_version` VALUES ('12', '2', '2.5.1.240105_relase', '性能提升，增加检查类型', '1.修复若干BUG\n2.性能优化，提高检测精度\n3.增加三相电表及人员闯入识别', '2024-01-05 09:40:12');
+INSERT INTO `t_version`
+VALUES ('1', '1', '1.0.1.200806_relase', '巡视主机初始版本，具备巡视主机主要功能。',
+        '巡视主机初始版本，具备巡视主机主要功能。', '2020-08-06 08:08:08');
+INSERT INTO `t_version`
+VALUES ('2', '1', '1.5.6.210412_relase', '巡视主机特高压检测版本，满足特高压检测要求。',
+        '修复若干BUG\n巡视主机特高压检测版本，满足特高压检测要求。', '2021-04-12 14:08:27');
+INSERT INTO `t_version`
+VALUES ('3', '1', '1.5.8.210608_relase', '巡视主机商用版本，增加用户定制需求。',
+        '修复若干BUG\n巡视主机商用版本，增加用户定制需求。', '2021-06-18 10:08:38');
+INSERT INTO `t_version`
+VALUES ('4', '1', '2.0.1.220506_RC', '巡视主机新500kv检测版本，添加新500kv检测要求',
+        '1.修复个别BUG\n2.巡检功能逻辑优化\n3.数据采集功能优化\n4.视频播放功能优化\n5.配置逻辑优化',
+        '2022-05-06 09:09:11');
+INSERT INTO `t_version`
+VALUES ('5', '2', '1.1.1.220422_beta', '增加用户定制需求，性能优化',
+        '1.修复个别BUG\n2.增加用户定制需求\n3.性能优化，提高检测精度', '2022-04-22 14:09:11');
+INSERT INTO `t_version`
+VALUES ('6', '2', '1.1.1.220610_beta', '巡视系统检测版本，添加500kv检测要求，增加检测类型',
+        '1.修复若干BUG\n2.检测接口优化修改\n3.图片传输方式修改\n4.性能优化，增加检测类型，提高检测精度\n5.配置逻辑优化',
+        '2022-06-10 16:22:53');
+INSERT INTO `t_version`
+VALUES ('7', '1', '2.1.1.221031_beta', '协议拓展，满足220kv巡视系统协议和功能要求',
+        '1.修复大量BUG\n2.巡检任务逻辑优化，提升视频任务效率\n3.性能优化，提升大数据量下系统性能\n4.增加国产化操作系统和aarch64架构支持\n5.配置逻辑优化，简化配置项',
+        '2022-10-23 14:23:22');
+INSERT INTO `t_version`
+VALUES ('8', '2', '2.0.0.221031_beta', '性能提升，增加检查类型，增加arm架构适配',
+        '1.修复若干BUG\n2.性能优化，增加检测类型，提高检测精度\n5.增加国产化操作系统和aarch64架构支持',
+        '2022-10-23 15:19:37');
+INSERT INTO `t_version`
+VALUES ('9', '1', '2.5.5.230928_relase', '软件易用性改造，相机兼容，上级系统对接修改',
+        '1.修复大量BUG，优化redis调用性能\n2.支持GB28181协议，国标相机接入，大华相机适配\n3.易用性优化，提升软件易用性5.增加主接线图功能',
+        '2023-09-28 10:41:24');
+INSERT INTO `t_version`
+VALUES ('10', '2', '2.1.0.230928_relase', '性能提升，增加检查类型',
+        '1.修复若干BUG\n2.性能优化，增加识别类型，提高检测精度\n3.表计识别增加去模板化能力', '2023-09-28 15:36:41');
+INSERT INTO `t_version`
+VALUES ('11', '1', '3.2.5.240131_relase', '接入操作类型机器人，接入环境传感器',
+        '1.修复若干BUG\n2.支持D200操作机器人接入\n3.支持机器人多传感器接入5.其他商业化定制功能', '2024-01-31 14:02:44');
+INSERT INTO `t_version`
+VALUES ('12', '2', '2.5.1.240105_relase', '性能提升，增加检查类型',
+        '1.修复若干BUG\n2.性能优化，提高检测精度\n3.增加三相电表及人员闯入识别', '2024-01-05 09:40:12');
 
 
-INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (1, 1, '普通预置位', '', -1, 0);
-INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (2, 2, '守望位', '', -1, 0);
-INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (3, 3, '秒级静默任务', '', -1, 0);
-INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (4, 4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600, 1);
-INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`) VALUES (5, 5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120, 1);
+INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`)
+VALUES (1, 1, '普通预置位', '', -1, 0);
+INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`)
+VALUES (2, 2, '守望位', '', -1, 0);
+INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`)
+VALUES (3, 3, '秒级静默任务', '', -1, 0);
+INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`)
+VALUES (4, 4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600, 1);
+INSERT INTO `silent_conf` (`id`, `preset_type`, `preset_type_name`, `recognize_type`, `chill_time`, `editable`)
+VALUES (5, 5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120, 1);
 
 
-INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('901', '1', NULL);
-INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('902', '2', NULL);
-INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('903', '3', NULL);
-INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`) VALUES ('904', '4', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`)
+VALUES ('901', '1', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`)
+VALUES ('902', '2', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`)
+VALUES ('903', '3', NULL);
+INSERT INTO `t_task_priority_config` (`prioritized_task_type`, `execute_level`, `update_time`)
+VALUES ('904', '4', NULL);
 
 -- ----------------------------
 -- Records of system_config
 -- ----------------------------
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemFtpsIp', '192.168.9.40', 'ftps服务ip', '上级系统ftps服务ip', '{\"rule\":\"^([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])(\\\\.([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])){3}$\",\"msg\":\"请输入正确的ip\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemFtpsPort', '10012', 'ftps服务端口', '上级系统ftps服务端口', '{\"rule\":\"^([0-9]|[1-9]\\\\d{1,3}|[1-5]\\\\d{4}|6[0-4]\\\\d{4}|65[0-4]\\\\d{2}|655[0-2]\\\\d|6553[0-5])$\",\"msg\":\"请输入正确端口\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemFtpsUsername', 'ftpuser', '登录用户名', '上级系统ftps服务登录用户名', '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"输入字母数字或_-符号\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemFtpsPassword', 'ftpuser', '登录密码', '上级系统ftps服务登录密码', '{\"rule\":\"^[^\'\\\"\\\\s]+$\",\"msg\":\"不可以输入空格或特殊字符\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`,
+                             `rules`)
+VALUES ('upSystem', '上级系统配置', 'upSystemFtpsIp', '192.168.9.40', 'ftps服务ip', '上级系统ftps服务ip',
+        '{\"rule\":\"^([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])(\\\\.([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])){3}$\",\"msg\":\"请输入正确的ip\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`,
+                             `rules`)
+VALUES ('upSystem', '上级系统配置', 'upSystemFtpsPort', '10012', 'ftps服务端口', '上级系统ftps服务端口',
+        '{\"rule\":\"^([0-9]|[1-9]\\\\d{1,3}|[1-5]\\\\d{4}|6[0-4]\\\\d{4}|65[0-4]\\\\d{2}|655[0-2]\\\\d|6553[0-5])$\",\"msg\":\"请输入正确端口\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`,
+                             `rules`)
+VALUES ('upSystem', '上级系统配置', 'upSystemFtpsUsername', 'ftpuser', '登录用户名', '上级系统ftps服务登录用户名',
+        '{\"rule\":\"^[_a-zA-Z0-9\\\\-]+$\",\"msg\":\"输入字母数字或_-符号\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`,
+                             `rules`)
+VALUES ('upSystem', '上级系统配置', 'upSystemFtpsPassword', 'ftpuser', '登录密码', '上级系统ftps服务登录密码',
+        '{\"rule\":\"^[^\'\\\"\\\\s]+$\",\"msg\":\"不可以输入空格或特殊字符\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemFlag', '1', '是否开启', '上级系统是否开启 1开启 0关闭', '{\"rule\":\"^(0|1)$\",\"msg\":\"只能填 0 或 1\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemIp', '192.168.9.40', '系统IP', '上级系统IP', '{\"rule\":\"^([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])(\\\\.([1-9]?\\\\d|1\\\\d{2}|2[0-4]\\\\d|25[0-5])){3}$\",\"msg\":\"请输入正确的ip\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('upSystem', '上级系统配置', 'upSystemPort', '10011', '系统端口', '上级系统端口', '{\"rule\":\"^([0-9]|[1-9]\\\\d{1,3}|[1-5]\\\\d{4}|6[0-4]\\\\d{4}|65[0-4]\\\\d{2}|655[0-2]\\\\d|6553[0-5])$\",\"msg\":\"请输入正确端口\"}');
@@ -1627,3653 +4074,7309 @@ INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '其他配置', 'meterWarnType', '1:SF6,2:防盗,3:烟雾,4:温度,5:O3,6:空调,7:液位传感器,8:水泵,9:门禁,10:风机,11:湿度,12:O2,13:CO,14:CO2,15:SO2,16:CH4,17:H2S,18:H2,19:风速,20:液位', '环控终端告警类型', '环控终端告警类型对应说明', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9:,\\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('sequentialConfig', '一键顺控相关配置', 'dataCallPath', '/home/yjh_iot_center/iot-files/sourceFile/', '数据召唤文件生成路径', '数据召唤文件生成路径', '{\"rule\":\"^[_a-zA-Z0-9\\\\-\\\\.]+$\",\"msg\":\"输入字母数字或_-符号\"}');
 INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('sequentialConfig', '一键顺控相关配置', 'dataCallName', 'datacall.cime', '数据召唤文件名称', '数据召唤文件名称', '{\"rule\":\"^[_a-zA-Z0-9\\\\-\\\\.]+$\",\"msg\":\"输入字母数字或_-符号\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '结果对应数字', 'coverResult', '返回,合,降,投入,控合,未储能,联锁,成功,远方,合上,中断,上限,1;启动,分,升,退出,控分,已储能,解锁,失败,本地,断开,恢复,下限,2;停,复归,触发,3;', '其他系统的识别结果转化为数字', '结果按照逗号隔开，最后一个是对应数字，每个分组以;隔开', '{"rule":"^[\\u4e00-\\u9fa5_a-zA-Z0-9:,\\-]+$","msg":"请不要输入特殊字符"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('audioConfig', '请求采集声纹数据接口', 'voiceprintDataCollectUrl', 'http://ip:port/voiceprintDataCollect', 'http请求采集声纹数据接口', '请求采集声纹数据接口', '{\"rule\":\"^(tcp|ssl):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
-INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('audioConfig', '请求声纹分析接口', 'voiceprintAnalyseUrl', 'http://ip:port/voiceprintAnalyse', 'http请求声纹分析接口', '请求声纹分析接口', '{\"rule\":\"^(tcp|ssl):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`, `rules`) VALUES ('otherConfig', '结果对应数字', 'coverResult', '返回,合,降,投入,控合,未储能,联锁,成功,远方,合上,中断,上限,1;启动,分,升,退出,控分,已储能,解锁,失败,本地,断开,恢复,下限,2;停,复归,触发,3;', '其他系统的识别结果转化为数字', '结果按照逗号隔开，最后一个是对应数字，每个分组以;隔开', '{"rule":"^[\\u4e00-\\u9fa5_a-zA-Z0-9:, \\-]
+        + $ "," msg ":" 请不要输入特殊字符 "}');
+        INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`,
+        `remark`, `rules`) VALUES ('audioConfig', '请求采集声纹数据接口', 'voiceprintDataCollectUrl',
+        'http://ip:port/voiceprintDataCollect', 'http请求采集声纹数据接口', '请求采集声纹数据接口',
+        '{\"rule\":\"^(tcp|ssl):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
+INSERT INTO `system_config` (`config_type`, `config_name`, `config_key`, `config_value`, `config_remark`, `remark`,
+                             `rules`)
+VALUES ('audioConfig', '请求声纹分析接口', 'voiceprintAnalyseUrl', 'http://ip:port/voiceprintAnalyse',
+        'http请求声纹分析接口', '请求声纹分析接口',
+        '{\"rule\":\"^(tcp|ssl):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
 
 
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (1, NULL, '任务管理', '/scout/task', 'images/renwuguanli.png', 1);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'images/xunshijieguo.png', 2);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (3, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'images/xunshibaobiao.png', 3);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (4, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'images/feitongyuangaojing.png', 4);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (5, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'images/yichangdianwei.png', 5);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (6, NULL, '测点查看', '/monitoring/autoPatrol', 'images/cedainchakan.png', 6);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'images/jiqirenjiankong.png', 7);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'images/wurenjijiankong.png', 8);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'images/liandongxinhao.png', 9);
-INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`) VALUES (10, NULL, '告警管理', '/scout/warningManagePage', 'images/xunshishebeigaojing.png', 10);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (1, NULL, '任务管理', '/scout/task', 'images/renwuguanli.png', 1);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (2, NULL, '巡视结果', '/scout/resultConfirm', 'images/xunshijieguo.png', 2);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (3, NULL, '巡视报表', '/scout/resultConfirm?activeName=巡视报表', 'images/xunshibaobiao.png', 3);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (4, NULL, '非同源告警', '/scout/resultConfirm?activeName=非同源告警', 'images/feitongyuangaojing.png', 4);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (5, NULL, '异常点位', '/scout/resultConfirm?activeName=识别异常点位', 'images/yichangdianwei.png', 5);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (6, NULL, '测点查看', '/monitoring/autoPatrol', 'images/cedainchakan.png', 6);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (7, NULL, '机器人监控', '/monitoring/robotMonitor', 'images/jiqirenjiankong.png', 7);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (8, NULL, '无人机监控', '/monitoring/unmannedMonitor', 'images/wurenjijiankong.png', 8);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (9, NULL, '联动信息', '/linkage/linkageSignal', 'images/liandongxinhao.png', 9);
+INSERT INTO `common_menu_conf`(`id`, `menu_code`, `menu_name`, `path`, `img`, `sort`)
+VALUES (10, NULL, '告警管理', '/scout/warningManagePage', 'images/xunshishebeigaojing.png', 10);
 
-INSERT INTO `dict_area` VALUES ('110000', '北京市', '-1');
-INSERT INTO `dict_area` VALUES ('110100', '市辖区', '110000');
-INSERT INTO `dict_area` VALUES ('110101', '东城区', '110100');
-INSERT INTO `dict_area` VALUES ('110102', '西城区', '110100');
-INSERT INTO `dict_area` VALUES ('110105', '朝阳区', '110100');
-INSERT INTO `dict_area` VALUES ('110106', '丰台区', '110100');
-INSERT INTO `dict_area` VALUES ('110107', '石景山区', '110100');
-INSERT INTO `dict_area` VALUES ('110108', '海淀区', '110100');
-INSERT INTO `dict_area` VALUES ('110109', '门头沟区', '110100');
-INSERT INTO `dict_area` VALUES ('110111', '房山区', '110100');
-INSERT INTO `dict_area` VALUES ('110112', '通州区', '110100');
-INSERT INTO `dict_area` VALUES ('110113', '顺义区', '110100');
-INSERT INTO `dict_area` VALUES ('110114', '昌平区', '110100');
-INSERT INTO `dict_area` VALUES ('110115', '大兴区', '110100');
-INSERT INTO `dict_area` VALUES ('110116', '怀柔区', '110100');
-INSERT INTO `dict_area` VALUES ('110117', '平谷区', '110100');
-INSERT INTO `dict_area` VALUES ('110118', '密云区', '110100');
-INSERT INTO `dict_area` VALUES ('110119', '延庆区', '110100');
-INSERT INTO `dict_area` VALUES ('120000', '天津市', '-1');
-INSERT INTO `dict_area` VALUES ('120100', '市辖区', '120000');
-INSERT INTO `dict_area` VALUES ('120101', '和平区', '120100');
-INSERT INTO `dict_area` VALUES ('120102', '河东区', '120100');
-INSERT INTO `dict_area` VALUES ('120103', '河西区', '120100');
-INSERT INTO `dict_area` VALUES ('120104', '南开区', '120100');
-INSERT INTO `dict_area` VALUES ('120105', '河北区', '120100');
-INSERT INTO `dict_area` VALUES ('120106', '红桥区', '120100');
-INSERT INTO `dict_area` VALUES ('120110', '东丽区', '120100');
-INSERT INTO `dict_area` VALUES ('120111', '西青区', '120100');
-INSERT INTO `dict_area` VALUES ('120112', '津南区', '120100');
-INSERT INTO `dict_area` VALUES ('120113', '北辰区', '120100');
-INSERT INTO `dict_area` VALUES ('120114', '武清区', '120100');
-INSERT INTO `dict_area` VALUES ('120115', '宝坻区', '120100');
-INSERT INTO `dict_area` VALUES ('120116', '滨海新区', '120100');
-INSERT INTO `dict_area` VALUES ('120117', '宁河区', '120100');
-INSERT INTO `dict_area` VALUES ('120118', '静海区', '120100');
-INSERT INTO `dict_area` VALUES ('120119', '蓟州区', '120100');
-INSERT INTO `dict_area` VALUES ('130000', '河北省', '-1');
-INSERT INTO `dict_area` VALUES ('130100', '石家庄市', '130000');
-INSERT INTO `dict_area` VALUES ('130102', '长安区', '130100');
-INSERT INTO `dict_area` VALUES ('130104', '桥西区', '130100');
-INSERT INTO `dict_area` VALUES ('130105', '新华区', '130100');
-INSERT INTO `dict_area` VALUES ('130107', '井陉矿区', '130100');
-INSERT INTO `dict_area` VALUES ('130108', '裕华区', '130100');
-INSERT INTO `dict_area` VALUES ('130109', '藁城区', '130100');
-INSERT INTO `dict_area` VALUES ('130110', '鹿泉区', '130100');
-INSERT INTO `dict_area` VALUES ('130111', '栾城区', '130100');
-INSERT INTO `dict_area` VALUES ('130121', '井陉县', '130100');
-INSERT INTO `dict_area` VALUES ('130123', '正定县', '130100');
-INSERT INTO `dict_area` VALUES ('130125', '行唐县', '130100');
-INSERT INTO `dict_area` VALUES ('130126', '灵寿县', '130100');
-INSERT INTO `dict_area` VALUES ('130127', '高邑县', '130100');
-INSERT INTO `dict_area` VALUES ('130128', '深泽县', '130100');
-INSERT INTO `dict_area` VALUES ('130129', '赞皇县', '130100');
-INSERT INTO `dict_area` VALUES ('130130', '无极县', '130100');
-INSERT INTO `dict_area` VALUES ('130131', '平山县', '130100');
-INSERT INTO `dict_area` VALUES ('130132', '元氏县', '130100');
-INSERT INTO `dict_area` VALUES ('130133', '赵县', '130100');
-INSERT INTO `dict_area` VALUES ('130183', '晋州市', '130100');
-INSERT INTO `dict_area` VALUES ('130184', '新乐市', '130100');
-INSERT INTO `dict_area` VALUES ('130200', '唐山市', '130000');
-INSERT INTO `dict_area` VALUES ('130202', '路南区', '130200');
-INSERT INTO `dict_area` VALUES ('130203', '路北区', '130200');
-INSERT INTO `dict_area` VALUES ('130204', '古冶区', '130200');
-INSERT INTO `dict_area` VALUES ('130205', '开平区', '130200');
-INSERT INTO `dict_area` VALUES ('130207', '丰南区', '130200');
-INSERT INTO `dict_area` VALUES ('130208', '丰润区', '130200');
-INSERT INTO `dict_area` VALUES ('130209', '曹妃甸区', '130200');
-INSERT INTO `dict_area` VALUES ('130223', '滦县', '130200');
-INSERT INTO `dict_area` VALUES ('130224', '滦南县', '130200');
-INSERT INTO `dict_area` VALUES ('130225', '乐亭县', '130200');
-INSERT INTO `dict_area` VALUES ('130227', '迁西县', '130200');
-INSERT INTO `dict_area` VALUES ('130229', '玉田县', '130200');
-INSERT INTO `dict_area` VALUES ('130281', '遵化市', '130200');
-INSERT INTO `dict_area` VALUES ('130283', '迁安市', '130200');
-INSERT INTO `dict_area` VALUES ('130300', '秦皇岛市', '130000');
-INSERT INTO `dict_area` VALUES ('130302', '海港区', '130300');
-INSERT INTO `dict_area` VALUES ('130303', '山海关区', '130300');
-INSERT INTO `dict_area` VALUES ('130304', '北戴河区', '130300');
-INSERT INTO `dict_area` VALUES ('130306', '抚宁区', '130300');
-INSERT INTO `dict_area` VALUES ('130321', '青龙满族自治县', '130300');
-INSERT INTO `dict_area` VALUES ('130322', '昌黎县', '130300');
-INSERT INTO `dict_area` VALUES ('130324', '卢龙县', '130300');
-INSERT INTO `dict_area` VALUES ('130400', '邯郸市', '130000');
-INSERT INTO `dict_area` VALUES ('130402', '邯山区', '130400');
-INSERT INTO `dict_area` VALUES ('130403', '丛台区', '130400');
-INSERT INTO `dict_area` VALUES ('130404', '复兴区', '130400');
-INSERT INTO `dict_area` VALUES ('130406', '峰峰矿区', '130400');
-INSERT INTO `dict_area` VALUES ('130407', '肥乡区', '130400');
-INSERT INTO `dict_area` VALUES ('130408', '永年区', '130400');
-INSERT INTO `dict_area` VALUES ('130423', '临漳县', '130400');
-INSERT INTO `dict_area` VALUES ('130424', '成安县', '130400');
-INSERT INTO `dict_area` VALUES ('130425', '大名县', '130400');
-INSERT INTO `dict_area` VALUES ('130426', '涉县', '130400');
-INSERT INTO `dict_area` VALUES ('130427', '磁县', '130400');
-INSERT INTO `dict_area` VALUES ('130430', '邱县', '130400');
-INSERT INTO `dict_area` VALUES ('130431', '鸡泽县', '130400');
-INSERT INTO `dict_area` VALUES ('130432', '广平县', '130400');
-INSERT INTO `dict_area` VALUES ('130433', '馆陶县', '130400');
-INSERT INTO `dict_area` VALUES ('130434', '魏县', '130400');
-INSERT INTO `dict_area` VALUES ('130435', '曲周县', '130400');
-INSERT INTO `dict_area` VALUES ('130481', '武安市', '130400');
-INSERT INTO `dict_area` VALUES ('130500', '邢台市', '130000');
-INSERT INTO `dict_area` VALUES ('130502', '桥东区', '130500');
-INSERT INTO `dict_area` VALUES ('130503', '桥西区', '130500');
-INSERT INTO `dict_area` VALUES ('130521', '邢台县', '130500');
-INSERT INTO `dict_area` VALUES ('130522', '临城县', '130500');
-INSERT INTO `dict_area` VALUES ('130523', '内丘县', '130500');
-INSERT INTO `dict_area` VALUES ('130524', '柏乡县', '130500');
-INSERT INTO `dict_area` VALUES ('130525', '隆尧县', '130500');
-INSERT INTO `dict_area` VALUES ('130526', '任县', '130500');
-INSERT INTO `dict_area` VALUES ('130527', '南和县', '130500');
-INSERT INTO `dict_area` VALUES ('130528', '宁晋县', '130500');
-INSERT INTO `dict_area` VALUES ('130529', '巨鹿县', '130500');
-INSERT INTO `dict_area` VALUES ('130530', '新河县', '130500');
-INSERT INTO `dict_area` VALUES ('130531', '广宗县', '130500');
-INSERT INTO `dict_area` VALUES ('130532', '平乡县', '130500');
-INSERT INTO `dict_area` VALUES ('130533', '威县', '130500');
-INSERT INTO `dict_area` VALUES ('130534', '清河县', '130500');
-INSERT INTO `dict_area` VALUES ('130535', '临西县', '130500');
-INSERT INTO `dict_area` VALUES ('130581', '南宫市', '130500');
-INSERT INTO `dict_area` VALUES ('130582', '沙河市', '130500');
-INSERT INTO `dict_area` VALUES ('130600', '保定市', '130000');
-INSERT INTO `dict_area` VALUES ('130602', '竞秀区', '130600');
-INSERT INTO `dict_area` VALUES ('130606', '莲池区', '130600');
-INSERT INTO `dict_area` VALUES ('130607', '满城区', '130600');
-INSERT INTO `dict_area` VALUES ('130608', '清苑区', '130600');
-INSERT INTO `dict_area` VALUES ('130609', '徐水区', '130600');
-INSERT INTO `dict_area` VALUES ('130623', '涞水县', '130600');
-INSERT INTO `dict_area` VALUES ('130624', '阜平县', '130600');
-INSERT INTO `dict_area` VALUES ('130626', '定兴县', '130600');
-INSERT INTO `dict_area` VALUES ('130627', '唐县', '130600');
-INSERT INTO `dict_area` VALUES ('130628', '高阳县', '130600');
-INSERT INTO `dict_area` VALUES ('130629', '容城县', '130600');
-INSERT INTO `dict_area` VALUES ('130630', '涞源县', '130600');
-INSERT INTO `dict_area` VALUES ('130631', '望都县', '130600');
-INSERT INTO `dict_area` VALUES ('130632', '安新县', '130600');
-INSERT INTO `dict_area` VALUES ('130633', '易县', '130600');
-INSERT INTO `dict_area` VALUES ('130634', '曲阳县', '130600');
-INSERT INTO `dict_area` VALUES ('130635', '蠡县', '130600');
-INSERT INTO `dict_area` VALUES ('130636', '顺平县', '130600');
-INSERT INTO `dict_area` VALUES ('130637', '博野县', '130600');
-INSERT INTO `dict_area` VALUES ('130638', '雄县', '130600');
-INSERT INTO `dict_area` VALUES ('130681', '涿州市', '130600');
-INSERT INTO `dict_area` VALUES ('130683', '安国市', '130600');
-INSERT INTO `dict_area` VALUES ('130684', '高碑店市', '130600');
-INSERT INTO `dict_area` VALUES ('130700', '张家口市', '130000');
-INSERT INTO `dict_area` VALUES ('130702', '桥东区', '130700');
-INSERT INTO `dict_area` VALUES ('130703', '桥西区', '130700');
-INSERT INTO `dict_area` VALUES ('130705', '宣化区', '130700');
-INSERT INTO `dict_area` VALUES ('130706', '下花园区', '130700');
-INSERT INTO `dict_area` VALUES ('130708', '万全区', '130700');
-INSERT INTO `dict_area` VALUES ('130709', '崇礼区', '130700');
-INSERT INTO `dict_area` VALUES ('130722', '张北县', '130700');
-INSERT INTO `dict_area` VALUES ('130723', '康保县', '130700');
-INSERT INTO `dict_area` VALUES ('130724', '沽源县', '130700');
-INSERT INTO `dict_area` VALUES ('130725', '尚义县', '130700');
-INSERT INTO `dict_area` VALUES ('130726', '蔚县', '130700');
-INSERT INTO `dict_area` VALUES ('130727', '阳原县', '130700');
-INSERT INTO `dict_area` VALUES ('130728', '怀安县', '130700');
-INSERT INTO `dict_area` VALUES ('130730', '怀来县', '130700');
-INSERT INTO `dict_area` VALUES ('130731', '涿鹿县', '130700');
-INSERT INTO `dict_area` VALUES ('130732', '赤城县', '130700');
-INSERT INTO `dict_area` VALUES ('130800', '承德市', '130000');
-INSERT INTO `dict_area` VALUES ('130802', '双桥区', '130800');
-INSERT INTO `dict_area` VALUES ('130803', '双滦区', '130800');
-INSERT INTO `dict_area` VALUES ('130804', '鹰手营子矿区', '130800');
-INSERT INTO `dict_area` VALUES ('130821', '承德县', '130800');
-INSERT INTO `dict_area` VALUES ('130822', '兴隆县', '130800');
-INSERT INTO `dict_area` VALUES ('130824', '滦平县', '130800');
-INSERT INTO `dict_area` VALUES ('130825', '隆化县', '130800');
-INSERT INTO `dict_area` VALUES ('130826', '丰宁满族自治县', '130800');
-INSERT INTO `dict_area` VALUES ('130827', '宽城满族自治县', '130800');
-INSERT INTO `dict_area` VALUES ('130828', '围场满族蒙古族自治县', '130800');
-INSERT INTO `dict_area` VALUES ('130881', '平泉市', '130800');
-INSERT INTO `dict_area` VALUES ('130900', '沧州市', '130000');
-INSERT INTO `dict_area` VALUES ('130902', '新华区', '130900');
-INSERT INTO `dict_area` VALUES ('130903', '运河区', '130900');
-INSERT INTO `dict_area` VALUES ('130921', '沧县', '130900');
-INSERT INTO `dict_area` VALUES ('130922', '青县', '130900');
-INSERT INTO `dict_area` VALUES ('130923', '东光县', '130900');
-INSERT INTO `dict_area` VALUES ('130924', '海兴县', '130900');
-INSERT INTO `dict_area` VALUES ('130925', '盐山县', '130900');
-INSERT INTO `dict_area` VALUES ('130926', '肃宁县', '130900');
-INSERT INTO `dict_area` VALUES ('130927', '南皮县', '130900');
-INSERT INTO `dict_area` VALUES ('130928', '吴桥县', '130900');
-INSERT INTO `dict_area` VALUES ('130929', '献县', '130900');
-INSERT INTO `dict_area` VALUES ('130930', '孟村回族自治县', '130900');
-INSERT INTO `dict_area` VALUES ('130981', '泊头市', '130900');
-INSERT INTO `dict_area` VALUES ('130982', '任丘市', '130900');
-INSERT INTO `dict_area` VALUES ('130983', '黄骅市', '130900');
-INSERT INTO `dict_area` VALUES ('130984', '河间市', '130900');
-INSERT INTO `dict_area` VALUES ('131000', '廊坊市', '130000');
-INSERT INTO `dict_area` VALUES ('131002', '安次区', '131000');
-INSERT INTO `dict_area` VALUES ('131003', '广阳区', '131000');
-INSERT INTO `dict_area` VALUES ('131022', '固安县', '131000');
-INSERT INTO `dict_area` VALUES ('131023', '永清县', '131000');
-INSERT INTO `dict_area` VALUES ('131024', '香河县', '131000');
-INSERT INTO `dict_area` VALUES ('131025', '大城县', '131000');
-INSERT INTO `dict_area` VALUES ('131026', '文安县', '131000');
-INSERT INTO `dict_area` VALUES ('131028', '大厂回族自治县', '131000');
-INSERT INTO `dict_area` VALUES ('131081', '霸州市', '131000');
-INSERT INTO `dict_area` VALUES ('131082', '三河市', '131000');
-INSERT INTO `dict_area` VALUES ('131100', '衡水市', '130000');
-INSERT INTO `dict_area` VALUES ('131102', '桃城区', '131100');
-INSERT INTO `dict_area` VALUES ('131103', '冀州区', '131100');
-INSERT INTO `dict_area` VALUES ('131121', '枣强县', '131100');
-INSERT INTO `dict_area` VALUES ('131122', '武邑县', '131100');
-INSERT INTO `dict_area` VALUES ('131123', '武强县', '131100');
-INSERT INTO `dict_area` VALUES ('131124', '饶阳县', '131100');
-INSERT INTO `dict_area` VALUES ('131125', '安平县', '131100');
-INSERT INTO `dict_area` VALUES ('131126', '故城县', '131100');
-INSERT INTO `dict_area` VALUES ('131127', '景县', '131100');
-INSERT INTO `dict_area` VALUES ('131128', '阜城县', '131100');
-INSERT INTO `dict_area` VALUES ('131182', '深州市', '131100');
-INSERT INTO `dict_area` VALUES ('131200', '定州市', '130000');
-INSERT INTO `dict_area` VALUES ('131300', '辛集市', '130000');
-INSERT INTO `dict_area` VALUES ('140000', '山西省', '-1');
-INSERT INTO `dict_area` VALUES ('140100', '太原市', '140000');
-INSERT INTO `dict_area` VALUES ('140105', '小店区', '140100');
-INSERT INTO `dict_area` VALUES ('140106', '迎泽区', '140100');
-INSERT INTO `dict_area` VALUES ('140107', '杏花岭区', '140100');
-INSERT INTO `dict_area` VALUES ('140108', '尖草坪区', '140100');
-INSERT INTO `dict_area` VALUES ('140109', '万柏林区', '140100');
-INSERT INTO `dict_area` VALUES ('140110', '晋源区', '140100');
-INSERT INTO `dict_area` VALUES ('140121', '清徐县', '140100');
-INSERT INTO `dict_area` VALUES ('140122', '阳曲县', '140100');
-INSERT INTO `dict_area` VALUES ('140123', '娄烦县', '140100');
-INSERT INTO `dict_area` VALUES ('140181', '古交市', '140100');
-INSERT INTO `dict_area` VALUES ('140200', '大同市', '140000');
-INSERT INTO `dict_area` VALUES ('140202', '城区', '140200');
-INSERT INTO `dict_area` VALUES ('140203', '矿区', '140200');
-INSERT INTO `dict_area` VALUES ('140211', '南郊区', '140200');
-INSERT INTO `dict_area` VALUES ('140212', '新荣区', '140200');
-INSERT INTO `dict_area` VALUES ('140221', '阳高县', '140200');
-INSERT INTO `dict_area` VALUES ('140222', '天镇县', '140200');
-INSERT INTO `dict_area` VALUES ('140223', '广灵县', '140200');
-INSERT INTO `dict_area` VALUES ('140224', '灵丘县', '140200');
-INSERT INTO `dict_area` VALUES ('140225', '浑源县', '140200');
-INSERT INTO `dict_area` VALUES ('140226', '左云县', '140200');
-INSERT INTO `dict_area` VALUES ('140227', '大同县', '140200');
-INSERT INTO `dict_area` VALUES ('140300', '阳泉市', '140000');
-INSERT INTO `dict_area` VALUES ('140302', '城区', '140300');
-INSERT INTO `dict_area` VALUES ('140303', '矿区', '140300');
-INSERT INTO `dict_area` VALUES ('140311', '郊区', '140300');
-INSERT INTO `dict_area` VALUES ('140321', '平定县', '140300');
-INSERT INTO `dict_area` VALUES ('140322', '盂县', '140300');
-INSERT INTO `dict_area` VALUES ('140400', '长治市', '140000');
-INSERT INTO `dict_area` VALUES ('140402', '城区', '140400');
-INSERT INTO `dict_area` VALUES ('140411', '郊区', '140400');
-INSERT INTO `dict_area` VALUES ('140421', '长治县', '140400');
-INSERT INTO `dict_area` VALUES ('140423', '襄垣县', '140400');
-INSERT INTO `dict_area` VALUES ('140424', '屯留县', '140400');
-INSERT INTO `dict_area` VALUES ('140425', '平顺县', '140400');
-INSERT INTO `dict_area` VALUES ('140426', '黎城县', '140400');
-INSERT INTO `dict_area` VALUES ('140427', '壶关县', '140400');
-INSERT INTO `dict_area` VALUES ('140428', '长子县', '140400');
-INSERT INTO `dict_area` VALUES ('140429', '武乡县', '140400');
-INSERT INTO `dict_area` VALUES ('140430', '沁县', '140400');
-INSERT INTO `dict_area` VALUES ('140431', '沁源县', '140400');
-INSERT INTO `dict_area` VALUES ('140481', '潞城市', '140400');
-INSERT INTO `dict_area` VALUES ('140500', '晋城市', '140000');
-INSERT INTO `dict_area` VALUES ('140502', '城区', '140500');
-INSERT INTO `dict_area` VALUES ('140521', '沁水县', '140500');
-INSERT INTO `dict_area` VALUES ('140522', '阳城县', '140500');
-INSERT INTO `dict_area` VALUES ('140524', '陵川县', '140500');
-INSERT INTO `dict_area` VALUES ('140525', '泽州县', '140500');
-INSERT INTO `dict_area` VALUES ('140581', '高平市', '140500');
-INSERT INTO `dict_area` VALUES ('140600', '朔州市', '140000');
-INSERT INTO `dict_area` VALUES ('140602', '朔城区', '140600');
-INSERT INTO `dict_area` VALUES ('140603', '平鲁区', '140600');
-INSERT INTO `dict_area` VALUES ('140621', '山阴县', '140600');
-INSERT INTO `dict_area` VALUES ('140622', '应县', '140600');
-INSERT INTO `dict_area` VALUES ('140623', '右玉县', '140600');
-INSERT INTO `dict_area` VALUES ('140624', '怀仁县', '140600');
-INSERT INTO `dict_area` VALUES ('140700', '晋中市', '140000');
-INSERT INTO `dict_area` VALUES ('140702', '榆次区', '140700');
-INSERT INTO `dict_area` VALUES ('140721', '榆社县', '140700');
-INSERT INTO `dict_area` VALUES ('140722', '左权县', '140700');
-INSERT INTO `dict_area` VALUES ('140723', '和顺县', '140700');
-INSERT INTO `dict_area` VALUES ('140724', '昔阳县', '140700');
-INSERT INTO `dict_area` VALUES ('140725', '寿阳县', '140700');
-INSERT INTO `dict_area` VALUES ('140726', '太谷县', '140700');
-INSERT INTO `dict_area` VALUES ('140727', '祁县', '140700');
-INSERT INTO `dict_area` VALUES ('140728', '平遥县', '140700');
-INSERT INTO `dict_area` VALUES ('140729', '灵石县', '140700');
-INSERT INTO `dict_area` VALUES ('140781', '介休市', '140700');
-INSERT INTO `dict_area` VALUES ('140800', '运城市', '140000');
-INSERT INTO `dict_area` VALUES ('140802', '盐湖区', '140800');
-INSERT INTO `dict_area` VALUES ('140821', '临猗县', '140800');
-INSERT INTO `dict_area` VALUES ('140822', '万荣县', '140800');
-INSERT INTO `dict_area` VALUES ('140823', '闻喜县', '140800');
-INSERT INTO `dict_area` VALUES ('140824', '稷山县', '140800');
-INSERT INTO `dict_area` VALUES ('140825', '新绛县', '140800');
-INSERT INTO `dict_area` VALUES ('140826', '绛县', '140800');
-INSERT INTO `dict_area` VALUES ('140827', '垣曲县', '140800');
-INSERT INTO `dict_area` VALUES ('140828', '夏县', '140800');
-INSERT INTO `dict_area` VALUES ('140829', '平陆县', '140800');
-INSERT INTO `dict_area` VALUES ('140830', '芮城县', '140800');
-INSERT INTO `dict_area` VALUES ('140881', '永济市', '140800');
-INSERT INTO `dict_area` VALUES ('140882', '河津市', '140800');
-INSERT INTO `dict_area` VALUES ('140900', '忻州市', '140000');
-INSERT INTO `dict_area` VALUES ('140902', '忻府区', '140900');
-INSERT INTO `dict_area` VALUES ('140921', '定襄县', '140900');
-INSERT INTO `dict_area` VALUES ('140922', '五台县', '140900');
-INSERT INTO `dict_area` VALUES ('140923', '代县', '140900');
-INSERT INTO `dict_area` VALUES ('140924', '繁峙县', '140900');
-INSERT INTO `dict_area` VALUES ('140925', '宁武县', '140900');
-INSERT INTO `dict_area` VALUES ('140926', '静乐县', '140900');
-INSERT INTO `dict_area` VALUES ('140927', '神池县', '140900');
-INSERT INTO `dict_area` VALUES ('140928', '五寨县', '140900');
-INSERT INTO `dict_area` VALUES ('140929', '岢岚县', '140900');
-INSERT INTO `dict_area` VALUES ('140930', '河曲县', '140900');
-INSERT INTO `dict_area` VALUES ('140931', '保德县', '140900');
-INSERT INTO `dict_area` VALUES ('140932', '偏关县', '140900');
-INSERT INTO `dict_area` VALUES ('140981', '原平市', '140900');
-INSERT INTO `dict_area` VALUES ('141000', '临汾市', '140000');
-INSERT INTO `dict_area` VALUES ('141002', '尧都区', '141000');
-INSERT INTO `dict_area` VALUES ('141021', '曲沃县', '141000');
-INSERT INTO `dict_area` VALUES ('141022', '翼城县', '141000');
-INSERT INTO `dict_area` VALUES ('141023', '襄汾县', '141000');
-INSERT INTO `dict_area` VALUES ('141024', '洪洞县', '141000');
-INSERT INTO `dict_area` VALUES ('141025', '古县', '141000');
-INSERT INTO `dict_area` VALUES ('141026', '安泽县', '141000');
-INSERT INTO `dict_area` VALUES ('141027', '浮山县', '141000');
-INSERT INTO `dict_area` VALUES ('141028', '吉县', '141000');
-INSERT INTO `dict_area` VALUES ('141029', '乡宁县', '141000');
-INSERT INTO `dict_area` VALUES ('141030', '大宁县', '141000');
-INSERT INTO `dict_area` VALUES ('141031', '隰县', '141000');
-INSERT INTO `dict_area` VALUES ('141032', '永和县', '141000');
-INSERT INTO `dict_area` VALUES ('141033', '蒲县', '141000');
-INSERT INTO `dict_area` VALUES ('141034', '汾西县', '141000');
-INSERT INTO `dict_area` VALUES ('141081', '侯马市', '141000');
-INSERT INTO `dict_area` VALUES ('141082', '霍州市', '141000');
-INSERT INTO `dict_area` VALUES ('141100', '吕梁市', '140000');
-INSERT INTO `dict_area` VALUES ('141102', '离石区', '141100');
-INSERT INTO `dict_area` VALUES ('141121', '文水县', '141100');
-INSERT INTO `dict_area` VALUES ('141122', '交城县', '141100');
-INSERT INTO `dict_area` VALUES ('141123', '兴县', '141100');
-INSERT INTO `dict_area` VALUES ('141124', '临县', '141100');
-INSERT INTO `dict_area` VALUES ('141125', '柳林县', '141100');
-INSERT INTO `dict_area` VALUES ('141126', '石楼县', '141100');
-INSERT INTO `dict_area` VALUES ('141127', '岚县', '141100');
-INSERT INTO `dict_area` VALUES ('141128', '方山县', '141100');
-INSERT INTO `dict_area` VALUES ('141129', '中阳县', '141100');
-INSERT INTO `dict_area` VALUES ('141130', '交口县', '141100');
-INSERT INTO `dict_area` VALUES ('141181', '孝义市', '141100');
-INSERT INTO `dict_area` VALUES ('141182', '汾阳市', '141100');
-INSERT INTO `dict_area` VALUES ('150000', '内蒙古自治区', '-1');
-INSERT INTO `dict_area` VALUES ('150100', '呼和浩特市', '150000');
-INSERT INTO `dict_area` VALUES ('150102', '新城区', '150100');
-INSERT INTO `dict_area` VALUES ('150103', '回民区', '150100');
-INSERT INTO `dict_area` VALUES ('150104', '玉泉区', '150100');
-INSERT INTO `dict_area` VALUES ('150105', '赛罕区', '150100');
-INSERT INTO `dict_area` VALUES ('150121', '土默特左旗', '150100');
-INSERT INTO `dict_area` VALUES ('150122', '托克托县', '150100');
-INSERT INTO `dict_area` VALUES ('150123', '和林格尔县', '150100');
-INSERT INTO `dict_area` VALUES ('150124', '清水河县', '150100');
-INSERT INTO `dict_area` VALUES ('150125', '武川县', '150100');
-INSERT INTO `dict_area` VALUES ('150200', '包头市', '150000');
-INSERT INTO `dict_area` VALUES ('150202', '东河区', '150200');
-INSERT INTO `dict_area` VALUES ('150203', '昆都仑区', '150200');
-INSERT INTO `dict_area` VALUES ('150204', '青山区', '150200');
-INSERT INTO `dict_area` VALUES ('150205', '石拐区', '150200');
-INSERT INTO `dict_area` VALUES ('150206', '白云鄂博矿区', '150200');
-INSERT INTO `dict_area` VALUES ('150207', '九原区', '150200');
-INSERT INTO `dict_area` VALUES ('150221', '土默特右旗', '150200');
-INSERT INTO `dict_area` VALUES ('150222', '固阳县', '150200');
-INSERT INTO `dict_area` VALUES ('150223', '达尔罕茂明安联合旗', '150200');
-INSERT INTO `dict_area` VALUES ('150300', '乌海市', '150000');
-INSERT INTO `dict_area` VALUES ('150302', '海勃湾区', '150300');
-INSERT INTO `dict_area` VALUES ('150303', '海南区', '150300');
-INSERT INTO `dict_area` VALUES ('150304', '乌达区', '150300');
-INSERT INTO `dict_area` VALUES ('150400', '赤峰市', '150000');
-INSERT INTO `dict_area` VALUES ('150402', '红山区', '150400');
-INSERT INTO `dict_area` VALUES ('150403', '元宝山区', '150400');
-INSERT INTO `dict_area` VALUES ('150404', '松山区', '150400');
-INSERT INTO `dict_area` VALUES ('150421', '阿鲁科尔沁旗', '150400');
-INSERT INTO `dict_area` VALUES ('150422', '巴林左旗', '150400');
-INSERT INTO `dict_area` VALUES ('150423', '巴林右旗', '150400');
-INSERT INTO `dict_area` VALUES ('150424', '林西县', '150400');
-INSERT INTO `dict_area` VALUES ('150425', '克什克腾旗', '150400');
-INSERT INTO `dict_area` VALUES ('150426', '翁牛特旗', '150400');
-INSERT INTO `dict_area` VALUES ('150428', '喀喇沁旗', '150400');
-INSERT INTO `dict_area` VALUES ('150429', '宁城县', '150400');
-INSERT INTO `dict_area` VALUES ('150430', '敖汉旗', '150400');
-INSERT INTO `dict_area` VALUES ('150500', '通辽市', '150000');
-INSERT INTO `dict_area` VALUES ('150502', '科尔沁区', '150500');
-INSERT INTO `dict_area` VALUES ('150521', '科尔沁左翼中旗', '150500');
-INSERT INTO `dict_area` VALUES ('150522', '科尔沁左翼后旗', '150500');
-INSERT INTO `dict_area` VALUES ('150523', '开鲁县', '150500');
-INSERT INTO `dict_area` VALUES ('150524', '库伦旗', '150500');
-INSERT INTO `dict_area` VALUES ('150525', '奈曼旗', '150500');
-INSERT INTO `dict_area` VALUES ('150526', '扎鲁特旗', '150500');
-INSERT INTO `dict_area` VALUES ('150581', '霍林郭勒市', '150500');
-INSERT INTO `dict_area` VALUES ('150600', '鄂尔多斯市', '150000');
-INSERT INTO `dict_area` VALUES ('150602', '东胜区', '150600');
-INSERT INTO `dict_area` VALUES ('150603', '康巴什区', '150600');
-INSERT INTO `dict_area` VALUES ('150621', '达拉特旗', '150600');
-INSERT INTO `dict_area` VALUES ('150622', '准格尔旗', '150600');
-INSERT INTO `dict_area` VALUES ('150623', '鄂托克前旗', '150600');
-INSERT INTO `dict_area` VALUES ('150624', '鄂托克旗', '150600');
-INSERT INTO `dict_area` VALUES ('150625', '杭锦旗', '150600');
-INSERT INTO `dict_area` VALUES ('150626', '乌审旗', '150600');
-INSERT INTO `dict_area` VALUES ('150627', '伊金霍洛旗', '150600');
-INSERT INTO `dict_area` VALUES ('150700', '呼伦贝尔市', '150000');
-INSERT INTO `dict_area` VALUES ('150702', '海拉尔区', '150700');
-INSERT INTO `dict_area` VALUES ('150703', '扎赉诺尔区', '150700');
-INSERT INTO `dict_area` VALUES ('150721', '阿荣旗', '150700');
-INSERT INTO `dict_area` VALUES ('150722', '莫力达瓦达斡尔族自治旗', '150700');
-INSERT INTO `dict_area` VALUES ('150723', '鄂伦春自治旗', '150700');
-INSERT INTO `dict_area` VALUES ('150724', '鄂温克族自治旗', '150700');
-INSERT INTO `dict_area` VALUES ('150725', '陈巴尔虎旗', '150700');
-INSERT INTO `dict_area` VALUES ('150726', '新巴尔虎左旗', '150700');
-INSERT INTO `dict_area` VALUES ('150727', '新巴尔虎右旗', '150700');
-INSERT INTO `dict_area` VALUES ('150781', '满洲里市', '150700');
-INSERT INTO `dict_area` VALUES ('150782', '牙克石市', '150700');
-INSERT INTO `dict_area` VALUES ('150783', '扎兰屯市', '150700');
-INSERT INTO `dict_area` VALUES ('150784', '额尔古纳市', '150700');
-INSERT INTO `dict_area` VALUES ('150785', '根河市', '150700');
-INSERT INTO `dict_area` VALUES ('150800', '巴彦淖尔市', '150000');
-INSERT INTO `dict_area` VALUES ('150802', '临河区', '150800');
-INSERT INTO `dict_area` VALUES ('150821', '五原县', '150800');
-INSERT INTO `dict_area` VALUES ('150822', '磴口县', '150800');
-INSERT INTO `dict_area` VALUES ('150823', '乌拉特前旗', '150800');
-INSERT INTO `dict_area` VALUES ('150824', '乌拉特中旗', '150800');
-INSERT INTO `dict_area` VALUES ('150825', '乌拉特后旗', '150800');
-INSERT INTO `dict_area` VALUES ('150826', '杭锦后旗', '150800');
-INSERT INTO `dict_area` VALUES ('150900', '乌兰察布市', '150000');
-INSERT INTO `dict_area` VALUES ('150902', '集宁区', '150900');
-INSERT INTO `dict_area` VALUES ('150921', '卓资县', '150900');
-INSERT INTO `dict_area` VALUES ('150922', '化德县', '150900');
-INSERT INTO `dict_area` VALUES ('150923', '商都县', '150900');
-INSERT INTO `dict_area` VALUES ('150924', '兴和县', '150900');
-INSERT INTO `dict_area` VALUES ('150925', '凉城县', '150900');
-INSERT INTO `dict_area` VALUES ('150926', '察哈尔右翼前旗', '150900');
-INSERT INTO `dict_area` VALUES ('150927', '察哈尔右翼中旗', '150900');
-INSERT INTO `dict_area` VALUES ('150928', '察哈尔右翼后旗', '150900');
-INSERT INTO `dict_area` VALUES ('150929', '四子王旗', '150900');
-INSERT INTO `dict_area` VALUES ('150981', '丰镇市', '150900');
-INSERT INTO `dict_area` VALUES ('152200', '兴安盟', '150000');
-INSERT INTO `dict_area` VALUES ('152201', '乌兰浩特市', '152200');
-INSERT INTO `dict_area` VALUES ('152202', '阿尔山市', '152200');
-INSERT INTO `dict_area` VALUES ('152221', '科尔沁右翼前旗', '152200');
-INSERT INTO `dict_area` VALUES ('152222', '科尔沁右翼中旗', '152200');
-INSERT INTO `dict_area` VALUES ('152223', '扎赉特旗', '152200');
-INSERT INTO `dict_area` VALUES ('152224', '突泉县', '152200');
-INSERT INTO `dict_area` VALUES ('152500', '锡林郭勒盟', '150000');
-INSERT INTO `dict_area` VALUES ('152501', '二连浩特市', '152500');
-INSERT INTO `dict_area` VALUES ('152502', '锡林浩特市', '152500');
-INSERT INTO `dict_area` VALUES ('152522', '阿巴嘎旗', '152500');
-INSERT INTO `dict_area` VALUES ('152523', '苏尼特左旗', '152500');
-INSERT INTO `dict_area` VALUES ('152524', '苏尼特右旗', '152500');
-INSERT INTO `dict_area` VALUES ('152525', '东乌珠穆沁旗', '152500');
-INSERT INTO `dict_area` VALUES ('152526', '西乌珠穆沁旗', '152500');
-INSERT INTO `dict_area` VALUES ('152527', '太仆寺旗', '152500');
-INSERT INTO `dict_area` VALUES ('152528', '镶黄旗', '152500');
-INSERT INTO `dict_area` VALUES ('152529', '正镶白旗', '152500');
-INSERT INTO `dict_area` VALUES ('152530', '正蓝旗', '152500');
-INSERT INTO `dict_area` VALUES ('152531', '多伦县', '152500');
-INSERT INTO `dict_area` VALUES ('152900', '阿拉善盟', '150000');
-INSERT INTO `dict_area` VALUES ('152921', '阿拉善左旗', '152900');
-INSERT INTO `dict_area` VALUES ('152922', '阿拉善右旗', '152900');
-INSERT INTO `dict_area` VALUES ('152923', '额济纳旗', '152900');
-INSERT INTO `dict_area` VALUES ('210000', '辽宁省', '-1');
-INSERT INTO `dict_area` VALUES ('210100', '沈阳市', '210000');
-INSERT INTO `dict_area` VALUES ('210102', '和平区', '210100');
-INSERT INTO `dict_area` VALUES ('210103', '沈河区', '210100');
-INSERT INTO `dict_area` VALUES ('210104', '大东区', '210100');
-INSERT INTO `dict_area` VALUES ('210105', '皇姑区', '210100');
-INSERT INTO `dict_area` VALUES ('210106', '铁西区', '210100');
-INSERT INTO `dict_area` VALUES ('210111', '苏家屯区', '210100');
-INSERT INTO `dict_area` VALUES ('210112', '浑南区', '210100');
-INSERT INTO `dict_area` VALUES ('210113', '沈北新区', '210100');
-INSERT INTO `dict_area` VALUES ('210114', '于洪区', '210100');
-INSERT INTO `dict_area` VALUES ('210115', '辽中区', '210100');
-INSERT INTO `dict_area` VALUES ('210123', '康平县', '210100');
-INSERT INTO `dict_area` VALUES ('210124', '法库县', '210100');
-INSERT INTO `dict_area` VALUES ('210181', '新民市', '210100');
-INSERT INTO `dict_area` VALUES ('210200', '大连市', '210000');
-INSERT INTO `dict_area` VALUES ('210202', '中山区', '210200');
-INSERT INTO `dict_area` VALUES ('210203', '西岗区', '210200');
-INSERT INTO `dict_area` VALUES ('210204', '沙河口区', '210200');
-INSERT INTO `dict_area` VALUES ('210211', '甘井子区', '210200');
-INSERT INTO `dict_area` VALUES ('210212', '旅顺口区', '210200');
-INSERT INTO `dict_area` VALUES ('210213', '金州区', '210200');
-INSERT INTO `dict_area` VALUES ('210214', '普兰店区', '210200');
-INSERT INTO `dict_area` VALUES ('210224', '长海县', '210200');
-INSERT INTO `dict_area` VALUES ('210281', '瓦房店市', '210200');
-INSERT INTO `dict_area` VALUES ('210283', '庄河市', '210200');
-INSERT INTO `dict_area` VALUES ('210300', '鞍山市', '210000');
-INSERT INTO `dict_area` VALUES ('210302', '铁东区', '210300');
-INSERT INTO `dict_area` VALUES ('210303', '铁西区', '210300');
-INSERT INTO `dict_area` VALUES ('210304', '立山区', '210300');
-INSERT INTO `dict_area` VALUES ('210311', '千山区', '210300');
-INSERT INTO `dict_area` VALUES ('210321', '台安县', '210300');
-INSERT INTO `dict_area` VALUES ('210323', '岫岩满族自治县', '210300');
-INSERT INTO `dict_area` VALUES ('210381', '海城市', '210300');
-INSERT INTO `dict_area` VALUES ('210400', '抚顺市', '210000');
-INSERT INTO `dict_area` VALUES ('210402', '新抚区', '210400');
-INSERT INTO `dict_area` VALUES ('210403', '东洲区', '210400');
-INSERT INTO `dict_area` VALUES ('210404', '望花区', '210400');
-INSERT INTO `dict_area` VALUES ('210411', '顺城区', '210400');
-INSERT INTO `dict_area` VALUES ('210421', '抚顺县', '210400');
-INSERT INTO `dict_area` VALUES ('210422', '新宾满族自治县', '210400');
-INSERT INTO `dict_area` VALUES ('210423', '清原满族自治县', '210400');
-INSERT INTO `dict_area` VALUES ('210500', '本溪市', '210000');
-INSERT INTO `dict_area` VALUES ('210502', '平山区', '210500');
-INSERT INTO `dict_area` VALUES ('210503', '溪湖区', '210500');
-INSERT INTO `dict_area` VALUES ('210504', '明山区', '210500');
-INSERT INTO `dict_area` VALUES ('210505', '南芬区', '210500');
-INSERT INTO `dict_area` VALUES ('210521', '本溪满族自治县', '210500');
-INSERT INTO `dict_area` VALUES ('210522', '桓仁满族自治县', '210500');
-INSERT INTO `dict_area` VALUES ('210600', '丹东市', '210000');
-INSERT INTO `dict_area` VALUES ('210602', '元宝区', '210600');
-INSERT INTO `dict_area` VALUES ('210603', '振兴区', '210600');
-INSERT INTO `dict_area` VALUES ('210604', '振安区', '210600');
-INSERT INTO `dict_area` VALUES ('210624', '宽甸满族自治县', '210600');
-INSERT INTO `dict_area` VALUES ('210681', '东港市', '210600');
-INSERT INTO `dict_area` VALUES ('210682', '凤城市', '210600');
-INSERT INTO `dict_area` VALUES ('210700', '锦州市', '210000');
-INSERT INTO `dict_area` VALUES ('210702', '古塔区', '210700');
-INSERT INTO `dict_area` VALUES ('210703', '凌河区', '210700');
-INSERT INTO `dict_area` VALUES ('210711', '太和区', '210700');
-INSERT INTO `dict_area` VALUES ('210726', '黑山县', '210700');
-INSERT INTO `dict_area` VALUES ('210727', '义县', '210700');
-INSERT INTO `dict_area` VALUES ('210781', '凌海市', '210700');
-INSERT INTO `dict_area` VALUES ('210782', '北镇市', '210700');
-INSERT INTO `dict_area` VALUES ('210800', '营口市', '210000');
-INSERT INTO `dict_area` VALUES ('210802', '站前区', '210800');
-INSERT INTO `dict_area` VALUES ('210803', '西市区', '210800');
-INSERT INTO `dict_area` VALUES ('210804', '鲅鱼圈区', '210800');
-INSERT INTO `dict_area` VALUES ('210811', '老边区', '210800');
-INSERT INTO `dict_area` VALUES ('210881', '盖州市', '210800');
-INSERT INTO `dict_area` VALUES ('210882', '大石桥市', '210800');
-INSERT INTO `dict_area` VALUES ('210900', '阜新市', '210000');
-INSERT INTO `dict_area` VALUES ('210902', '海州区', '210900');
-INSERT INTO `dict_area` VALUES ('210903', '新邱区', '210900');
-INSERT INTO `dict_area` VALUES ('210904', '太平区', '210900');
-INSERT INTO `dict_area` VALUES ('210905', '清河门区', '210900');
-INSERT INTO `dict_area` VALUES ('210911', '细河区', '210900');
-INSERT INTO `dict_area` VALUES ('210921', '阜新蒙古族自治县', '210900');
-INSERT INTO `dict_area` VALUES ('210922', '彰武县', '210900');
-INSERT INTO `dict_area` VALUES ('211000', '辽阳市', '210000');
-INSERT INTO `dict_area` VALUES ('211002', '白塔区', '211000');
-INSERT INTO `dict_area` VALUES ('211003', '文圣区', '211000');
-INSERT INTO `dict_area` VALUES ('211004', '宏伟区', '211000');
-INSERT INTO `dict_area` VALUES ('211005', '弓长岭区', '211000');
-INSERT INTO `dict_area` VALUES ('211011', '太子河区', '211000');
-INSERT INTO `dict_area` VALUES ('211021', '辽阳县', '211000');
-INSERT INTO `dict_area` VALUES ('211081', '灯塔市', '211000');
-INSERT INTO `dict_area` VALUES ('211100', '盘锦市', '210000');
-INSERT INTO `dict_area` VALUES ('211102', '双台子区', '211100');
-INSERT INTO `dict_area` VALUES ('211103', '兴隆台区', '211100');
-INSERT INTO `dict_area` VALUES ('211104', '大洼区', '211100');
-INSERT INTO `dict_area` VALUES ('211122', '盘山县', '211100');
-INSERT INTO `dict_area` VALUES ('211200', '铁岭市', '210000');
-INSERT INTO `dict_area` VALUES ('211202', '银州区', '211200');
-INSERT INTO `dict_area` VALUES ('211204', '清河区', '211200');
-INSERT INTO `dict_area` VALUES ('211221', '铁岭县', '211200');
-INSERT INTO `dict_area` VALUES ('211223', '西丰县', '211200');
-INSERT INTO `dict_area` VALUES ('211224', '昌图县', '211200');
-INSERT INTO `dict_area` VALUES ('211281', '调兵山市', '211200');
-INSERT INTO `dict_area` VALUES ('211282', '开原市', '211200');
-INSERT INTO `dict_area` VALUES ('211300', '朝阳市', '210000');
-INSERT INTO `dict_area` VALUES ('211302', '双塔区', '211300');
-INSERT INTO `dict_area` VALUES ('211303', '龙城区', '211300');
-INSERT INTO `dict_area` VALUES ('211321', '朝阳县', '211300');
-INSERT INTO `dict_area` VALUES ('211322', '建平县', '211300');
-INSERT INTO `dict_area` VALUES ('211324', '喀喇沁左翼蒙古族自治县', '211300');
-INSERT INTO `dict_area` VALUES ('211381', '北票市', '211300');
-INSERT INTO `dict_area` VALUES ('211382', '凌源市', '211300');
-INSERT INTO `dict_area` VALUES ('211400', '葫芦岛市', '210000');
-INSERT INTO `dict_area` VALUES ('211402', '连山区', '211400');
-INSERT INTO `dict_area` VALUES ('211403', '龙港区', '211400');
-INSERT INTO `dict_area` VALUES ('211404', '南票区', '211400');
-INSERT INTO `dict_area` VALUES ('211421', '绥中县', '211400');
-INSERT INTO `dict_area` VALUES ('211422', '建昌县', '211400');
-INSERT INTO `dict_area` VALUES ('211481', '兴城市', '211400');
-INSERT INTO `dict_area` VALUES ('220000', '吉林省', '-1');
-INSERT INTO `dict_area` VALUES ('220100', '长春市', '220000');
-INSERT INTO `dict_area` VALUES ('220102', '南关区', '220100');
-INSERT INTO `dict_area` VALUES ('220103', '宽城区', '220100');
-INSERT INTO `dict_area` VALUES ('220104', '朝阳区', '220100');
-INSERT INTO `dict_area` VALUES ('220105', '二道区', '220100');
-INSERT INTO `dict_area` VALUES ('220106', '绿园区', '220100');
-INSERT INTO `dict_area` VALUES ('220112', '双阳区', '220100');
-INSERT INTO `dict_area` VALUES ('220113', '九台区', '220100');
-INSERT INTO `dict_area` VALUES ('220122', '农安县', '220100');
-INSERT INTO `dict_area` VALUES ('220182', '榆树市', '220100');
-INSERT INTO `dict_area` VALUES ('220183', '德惠市', '220100');
-INSERT INTO `dict_area` VALUES ('220200', '吉林市', '220000');
-INSERT INTO `dict_area` VALUES ('220202', '昌邑区', '220200');
-INSERT INTO `dict_area` VALUES ('220203', '龙潭区', '220200');
-INSERT INTO `dict_area` VALUES ('220204', '船营区', '220200');
-INSERT INTO `dict_area` VALUES ('220211', '丰满区', '220200');
-INSERT INTO `dict_area` VALUES ('220221', '永吉县', '220200');
-INSERT INTO `dict_area` VALUES ('220281', '蛟河市', '220200');
-INSERT INTO `dict_area` VALUES ('220282', '桦甸市', '220200');
-INSERT INTO `dict_area` VALUES ('220283', '舒兰市', '220200');
-INSERT INTO `dict_area` VALUES ('220284', '磐石市', '220200');
-INSERT INTO `dict_area` VALUES ('220300', '四平市', '220000');
-INSERT INTO `dict_area` VALUES ('220302', '铁西区', '220300');
-INSERT INTO `dict_area` VALUES ('220303', '铁东区', '220300');
-INSERT INTO `dict_area` VALUES ('220322', '梨树县', '220300');
-INSERT INTO `dict_area` VALUES ('220323', '伊通满族自治县', '220300');
-INSERT INTO `dict_area` VALUES ('220381', '公主岭市', '220300');
-INSERT INTO `dict_area` VALUES ('220382', '双辽市', '220300');
-INSERT INTO `dict_area` VALUES ('220400', '辽源市', '220000');
-INSERT INTO `dict_area` VALUES ('220402', '龙山区', '220400');
-INSERT INTO `dict_area` VALUES ('220403', '西安区', '220400');
-INSERT INTO `dict_area` VALUES ('220421', '东丰县', '220400');
-INSERT INTO `dict_area` VALUES ('220422', '东辽县', '220400');
-INSERT INTO `dict_area` VALUES ('220500', '通化市', '220000');
-INSERT INTO `dict_area` VALUES ('220502', '东昌区', '220500');
-INSERT INTO `dict_area` VALUES ('220503', '二道江区', '220500');
-INSERT INTO `dict_area` VALUES ('220521', '通化县', '220500');
-INSERT INTO `dict_area` VALUES ('220523', '辉南县', '220500');
-INSERT INTO `dict_area` VALUES ('220524', '柳河县', '220500');
-INSERT INTO `dict_area` VALUES ('220581', '梅河口市', '220500');
-INSERT INTO `dict_area` VALUES ('220582', '集安市', '220500');
-INSERT INTO `dict_area` VALUES ('220600', '白山市', '220000');
-INSERT INTO `dict_area` VALUES ('220602', '浑江区', '220600');
-INSERT INTO `dict_area` VALUES ('220605', '江源区', '220600');
-INSERT INTO `dict_area` VALUES ('220621', '抚松县', '220600');
-INSERT INTO `dict_area` VALUES ('220622', '靖宇县', '220600');
-INSERT INTO `dict_area` VALUES ('220623', '长白朝鲜族自治县', '220600');
-INSERT INTO `dict_area` VALUES ('220681', '临江市', '220600');
-INSERT INTO `dict_area` VALUES ('220700', '松原市', '220000');
-INSERT INTO `dict_area` VALUES ('220702', '宁江区', '220700');
-INSERT INTO `dict_area` VALUES ('220721', '前郭尔罗斯蒙古族自治县', '220700');
-INSERT INTO `dict_area` VALUES ('220722', '长岭县', '220700');
-INSERT INTO `dict_area` VALUES ('220723', '乾安县', '220700');
-INSERT INTO `dict_area` VALUES ('220781', '扶余市', '220700');
-INSERT INTO `dict_area` VALUES ('220800', '白城市', '220000');
-INSERT INTO `dict_area` VALUES ('220802', '洮北区', '220800');
-INSERT INTO `dict_area` VALUES ('220821', '镇赉县', '220800');
-INSERT INTO `dict_area` VALUES ('220822', '通榆县', '220800');
-INSERT INTO `dict_area` VALUES ('220881', '洮南市', '220800');
-INSERT INTO `dict_area` VALUES ('220882', '大安市', '220800');
-INSERT INTO `dict_area` VALUES ('222400', '延边朝鲜族自治州', '220000');
-INSERT INTO `dict_area` VALUES ('222401', '延吉市', '222400');
-INSERT INTO `dict_area` VALUES ('222402', '图们市', '222400');
-INSERT INTO `dict_area` VALUES ('222403', '敦化市', '222400');
-INSERT INTO `dict_area` VALUES ('222404', '珲春市', '222400');
-INSERT INTO `dict_area` VALUES ('222405', '龙井市', '222400');
-INSERT INTO `dict_area` VALUES ('222406', '和龙市', '222400');
-INSERT INTO `dict_area` VALUES ('222424', '汪清县', '222400');
-INSERT INTO `dict_area` VALUES ('222426', '安图县', '222400');
-INSERT INTO `dict_area` VALUES ('230000', '黑龙江省', '-1');
-INSERT INTO `dict_area` VALUES ('230100', '哈尔滨市', '230000');
-INSERT INTO `dict_area` VALUES ('230102', '道里区', '230100');
-INSERT INTO `dict_area` VALUES ('230103', '南岗区', '230100');
-INSERT INTO `dict_area` VALUES ('230104', '道外区', '230100');
-INSERT INTO `dict_area` VALUES ('230108', '平房区', '230100');
-INSERT INTO `dict_area` VALUES ('230109', '松北区', '230100');
-INSERT INTO `dict_area` VALUES ('230110', '香坊区', '230100');
-INSERT INTO `dict_area` VALUES ('230111', '呼兰区', '230100');
-INSERT INTO `dict_area` VALUES ('230112', '阿城区', '230100');
-INSERT INTO `dict_area` VALUES ('230113', '双城区', '230100');
-INSERT INTO `dict_area` VALUES ('230123', '依兰县', '230100');
-INSERT INTO `dict_area` VALUES ('230124', '方正县', '230100');
-INSERT INTO `dict_area` VALUES ('230125', '宾县', '230100');
-INSERT INTO `dict_area` VALUES ('230126', '巴彦县', '230100');
-INSERT INTO `dict_area` VALUES ('230127', '木兰县', '230100');
-INSERT INTO `dict_area` VALUES ('230128', '通河县', '230100');
-INSERT INTO `dict_area` VALUES ('230129', '延寿县', '230100');
-INSERT INTO `dict_area` VALUES ('230183', '尚志市', '230100');
-INSERT INTO `dict_area` VALUES ('230184', '五常市', '230100');
-INSERT INTO `dict_area` VALUES ('230200', '齐齐哈尔市', '230000');
-INSERT INTO `dict_area` VALUES ('230202', '龙沙区', '230200');
-INSERT INTO `dict_area` VALUES ('230203', '建华区', '230200');
-INSERT INTO `dict_area` VALUES ('230204', '铁锋区', '230200');
-INSERT INTO `dict_area` VALUES ('230205', '昂昂溪区', '230200');
-INSERT INTO `dict_area` VALUES ('230206', '富拉尔基区', '230200');
-INSERT INTO `dict_area` VALUES ('230207', '碾子山区', '230200');
-INSERT INTO `dict_area` VALUES ('230208', '梅里斯达斡尔族区', '230200');
-INSERT INTO `dict_area` VALUES ('230221', '龙江县', '230200');
-INSERT INTO `dict_area` VALUES ('230223', '依安县', '230200');
-INSERT INTO `dict_area` VALUES ('230224', '泰来县', '230200');
-INSERT INTO `dict_area` VALUES ('230225', '甘南县', '230200');
-INSERT INTO `dict_area` VALUES ('230227', '富裕县', '230200');
-INSERT INTO `dict_area` VALUES ('230229', '克山县', '230200');
-INSERT INTO `dict_area` VALUES ('230230', '克东县', '230200');
-INSERT INTO `dict_area` VALUES ('230231', '拜泉县', '230200');
-INSERT INTO `dict_area` VALUES ('230281', '讷河市', '230200');
-INSERT INTO `dict_area` VALUES ('230300', '鸡西市', '230000');
-INSERT INTO `dict_area` VALUES ('230302', '鸡冠区', '230300');
-INSERT INTO `dict_area` VALUES ('230303', '恒山区', '230300');
-INSERT INTO `dict_area` VALUES ('230304', '滴道区', '230300');
-INSERT INTO `dict_area` VALUES ('230305', '梨树区', '230300');
-INSERT INTO `dict_area` VALUES ('230306', '城子河区', '230300');
-INSERT INTO `dict_area` VALUES ('230307', '麻山区', '230300');
-INSERT INTO `dict_area` VALUES ('230321', '鸡东县', '230300');
-INSERT INTO `dict_area` VALUES ('230381', '虎林市', '230300');
-INSERT INTO `dict_area` VALUES ('230382', '密山市', '230300');
-INSERT INTO `dict_area` VALUES ('230400', '鹤岗市', '230000');
-INSERT INTO `dict_area` VALUES ('230402', '向阳区', '230400');
-INSERT INTO `dict_area` VALUES ('230403', '工农区', '230400');
-INSERT INTO `dict_area` VALUES ('230404', '南山区', '230400');
-INSERT INTO `dict_area` VALUES ('230405', '兴安区', '230400');
-INSERT INTO `dict_area` VALUES ('230406', '东山区', '230400');
-INSERT INTO `dict_area` VALUES ('230407', '兴山区', '230400');
-INSERT INTO `dict_area` VALUES ('230421', '萝北县', '230400');
-INSERT INTO `dict_area` VALUES ('230422', '绥滨县', '230400');
-INSERT INTO `dict_area` VALUES ('230500', '双鸭山市', '230000');
-INSERT INTO `dict_area` VALUES ('230502', '尖山区', '230500');
-INSERT INTO `dict_area` VALUES ('230503', '岭东区', '230500');
-INSERT INTO `dict_area` VALUES ('230505', '四方台区', '230500');
-INSERT INTO `dict_area` VALUES ('230506', '宝山区', '230500');
-INSERT INTO `dict_area` VALUES ('230521', '集贤县', '230500');
-INSERT INTO `dict_area` VALUES ('230522', '友谊县', '230500');
-INSERT INTO `dict_area` VALUES ('230523', '宝清县', '230500');
-INSERT INTO `dict_area` VALUES ('230524', '饶河县', '230500');
-INSERT INTO `dict_area` VALUES ('230600', '大庆市', '230000');
-INSERT INTO `dict_area` VALUES ('230602', '萨尔图区', '230600');
-INSERT INTO `dict_area` VALUES ('230603', '龙凤区', '230600');
-INSERT INTO `dict_area` VALUES ('230604', '让胡路区', '230600');
-INSERT INTO `dict_area` VALUES ('230605', '红岗区', '230600');
-INSERT INTO `dict_area` VALUES ('230606', '大同区', '230600');
-INSERT INTO `dict_area` VALUES ('230621', '肇州县', '230600');
-INSERT INTO `dict_area` VALUES ('230622', '肇源县', '230600');
-INSERT INTO `dict_area` VALUES ('230623', '林甸县', '230600');
-INSERT INTO `dict_area` VALUES ('230624', '杜尔伯特蒙古族自治县', '230600');
-INSERT INTO `dict_area` VALUES ('230700', '伊春市', '230000');
-INSERT INTO `dict_area` VALUES ('230702', '伊春区', '230700');
-INSERT INTO `dict_area` VALUES ('230703', '南岔区', '230700');
-INSERT INTO `dict_area` VALUES ('230704', '友好区', '230700');
-INSERT INTO `dict_area` VALUES ('230705', '西林区', '230700');
-INSERT INTO `dict_area` VALUES ('230706', '翠峦区', '230700');
-INSERT INTO `dict_area` VALUES ('230707', '新青区', '230700');
-INSERT INTO `dict_area` VALUES ('230708', '美溪区', '230700');
-INSERT INTO `dict_area` VALUES ('230709', '金山屯区', '230700');
-INSERT INTO `dict_area` VALUES ('230710', '五营区', '230700');
-INSERT INTO `dict_area` VALUES ('230711', '乌马河区', '230700');
-INSERT INTO `dict_area` VALUES ('230712', '汤旺河区', '230700');
-INSERT INTO `dict_area` VALUES ('230713', '带岭区', '230700');
-INSERT INTO `dict_area` VALUES ('230714', '乌伊岭区', '230700');
-INSERT INTO `dict_area` VALUES ('230715', '红星区', '230700');
-INSERT INTO `dict_area` VALUES ('230716', '上甘岭区', '230700');
-INSERT INTO `dict_area` VALUES ('230722', '嘉荫县', '230700');
-INSERT INTO `dict_area` VALUES ('230781', '铁力市', '230700');
-INSERT INTO `dict_area` VALUES ('230800', '佳木斯市', '230000');
-INSERT INTO `dict_area` VALUES ('230803', '向阳区', '230800');
-INSERT INTO `dict_area` VALUES ('230804', '前进区', '230800');
-INSERT INTO `dict_area` VALUES ('230805', '东风区', '230800');
-INSERT INTO `dict_area` VALUES ('230811', '郊区', '230800');
-INSERT INTO `dict_area` VALUES ('230822', '桦南县', '230800');
-INSERT INTO `dict_area` VALUES ('230826', '桦川县', '230800');
-INSERT INTO `dict_area` VALUES ('230828', '汤原县', '230800');
-INSERT INTO `dict_area` VALUES ('230881', '同江市', '230800');
-INSERT INTO `dict_area` VALUES ('230882', '富锦市', '230800');
-INSERT INTO `dict_area` VALUES ('230883', '抚远市', '230800');
-INSERT INTO `dict_area` VALUES ('230900', '七台河市', '230000');
-INSERT INTO `dict_area` VALUES ('230902', '新兴区', '230900');
-INSERT INTO `dict_area` VALUES ('230903', '桃山区', '230900');
-INSERT INTO `dict_area` VALUES ('230904', '茄子河区', '230900');
-INSERT INTO `dict_area` VALUES ('230921', '勃利县', '230900');
-INSERT INTO `dict_area` VALUES ('231000', '牡丹江市', '230000');
-INSERT INTO `dict_area` VALUES ('231002', '东安区', '231000');
-INSERT INTO `dict_area` VALUES ('231003', '阳明区', '231000');
-INSERT INTO `dict_area` VALUES ('231004', '爱民区', '231000');
-INSERT INTO `dict_area` VALUES ('231005', '西安区', '231000');
-INSERT INTO `dict_area` VALUES ('231025', '林口县', '231000');
-INSERT INTO `dict_area` VALUES ('231081', '绥芬河市', '231000');
-INSERT INTO `dict_area` VALUES ('231083', '海林市', '231000');
-INSERT INTO `dict_area` VALUES ('231084', '宁安市', '231000');
-INSERT INTO `dict_area` VALUES ('231085', '穆棱市', '231000');
-INSERT INTO `dict_area` VALUES ('231086', '东宁市', '231000');
-INSERT INTO `dict_area` VALUES ('231100', '黑河市', '230000');
-INSERT INTO `dict_area` VALUES ('231102', '爱辉区', '231100');
-INSERT INTO `dict_area` VALUES ('231121', '嫩江县', '231100');
-INSERT INTO `dict_area` VALUES ('231123', '逊克县', '231100');
-INSERT INTO `dict_area` VALUES ('231124', '孙吴县', '231100');
-INSERT INTO `dict_area` VALUES ('231181', '北安市', '231100');
-INSERT INTO `dict_area` VALUES ('231182', '五大连池市', '231100');
-INSERT INTO `dict_area` VALUES ('231200', '绥化市', '230000');
-INSERT INTO `dict_area` VALUES ('231202', '北林区', '231200');
-INSERT INTO `dict_area` VALUES ('231221', '望奎县', '231200');
-INSERT INTO `dict_area` VALUES ('231222', '兰西县', '231200');
-INSERT INTO `dict_area` VALUES ('231223', '青冈县', '231200');
-INSERT INTO `dict_area` VALUES ('231224', '庆安县', '231200');
-INSERT INTO `dict_area` VALUES ('231225', '明水县', '231200');
-INSERT INTO `dict_area` VALUES ('231226', '绥棱县', '231200');
-INSERT INTO `dict_area` VALUES ('231281', '安达市', '231200');
-INSERT INTO `dict_area` VALUES ('231282', '肇东市', '231200');
-INSERT INTO `dict_area` VALUES ('231283', '海伦市', '231200');
-INSERT INTO `dict_area` VALUES ('232700', '大兴安岭地区', '230000');
-INSERT INTO `dict_area` VALUES ('232701', '加格达奇区', '232700');
-INSERT INTO `dict_area` VALUES ('232721', '呼玛县', '232700');
-INSERT INTO `dict_area` VALUES ('232722', '塔河县', '232700');
-INSERT INTO `dict_area` VALUES ('232723', '漠河县', '232700');
-INSERT INTO `dict_area` VALUES ('310000', '上海市', '-1');
-INSERT INTO `dict_area` VALUES ('310100', '市辖区', '310000');
-INSERT INTO `dict_area` VALUES ('310101', '黄浦区', '310100');
-INSERT INTO `dict_area` VALUES ('310104', '徐汇区', '310100');
-INSERT INTO `dict_area` VALUES ('310105', '长宁区', '310100');
-INSERT INTO `dict_area` VALUES ('310106', '静安区', '310100');
-INSERT INTO `dict_area` VALUES ('310107', '普陀区', '310100');
-INSERT INTO `dict_area` VALUES ('310109', '虹口区', '310100');
-INSERT INTO `dict_area` VALUES ('310110', '杨浦区', '310100');
-INSERT INTO `dict_area` VALUES ('310112', '闵行区', '310100');
-INSERT INTO `dict_area` VALUES ('310113', '宝山区', '310100');
-INSERT INTO `dict_area` VALUES ('310114', '嘉定区', '310100');
-INSERT INTO `dict_area` VALUES ('310115', '浦东新区', '310100');
-INSERT INTO `dict_area` VALUES ('310116', '金山区', '310100');
-INSERT INTO `dict_area` VALUES ('310117', '松江区', '310100');
-INSERT INTO `dict_area` VALUES ('310118', '青浦区', '310100');
-INSERT INTO `dict_area` VALUES ('310120', '奉贤区', '310100');
-INSERT INTO `dict_area` VALUES ('310151', '崇明区', '310100');
-INSERT INTO `dict_area` VALUES ('320000', '江苏省', '-1');
-INSERT INTO `dict_area` VALUES ('320100', '南京市', '320000');
-INSERT INTO `dict_area` VALUES ('320102', '玄武区', '320100');
-INSERT INTO `dict_area` VALUES ('320104', '秦淮区', '320100');
-INSERT INTO `dict_area` VALUES ('320105', '建邺区', '320100');
-INSERT INTO `dict_area` VALUES ('320106', '鼓楼区', '320100');
-INSERT INTO `dict_area` VALUES ('320111', '浦口区', '320100');
-INSERT INTO `dict_area` VALUES ('320113', '栖霞区', '320100');
-INSERT INTO `dict_area` VALUES ('320114', '雨花台区', '320100');
-INSERT INTO `dict_area` VALUES ('320115', '江宁区', '320100');
-INSERT INTO `dict_area` VALUES ('320116', '六合区', '320100');
-INSERT INTO `dict_area` VALUES ('320117', '溧水区', '320100');
-INSERT INTO `dict_area` VALUES ('320118', '高淳区', '320100');
-INSERT INTO `dict_area` VALUES ('320200', '无锡市', '320000');
-INSERT INTO `dict_area` VALUES ('320205', '锡山区', '320200');
-INSERT INTO `dict_area` VALUES ('320206', '惠山区', '320200');
-INSERT INTO `dict_area` VALUES ('320211', '滨湖区', '320200');
-INSERT INTO `dict_area` VALUES ('320213', '梁溪区', '320200');
-INSERT INTO `dict_area` VALUES ('320214', '新吴区', '320200');
-INSERT INTO `dict_area` VALUES ('320281', '江阴市', '320200');
-INSERT INTO `dict_area` VALUES ('320282', '宜兴市', '320200');
-INSERT INTO `dict_area` VALUES ('320300', '徐州市', '320000');
-INSERT INTO `dict_area` VALUES ('320302', '鼓楼区', '320300');
-INSERT INTO `dict_area` VALUES ('320303', '云龙区', '320300');
-INSERT INTO `dict_area` VALUES ('320305', '贾汪区', '320300');
-INSERT INTO `dict_area` VALUES ('320311', '泉山区', '320300');
-INSERT INTO `dict_area` VALUES ('320312', '铜山区', '320300');
-INSERT INTO `dict_area` VALUES ('320321', '丰县', '320300');
-INSERT INTO `dict_area` VALUES ('320322', '沛县', '320300');
-INSERT INTO `dict_area` VALUES ('320324', '睢宁县', '320300');
-INSERT INTO `dict_area` VALUES ('320381', '新沂市', '320300');
-INSERT INTO `dict_area` VALUES ('320382', '邳州市', '320300');
-INSERT INTO `dict_area` VALUES ('320400', '常州市', '320000');
-INSERT INTO `dict_area` VALUES ('320402', '天宁区', '320400');
-INSERT INTO `dict_area` VALUES ('320404', '钟楼区', '320400');
-INSERT INTO `dict_area` VALUES ('320411', '新北区', '320400');
-INSERT INTO `dict_area` VALUES ('320412', '武进区', '320400');
-INSERT INTO `dict_area` VALUES ('320413', '金坛区', '320400');
-INSERT INTO `dict_area` VALUES ('320481', '溧阳市', '320400');
-INSERT INTO `dict_area` VALUES ('320500', '苏州市', '320000');
-INSERT INTO `dict_area` VALUES ('320505', '虎丘区', '320500');
-INSERT INTO `dict_area` VALUES ('320506', '吴中区', '320500');
-INSERT INTO `dict_area` VALUES ('320507', '相城区', '320500');
-INSERT INTO `dict_area` VALUES ('320508', '姑苏区', '320500');
-INSERT INTO `dict_area` VALUES ('320509', '吴江区', '320500');
-INSERT INTO `dict_area` VALUES ('320581', '常熟市', '320500');
-INSERT INTO `dict_area` VALUES ('320582', '张家港市', '320500');
-INSERT INTO `dict_area` VALUES ('320583', '昆山市', '320500');
-INSERT INTO `dict_area` VALUES ('320585', '太仓市', '320500');
-INSERT INTO `dict_area` VALUES ('320600', '南通市', '320000');
-INSERT INTO `dict_area` VALUES ('320602', '崇川区', '320600');
-INSERT INTO `dict_area` VALUES ('320611', '港闸区', '320600');
-INSERT INTO `dict_area` VALUES ('320612', '通州区', '320600');
-INSERT INTO `dict_area` VALUES ('320621', '海安县', '320600');
-INSERT INTO `dict_area` VALUES ('320623', '如东县', '320600');
-INSERT INTO `dict_area` VALUES ('320681', '启东市', '320600');
-INSERT INTO `dict_area` VALUES ('320682', '如皋市', '320600');
-INSERT INTO `dict_area` VALUES ('320684', '海门市', '320600');
-INSERT INTO `dict_area` VALUES ('320700', '连云港市', '320000');
-INSERT INTO `dict_area` VALUES ('320703', '连云区', '320700');
-INSERT INTO `dict_area` VALUES ('320706', '海州区', '320700');
-INSERT INTO `dict_area` VALUES ('320707', '赣榆区', '320700');
-INSERT INTO `dict_area` VALUES ('320722', '东海县', '320700');
-INSERT INTO `dict_area` VALUES ('320723', '灌云县', '320700');
-INSERT INTO `dict_area` VALUES ('320724', '灌南县', '320700');
-INSERT INTO `dict_area` VALUES ('320800', '淮安市', '320000');
-INSERT INTO `dict_area` VALUES ('320803', '淮安区', '320800');
-INSERT INTO `dict_area` VALUES ('320804', '淮阴区', '320800');
-INSERT INTO `dict_area` VALUES ('320812', '清江浦区', '320800');
-INSERT INTO `dict_area` VALUES ('320813', '洪泽区', '320800');
-INSERT INTO `dict_area` VALUES ('320826', '涟水县', '320800');
-INSERT INTO `dict_area` VALUES ('320830', '盱眙县', '320800');
-INSERT INTO `dict_area` VALUES ('320831', '金湖县', '320800');
-INSERT INTO `dict_area` VALUES ('320900', '盐城市', '320000');
-INSERT INTO `dict_area` VALUES ('320902', '亭湖区', '320900');
-INSERT INTO `dict_area` VALUES ('320903', '盐都区', '320900');
-INSERT INTO `dict_area` VALUES ('320904', '大丰区', '320900');
-INSERT INTO `dict_area` VALUES ('320921', '响水县', '320900');
-INSERT INTO `dict_area` VALUES ('320922', '滨海县', '320900');
-INSERT INTO `dict_area` VALUES ('320923', '阜宁县', '320900');
-INSERT INTO `dict_area` VALUES ('320924', '射阳县', '320900');
-INSERT INTO `dict_area` VALUES ('320925', '建湖县', '320900');
-INSERT INTO `dict_area` VALUES ('320981', '东台市', '320900');
-INSERT INTO `dict_area` VALUES ('321000', '扬州市', '320000');
-INSERT INTO `dict_area` VALUES ('321002', '广陵区', '321000');
-INSERT INTO `dict_area` VALUES ('321003', '邗江区', '321000');
-INSERT INTO `dict_area` VALUES ('321012', '江都区', '321000');
-INSERT INTO `dict_area` VALUES ('321023', '宝应县', '321000');
-INSERT INTO `dict_area` VALUES ('321081', '仪征市', '321000');
-INSERT INTO `dict_area` VALUES ('321084', '高邮市', '321000');
-INSERT INTO `dict_area` VALUES ('321100', '镇江市', '320000');
-INSERT INTO `dict_area` VALUES ('321102', '京口区', '321100');
-INSERT INTO `dict_area` VALUES ('321111', '润州区', '321100');
-INSERT INTO `dict_area` VALUES ('321112', '丹徒区', '321100');
-INSERT INTO `dict_area` VALUES ('321181', '丹阳市', '321100');
-INSERT INTO `dict_area` VALUES ('321182', '扬中市', '321100');
-INSERT INTO `dict_area` VALUES ('321183', '句容市', '321100');
-INSERT INTO `dict_area` VALUES ('321200', '泰州市', '320000');
-INSERT INTO `dict_area` VALUES ('321202', '海陵区', '321200');
-INSERT INTO `dict_area` VALUES ('321203', '高港区', '321200');
-INSERT INTO `dict_area` VALUES ('321204', '姜堰区', '321200');
-INSERT INTO `dict_area` VALUES ('321281', '兴化市', '321200');
-INSERT INTO `dict_area` VALUES ('321282', '靖江市', '321200');
-INSERT INTO `dict_area` VALUES ('321283', '泰兴市', '321200');
-INSERT INTO `dict_area` VALUES ('321300', '宿迁市', '320000');
-INSERT INTO `dict_area` VALUES ('321302', '宿城区', '321300');
-INSERT INTO `dict_area` VALUES ('321311', '宿豫区', '321300');
-INSERT INTO `dict_area` VALUES ('321322', '沭阳县', '321300');
-INSERT INTO `dict_area` VALUES ('321323', '泗阳县', '321300');
-INSERT INTO `dict_area` VALUES ('321324', '泗洪县', '321300');
-INSERT INTO `dict_area` VALUES ('330000', '浙江省', '-1');
-INSERT INTO `dict_area` VALUES ('330100', '杭州市', '330000');
-INSERT INTO `dict_area` VALUES ('330102', '上城区', '330100');
-INSERT INTO `dict_area` VALUES ('330103', '下城区', '330100');
-INSERT INTO `dict_area` VALUES ('330104', '江干区', '330100');
-INSERT INTO `dict_area` VALUES ('330105', '拱墅区', '330100');
-INSERT INTO `dict_area` VALUES ('330106', '西湖区', '330100');
-INSERT INTO `dict_area` VALUES ('330108', '滨江区', '330100');
-INSERT INTO `dict_area` VALUES ('330109', '萧山区', '330100');
-INSERT INTO `dict_area` VALUES ('330110', '余杭区', '330100');
-INSERT INTO `dict_area` VALUES ('330111', '富阳区', '330100');
-INSERT INTO `dict_area` VALUES ('330122', '桐庐县', '330100');
-INSERT INTO `dict_area` VALUES ('330127', '淳安县', '330100');
-INSERT INTO `dict_area` VALUES ('330182', '建德市', '330100');
-INSERT INTO `dict_area` VALUES ('330185', '临安市', '330100');
-INSERT INTO `dict_area` VALUES ('330200', '宁波市', '330000');
-INSERT INTO `dict_area` VALUES ('330203', '海曙区', '330200');
-INSERT INTO `dict_area` VALUES ('330205', '江北区', '330200');
-INSERT INTO `dict_area` VALUES ('330206', '北仑区', '330200');
-INSERT INTO `dict_area` VALUES ('330211', '镇海区', '330200');
-INSERT INTO `dict_area` VALUES ('330212', '鄞州区', '330200');
-INSERT INTO `dict_area` VALUES ('330213', '奉化区', '330200');
-INSERT INTO `dict_area` VALUES ('330225', '象山县', '330200');
-INSERT INTO `dict_area` VALUES ('330226', '宁海县', '330200');
-INSERT INTO `dict_area` VALUES ('330281', '余姚市', '330200');
-INSERT INTO `dict_area` VALUES ('330282', '慈溪市', '330200');
-INSERT INTO `dict_area` VALUES ('330300', '温州市', '330000');
-INSERT INTO `dict_area` VALUES ('330302', '鹿城区', '330300');
-INSERT INTO `dict_area` VALUES ('330303', '龙湾区', '330300');
-INSERT INTO `dict_area` VALUES ('330304', '瓯海区', '330300');
-INSERT INTO `dict_area` VALUES ('330305', '洞头区', '330300');
-INSERT INTO `dict_area` VALUES ('330324', '永嘉县', '330300');
-INSERT INTO `dict_area` VALUES ('330326', '平阳县', '330300');
-INSERT INTO `dict_area` VALUES ('330327', '苍南县', '330300');
-INSERT INTO `dict_area` VALUES ('330328', '文成县', '330300');
-INSERT INTO `dict_area` VALUES ('330329', '泰顺县', '330300');
-INSERT INTO `dict_area` VALUES ('330381', '瑞安市', '330300');
-INSERT INTO `dict_area` VALUES ('330382', '乐清市', '330300');
-INSERT INTO `dict_area` VALUES ('330400', '嘉兴市', '330000');
-INSERT INTO `dict_area` VALUES ('330402', '南湖区', '330400');
-INSERT INTO `dict_area` VALUES ('330411', '秀洲区', '330400');
-INSERT INTO `dict_area` VALUES ('330421', '嘉善县', '330400');
-INSERT INTO `dict_area` VALUES ('330424', '海盐县', '330400');
-INSERT INTO `dict_area` VALUES ('330481', '海宁市', '330400');
-INSERT INTO `dict_area` VALUES ('330482', '平湖市', '330400');
-INSERT INTO `dict_area` VALUES ('330483', '桐乡市', '330400');
-INSERT INTO `dict_area` VALUES ('330500', '湖州市', '330000');
-INSERT INTO `dict_area` VALUES ('330502', '吴兴区', '330500');
-INSERT INTO `dict_area` VALUES ('330503', '南浔区', '330500');
-INSERT INTO `dict_area` VALUES ('330521', '德清县', '330500');
-INSERT INTO `dict_area` VALUES ('330522', '长兴县', '330500');
-INSERT INTO `dict_area` VALUES ('330523', '安吉县', '330500');
-INSERT INTO `dict_area` VALUES ('330600', '绍兴市', '330000');
-INSERT INTO `dict_area` VALUES ('330602', '越城区', '330600');
-INSERT INTO `dict_area` VALUES ('330603', '柯桥区', '330600');
-INSERT INTO `dict_area` VALUES ('330604', '上虞区', '330600');
-INSERT INTO `dict_area` VALUES ('330624', '新昌县', '330600');
-INSERT INTO `dict_area` VALUES ('330681', '诸暨市', '330600');
-INSERT INTO `dict_area` VALUES ('330683', '嵊州市', '330600');
-INSERT INTO `dict_area` VALUES ('330700', '金华市', '330000');
-INSERT INTO `dict_area` VALUES ('330702', '婺城区', '330700');
-INSERT INTO `dict_area` VALUES ('330703', '金东区', '330700');
-INSERT INTO `dict_area` VALUES ('330723', '武义县', '330700');
-INSERT INTO `dict_area` VALUES ('330726', '浦江县', '330700');
-INSERT INTO `dict_area` VALUES ('330727', '磐安县', '330700');
-INSERT INTO `dict_area` VALUES ('330781', '兰溪市', '330700');
-INSERT INTO `dict_area` VALUES ('330782', '义乌市', '330700');
-INSERT INTO `dict_area` VALUES ('330783', '东阳市', '330700');
-INSERT INTO `dict_area` VALUES ('330784', '永康市', '330700');
-INSERT INTO `dict_area` VALUES ('330800', '衢州市', '330000');
-INSERT INTO `dict_area` VALUES ('330802', '柯城区', '330800');
-INSERT INTO `dict_area` VALUES ('330803', '衢江区', '330800');
-INSERT INTO `dict_area` VALUES ('330822', '常山县', '330800');
-INSERT INTO `dict_area` VALUES ('330824', '开化县', '330800');
-INSERT INTO `dict_area` VALUES ('330825', '龙游县', '330800');
-INSERT INTO `dict_area` VALUES ('330881', '江山市', '330800');
-INSERT INTO `dict_area` VALUES ('330900', '舟山市', '330000');
-INSERT INTO `dict_area` VALUES ('330902', '定海区', '330900');
-INSERT INTO `dict_area` VALUES ('330903', '普陀区', '330900');
-INSERT INTO `dict_area` VALUES ('330921', '岱山县', '330900');
-INSERT INTO `dict_area` VALUES ('330922', '嵊泗县', '330900');
-INSERT INTO `dict_area` VALUES ('331000', '台州市', '330000');
-INSERT INTO `dict_area` VALUES ('331002', '椒江区', '331000');
-INSERT INTO `dict_area` VALUES ('331003', '黄岩区', '331000');
-INSERT INTO `dict_area` VALUES ('331004', '路桥区', '331000');
-INSERT INTO `dict_area` VALUES ('331022', '三门县', '331000');
-INSERT INTO `dict_area` VALUES ('331023', '天台县', '331000');
-INSERT INTO `dict_area` VALUES ('331024', '仙居县', '331000');
-INSERT INTO `dict_area` VALUES ('331081', '温岭市', '331000');
-INSERT INTO `dict_area` VALUES ('331082', '临海市', '331000');
-INSERT INTO `dict_area` VALUES ('331083', '玉环市', '331000');
-INSERT INTO `dict_area` VALUES ('331100', '丽水市', '330000');
-INSERT INTO `dict_area` VALUES ('331102', '莲都区', '331100');
-INSERT INTO `dict_area` VALUES ('331121', '青田县', '331100');
-INSERT INTO `dict_area` VALUES ('331122', '缙云县', '331100');
-INSERT INTO `dict_area` VALUES ('331123', '遂昌县', '331100');
-INSERT INTO `dict_area` VALUES ('331124', '松阳县', '331100');
-INSERT INTO `dict_area` VALUES ('331125', '云和县', '331100');
-INSERT INTO `dict_area` VALUES ('331126', '庆元县', '331100');
-INSERT INTO `dict_area` VALUES ('331127', '景宁畲族自治县', '331100');
-INSERT INTO `dict_area` VALUES ('331181', '龙泉市', '331100');
-INSERT INTO `dict_area` VALUES ('340000', '安徽省', '-1');
-INSERT INTO `dict_area` VALUES ('340100', '合肥市', '340000');
-INSERT INTO `dict_area` VALUES ('340102', '瑶海区', '340100');
-INSERT INTO `dict_area` VALUES ('340103', '庐阳区', '340100');
-INSERT INTO `dict_area` VALUES ('340104', '蜀山区', '340100');
-INSERT INTO `dict_area` VALUES ('340111', '包河区', '340100');
-INSERT INTO `dict_area` VALUES ('340121', '长丰县', '340100');
-INSERT INTO `dict_area` VALUES ('340122', '肥东县', '340100');
-INSERT INTO `dict_area` VALUES ('340123', '肥西县', '340100');
-INSERT INTO `dict_area` VALUES ('340124', '庐江县', '340100');
-INSERT INTO `dict_area` VALUES ('340181', '巢湖市', '340100');
-INSERT INTO `dict_area` VALUES ('340200', '芜湖市', '340000');
-INSERT INTO `dict_area` VALUES ('340202', '镜湖区', '340200');
-INSERT INTO `dict_area` VALUES ('340203', '弋江区', '340200');
-INSERT INTO `dict_area` VALUES ('340207', '鸠江区', '340200');
-INSERT INTO `dict_area` VALUES ('340208', '三山区', '340200');
-INSERT INTO `dict_area` VALUES ('340221', '芜湖县', '340200');
-INSERT INTO `dict_area` VALUES ('340222', '繁昌县', '340200');
-INSERT INTO `dict_area` VALUES ('340223', '南陵县', '340200');
-INSERT INTO `dict_area` VALUES ('340225', '无为县', '340200');
-INSERT INTO `dict_area` VALUES ('340300', '蚌埠市', '340000');
-INSERT INTO `dict_area` VALUES ('340302', '龙子湖区', '340300');
-INSERT INTO `dict_area` VALUES ('340303', '蚌山区', '340300');
-INSERT INTO `dict_area` VALUES ('340304', '禹会区', '340300');
-INSERT INTO `dict_area` VALUES ('340311', '淮上区', '340300');
-INSERT INTO `dict_area` VALUES ('340321', '怀远县', '340300');
-INSERT INTO `dict_area` VALUES ('340322', '五河县', '340300');
-INSERT INTO `dict_area` VALUES ('340323', '固镇县', '340300');
-INSERT INTO `dict_area` VALUES ('340400', '淮南市', '340000');
-INSERT INTO `dict_area` VALUES ('340402', '大通区', '340400');
-INSERT INTO `dict_area` VALUES ('340403', '田家庵区', '340400');
-INSERT INTO `dict_area` VALUES ('340404', '谢家集区', '340400');
-INSERT INTO `dict_area` VALUES ('340405', '八公山区', '340400');
-INSERT INTO `dict_area` VALUES ('340406', '潘集区', '340400');
-INSERT INTO `dict_area` VALUES ('340421', '凤台县', '340400');
-INSERT INTO `dict_area` VALUES ('340422', '寿县', '340400');
-INSERT INTO `dict_area` VALUES ('340500', '马鞍山市', '340000');
-INSERT INTO `dict_area` VALUES ('340503', '花山区', '340500');
-INSERT INTO `dict_area` VALUES ('340504', '雨山区', '340500');
-INSERT INTO `dict_area` VALUES ('340506', '博望区', '340500');
-INSERT INTO `dict_area` VALUES ('340521', '当涂县', '340500');
-INSERT INTO `dict_area` VALUES ('340522', '含山县', '340500');
-INSERT INTO `dict_area` VALUES ('340523', '和县', '340500');
-INSERT INTO `dict_area` VALUES ('340600', '淮北市', '340000');
-INSERT INTO `dict_area` VALUES ('340602', '杜集区', '340600');
-INSERT INTO `dict_area` VALUES ('340603', '相山区', '340600');
-INSERT INTO `dict_area` VALUES ('340604', '烈山区', '340600');
-INSERT INTO `dict_area` VALUES ('340621', '濉溪县', '340600');
-INSERT INTO `dict_area` VALUES ('340700', '铜陵市', '340000');
-INSERT INTO `dict_area` VALUES ('340705', '铜官区', '340700');
-INSERT INTO `dict_area` VALUES ('340706', '义安区', '340700');
-INSERT INTO `dict_area` VALUES ('340711', '郊区', '340700');
-INSERT INTO `dict_area` VALUES ('340722', '枞阳县', '340700');
-INSERT INTO `dict_area` VALUES ('340800', '安庆市', '340000');
-INSERT INTO `dict_area` VALUES ('340802', '迎江区', '340800');
-INSERT INTO `dict_area` VALUES ('340803', '大观区', '340800');
-INSERT INTO `dict_area` VALUES ('340811', '宜秀区', '340800');
-INSERT INTO `dict_area` VALUES ('340822', '怀宁县', '340800');
-INSERT INTO `dict_area` VALUES ('340824', '潜山县', '340800');
-INSERT INTO `dict_area` VALUES ('340825', '太湖县', '340800');
-INSERT INTO `dict_area` VALUES ('340826', '宿松县', '340800');
-INSERT INTO `dict_area` VALUES ('340827', '望江县', '340800');
-INSERT INTO `dict_area` VALUES ('340828', '岳西县', '340800');
-INSERT INTO `dict_area` VALUES ('340881', '桐城市', '340800');
-INSERT INTO `dict_area` VALUES ('341000', '黄山市', '340000');
-INSERT INTO `dict_area` VALUES ('341002', '屯溪区', '341000');
-INSERT INTO `dict_area` VALUES ('341003', '黄山区', '341000');
-INSERT INTO `dict_area` VALUES ('341004', '徽州区', '341000');
-INSERT INTO `dict_area` VALUES ('341021', '歙县', '341000');
-INSERT INTO `dict_area` VALUES ('341022', '休宁县', '341000');
-INSERT INTO `dict_area` VALUES ('341023', '黟县', '341000');
-INSERT INTO `dict_area` VALUES ('341024', '祁门县', '341000');
-INSERT INTO `dict_area` VALUES ('341100', '滁州市', '340000');
-INSERT INTO `dict_area` VALUES ('341102', '琅琊区', '341100');
-INSERT INTO `dict_area` VALUES ('341103', '南谯区', '341100');
-INSERT INTO `dict_area` VALUES ('341122', '来安县', '341100');
-INSERT INTO `dict_area` VALUES ('341124', '全椒县', '341100');
-INSERT INTO `dict_area` VALUES ('341125', '定远县', '341100');
-INSERT INTO `dict_area` VALUES ('341126', '凤阳县', '341100');
-INSERT INTO `dict_area` VALUES ('341181', '天长市', '341100');
-INSERT INTO `dict_area` VALUES ('341182', '明光市', '341100');
-INSERT INTO `dict_area` VALUES ('341200', '阜阳市', '340000');
-INSERT INTO `dict_area` VALUES ('341202', '颍州区', '341200');
-INSERT INTO `dict_area` VALUES ('341203', '颍东区', '341200');
-INSERT INTO `dict_area` VALUES ('341204', '颍泉区', '341200');
-INSERT INTO `dict_area` VALUES ('341221', '临泉县', '341200');
-INSERT INTO `dict_area` VALUES ('341222', '太和县', '341200');
-INSERT INTO `dict_area` VALUES ('341225', '阜南县', '341200');
-INSERT INTO `dict_area` VALUES ('341226', '颍上县', '341200');
-INSERT INTO `dict_area` VALUES ('341282', '界首市', '341200');
-INSERT INTO `dict_area` VALUES ('341300', '宿州市', '340000');
-INSERT INTO `dict_area` VALUES ('341302', '埇桥区', '341300');
-INSERT INTO `dict_area` VALUES ('341321', '砀山县', '341300');
-INSERT INTO `dict_area` VALUES ('341322', '萧县', '341300');
-INSERT INTO `dict_area` VALUES ('341323', '灵璧县', '341300');
-INSERT INTO `dict_area` VALUES ('341324', '泗县', '341300');
-INSERT INTO `dict_area` VALUES ('341500', '六安市', '340000');
-INSERT INTO `dict_area` VALUES ('341502', '金安区', '341500');
-INSERT INTO `dict_area` VALUES ('341503', '裕安区', '341500');
-INSERT INTO `dict_area` VALUES ('341504', '叶集区', '341500');
-INSERT INTO `dict_area` VALUES ('341522', '霍邱县', '341500');
-INSERT INTO `dict_area` VALUES ('341523', '舒城县', '341500');
-INSERT INTO `dict_area` VALUES ('341524', '金寨县', '341500');
-INSERT INTO `dict_area` VALUES ('341525', '霍山县', '341500');
-INSERT INTO `dict_area` VALUES ('341600', '亳州市', '340000');
-INSERT INTO `dict_area` VALUES ('341602', '谯城区', '341600');
-INSERT INTO `dict_area` VALUES ('341621', '涡阳县', '341600');
-INSERT INTO `dict_area` VALUES ('341622', '蒙城县', '341600');
-INSERT INTO `dict_area` VALUES ('341623', '利辛县', '341600');
-INSERT INTO `dict_area` VALUES ('341700', '池州市', '340000');
-INSERT INTO `dict_area` VALUES ('341702', '贵池区', '341700');
-INSERT INTO `dict_area` VALUES ('341721', '东至县', '341700');
-INSERT INTO `dict_area` VALUES ('341722', '石台县', '341700');
-INSERT INTO `dict_area` VALUES ('341723', '青阳县', '341700');
-INSERT INTO `dict_area` VALUES ('341800', '宣城市', '340000');
-INSERT INTO `dict_area` VALUES ('341802', '宣州区', '341800');
-INSERT INTO `dict_area` VALUES ('341821', '郎溪县', '341800');
-INSERT INTO `dict_area` VALUES ('341822', '广德县', '341800');
-INSERT INTO `dict_area` VALUES ('341823', '泾县', '341800');
-INSERT INTO `dict_area` VALUES ('341824', '绩溪县', '341800');
-INSERT INTO `dict_area` VALUES ('341825', '旌德县', '341800');
-INSERT INTO `dict_area` VALUES ('341881', '宁国市', '341800');
-INSERT INTO `dict_area` VALUES ('350000', '福建省', '-1');
-INSERT INTO `dict_area` VALUES ('350100', '福州市', '350000');
-INSERT INTO `dict_area` VALUES ('350102', '鼓楼区', '350100');
-INSERT INTO `dict_area` VALUES ('350103', '台江区', '350100');
-INSERT INTO `dict_area` VALUES ('350104', '仓山区', '350100');
-INSERT INTO `dict_area` VALUES ('350105', '马尾区', '350100');
-INSERT INTO `dict_area` VALUES ('350111', '晋安区', '350100');
-INSERT INTO `dict_area` VALUES ('350121', '闽侯县', '350100');
-INSERT INTO `dict_area` VALUES ('350122', '连江县', '350100');
-INSERT INTO `dict_area` VALUES ('350123', '罗源县', '350100');
-INSERT INTO `dict_area` VALUES ('350124', '闽清县', '350100');
-INSERT INTO `dict_area` VALUES ('350125', '永泰县', '350100');
-INSERT INTO `dict_area` VALUES ('350128', '平潭县', '350100');
-INSERT INTO `dict_area` VALUES ('350181', '福清市', '350100');
-INSERT INTO `dict_area` VALUES ('350182', '长乐市', '350100');
-INSERT INTO `dict_area` VALUES ('350200', '厦门市', '350000');
-INSERT INTO `dict_area` VALUES ('350203', '思明区', '350200');
-INSERT INTO `dict_area` VALUES ('350205', '海沧区', '350200');
-INSERT INTO `dict_area` VALUES ('350206', '湖里区', '350200');
-INSERT INTO `dict_area` VALUES ('350211', '集美区', '350200');
-INSERT INTO `dict_area` VALUES ('350212', '同安区', '350200');
-INSERT INTO `dict_area` VALUES ('350213', '翔安区', '350200');
-INSERT INTO `dict_area` VALUES ('350300', '莆田市', '350000');
-INSERT INTO `dict_area` VALUES ('350302', '城厢区', '350300');
-INSERT INTO `dict_area` VALUES ('350303', '涵江区', '350300');
-INSERT INTO `dict_area` VALUES ('350304', '荔城区', '350300');
-INSERT INTO `dict_area` VALUES ('350305', '秀屿区', '350300');
-INSERT INTO `dict_area` VALUES ('350322', '仙游县', '350300');
-INSERT INTO `dict_area` VALUES ('350400', '三明市', '350000');
-INSERT INTO `dict_area` VALUES ('350402', '梅列区', '350400');
-INSERT INTO `dict_area` VALUES ('350403', '三元区', '350400');
-INSERT INTO `dict_area` VALUES ('350421', '明溪县', '350400');
-INSERT INTO `dict_area` VALUES ('350423', '清流县', '350400');
-INSERT INTO `dict_area` VALUES ('350424', '宁化县', '350400');
-INSERT INTO `dict_area` VALUES ('350425', '大田县', '350400');
-INSERT INTO `dict_area` VALUES ('350426', '尤溪县', '350400');
-INSERT INTO `dict_area` VALUES ('350427', '沙县', '350400');
-INSERT INTO `dict_area` VALUES ('350428', '将乐县', '350400');
-INSERT INTO `dict_area` VALUES ('350429', '泰宁县', '350400');
-INSERT INTO `dict_area` VALUES ('350430', '建宁县', '350400');
-INSERT INTO `dict_area` VALUES ('350481', '永安市', '350400');
-INSERT INTO `dict_area` VALUES ('350500', '泉州市', '350000');
-INSERT INTO `dict_area` VALUES ('350502', '鲤城区', '350500');
-INSERT INTO `dict_area` VALUES ('350503', '丰泽区', '350500');
-INSERT INTO `dict_area` VALUES ('350504', '洛江区', '350500');
-INSERT INTO `dict_area` VALUES ('350505', '泉港区', '350500');
-INSERT INTO `dict_area` VALUES ('350521', '惠安县', '350500');
-INSERT INTO `dict_area` VALUES ('350524', '安溪县', '350500');
-INSERT INTO `dict_area` VALUES ('350525', '永春县', '350500');
-INSERT INTO `dict_area` VALUES ('350526', '德化县', '350500');
-INSERT INTO `dict_area` VALUES ('350527', '金门县', '350500');
-INSERT INTO `dict_area` VALUES ('350581', '石狮市', '350500');
-INSERT INTO `dict_area` VALUES ('350582', '晋江市', '350500');
-INSERT INTO `dict_area` VALUES ('350583', '南安市', '350500');
-INSERT INTO `dict_area` VALUES ('350600', '漳州市', '350000');
-INSERT INTO `dict_area` VALUES ('350602', '芗城区', '350600');
-INSERT INTO `dict_area` VALUES ('350603', '龙文区', '350600');
-INSERT INTO `dict_area` VALUES ('350622', '云霄县', '350600');
-INSERT INTO `dict_area` VALUES ('350623', '漳浦县', '350600');
-INSERT INTO `dict_area` VALUES ('350624', '诏安县', '350600');
-INSERT INTO `dict_area` VALUES ('350625', '长泰县', '350600');
-INSERT INTO `dict_area` VALUES ('350626', '东山县', '350600');
-INSERT INTO `dict_area` VALUES ('350627', '南靖县', '350600');
-INSERT INTO `dict_area` VALUES ('350628', '平和县', '350600');
-INSERT INTO `dict_area` VALUES ('350629', '华安县', '350600');
-INSERT INTO `dict_area` VALUES ('350681', '龙海市', '350600');
-INSERT INTO `dict_area` VALUES ('350700', '南平市', '350000');
-INSERT INTO `dict_area` VALUES ('350702', '延平区', '350700');
-INSERT INTO `dict_area` VALUES ('350703', '建阳区', '350700');
-INSERT INTO `dict_area` VALUES ('350721', '顺昌县', '350700');
-INSERT INTO `dict_area` VALUES ('350722', '浦城县', '350700');
-INSERT INTO `dict_area` VALUES ('350723', '光泽县', '350700');
-INSERT INTO `dict_area` VALUES ('350724', '松溪县', '350700');
-INSERT INTO `dict_area` VALUES ('350725', '政和县', '350700');
-INSERT INTO `dict_area` VALUES ('350781', '邵武市', '350700');
-INSERT INTO `dict_area` VALUES ('350782', '武夷山市', '350700');
-INSERT INTO `dict_area` VALUES ('350783', '建瓯市', '350700');
-INSERT INTO `dict_area` VALUES ('350800', '龙岩市', '350000');
-INSERT INTO `dict_area` VALUES ('350802', '新罗区', '350800');
-INSERT INTO `dict_area` VALUES ('350803', '永定区', '350800');
-INSERT INTO `dict_area` VALUES ('350821', '长汀县', '350800');
-INSERT INTO `dict_area` VALUES ('350823', '上杭县', '350800');
-INSERT INTO `dict_area` VALUES ('350824', '武平县', '350800');
-INSERT INTO `dict_area` VALUES ('350825', '连城县', '350800');
-INSERT INTO `dict_area` VALUES ('350881', '漳平市', '350800');
-INSERT INTO `dict_area` VALUES ('350900', '宁德市', '350000');
-INSERT INTO `dict_area` VALUES ('350902', '蕉城区', '350900');
-INSERT INTO `dict_area` VALUES ('350921', '霞浦县', '350900');
-INSERT INTO `dict_area` VALUES ('350922', '古田县', '350900');
-INSERT INTO `dict_area` VALUES ('350923', '屏南县', '350900');
-INSERT INTO `dict_area` VALUES ('350924', '寿宁县', '350900');
-INSERT INTO `dict_area` VALUES ('350925', '周宁县', '350900');
-INSERT INTO `dict_area` VALUES ('350926', '柘荣县', '350900');
-INSERT INTO `dict_area` VALUES ('350981', '福安市', '350900');
-INSERT INTO `dict_area` VALUES ('350982', '福鼎市', '350900');
-INSERT INTO `dict_area` VALUES ('360000', '江西省', '-1');
-INSERT INTO `dict_area` VALUES ('360100', '南昌市', '360000');
-INSERT INTO `dict_area` VALUES ('360102', '东湖区', '360100');
-INSERT INTO `dict_area` VALUES ('360103', '西湖区', '360100');
-INSERT INTO `dict_area` VALUES ('360104', '青云谱区', '360100');
-INSERT INTO `dict_area` VALUES ('360105', '湾里区', '360100');
-INSERT INTO `dict_area` VALUES ('360111', '青山湖区', '360100');
-INSERT INTO `dict_area` VALUES ('360112', '新建区', '360100');
-INSERT INTO `dict_area` VALUES ('360121', '南昌县', '360100');
-INSERT INTO `dict_area` VALUES ('360123', '安义县', '360100');
-INSERT INTO `dict_area` VALUES ('360124', '进贤县', '360100');
-INSERT INTO `dict_area` VALUES ('360200', '景德镇市', '360000');
-INSERT INTO `dict_area` VALUES ('360202', '昌江区', '360200');
-INSERT INTO `dict_area` VALUES ('360203', '珠山区', '360200');
-INSERT INTO `dict_area` VALUES ('360222', '浮梁县', '360200');
-INSERT INTO `dict_area` VALUES ('360281', '乐平市', '360200');
-INSERT INTO `dict_area` VALUES ('360300', '萍乡市', '360000');
-INSERT INTO `dict_area` VALUES ('360302', '安源区', '360300');
-INSERT INTO `dict_area` VALUES ('360313', '湘东区', '360300');
-INSERT INTO `dict_area` VALUES ('360321', '莲花县', '360300');
-INSERT INTO `dict_area` VALUES ('360322', '上栗县', '360300');
-INSERT INTO `dict_area` VALUES ('360323', '芦溪县', '360300');
-INSERT INTO `dict_area` VALUES ('360400', '九江市', '360000');
-INSERT INTO `dict_area` VALUES ('360402', '濂溪区', '360400');
-INSERT INTO `dict_area` VALUES ('360403', '浔阳区', '360400');
-INSERT INTO `dict_area` VALUES ('360421', '九江县', '360400');
-INSERT INTO `dict_area` VALUES ('360423', '武宁县', '360400');
-INSERT INTO `dict_area` VALUES ('360424', '修水县', '360400');
-INSERT INTO `dict_area` VALUES ('360425', '永修县', '360400');
-INSERT INTO `dict_area` VALUES ('360426', '德安县', '360400');
-INSERT INTO `dict_area` VALUES ('360428', '都昌县', '360400');
-INSERT INTO `dict_area` VALUES ('360429', '湖口县', '360400');
-INSERT INTO `dict_area` VALUES ('360430', '彭泽县', '360400');
-INSERT INTO `dict_area` VALUES ('360481', '瑞昌市', '360400');
-INSERT INTO `dict_area` VALUES ('360482', '共青城市', '360400');
-INSERT INTO `dict_area` VALUES ('360483', '庐山市', '360400');
-INSERT INTO `dict_area` VALUES ('360500', '新余市', '360000');
-INSERT INTO `dict_area` VALUES ('360502', '渝水区', '360500');
-INSERT INTO `dict_area` VALUES ('360521', '分宜县', '360500');
-INSERT INTO `dict_area` VALUES ('360600', '鹰潭市', '360000');
-INSERT INTO `dict_area` VALUES ('360602', '月湖区', '360600');
-INSERT INTO `dict_area` VALUES ('360622', '余江县', '360600');
-INSERT INTO `dict_area` VALUES ('360681', '贵溪市', '360600');
-INSERT INTO `dict_area` VALUES ('360700', '赣州市', '360000');
-INSERT INTO `dict_area` VALUES ('360702', '章贡区', '360700');
-INSERT INTO `dict_area` VALUES ('360703', '南康区', '360700');
-INSERT INTO `dict_area` VALUES ('360704', '赣县区', '360700');
-INSERT INTO `dict_area` VALUES ('360722', '信丰县', '360700');
-INSERT INTO `dict_area` VALUES ('360723', '大余县', '360700');
-INSERT INTO `dict_area` VALUES ('360724', '上犹县', '360700');
-INSERT INTO `dict_area` VALUES ('360725', '崇义县', '360700');
-INSERT INTO `dict_area` VALUES ('360726', '安远县', '360700');
-INSERT INTO `dict_area` VALUES ('360727', '龙南县', '360700');
-INSERT INTO `dict_area` VALUES ('360728', '定南县', '360700');
-INSERT INTO `dict_area` VALUES ('360729', '全南县', '360700');
-INSERT INTO `dict_area` VALUES ('360730', '宁都县', '360700');
-INSERT INTO `dict_area` VALUES ('360731', '于都县', '360700');
-INSERT INTO `dict_area` VALUES ('360732', '兴国县', '360700');
-INSERT INTO `dict_area` VALUES ('360733', '会昌县', '360700');
-INSERT INTO `dict_area` VALUES ('360734', '寻乌县', '360700');
-INSERT INTO `dict_area` VALUES ('360735', '石城县', '360700');
-INSERT INTO `dict_area` VALUES ('360781', '瑞金市', '360700');
-INSERT INTO `dict_area` VALUES ('360800', '吉安市', '360000');
-INSERT INTO `dict_area` VALUES ('360802', '吉州区', '360800');
-INSERT INTO `dict_area` VALUES ('360803', '青原区', '360800');
-INSERT INTO `dict_area` VALUES ('360821', '吉安县', '360800');
-INSERT INTO `dict_area` VALUES ('360822', '吉水县', '360800');
-INSERT INTO `dict_area` VALUES ('360823', '峡江县', '360800');
-INSERT INTO `dict_area` VALUES ('360824', '新干县', '360800');
-INSERT INTO `dict_area` VALUES ('360825', '永丰县', '360800');
-INSERT INTO `dict_area` VALUES ('360826', '泰和县', '360800');
-INSERT INTO `dict_area` VALUES ('360827', '遂川县', '360800');
-INSERT INTO `dict_area` VALUES ('360828', '万安县', '360800');
-INSERT INTO `dict_area` VALUES ('360829', '安福县', '360800');
-INSERT INTO `dict_area` VALUES ('360830', '永新县', '360800');
-INSERT INTO `dict_area` VALUES ('360881', '井冈山市', '360800');
-INSERT INTO `dict_area` VALUES ('360900', '宜春市', '360000');
-INSERT INTO `dict_area` VALUES ('360902', '袁州区', '360900');
-INSERT INTO `dict_area` VALUES ('360921', '奉新县', '360900');
-INSERT INTO `dict_area` VALUES ('360922', '万载县', '360900');
-INSERT INTO `dict_area` VALUES ('360923', '上高县', '360900');
-INSERT INTO `dict_area` VALUES ('360924', '宜丰县', '360900');
-INSERT INTO `dict_area` VALUES ('360925', '靖安县', '360900');
-INSERT INTO `dict_area` VALUES ('360926', '铜鼓县', '360900');
-INSERT INTO `dict_area` VALUES ('360981', '丰城市', '360900');
-INSERT INTO `dict_area` VALUES ('360982', '樟树市', '360900');
-INSERT INTO `dict_area` VALUES ('360983', '高安市', '360900');
-INSERT INTO `dict_area` VALUES ('361000', '抚州市', '360000');
-INSERT INTO `dict_area` VALUES ('361002', '临川区', '361000');
-INSERT INTO `dict_area` VALUES ('361003', '东乡区', '361000');
-INSERT INTO `dict_area` VALUES ('361021', '南城县', '361000');
-INSERT INTO `dict_area` VALUES ('361022', '黎川县', '361000');
-INSERT INTO `dict_area` VALUES ('361023', '南丰县', '361000');
-INSERT INTO `dict_area` VALUES ('361024', '崇仁县', '361000');
-INSERT INTO `dict_area` VALUES ('361025', '乐安县', '361000');
-INSERT INTO `dict_area` VALUES ('361026', '宜黄县', '361000');
-INSERT INTO `dict_area` VALUES ('361027', '金溪县', '361000');
-INSERT INTO `dict_area` VALUES ('361028', '资溪县', '361000');
-INSERT INTO `dict_area` VALUES ('361030', '广昌县', '361000');
-INSERT INTO `dict_area` VALUES ('361100', '上饶市', '360000');
-INSERT INTO `dict_area` VALUES ('361102', '信州区', '361100');
-INSERT INTO `dict_area` VALUES ('361103', '广丰区', '361100');
-INSERT INTO `dict_area` VALUES ('361121', '上饶县', '361100');
-INSERT INTO `dict_area` VALUES ('361123', '玉山县', '361100');
-INSERT INTO `dict_area` VALUES ('361124', '铅山县', '361100');
-INSERT INTO `dict_area` VALUES ('361125', '横峰县', '361100');
-INSERT INTO `dict_area` VALUES ('361126', '弋阳县', '361100');
-INSERT INTO `dict_area` VALUES ('361127', '余干县', '361100');
-INSERT INTO `dict_area` VALUES ('361128', '鄱阳县', '361100');
-INSERT INTO `dict_area` VALUES ('361129', '万年县', '361100');
-INSERT INTO `dict_area` VALUES ('361130', '婺源县', '361100');
-INSERT INTO `dict_area` VALUES ('361181', '德兴市', '361100');
-INSERT INTO `dict_area` VALUES ('370000', '山东省', '-1');
-INSERT INTO `dict_area` VALUES ('370100', '济南市', '370000');
-INSERT INTO `dict_area` VALUES ('370102', '历下区', '370100');
-INSERT INTO `dict_area` VALUES ('370103', '市中区', '370100');
-INSERT INTO `dict_area` VALUES ('370104', '槐荫区', '370100');
-INSERT INTO `dict_area` VALUES ('370105', '天桥区', '370100');
-INSERT INTO `dict_area` VALUES ('370112', '历城区', '370100');
-INSERT INTO `dict_area` VALUES ('370113', '长清区', '370100');
-INSERT INTO `dict_area` VALUES ('370114', '章丘区', '370100');
-INSERT INTO `dict_area` VALUES ('370124', '平阴县', '370100');
-INSERT INTO `dict_area` VALUES ('370125', '济阳县', '370100');
-INSERT INTO `dict_area` VALUES ('370126', '商河县', '370100');
-INSERT INTO `dict_area` VALUES ('370200', '青岛市', '370000');
-INSERT INTO `dict_area` VALUES ('370202', '市南区', '370200');
-INSERT INTO `dict_area` VALUES ('370203', '市北区', '370200');
-INSERT INTO `dict_area` VALUES ('370211', '黄岛区', '370200');
-INSERT INTO `dict_area` VALUES ('370212', '崂山区', '370200');
-INSERT INTO `dict_area` VALUES ('370213', '李沧区', '370200');
-INSERT INTO `dict_area` VALUES ('370214', '城阳区', '370200');
-INSERT INTO `dict_area` VALUES ('370281', '胶州市', '370200');
-INSERT INTO `dict_area` VALUES ('370282', '即墨市', '370200');
-INSERT INTO `dict_area` VALUES ('370283', '平度市', '370200');
-INSERT INTO `dict_area` VALUES ('370285', '莱西市', '370200');
-INSERT INTO `dict_area` VALUES ('370300', '淄博市', '370000');
-INSERT INTO `dict_area` VALUES ('370302', '淄川区', '370300');
-INSERT INTO `dict_area` VALUES ('370303', '张店区', '370300');
-INSERT INTO `dict_area` VALUES ('370304', '博山区', '370300');
-INSERT INTO `dict_area` VALUES ('370305', '临淄区', '370300');
-INSERT INTO `dict_area` VALUES ('370306', '周村区', '370300');
-INSERT INTO `dict_area` VALUES ('370321', '桓台县', '370300');
-INSERT INTO `dict_area` VALUES ('370322', '高青县', '370300');
-INSERT INTO `dict_area` VALUES ('370323', '沂源县', '370300');
-INSERT INTO `dict_area` VALUES ('370400', '枣庄市', '370000');
-INSERT INTO `dict_area` VALUES ('370402', '市中区', '370400');
-INSERT INTO `dict_area` VALUES ('370403', '薛城区', '370400');
-INSERT INTO `dict_area` VALUES ('370404', '峄城区', '370400');
-INSERT INTO `dict_area` VALUES ('370405', '台儿庄区', '370400');
-INSERT INTO `dict_area` VALUES ('370406', '山亭区', '370400');
-INSERT INTO `dict_area` VALUES ('370481', '滕州市', '370400');
-INSERT INTO `dict_area` VALUES ('370500', '东营市', '370000');
-INSERT INTO `dict_area` VALUES ('370502', '东营区', '370500');
-INSERT INTO `dict_area` VALUES ('370503', '河口区', '370500');
-INSERT INTO `dict_area` VALUES ('370505', '垦利区', '370500');
-INSERT INTO `dict_area` VALUES ('370522', '利津县', '370500');
-INSERT INTO `dict_area` VALUES ('370523', '广饶县', '370500');
-INSERT INTO `dict_area` VALUES ('370600', '烟台市', '370000');
-INSERT INTO `dict_area` VALUES ('370602', '芝罘区', '370600');
-INSERT INTO `dict_area` VALUES ('370611', '福山区', '370600');
-INSERT INTO `dict_area` VALUES ('370612', '牟平区', '370600');
-INSERT INTO `dict_area` VALUES ('370613', '莱山区', '370600');
-INSERT INTO `dict_area` VALUES ('370634', '长岛县', '370600');
-INSERT INTO `dict_area` VALUES ('370681', '龙口市', '370600');
-INSERT INTO `dict_area` VALUES ('370682', '莱阳市', '370600');
-INSERT INTO `dict_area` VALUES ('370683', '莱州市', '370600');
-INSERT INTO `dict_area` VALUES ('370684', '蓬莱市', '370600');
-INSERT INTO `dict_area` VALUES ('370685', '招远市', '370600');
-INSERT INTO `dict_area` VALUES ('370686', '栖霞市', '370600');
-INSERT INTO `dict_area` VALUES ('370687', '海阳市', '370600');
-INSERT INTO `dict_area` VALUES ('370700', '潍坊市', '370000');
-INSERT INTO `dict_area` VALUES ('370702', '潍城区', '370700');
-INSERT INTO `dict_area` VALUES ('370703', '寒亭区', '370700');
-INSERT INTO `dict_area` VALUES ('370704', '坊子区', '370700');
-INSERT INTO `dict_area` VALUES ('370705', '奎文区', '370700');
-INSERT INTO `dict_area` VALUES ('370724', '临朐县', '370700');
-INSERT INTO `dict_area` VALUES ('370725', '昌乐县', '370700');
-INSERT INTO `dict_area` VALUES ('370781', '青州市', '370700');
-INSERT INTO `dict_area` VALUES ('370782', '诸城市', '370700');
-INSERT INTO `dict_area` VALUES ('370783', '寿光市', '370700');
-INSERT INTO `dict_area` VALUES ('370784', '安丘市', '370700');
-INSERT INTO `dict_area` VALUES ('370785', '高密市', '370700');
-INSERT INTO `dict_area` VALUES ('370786', '昌邑市', '370700');
-INSERT INTO `dict_area` VALUES ('370800', '济宁市', '370000');
-INSERT INTO `dict_area` VALUES ('370811', '任城区', '370800');
-INSERT INTO `dict_area` VALUES ('370812', '兖州区', '370800');
-INSERT INTO `dict_area` VALUES ('370826', '微山县', '370800');
-INSERT INTO `dict_area` VALUES ('370827', '鱼台县', '370800');
-INSERT INTO `dict_area` VALUES ('370828', '金乡县', '370800');
-INSERT INTO `dict_area` VALUES ('370829', '嘉祥县', '370800');
-INSERT INTO `dict_area` VALUES ('370830', '汶上县', '370800');
-INSERT INTO `dict_area` VALUES ('370831', '泗水县', '370800');
-INSERT INTO `dict_area` VALUES ('370832', '梁山县', '370800');
-INSERT INTO `dict_area` VALUES ('370881', '曲阜市', '370800');
-INSERT INTO `dict_area` VALUES ('370883', '邹城市', '370800');
-INSERT INTO `dict_area` VALUES ('370900', '泰安市', '370000');
-INSERT INTO `dict_area` VALUES ('370902', '泰山区', '370900');
-INSERT INTO `dict_area` VALUES ('370911', '岱岳区', '370900');
-INSERT INTO `dict_area` VALUES ('370921', '宁阳县', '370900');
-INSERT INTO `dict_area` VALUES ('370923', '东平县', '370900');
-INSERT INTO `dict_area` VALUES ('370982', '新泰市', '370900');
-INSERT INTO `dict_area` VALUES ('370983', '肥城市', '370900');
-INSERT INTO `dict_area` VALUES ('371000', '威海市', '370000');
-INSERT INTO `dict_area` VALUES ('371002', '环翠区', '371000');
-INSERT INTO `dict_area` VALUES ('371003', '文登区', '371000');
-INSERT INTO `dict_area` VALUES ('371082', '荣成市', '371000');
-INSERT INTO `dict_area` VALUES ('371083', '乳山市', '371000');
-INSERT INTO `dict_area` VALUES ('371100', '日照市', '370000');
-INSERT INTO `dict_area` VALUES ('371102', '东港区', '371100');
-INSERT INTO `dict_area` VALUES ('371103', '岚山区', '371100');
-INSERT INTO `dict_area` VALUES ('371121', '五莲县', '371100');
-INSERT INTO `dict_area` VALUES ('371122', '莒县', '371100');
-INSERT INTO `dict_area` VALUES ('371200', '莱芜市', '370000');
-INSERT INTO `dict_area` VALUES ('371202', '莱城区', '371200');
-INSERT INTO `dict_area` VALUES ('371203', '钢城区', '371200');
-INSERT INTO `dict_area` VALUES ('371300', '临沂市', '370000');
-INSERT INTO `dict_area` VALUES ('371302', '兰山区', '371300');
-INSERT INTO `dict_area` VALUES ('371311', '罗庄区', '371300');
-INSERT INTO `dict_area` VALUES ('371312', '河东区', '371300');
-INSERT INTO `dict_area` VALUES ('371321', '沂南县', '371300');
-INSERT INTO `dict_area` VALUES ('371322', '郯城县', '371300');
-INSERT INTO `dict_area` VALUES ('371323', '沂水县', '371300');
-INSERT INTO `dict_area` VALUES ('371324', '兰陵县', '371300');
-INSERT INTO `dict_area` VALUES ('371325', '费县', '371300');
-INSERT INTO `dict_area` VALUES ('371326', '平邑县', '371300');
-INSERT INTO `dict_area` VALUES ('371327', '莒南县', '371300');
-INSERT INTO `dict_area` VALUES ('371328', '蒙阴县', '371300');
-INSERT INTO `dict_area` VALUES ('371329', '临沭县', '371300');
-INSERT INTO `dict_area` VALUES ('371400', '德州市', '370000');
-INSERT INTO `dict_area` VALUES ('371402', '德城区', '371400');
-INSERT INTO `dict_area` VALUES ('371403', '陵城区', '371400');
-INSERT INTO `dict_area` VALUES ('371422', '宁津县', '371400');
-INSERT INTO `dict_area` VALUES ('371423', '庆云县', '371400');
-INSERT INTO `dict_area` VALUES ('371424', '临邑县', '371400');
-INSERT INTO `dict_area` VALUES ('371425', '齐河县', '371400');
-INSERT INTO `dict_area` VALUES ('371426', '平原县', '371400');
-INSERT INTO `dict_area` VALUES ('371427', '夏津县', '371400');
-INSERT INTO `dict_area` VALUES ('371428', '武城县', '371400');
-INSERT INTO `dict_area` VALUES ('371481', '乐陵市', '371400');
-INSERT INTO `dict_area` VALUES ('371482', '禹城市', '371400');
-INSERT INTO `dict_area` VALUES ('371500', '聊城市', '370000');
-INSERT INTO `dict_area` VALUES ('371502', '东昌府区', '371500');
-INSERT INTO `dict_area` VALUES ('371521', '阳谷县', '371500');
-INSERT INTO `dict_area` VALUES ('371522', '莘县', '371500');
-INSERT INTO `dict_area` VALUES ('371523', '茌平县', '371500');
-INSERT INTO `dict_area` VALUES ('371524', '东阿县', '371500');
-INSERT INTO `dict_area` VALUES ('371525', '冠县', '371500');
-INSERT INTO `dict_area` VALUES ('371526', '高唐县', '371500');
-INSERT INTO `dict_area` VALUES ('371581', '临清市', '371500');
-INSERT INTO `dict_area` VALUES ('371600', '滨州市', '370000');
-INSERT INTO `dict_area` VALUES ('371602', '滨城区', '371600');
-INSERT INTO `dict_area` VALUES ('371603', '沾化区', '371600');
-INSERT INTO `dict_area` VALUES ('371621', '惠民县', '371600');
-INSERT INTO `dict_area` VALUES ('371622', '阳信县', '371600');
-INSERT INTO `dict_area` VALUES ('371623', '无棣县', '371600');
-INSERT INTO `dict_area` VALUES ('371625', '博兴县', '371600');
-INSERT INTO `dict_area` VALUES ('371626', '邹平县', '371600');
-INSERT INTO `dict_area` VALUES ('371700', '菏泽市', '370000');
-INSERT INTO `dict_area` VALUES ('371702', '牡丹区', '371700');
-INSERT INTO `dict_area` VALUES ('371703', '定陶区', '371700');
-INSERT INTO `dict_area` VALUES ('371721', '曹县', '371700');
-INSERT INTO `dict_area` VALUES ('371722', '单县', '371700');
-INSERT INTO `dict_area` VALUES ('371723', '成武县', '371700');
-INSERT INTO `dict_area` VALUES ('371724', '巨野县', '371700');
-INSERT INTO `dict_area` VALUES ('371725', '郓城县', '371700');
-INSERT INTO `dict_area` VALUES ('371726', '鄄城县', '371700');
-INSERT INTO `dict_area` VALUES ('371728', '东明县', '371700');
-INSERT INTO `dict_area` VALUES ('410000', '河南省', '-1');
-INSERT INTO `dict_area` VALUES ('410100', '郑州市', '410000');
-INSERT INTO `dict_area` VALUES ('410102', '中原区', '410100');
-INSERT INTO `dict_area` VALUES ('410103', '二七区', '410100');
-INSERT INTO `dict_area` VALUES ('410104', '管城回族区', '410100');
-INSERT INTO `dict_area` VALUES ('410105', '金水区', '410100');
-INSERT INTO `dict_area` VALUES ('410106', '上街区', '410100');
-INSERT INTO `dict_area` VALUES ('410108', '惠济区', '410100');
-INSERT INTO `dict_area` VALUES ('410122', '中牟县', '410100');
-INSERT INTO `dict_area` VALUES ('410181', '巩义市', '410100');
-INSERT INTO `dict_area` VALUES ('410182', '荥阳市', '410100');
-INSERT INTO `dict_area` VALUES ('410183', '新密市', '410100');
-INSERT INTO `dict_area` VALUES ('410184', '新郑市', '410100');
-INSERT INTO `dict_area` VALUES ('410185', '登封市', '410100');
-INSERT INTO `dict_area` VALUES ('410200', '开封市', '410000');
-INSERT INTO `dict_area` VALUES ('410202', '龙亭区', '410200');
-INSERT INTO `dict_area` VALUES ('410203', '顺河回族区', '410200');
-INSERT INTO `dict_area` VALUES ('410204', '鼓楼区', '410200');
-INSERT INTO `dict_area` VALUES ('410205', '禹王台区', '410200');
-INSERT INTO `dict_area` VALUES ('410212', '祥符区', '410200');
-INSERT INTO `dict_area` VALUES ('410221', '杞县', '410200');
-INSERT INTO `dict_area` VALUES ('410222', '通许县', '410200');
-INSERT INTO `dict_area` VALUES ('410223', '尉氏县', '410200');
-INSERT INTO `dict_area` VALUES ('410225', '兰考县', '410200');
-INSERT INTO `dict_area` VALUES ('410300', '洛阳市', '410000');
-INSERT INTO `dict_area` VALUES ('410302', '老城区', '410300');
-INSERT INTO `dict_area` VALUES ('410303', '西工区', '410300');
-INSERT INTO `dict_area` VALUES ('410304', '瀍河回族区', '410300');
-INSERT INTO `dict_area` VALUES ('410305', '涧西区', '410300');
-INSERT INTO `dict_area` VALUES ('410306', '吉利区', '410300');
-INSERT INTO `dict_area` VALUES ('410311', '洛龙区', '410300');
-INSERT INTO `dict_area` VALUES ('410322', '孟津县', '410300');
-INSERT INTO `dict_area` VALUES ('410323', '新安县', '410300');
-INSERT INTO `dict_area` VALUES ('410324', '栾川县', '410300');
-INSERT INTO `dict_area` VALUES ('410325', '嵩县', '410300');
-INSERT INTO `dict_area` VALUES ('410326', '汝阳县', '410300');
-INSERT INTO `dict_area` VALUES ('410327', '宜阳县', '410300');
-INSERT INTO `dict_area` VALUES ('410328', '洛宁县', '410300');
-INSERT INTO `dict_area` VALUES ('410329', '伊川县', '410300');
-INSERT INTO `dict_area` VALUES ('410381', '偃师市', '410300');
-INSERT INTO `dict_area` VALUES ('410400', '平顶山市', '410000');
-INSERT INTO `dict_area` VALUES ('410402', '新华区', '410400');
-INSERT INTO `dict_area` VALUES ('410403', '卫东区', '410400');
-INSERT INTO `dict_area` VALUES ('410404', '石龙区', '410400');
-INSERT INTO `dict_area` VALUES ('410411', '湛河区', '410400');
-INSERT INTO `dict_area` VALUES ('410421', '宝丰县', '410400');
-INSERT INTO `dict_area` VALUES ('410422', '叶县', '410400');
-INSERT INTO `dict_area` VALUES ('410423', '鲁山县', '410400');
-INSERT INTO `dict_area` VALUES ('410425', '郏县', '410400');
-INSERT INTO `dict_area` VALUES ('410481', '舞钢市', '410400');
-INSERT INTO `dict_area` VALUES ('410482', '汝州市', '410400');
-INSERT INTO `dict_area` VALUES ('410500', '安阳市', '410000');
-INSERT INTO `dict_area` VALUES ('410502', '文峰区', '410500');
-INSERT INTO `dict_area` VALUES ('410503', '北关区', '410500');
-INSERT INTO `dict_area` VALUES ('410505', '殷都区', '410500');
-INSERT INTO `dict_area` VALUES ('410506', '龙安区', '410500');
-INSERT INTO `dict_area` VALUES ('410522', '安阳县', '410500');
-INSERT INTO `dict_area` VALUES ('410523', '汤阴县', '410500');
-INSERT INTO `dict_area` VALUES ('410526', '滑县', '410500');
-INSERT INTO `dict_area` VALUES ('410527', '内黄县', '410500');
-INSERT INTO `dict_area` VALUES ('410581', '林州市', '410500');
-INSERT INTO `dict_area` VALUES ('410600', '鹤壁市', '410000');
-INSERT INTO `dict_area` VALUES ('410602', '鹤山区', '410600');
-INSERT INTO `dict_area` VALUES ('410603', '山城区', '410600');
-INSERT INTO `dict_area` VALUES ('410611', '淇滨区', '410600');
-INSERT INTO `dict_area` VALUES ('410621', '浚县', '410600');
-INSERT INTO `dict_area` VALUES ('410622', '淇县', '410600');
-INSERT INTO `dict_area` VALUES ('410700', '新乡市', '410000');
-INSERT INTO `dict_area` VALUES ('410702', '红旗区', '410700');
-INSERT INTO `dict_area` VALUES ('410703', '卫滨区', '410700');
-INSERT INTO `dict_area` VALUES ('410704', '凤泉区', '410700');
-INSERT INTO `dict_area` VALUES ('410711', '牧野区', '410700');
-INSERT INTO `dict_area` VALUES ('410721', '新乡县', '410700');
-INSERT INTO `dict_area` VALUES ('410724', '获嘉县', '410700');
-INSERT INTO `dict_area` VALUES ('410725', '原阳县', '410700');
-INSERT INTO `dict_area` VALUES ('410726', '延津县', '410700');
-INSERT INTO `dict_area` VALUES ('410727', '封丘县', '410700');
-INSERT INTO `dict_area` VALUES ('410728', '长垣县', '410700');
-INSERT INTO `dict_area` VALUES ('410781', '卫辉市', '410700');
-INSERT INTO `dict_area` VALUES ('410782', '辉县市', '410700');
-INSERT INTO `dict_area` VALUES ('410800', '焦作市', '410000');
-INSERT INTO `dict_area` VALUES ('410802', '解放区', '410800');
-INSERT INTO `dict_area` VALUES ('410803', '中站区', '410800');
-INSERT INTO `dict_area` VALUES ('410804', '马村区', '410800');
-INSERT INTO `dict_area` VALUES ('410811', '山阳区', '410800');
-INSERT INTO `dict_area` VALUES ('410821', '修武县', '410800');
-INSERT INTO `dict_area` VALUES ('410822', '博爱县', '410800');
-INSERT INTO `dict_area` VALUES ('410823', '武陟县', '410800');
-INSERT INTO `dict_area` VALUES ('410825', '温县', '410800');
-INSERT INTO `dict_area` VALUES ('410882', '沁阳市', '410800');
-INSERT INTO `dict_area` VALUES ('410883', '孟州市', '410800');
-INSERT INTO `dict_area` VALUES ('410900', '濮阳市', '410000');
-INSERT INTO `dict_area` VALUES ('410902', '华龙区', '410900');
-INSERT INTO `dict_area` VALUES ('410922', '清丰县', '410900');
-INSERT INTO `dict_area` VALUES ('410923', '南乐县', '410900');
-INSERT INTO `dict_area` VALUES ('410926', '范县', '410900');
-INSERT INTO `dict_area` VALUES ('410927', '台前县', '410900');
-INSERT INTO `dict_area` VALUES ('410928', '濮阳县', '410900');
-INSERT INTO `dict_area` VALUES ('411000', '许昌市', '410000');
-INSERT INTO `dict_area` VALUES ('411002', '魏都区', '411000');
-INSERT INTO `dict_area` VALUES ('411003', '建安区', '411000');
-INSERT INTO `dict_area` VALUES ('411024', '鄢陵县', '411000');
-INSERT INTO `dict_area` VALUES ('411025', '襄城县', '411000');
-INSERT INTO `dict_area` VALUES ('411081', '禹州市', '411000');
-INSERT INTO `dict_area` VALUES ('411082', '长葛市', '411000');
-INSERT INTO `dict_area` VALUES ('411100', '漯河市', '410000');
-INSERT INTO `dict_area` VALUES ('411102', '源汇区', '411100');
-INSERT INTO `dict_area` VALUES ('411103', '郾城区', '411100');
-INSERT INTO `dict_area` VALUES ('411104', '召陵区', '411100');
-INSERT INTO `dict_area` VALUES ('411121', '舞阳县', '411100');
-INSERT INTO `dict_area` VALUES ('411122', '临颍县', '411100');
-INSERT INTO `dict_area` VALUES ('411200', '三门峡市', '410000');
-INSERT INTO `dict_area` VALUES ('411202', '湖滨区', '411200');
-INSERT INTO `dict_area` VALUES ('411203', '陕州区', '411200');
-INSERT INTO `dict_area` VALUES ('411221', '渑池县', '411200');
-INSERT INTO `dict_area` VALUES ('411224', '卢氏县', '411200');
-INSERT INTO `dict_area` VALUES ('411281', '义马市', '411200');
-INSERT INTO `dict_area` VALUES ('411282', '灵宝市', '411200');
-INSERT INTO `dict_area` VALUES ('411300', '南阳市', '410000');
-INSERT INTO `dict_area` VALUES ('411302', '宛城区', '411300');
-INSERT INTO `dict_area` VALUES ('411303', '卧龙区', '411300');
-INSERT INTO `dict_area` VALUES ('411321', '南召县', '411300');
-INSERT INTO `dict_area` VALUES ('411322', '方城县', '411300');
-INSERT INTO `dict_area` VALUES ('411323', '西峡县', '411300');
-INSERT INTO `dict_area` VALUES ('411324', '镇平县', '411300');
-INSERT INTO `dict_area` VALUES ('411325', '内乡县', '411300');
-INSERT INTO `dict_area` VALUES ('411326', '淅川县', '411300');
-INSERT INTO `dict_area` VALUES ('411327', '社旗县', '411300');
-INSERT INTO `dict_area` VALUES ('411328', '唐河县', '411300');
-INSERT INTO `dict_area` VALUES ('411329', '新野县', '411300');
-INSERT INTO `dict_area` VALUES ('411330', '桐柏县', '411300');
-INSERT INTO `dict_area` VALUES ('411381', '邓州市', '411300');
-INSERT INTO `dict_area` VALUES ('411400', '商丘市', '410000');
-INSERT INTO `dict_area` VALUES ('411402', '梁园区', '411400');
-INSERT INTO `dict_area` VALUES ('411403', '睢阳区', '411400');
-INSERT INTO `dict_area` VALUES ('411421', '民权县', '411400');
-INSERT INTO `dict_area` VALUES ('411422', '睢县', '411400');
-INSERT INTO `dict_area` VALUES ('411423', '宁陵县', '411400');
-INSERT INTO `dict_area` VALUES ('411424', '柘城县', '411400');
-INSERT INTO `dict_area` VALUES ('411425', '虞城县', '411400');
-INSERT INTO `dict_area` VALUES ('411426', '夏邑县', '411400');
-INSERT INTO `dict_area` VALUES ('411481', '永城市', '411400');
-INSERT INTO `dict_area` VALUES ('411500', '信阳市', '410000');
-INSERT INTO `dict_area` VALUES ('411502', '浉河区', '411500');
-INSERT INTO `dict_area` VALUES ('411503', '平桥区', '411500');
-INSERT INTO `dict_area` VALUES ('411521', '罗山县', '411500');
-INSERT INTO `dict_area` VALUES ('411522', '光山县', '411500');
-INSERT INTO `dict_area` VALUES ('411523', '新县', '411500');
-INSERT INTO `dict_area` VALUES ('411524', '商城县', '411500');
-INSERT INTO `dict_area` VALUES ('411525', '固始县', '411500');
-INSERT INTO `dict_area` VALUES ('411526', '潢川县', '411500');
-INSERT INTO `dict_area` VALUES ('411527', '淮滨县', '411500');
-INSERT INTO `dict_area` VALUES ('411528', '息县', '411500');
-INSERT INTO `dict_area` VALUES ('411600', '周口市', '410000');
-INSERT INTO `dict_area` VALUES ('411602', '川汇区', '411600');
-INSERT INTO `dict_area` VALUES ('411621', '扶沟县', '411600');
-INSERT INTO `dict_area` VALUES ('411622', '西华县', '411600');
-INSERT INTO `dict_area` VALUES ('411623', '商水县', '411600');
-INSERT INTO `dict_area` VALUES ('411624', '沈丘县', '411600');
-INSERT INTO `dict_area` VALUES ('411625', '郸城县', '411600');
-INSERT INTO `dict_area` VALUES ('411626', '淮阳县', '411600');
-INSERT INTO `dict_area` VALUES ('411627', '太康县', '411600');
-INSERT INTO `dict_area` VALUES ('411628', '鹿邑县', '411600');
-INSERT INTO `dict_area` VALUES ('411681', '项城市', '411600');
-INSERT INTO `dict_area` VALUES ('411700', '驻马店市', '410000');
-INSERT INTO `dict_area` VALUES ('411702', '驿城区', '411700');
-INSERT INTO `dict_area` VALUES ('411721', '西平县', '411700');
-INSERT INTO `dict_area` VALUES ('411722', '上蔡县', '411700');
-INSERT INTO `dict_area` VALUES ('411723', '平舆县', '411700');
-INSERT INTO `dict_area` VALUES ('411724', '正阳县', '411700');
-INSERT INTO `dict_area` VALUES ('411725', '确山县', '411700');
-INSERT INTO `dict_area` VALUES ('411726', '泌阳县', '411700');
-INSERT INTO `dict_area` VALUES ('411727', '汝南县', '411700');
-INSERT INTO `dict_area` VALUES ('411728', '遂平县', '411700');
-INSERT INTO `dict_area` VALUES ('411729', '新蔡县', '411700');
-INSERT INTO `dict_area` VALUES ('411800', '济源市', '410000');
-INSERT INTO `dict_area` VALUES ('420000', '湖北省', '-1');
-INSERT INTO `dict_area` VALUES ('420100', '武汉市', '420000');
-INSERT INTO `dict_area` VALUES ('420102', '江岸区', '420100');
-INSERT INTO `dict_area` VALUES ('420103', '江汉区', '420100');
-INSERT INTO `dict_area` VALUES ('420104', '硚口区', '420100');
-INSERT INTO `dict_area` VALUES ('420105', '汉阳区', '420100');
-INSERT INTO `dict_area` VALUES ('420106', '武昌区', '420100');
-INSERT INTO `dict_area` VALUES ('420107', '青山区', '420100');
-INSERT INTO `dict_area` VALUES ('420111', '洪山区', '420100');
-INSERT INTO `dict_area` VALUES ('420112', '东西湖区', '420100');
-INSERT INTO `dict_area` VALUES ('420113', '汉南区', '420100');
-INSERT INTO `dict_area` VALUES ('420114', '蔡甸区', '420100');
-INSERT INTO `dict_area` VALUES ('420115', '江夏区', '420100');
-INSERT INTO `dict_area` VALUES ('420116', '黄陂区', '420100');
-INSERT INTO `dict_area` VALUES ('420117', '新洲区', '420100');
-INSERT INTO `dict_area` VALUES ('420200', '黄石市', '420000');
-INSERT INTO `dict_area` VALUES ('420202', '黄石港区', '420200');
-INSERT INTO `dict_area` VALUES ('420203', '西塞山区', '420200');
-INSERT INTO `dict_area` VALUES ('420204', '下陆区', '420200');
-INSERT INTO `dict_area` VALUES ('420205', '铁山区', '420200');
-INSERT INTO `dict_area` VALUES ('420222', '阳新县', '420200');
-INSERT INTO `dict_area` VALUES ('420281', '大冶市', '420200');
-INSERT INTO `dict_area` VALUES ('420300', '十堰市', '420000');
-INSERT INTO `dict_area` VALUES ('420302', '茅箭区', '420300');
-INSERT INTO `dict_area` VALUES ('420303', '张湾区', '420300');
-INSERT INTO `dict_area` VALUES ('420304', '郧阳区', '420300');
-INSERT INTO `dict_area` VALUES ('420322', '郧西县', '420300');
-INSERT INTO `dict_area` VALUES ('420323', '竹山县', '420300');
-INSERT INTO `dict_area` VALUES ('420324', '竹溪县', '420300');
-INSERT INTO `dict_area` VALUES ('420325', '房县', '420300');
-INSERT INTO `dict_area` VALUES ('420381', '丹江口市', '420300');
-INSERT INTO `dict_area` VALUES ('420500', '宜昌市', '420000');
-INSERT INTO `dict_area` VALUES ('420502', '西陵区', '420500');
-INSERT INTO `dict_area` VALUES ('420503', '伍家岗区', '420500');
-INSERT INTO `dict_area` VALUES ('420504', '点军区', '420500');
-INSERT INTO `dict_area` VALUES ('420505', '猇亭区', '420500');
-INSERT INTO `dict_area` VALUES ('420506', '夷陵区', '420500');
-INSERT INTO `dict_area` VALUES ('420525', '远安县', '420500');
-INSERT INTO `dict_area` VALUES ('420526', '兴山县', '420500');
-INSERT INTO `dict_area` VALUES ('420527', '秭归县', '420500');
-INSERT INTO `dict_area` VALUES ('420528', '长阳土家族自治县', '420500');
-INSERT INTO `dict_area` VALUES ('420529', '五峰土家族自治县', '420500');
-INSERT INTO `dict_area` VALUES ('420581', '宜都市', '420500');
-INSERT INTO `dict_area` VALUES ('420582', '当阳市', '420500');
-INSERT INTO `dict_area` VALUES ('420583', '枝江市', '420500');
-INSERT INTO `dict_area` VALUES ('420600', '襄阳市', '420000');
-INSERT INTO `dict_area` VALUES ('420602', '襄城区', '420600');
-INSERT INTO `dict_area` VALUES ('420606', '樊城区', '420600');
-INSERT INTO `dict_area` VALUES ('420607', '襄州区', '420600');
-INSERT INTO `dict_area` VALUES ('420624', '南漳县', '420600');
-INSERT INTO `dict_area` VALUES ('420625', '谷城县', '420600');
-INSERT INTO `dict_area` VALUES ('420626', '保康县', '420600');
-INSERT INTO `dict_area` VALUES ('420682', '老河口市', '420600');
-INSERT INTO `dict_area` VALUES ('420683', '枣阳市', '420600');
-INSERT INTO `dict_area` VALUES ('420684', '宜城市', '420600');
-INSERT INTO `dict_area` VALUES ('420700', '鄂州市', '420000');
-INSERT INTO `dict_area` VALUES ('420702', '梁子湖区', '420700');
-INSERT INTO `dict_area` VALUES ('420703', '华容区', '420700');
-INSERT INTO `dict_area` VALUES ('420704', '鄂城区', '420700');
-INSERT INTO `dict_area` VALUES ('420800', '荆门市', '420000');
-INSERT INTO `dict_area` VALUES ('420802', '东宝区', '420800');
-INSERT INTO `dict_area` VALUES ('420804', '掇刀区', '420800');
-INSERT INTO `dict_area` VALUES ('420821', '京山县', '420800');
-INSERT INTO `dict_area` VALUES ('420822', '沙洋县', '420800');
-INSERT INTO `dict_area` VALUES ('420881', '钟祥市', '420800');
-INSERT INTO `dict_area` VALUES ('420900', '孝感市', '420000');
-INSERT INTO `dict_area` VALUES ('420902', '孝南区', '420900');
-INSERT INTO `dict_area` VALUES ('420921', '孝昌县', '420900');
-INSERT INTO `dict_area` VALUES ('420922', '大悟县', '420900');
-INSERT INTO `dict_area` VALUES ('420923', '云梦县', '420900');
-INSERT INTO `dict_area` VALUES ('420981', '应城市', '420900');
-INSERT INTO `dict_area` VALUES ('420982', '安陆市', '420900');
-INSERT INTO `dict_area` VALUES ('420984', '汉川市', '420900');
-INSERT INTO `dict_area` VALUES ('421000', '荆州市', '420000');
-INSERT INTO `dict_area` VALUES ('421002', '沙市区', '421000');
-INSERT INTO `dict_area` VALUES ('421003', '荆州区', '421000');
-INSERT INTO `dict_area` VALUES ('421022', '公安县', '421000');
-INSERT INTO `dict_area` VALUES ('421023', '监利县', '421000');
-INSERT INTO `dict_area` VALUES ('421024', '江陵县', '421000');
-INSERT INTO `dict_area` VALUES ('421081', '石首市', '421000');
-INSERT INTO `dict_area` VALUES ('421083', '洪湖市', '421000');
-INSERT INTO `dict_area` VALUES ('421087', '松滋市', '421000');
-INSERT INTO `dict_area` VALUES ('421100', '黄冈市', '420000');
-INSERT INTO `dict_area` VALUES ('421102', '黄州区', '421100');
-INSERT INTO `dict_area` VALUES ('421121', '团风县', '421100');
-INSERT INTO `dict_area` VALUES ('421122', '红安县', '421100');
-INSERT INTO `dict_area` VALUES ('421123', '罗田县', '421100');
-INSERT INTO `dict_area` VALUES ('421124', '英山县', '421100');
-INSERT INTO `dict_area` VALUES ('421125', '浠水县', '421100');
-INSERT INTO `dict_area` VALUES ('421126', '蕲春县', '421100');
-INSERT INTO `dict_area` VALUES ('421127', '黄梅县', '421100');
-INSERT INTO `dict_area` VALUES ('421181', '麻城市', '421100');
-INSERT INTO `dict_area` VALUES ('421182', '武穴市', '421100');
-INSERT INTO `dict_area` VALUES ('421200', '咸宁市', '420000');
-INSERT INTO `dict_area` VALUES ('421202', '咸安区', '421200');
-INSERT INTO `dict_area` VALUES ('421221', '嘉鱼县', '421200');
-INSERT INTO `dict_area` VALUES ('421222', '通城县', '421200');
-INSERT INTO `dict_area` VALUES ('421223', '崇阳县', '421200');
-INSERT INTO `dict_area` VALUES ('421224', '通山县', '421200');
-INSERT INTO `dict_area` VALUES ('421281', '赤壁市', '421200');
-INSERT INTO `dict_area` VALUES ('421300', '随州市', '420000');
-INSERT INTO `dict_area` VALUES ('421303', '曾都区', '421300');
-INSERT INTO `dict_area` VALUES ('421321', '随县', '421300');
-INSERT INTO `dict_area` VALUES ('421381', '广水市', '421300');
-INSERT INTO `dict_area` VALUES ('421400', '仙桃市', '420000');
-INSERT INTO `dict_area` VALUES ('421500', '潜江市', '420000');
-INSERT INTO `dict_area` VALUES ('421600', '天门市', '420000');
-INSERT INTO `dict_area` VALUES ('421700', '神农架林区', '420000');
-INSERT INTO `dict_area` VALUES ('422800', '恩施土家族苗族自治州', '420000');
-INSERT INTO `dict_area` VALUES ('422801', '恩施市', '422800');
-INSERT INTO `dict_area` VALUES ('422802', '利川市', '422800');
-INSERT INTO `dict_area` VALUES ('422822', '建始县', '422800');
-INSERT INTO `dict_area` VALUES ('422823', '巴东县', '422800');
-INSERT INTO `dict_area` VALUES ('422825', '宣恩县', '422800');
-INSERT INTO `dict_area` VALUES ('422826', '咸丰县', '422800');
-INSERT INTO `dict_area` VALUES ('422827', '来凤县', '422800');
-INSERT INTO `dict_area` VALUES ('422828', '鹤峰县', '422800');
-INSERT INTO `dict_area` VALUES ('430000', '湖南省', '-1');
-INSERT INTO `dict_area` VALUES ('430100', '长沙市', '430000');
-INSERT INTO `dict_area` VALUES ('430102', '芙蓉区', '430100');
-INSERT INTO `dict_area` VALUES ('430103', '天心区', '430100');
-INSERT INTO `dict_area` VALUES ('430104', '岳麓区', '430100');
-INSERT INTO `dict_area` VALUES ('430105', '开福区', '430100');
-INSERT INTO `dict_area` VALUES ('430111', '雨花区', '430100');
-INSERT INTO `dict_area` VALUES ('430112', '望城区', '430100');
-INSERT INTO `dict_area` VALUES ('430121', '长沙县', '430100');
-INSERT INTO `dict_area` VALUES ('430181', '浏阳市', '430100');
-INSERT INTO `dict_area` VALUES ('430182', '宁乡市', '430100');
-INSERT INTO `dict_area` VALUES ('430200', '株洲市', '430000');
-INSERT INTO `dict_area` VALUES ('430202', '荷塘区', '430200');
-INSERT INTO `dict_area` VALUES ('430203', '芦淞区', '430200');
-INSERT INTO `dict_area` VALUES ('430204', '石峰区', '430200');
-INSERT INTO `dict_area` VALUES ('430211', '天元区', '430200');
-INSERT INTO `dict_area` VALUES ('430221', '株洲县', '430200');
-INSERT INTO `dict_area` VALUES ('430223', '攸县', '430200');
-INSERT INTO `dict_area` VALUES ('430224', '茶陵县', '430200');
-INSERT INTO `dict_area` VALUES ('430225', '炎陵县', '430200');
-INSERT INTO `dict_area` VALUES ('430281', '醴陵市', '430200');
-INSERT INTO `dict_area` VALUES ('430300', '湘潭市', '430000');
-INSERT INTO `dict_area` VALUES ('430302', '雨湖区', '430300');
-INSERT INTO `dict_area` VALUES ('430304', '岳塘区', '430300');
-INSERT INTO `dict_area` VALUES ('430321', '湘潭县', '430300');
-INSERT INTO `dict_area` VALUES ('430381', '湘乡市', '430300');
-INSERT INTO `dict_area` VALUES ('430382', '韶山市', '430300');
-INSERT INTO `dict_area` VALUES ('430400', '衡阳市', '430000');
-INSERT INTO `dict_area` VALUES ('430405', '珠晖区', '430400');
-INSERT INTO `dict_area` VALUES ('430406', '雁峰区', '430400');
-INSERT INTO `dict_area` VALUES ('430407', '石鼓区', '430400');
-INSERT INTO `dict_area` VALUES ('430408', '蒸湘区', '430400');
-INSERT INTO `dict_area` VALUES ('430412', '南岳区', '430400');
-INSERT INTO `dict_area` VALUES ('430421', '衡阳县', '430400');
-INSERT INTO `dict_area` VALUES ('430422', '衡南县', '430400');
-INSERT INTO `dict_area` VALUES ('430423', '衡山县', '430400');
-INSERT INTO `dict_area` VALUES ('430424', '衡东县', '430400');
-INSERT INTO `dict_area` VALUES ('430426', '祁东县', '430400');
-INSERT INTO `dict_area` VALUES ('430481', '耒阳市', '430400');
-INSERT INTO `dict_area` VALUES ('430482', '常宁市', '430400');
-INSERT INTO `dict_area` VALUES ('430500', '邵阳市', '430000');
-INSERT INTO `dict_area` VALUES ('430502', '双清区', '430500');
-INSERT INTO `dict_area` VALUES ('430503', '大祥区', '430500');
-INSERT INTO `dict_area` VALUES ('430511', '北塔区', '430500');
-INSERT INTO `dict_area` VALUES ('430521', '邵东县', '430500');
-INSERT INTO `dict_area` VALUES ('430522', '新邵县', '430500');
-INSERT INTO `dict_area` VALUES ('430523', '邵阳县', '430500');
-INSERT INTO `dict_area` VALUES ('430524', '隆回县', '430500');
-INSERT INTO `dict_area` VALUES ('430525', '洞口县', '430500');
-INSERT INTO `dict_area` VALUES ('430527', '绥宁县', '430500');
-INSERT INTO `dict_area` VALUES ('430528', '新宁县', '430500');
-INSERT INTO `dict_area` VALUES ('430529', '城步苗族自治县', '430500');
-INSERT INTO `dict_area` VALUES ('430581', '武冈市', '430500');
-INSERT INTO `dict_area` VALUES ('430600', '岳阳市', '430000');
-INSERT INTO `dict_area` VALUES ('430602', '岳阳楼区', '430600');
-INSERT INTO `dict_area` VALUES ('430603', '云溪区', '430600');
-INSERT INTO `dict_area` VALUES ('430611', '君山区', '430600');
-INSERT INTO `dict_area` VALUES ('430621', '岳阳县', '430600');
-INSERT INTO `dict_area` VALUES ('430623', '华容县', '430600');
-INSERT INTO `dict_area` VALUES ('430624', '湘阴县', '430600');
-INSERT INTO `dict_area` VALUES ('430626', '平江县', '430600');
-INSERT INTO `dict_area` VALUES ('430681', '汨罗市', '430600');
-INSERT INTO `dict_area` VALUES ('430682', '临湘市', '430600');
-INSERT INTO `dict_area` VALUES ('430700', '常德市', '430000');
-INSERT INTO `dict_area` VALUES ('430702', '武陵区', '430700');
-INSERT INTO `dict_area` VALUES ('430703', '鼎城区', '430700');
-INSERT INTO `dict_area` VALUES ('430721', '安乡县', '430700');
-INSERT INTO `dict_area` VALUES ('430722', '汉寿县', '430700');
-INSERT INTO `dict_area` VALUES ('430723', '澧县', '430700');
-INSERT INTO `dict_area` VALUES ('430724', '临澧县', '430700');
-INSERT INTO `dict_area` VALUES ('430725', '桃源县', '430700');
-INSERT INTO `dict_area` VALUES ('430726', '石门县', '430700');
-INSERT INTO `dict_area` VALUES ('430781', '津市市', '430700');
-INSERT INTO `dict_area` VALUES ('430800', '张家界市', '430000');
-INSERT INTO `dict_area` VALUES ('430802', '永定区', '430800');
-INSERT INTO `dict_area` VALUES ('430811', '武陵源区', '430800');
-INSERT INTO `dict_area` VALUES ('430821', '慈利县', '430800');
-INSERT INTO `dict_area` VALUES ('430822', '桑植县', '430800');
-INSERT INTO `dict_area` VALUES ('430900', '益阳市', '430000');
-INSERT INTO `dict_area` VALUES ('430902', '资阳区', '430900');
-INSERT INTO `dict_area` VALUES ('430903', '赫山区', '430900');
-INSERT INTO `dict_area` VALUES ('430921', '南县', '430900');
-INSERT INTO `dict_area` VALUES ('430922', '桃江县', '430900');
-INSERT INTO `dict_area` VALUES ('430923', '安化县', '430900');
-INSERT INTO `dict_area` VALUES ('430981', '沅江市', '430900');
-INSERT INTO `dict_area` VALUES ('431000', '郴州市', '430000');
-INSERT INTO `dict_area` VALUES ('431002', '北湖区', '431000');
-INSERT INTO `dict_area` VALUES ('431003', '苏仙区', '431000');
-INSERT INTO `dict_area` VALUES ('431021', '桂阳县', '431000');
-INSERT INTO `dict_area` VALUES ('431022', '宜章县', '431000');
-INSERT INTO `dict_area` VALUES ('431023', '永兴县', '431000');
-INSERT INTO `dict_area` VALUES ('431024', '嘉禾县', '431000');
-INSERT INTO `dict_area` VALUES ('431025', '临武县', '431000');
-INSERT INTO `dict_area` VALUES ('431026', '汝城县', '431000');
-INSERT INTO `dict_area` VALUES ('431027', '桂东县', '431000');
-INSERT INTO `dict_area` VALUES ('431028', '安仁县', '431000');
-INSERT INTO `dict_area` VALUES ('431081', '资兴市', '431000');
-INSERT INTO `dict_area` VALUES ('431100', '永州市', '430000');
-INSERT INTO `dict_area` VALUES ('431102', '零陵区', '431100');
-INSERT INTO `dict_area` VALUES ('431103', '冷水滩区', '431100');
-INSERT INTO `dict_area` VALUES ('431121', '祁阳县', '431100');
-INSERT INTO `dict_area` VALUES ('431122', '东安县', '431100');
-INSERT INTO `dict_area` VALUES ('431123', '双牌县', '431100');
-INSERT INTO `dict_area` VALUES ('431124', '道县', '431100');
-INSERT INTO `dict_area` VALUES ('431125', '江永县', '431100');
-INSERT INTO `dict_area` VALUES ('431126', '宁远县', '431100');
-INSERT INTO `dict_area` VALUES ('431127', '蓝山县', '431100');
-INSERT INTO `dict_area` VALUES ('431128', '新田县', '431100');
-INSERT INTO `dict_area` VALUES ('431129', '江华瑶族自治县', '431100');
-INSERT INTO `dict_area` VALUES ('431200', '怀化市', '430000');
-INSERT INTO `dict_area` VALUES ('431202', '鹤城区', '431200');
-INSERT INTO `dict_area` VALUES ('431221', '中方县', '431200');
-INSERT INTO `dict_area` VALUES ('431222', '沅陵县', '431200');
-INSERT INTO `dict_area` VALUES ('431223', '辰溪县', '431200');
-INSERT INTO `dict_area` VALUES ('431224', '溆浦县', '431200');
-INSERT INTO `dict_area` VALUES ('431225', '会同县', '431200');
-INSERT INTO `dict_area` VALUES ('431226', '麻阳苗族自治县', '431200');
-INSERT INTO `dict_area` VALUES ('431227', '新晃侗族自治县', '431200');
-INSERT INTO `dict_area` VALUES ('431228', '芷江侗族自治县', '431200');
-INSERT INTO `dict_area` VALUES ('431229', '靖州苗族侗族自治县', '431200');
-INSERT INTO `dict_area` VALUES ('431230', '通道侗族自治县', '431200');
-INSERT INTO `dict_area` VALUES ('431281', '洪江市', '431200');
-INSERT INTO `dict_area` VALUES ('431300', '娄底市', '430000');
-INSERT INTO `dict_area` VALUES ('431302', '娄星区', '431300');
-INSERT INTO `dict_area` VALUES ('431321', '双峰县', '431300');
-INSERT INTO `dict_area` VALUES ('431322', '新化县', '431300');
-INSERT INTO `dict_area` VALUES ('431381', '冷水江市', '431300');
-INSERT INTO `dict_area` VALUES ('431382', '涟源市', '431300');
-INSERT INTO `dict_area` VALUES ('433100', '湘西土家族苗族自治州', '430000');
-INSERT INTO `dict_area` VALUES ('433101', '吉首市', '433100');
-INSERT INTO `dict_area` VALUES ('433122', '泸溪县', '433100');
-INSERT INTO `dict_area` VALUES ('433123', '凤凰县', '433100');
-INSERT INTO `dict_area` VALUES ('433124', '花垣县', '433100');
-INSERT INTO `dict_area` VALUES ('433125', '保靖县', '433100');
-INSERT INTO `dict_area` VALUES ('433126', '古丈县', '433100');
-INSERT INTO `dict_area` VALUES ('433127', '永顺县', '433100');
-INSERT INTO `dict_area` VALUES ('433130', '龙山县', '433100');
-INSERT INTO `dict_area` VALUES ('440000', '广东省', '-1');
-INSERT INTO `dict_area` VALUES ('440100', '广州市', '440000');
-INSERT INTO `dict_area` VALUES ('440103', '荔湾区', '440100');
-INSERT INTO `dict_area` VALUES ('440104', '越秀区', '440100');
-INSERT INTO `dict_area` VALUES ('440105', '海珠区', '440100');
-INSERT INTO `dict_area` VALUES ('440106', '天河区', '440100');
-INSERT INTO `dict_area` VALUES ('440111', '白云区', '440100');
-INSERT INTO `dict_area` VALUES ('440112', '黄埔区', '440100');
-INSERT INTO `dict_area` VALUES ('440113', '番禺区', '440100');
-INSERT INTO `dict_area` VALUES ('440114', '花都区', '440100');
-INSERT INTO `dict_area` VALUES ('440115', '南沙区', '440100');
-INSERT INTO `dict_area` VALUES ('440117', '从化区', '440100');
-INSERT INTO `dict_area` VALUES ('440118', '增城区', '440100');
-INSERT INTO `dict_area` VALUES ('440200', '韶关市', '440000');
-INSERT INTO `dict_area` VALUES ('440203', '武江区', '440200');
-INSERT INTO `dict_area` VALUES ('440204', '浈江区', '440200');
-INSERT INTO `dict_area` VALUES ('440205', '曲江区', '440200');
-INSERT INTO `dict_area` VALUES ('440222', '始兴县', '440200');
-INSERT INTO `dict_area` VALUES ('440224', '仁化县', '440200');
-INSERT INTO `dict_area` VALUES ('440229', '翁源县', '440200');
-INSERT INTO `dict_area` VALUES ('440232', '乳源瑶族自治县', '440200');
-INSERT INTO `dict_area` VALUES ('440233', '新丰县', '440200');
-INSERT INTO `dict_area` VALUES ('440281', '乐昌市', '440200');
-INSERT INTO `dict_area` VALUES ('440282', '南雄市', '440200');
-INSERT INTO `dict_area` VALUES ('440300', '深圳市', '440000');
-INSERT INTO `dict_area` VALUES ('440303', '罗湖区', '440300');
-INSERT INTO `dict_area` VALUES ('440304', '福田区', '440300');
-INSERT INTO `dict_area` VALUES ('440305', '南山区', '440300');
-INSERT INTO `dict_area` VALUES ('440306', '宝安区', '440300');
-INSERT INTO `dict_area` VALUES ('440307', '龙岗区', '440300');
-INSERT INTO `dict_area` VALUES ('440308', '盐田区', '440300');
-INSERT INTO `dict_area` VALUES ('440309', '龙华区', '440300');
-INSERT INTO `dict_area` VALUES ('440310', '坪山区', '440300');
-INSERT INTO `dict_area` VALUES ('440400', '珠海市', '440000');
-INSERT INTO `dict_area` VALUES ('440402', '香洲区', '440400');
-INSERT INTO `dict_area` VALUES ('440403', '斗门区', '440400');
-INSERT INTO `dict_area` VALUES ('440404', '金湾区', '440400');
-INSERT INTO `dict_area` VALUES ('440499', '香洲区(由澳门特别行政区实施管辖)', '440400');
-INSERT INTO `dict_area` VALUES ('440500', '汕头市', '440000');
-INSERT INTO `dict_area` VALUES ('440507', '龙湖区', '440500');
-INSERT INTO `dict_area` VALUES ('440511', '金平区', '440500');
-INSERT INTO `dict_area` VALUES ('440512', '濠江区', '440500');
-INSERT INTO `dict_area` VALUES ('440513', '潮阳区', '440500');
-INSERT INTO `dict_area` VALUES ('440514', '潮南区', '440500');
-INSERT INTO `dict_area` VALUES ('440515', '澄海区', '440500');
-INSERT INTO `dict_area` VALUES ('440523', '南澳县', '440500');
-INSERT INTO `dict_area` VALUES ('440600', '佛山市', '440000');
-INSERT INTO `dict_area` VALUES ('440604', '禅城区', '440600');
-INSERT INTO `dict_area` VALUES ('440605', '南海区', '440600');
-INSERT INTO `dict_area` VALUES ('440606', '顺德区', '440600');
-INSERT INTO `dict_area` VALUES ('440607', '三水区', '440600');
-INSERT INTO `dict_area` VALUES ('440608', '高明区', '440600');
-INSERT INTO `dict_area` VALUES ('440700', '江门市', '440000');
-INSERT INTO `dict_area` VALUES ('440703', '蓬江区', '440700');
-INSERT INTO `dict_area` VALUES ('440704', '江海区', '440700');
-INSERT INTO `dict_area` VALUES ('440705', '新会区', '440700');
-INSERT INTO `dict_area` VALUES ('440781', '台山市', '440700');
-INSERT INTO `dict_area` VALUES ('440783', '开平市', '440700');
-INSERT INTO `dict_area` VALUES ('440784', '鹤山市', '440700');
-INSERT INTO `dict_area` VALUES ('440785', '恩平市', '440700');
-INSERT INTO `dict_area` VALUES ('440800', '湛江市', '440000');
-INSERT INTO `dict_area` VALUES ('440802', '赤坎区', '440800');
-INSERT INTO `dict_area` VALUES ('440803', '霞山区', '440800');
-INSERT INTO `dict_area` VALUES ('440804', '坡头区', '440800');
-INSERT INTO `dict_area` VALUES ('440811', '麻章区', '440800');
-INSERT INTO `dict_area` VALUES ('440823', '遂溪县', '440800');
-INSERT INTO `dict_area` VALUES ('440825', '徐闻县', '440800');
-INSERT INTO `dict_area` VALUES ('440881', '廉江市', '440800');
-INSERT INTO `dict_area` VALUES ('440882', '雷州市', '440800');
-INSERT INTO `dict_area` VALUES ('440883', '吴川市', '440800');
-INSERT INTO `dict_area` VALUES ('440900', '茂名市', '440000');
-INSERT INTO `dict_area` VALUES ('440902', '茂南区', '440900');
-INSERT INTO `dict_area` VALUES ('440904', '电白区', '440900');
-INSERT INTO `dict_area` VALUES ('440981', '高州市', '440900');
-INSERT INTO `dict_area` VALUES ('440982', '化州市', '440900');
-INSERT INTO `dict_area` VALUES ('440983', '信宜市', '440900');
-INSERT INTO `dict_area` VALUES ('441200', '肇庆市', '440000');
-INSERT INTO `dict_area` VALUES ('441202', '端州区', '441200');
-INSERT INTO `dict_area` VALUES ('441203', '鼎湖区', '441200');
-INSERT INTO `dict_area` VALUES ('441204', '高要区', '441200');
-INSERT INTO `dict_area` VALUES ('441223', '广宁县', '441200');
-INSERT INTO `dict_area` VALUES ('441224', '怀集县', '441200');
-INSERT INTO `dict_area` VALUES ('441225', '封开县', '441200');
-INSERT INTO `dict_area` VALUES ('441226', '德庆县', '441200');
-INSERT INTO `dict_area` VALUES ('441284', '四会市', '441200');
-INSERT INTO `dict_area` VALUES ('441300', '惠州市', '440000');
-INSERT INTO `dict_area` VALUES ('441302', '惠城区', '441300');
-INSERT INTO `dict_area` VALUES ('441303', '惠阳区', '441300');
-INSERT INTO `dict_area` VALUES ('441322', '博罗县', '441300');
-INSERT INTO `dict_area` VALUES ('441323', '惠东县', '441300');
-INSERT INTO `dict_area` VALUES ('441324', '龙门县', '441300');
-INSERT INTO `dict_area` VALUES ('441400', '梅州市', '440000');
-INSERT INTO `dict_area` VALUES ('441402', '梅江区', '441400');
-INSERT INTO `dict_area` VALUES ('441403', '梅县区', '441400');
-INSERT INTO `dict_area` VALUES ('441422', '大埔县', '441400');
-INSERT INTO `dict_area` VALUES ('441423', '丰顺县', '441400');
-INSERT INTO `dict_area` VALUES ('441424', '五华县', '441400');
-INSERT INTO `dict_area` VALUES ('441426', '平远县', '441400');
-INSERT INTO `dict_area` VALUES ('441427', '蕉岭县', '441400');
-INSERT INTO `dict_area` VALUES ('441481', '兴宁市', '441400');
-INSERT INTO `dict_area` VALUES ('441500', '汕尾市', '440000');
-INSERT INTO `dict_area` VALUES ('441502', '城区', '441500');
-INSERT INTO `dict_area` VALUES ('441521', '海丰县', '441500');
-INSERT INTO `dict_area` VALUES ('441523', '陆河县', '441500');
-INSERT INTO `dict_area` VALUES ('441581', '陆丰市', '441500');
-INSERT INTO `dict_area` VALUES ('441600', '河源市', '440000');
-INSERT INTO `dict_area` VALUES ('441602', '源城区', '441600');
-INSERT INTO `dict_area` VALUES ('441621', '紫金县', '441600');
-INSERT INTO `dict_area` VALUES ('441622', '龙川县', '441600');
-INSERT INTO `dict_area` VALUES ('441623', '连平县', '441600');
-INSERT INTO `dict_area` VALUES ('441624', '和平县', '441600');
-INSERT INTO `dict_area` VALUES ('441625', '东源县', '441600');
-INSERT INTO `dict_area` VALUES ('441700', '阳江市', '440000');
-INSERT INTO `dict_area` VALUES ('441702', '江城区', '441700');
-INSERT INTO `dict_area` VALUES ('441704', '阳东区', '441700');
-INSERT INTO `dict_area` VALUES ('441721', '阳西县', '441700');
-INSERT INTO `dict_area` VALUES ('441781', '阳春市', '441700');
-INSERT INTO `dict_area` VALUES ('441800', '清远市', '440000');
-INSERT INTO `dict_area` VALUES ('441802', '清城区', '441800');
-INSERT INTO `dict_area` VALUES ('441803', '清新区', '441800');
-INSERT INTO `dict_area` VALUES ('441821', '佛冈县', '441800');
-INSERT INTO `dict_area` VALUES ('441823', '阳山县', '441800');
-INSERT INTO `dict_area` VALUES ('441825', '连山壮族瑶族自治县', '441800');
-INSERT INTO `dict_area` VALUES ('441826', '连南瑶族自治县', '441800');
-INSERT INTO `dict_area` VALUES ('441881', '英德市', '441800');
-INSERT INTO `dict_area` VALUES ('441882', '连州市', '441800');
-INSERT INTO `dict_area` VALUES ('441900', '东莞市', '440000');
-INSERT INTO `dict_area` VALUES ('442000', '中山市', '440000');
-INSERT INTO `dict_area` VALUES ('445100', '潮州市', '440000');
-INSERT INTO `dict_area` VALUES ('445102', '湘桥区', '445100');
-INSERT INTO `dict_area` VALUES ('445103', '潮安区', '445100');
-INSERT INTO `dict_area` VALUES ('445122', '饶平县', '445100');
-INSERT INTO `dict_area` VALUES ('445200', '揭阳市', '440000');
-INSERT INTO `dict_area` VALUES ('445202', '榕城区', '445200');
-INSERT INTO `dict_area` VALUES ('445203', '揭东区', '445200');
-INSERT INTO `dict_area` VALUES ('445222', '揭西县', '445200');
-INSERT INTO `dict_area` VALUES ('445224', '惠来县', '445200');
-INSERT INTO `dict_area` VALUES ('445281', '普宁市', '445200');
-INSERT INTO `dict_area` VALUES ('445300', '云浮市', '440000');
-INSERT INTO `dict_area` VALUES ('445302', '云城区', '445300');
-INSERT INTO `dict_area` VALUES ('445303', '云安区', '445300');
-INSERT INTO `dict_area` VALUES ('445321', '新兴县', '445300');
-INSERT INTO `dict_area` VALUES ('445322', '郁南县', '445300');
-INSERT INTO `dict_area` VALUES ('445381', '罗定市', '445300');
-INSERT INTO `dict_area` VALUES ('450000', '广西壮族自治区', '-1');
-INSERT INTO `dict_area` VALUES ('450100', '南宁市', '450000');
-INSERT INTO `dict_area` VALUES ('450102', '兴宁区', '450100');
-INSERT INTO `dict_area` VALUES ('450103', '青秀区', '450100');
-INSERT INTO `dict_area` VALUES ('450105', '江南区', '450100');
-INSERT INTO `dict_area` VALUES ('450107', '西乡塘区', '450100');
-INSERT INTO `dict_area` VALUES ('450108', '良庆区', '450100');
-INSERT INTO `dict_area` VALUES ('450109', '邕宁区', '450100');
-INSERT INTO `dict_area` VALUES ('450110', '武鸣区', '450100');
-INSERT INTO `dict_area` VALUES ('450123', '隆安县', '450100');
-INSERT INTO `dict_area` VALUES ('450124', '马山县', '450100');
-INSERT INTO `dict_area` VALUES ('450125', '上林县', '450100');
-INSERT INTO `dict_area` VALUES ('450126', '宾阳县', '450100');
-INSERT INTO `dict_area` VALUES ('450127', '横县', '450100');
-INSERT INTO `dict_area` VALUES ('450200', '柳州市', '450000');
-INSERT INTO `dict_area` VALUES ('450202', '城中区', '450200');
-INSERT INTO `dict_area` VALUES ('450203', '鱼峰区', '450200');
-INSERT INTO `dict_area` VALUES ('450204', '柳南区', '450200');
-INSERT INTO `dict_area` VALUES ('450205', '柳北区', '450200');
-INSERT INTO `dict_area` VALUES ('450206', '柳江区', '450200');
-INSERT INTO `dict_area` VALUES ('450222', '柳城县', '450200');
-INSERT INTO `dict_area` VALUES ('450223', '鹿寨县', '450200');
-INSERT INTO `dict_area` VALUES ('450224', '融安县', '450200');
-INSERT INTO `dict_area` VALUES ('450225', '融水苗族自治县', '450200');
-INSERT INTO `dict_area` VALUES ('450226', '三江侗族自治县', '450200');
-INSERT INTO `dict_area` VALUES ('450300', '桂林市', '450000');
-INSERT INTO `dict_area` VALUES ('450302', '秀峰区', '450300');
-INSERT INTO `dict_area` VALUES ('450303', '叠彩区', '450300');
-INSERT INTO `dict_area` VALUES ('450304', '象山区', '450300');
-INSERT INTO `dict_area` VALUES ('450305', '七星区', '450300');
-INSERT INTO `dict_area` VALUES ('450311', '雁山区', '450300');
-INSERT INTO `dict_area` VALUES ('450312', '临桂区', '450300');
-INSERT INTO `dict_area` VALUES ('450321', '阳朔县', '450300');
-INSERT INTO `dict_area` VALUES ('450323', '灵川县', '450300');
-INSERT INTO `dict_area` VALUES ('450324', '全州县', '450300');
-INSERT INTO `dict_area` VALUES ('450325', '兴安县', '450300');
-INSERT INTO `dict_area` VALUES ('450326', '永福县', '450300');
-INSERT INTO `dict_area` VALUES ('450327', '灌阳县', '450300');
-INSERT INTO `dict_area` VALUES ('450328', '龙胜各族自治县', '450300');
-INSERT INTO `dict_area` VALUES ('450329', '资源县', '450300');
-INSERT INTO `dict_area` VALUES ('450330', '平乐县', '450300');
-INSERT INTO `dict_area` VALUES ('450331', '荔浦县', '450300');
-INSERT INTO `dict_area` VALUES ('450332', '恭城瑶族自治县', '450300');
-INSERT INTO `dict_area` VALUES ('450400', '梧州市', '450000');
-INSERT INTO `dict_area` VALUES ('450403', '万秀区', '450400');
-INSERT INTO `dict_area` VALUES ('450405', '长洲区', '450400');
-INSERT INTO `dict_area` VALUES ('450406', '龙圩区', '450400');
-INSERT INTO `dict_area` VALUES ('450421', '苍梧县', '450400');
-INSERT INTO `dict_area` VALUES ('450422', '藤县', '450400');
-INSERT INTO `dict_area` VALUES ('450423', '蒙山县', '450400');
-INSERT INTO `dict_area` VALUES ('450481', '岑溪市', '450400');
-INSERT INTO `dict_area` VALUES ('450500', '北海市', '450000');
-INSERT INTO `dict_area` VALUES ('450502', '海城区', '450500');
-INSERT INTO `dict_area` VALUES ('450503', '银海区', '450500');
-INSERT INTO `dict_area` VALUES ('450512', '铁山港区', '450500');
-INSERT INTO `dict_area` VALUES ('450521', '合浦县', '450500');
-INSERT INTO `dict_area` VALUES ('450600', '防城港市', '450000');
-INSERT INTO `dict_area` VALUES ('450602', '港口区', '450600');
-INSERT INTO `dict_area` VALUES ('450603', '防城区', '450600');
-INSERT INTO `dict_area` VALUES ('450621', '上思县', '450600');
-INSERT INTO `dict_area` VALUES ('450681', '东兴市', '450600');
-INSERT INTO `dict_area` VALUES ('450700', '钦州市', '450000');
-INSERT INTO `dict_area` VALUES ('450702', '钦南区', '450700');
-INSERT INTO `dict_area` VALUES ('450703', '钦北区', '450700');
-INSERT INTO `dict_area` VALUES ('450721', '灵山县', '450700');
-INSERT INTO `dict_area` VALUES ('450722', '浦北县', '450700');
-INSERT INTO `dict_area` VALUES ('450800', '贵港市', '450000');
-INSERT INTO `dict_area` VALUES ('450802', '港北区', '450800');
-INSERT INTO `dict_area` VALUES ('450803', '港南区', '450800');
-INSERT INTO `dict_area` VALUES ('450804', '覃塘区', '450800');
-INSERT INTO `dict_area` VALUES ('450821', '平南县', '450800');
-INSERT INTO `dict_area` VALUES ('450881', '桂平市', '450800');
-INSERT INTO `dict_area` VALUES ('450900', '玉林市', '450000');
-INSERT INTO `dict_area` VALUES ('450902', '玉州区', '450900');
-INSERT INTO `dict_area` VALUES ('450903', '福绵区', '450900');
-INSERT INTO `dict_area` VALUES ('450921', '容县', '450900');
-INSERT INTO `dict_area` VALUES ('450922', '陆川县', '450900');
-INSERT INTO `dict_area` VALUES ('450923', '博白县', '450900');
-INSERT INTO `dict_area` VALUES ('450924', '兴业县', '450900');
-INSERT INTO `dict_area` VALUES ('450981', '北流市', '450900');
-INSERT INTO `dict_area` VALUES ('451000', '百色市', '450000');
-INSERT INTO `dict_area` VALUES ('451002', '右江区', '451000');
-INSERT INTO `dict_area` VALUES ('451021', '田阳县', '451000');
-INSERT INTO `dict_area` VALUES ('451022', '田东县', '451000');
-INSERT INTO `dict_area` VALUES ('451023', '平果县', '451000');
-INSERT INTO `dict_area` VALUES ('451024', '德保县', '451000');
-INSERT INTO `dict_area` VALUES ('451026', '那坡县', '451000');
-INSERT INTO `dict_area` VALUES ('451027', '凌云县', '451000');
-INSERT INTO `dict_area` VALUES ('451028', '乐业县', '451000');
-INSERT INTO `dict_area` VALUES ('451029', '田林县', '451000');
-INSERT INTO `dict_area` VALUES ('451030', '西林县', '451000');
-INSERT INTO `dict_area` VALUES ('451031', '隆林各族自治县', '451000');
-INSERT INTO `dict_area` VALUES ('451081', '靖西市', '451000');
-INSERT INTO `dict_area` VALUES ('451100', '贺州市', '450000');
-INSERT INTO `dict_area` VALUES ('451102', '八步区', '451100');
-INSERT INTO `dict_area` VALUES ('451103', '平桂区', '451100');
-INSERT INTO `dict_area` VALUES ('451121', '昭平县', '451100');
-INSERT INTO `dict_area` VALUES ('451122', '钟山县', '451100');
-INSERT INTO `dict_area` VALUES ('451123', '富川瑶族自治县', '451100');
-INSERT INTO `dict_area` VALUES ('451200', '河池市', '450000');
-INSERT INTO `dict_area` VALUES ('451202', '金城江区', '451200');
-INSERT INTO `dict_area` VALUES ('451203', '宜州区', '451200');
-INSERT INTO `dict_area` VALUES ('451221', '南丹县', '451200');
-INSERT INTO `dict_area` VALUES ('451222', '天峨县', '451200');
-INSERT INTO `dict_area` VALUES ('451223', '凤山县', '451200');
-INSERT INTO `dict_area` VALUES ('451224', '东兰县', '451200');
-INSERT INTO `dict_area` VALUES ('451225', '罗城仫佬族自治县', '451200');
-INSERT INTO `dict_area` VALUES ('451226', '环江毛南族自治县', '451200');
-INSERT INTO `dict_area` VALUES ('451227', '巴马瑶族自治县', '451200');
-INSERT INTO `dict_area` VALUES ('451228', '都安瑶族自治县', '451200');
-INSERT INTO `dict_area` VALUES ('451229', '大化瑶族自治县', '451200');
-INSERT INTO `dict_area` VALUES ('451300', '来宾市', '450000');
-INSERT INTO `dict_area` VALUES ('451302', '兴宾区', '451300');
-INSERT INTO `dict_area` VALUES ('451321', '忻城县', '451300');
-INSERT INTO `dict_area` VALUES ('451322', '象州县', '451300');
-INSERT INTO `dict_area` VALUES ('451323', '武宣县', '451300');
-INSERT INTO `dict_area` VALUES ('451324', '金秀瑶族自治县', '451300');
-INSERT INTO `dict_area` VALUES ('451381', '合山市', '451300');
-INSERT INTO `dict_area` VALUES ('451400', '崇左市', '450000');
-INSERT INTO `dict_area` VALUES ('451402', '江州区', '451400');
-INSERT INTO `dict_area` VALUES ('451421', '扶绥县', '451400');
-INSERT INTO `dict_area` VALUES ('451422', '宁明县', '451400');
-INSERT INTO `dict_area` VALUES ('451423', '龙州县', '451400');
-INSERT INTO `dict_area` VALUES ('451424', '大新县', '451400');
-INSERT INTO `dict_area` VALUES ('451425', '天等县', '451400');
-INSERT INTO `dict_area` VALUES ('451481', '凭祥市', '451400');
-INSERT INTO `dict_area` VALUES ('460000', '海南省', '-1');
-INSERT INTO `dict_area` VALUES ('460100', '海口市', '460000');
-INSERT INTO `dict_area` VALUES ('460105', '秀英区', '460100');
-INSERT INTO `dict_area` VALUES ('460106', '龙华区', '460100');
-INSERT INTO `dict_area` VALUES ('460107', '琼山区', '460100');
-INSERT INTO `dict_area` VALUES ('460108', '美兰区', '460100');
-INSERT INTO `dict_area` VALUES ('460200', '三亚市', '460000');
-INSERT INTO `dict_area` VALUES ('460202', '海棠区', '460200');
-INSERT INTO `dict_area` VALUES ('460203', '吉阳区', '460200');
-INSERT INTO `dict_area` VALUES ('460204', '天涯区', '460200');
-INSERT INTO `dict_area` VALUES ('460205', '崖州区', '460200');
-INSERT INTO `dict_area` VALUES ('460300', '三沙市', '460000');
-INSERT INTO `dict_area` VALUES ('460321', '西沙群岛', '460300');
-INSERT INTO `dict_area` VALUES ('460322', '南沙群岛', '460300');
-INSERT INTO `dict_area` VALUES ('460323', '中沙群岛的岛礁及其海域', '460300');
-INSERT INTO `dict_area` VALUES ('460400', '儋州市', '460000');
-INSERT INTO `dict_area` VALUES ('460500', '五指山市', '460000');
-INSERT INTO `dict_area` VALUES ('460600', '琼海市', '460000');
-INSERT INTO `dict_area` VALUES ('460700', '文昌市', '460000');
-INSERT INTO `dict_area` VALUES ('460800', '万宁市', '460000');
-INSERT INTO `dict_area` VALUES ('460900', '东方市', '460000');
-INSERT INTO `dict_area` VALUES ('461000', '定安县', '460000');
-INSERT INTO `dict_area` VALUES ('461100', '屯昌县', '460000');
-INSERT INTO `dict_area` VALUES ('461200', '澄迈县', '460000');
-INSERT INTO `dict_area` VALUES ('461300', '临高县', '460000');
-INSERT INTO `dict_area` VALUES ('461400', '白沙黎族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('461500', '昌江黎族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('461600', '乐东黎族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('461700', '陵水黎族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('461800', '保亭黎族苗族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('461900', '琼中黎族苗族自治县', '460000');
-INSERT INTO `dict_area` VALUES ('500000', '重庆市', '-1');
-INSERT INTO `dict_area` VALUES ('500100', '市辖区', '500000');
-INSERT INTO `dict_area` VALUES ('500101', '万州区', '500100');
-INSERT INTO `dict_area` VALUES ('500102', '涪陵区', '500100');
-INSERT INTO `dict_area` VALUES ('500103', '渝中区', '500100');
-INSERT INTO `dict_area` VALUES ('500104', '大渡口区', '500100');
-INSERT INTO `dict_area` VALUES ('500105', '江北区', '500100');
-INSERT INTO `dict_area` VALUES ('500106', '沙坪坝区', '500100');
-INSERT INTO `dict_area` VALUES ('500107', '九龙坡区', '500100');
-INSERT INTO `dict_area` VALUES ('500108', '南岸区', '500100');
-INSERT INTO `dict_area` VALUES ('500109', '北碚区', '500100');
-INSERT INTO `dict_area` VALUES ('500110', '綦江区', '500100');
-INSERT INTO `dict_area` VALUES ('500111', '大足区', '500100');
-INSERT INTO `dict_area` VALUES ('500112', '渝北区', '500100');
-INSERT INTO `dict_area` VALUES ('500113', '巴南区', '500100');
-INSERT INTO `dict_area` VALUES ('500114', '黔江区', '500100');
-INSERT INTO `dict_area` VALUES ('500115', '长寿区', '500100');
-INSERT INTO `dict_area` VALUES ('500116', '江津区', '500100');
-INSERT INTO `dict_area` VALUES ('500117', '合川区', '500100');
-INSERT INTO `dict_area` VALUES ('500118', '永川区', '500100');
-INSERT INTO `dict_area` VALUES ('500119', '南川区', '500100');
-INSERT INTO `dict_area` VALUES ('500120', '璧山区', '500100');
-INSERT INTO `dict_area` VALUES ('500151', '铜梁区', '500100');
-INSERT INTO `dict_area` VALUES ('500152', '潼南区', '500100');
-INSERT INTO `dict_area` VALUES ('500153', '荣昌区', '500100');
-INSERT INTO `dict_area` VALUES ('500154', '开州区', '500100');
-INSERT INTO `dict_area` VALUES ('500155', '梁平区', '500100');
-INSERT INTO `dict_area` VALUES ('500156', '武隆区', '500100');
-INSERT INTO `dict_area` VALUES ('500229', '城口县', '500100');
-INSERT INTO `dict_area` VALUES ('500230', '丰都县', '500100');
-INSERT INTO `dict_area` VALUES ('500231', '垫江县', '500100');
-INSERT INTO `dict_area` VALUES ('500233', '忠县', '500100');
-INSERT INTO `dict_area` VALUES ('500235', '云阳县', '500100');
-INSERT INTO `dict_area` VALUES ('500236', '奉节县', '500100');
-INSERT INTO `dict_area` VALUES ('500237', '巫山县', '500100');
-INSERT INTO `dict_area` VALUES ('500238', '巫溪县', '500100');
-INSERT INTO `dict_area` VALUES ('500240', '石柱土家族自治县', '500100');
-INSERT INTO `dict_area` VALUES ('500241', '秀山土家族苗族自治县', '500100');
-INSERT INTO `dict_area` VALUES ('500242', '酉阳土家族苗族自治县', '500100');
-INSERT INTO `dict_area` VALUES ('500243', '彭水苗族土家族自治县', '500100');
-INSERT INTO `dict_area` VALUES ('510000', '四川省', '-1');
-INSERT INTO `dict_area` VALUES ('510100', '成都市', '510000');
-INSERT INTO `dict_area` VALUES ('510104', '锦江区', '510100');
-INSERT INTO `dict_area` VALUES ('510105', '青羊区', '510100');
-INSERT INTO `dict_area` VALUES ('510106', '金牛区', '510100');
-INSERT INTO `dict_area` VALUES ('510107', '武侯区', '510100');
-INSERT INTO `dict_area` VALUES ('510108', '成华区', '510100');
-INSERT INTO `dict_area` VALUES ('510112', '龙泉驿区', '510100');
-INSERT INTO `dict_area` VALUES ('510113', '青白江区', '510100');
-INSERT INTO `dict_area` VALUES ('510114', '新都区', '510100');
-INSERT INTO `dict_area` VALUES ('510115', '温江区', '510100');
-INSERT INTO `dict_area` VALUES ('510116', '双流区', '510100');
-INSERT INTO `dict_area` VALUES ('510117', '郫都区', '510100');
-INSERT INTO `dict_area` VALUES ('510121', '金堂县', '510100');
-INSERT INTO `dict_area` VALUES ('510129', '大邑县', '510100');
-INSERT INTO `dict_area` VALUES ('510131', '蒲江县', '510100');
-INSERT INTO `dict_area` VALUES ('510132', '新津县', '510100');
-INSERT INTO `dict_area` VALUES ('510181', '都江堰市', '510100');
-INSERT INTO `dict_area` VALUES ('510182', '彭州市', '510100');
-INSERT INTO `dict_area` VALUES ('510183', '邛崃市', '510100');
-INSERT INTO `dict_area` VALUES ('510184', '崇州市', '510100');
-INSERT INTO `dict_area` VALUES ('510185', '简阳市', '510100');
-INSERT INTO `dict_area` VALUES ('510300', '自贡市', '510000');
-INSERT INTO `dict_area` VALUES ('510302', '自流井区', '510300');
-INSERT INTO `dict_area` VALUES ('510303', '贡井区', '510300');
-INSERT INTO `dict_area` VALUES ('510304', '大安区', '510300');
-INSERT INTO `dict_area` VALUES ('510311', '沿滩区', '510300');
-INSERT INTO `dict_area` VALUES ('510321', '荣县', '510300');
-INSERT INTO `dict_area` VALUES ('510322', '富顺县', '510300');
-INSERT INTO `dict_area` VALUES ('510400', '攀枝花市', '510000');
-INSERT INTO `dict_area` VALUES ('510402', '东区', '510400');
-INSERT INTO `dict_area` VALUES ('510403', '西区', '510400');
-INSERT INTO `dict_area` VALUES ('510411', '仁和区', '510400');
-INSERT INTO `dict_area` VALUES ('510421', '米易县', '510400');
-INSERT INTO `dict_area` VALUES ('510422', '盐边县', '510400');
-INSERT INTO `dict_area` VALUES ('510500', '泸州市', '510000');
-INSERT INTO `dict_area` VALUES ('510502', '江阳区', '510500');
-INSERT INTO `dict_area` VALUES ('510503', '纳溪区', '510500');
-INSERT INTO `dict_area` VALUES ('510504', '龙马潭区', '510500');
-INSERT INTO `dict_area` VALUES ('510521', '泸县', '510500');
-INSERT INTO `dict_area` VALUES ('510522', '合江县', '510500');
-INSERT INTO `dict_area` VALUES ('510524', '叙永县', '510500');
-INSERT INTO `dict_area` VALUES ('510525', '古蔺县', '510500');
-INSERT INTO `dict_area` VALUES ('510600', '德阳市', '510000');
-INSERT INTO `dict_area` VALUES ('510603', '旌阳区', '510600');
-INSERT INTO `dict_area` VALUES ('510623', '中江县', '510600');
-INSERT INTO `dict_area` VALUES ('510626', '罗江县', '510600');
-INSERT INTO `dict_area` VALUES ('510681', '广汉市', '510600');
-INSERT INTO `dict_area` VALUES ('510682', '什邡市', '510600');
-INSERT INTO `dict_area` VALUES ('510683', '绵竹市', '510600');
-INSERT INTO `dict_area` VALUES ('510700', '绵阳市', '510000');
-INSERT INTO `dict_area` VALUES ('510703', '涪城区', '510700');
-INSERT INTO `dict_area` VALUES ('510704', '游仙区', '510700');
-INSERT INTO `dict_area` VALUES ('510705', '安州区', '510700');
-INSERT INTO `dict_area` VALUES ('510722', '三台县', '510700');
-INSERT INTO `dict_area` VALUES ('510723', '盐亭县', '510700');
-INSERT INTO `dict_area` VALUES ('510725', '梓潼县', '510700');
-INSERT INTO `dict_area` VALUES ('510726', '北川羌族自治县', '510700');
-INSERT INTO `dict_area` VALUES ('510727', '平武县', '510700');
-INSERT INTO `dict_area` VALUES ('510781', '江油市', '510700');
-INSERT INTO `dict_area` VALUES ('510800', '广元市', '510000');
-INSERT INTO `dict_area` VALUES ('510802', '利州区', '510800');
-INSERT INTO `dict_area` VALUES ('510811', '昭化区', '510800');
-INSERT INTO `dict_area` VALUES ('510812', '朝天区', '510800');
-INSERT INTO `dict_area` VALUES ('510821', '旺苍县', '510800');
-INSERT INTO `dict_area` VALUES ('510822', '青川县', '510800');
-INSERT INTO `dict_area` VALUES ('510823', '剑阁县', '510800');
-INSERT INTO `dict_area` VALUES ('510824', '苍溪县', '510800');
-INSERT INTO `dict_area` VALUES ('510900', '遂宁市', '510000');
-INSERT INTO `dict_area` VALUES ('510903', '船山区', '510900');
-INSERT INTO `dict_area` VALUES ('510904', '安居区', '510900');
-INSERT INTO `dict_area` VALUES ('510921', '蓬溪县', '510900');
-INSERT INTO `dict_area` VALUES ('510922', '射洪县', '510900');
-INSERT INTO `dict_area` VALUES ('510923', '大英县', '510900');
-INSERT INTO `dict_area` VALUES ('511000', '内江市', '510000');
-INSERT INTO `dict_area` VALUES ('511002', '市中区', '511000');
-INSERT INTO `dict_area` VALUES ('511011', '东兴区', '511000');
-INSERT INTO `dict_area` VALUES ('511024', '威远县', '511000');
-INSERT INTO `dict_area` VALUES ('511025', '资中县', '511000');
-INSERT INTO `dict_area` VALUES ('511083', '隆昌市', '511000');
-INSERT INTO `dict_area` VALUES ('511100', '乐山市', '510000');
-INSERT INTO `dict_area` VALUES ('511102', '市中区', '511100');
-INSERT INTO `dict_area` VALUES ('511111', '沙湾区', '511100');
-INSERT INTO `dict_area` VALUES ('511112', '五通桥区', '511100');
-INSERT INTO `dict_area` VALUES ('511113', '金口河区', '511100');
-INSERT INTO `dict_area` VALUES ('511123', '犍为县', '511100');
-INSERT INTO `dict_area` VALUES ('511124', '井研县', '511100');
-INSERT INTO `dict_area` VALUES ('511126', '夹江县', '511100');
-INSERT INTO `dict_area` VALUES ('511129', '沐川县', '511100');
-INSERT INTO `dict_area` VALUES ('511132', '峨边彝族自治县', '511100');
-INSERT INTO `dict_area` VALUES ('511133', '马边彝族自治县', '511100');
-INSERT INTO `dict_area` VALUES ('511181', '峨眉山市', '511100');
-INSERT INTO `dict_area` VALUES ('511300', '南充市', '510000');
-INSERT INTO `dict_area` VALUES ('511302', '顺庆区', '511300');
-INSERT INTO `dict_area` VALUES ('511303', '高坪区', '511300');
-INSERT INTO `dict_area` VALUES ('511304', '嘉陵区', '511300');
-INSERT INTO `dict_area` VALUES ('511321', '南部县', '511300');
-INSERT INTO `dict_area` VALUES ('511322', '营山县', '511300');
-INSERT INTO `dict_area` VALUES ('511323', '蓬安县', '511300');
-INSERT INTO `dict_area` VALUES ('511324', '仪陇县', '511300');
-INSERT INTO `dict_area` VALUES ('511325', '西充县', '511300');
-INSERT INTO `dict_area` VALUES ('511381', '阆中市', '511300');
-INSERT INTO `dict_area` VALUES ('511400', '眉山市', '510000');
-INSERT INTO `dict_area` VALUES ('511402', '东坡区', '511400');
-INSERT INTO `dict_area` VALUES ('511403', '彭山区', '511400');
-INSERT INTO `dict_area` VALUES ('511421', '仁寿县', '511400');
-INSERT INTO `dict_area` VALUES ('511423', '洪雅县', '511400');
-INSERT INTO `dict_area` VALUES ('511424', '丹棱县', '511400');
-INSERT INTO `dict_area` VALUES ('511425', '青神县', '511400');
-INSERT INTO `dict_area` VALUES ('511500', '宜宾市', '510000');
-INSERT INTO `dict_area` VALUES ('511502', '翠屏区', '511500');
-INSERT INTO `dict_area` VALUES ('511503', '南溪区', '511500');
-INSERT INTO `dict_area` VALUES ('511521', '宜宾县', '511500');
-INSERT INTO `dict_area` VALUES ('511523', '江安县', '511500');
-INSERT INTO `dict_area` VALUES ('511524', '长宁县', '511500');
-INSERT INTO `dict_area` VALUES ('511525', '高县', '511500');
-INSERT INTO `dict_area` VALUES ('511526', '珙县', '511500');
-INSERT INTO `dict_area` VALUES ('511527', '筠连县', '511500');
-INSERT INTO `dict_area` VALUES ('511528', '兴文县', '511500');
-INSERT INTO `dict_area` VALUES ('511529', '屏山县', '511500');
-INSERT INTO `dict_area` VALUES ('511600', '广安市', '510000');
-INSERT INTO `dict_area` VALUES ('511602', '广安区', '511600');
-INSERT INTO `dict_area` VALUES ('511603', '前锋区', '511600');
-INSERT INTO `dict_area` VALUES ('511621', '岳池县', '511600');
-INSERT INTO `dict_area` VALUES ('511622', '武胜县', '511600');
-INSERT INTO `dict_area` VALUES ('511623', '邻水县', '511600');
-INSERT INTO `dict_area` VALUES ('511681', '华蓥市', '511600');
-INSERT INTO `dict_area` VALUES ('511700', '达州市', '510000');
-INSERT INTO `dict_area` VALUES ('511702', '通川区', '511700');
-INSERT INTO `dict_area` VALUES ('511703', '达川区', '511700');
-INSERT INTO `dict_area` VALUES ('511722', '宣汉县', '511700');
-INSERT INTO `dict_area` VALUES ('511723', '开江县', '511700');
-INSERT INTO `dict_area` VALUES ('511724', '大竹县', '511700');
-INSERT INTO `dict_area` VALUES ('511725', '渠县', '511700');
-INSERT INTO `dict_area` VALUES ('511781', '万源市', '511700');
-INSERT INTO `dict_area` VALUES ('511800', '雅安市', '510000');
-INSERT INTO `dict_area` VALUES ('511802', '雨城区', '511800');
-INSERT INTO `dict_area` VALUES ('511803', '名山区', '511800');
-INSERT INTO `dict_area` VALUES ('511822', '荥经县', '511800');
-INSERT INTO `dict_area` VALUES ('511823', '汉源县', '511800');
-INSERT INTO `dict_area` VALUES ('511824', '石棉县', '511800');
-INSERT INTO `dict_area` VALUES ('511825', '天全县', '511800');
-INSERT INTO `dict_area` VALUES ('511826', '芦山县', '511800');
-INSERT INTO `dict_area` VALUES ('511827', '宝兴县', '511800');
-INSERT INTO `dict_area` VALUES ('511900', '巴中市', '510000');
-INSERT INTO `dict_area` VALUES ('511902', '巴州区', '511900');
-INSERT INTO `dict_area` VALUES ('511903', '恩阳区', '511900');
-INSERT INTO `dict_area` VALUES ('511921', '通江县', '511900');
-INSERT INTO `dict_area` VALUES ('511922', '南江县', '511900');
-INSERT INTO `dict_area` VALUES ('511923', '平昌县', '511900');
-INSERT INTO `dict_area` VALUES ('512000', '资阳市', '510000');
-INSERT INTO `dict_area` VALUES ('512002', '雁江区', '512000');
-INSERT INTO `dict_area` VALUES ('512021', '安岳县', '512000');
-INSERT INTO `dict_area` VALUES ('512022', '乐至县', '512000');
-INSERT INTO `dict_area` VALUES ('513200', '阿坝藏族羌族自治州', '510000');
-INSERT INTO `dict_area` VALUES ('513201', '马尔康市', '513200');
-INSERT INTO `dict_area` VALUES ('513221', '汶川县', '513200');
-INSERT INTO `dict_area` VALUES ('513222', '理县', '513200');
-INSERT INTO `dict_area` VALUES ('513223', '茂县', '513200');
-INSERT INTO `dict_area` VALUES ('513224', '松潘县', '513200');
-INSERT INTO `dict_area` VALUES ('513225', '九寨沟县', '513200');
-INSERT INTO `dict_area` VALUES ('513226', '金川县', '513200');
-INSERT INTO `dict_area` VALUES ('513227', '小金县', '513200');
-INSERT INTO `dict_area` VALUES ('513228', '黑水县', '513200');
-INSERT INTO `dict_area` VALUES ('513230', '壤塘县', '513200');
-INSERT INTO `dict_area` VALUES ('513231', '阿坝县', '513200');
-INSERT INTO `dict_area` VALUES ('513232', '若尔盖县', '513200');
-INSERT INTO `dict_area` VALUES ('513233', '红原县', '513200');
-INSERT INTO `dict_area` VALUES ('513300', '甘孜藏族自治州', '510000');
-INSERT INTO `dict_area` VALUES ('513301', '康定市', '513300');
-INSERT INTO `dict_area` VALUES ('513322', '泸定县', '513300');
-INSERT INTO `dict_area` VALUES ('513323', '丹巴县', '513300');
-INSERT INTO `dict_area` VALUES ('513324', '九龙县', '513300');
-INSERT INTO `dict_area` VALUES ('513325', '雅江县', '513300');
-INSERT INTO `dict_area` VALUES ('513326', '道孚县', '513300');
-INSERT INTO `dict_area` VALUES ('513327', '炉霍县', '513300');
-INSERT INTO `dict_area` VALUES ('513328', '甘孜县', '513300');
-INSERT INTO `dict_area` VALUES ('513329', '新龙县', '513300');
-INSERT INTO `dict_area` VALUES ('513330', '德格县', '513300');
-INSERT INTO `dict_area` VALUES ('513331', '白玉县', '513300');
-INSERT INTO `dict_area` VALUES ('513332', '石渠县', '513300');
-INSERT INTO `dict_area` VALUES ('513333', '色达县', '513300');
-INSERT INTO `dict_area` VALUES ('513334', '理塘县', '513300');
-INSERT INTO `dict_area` VALUES ('513335', '巴塘县', '513300');
-INSERT INTO `dict_area` VALUES ('513336', '乡城县', '513300');
-INSERT INTO `dict_area` VALUES ('513337', '稻城县', '513300');
-INSERT INTO `dict_area` VALUES ('513338', '得荣县', '513300');
-INSERT INTO `dict_area` VALUES ('513400', '凉山彝族自治州', '510000');
-INSERT INTO `dict_area` VALUES ('513401', '西昌市', '513400');
-INSERT INTO `dict_area` VALUES ('513422', '木里藏族自治县', '513400');
-INSERT INTO `dict_area` VALUES ('513423', '盐源县', '513400');
-INSERT INTO `dict_area` VALUES ('513424', '德昌县', '513400');
-INSERT INTO `dict_area` VALUES ('513425', '会理县', '513400');
-INSERT INTO `dict_area` VALUES ('513426', '会东县', '513400');
-INSERT INTO `dict_area` VALUES ('513427', '宁南县', '513400');
-INSERT INTO `dict_area` VALUES ('513428', '普格县', '513400');
-INSERT INTO `dict_area` VALUES ('513429', '布拖县', '513400');
-INSERT INTO `dict_area` VALUES ('513430', '金阳县', '513400');
-INSERT INTO `dict_area` VALUES ('513431', '昭觉县', '513400');
-INSERT INTO `dict_area` VALUES ('513432', '喜德县', '513400');
-INSERT INTO `dict_area` VALUES ('513433', '冕宁县', '513400');
-INSERT INTO `dict_area` VALUES ('513434', '越西县', '513400');
-INSERT INTO `dict_area` VALUES ('513435', '甘洛县', '513400');
-INSERT INTO `dict_area` VALUES ('513436', '美姑县', '513400');
-INSERT INTO `dict_area` VALUES ('513437', '雷波县', '513400');
-INSERT INTO `dict_area` VALUES ('520000', '贵州省', '-1');
-INSERT INTO `dict_area` VALUES ('520100', '贵阳市', '520000');
-INSERT INTO `dict_area` VALUES ('520102', '南明区', '520100');
-INSERT INTO `dict_area` VALUES ('520103', '云岩区', '520100');
-INSERT INTO `dict_area` VALUES ('520111', '花溪区', '520100');
-INSERT INTO `dict_area` VALUES ('520112', '乌当区', '520100');
-INSERT INTO `dict_area` VALUES ('520113', '白云区', '520100');
-INSERT INTO `dict_area` VALUES ('520115', '观山湖区', '520100');
-INSERT INTO `dict_area` VALUES ('520121', '开阳县', '520100');
-INSERT INTO `dict_area` VALUES ('520122', '息烽县', '520100');
-INSERT INTO `dict_area` VALUES ('520123', '修文县', '520100');
-INSERT INTO `dict_area` VALUES ('520181', '清镇市', '520100');
-INSERT INTO `dict_area` VALUES ('520200', '六盘水市', '520000');
-INSERT INTO `dict_area` VALUES ('520201', '钟山区', '520200');
-INSERT INTO `dict_area` VALUES ('520203', '六枝特区', '520200');
-INSERT INTO `dict_area` VALUES ('520221', '水城县', '520200');
-INSERT INTO `dict_area` VALUES ('520281', '盘州市', '520200');
-INSERT INTO `dict_area` VALUES ('520300', '遵义市', '520000');
-INSERT INTO `dict_area` VALUES ('520302', '红花岗区', '520300');
-INSERT INTO `dict_area` VALUES ('520303', '汇川区', '520300');
-INSERT INTO `dict_area` VALUES ('520304', '播州区', '520300');
-INSERT INTO `dict_area` VALUES ('520322', '桐梓县', '520300');
-INSERT INTO `dict_area` VALUES ('520323', '绥阳县', '520300');
-INSERT INTO `dict_area` VALUES ('520324', '正安县', '520300');
-INSERT INTO `dict_area` VALUES ('520325', '道真仡佬族苗族自治县', '520300');
-INSERT INTO `dict_area` VALUES ('520326', '务川仡佬族苗族自治县', '520300');
-INSERT INTO `dict_area` VALUES ('520327', '凤冈县', '520300');
-INSERT INTO `dict_area` VALUES ('520328', '湄潭县', '520300');
-INSERT INTO `dict_area` VALUES ('520329', '余庆县', '520300');
-INSERT INTO `dict_area` VALUES ('520330', '习水县', '520300');
-INSERT INTO `dict_area` VALUES ('520381', '赤水市', '520300');
-INSERT INTO `dict_area` VALUES ('520382', '仁怀市', '520300');
-INSERT INTO `dict_area` VALUES ('520400', '安顺市', '520000');
-INSERT INTO `dict_area` VALUES ('520402', '西秀区', '520400');
-INSERT INTO `dict_area` VALUES ('520403', '平坝区', '520400');
-INSERT INTO `dict_area` VALUES ('520422', '普定县', '520400');
-INSERT INTO `dict_area` VALUES ('520423', '镇宁布依族苗族自治县', '520400');
-INSERT INTO `dict_area` VALUES ('520424', '关岭布依族苗族自治县', '520400');
-INSERT INTO `dict_area` VALUES ('520425', '紫云苗族布依族自治县', '520400');
-INSERT INTO `dict_area` VALUES ('520500', '毕节市', '520000');
-INSERT INTO `dict_area` VALUES ('520502', '七星关区', '520500');
-INSERT INTO `dict_area` VALUES ('520521', '大方县', '520500');
-INSERT INTO `dict_area` VALUES ('520522', '黔西县', '520500');
-INSERT INTO `dict_area` VALUES ('520523', '金沙县', '520500');
-INSERT INTO `dict_area` VALUES ('520524', '织金县', '520500');
-INSERT INTO `dict_area` VALUES ('520525', '纳雍县', '520500');
-INSERT INTO `dict_area` VALUES ('520526', '威宁彝族回族苗族自治县', '520500');
-INSERT INTO `dict_area` VALUES ('520527', '赫章县', '520500');
-INSERT INTO `dict_area` VALUES ('520600', '铜仁市', '520000');
-INSERT INTO `dict_area` VALUES ('520602', '碧江区', '520600');
-INSERT INTO `dict_area` VALUES ('520603', '万山区', '520600');
-INSERT INTO `dict_area` VALUES ('520621', '江口县', '520600');
-INSERT INTO `dict_area` VALUES ('520622', '玉屏侗族自治县', '520600');
-INSERT INTO `dict_area` VALUES ('520623', '石阡县', '520600');
-INSERT INTO `dict_area` VALUES ('520624', '思南县', '520600');
-INSERT INTO `dict_area` VALUES ('520625', '印江土家族苗族自治县', '520600');
-INSERT INTO `dict_area` VALUES ('520626', '德江县', '520600');
-INSERT INTO `dict_area` VALUES ('520627', '沿河土家族自治县', '520600');
-INSERT INTO `dict_area` VALUES ('520628', '松桃苗族自治县', '520600');
-INSERT INTO `dict_area` VALUES ('522300', '黔西南布依族苗族自治州', '520000');
-INSERT INTO `dict_area` VALUES ('522301', '兴义市', '522300');
-INSERT INTO `dict_area` VALUES ('522322', '兴仁县', '522300');
-INSERT INTO `dict_area` VALUES ('522323', '普安县', '522300');
-INSERT INTO `dict_area` VALUES ('522324', '晴隆县', '522300');
-INSERT INTO `dict_area` VALUES ('522325', '贞丰县', '522300');
-INSERT INTO `dict_area` VALUES ('522326', '望谟县', '522300');
-INSERT INTO `dict_area` VALUES ('522327', '册亨县', '522300');
-INSERT INTO `dict_area` VALUES ('522328', '安龙县', '522300');
-INSERT INTO `dict_area` VALUES ('522600', '黔东南苗族侗族自治州', '520000');
-INSERT INTO `dict_area` VALUES ('522601', '凯里市', '522600');
-INSERT INTO `dict_area` VALUES ('522622', '黄平县', '522600');
-INSERT INTO `dict_area` VALUES ('522623', '施秉县', '522600');
-INSERT INTO `dict_area` VALUES ('522624', '三穗县', '522600');
-INSERT INTO `dict_area` VALUES ('522625', '镇远县', '522600');
-INSERT INTO `dict_area` VALUES ('522626', '岑巩县', '522600');
-INSERT INTO `dict_area` VALUES ('522627', '天柱县', '522600');
-INSERT INTO `dict_area` VALUES ('522628', '锦屏县', '522600');
-INSERT INTO `dict_area` VALUES ('522629', '剑河县', '522600');
-INSERT INTO `dict_area` VALUES ('522630', '台江县', '522600');
-INSERT INTO `dict_area` VALUES ('522631', '黎平县', '522600');
-INSERT INTO `dict_area` VALUES ('522632', '榕江县', '522600');
-INSERT INTO `dict_area` VALUES ('522633', '从江县', '522600');
-INSERT INTO `dict_area` VALUES ('522634', '雷山县', '522600');
-INSERT INTO `dict_area` VALUES ('522635', '麻江县', '522600');
-INSERT INTO `dict_area` VALUES ('522636', '丹寨县', '522600');
-INSERT INTO `dict_area` VALUES ('522700', '黔南布依族苗族自治州', '520000');
-INSERT INTO `dict_area` VALUES ('522701', '都匀市', '522700');
-INSERT INTO `dict_area` VALUES ('522702', '福泉市', '522700');
-INSERT INTO `dict_area` VALUES ('522722', '荔波县', '522700');
-INSERT INTO `dict_area` VALUES ('522723', '贵定县', '522700');
-INSERT INTO `dict_area` VALUES ('522725', '瓮安县', '522700');
-INSERT INTO `dict_area` VALUES ('522726', '独山县', '522700');
-INSERT INTO `dict_area` VALUES ('522727', '平塘县', '522700');
-INSERT INTO `dict_area` VALUES ('522728', '罗甸县', '522700');
-INSERT INTO `dict_area` VALUES ('522729', '长顺县', '522700');
-INSERT INTO `dict_area` VALUES ('522730', '龙里县', '522700');
-INSERT INTO `dict_area` VALUES ('522731', '惠水县', '522700');
-INSERT INTO `dict_area` VALUES ('522732', '三都水族自治县', '522700');
-INSERT INTO `dict_area` VALUES ('530000', '云南省', '-1');
-INSERT INTO `dict_area` VALUES ('530100', '昆明市', '530000');
-INSERT INTO `dict_area` VALUES ('530102', '五华区', '530100');
-INSERT INTO `dict_area` VALUES ('530103', '盘龙区', '530100');
-INSERT INTO `dict_area` VALUES ('530111', '官渡区', '530100');
-INSERT INTO `dict_area` VALUES ('530112', '西山区', '530100');
-INSERT INTO `dict_area` VALUES ('530113', '东川区', '530100');
-INSERT INTO `dict_area` VALUES ('530114', '呈贡区', '530100');
-INSERT INTO `dict_area` VALUES ('530115', '晋宁区', '530100');
-INSERT INTO `dict_area` VALUES ('530124', '富民县', '530100');
-INSERT INTO `dict_area` VALUES ('530125', '宜良县', '530100');
-INSERT INTO `dict_area` VALUES ('530126', '石林彝族自治县', '530100');
-INSERT INTO `dict_area` VALUES ('530127', '嵩明县', '530100');
-INSERT INTO `dict_area` VALUES ('530128', '禄劝彝族苗族自治县', '530100');
-INSERT INTO `dict_area` VALUES ('530129', '寻甸回族彝族自治县', '530100');
-INSERT INTO `dict_area` VALUES ('530181', '安宁市', '530100');
-INSERT INTO `dict_area` VALUES ('530300', '曲靖市', '530000');
-INSERT INTO `dict_area` VALUES ('530302', '麒麟区', '530300');
-INSERT INTO `dict_area` VALUES ('530303', '沾益区', '530300');
-INSERT INTO `dict_area` VALUES ('530321', '马龙县', '530300');
-INSERT INTO `dict_area` VALUES ('530322', '陆良县', '530300');
-INSERT INTO `dict_area` VALUES ('530323', '师宗县', '530300');
-INSERT INTO `dict_area` VALUES ('530324', '罗平县', '530300');
-INSERT INTO `dict_area` VALUES ('530325', '富源县', '530300');
-INSERT INTO `dict_area` VALUES ('530326', '会泽县', '530300');
-INSERT INTO `dict_area` VALUES ('530381', '宣威市', '530300');
-INSERT INTO `dict_area` VALUES ('530400', '玉溪市', '530000');
-INSERT INTO `dict_area` VALUES ('530402', '红塔区', '530400');
-INSERT INTO `dict_area` VALUES ('530403', '江川区', '530400');
-INSERT INTO `dict_area` VALUES ('530422', '澄江县', '530400');
-INSERT INTO `dict_area` VALUES ('530423', '通海县', '530400');
-INSERT INTO `dict_area` VALUES ('530424', '华宁县', '530400');
-INSERT INTO `dict_area` VALUES ('530425', '易门县', '530400');
-INSERT INTO `dict_area` VALUES ('530426', '峨山彝族自治县', '530400');
-INSERT INTO `dict_area` VALUES ('530427', '新平彝族傣族自治县', '530400');
-INSERT INTO `dict_area` VALUES ('530428', '元江哈尼族彝族傣族自治县', '530400');
-INSERT INTO `dict_area` VALUES ('530500', '保山市', '530000');
-INSERT INTO `dict_area` VALUES ('530502', '隆阳区', '530500');
-INSERT INTO `dict_area` VALUES ('530521', '施甸县', '530500');
-INSERT INTO `dict_area` VALUES ('530523', '龙陵县', '530500');
-INSERT INTO `dict_area` VALUES ('530524', '昌宁县', '530500');
-INSERT INTO `dict_area` VALUES ('530581', '腾冲市', '530500');
-INSERT INTO `dict_area` VALUES ('530600', '昭通市', '530000');
-INSERT INTO `dict_area` VALUES ('530602', '昭阳区', '530600');
-INSERT INTO `dict_area` VALUES ('530621', '鲁甸县', '530600');
-INSERT INTO `dict_area` VALUES ('530622', '巧家县', '530600');
-INSERT INTO `dict_area` VALUES ('530623', '盐津县', '530600');
-INSERT INTO `dict_area` VALUES ('530624', '大关县', '530600');
-INSERT INTO `dict_area` VALUES ('530625', '永善县', '530600');
-INSERT INTO `dict_area` VALUES ('530626', '绥江县', '530600');
-INSERT INTO `dict_area` VALUES ('530627', '镇雄县', '530600');
-INSERT INTO `dict_area` VALUES ('530628', '彝良县', '530600');
-INSERT INTO `dict_area` VALUES ('530629', '威信县', '530600');
-INSERT INTO `dict_area` VALUES ('530630', '水富县', '530600');
-INSERT INTO `dict_area` VALUES ('530700', '丽江市', '530000');
-INSERT INTO `dict_area` VALUES ('530702', '古城区', '530700');
-INSERT INTO `dict_area` VALUES ('530721', '玉龙纳西族自治县', '530700');
-INSERT INTO `dict_area` VALUES ('530722', '永胜县', '530700');
-INSERT INTO `dict_area` VALUES ('530723', '华坪县', '530700');
-INSERT INTO `dict_area` VALUES ('530724', '宁蒗彝族自治县', '530700');
-INSERT INTO `dict_area` VALUES ('530800', '普洱市', '530000');
-INSERT INTO `dict_area` VALUES ('530802', '思茅区', '530800');
-INSERT INTO `dict_area` VALUES ('530821', '宁洱哈尼族彝族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530822', '墨江哈尼族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530823', '景东彝族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530824', '景谷傣族彝族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530825', '镇沅彝族哈尼族拉祜族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530826', '江城哈尼族彝族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530827', '孟连傣族拉祜族佤族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530828', '澜沧拉祜族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530829', '西盟佤族自治县', '530800');
-INSERT INTO `dict_area` VALUES ('530900', '临沧市', '530000');
-INSERT INTO `dict_area` VALUES ('530902', '临翔区', '530900');
-INSERT INTO `dict_area` VALUES ('530921', '凤庆县', '530900');
-INSERT INTO `dict_area` VALUES ('530922', '云县', '530900');
-INSERT INTO `dict_area` VALUES ('530923', '永德县', '530900');
-INSERT INTO `dict_area` VALUES ('530924', '镇康县', '530900');
-INSERT INTO `dict_area` VALUES ('530925', '双江拉祜族佤族布朗族傣族自治县', '530900');
-INSERT INTO `dict_area` VALUES ('530926', '耿马傣族佤族自治县', '530900');
-INSERT INTO `dict_area` VALUES ('530927', '沧源佤族自治县', '530900');
-INSERT INTO `dict_area` VALUES ('532300', '楚雄彝族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('532301', '楚雄市', '532300');
-INSERT INTO `dict_area` VALUES ('532322', '双柏县', '532300');
-INSERT INTO `dict_area` VALUES ('532323', '牟定县', '532300');
-INSERT INTO `dict_area` VALUES ('532324', '南华县', '532300');
-INSERT INTO `dict_area` VALUES ('532325', '姚安县', '532300');
-INSERT INTO `dict_area` VALUES ('532326', '大姚县', '532300');
-INSERT INTO `dict_area` VALUES ('532327', '永仁县', '532300');
-INSERT INTO `dict_area` VALUES ('532328', '元谋县', '532300');
-INSERT INTO `dict_area` VALUES ('532329', '武定县', '532300');
-INSERT INTO `dict_area` VALUES ('532331', '禄丰县', '532300');
-INSERT INTO `dict_area` VALUES ('532500', '红河哈尼族彝族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('532501', '个旧市', '532500');
-INSERT INTO `dict_area` VALUES ('532502', '开远市', '532500');
-INSERT INTO `dict_area` VALUES ('532503', '蒙自市', '532500');
-INSERT INTO `dict_area` VALUES ('532504', '弥勒市', '532500');
-INSERT INTO `dict_area` VALUES ('532523', '屏边苗族自治县', '532500');
-INSERT INTO `dict_area` VALUES ('532524', '建水县', '532500');
-INSERT INTO `dict_area` VALUES ('532525', '石屏县', '532500');
-INSERT INTO `dict_area` VALUES ('532527', '泸西县', '532500');
-INSERT INTO `dict_area` VALUES ('532528', '元阳县', '532500');
-INSERT INTO `dict_area` VALUES ('532529', '红河县', '532500');
-INSERT INTO `dict_area` VALUES ('532530', '金平苗族瑶族傣族自治县', '532500');
-INSERT INTO `dict_area` VALUES ('532531', '绿春县', '532500');
-INSERT INTO `dict_area` VALUES ('532532', '河口瑶族自治县', '532500');
-INSERT INTO `dict_area` VALUES ('532600', '文山壮族苗族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('532601', '文山市', '532600');
-INSERT INTO `dict_area` VALUES ('532622', '砚山县', '532600');
-INSERT INTO `dict_area` VALUES ('532623', '西畴县', '532600');
-INSERT INTO `dict_area` VALUES ('532624', '麻栗坡县', '532600');
-INSERT INTO `dict_area` VALUES ('532625', '马关县', '532600');
-INSERT INTO `dict_area` VALUES ('532626', '丘北县', '532600');
-INSERT INTO `dict_area` VALUES ('532627', '广南县', '532600');
-INSERT INTO `dict_area` VALUES ('532628', '富宁县', '532600');
-INSERT INTO `dict_area` VALUES ('532800', '西双版纳傣族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('532801', '景洪市', '532800');
-INSERT INTO `dict_area` VALUES ('532822', '勐海县', '532800');
-INSERT INTO `dict_area` VALUES ('532823', '勐腊县', '532800');
-INSERT INTO `dict_area` VALUES ('532900', '大理白族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('532901', '大理市', '532900');
-INSERT INTO `dict_area` VALUES ('532922', '漾濞彝族自治县', '532900');
-INSERT INTO `dict_area` VALUES ('532923', '祥云县', '532900');
-INSERT INTO `dict_area` VALUES ('532924', '宾川县', '532900');
-INSERT INTO `dict_area` VALUES ('532925', '弥渡县', '532900');
-INSERT INTO `dict_area` VALUES ('532926', '南涧彝族自治县', '532900');
-INSERT INTO `dict_area` VALUES ('532927', '巍山彝族回族自治县', '532900');
-INSERT INTO `dict_area` VALUES ('532928', '永平县', '532900');
-INSERT INTO `dict_area` VALUES ('532929', '云龙县', '532900');
-INSERT INTO `dict_area` VALUES ('532930', '洱源县', '532900');
-INSERT INTO `dict_area` VALUES ('532931', '剑川县', '532900');
-INSERT INTO `dict_area` VALUES ('532932', '鹤庆县', '532900');
-INSERT INTO `dict_area` VALUES ('533100', '德宏傣族景颇族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('533102', '瑞丽市', '533100');
-INSERT INTO `dict_area` VALUES ('533103', '芒市', '533100');
-INSERT INTO `dict_area` VALUES ('533122', '梁河县', '533100');
-INSERT INTO `dict_area` VALUES ('533123', '盈江县', '533100');
-INSERT INTO `dict_area` VALUES ('533124', '陇川县', '533100');
-INSERT INTO `dict_area` VALUES ('533300', '怒江傈僳族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('533301', '泸水市', '533300');
-INSERT INTO `dict_area` VALUES ('533323', '福贡县', '533300');
-INSERT INTO `dict_area` VALUES ('533324', '贡山独龙族怒族自治县', '533300');
-INSERT INTO `dict_area` VALUES ('533325', '兰坪白族普米族自治县', '533300');
-INSERT INTO `dict_area` VALUES ('533400', '迪庆藏族自治州', '530000');
-INSERT INTO `dict_area` VALUES ('533401', '香格里拉市', '533400');
-INSERT INTO `dict_area` VALUES ('533422', '德钦县', '533400');
-INSERT INTO `dict_area` VALUES ('533423', '维西傈僳族自治县', '533400');
-INSERT INTO `dict_area` VALUES ('540000', '西藏自治区', '-1');
-INSERT INTO `dict_area` VALUES ('540100', '拉萨市', '540000');
-INSERT INTO `dict_area` VALUES ('540102', '城关区', '540100');
-INSERT INTO `dict_area` VALUES ('540103', '堆龙德庆区', '540100');
-INSERT INTO `dict_area` VALUES ('540121', '林周县', '540100');
-INSERT INTO `dict_area` VALUES ('540122', '当雄县', '540100');
-INSERT INTO `dict_area` VALUES ('540123', '尼木县', '540100');
-INSERT INTO `dict_area` VALUES ('540124', '曲水县', '540100');
-INSERT INTO `dict_area` VALUES ('540126', '达孜县', '540100');
-INSERT INTO `dict_area` VALUES ('540127', '墨竹工卡县', '540100');
-INSERT INTO `dict_area` VALUES ('540200', '日喀则市', '540000');
-INSERT INTO `dict_area` VALUES ('540202', '桑珠孜区', '540200');
-INSERT INTO `dict_area` VALUES ('540221', '南木林县', '540200');
-INSERT INTO `dict_area` VALUES ('540222', '江孜县', '540200');
-INSERT INTO `dict_area` VALUES ('540223', '定日县', '540200');
-INSERT INTO `dict_area` VALUES ('540224', '萨迦县', '540200');
-INSERT INTO `dict_area` VALUES ('540225', '拉孜县', '540200');
-INSERT INTO `dict_area` VALUES ('540226', '昂仁县', '540200');
-INSERT INTO `dict_area` VALUES ('540227', '谢通门县', '540200');
-INSERT INTO `dict_area` VALUES ('540228', '白朗县', '540200');
-INSERT INTO `dict_area` VALUES ('540229', '仁布县', '540200');
-INSERT INTO `dict_area` VALUES ('540230', '康马县', '540200');
-INSERT INTO `dict_area` VALUES ('540231', '定结县', '540200');
-INSERT INTO `dict_area` VALUES ('540232', '仲巴县', '540200');
-INSERT INTO `dict_area` VALUES ('540233', '亚东县', '540200');
-INSERT INTO `dict_area` VALUES ('540234', '吉隆县', '540200');
-INSERT INTO `dict_area` VALUES ('540235', '聂拉木县', '540200');
-INSERT INTO `dict_area` VALUES ('540236', '萨嘎县', '540200');
-INSERT INTO `dict_area` VALUES ('540237', '岗巴县', '540200');
-INSERT INTO `dict_area` VALUES ('540300', '昌都市', '540000');
-INSERT INTO `dict_area` VALUES ('540302', '卡若区', '540300');
-INSERT INTO `dict_area` VALUES ('540321', '江达县', '540300');
-INSERT INTO `dict_area` VALUES ('540322', '贡觉县', '540300');
-INSERT INTO `dict_area` VALUES ('540323', '类乌齐县', '540300');
-INSERT INTO `dict_area` VALUES ('540324', '丁青县', '540300');
-INSERT INTO `dict_area` VALUES ('540325', '察雅县', '540300');
-INSERT INTO `dict_area` VALUES ('540326', '八宿县', '540300');
-INSERT INTO `dict_area` VALUES ('540327', '左贡县', '540300');
-INSERT INTO `dict_area` VALUES ('540328', '芒康县', '540300');
-INSERT INTO `dict_area` VALUES ('540329', '洛隆县', '540300');
-INSERT INTO `dict_area` VALUES ('540330', '边坝县', '540300');
-INSERT INTO `dict_area` VALUES ('540400', '林芝市', '540000');
-INSERT INTO `dict_area` VALUES ('540402', '巴宜区', '540400');
-INSERT INTO `dict_area` VALUES ('540421', '工布江达县', '540400');
-INSERT INTO `dict_area` VALUES ('540422', '米林县', '540400');
-INSERT INTO `dict_area` VALUES ('540423', '墨脱县', '540400');
-INSERT INTO `dict_area` VALUES ('540424', '波密县', '540400');
-INSERT INTO `dict_area` VALUES ('540425', '察隅县', '540400');
-INSERT INTO `dict_area` VALUES ('540426', '朗县', '540400');
-INSERT INTO `dict_area` VALUES ('540500', '山南市', '540000');
-INSERT INTO `dict_area` VALUES ('540502', '乃东区', '540500');
-INSERT INTO `dict_area` VALUES ('540521', '扎囊县', '540500');
-INSERT INTO `dict_area` VALUES ('540522', '贡嘎县', '540500');
-INSERT INTO `dict_area` VALUES ('540523', '桑日县', '540500');
-INSERT INTO `dict_area` VALUES ('540524', '琼结县', '540500');
-INSERT INTO `dict_area` VALUES ('540525', '曲松县', '540500');
-INSERT INTO `dict_area` VALUES ('540526', '措美县', '540500');
-INSERT INTO `dict_area` VALUES ('540527', '洛扎县', '540500');
-INSERT INTO `dict_area` VALUES ('540528', '加查县', '540500');
-INSERT INTO `dict_area` VALUES ('540529', '隆子县', '540500');
-INSERT INTO `dict_area` VALUES ('540530', '错那县', '540500');
-INSERT INTO `dict_area` VALUES ('540531', '浪卡子县', '540500');
-INSERT INTO `dict_area` VALUES ('542400', '那曲地区', '540000');
-INSERT INTO `dict_area` VALUES ('542421', '那曲县', '542400');
-INSERT INTO `dict_area` VALUES ('542422', '嘉黎县', '542400');
-INSERT INTO `dict_area` VALUES ('542423', '比如县', '542400');
-INSERT INTO `dict_area` VALUES ('542424', '聂荣县', '542400');
-INSERT INTO `dict_area` VALUES ('542425', '安多县', '542400');
-INSERT INTO `dict_area` VALUES ('542426', '申扎县', '542400');
-INSERT INTO `dict_area` VALUES ('542427', '索县', '542400');
-INSERT INTO `dict_area` VALUES ('542428', '班戈县', '542400');
-INSERT INTO `dict_area` VALUES ('542429', '巴青县', '542400');
-INSERT INTO `dict_area` VALUES ('542430', '尼玛县', '542400');
-INSERT INTO `dict_area` VALUES ('542431', '双湖县', '542400');
-INSERT INTO `dict_area` VALUES ('542500', '阿里地区', '540000');
-INSERT INTO `dict_area` VALUES ('542521', '普兰县', '542500');
-INSERT INTO `dict_area` VALUES ('542522', '札达县', '542500');
-INSERT INTO `dict_area` VALUES ('542523', '噶尔县', '542500');
-INSERT INTO `dict_area` VALUES ('542524', '日土县', '542500');
-INSERT INTO `dict_area` VALUES ('542525', '革吉县', '542500');
-INSERT INTO `dict_area` VALUES ('542526', '改则县', '542500');
-INSERT INTO `dict_area` VALUES ('542527', '措勤县', '542500');
-INSERT INTO `dict_area` VALUES ('610000', '陕西省', '-1');
-INSERT INTO `dict_area` VALUES ('610100', '西安市', '610000');
-INSERT INTO `dict_area` VALUES ('610102', '新城区', '610100');
-INSERT INTO `dict_area` VALUES ('610103', '碑林区', '610100');
-INSERT INTO `dict_area` VALUES ('610104', '莲湖区', '610100');
-INSERT INTO `dict_area` VALUES ('610111', '灞桥区', '610100');
-INSERT INTO `dict_area` VALUES ('610112', '未央区', '610100');
-INSERT INTO `dict_area` VALUES ('610113', '雁塔区', '610100');
-INSERT INTO `dict_area` VALUES ('610114', '阎良区', '610100');
-INSERT INTO `dict_area` VALUES ('610115', '临潼区', '610100');
-INSERT INTO `dict_area` VALUES ('610116', '长安区', '610100');
-INSERT INTO `dict_area` VALUES ('610117', '高陵区', '610100');
-INSERT INTO `dict_area` VALUES ('610118', '鄠邑区', '610100');
-INSERT INTO `dict_area` VALUES ('610122', '蓝田县', '610100');
-INSERT INTO `dict_area` VALUES ('610124', '周至县', '610100');
-INSERT INTO `dict_area` VALUES ('610200', '铜川市', '610000');
-INSERT INTO `dict_area` VALUES ('610202', '王益区', '610200');
-INSERT INTO `dict_area` VALUES ('610203', '印台区', '610200');
-INSERT INTO `dict_area` VALUES ('610204', '耀州区', '610200');
-INSERT INTO `dict_area` VALUES ('610222', '宜君县', '610200');
-INSERT INTO `dict_area` VALUES ('610300', '宝鸡市', '610000');
-INSERT INTO `dict_area` VALUES ('610302', '渭滨区', '610300');
-INSERT INTO `dict_area` VALUES ('610303', '金台区', '610300');
-INSERT INTO `dict_area` VALUES ('610304', '陈仓区', '610300');
-INSERT INTO `dict_area` VALUES ('610322', '凤翔县', '610300');
-INSERT INTO `dict_area` VALUES ('610323', '岐山县', '610300');
-INSERT INTO `dict_area` VALUES ('610324', '扶风县', '610300');
-INSERT INTO `dict_area` VALUES ('610326', '眉县', '610300');
-INSERT INTO `dict_area` VALUES ('610327', '陇县', '610300');
-INSERT INTO `dict_area` VALUES ('610328', '千阳县', '610300');
-INSERT INTO `dict_area` VALUES ('610329', '麟游县', '610300');
-INSERT INTO `dict_area` VALUES ('610330', '凤县', '610300');
-INSERT INTO `dict_area` VALUES ('610331', '太白县', '610300');
-INSERT INTO `dict_area` VALUES ('610400', '咸阳市', '610000');
-INSERT INTO `dict_area` VALUES ('610402', '秦都区', '610400');
-INSERT INTO `dict_area` VALUES ('610403', '杨陵区', '610400');
-INSERT INTO `dict_area` VALUES ('610404', '渭城区', '610400');
-INSERT INTO `dict_area` VALUES ('610422', '三原县', '610400');
-INSERT INTO `dict_area` VALUES ('610423', '泾阳县', '610400');
-INSERT INTO `dict_area` VALUES ('610424', '乾县', '610400');
-INSERT INTO `dict_area` VALUES ('610425', '礼泉县', '610400');
-INSERT INTO `dict_area` VALUES ('610426', '永寿县', '610400');
-INSERT INTO `dict_area` VALUES ('610427', '彬县', '610400');
-INSERT INTO `dict_area` VALUES ('610428', '长武县', '610400');
-INSERT INTO `dict_area` VALUES ('610429', '旬邑县', '610400');
-INSERT INTO `dict_area` VALUES ('610430', '淳化县', '610400');
-INSERT INTO `dict_area` VALUES ('610431', '武功县', '610400');
-INSERT INTO `dict_area` VALUES ('610481', '兴平市', '610400');
-INSERT INTO `dict_area` VALUES ('610500', '渭南市', '610000');
-INSERT INTO `dict_area` VALUES ('610502', '临渭区', '610500');
-INSERT INTO `dict_area` VALUES ('610503', '华州区', '610500');
-INSERT INTO `dict_area` VALUES ('610522', '潼关县', '610500');
-INSERT INTO `dict_area` VALUES ('610523', '大荔县', '610500');
-INSERT INTO `dict_area` VALUES ('610524', '合阳县', '610500');
-INSERT INTO `dict_area` VALUES ('610525', '澄城县', '610500');
-INSERT INTO `dict_area` VALUES ('610526', '蒲城县', '610500');
-INSERT INTO `dict_area` VALUES ('610527', '白水县', '610500');
-INSERT INTO `dict_area` VALUES ('610528', '富平县', '610500');
-INSERT INTO `dict_area` VALUES ('610581', '韩城市', '610500');
-INSERT INTO `dict_area` VALUES ('610582', '华阴市', '610500');
-INSERT INTO `dict_area` VALUES ('610600', '延安市', '610000');
-INSERT INTO `dict_area` VALUES ('610602', '宝塔区', '610600');
-INSERT INTO `dict_area` VALUES ('610603', '安塞区', '610600');
-INSERT INTO `dict_area` VALUES ('610621', '延长县', '610600');
-INSERT INTO `dict_area` VALUES ('610622', '延川县', '610600');
-INSERT INTO `dict_area` VALUES ('610623', '子长县', '610600');
-INSERT INTO `dict_area` VALUES ('610625', '志丹县', '610600');
-INSERT INTO `dict_area` VALUES ('610626', '吴起县', '610600');
-INSERT INTO `dict_area` VALUES ('610627', '甘泉县', '610600');
-INSERT INTO `dict_area` VALUES ('610628', '富县', '610600');
-INSERT INTO `dict_area` VALUES ('610629', '洛川县', '610600');
-INSERT INTO `dict_area` VALUES ('610630', '宜川县', '610600');
-INSERT INTO `dict_area` VALUES ('610631', '黄龙县', '610600');
-INSERT INTO `dict_area` VALUES ('610632', '黄陵县', '610600');
-INSERT INTO `dict_area` VALUES ('610700', '汉中市', '610000');
-INSERT INTO `dict_area` VALUES ('610702', '汉台区', '610700');
-INSERT INTO `dict_area` VALUES ('610721', '南郑县', '610700');
-INSERT INTO `dict_area` VALUES ('610722', '城固县', '610700');
-INSERT INTO `dict_area` VALUES ('610723', '洋县', '610700');
-INSERT INTO `dict_area` VALUES ('610724', '西乡县', '610700');
-INSERT INTO `dict_area` VALUES ('610725', '勉县', '610700');
-INSERT INTO `dict_area` VALUES ('610726', '宁强县', '610700');
-INSERT INTO `dict_area` VALUES ('610727', '略阳县', '610700');
-INSERT INTO `dict_area` VALUES ('610728', '镇巴县', '610700');
-INSERT INTO `dict_area` VALUES ('610729', '留坝县', '610700');
-INSERT INTO `dict_area` VALUES ('610730', '佛坪县', '610700');
-INSERT INTO `dict_area` VALUES ('610800', '榆林市', '610000');
-INSERT INTO `dict_area` VALUES ('610802', '榆阳区', '610800');
-INSERT INTO `dict_area` VALUES ('610803', '横山区', '610800');
-INSERT INTO `dict_area` VALUES ('610822', '府谷县', '610800');
-INSERT INTO `dict_area` VALUES ('610824', '靖边县', '610800');
-INSERT INTO `dict_area` VALUES ('610825', '定边县', '610800');
-INSERT INTO `dict_area` VALUES ('610826', '绥德县', '610800');
-INSERT INTO `dict_area` VALUES ('610827', '米脂县', '610800');
-INSERT INTO `dict_area` VALUES ('610828', '佳县', '610800');
-INSERT INTO `dict_area` VALUES ('610829', '吴堡县', '610800');
-INSERT INTO `dict_area` VALUES ('610830', '清涧县', '610800');
-INSERT INTO `dict_area` VALUES ('610831', '子洲县', '610800');
-INSERT INTO `dict_area` VALUES ('610881', '神木市', '610800');
-INSERT INTO `dict_area` VALUES ('610900', '安康市', '610000');
-INSERT INTO `dict_area` VALUES ('610902', '汉滨区', '610900');
-INSERT INTO `dict_area` VALUES ('610921', '汉阴县', '610900');
-INSERT INTO `dict_area` VALUES ('610922', '石泉县', '610900');
-INSERT INTO `dict_area` VALUES ('610923', '宁陕县', '610900');
-INSERT INTO `dict_area` VALUES ('610924', '紫阳县', '610900');
-INSERT INTO `dict_area` VALUES ('610925', '岚皋县', '610900');
-INSERT INTO `dict_area` VALUES ('610926', '平利县', '610900');
-INSERT INTO `dict_area` VALUES ('610927', '镇坪县', '610900');
-INSERT INTO `dict_area` VALUES ('610928', '旬阳县', '610900');
-INSERT INTO `dict_area` VALUES ('610929', '白河县', '610900');
-INSERT INTO `dict_area` VALUES ('611000', '商洛市', '610000');
-INSERT INTO `dict_area` VALUES ('611002', '商州区', '611000');
-INSERT INTO `dict_area` VALUES ('611021', '洛南县', '611000');
-INSERT INTO `dict_area` VALUES ('611022', '丹凤县', '611000');
-INSERT INTO `dict_area` VALUES ('611023', '商南县', '611000');
-INSERT INTO `dict_area` VALUES ('611024', '山阳县', '611000');
-INSERT INTO `dict_area` VALUES ('611025', '镇安县', '611000');
-INSERT INTO `dict_area` VALUES ('611026', '柞水县', '611000');
-INSERT INTO `dict_area` VALUES ('620000', '甘肃省', '-1');
-INSERT INTO `dict_area` VALUES ('620100', '兰州市', '620000');
-INSERT INTO `dict_area` VALUES ('620102', '城关区', '620100');
-INSERT INTO `dict_area` VALUES ('620103', '七里河区', '620100');
-INSERT INTO `dict_area` VALUES ('620104', '西固区', '620100');
-INSERT INTO `dict_area` VALUES ('620105', '安宁区', '620100');
-INSERT INTO `dict_area` VALUES ('620111', '红古区', '620100');
-INSERT INTO `dict_area` VALUES ('620121', '永登县', '620100');
-INSERT INTO `dict_area` VALUES ('620122', '皋兰县', '620100');
-INSERT INTO `dict_area` VALUES ('620123', '榆中县', '620100');
-INSERT INTO `dict_area` VALUES ('620200', '嘉峪关市', '620000');
-INSERT INTO `dict_area` VALUES ('620201', '嘉峪关市', '620200');
-INSERT INTO `dict_area` VALUES ('620300', '金昌市', '620000');
-INSERT INTO `dict_area` VALUES ('620302', '金川区', '620300');
-INSERT INTO `dict_area` VALUES ('620321', '永昌县', '620300');
-INSERT INTO `dict_area` VALUES ('620400', '白银市', '620000');
-INSERT INTO `dict_area` VALUES ('620402', '白银区', '620400');
-INSERT INTO `dict_area` VALUES ('620403', '平川区', '620400');
-INSERT INTO `dict_area` VALUES ('620421', '靖远县', '620400');
-INSERT INTO `dict_area` VALUES ('620422', '会宁县', '620400');
-INSERT INTO `dict_area` VALUES ('620423', '景泰县', '620400');
-INSERT INTO `dict_area` VALUES ('620500', '天水市', '620000');
-INSERT INTO `dict_area` VALUES ('620502', '秦州区', '620500');
-INSERT INTO `dict_area` VALUES ('620503', '麦积区', '620500');
-INSERT INTO `dict_area` VALUES ('620521', '清水县', '620500');
-INSERT INTO `dict_area` VALUES ('620522', '秦安县', '620500');
-INSERT INTO `dict_area` VALUES ('620523', '甘谷县', '620500');
-INSERT INTO `dict_area` VALUES ('620524', '武山县', '620500');
-INSERT INTO `dict_area` VALUES ('620525', '张家川回族自治县', '620500');
-INSERT INTO `dict_area` VALUES ('620600', '武威市', '620000');
-INSERT INTO `dict_area` VALUES ('620602', '凉州区', '620600');
-INSERT INTO `dict_area` VALUES ('620621', '民勤县', '620600');
-INSERT INTO `dict_area` VALUES ('620622', '古浪县', '620600');
-INSERT INTO `dict_area` VALUES ('620623', '天祝藏族自治县', '620600');
-INSERT INTO `dict_area` VALUES ('620700', '张掖市', '620000');
-INSERT INTO `dict_area` VALUES ('620702', '甘州区', '620700');
-INSERT INTO `dict_area` VALUES ('620721', '肃南裕固族自治县', '620700');
-INSERT INTO `dict_area` VALUES ('620722', '民乐县', '620700');
-INSERT INTO `dict_area` VALUES ('620723', '临泽县', '620700');
-INSERT INTO `dict_area` VALUES ('620724', '高台县', '620700');
-INSERT INTO `dict_area` VALUES ('620725', '山丹县', '620700');
-INSERT INTO `dict_area` VALUES ('620800', '平凉市', '620000');
-INSERT INTO `dict_area` VALUES ('620802', '崆峒区', '620800');
-INSERT INTO `dict_area` VALUES ('620821', '泾川县', '620800');
-INSERT INTO `dict_area` VALUES ('620822', '灵台县', '620800');
-INSERT INTO `dict_area` VALUES ('620823', '崇信县', '620800');
-INSERT INTO `dict_area` VALUES ('620824', '华亭县', '620800');
-INSERT INTO `dict_area` VALUES ('620825', '庄浪县', '620800');
-INSERT INTO `dict_area` VALUES ('620826', '静宁县', '620800');
-INSERT INTO `dict_area` VALUES ('620900', '酒泉市', '620000');
-INSERT INTO `dict_area` VALUES ('620902', '肃州区', '620900');
-INSERT INTO `dict_area` VALUES ('620921', '金塔县', '620900');
-INSERT INTO `dict_area` VALUES ('620922', '瓜州县', '620900');
-INSERT INTO `dict_area` VALUES ('620923', '肃北蒙古族自治县', '620900');
-INSERT INTO `dict_area` VALUES ('620924', '阿克塞哈萨克族自治县', '620900');
-INSERT INTO `dict_area` VALUES ('620981', '玉门市', '620900');
-INSERT INTO `dict_area` VALUES ('620982', '敦煌市', '620900');
-INSERT INTO `dict_area` VALUES ('621000', '庆阳市', '620000');
-INSERT INTO `dict_area` VALUES ('621002', '西峰区', '621000');
-INSERT INTO `dict_area` VALUES ('621021', '庆城县', '621000');
-INSERT INTO `dict_area` VALUES ('621022', '环县', '621000');
-INSERT INTO `dict_area` VALUES ('621023', '华池县', '621000');
-INSERT INTO `dict_area` VALUES ('621024', '合水县', '621000');
-INSERT INTO `dict_area` VALUES ('621025', '正宁县', '621000');
-INSERT INTO `dict_area` VALUES ('621026', '宁县', '621000');
-INSERT INTO `dict_area` VALUES ('621027', '镇原县', '621000');
-INSERT INTO `dict_area` VALUES ('621100', '定西市', '620000');
-INSERT INTO `dict_area` VALUES ('621102', '安定区', '621100');
-INSERT INTO `dict_area` VALUES ('621121', '通渭县', '621100');
-INSERT INTO `dict_area` VALUES ('621122', '陇西县', '621100');
-INSERT INTO `dict_area` VALUES ('621123', '渭源县', '621100');
-INSERT INTO `dict_area` VALUES ('621124', '临洮县', '621100');
-INSERT INTO `dict_area` VALUES ('621125', '漳县', '621100');
-INSERT INTO `dict_area` VALUES ('621126', '岷县', '621100');
-INSERT INTO `dict_area` VALUES ('621200', '陇南市', '620000');
-INSERT INTO `dict_area` VALUES ('621202', '武都区', '621200');
-INSERT INTO `dict_area` VALUES ('621221', '成县', '621200');
-INSERT INTO `dict_area` VALUES ('621222', '文县', '621200');
-INSERT INTO `dict_area` VALUES ('621223', '宕昌县', '621200');
-INSERT INTO `dict_area` VALUES ('621224', '康县', '621200');
-INSERT INTO `dict_area` VALUES ('621225', '西和县', '621200');
-INSERT INTO `dict_area` VALUES ('621226', '礼县', '621200');
-INSERT INTO `dict_area` VALUES ('621227', '徽县', '621200');
-INSERT INTO `dict_area` VALUES ('621228', '两当县', '621200');
-INSERT INTO `dict_area` VALUES ('622900', '临夏回族自治州', '620000');
-INSERT INTO `dict_area` VALUES ('622901', '临夏市', '622900');
-INSERT INTO `dict_area` VALUES ('622921', '临夏县', '622900');
-INSERT INTO `dict_area` VALUES ('622922', '康乐县', '622900');
-INSERT INTO `dict_area` VALUES ('622923', '永靖县', '622900');
-INSERT INTO `dict_area` VALUES ('622924', '广河县', '622900');
-INSERT INTO `dict_area` VALUES ('622925', '和政县', '622900');
-INSERT INTO `dict_area` VALUES ('622926', '东乡族自治县', '622900');
-INSERT INTO `dict_area` VALUES ('622927', '积石山保安族东乡族撒拉族自治县', '622900');
-INSERT INTO `dict_area` VALUES ('623000', '甘南藏族自治州', '620000');
-INSERT INTO `dict_area` VALUES ('623001', '合作市', '623000');
-INSERT INTO `dict_area` VALUES ('623021', '临潭县', '623000');
-INSERT INTO `dict_area` VALUES ('623022', '卓尼县', '623000');
-INSERT INTO `dict_area` VALUES ('623023', '舟曲县', '623000');
-INSERT INTO `dict_area` VALUES ('623024', '迭部县', '623000');
-INSERT INTO `dict_area` VALUES ('623025', '玛曲县', '623000');
-INSERT INTO `dict_area` VALUES ('623026', '碌曲县', '623000');
-INSERT INTO `dict_area` VALUES ('623027', '夏河县', '623000');
-INSERT INTO `dict_area` VALUES ('630000', '青海省', '-1');
-INSERT INTO `dict_area` VALUES ('630100', '西宁市', '630000');
-INSERT INTO `dict_area` VALUES ('630102', '城东区', '630100');
-INSERT INTO `dict_area` VALUES ('630103', '城中区', '630100');
-INSERT INTO `dict_area` VALUES ('630104', '城西区', '630100');
-INSERT INTO `dict_area` VALUES ('630105', '城北区', '630100');
-INSERT INTO `dict_area` VALUES ('630121', '大通回族土族自治县', '630100');
-INSERT INTO `dict_area` VALUES ('630122', '湟中县', '630100');
-INSERT INTO `dict_area` VALUES ('630123', '湟源县', '630100');
-INSERT INTO `dict_area` VALUES ('630200', '海东市', '630000');
-INSERT INTO `dict_area` VALUES ('630202', '乐都区', '630200');
-INSERT INTO `dict_area` VALUES ('630203', '平安区', '630200');
-INSERT INTO `dict_area` VALUES ('630222', '民和回族土族自治县', '630200');
-INSERT INTO `dict_area` VALUES ('630223', '互助土族自治县', '630200');
-INSERT INTO `dict_area` VALUES ('630224', '化隆回族自治县', '630200');
-INSERT INTO `dict_area` VALUES ('630225', '循化撒拉族自治县', '630200');
-INSERT INTO `dict_area` VALUES ('632200', '海北藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632221', '门源回族自治县', '632200');
-INSERT INTO `dict_area` VALUES ('632222', '祁连县', '632200');
-INSERT INTO `dict_area` VALUES ('632223', '海晏县', '632200');
-INSERT INTO `dict_area` VALUES ('632224', '刚察县', '632200');
-INSERT INTO `dict_area` VALUES ('632300', '黄南藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632321', '同仁县', '632300');
-INSERT INTO `dict_area` VALUES ('632322', '尖扎县', '632300');
-INSERT INTO `dict_area` VALUES ('632323', '泽库县', '632300');
-INSERT INTO `dict_area` VALUES ('632324', '河南蒙古族自治县', '632300');
-INSERT INTO `dict_area` VALUES ('632500', '海南藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632521', '共和县', '632500');
-INSERT INTO `dict_area` VALUES ('632522', '同德县', '632500');
-INSERT INTO `dict_area` VALUES ('632523', '贵德县', '632500');
-INSERT INTO `dict_area` VALUES ('632524', '兴海县', '632500');
-INSERT INTO `dict_area` VALUES ('632525', '贵南县', '632500');
-INSERT INTO `dict_area` VALUES ('632600', '果洛藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632621', '玛沁县', '632600');
-INSERT INTO `dict_area` VALUES ('632622', '班玛县', '632600');
-INSERT INTO `dict_area` VALUES ('632623', '甘德县', '632600');
-INSERT INTO `dict_area` VALUES ('632624', '达日县', '632600');
-INSERT INTO `dict_area` VALUES ('632625', '久治县', '632600');
-INSERT INTO `dict_area` VALUES ('632626', '玛多县', '632600');
-INSERT INTO `dict_area` VALUES ('632700', '玉树藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632701', '玉树市', '632700');
-INSERT INTO `dict_area` VALUES ('632722', '杂多县', '632700');
-INSERT INTO `dict_area` VALUES ('632723', '称多县', '632700');
-INSERT INTO `dict_area` VALUES ('632724', '治多县', '632700');
-INSERT INTO `dict_area` VALUES ('632725', '囊谦县', '632700');
-INSERT INTO `dict_area` VALUES ('632726', '曲麻莱县', '632700');
-INSERT INTO `dict_area` VALUES ('632800', '海西蒙古族藏族自治州', '630000');
-INSERT INTO `dict_area` VALUES ('632801', '格尔木市', '632800');
-INSERT INTO `dict_area` VALUES ('632802', '德令哈市', '632800');
-INSERT INTO `dict_area` VALUES ('632821', '乌兰县', '632800');
-INSERT INTO `dict_area` VALUES ('632822', '都兰县', '632800');
-INSERT INTO `dict_area` VALUES ('632823', '天峻县', '632800');
-INSERT INTO `dict_area` VALUES ('632824', '冷湖行政区', '632800');
-INSERT INTO `dict_area` VALUES ('632825', '大柴旦行政区', '632800');
-INSERT INTO `dict_area` VALUES ('632826', '茫崖行政区', '632800');
-INSERT INTO `dict_area` VALUES ('640000', '宁夏回族自治区', '-1');
-INSERT INTO `dict_area` VALUES ('640100', '银川市', '640000');
-INSERT INTO `dict_area` VALUES ('640104', '兴庆区', '640100');
-INSERT INTO `dict_area` VALUES ('640105', '西夏区', '640100');
-INSERT INTO `dict_area` VALUES ('640106', '金凤区', '640100');
-INSERT INTO `dict_area` VALUES ('640121', '永宁县', '640100');
-INSERT INTO `dict_area` VALUES ('640122', '贺兰县', '640100');
-INSERT INTO `dict_area` VALUES ('640181', '灵武市', '640100');
-INSERT INTO `dict_area` VALUES ('640200', '石嘴山市', '640000');
-INSERT INTO `dict_area` VALUES ('640202', '大武口区', '640200');
-INSERT INTO `dict_area` VALUES ('640205', '惠农区', '640200');
-INSERT INTO `dict_area` VALUES ('640221', '平罗县', '640200');
-INSERT INTO `dict_area` VALUES ('640300', '吴忠市', '640000');
-INSERT INTO `dict_area` VALUES ('640302', '利通区', '640300');
-INSERT INTO `dict_area` VALUES ('640303', '红寺堡区', '640300');
-INSERT INTO `dict_area` VALUES ('640323', '盐池县', '640300');
-INSERT INTO `dict_area` VALUES ('640324', '同心县', '640300');
-INSERT INTO `dict_area` VALUES ('640381', '青铜峡市', '640300');
-INSERT INTO `dict_area` VALUES ('640400', '固原市', '640000');
-INSERT INTO `dict_area` VALUES ('640402', '原州区', '640400');
-INSERT INTO `dict_area` VALUES ('640422', '西吉县', '640400');
-INSERT INTO `dict_area` VALUES ('640423', '隆德县', '640400');
-INSERT INTO `dict_area` VALUES ('640424', '泾源县', '640400');
-INSERT INTO `dict_area` VALUES ('640425', '彭阳县', '640400');
-INSERT INTO `dict_area` VALUES ('640500', '中卫市', '640000');
-INSERT INTO `dict_area` VALUES ('640502', '沙坡头区', '640500');
-INSERT INTO `dict_area` VALUES ('640521', '中宁县', '640500');
-INSERT INTO `dict_area` VALUES ('640522', '海原县', '640500');
-INSERT INTO `dict_area` VALUES ('650000', '新疆维吾尔自治区', '-1');
-INSERT INTO `dict_area` VALUES ('650100', '乌鲁木齐市', '650000');
-INSERT INTO `dict_area` VALUES ('650102', '天山区', '650100');
-INSERT INTO `dict_area` VALUES ('650103', '沙依巴克区', '650100');
-INSERT INTO `dict_area` VALUES ('650104', '新市区', '650100');
-INSERT INTO `dict_area` VALUES ('650105', '水磨沟区', '650100');
-INSERT INTO `dict_area` VALUES ('650106', '头屯河区', '650100');
-INSERT INTO `dict_area` VALUES ('650107', '达坂城区', '650100');
-INSERT INTO `dict_area` VALUES ('650109', '米东区', '650100');
-INSERT INTO `dict_area` VALUES ('650121', '乌鲁木齐县', '650100');
-INSERT INTO `dict_area` VALUES ('650200', '克拉玛依市', '650000');
-INSERT INTO `dict_area` VALUES ('650202', '独山子区', '650200');
-INSERT INTO `dict_area` VALUES ('650203', '克拉玛依区', '650200');
-INSERT INTO `dict_area` VALUES ('650204', '白碱滩区', '650200');
-INSERT INTO `dict_area` VALUES ('650205', '乌尔禾区', '650200');
-INSERT INTO `dict_area` VALUES ('650400', '吐鲁番市', '650000');
-INSERT INTO `dict_area` VALUES ('650402', '高昌区', '650400');
-INSERT INTO `dict_area` VALUES ('650421', '鄯善县', '650400');
-INSERT INTO `dict_area` VALUES ('650422', '托克逊县', '650400');
-INSERT INTO `dict_area` VALUES ('650500', '哈密市', '650000');
-INSERT INTO `dict_area` VALUES ('650502', '伊州区', '650500');
-INSERT INTO `dict_area` VALUES ('650521', '巴里坤哈萨克自治县', '650500');
-INSERT INTO `dict_area` VALUES ('650522', '伊吾县', '650500');
-INSERT INTO `dict_area` VALUES ('652300', '昌吉回族自治州', '650000');
-INSERT INTO `dict_area` VALUES ('652301', '昌吉市', '652300');
-INSERT INTO `dict_area` VALUES ('652302', '阜康市', '652300');
-INSERT INTO `dict_area` VALUES ('652323', '呼图壁县', '652300');
-INSERT INTO `dict_area` VALUES ('652324', '玛纳斯县', '652300');
-INSERT INTO `dict_area` VALUES ('652325', '奇台县', '652300');
-INSERT INTO `dict_area` VALUES ('652327', '吉木萨尔县', '652300');
-INSERT INTO `dict_area` VALUES ('652328', '木垒哈萨克自治县', '652300');
-INSERT INTO `dict_area` VALUES ('652700', '博尔塔拉蒙古自治州', '650000');
-INSERT INTO `dict_area` VALUES ('652701', '博乐市', '652700');
-INSERT INTO `dict_area` VALUES ('652702', '阿拉山口市', '652700');
-INSERT INTO `dict_area` VALUES ('652722', '精河县', '652700');
-INSERT INTO `dict_area` VALUES ('652723', '温泉县', '652700');
-INSERT INTO `dict_area` VALUES ('652800', '巴音郭楞蒙古自治州', '650000');
-INSERT INTO `dict_area` VALUES ('652801', '库尔勒市', '652800');
-INSERT INTO `dict_area` VALUES ('652822', '轮台县', '652800');
-INSERT INTO `dict_area` VALUES ('652823', '尉犁县', '652800');
-INSERT INTO `dict_area` VALUES ('652824', '若羌县', '652800');
-INSERT INTO `dict_area` VALUES ('652825', '且末县', '652800');
-INSERT INTO `dict_area` VALUES ('652826', '焉耆回族自治县', '652800');
-INSERT INTO `dict_area` VALUES ('652827', '和静县', '652800');
-INSERT INTO `dict_area` VALUES ('652828', '和硕县', '652800');
-INSERT INTO `dict_area` VALUES ('652829', '博湖县', '652800');
-INSERT INTO `dict_area` VALUES ('652900', '阿克苏地区', '650000');
-INSERT INTO `dict_area` VALUES ('652901', '阿克苏市', '652900');
-INSERT INTO `dict_area` VALUES ('652922', '温宿县', '652900');
-INSERT INTO `dict_area` VALUES ('652923', '库车县', '652900');
-INSERT INTO `dict_area` VALUES ('652924', '沙雅县', '652900');
-INSERT INTO `dict_area` VALUES ('652925', '新和县', '652900');
-INSERT INTO `dict_area` VALUES ('652926', '拜城县', '652900');
-INSERT INTO `dict_area` VALUES ('652927', '乌什县', '652900');
-INSERT INTO `dict_area` VALUES ('652928', '阿瓦提县', '652900');
-INSERT INTO `dict_area` VALUES ('652929', '柯坪县', '652900');
-INSERT INTO `dict_area` VALUES ('653000', '克孜勒苏柯尔克孜自治州', '650000');
-INSERT INTO `dict_area` VALUES ('653001', '阿图什市', '653000');
-INSERT INTO `dict_area` VALUES ('653022', '阿克陶县', '653000');
-INSERT INTO `dict_area` VALUES ('653023', '阿合奇县', '653000');
-INSERT INTO `dict_area` VALUES ('653024', '乌恰县', '653000');
-INSERT INTO `dict_area` VALUES ('653100', '喀什地区', '650000');
-INSERT INTO `dict_area` VALUES ('653101', '喀什市', '653100');
-INSERT INTO `dict_area` VALUES ('653121', '疏附县', '653100');
-INSERT INTO `dict_area` VALUES ('653122', '疏勒县', '653100');
-INSERT INTO `dict_area` VALUES ('653123', '英吉沙县', '653100');
-INSERT INTO `dict_area` VALUES ('653124', '泽普县', '653100');
-INSERT INTO `dict_area` VALUES ('653125', '莎车县', '653100');
-INSERT INTO `dict_area` VALUES ('653126', '叶城县', '653100');
-INSERT INTO `dict_area` VALUES ('653127', '麦盖提县', '653100');
-INSERT INTO `dict_area` VALUES ('653128', '岳普湖县', '653100');
-INSERT INTO `dict_area` VALUES ('653129', '伽师县', '653100');
-INSERT INTO `dict_area` VALUES ('653130', '巴楚县', '653100');
-INSERT INTO `dict_area` VALUES ('653131', '塔什库尔干塔吉克自治县', '653100');
-INSERT INTO `dict_area` VALUES ('653200', '和田地区', '650000');
-INSERT INTO `dict_area` VALUES ('653201', '和田市', '653200');
-INSERT INTO `dict_area` VALUES ('653221', '和田县', '653200');
-INSERT INTO `dict_area` VALUES ('653222', '墨玉县', '653200');
-INSERT INTO `dict_area` VALUES ('653223', '皮山县', '653200');
-INSERT INTO `dict_area` VALUES ('653224', '洛浦县', '653200');
-INSERT INTO `dict_area` VALUES ('653225', '策勒县', '653200');
-INSERT INTO `dict_area` VALUES ('653226', '于田县', '653200');
-INSERT INTO `dict_area` VALUES ('653227', '民丰县', '653200');
-INSERT INTO `dict_area` VALUES ('654000', '伊犁哈萨克自治州', '650000');
-INSERT INTO `dict_area` VALUES ('654002', '伊宁市', '654000');
-INSERT INTO `dict_area` VALUES ('654003', '奎屯市', '654000');
-INSERT INTO `dict_area` VALUES ('654004', '霍尔果斯市', '654000');
-INSERT INTO `dict_area` VALUES ('654021', '伊宁县', '654000');
-INSERT INTO `dict_area` VALUES ('654022', '察布查尔锡伯自治县', '654000');
-INSERT INTO `dict_area` VALUES ('654023', '霍城县', '654000');
-INSERT INTO `dict_area` VALUES ('654024', '巩留县', '654000');
-INSERT INTO `dict_area` VALUES ('654025', '新源县', '654000');
-INSERT INTO `dict_area` VALUES ('654026', '昭苏县', '654000');
-INSERT INTO `dict_area` VALUES ('654027', '特克斯县', '654000');
-INSERT INTO `dict_area` VALUES ('654028', '尼勒克县', '654000');
-INSERT INTO `dict_area` VALUES ('654200', '塔城地区', '650000');
-INSERT INTO `dict_area` VALUES ('654201', '塔城市', '654200');
-INSERT INTO `dict_area` VALUES ('654202', '乌苏市', '654200');
-INSERT INTO `dict_area` VALUES ('654221', '额敏县', '654200');
-INSERT INTO `dict_area` VALUES ('654223', '沙湾县', '654200');
-INSERT INTO `dict_area` VALUES ('654224', '托里县', '654200');
-INSERT INTO `dict_area` VALUES ('654225', '裕民县', '654200');
-INSERT INTO `dict_area` VALUES ('654226', '和布克赛尔蒙古自治县', '654200');
-INSERT INTO `dict_area` VALUES ('654300', '阿勒泰地区', '650000');
-INSERT INTO `dict_area` VALUES ('654301', '阿勒泰市', '654300');
-INSERT INTO `dict_area` VALUES ('654321', '布尔津县', '654300');
-INSERT INTO `dict_area` VALUES ('654322', '富蕴县', '654300');
-INSERT INTO `dict_area` VALUES ('654323', '福海县', '654300');
-INSERT INTO `dict_area` VALUES ('654324', '哈巴河县', '654300');
-INSERT INTO `dict_area` VALUES ('654325', '青河县', '654300');
-INSERT INTO `dict_area` VALUES ('654326', '吉木乃县', '654300');
-INSERT INTO `dict_area` VALUES ('659100', '石河子市', '650000');
-INSERT INTO `dict_area` VALUES ('659200', '阿拉尔市', '650000');
-INSERT INTO `dict_area` VALUES ('659300', '图木舒克市', '650000');
-INSERT INTO `dict_area` VALUES ('659400', '五家渠市', '650000');
-INSERT INTO `dict_area` VALUES ('659500', '北屯市', '650000');
-INSERT INTO `dict_area` VALUES ('659600', '铁门关市', '650000');
-INSERT INTO `dict_area` VALUES ('659700', '双河市', '650000');
-INSERT INTO `dict_area` VALUES ('659800', '可克达拉市', '650000');
-INSERT INTO `dict_area` VALUES ('659900', '昆玉市', '650000');
-INSERT INTO `dict_area` VALUES ('710000', '台湾省', '-1');
-INSERT INTO `dict_area` VALUES ('710100', '台北市', '710000');
-INSERT INTO `dict_area` VALUES ('710101', '中正区', '710100');
-INSERT INTO `dict_area` VALUES ('710102', '大同区', '710100');
-INSERT INTO `dict_area` VALUES ('710103', '中山区', '710100');
-INSERT INTO `dict_area` VALUES ('710104', '松山区', '710100');
-INSERT INTO `dict_area` VALUES ('710105', '大安区', '710100');
-INSERT INTO `dict_area` VALUES ('710106', '万华区', '710100');
-INSERT INTO `dict_area` VALUES ('710107', '信义区', '710100');
-INSERT INTO `dict_area` VALUES ('710108', '士林区', '710100');
-INSERT INTO `dict_area` VALUES ('710109', '北投区', '710100');
-INSERT INTO `dict_area` VALUES ('710110', '内湖区', '710100');
-INSERT INTO `dict_area` VALUES ('710111', '南港区', '710100');
-INSERT INTO `dict_area` VALUES ('710112', '文山区', '710100');
-INSERT INTO `dict_area` VALUES ('710200', '高雄市', '710000');
-INSERT INTO `dict_area` VALUES ('710201', '新兴区', '710200');
-INSERT INTO `dict_area` VALUES ('710202', '前金区', '710200');
-INSERT INTO `dict_area` VALUES ('710203', '苓雅区', '710200');
-INSERT INTO `dict_area` VALUES ('710204', '盐埕区', '710200');
-INSERT INTO `dict_area` VALUES ('710205', '鼓山区', '710200');
-INSERT INTO `dict_area` VALUES ('710206', '旗津区', '710200');
-INSERT INTO `dict_area` VALUES ('710207', '前镇区', '710200');
-INSERT INTO `dict_area` VALUES ('710208', '三民区', '710200');
-INSERT INTO `dict_area` VALUES ('710209', '左营区', '710200');
-INSERT INTO `dict_area` VALUES ('710210', '楠梓区', '710200');
-INSERT INTO `dict_area` VALUES ('710211', '小港区', '710200');
-INSERT INTO `dict_area` VALUES ('710242', '仁武区', '710200');
-INSERT INTO `dict_area` VALUES ('710243', '大社区', '710200');
-INSERT INTO `dict_area` VALUES ('710244', '冈山区', '710200');
-INSERT INTO `dict_area` VALUES ('710245', '路竹区', '710200');
-INSERT INTO `dict_area` VALUES ('710246', '阿莲区', '710200');
-INSERT INTO `dict_area` VALUES ('710247', '田寮区', '710200');
-INSERT INTO `dict_area` VALUES ('710248', '燕巢区', '710200');
-INSERT INTO `dict_area` VALUES ('710249', '桥头区', '710200');
-INSERT INTO `dict_area` VALUES ('710250', '梓官区', '710200');
-INSERT INTO `dict_area` VALUES ('710251', '弥陀区', '710200');
-INSERT INTO `dict_area` VALUES ('710252', '永安区', '710200');
-INSERT INTO `dict_area` VALUES ('710253', '湖内区', '710200');
-INSERT INTO `dict_area` VALUES ('710254', '凤山区', '710200');
-INSERT INTO `dict_area` VALUES ('710255', '大寮区', '710200');
-INSERT INTO `dict_area` VALUES ('710256', '林园区', '710200');
-INSERT INTO `dict_area` VALUES ('710257', '鸟松区', '710200');
-INSERT INTO `dict_area` VALUES ('710258', '大树区', '710200');
-INSERT INTO `dict_area` VALUES ('710259', '旗山区', '710200');
-INSERT INTO `dict_area` VALUES ('710260', '美浓区', '710200');
-INSERT INTO `dict_area` VALUES ('710261', '六龟区', '710200');
-INSERT INTO `dict_area` VALUES ('710262', '内门区', '710200');
-INSERT INTO `dict_area` VALUES ('710263', '杉林区', '710200');
-INSERT INTO `dict_area` VALUES ('710264', '甲仙区', '710200');
-INSERT INTO `dict_area` VALUES ('710265', '桃源区', '710200');
-INSERT INTO `dict_area` VALUES ('710266', '那玛夏区', '710200');
-INSERT INTO `dict_area` VALUES ('710267', '茂林区', '710200');
-INSERT INTO `dict_area` VALUES ('710268', '茄萣区', '710200');
-INSERT INTO `dict_area` VALUES ('710300', '台南市', '710000');
-INSERT INTO `dict_area` VALUES ('710301', '中西区', '710300');
-INSERT INTO `dict_area` VALUES ('710302', '东区', '710300');
-INSERT INTO `dict_area` VALUES ('710303', '南区', '710300');
-INSERT INTO `dict_area` VALUES ('710304', '北区', '710300');
-INSERT INTO `dict_area` VALUES ('710305', '安平区', '710300');
-INSERT INTO `dict_area` VALUES ('710306', '安南区', '710300');
-INSERT INTO `dict_area` VALUES ('710339', '永康区', '710300');
-INSERT INTO `dict_area` VALUES ('710340', '归仁区', '710300');
-INSERT INTO `dict_area` VALUES ('710341', '新化区', '710300');
-INSERT INTO `dict_area` VALUES ('710342', '左镇区', '710300');
-INSERT INTO `dict_area` VALUES ('710343', '玉井区', '710300');
-INSERT INTO `dict_area` VALUES ('710344', '楠西区', '710300');
-INSERT INTO `dict_area` VALUES ('710345', '南化区', '710300');
-INSERT INTO `dict_area` VALUES ('710346', '仁德区', '710300');
-INSERT INTO `dict_area` VALUES ('710347', '关庙区', '710300');
-INSERT INTO `dict_area` VALUES ('710348', '龙崎区', '710300');
-INSERT INTO `dict_area` VALUES ('710349', '官田区', '710300');
-INSERT INTO `dict_area` VALUES ('710350', '麻豆区', '710300');
-INSERT INTO `dict_area` VALUES ('710351', '佳里区', '710300');
-INSERT INTO `dict_area` VALUES ('710352', '西港区', '710300');
-INSERT INTO `dict_area` VALUES ('710353', '七股区', '710300');
-INSERT INTO `dict_area` VALUES ('710354', '将军区', '710300');
-INSERT INTO `dict_area` VALUES ('710355', '学甲区', '710300');
-INSERT INTO `dict_area` VALUES ('710356', '北门区', '710300');
-INSERT INTO `dict_area` VALUES ('710357', '新营区', '710300');
-INSERT INTO `dict_area` VALUES ('710358', '后壁区', '710300');
-INSERT INTO `dict_area` VALUES ('710359', '白河区', '710300');
-INSERT INTO `dict_area` VALUES ('710360', '东山区', '710300');
-INSERT INTO `dict_area` VALUES ('710361', '六甲区', '710300');
-INSERT INTO `dict_area` VALUES ('710362', '下营区', '710300');
-INSERT INTO `dict_area` VALUES ('710363', '柳营区', '710300');
-INSERT INTO `dict_area` VALUES ('710364', '盐水区', '710300');
-INSERT INTO `dict_area` VALUES ('710365', '善化区', '710300');
-INSERT INTO `dict_area` VALUES ('710366', '大内区', '710300');
-INSERT INTO `dict_area` VALUES ('710367', '山上区', '710300');
-INSERT INTO `dict_area` VALUES ('710368', '新市区', '710300');
-INSERT INTO `dict_area` VALUES ('710369', '安定区', '710300');
-INSERT INTO `dict_area` VALUES ('710400', '台中市', '710000');
-INSERT INTO `dict_area` VALUES ('710401', '中区', '710400');
-INSERT INTO `dict_area` VALUES ('710402', '东区', '710400');
-INSERT INTO `dict_area` VALUES ('710403', '南区', '710400');
-INSERT INTO `dict_area` VALUES ('710404', '西区', '710400');
-INSERT INTO `dict_area` VALUES ('710405', '北区', '710400');
-INSERT INTO `dict_area` VALUES ('710406', '北屯区', '710400');
-INSERT INTO `dict_area` VALUES ('710407', '西屯区', '710400');
-INSERT INTO `dict_area` VALUES ('710408', '南屯区', '710400');
-INSERT INTO `dict_area` VALUES ('710431', '太平区', '710400');
-INSERT INTO `dict_area` VALUES ('710432', '大里区', '710400');
-INSERT INTO `dict_area` VALUES ('710433', '雾峰区', '710400');
-INSERT INTO `dict_area` VALUES ('710434', '乌日区', '710400');
-INSERT INTO `dict_area` VALUES ('710435', '丰原区', '710400');
-INSERT INTO `dict_area` VALUES ('710436', '后里区', '710400');
-INSERT INTO `dict_area` VALUES ('710437', '石冈区', '710400');
-INSERT INTO `dict_area` VALUES ('710438', '东势区', '710400');
-INSERT INTO `dict_area` VALUES ('710439', '和平区', '710400');
-INSERT INTO `dict_area` VALUES ('710440', '新社区', '710400');
-INSERT INTO `dict_area` VALUES ('710441', '潭子区', '710400');
-INSERT INTO `dict_area` VALUES ('710442', '大雅区', '710400');
-INSERT INTO `dict_area` VALUES ('710443', '神冈区', '710400');
-INSERT INTO `dict_area` VALUES ('710444', '大肚区', '710400');
-INSERT INTO `dict_area` VALUES ('710445', '沙鹿区', '710400');
-INSERT INTO `dict_area` VALUES ('710446', '龙井区', '710400');
-INSERT INTO `dict_area` VALUES ('710447', '梧栖区', '710400');
-INSERT INTO `dict_area` VALUES ('710448', '清水区', '710400');
-INSERT INTO `dict_area` VALUES ('710449', '大甲区', '710400');
-INSERT INTO `dict_area` VALUES ('710450', '外埔区', '710400');
-INSERT INTO `dict_area` VALUES ('710451', '大安区', '710400');
-INSERT INTO `dict_area` VALUES ('710600', '南投县', '710000');
-INSERT INTO `dict_area` VALUES ('710614', '南投市', '710600');
-INSERT INTO `dict_area` VALUES ('710615', '中寮乡', '710600');
-INSERT INTO `dict_area` VALUES ('710616', '草屯镇', '710600');
-INSERT INTO `dict_area` VALUES ('710617', '国姓乡', '710600');
-INSERT INTO `dict_area` VALUES ('710618', '埔里镇', '710600');
-INSERT INTO `dict_area` VALUES ('710619', '仁爱乡', '710600');
-INSERT INTO `dict_area` VALUES ('710620', '名间乡', '710600');
-INSERT INTO `dict_area` VALUES ('710621', '集集镇', '710600');
-INSERT INTO `dict_area` VALUES ('710622', '水里乡', '710600');
-INSERT INTO `dict_area` VALUES ('710623', '鱼池乡', '710600');
-INSERT INTO `dict_area` VALUES ('710624', '信义乡', '710600');
-INSERT INTO `dict_area` VALUES ('710625', '竹山镇', '710600');
-INSERT INTO `dict_area` VALUES ('710626', '鹿谷乡', '710600');
-INSERT INTO `dict_area` VALUES ('710700', '基隆市', '710000');
-INSERT INTO `dict_area` VALUES ('710701', '仁爱区', '710700');
-INSERT INTO `dict_area` VALUES ('710702', '信义区', '710700');
-INSERT INTO `dict_area` VALUES ('710703', '中正区', '710700');
-INSERT INTO `dict_area` VALUES ('710704', '中山区', '710700');
-INSERT INTO `dict_area` VALUES ('710705', '安乐区', '710700');
-INSERT INTO `dict_area` VALUES ('710706', '暖暖区', '710700');
-INSERT INTO `dict_area` VALUES ('710707', '七堵区', '710700');
-INSERT INTO `dict_area` VALUES ('710800', '新竹市', '710000');
-INSERT INTO `dict_area` VALUES ('710801', '东区', '710800');
-INSERT INTO `dict_area` VALUES ('710802', '北区', '710800');
-INSERT INTO `dict_area` VALUES ('710803', '香山区', '710800');
-INSERT INTO `dict_area` VALUES ('710900', '嘉义市', '710000');
-INSERT INTO `dict_area` VALUES ('710901', '东区', '710900');
-INSERT INTO `dict_area` VALUES ('710902', '西区', '710900');
-INSERT INTO `dict_area` VALUES ('711100', '新北市', '710000');
-INSERT INTO `dict_area` VALUES ('711130', '万里区', '711100');
-INSERT INTO `dict_area` VALUES ('711131', '金山区', '711100');
-INSERT INTO `dict_area` VALUES ('711132', '板桥区', '711100');
-INSERT INTO `dict_area` VALUES ('711133', '汐止区', '711100');
-INSERT INTO `dict_area` VALUES ('711134', '深坑区', '711100');
-INSERT INTO `dict_area` VALUES ('711135', '石碇区', '711100');
-INSERT INTO `dict_area` VALUES ('711136', '瑞芳区', '711100');
-INSERT INTO `dict_area` VALUES ('711137', '平溪区', '711100');
-INSERT INTO `dict_area` VALUES ('711138', '双溪区', '711100');
-INSERT INTO `dict_area` VALUES ('711139', '贡寮区', '711100');
-INSERT INTO `dict_area` VALUES ('711140', '新店区', '711100');
-INSERT INTO `dict_area` VALUES ('711141', '坪林区', '711100');
-INSERT INTO `dict_area` VALUES ('711142', '乌来区', '711100');
-INSERT INTO `dict_area` VALUES ('711143', '永和区', '711100');
-INSERT INTO `dict_area` VALUES ('711144', '中和区', '711100');
-INSERT INTO `dict_area` VALUES ('711145', '土城区', '711100');
-INSERT INTO `dict_area` VALUES ('711146', '三峡区', '711100');
-INSERT INTO `dict_area` VALUES ('711147', '树林区', '711100');
-INSERT INTO `dict_area` VALUES ('711148', '莺歌区', '711100');
-INSERT INTO `dict_area` VALUES ('711149', '三重区', '711100');
-INSERT INTO `dict_area` VALUES ('711150', '新庄区', '711100');
-INSERT INTO `dict_area` VALUES ('711151', '泰山区', '711100');
-INSERT INTO `dict_area` VALUES ('711152', '林口区', '711100');
-INSERT INTO `dict_area` VALUES ('711153', '芦洲区', '711100');
-INSERT INTO `dict_area` VALUES ('711154', '五股区', '711100');
-INSERT INTO `dict_area` VALUES ('711155', '八里区', '711100');
-INSERT INTO `dict_area` VALUES ('711156', '淡水区', '711100');
-INSERT INTO `dict_area` VALUES ('711157', '三芝区', '711100');
-INSERT INTO `dict_area` VALUES ('711158', '石门区', '711100');
-INSERT INTO `dict_area` VALUES ('711200', '宜兰县', '710000');
-INSERT INTO `dict_area` VALUES ('711214', '宜兰市', '711200');
-INSERT INTO `dict_area` VALUES ('711215', '头城镇', '711200');
-INSERT INTO `dict_area` VALUES ('711216', '礁溪乡', '711200');
-INSERT INTO `dict_area` VALUES ('711217', '壮围乡', '711200');
-INSERT INTO `dict_area` VALUES ('711218', '员山乡', '711200');
-INSERT INTO `dict_area` VALUES ('711219', '罗东镇', '711200');
-INSERT INTO `dict_area` VALUES ('711220', '三星乡', '711200');
-INSERT INTO `dict_area` VALUES ('711221', '大同乡', '711200');
-INSERT INTO `dict_area` VALUES ('711222', '五结乡', '711200');
-INSERT INTO `dict_area` VALUES ('711223', '冬山乡', '711200');
-INSERT INTO `dict_area` VALUES ('711224', '苏澳镇', '711200');
-INSERT INTO `dict_area` VALUES ('711225', '南澳乡', '711200');
-INSERT INTO `dict_area` VALUES ('711300', '新竹县', '710000');
-INSERT INTO `dict_area` VALUES ('711314', '竹北市', '711300');
-INSERT INTO `dict_area` VALUES ('711315', '湖口乡', '711300');
-INSERT INTO `dict_area` VALUES ('711316', '新丰乡', '711300');
-INSERT INTO `dict_area` VALUES ('711317', '新埔镇', '711300');
-INSERT INTO `dict_area` VALUES ('711318', '关西镇', '711300');
-INSERT INTO `dict_area` VALUES ('711319', '芎林乡', '711300');
-INSERT INTO `dict_area` VALUES ('711320', '宝山乡', '711300');
-INSERT INTO `dict_area` VALUES ('711321', '竹东镇', '711300');
-INSERT INTO `dict_area` VALUES ('711322', '五峰乡', '711300');
-INSERT INTO `dict_area` VALUES ('711323', '横山乡', '711300');
-INSERT INTO `dict_area` VALUES ('711324', '尖石乡', '711300');
-INSERT INTO `dict_area` VALUES ('711325', '北埔乡', '711300');
-INSERT INTO `dict_area` VALUES ('711326', '峨眉乡', '711300');
-INSERT INTO `dict_area` VALUES ('711400', '桃园市', '710000');
-INSERT INTO `dict_area` VALUES ('711414', '中坜区', '711400');
-INSERT INTO `dict_area` VALUES ('711415', '平镇区', '711400');
-INSERT INTO `dict_area` VALUES ('711416', '龙潭区', '711400');
-INSERT INTO `dict_area` VALUES ('711417', '杨梅区', '711400');
-INSERT INTO `dict_area` VALUES ('711418', '新屋区', '711400');
-INSERT INTO `dict_area` VALUES ('711419', '观音区', '711400');
-INSERT INTO `dict_area` VALUES ('711420', '桃园区', '711400');
-INSERT INTO `dict_area` VALUES ('711421', '龟山区', '711400');
-INSERT INTO `dict_area` VALUES ('711422', '八德区', '711400');
-INSERT INTO `dict_area` VALUES ('711423', '大溪区', '711400');
-INSERT INTO `dict_area` VALUES ('711424', '复兴区', '711400');
-INSERT INTO `dict_area` VALUES ('711425', '大园区', '711400');
-INSERT INTO `dict_area` VALUES ('711426', '芦竹区', '711400');
-INSERT INTO `dict_area` VALUES ('711500', '苗栗县', '710000');
-INSERT INTO `dict_area` VALUES ('711519', '竹南镇', '711500');
-INSERT INTO `dict_area` VALUES ('711520', '头份市', '711500');
-INSERT INTO `dict_area` VALUES ('711521', '三湾乡', '711500');
-INSERT INTO `dict_area` VALUES ('711522', '南庄乡', '711500');
-INSERT INTO `dict_area` VALUES ('711523', '狮潭乡', '711500');
-INSERT INTO `dict_area` VALUES ('711524', '后龙镇', '711500');
-INSERT INTO `dict_area` VALUES ('711525', '通霄镇', '711500');
-INSERT INTO `dict_area` VALUES ('711526', '苑里镇', '711500');
-INSERT INTO `dict_area` VALUES ('711527', '苗栗市', '711500');
-INSERT INTO `dict_area` VALUES ('711528', '造桥乡', '711500');
-INSERT INTO `dict_area` VALUES ('711529', '头屋乡', '711500');
-INSERT INTO `dict_area` VALUES ('711530', '公馆乡', '711500');
-INSERT INTO `dict_area` VALUES ('711531', '大湖乡', '711500');
-INSERT INTO `dict_area` VALUES ('711532', '泰安乡', '711500');
-INSERT INTO `dict_area` VALUES ('711533', '铜锣乡', '711500');
-INSERT INTO `dict_area` VALUES ('711534', '三义乡', '711500');
-INSERT INTO `dict_area` VALUES ('711535', '西湖乡', '711500');
-INSERT INTO `dict_area` VALUES ('711536', '卓兰镇', '711500');
-INSERT INTO `dict_area` VALUES ('711700', '彰化县', '710000');
-INSERT INTO `dict_area` VALUES ('711727', '彰化市', '711700');
-INSERT INTO `dict_area` VALUES ('711728', '芬园乡', '711700');
-INSERT INTO `dict_area` VALUES ('711729', '花坛乡', '711700');
-INSERT INTO `dict_area` VALUES ('711730', '秀水乡', '711700');
-INSERT INTO `dict_area` VALUES ('711731', '鹿港镇', '711700');
-INSERT INTO `dict_area` VALUES ('711732', '福兴乡', '711700');
-INSERT INTO `dict_area` VALUES ('711733', '线西乡', '711700');
-INSERT INTO `dict_area` VALUES ('711734', '和美镇', '711700');
-INSERT INTO `dict_area` VALUES ('711735', '伸港乡', '711700');
-INSERT INTO `dict_area` VALUES ('711736', '员林市', '711700');
-INSERT INTO `dict_area` VALUES ('711737', '社头乡', '711700');
-INSERT INTO `dict_area` VALUES ('711738', '永靖乡', '711700');
-INSERT INTO `dict_area` VALUES ('711739', '埔心乡', '711700');
-INSERT INTO `dict_area` VALUES ('711740', '溪湖镇', '711700');
-INSERT INTO `dict_area` VALUES ('711741', '大村乡', '711700');
-INSERT INTO `dict_area` VALUES ('711742', '埔盐乡', '711700');
-INSERT INTO `dict_area` VALUES ('711743', '田中镇', '711700');
-INSERT INTO `dict_area` VALUES ('711744', '北斗镇', '711700');
-INSERT INTO `dict_area` VALUES ('711745', '田尾乡', '711700');
-INSERT INTO `dict_area` VALUES ('711746', '埤头乡', '711700');
-INSERT INTO `dict_area` VALUES ('711747', '溪州乡', '711700');
-INSERT INTO `dict_area` VALUES ('711748', '竹塘乡', '711700');
-INSERT INTO `dict_area` VALUES ('711749', '二林镇', '711700');
-INSERT INTO `dict_area` VALUES ('711750', '大城乡', '711700');
-INSERT INTO `dict_area` VALUES ('711751', '芳苑乡', '711700');
-INSERT INTO `dict_area` VALUES ('711752', '二水乡', '711700');
-INSERT INTO `dict_area` VALUES ('711900', '嘉义县', '710000');
-INSERT INTO `dict_area` VALUES ('711919', '番路乡', '711900');
-INSERT INTO `dict_area` VALUES ('711920', '梅山乡', '711900');
-INSERT INTO `dict_area` VALUES ('711921', '竹崎乡', '711900');
-INSERT INTO `dict_area` VALUES ('711922', '阿里山乡', '711900');
-INSERT INTO `dict_area` VALUES ('711923', '中埔乡', '711900');
-INSERT INTO `dict_area` VALUES ('711924', '大埔乡', '711900');
-INSERT INTO `dict_area` VALUES ('711925', '水上乡', '711900');
-INSERT INTO `dict_area` VALUES ('711926', '鹿草乡', '711900');
-INSERT INTO `dict_area` VALUES ('711927', '太保市', '711900');
-INSERT INTO `dict_area` VALUES ('711928', '朴子市', '711900');
-INSERT INTO `dict_area` VALUES ('711929', '东石乡', '711900');
-INSERT INTO `dict_area` VALUES ('711930', '六脚乡', '711900');
-INSERT INTO `dict_area` VALUES ('711931', '新港乡', '711900');
-INSERT INTO `dict_area` VALUES ('711932', '民雄乡', '711900');
-INSERT INTO `dict_area` VALUES ('711933', '大林镇', '711900');
-INSERT INTO `dict_area` VALUES ('711934', '溪口乡', '711900');
-INSERT INTO `dict_area` VALUES ('711935', '义竹乡', '711900');
-INSERT INTO `dict_area` VALUES ('711936', '布袋镇', '711900');
-INSERT INTO `dict_area` VALUES ('712100', '云林县', '710000');
-INSERT INTO `dict_area` VALUES ('712121', '斗南镇', '712100');
-INSERT INTO `dict_area` VALUES ('712122', '大埤乡', '712100');
-INSERT INTO `dict_area` VALUES ('712123', '虎尾镇', '712100');
-INSERT INTO `dict_area` VALUES ('712124', '土库镇', '712100');
-INSERT INTO `dict_area` VALUES ('712125', '褒忠乡', '712100');
-INSERT INTO `dict_area` VALUES ('712126', '东势乡', '712100');
-INSERT INTO `dict_area` VALUES ('712127', '台西乡', '712100');
-INSERT INTO `dict_area` VALUES ('712128', '仑背乡', '712100');
-INSERT INTO `dict_area` VALUES ('712129', '麦寮乡', '712100');
-INSERT INTO `dict_area` VALUES ('712130', '斗六市', '712100');
-INSERT INTO `dict_area` VALUES ('712131', '林内乡', '712100');
-INSERT INTO `dict_area` VALUES ('712132', '古坑乡', '712100');
-INSERT INTO `dict_area` VALUES ('712133', '莿桐乡', '712100');
-INSERT INTO `dict_area` VALUES ('712134', '西螺镇', '712100');
-INSERT INTO `dict_area` VALUES ('712135', '二仑乡', '712100');
-INSERT INTO `dict_area` VALUES ('712136', '北港镇', '712100');
-INSERT INTO `dict_area` VALUES ('712137', '水林乡', '712100');
-INSERT INTO `dict_area` VALUES ('712138', '口湖乡', '712100');
-INSERT INTO `dict_area` VALUES ('712139', '四湖乡', '712100');
-INSERT INTO `dict_area` VALUES ('712140', '元长乡', '712100');
-INSERT INTO `dict_area` VALUES ('712400', '屏东县', '710000');
-INSERT INTO `dict_area` VALUES ('712434', '屏东市', '712400');
-INSERT INTO `dict_area` VALUES ('712435', '三地门乡', '712400');
-INSERT INTO `dict_area` VALUES ('712436', '雾台乡', '712400');
-INSERT INTO `dict_area` VALUES ('712437', '玛家乡', '712400');
-INSERT INTO `dict_area` VALUES ('712438', '九如乡', '712400');
-INSERT INTO `dict_area` VALUES ('712439', '里港乡', '712400');
-INSERT INTO `dict_area` VALUES ('712440', '高树乡', '712400');
-INSERT INTO `dict_area` VALUES ('712441', '盐埔乡', '712400');
-INSERT INTO `dict_area` VALUES ('712442', '长治乡', '712400');
-INSERT INTO `dict_area` VALUES ('712443', '麟洛乡', '712400');
-INSERT INTO `dict_area` VALUES ('712444', '竹田乡', '712400');
-INSERT INTO `dict_area` VALUES ('712445', '内埔乡', '712400');
-INSERT INTO `dict_area` VALUES ('712446', '万丹乡', '712400');
-INSERT INTO `dict_area` VALUES ('712447', '潮州镇', '712400');
-INSERT INTO `dict_area` VALUES ('712448', '泰武乡', '712400');
-INSERT INTO `dict_area` VALUES ('712449', '来义乡', '712400');
-INSERT INTO `dict_area` VALUES ('712450', '万峦乡', '712400');
-INSERT INTO `dict_area` VALUES ('712451', '崁顶乡', '712400');
-INSERT INTO `dict_area` VALUES ('712452', '新埤乡', '712400');
-INSERT INTO `dict_area` VALUES ('712453', '南州乡', '712400');
-INSERT INTO `dict_area` VALUES ('712454', '林边乡', '712400');
-INSERT INTO `dict_area` VALUES ('712455', '东港镇', '712400');
-INSERT INTO `dict_area` VALUES ('712456', '琉球乡', '712400');
-INSERT INTO `dict_area` VALUES ('712457', '佳冬乡', '712400');
-INSERT INTO `dict_area` VALUES ('712458', '新园乡', '712400');
-INSERT INTO `dict_area` VALUES ('712459', '枋寮乡', '712400');
-INSERT INTO `dict_area` VALUES ('712460', '枋山乡', '712400');
-INSERT INTO `dict_area` VALUES ('712461', '春日乡', '712400');
-INSERT INTO `dict_area` VALUES ('712462', '狮子乡', '712400');
-INSERT INTO `dict_area` VALUES ('712463', '车城乡', '712400');
-INSERT INTO `dict_area` VALUES ('712464', '牡丹乡', '712400');
-INSERT INTO `dict_area` VALUES ('712465', '恒春镇', '712400');
-INSERT INTO `dict_area` VALUES ('712466', '满州乡', '712400');
-INSERT INTO `dict_area` VALUES ('712500', '台东县', '710000');
-INSERT INTO `dict_area` VALUES ('712517', '台东市', '712500');
-INSERT INTO `dict_area` VALUES ('712518', '绿岛乡', '712500');
-INSERT INTO `dict_area` VALUES ('712519', '兰屿乡', '712500');
-INSERT INTO `dict_area` VALUES ('712520', '延平乡', '712500');
-INSERT INTO `dict_area` VALUES ('712521', '卑南乡', '712500');
-INSERT INTO `dict_area` VALUES ('712522', '鹿野乡', '712500');
-INSERT INTO `dict_area` VALUES ('712523', '关山镇', '712500');
-INSERT INTO `dict_area` VALUES ('712524', '海端乡', '712500');
-INSERT INTO `dict_area` VALUES ('712525', '池上乡', '712500');
-INSERT INTO `dict_area` VALUES ('712526', '东河乡', '712500');
-INSERT INTO `dict_area` VALUES ('712527', '成功镇', '712500');
-INSERT INTO `dict_area` VALUES ('712528', '长滨乡', '712500');
-INSERT INTO `dict_area` VALUES ('712529', '金峰乡', '712500');
-INSERT INTO `dict_area` VALUES ('712530', '大武乡', '712500');
-INSERT INTO `dict_area` VALUES ('712531', '达仁乡', '712500');
-INSERT INTO `dict_area` VALUES ('712532', '太麻里乡', '712500');
-INSERT INTO `dict_area` VALUES ('712600', '花莲县', '710000');
-INSERT INTO `dict_area` VALUES ('712615', '花莲市', '712600');
-INSERT INTO `dict_area` VALUES ('712616', '新城乡', '712600');
-INSERT INTO `dict_area` VALUES ('712618', '秀林乡', '712600');
-INSERT INTO `dict_area` VALUES ('712619', '吉安乡', '712600');
-INSERT INTO `dict_area` VALUES ('712620', '寿丰乡', '712600');
-INSERT INTO `dict_area` VALUES ('712621', '凤林镇', '712600');
-INSERT INTO `dict_area` VALUES ('712622', '光复乡', '712600');
-INSERT INTO `dict_area` VALUES ('712623', '丰滨乡', '712600');
-INSERT INTO `dict_area` VALUES ('712624', '瑞穗乡', '712600');
-INSERT INTO `dict_area` VALUES ('712625', '万荣乡', '712600');
-INSERT INTO `dict_area` VALUES ('712626', '玉里镇', '712600');
-INSERT INTO `dict_area` VALUES ('712627', '卓溪乡', '712600');
-INSERT INTO `dict_area` VALUES ('712628', '富里乡', '712600');
-INSERT INTO `dict_area` VALUES ('712700', '澎湖县', '710000');
-INSERT INTO `dict_area` VALUES ('712707', '马公市', '712700');
-INSERT INTO `dict_area` VALUES ('712708', '西屿乡', '712700');
-INSERT INTO `dict_area` VALUES ('712709', '望安乡', '712700');
-INSERT INTO `dict_area` VALUES ('712710', '七美乡', '712700');
-INSERT INTO `dict_area` VALUES ('712711', '白沙乡', '712700');
-INSERT INTO `dict_area` VALUES ('712712', '湖西乡', '712700');
-INSERT INTO `dict_area` VALUES ('810000', '香港特别行政区', '-1');
-INSERT INTO `dict_area` VALUES ('810100', '香港特别行政区', '810000');
-INSERT INTO `dict_area` VALUES ('810101', '中西区', '810100');
-INSERT INTO `dict_area` VALUES ('810102', '东区', '810100');
-INSERT INTO `dict_area` VALUES ('810103', '九龙城区', '810100');
-INSERT INTO `dict_area` VALUES ('810104', '观塘区', '810100');
-INSERT INTO `dict_area` VALUES ('810105', '南区', '810100');
-INSERT INTO `dict_area` VALUES ('810106', '深水埗区', '810100');
-INSERT INTO `dict_area` VALUES ('810107', '湾仔区', '810100');
-INSERT INTO `dict_area` VALUES ('810108', '黄大仙区', '810100');
-INSERT INTO `dict_area` VALUES ('810109', '油尖旺区', '810100');
-INSERT INTO `dict_area` VALUES ('810110', '离岛区', '810100');
-INSERT INTO `dict_area` VALUES ('810111', '葵青区', '810100');
-INSERT INTO `dict_area` VALUES ('810112', '北区', '810100');
-INSERT INTO `dict_area` VALUES ('810113', '西贡区', '810100');
-INSERT INTO `dict_area` VALUES ('810114', '沙田区', '810100');
-INSERT INTO `dict_area` VALUES ('810115', '屯门区', '810100');
-INSERT INTO `dict_area` VALUES ('810116', '大埔区', '810100');
-INSERT INTO `dict_area` VALUES ('810117', '荃湾区', '810100');
-INSERT INTO `dict_area` VALUES ('810118', '元朗区', '810100');
-INSERT INTO `dict_area` VALUES ('820000', '澳门特别行政区', '-1');
-INSERT INTO `dict_area` VALUES ('820100', '澳门特别行政区', '820000');
-INSERT INTO `dict_area` VALUES ('820101', '澳门半岛', '820100');
-INSERT INTO `dict_area` VALUES ('820102', '凼仔', '820100');
-INSERT INTO `dict_area` VALUES ('820103', '路凼城', '820100');
-INSERT INTO `dict_area` VALUES ('820104', '路环', '820100');
+INSERT INTO `dict_area`
+VALUES ('110000', '北京市', '-1');
+INSERT INTO `dict_area`
+VALUES ('110100', '市辖区', '110000');
+INSERT INTO `dict_area`
+VALUES ('110101', '东城区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110102', '西城区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110105', '朝阳区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110106', '丰台区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110107', '石景山区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110108', '海淀区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110109', '门头沟区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110111', '房山区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110112', '通州区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110113', '顺义区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110114', '昌平区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110115', '大兴区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110116', '怀柔区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110117', '平谷区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110118', '密云区', '110100');
+INSERT INTO `dict_area`
+VALUES ('110119', '延庆区', '110100');
+INSERT INTO `dict_area`
+VALUES ('120000', '天津市', '-1');
+INSERT INTO `dict_area`
+VALUES ('120100', '市辖区', '120000');
+INSERT INTO `dict_area`
+VALUES ('120101', '和平区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120102', '河东区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120103', '河西区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120104', '南开区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120105', '河北区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120106', '红桥区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120110', '东丽区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120111', '西青区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120112', '津南区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120113', '北辰区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120114', '武清区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120115', '宝坻区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120116', '滨海新区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120117', '宁河区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120118', '静海区', '120100');
+INSERT INTO `dict_area`
+VALUES ('120119', '蓟州区', '120100');
+INSERT INTO `dict_area`
+VALUES ('130000', '河北省', '-1');
+INSERT INTO `dict_area`
+VALUES ('130100', '石家庄市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130102', '长安区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130104', '桥西区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130105', '新华区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130107', '井陉矿区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130108', '裕华区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130109', '藁城区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130110', '鹿泉区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130111', '栾城区', '130100');
+INSERT INTO `dict_area`
+VALUES ('130121', '井陉县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130123', '正定县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130125', '行唐县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130126', '灵寿县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130127', '高邑县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130128', '深泽县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130129', '赞皇县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130130', '无极县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130131', '平山县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130132', '元氏县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130133', '赵县', '130100');
+INSERT INTO `dict_area`
+VALUES ('130183', '晋州市', '130100');
+INSERT INTO `dict_area`
+VALUES ('130184', '新乐市', '130100');
+INSERT INTO `dict_area`
+VALUES ('130200', '唐山市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130202', '路南区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130203', '路北区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130204', '古冶区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130205', '开平区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130207', '丰南区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130208', '丰润区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130209', '曹妃甸区', '130200');
+INSERT INTO `dict_area`
+VALUES ('130223', '滦县', '130200');
+INSERT INTO `dict_area`
+VALUES ('130224', '滦南县', '130200');
+INSERT INTO `dict_area`
+VALUES ('130225', '乐亭县', '130200');
+INSERT INTO `dict_area`
+VALUES ('130227', '迁西县', '130200');
+INSERT INTO `dict_area`
+VALUES ('130229', '玉田县', '130200');
+INSERT INTO `dict_area`
+VALUES ('130281', '遵化市', '130200');
+INSERT INTO `dict_area`
+VALUES ('130283', '迁安市', '130200');
+INSERT INTO `dict_area`
+VALUES ('130300', '秦皇岛市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130302', '海港区', '130300');
+INSERT INTO `dict_area`
+VALUES ('130303', '山海关区', '130300');
+INSERT INTO `dict_area`
+VALUES ('130304', '北戴河区', '130300');
+INSERT INTO `dict_area`
+VALUES ('130306', '抚宁区', '130300');
+INSERT INTO `dict_area`
+VALUES ('130321', '青龙满族自治县', '130300');
+INSERT INTO `dict_area`
+VALUES ('130322', '昌黎县', '130300');
+INSERT INTO `dict_area`
+VALUES ('130324', '卢龙县', '130300');
+INSERT INTO `dict_area`
+VALUES ('130400', '邯郸市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130402', '邯山区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130403', '丛台区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130404', '复兴区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130406', '峰峰矿区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130407', '肥乡区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130408', '永年区', '130400');
+INSERT INTO `dict_area`
+VALUES ('130423', '临漳县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130424', '成安县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130425', '大名县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130426', '涉县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130427', '磁县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130430', '邱县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130431', '鸡泽县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130432', '广平县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130433', '馆陶县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130434', '魏县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130435', '曲周县', '130400');
+INSERT INTO `dict_area`
+VALUES ('130481', '武安市', '130400');
+INSERT INTO `dict_area`
+VALUES ('130500', '邢台市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130502', '桥东区', '130500');
+INSERT INTO `dict_area`
+VALUES ('130503', '桥西区', '130500');
+INSERT INTO `dict_area`
+VALUES ('130521', '邢台县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130522', '临城县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130523', '内丘县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130524', '柏乡县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130525', '隆尧县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130526', '任县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130527', '南和县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130528', '宁晋县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130529', '巨鹿县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130530', '新河县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130531', '广宗县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130532', '平乡县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130533', '威县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130534', '清河县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130535', '临西县', '130500');
+INSERT INTO `dict_area`
+VALUES ('130581', '南宫市', '130500');
+INSERT INTO `dict_area`
+VALUES ('130582', '沙河市', '130500');
+INSERT INTO `dict_area`
+VALUES ('130600', '保定市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130602', '竞秀区', '130600');
+INSERT INTO `dict_area`
+VALUES ('130606', '莲池区', '130600');
+INSERT INTO `dict_area`
+VALUES ('130607', '满城区', '130600');
+INSERT INTO `dict_area`
+VALUES ('130608', '清苑区', '130600');
+INSERT INTO `dict_area`
+VALUES ('130609', '徐水区', '130600');
+INSERT INTO `dict_area`
+VALUES ('130623', '涞水县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130624', '阜平县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130626', '定兴县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130627', '唐县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130628', '高阳县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130629', '容城县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130630', '涞源县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130631', '望都县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130632', '安新县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130633', '易县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130634', '曲阳县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130635', '蠡县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130636', '顺平县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130637', '博野县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130638', '雄县', '130600');
+INSERT INTO `dict_area`
+VALUES ('130681', '涿州市', '130600');
+INSERT INTO `dict_area`
+VALUES ('130683', '安国市', '130600');
+INSERT INTO `dict_area`
+VALUES ('130684', '高碑店市', '130600');
+INSERT INTO `dict_area`
+VALUES ('130700', '张家口市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130702', '桥东区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130703', '桥西区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130705', '宣化区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130706', '下花园区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130708', '万全区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130709', '崇礼区', '130700');
+INSERT INTO `dict_area`
+VALUES ('130722', '张北县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130723', '康保县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130724', '沽源县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130725', '尚义县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130726', '蔚县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130727', '阳原县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130728', '怀安县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130730', '怀来县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130731', '涿鹿县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130732', '赤城县', '130700');
+INSERT INTO `dict_area`
+VALUES ('130800', '承德市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130802', '双桥区', '130800');
+INSERT INTO `dict_area`
+VALUES ('130803', '双滦区', '130800');
+INSERT INTO `dict_area`
+VALUES ('130804', '鹰手营子矿区', '130800');
+INSERT INTO `dict_area`
+VALUES ('130821', '承德县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130822', '兴隆县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130824', '滦平县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130825', '隆化县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130826', '丰宁满族自治县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130827', '宽城满族自治县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130828', '围场满族蒙古族自治县', '130800');
+INSERT INTO `dict_area`
+VALUES ('130881', '平泉市', '130800');
+INSERT INTO `dict_area`
+VALUES ('130900', '沧州市', '130000');
+INSERT INTO `dict_area`
+VALUES ('130902', '新华区', '130900');
+INSERT INTO `dict_area`
+VALUES ('130903', '运河区', '130900');
+INSERT INTO `dict_area`
+VALUES ('130921', '沧县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130922', '青县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130923', '东光县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130924', '海兴县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130925', '盐山县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130926', '肃宁县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130927', '南皮县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130928', '吴桥县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130929', '献县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130930', '孟村回族自治县', '130900');
+INSERT INTO `dict_area`
+VALUES ('130981', '泊头市', '130900');
+INSERT INTO `dict_area`
+VALUES ('130982', '任丘市', '130900');
+INSERT INTO `dict_area`
+VALUES ('130983', '黄骅市', '130900');
+INSERT INTO `dict_area`
+VALUES ('130984', '河间市', '130900');
+INSERT INTO `dict_area`
+VALUES ('131000', '廊坊市', '130000');
+INSERT INTO `dict_area`
+VALUES ('131002', '安次区', '131000');
+INSERT INTO `dict_area`
+VALUES ('131003', '广阳区', '131000');
+INSERT INTO `dict_area`
+VALUES ('131022', '固安县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131023', '永清县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131024', '香河县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131025', '大城县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131026', '文安县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131028', '大厂回族自治县', '131000');
+INSERT INTO `dict_area`
+VALUES ('131081', '霸州市', '131000');
+INSERT INTO `dict_area`
+VALUES ('131082', '三河市', '131000');
+INSERT INTO `dict_area`
+VALUES ('131100', '衡水市', '130000');
+INSERT INTO `dict_area`
+VALUES ('131102', '桃城区', '131100');
+INSERT INTO `dict_area`
+VALUES ('131103', '冀州区', '131100');
+INSERT INTO `dict_area`
+VALUES ('131121', '枣强县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131122', '武邑县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131123', '武强县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131124', '饶阳县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131125', '安平县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131126', '故城县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131127', '景县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131128', '阜城县', '131100');
+INSERT INTO `dict_area`
+VALUES ('131182', '深州市', '131100');
+INSERT INTO `dict_area`
+VALUES ('131200', '定州市', '130000');
+INSERT INTO `dict_area`
+VALUES ('131300', '辛集市', '130000');
+INSERT INTO `dict_area`
+VALUES ('140000', '山西省', '-1');
+INSERT INTO `dict_area`
+VALUES ('140100', '太原市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140105', '小店区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140106', '迎泽区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140107', '杏花岭区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140108', '尖草坪区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140109', '万柏林区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140110', '晋源区', '140100');
+INSERT INTO `dict_area`
+VALUES ('140121', '清徐县', '140100');
+INSERT INTO `dict_area`
+VALUES ('140122', '阳曲县', '140100');
+INSERT INTO `dict_area`
+VALUES ('140123', '娄烦县', '140100');
+INSERT INTO `dict_area`
+VALUES ('140181', '古交市', '140100');
+INSERT INTO `dict_area`
+VALUES ('140200', '大同市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140202', '城区', '140200');
+INSERT INTO `dict_area`
+VALUES ('140203', '矿区', '140200');
+INSERT INTO `dict_area`
+VALUES ('140211', '南郊区', '140200');
+INSERT INTO `dict_area`
+VALUES ('140212', '新荣区', '140200');
+INSERT INTO `dict_area`
+VALUES ('140221', '阳高县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140222', '天镇县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140223', '广灵县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140224', '灵丘县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140225', '浑源县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140226', '左云县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140227', '大同县', '140200');
+INSERT INTO `dict_area`
+VALUES ('140300', '阳泉市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140302', '城区', '140300');
+INSERT INTO `dict_area`
+VALUES ('140303', '矿区', '140300');
+INSERT INTO `dict_area`
+VALUES ('140311', '郊区', '140300');
+INSERT INTO `dict_area`
+VALUES ('140321', '平定县', '140300');
+INSERT INTO `dict_area`
+VALUES ('140322', '盂县', '140300');
+INSERT INTO `dict_area`
+VALUES ('140400', '长治市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140402', '城区', '140400');
+INSERT INTO `dict_area`
+VALUES ('140411', '郊区', '140400');
+INSERT INTO `dict_area`
+VALUES ('140421', '长治县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140423', '襄垣县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140424', '屯留县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140425', '平顺县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140426', '黎城县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140427', '壶关县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140428', '长子县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140429', '武乡县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140430', '沁县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140431', '沁源县', '140400');
+INSERT INTO `dict_area`
+VALUES ('140481', '潞城市', '140400');
+INSERT INTO `dict_area`
+VALUES ('140500', '晋城市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140502', '城区', '140500');
+INSERT INTO `dict_area`
+VALUES ('140521', '沁水县', '140500');
+INSERT INTO `dict_area`
+VALUES ('140522', '阳城县', '140500');
+INSERT INTO `dict_area`
+VALUES ('140524', '陵川县', '140500');
+INSERT INTO `dict_area`
+VALUES ('140525', '泽州县', '140500');
+INSERT INTO `dict_area`
+VALUES ('140581', '高平市', '140500');
+INSERT INTO `dict_area`
+VALUES ('140600', '朔州市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140602', '朔城区', '140600');
+INSERT INTO `dict_area`
+VALUES ('140603', '平鲁区', '140600');
+INSERT INTO `dict_area`
+VALUES ('140621', '山阴县', '140600');
+INSERT INTO `dict_area`
+VALUES ('140622', '应县', '140600');
+INSERT INTO `dict_area`
+VALUES ('140623', '右玉县', '140600');
+INSERT INTO `dict_area`
+VALUES ('140624', '怀仁县', '140600');
+INSERT INTO `dict_area`
+VALUES ('140700', '晋中市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140702', '榆次区', '140700');
+INSERT INTO `dict_area`
+VALUES ('140721', '榆社县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140722', '左权县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140723', '和顺县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140724', '昔阳县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140725', '寿阳县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140726', '太谷县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140727', '祁县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140728', '平遥县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140729', '灵石县', '140700');
+INSERT INTO `dict_area`
+VALUES ('140781', '介休市', '140700');
+INSERT INTO `dict_area`
+VALUES ('140800', '运城市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140802', '盐湖区', '140800');
+INSERT INTO `dict_area`
+VALUES ('140821', '临猗县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140822', '万荣县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140823', '闻喜县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140824', '稷山县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140825', '新绛县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140826', '绛县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140827', '垣曲县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140828', '夏县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140829', '平陆县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140830', '芮城县', '140800');
+INSERT INTO `dict_area`
+VALUES ('140881', '永济市', '140800');
+INSERT INTO `dict_area`
+VALUES ('140882', '河津市', '140800');
+INSERT INTO `dict_area`
+VALUES ('140900', '忻州市', '140000');
+INSERT INTO `dict_area`
+VALUES ('140902', '忻府区', '140900');
+INSERT INTO `dict_area`
+VALUES ('140921', '定襄县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140922', '五台县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140923', '代县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140924', '繁峙县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140925', '宁武县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140926', '静乐县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140927', '神池县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140928', '五寨县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140929', '岢岚县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140930', '河曲县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140931', '保德县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140932', '偏关县', '140900');
+INSERT INTO `dict_area`
+VALUES ('140981', '原平市', '140900');
+INSERT INTO `dict_area`
+VALUES ('141000', '临汾市', '140000');
+INSERT INTO `dict_area`
+VALUES ('141002', '尧都区', '141000');
+INSERT INTO `dict_area`
+VALUES ('141021', '曲沃县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141022', '翼城县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141023', '襄汾县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141024', '洪洞县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141025', '古县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141026', '安泽县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141027', '浮山县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141028', '吉县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141029', '乡宁县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141030', '大宁县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141031', '隰县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141032', '永和县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141033', '蒲县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141034', '汾西县', '141000');
+INSERT INTO `dict_area`
+VALUES ('141081', '侯马市', '141000');
+INSERT INTO `dict_area`
+VALUES ('141082', '霍州市', '141000');
+INSERT INTO `dict_area`
+VALUES ('141100', '吕梁市', '140000');
+INSERT INTO `dict_area`
+VALUES ('141102', '离石区', '141100');
+INSERT INTO `dict_area`
+VALUES ('141121', '文水县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141122', '交城县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141123', '兴县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141124', '临县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141125', '柳林县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141126', '石楼县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141127', '岚县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141128', '方山县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141129', '中阳县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141130', '交口县', '141100');
+INSERT INTO `dict_area`
+VALUES ('141181', '孝义市', '141100');
+INSERT INTO `dict_area`
+VALUES ('141182', '汾阳市', '141100');
+INSERT INTO `dict_area`
+VALUES ('150000', '内蒙古自治区', '-1');
+INSERT INTO `dict_area`
+VALUES ('150100', '呼和浩特市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150102', '新城区', '150100');
+INSERT INTO `dict_area`
+VALUES ('150103', '回民区', '150100');
+INSERT INTO `dict_area`
+VALUES ('150104', '玉泉区', '150100');
+INSERT INTO `dict_area`
+VALUES ('150105', '赛罕区', '150100');
+INSERT INTO `dict_area`
+VALUES ('150121', '土默特左旗', '150100');
+INSERT INTO `dict_area`
+VALUES ('150122', '托克托县', '150100');
+INSERT INTO `dict_area`
+VALUES ('150123', '和林格尔县', '150100');
+INSERT INTO `dict_area`
+VALUES ('150124', '清水河县', '150100');
+INSERT INTO `dict_area`
+VALUES ('150125', '武川县', '150100');
+INSERT INTO `dict_area`
+VALUES ('150200', '包头市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150202', '东河区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150203', '昆都仑区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150204', '青山区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150205', '石拐区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150206', '白云鄂博矿区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150207', '九原区', '150200');
+INSERT INTO `dict_area`
+VALUES ('150221', '土默特右旗', '150200');
+INSERT INTO `dict_area`
+VALUES ('150222', '固阳县', '150200');
+INSERT INTO `dict_area`
+VALUES ('150223', '达尔罕茂明安联合旗', '150200');
+INSERT INTO `dict_area`
+VALUES ('150300', '乌海市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150302', '海勃湾区', '150300');
+INSERT INTO `dict_area`
+VALUES ('150303', '海南区', '150300');
+INSERT INTO `dict_area`
+VALUES ('150304', '乌达区', '150300');
+INSERT INTO `dict_area`
+VALUES ('150400', '赤峰市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150402', '红山区', '150400');
+INSERT INTO `dict_area`
+VALUES ('150403', '元宝山区', '150400');
+INSERT INTO `dict_area`
+VALUES ('150404', '松山区', '150400');
+INSERT INTO `dict_area`
+VALUES ('150421', '阿鲁科尔沁旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150422', '巴林左旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150423', '巴林右旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150424', '林西县', '150400');
+INSERT INTO `dict_area`
+VALUES ('150425', '克什克腾旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150426', '翁牛特旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150428', '喀喇沁旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150429', '宁城县', '150400');
+INSERT INTO `dict_area`
+VALUES ('150430', '敖汉旗', '150400');
+INSERT INTO `dict_area`
+VALUES ('150500', '通辽市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150502', '科尔沁区', '150500');
+INSERT INTO `dict_area`
+VALUES ('150521', '科尔沁左翼中旗', '150500');
+INSERT INTO `dict_area`
+VALUES ('150522', '科尔沁左翼后旗', '150500');
+INSERT INTO `dict_area`
+VALUES ('150523', '开鲁县', '150500');
+INSERT INTO `dict_area`
+VALUES ('150524', '库伦旗', '150500');
+INSERT INTO `dict_area`
+VALUES ('150525', '奈曼旗', '150500');
+INSERT INTO `dict_area`
+VALUES ('150526', '扎鲁特旗', '150500');
+INSERT INTO `dict_area`
+VALUES ('150581', '霍林郭勒市', '150500');
+INSERT INTO `dict_area`
+VALUES ('150600', '鄂尔多斯市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150602', '东胜区', '150600');
+INSERT INTO `dict_area`
+VALUES ('150603', '康巴什区', '150600');
+INSERT INTO `dict_area`
+VALUES ('150621', '达拉特旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150622', '准格尔旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150623', '鄂托克前旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150624', '鄂托克旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150625', '杭锦旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150626', '乌审旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150627', '伊金霍洛旗', '150600');
+INSERT INTO `dict_area`
+VALUES ('150700', '呼伦贝尔市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150702', '海拉尔区', '150700');
+INSERT INTO `dict_area`
+VALUES ('150703', '扎赉诺尔区', '150700');
+INSERT INTO `dict_area`
+VALUES ('150721', '阿荣旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150722', '莫力达瓦达斡尔族自治旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150723', '鄂伦春自治旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150724', '鄂温克族自治旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150725', '陈巴尔虎旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150726', '新巴尔虎左旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150727', '新巴尔虎右旗', '150700');
+INSERT INTO `dict_area`
+VALUES ('150781', '满洲里市', '150700');
+INSERT INTO `dict_area`
+VALUES ('150782', '牙克石市', '150700');
+INSERT INTO `dict_area`
+VALUES ('150783', '扎兰屯市', '150700');
+INSERT INTO `dict_area`
+VALUES ('150784', '额尔古纳市', '150700');
+INSERT INTO `dict_area`
+VALUES ('150785', '根河市', '150700');
+INSERT INTO `dict_area`
+VALUES ('150800', '巴彦淖尔市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150802', '临河区', '150800');
+INSERT INTO `dict_area`
+VALUES ('150821', '五原县', '150800');
+INSERT INTO `dict_area`
+VALUES ('150822', '磴口县', '150800');
+INSERT INTO `dict_area`
+VALUES ('150823', '乌拉特前旗', '150800');
+INSERT INTO `dict_area`
+VALUES ('150824', '乌拉特中旗', '150800');
+INSERT INTO `dict_area`
+VALUES ('150825', '乌拉特后旗', '150800');
+INSERT INTO `dict_area`
+VALUES ('150826', '杭锦后旗', '150800');
+INSERT INTO `dict_area`
+VALUES ('150900', '乌兰察布市', '150000');
+INSERT INTO `dict_area`
+VALUES ('150902', '集宁区', '150900');
+INSERT INTO `dict_area`
+VALUES ('150921', '卓资县', '150900');
+INSERT INTO `dict_area`
+VALUES ('150922', '化德县', '150900');
+INSERT INTO `dict_area`
+VALUES ('150923', '商都县', '150900');
+INSERT INTO `dict_area`
+VALUES ('150924', '兴和县', '150900');
+INSERT INTO `dict_area`
+VALUES ('150925', '凉城县', '150900');
+INSERT INTO `dict_area`
+VALUES ('150926', '察哈尔右翼前旗', '150900');
+INSERT INTO `dict_area`
+VALUES ('150927', '察哈尔右翼中旗', '150900');
+INSERT INTO `dict_area`
+VALUES ('150928', '察哈尔右翼后旗', '150900');
+INSERT INTO `dict_area`
+VALUES ('150929', '四子王旗', '150900');
+INSERT INTO `dict_area`
+VALUES ('150981', '丰镇市', '150900');
+INSERT INTO `dict_area`
+VALUES ('152200', '兴安盟', '150000');
+INSERT INTO `dict_area`
+VALUES ('152201', '乌兰浩特市', '152200');
+INSERT INTO `dict_area`
+VALUES ('152202', '阿尔山市', '152200');
+INSERT INTO `dict_area`
+VALUES ('152221', '科尔沁右翼前旗', '152200');
+INSERT INTO `dict_area`
+VALUES ('152222', '科尔沁右翼中旗', '152200');
+INSERT INTO `dict_area`
+VALUES ('152223', '扎赉特旗', '152200');
+INSERT INTO `dict_area`
+VALUES ('152224', '突泉县', '152200');
+INSERT INTO `dict_area`
+VALUES ('152500', '锡林郭勒盟', '150000');
+INSERT INTO `dict_area`
+VALUES ('152501', '二连浩特市', '152500');
+INSERT INTO `dict_area`
+VALUES ('152502', '锡林浩特市', '152500');
+INSERT INTO `dict_area`
+VALUES ('152522', '阿巴嘎旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152523', '苏尼特左旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152524', '苏尼特右旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152525', '东乌珠穆沁旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152526', '西乌珠穆沁旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152527', '太仆寺旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152528', '镶黄旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152529', '正镶白旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152530', '正蓝旗', '152500');
+INSERT INTO `dict_area`
+VALUES ('152531', '多伦县', '152500');
+INSERT INTO `dict_area`
+VALUES ('152900', '阿拉善盟', '150000');
+INSERT INTO `dict_area`
+VALUES ('152921', '阿拉善左旗', '152900');
+INSERT INTO `dict_area`
+VALUES ('152922', '阿拉善右旗', '152900');
+INSERT INTO `dict_area`
+VALUES ('152923', '额济纳旗', '152900');
+INSERT INTO `dict_area`
+VALUES ('210000', '辽宁省', '-1');
+INSERT INTO `dict_area`
+VALUES ('210100', '沈阳市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210102', '和平区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210103', '沈河区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210104', '大东区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210105', '皇姑区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210106', '铁西区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210111', '苏家屯区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210112', '浑南区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210113', '沈北新区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210114', '于洪区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210115', '辽中区', '210100');
+INSERT INTO `dict_area`
+VALUES ('210123', '康平县', '210100');
+INSERT INTO `dict_area`
+VALUES ('210124', '法库县', '210100');
+INSERT INTO `dict_area`
+VALUES ('210181', '新民市', '210100');
+INSERT INTO `dict_area`
+VALUES ('210200', '大连市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210202', '中山区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210203', '西岗区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210204', '沙河口区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210211', '甘井子区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210212', '旅顺口区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210213', '金州区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210214', '普兰店区', '210200');
+INSERT INTO `dict_area`
+VALUES ('210224', '长海县', '210200');
+INSERT INTO `dict_area`
+VALUES ('210281', '瓦房店市', '210200');
+INSERT INTO `dict_area`
+VALUES ('210283', '庄河市', '210200');
+INSERT INTO `dict_area`
+VALUES ('210300', '鞍山市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210302', '铁东区', '210300');
+INSERT INTO `dict_area`
+VALUES ('210303', '铁西区', '210300');
+INSERT INTO `dict_area`
+VALUES ('210304', '立山区', '210300');
+INSERT INTO `dict_area`
+VALUES ('210311', '千山区', '210300');
+INSERT INTO `dict_area`
+VALUES ('210321', '台安县', '210300');
+INSERT INTO `dict_area`
+VALUES ('210323', '岫岩满族自治县', '210300');
+INSERT INTO `dict_area`
+VALUES ('210381', '海城市', '210300');
+INSERT INTO `dict_area`
+VALUES ('210400', '抚顺市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210402', '新抚区', '210400');
+INSERT INTO `dict_area`
+VALUES ('210403', '东洲区', '210400');
+INSERT INTO `dict_area`
+VALUES ('210404', '望花区', '210400');
+INSERT INTO `dict_area`
+VALUES ('210411', '顺城区', '210400');
+INSERT INTO `dict_area`
+VALUES ('210421', '抚顺县', '210400');
+INSERT INTO `dict_area`
+VALUES ('210422', '新宾满族自治县', '210400');
+INSERT INTO `dict_area`
+VALUES ('210423', '清原满族自治县', '210400');
+INSERT INTO `dict_area`
+VALUES ('210500', '本溪市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210502', '平山区', '210500');
+INSERT INTO `dict_area`
+VALUES ('210503', '溪湖区', '210500');
+INSERT INTO `dict_area`
+VALUES ('210504', '明山区', '210500');
+INSERT INTO `dict_area`
+VALUES ('210505', '南芬区', '210500');
+INSERT INTO `dict_area`
+VALUES ('210521', '本溪满族自治县', '210500');
+INSERT INTO `dict_area`
+VALUES ('210522', '桓仁满族自治县', '210500');
+INSERT INTO `dict_area`
+VALUES ('210600', '丹东市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210602', '元宝区', '210600');
+INSERT INTO `dict_area`
+VALUES ('210603', '振兴区', '210600');
+INSERT INTO `dict_area`
+VALUES ('210604', '振安区', '210600');
+INSERT INTO `dict_area`
+VALUES ('210624', '宽甸满族自治县', '210600');
+INSERT INTO `dict_area`
+VALUES ('210681', '东港市', '210600');
+INSERT INTO `dict_area`
+VALUES ('210682', '凤城市', '210600');
+INSERT INTO `dict_area`
+VALUES ('210700', '锦州市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210702', '古塔区', '210700');
+INSERT INTO `dict_area`
+VALUES ('210703', '凌河区', '210700');
+INSERT INTO `dict_area`
+VALUES ('210711', '太和区', '210700');
+INSERT INTO `dict_area`
+VALUES ('210726', '黑山县', '210700');
+INSERT INTO `dict_area`
+VALUES ('210727', '义县', '210700');
+INSERT INTO `dict_area`
+VALUES ('210781', '凌海市', '210700');
+INSERT INTO `dict_area`
+VALUES ('210782', '北镇市', '210700');
+INSERT INTO `dict_area`
+VALUES ('210800', '营口市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210802', '站前区', '210800');
+INSERT INTO `dict_area`
+VALUES ('210803', '西市区', '210800');
+INSERT INTO `dict_area`
+VALUES ('210804', '鲅鱼圈区', '210800');
+INSERT INTO `dict_area`
+VALUES ('210811', '老边区', '210800');
+INSERT INTO `dict_area`
+VALUES ('210881', '盖州市', '210800');
+INSERT INTO `dict_area`
+VALUES ('210882', '大石桥市', '210800');
+INSERT INTO `dict_area`
+VALUES ('210900', '阜新市', '210000');
+INSERT INTO `dict_area`
+VALUES ('210902', '海州区', '210900');
+INSERT INTO `dict_area`
+VALUES ('210903', '新邱区', '210900');
+INSERT INTO `dict_area`
+VALUES ('210904', '太平区', '210900');
+INSERT INTO `dict_area`
+VALUES ('210905', '清河门区', '210900');
+INSERT INTO `dict_area`
+VALUES ('210911', '细河区', '210900');
+INSERT INTO `dict_area`
+VALUES ('210921', '阜新蒙古族自治县', '210900');
+INSERT INTO `dict_area`
+VALUES ('210922', '彰武县', '210900');
+INSERT INTO `dict_area`
+VALUES ('211000', '辽阳市', '210000');
+INSERT INTO `dict_area`
+VALUES ('211002', '白塔区', '211000');
+INSERT INTO `dict_area`
+VALUES ('211003', '文圣区', '211000');
+INSERT INTO `dict_area`
+VALUES ('211004', '宏伟区', '211000');
+INSERT INTO `dict_area`
+VALUES ('211005', '弓长岭区', '211000');
+INSERT INTO `dict_area`
+VALUES ('211011', '太子河区', '211000');
+INSERT INTO `dict_area`
+VALUES ('211021', '辽阳县', '211000');
+INSERT INTO `dict_area`
+VALUES ('211081', '灯塔市', '211000');
+INSERT INTO `dict_area`
+VALUES ('211100', '盘锦市', '210000');
+INSERT INTO `dict_area`
+VALUES ('211102', '双台子区', '211100');
+INSERT INTO `dict_area`
+VALUES ('211103', '兴隆台区', '211100');
+INSERT INTO `dict_area`
+VALUES ('211104', '大洼区', '211100');
+INSERT INTO `dict_area`
+VALUES ('211122', '盘山县', '211100');
+INSERT INTO `dict_area`
+VALUES ('211200', '铁岭市', '210000');
+INSERT INTO `dict_area`
+VALUES ('211202', '银州区', '211200');
+INSERT INTO `dict_area`
+VALUES ('211204', '清河区', '211200');
+INSERT INTO `dict_area`
+VALUES ('211221', '铁岭县', '211200');
+INSERT INTO `dict_area`
+VALUES ('211223', '西丰县', '211200');
+INSERT INTO `dict_area`
+VALUES ('211224', '昌图县', '211200');
+INSERT INTO `dict_area`
+VALUES ('211281', '调兵山市', '211200');
+INSERT INTO `dict_area`
+VALUES ('211282', '开原市', '211200');
+INSERT INTO `dict_area`
+VALUES ('211300', '朝阳市', '210000');
+INSERT INTO `dict_area`
+VALUES ('211302', '双塔区', '211300');
+INSERT INTO `dict_area`
+VALUES ('211303', '龙城区', '211300');
+INSERT INTO `dict_area`
+VALUES ('211321', '朝阳县', '211300');
+INSERT INTO `dict_area`
+VALUES ('211322', '建平县', '211300');
+INSERT INTO `dict_area`
+VALUES ('211324', '喀喇沁左翼蒙古族自治县', '211300');
+INSERT INTO `dict_area`
+VALUES ('211381', '北票市', '211300');
+INSERT INTO `dict_area`
+VALUES ('211382', '凌源市', '211300');
+INSERT INTO `dict_area`
+VALUES ('211400', '葫芦岛市', '210000');
+INSERT INTO `dict_area`
+VALUES ('211402', '连山区', '211400');
+INSERT INTO `dict_area`
+VALUES ('211403', '龙港区', '211400');
+INSERT INTO `dict_area`
+VALUES ('211404', '南票区', '211400');
+INSERT INTO `dict_area`
+VALUES ('211421', '绥中县', '211400');
+INSERT INTO `dict_area`
+VALUES ('211422', '建昌县', '211400');
+INSERT INTO `dict_area`
+VALUES ('211481', '兴城市', '211400');
+INSERT INTO `dict_area`
+VALUES ('220000', '吉林省', '-1');
+INSERT INTO `dict_area`
+VALUES ('220100', '长春市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220102', '南关区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220103', '宽城区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220104', '朝阳区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220105', '二道区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220106', '绿园区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220112', '双阳区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220113', '九台区', '220100');
+INSERT INTO `dict_area`
+VALUES ('220122', '农安县', '220100');
+INSERT INTO `dict_area`
+VALUES ('220182', '榆树市', '220100');
+INSERT INTO `dict_area`
+VALUES ('220183', '德惠市', '220100');
+INSERT INTO `dict_area`
+VALUES ('220200', '吉林市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220202', '昌邑区', '220200');
+INSERT INTO `dict_area`
+VALUES ('220203', '龙潭区', '220200');
+INSERT INTO `dict_area`
+VALUES ('220204', '船营区', '220200');
+INSERT INTO `dict_area`
+VALUES ('220211', '丰满区', '220200');
+INSERT INTO `dict_area`
+VALUES ('220221', '永吉县', '220200');
+INSERT INTO `dict_area`
+VALUES ('220281', '蛟河市', '220200');
+INSERT INTO `dict_area`
+VALUES ('220282', '桦甸市', '220200');
+INSERT INTO `dict_area`
+VALUES ('220283', '舒兰市', '220200');
+INSERT INTO `dict_area`
+VALUES ('220284', '磐石市', '220200');
+INSERT INTO `dict_area`
+VALUES ('220300', '四平市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220302', '铁西区', '220300');
+INSERT INTO `dict_area`
+VALUES ('220303', '铁东区', '220300');
+INSERT INTO `dict_area`
+VALUES ('220322', '梨树县', '220300');
+INSERT INTO `dict_area`
+VALUES ('220323', '伊通满族自治县', '220300');
+INSERT INTO `dict_area`
+VALUES ('220381', '公主岭市', '220300');
+INSERT INTO `dict_area`
+VALUES ('220382', '双辽市', '220300');
+INSERT INTO `dict_area`
+VALUES ('220400', '辽源市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220402', '龙山区', '220400');
+INSERT INTO `dict_area`
+VALUES ('220403', '西安区', '220400');
+INSERT INTO `dict_area`
+VALUES ('220421', '东丰县', '220400');
+INSERT INTO `dict_area`
+VALUES ('220422', '东辽县', '220400');
+INSERT INTO `dict_area`
+VALUES ('220500', '通化市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220502', '东昌区', '220500');
+INSERT INTO `dict_area`
+VALUES ('220503', '二道江区', '220500');
+INSERT INTO `dict_area`
+VALUES ('220521', '通化县', '220500');
+INSERT INTO `dict_area`
+VALUES ('220523', '辉南县', '220500');
+INSERT INTO `dict_area`
+VALUES ('220524', '柳河县', '220500');
+INSERT INTO `dict_area`
+VALUES ('220581', '梅河口市', '220500');
+INSERT INTO `dict_area`
+VALUES ('220582', '集安市', '220500');
+INSERT INTO `dict_area`
+VALUES ('220600', '白山市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220602', '浑江区', '220600');
+INSERT INTO `dict_area`
+VALUES ('220605', '江源区', '220600');
+INSERT INTO `dict_area`
+VALUES ('220621', '抚松县', '220600');
+INSERT INTO `dict_area`
+VALUES ('220622', '靖宇县', '220600');
+INSERT INTO `dict_area`
+VALUES ('220623', '长白朝鲜族自治县', '220600');
+INSERT INTO `dict_area`
+VALUES ('220681', '临江市', '220600');
+INSERT INTO `dict_area`
+VALUES ('220700', '松原市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220702', '宁江区', '220700');
+INSERT INTO `dict_area`
+VALUES ('220721', '前郭尔罗斯蒙古族自治县', '220700');
+INSERT INTO `dict_area`
+VALUES ('220722', '长岭县', '220700');
+INSERT INTO `dict_area`
+VALUES ('220723', '乾安县', '220700');
+INSERT INTO `dict_area`
+VALUES ('220781', '扶余市', '220700');
+INSERT INTO `dict_area`
+VALUES ('220800', '白城市', '220000');
+INSERT INTO `dict_area`
+VALUES ('220802', '洮北区', '220800');
+INSERT INTO `dict_area`
+VALUES ('220821', '镇赉县', '220800');
+INSERT INTO `dict_area`
+VALUES ('220822', '通榆县', '220800');
+INSERT INTO `dict_area`
+VALUES ('220881', '洮南市', '220800');
+INSERT INTO `dict_area`
+VALUES ('220882', '大安市', '220800');
+INSERT INTO `dict_area`
+VALUES ('222400', '延边朝鲜族自治州', '220000');
+INSERT INTO `dict_area`
+VALUES ('222401', '延吉市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222402', '图们市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222403', '敦化市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222404', '珲春市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222405', '龙井市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222406', '和龙市', '222400');
+INSERT INTO `dict_area`
+VALUES ('222424', '汪清县', '222400');
+INSERT INTO `dict_area`
+VALUES ('222426', '安图县', '222400');
+INSERT INTO `dict_area`
+VALUES ('230000', '黑龙江省', '-1');
+INSERT INTO `dict_area`
+VALUES ('230100', '哈尔滨市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230102', '道里区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230103', '南岗区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230104', '道外区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230108', '平房区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230109', '松北区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230110', '香坊区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230111', '呼兰区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230112', '阿城区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230113', '双城区', '230100');
+INSERT INTO `dict_area`
+VALUES ('230123', '依兰县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230124', '方正县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230125', '宾县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230126', '巴彦县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230127', '木兰县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230128', '通河县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230129', '延寿县', '230100');
+INSERT INTO `dict_area`
+VALUES ('230183', '尚志市', '230100');
+INSERT INTO `dict_area`
+VALUES ('230184', '五常市', '230100');
+INSERT INTO `dict_area`
+VALUES ('230200', '齐齐哈尔市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230202', '龙沙区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230203', '建华区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230204', '铁锋区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230205', '昂昂溪区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230206', '富拉尔基区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230207', '碾子山区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230208', '梅里斯达斡尔族区', '230200');
+INSERT INTO `dict_area`
+VALUES ('230221', '龙江县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230223', '依安县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230224', '泰来县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230225', '甘南县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230227', '富裕县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230229', '克山县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230230', '克东县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230231', '拜泉县', '230200');
+INSERT INTO `dict_area`
+VALUES ('230281', '讷河市', '230200');
+INSERT INTO `dict_area`
+VALUES ('230300', '鸡西市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230302', '鸡冠区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230303', '恒山区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230304', '滴道区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230305', '梨树区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230306', '城子河区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230307', '麻山区', '230300');
+INSERT INTO `dict_area`
+VALUES ('230321', '鸡东县', '230300');
+INSERT INTO `dict_area`
+VALUES ('230381', '虎林市', '230300');
+INSERT INTO `dict_area`
+VALUES ('230382', '密山市', '230300');
+INSERT INTO `dict_area`
+VALUES ('230400', '鹤岗市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230402', '向阳区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230403', '工农区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230404', '南山区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230405', '兴安区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230406', '东山区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230407', '兴山区', '230400');
+INSERT INTO `dict_area`
+VALUES ('230421', '萝北县', '230400');
+INSERT INTO `dict_area`
+VALUES ('230422', '绥滨县', '230400');
+INSERT INTO `dict_area`
+VALUES ('230500', '双鸭山市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230502', '尖山区', '230500');
+INSERT INTO `dict_area`
+VALUES ('230503', '岭东区', '230500');
+INSERT INTO `dict_area`
+VALUES ('230505', '四方台区', '230500');
+INSERT INTO `dict_area`
+VALUES ('230506', '宝山区', '230500');
+INSERT INTO `dict_area`
+VALUES ('230521', '集贤县', '230500');
+INSERT INTO `dict_area`
+VALUES ('230522', '友谊县', '230500');
+INSERT INTO `dict_area`
+VALUES ('230523', '宝清县', '230500');
+INSERT INTO `dict_area`
+VALUES ('230524', '饶河县', '230500');
+INSERT INTO `dict_area`
+VALUES ('230600', '大庆市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230602', '萨尔图区', '230600');
+INSERT INTO `dict_area`
+VALUES ('230603', '龙凤区', '230600');
+INSERT INTO `dict_area`
+VALUES ('230604', '让胡路区', '230600');
+INSERT INTO `dict_area`
+VALUES ('230605', '红岗区', '230600');
+INSERT INTO `dict_area`
+VALUES ('230606', '大同区', '230600');
+INSERT INTO `dict_area`
+VALUES ('230621', '肇州县', '230600');
+INSERT INTO `dict_area`
+VALUES ('230622', '肇源县', '230600');
+INSERT INTO `dict_area`
+VALUES ('230623', '林甸县', '230600');
+INSERT INTO `dict_area`
+VALUES ('230624', '杜尔伯特蒙古族自治县', '230600');
+INSERT INTO `dict_area`
+VALUES ('230700', '伊春市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230702', '伊春区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230703', '南岔区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230704', '友好区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230705', '西林区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230706', '翠峦区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230707', '新青区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230708', '美溪区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230709', '金山屯区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230710', '五营区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230711', '乌马河区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230712', '汤旺河区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230713', '带岭区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230714', '乌伊岭区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230715', '红星区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230716', '上甘岭区', '230700');
+INSERT INTO `dict_area`
+VALUES ('230722', '嘉荫县', '230700');
+INSERT INTO `dict_area`
+VALUES ('230781', '铁力市', '230700');
+INSERT INTO `dict_area`
+VALUES ('230800', '佳木斯市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230803', '向阳区', '230800');
+INSERT INTO `dict_area`
+VALUES ('230804', '前进区', '230800');
+INSERT INTO `dict_area`
+VALUES ('230805', '东风区', '230800');
+INSERT INTO `dict_area`
+VALUES ('230811', '郊区', '230800');
+INSERT INTO `dict_area`
+VALUES ('230822', '桦南县', '230800');
+INSERT INTO `dict_area`
+VALUES ('230826', '桦川县', '230800');
+INSERT INTO `dict_area`
+VALUES ('230828', '汤原县', '230800');
+INSERT INTO `dict_area`
+VALUES ('230881', '同江市', '230800');
+INSERT INTO `dict_area`
+VALUES ('230882', '富锦市', '230800');
+INSERT INTO `dict_area`
+VALUES ('230883', '抚远市', '230800');
+INSERT INTO `dict_area`
+VALUES ('230900', '七台河市', '230000');
+INSERT INTO `dict_area`
+VALUES ('230902', '新兴区', '230900');
+INSERT INTO `dict_area`
+VALUES ('230903', '桃山区', '230900');
+INSERT INTO `dict_area`
+VALUES ('230904', '茄子河区', '230900');
+INSERT INTO `dict_area`
+VALUES ('230921', '勃利县', '230900');
+INSERT INTO `dict_area`
+VALUES ('231000', '牡丹江市', '230000');
+INSERT INTO `dict_area`
+VALUES ('231002', '东安区', '231000');
+INSERT INTO `dict_area`
+VALUES ('231003', '阳明区', '231000');
+INSERT INTO `dict_area`
+VALUES ('231004', '爱民区', '231000');
+INSERT INTO `dict_area`
+VALUES ('231005', '西安区', '231000');
+INSERT INTO `dict_area`
+VALUES ('231025', '林口县', '231000');
+INSERT INTO `dict_area`
+VALUES ('231081', '绥芬河市', '231000');
+INSERT INTO `dict_area`
+VALUES ('231083', '海林市', '231000');
+INSERT INTO `dict_area`
+VALUES ('231084', '宁安市', '231000');
+INSERT INTO `dict_area`
+VALUES ('231085', '穆棱市', '231000');
+INSERT INTO `dict_area`
+VALUES ('231086', '东宁市', '231000');
+INSERT INTO `dict_area`
+VALUES ('231100', '黑河市', '230000');
+INSERT INTO `dict_area`
+VALUES ('231102', '爱辉区', '231100');
+INSERT INTO `dict_area`
+VALUES ('231121', '嫩江县', '231100');
+INSERT INTO `dict_area`
+VALUES ('231123', '逊克县', '231100');
+INSERT INTO `dict_area`
+VALUES ('231124', '孙吴县', '231100');
+INSERT INTO `dict_area`
+VALUES ('231181', '北安市', '231100');
+INSERT INTO `dict_area`
+VALUES ('231182', '五大连池市', '231100');
+INSERT INTO `dict_area`
+VALUES ('231200', '绥化市', '230000');
+INSERT INTO `dict_area`
+VALUES ('231202', '北林区', '231200');
+INSERT INTO `dict_area`
+VALUES ('231221', '望奎县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231222', '兰西县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231223', '青冈县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231224', '庆安县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231225', '明水县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231226', '绥棱县', '231200');
+INSERT INTO `dict_area`
+VALUES ('231281', '安达市', '231200');
+INSERT INTO `dict_area`
+VALUES ('231282', '肇东市', '231200');
+INSERT INTO `dict_area`
+VALUES ('231283', '海伦市', '231200');
+INSERT INTO `dict_area`
+VALUES ('232700', '大兴安岭地区', '230000');
+INSERT INTO `dict_area`
+VALUES ('232701', '加格达奇区', '232700');
+INSERT INTO `dict_area`
+VALUES ('232721', '呼玛县', '232700');
+INSERT INTO `dict_area`
+VALUES ('232722', '塔河县', '232700');
+INSERT INTO `dict_area`
+VALUES ('232723', '漠河县', '232700');
+INSERT INTO `dict_area`
+VALUES ('310000', '上海市', '-1');
+INSERT INTO `dict_area`
+VALUES ('310100', '市辖区', '310000');
+INSERT INTO `dict_area`
+VALUES ('310101', '黄浦区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310104', '徐汇区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310105', '长宁区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310106', '静安区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310107', '普陀区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310109', '虹口区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310110', '杨浦区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310112', '闵行区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310113', '宝山区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310114', '嘉定区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310115', '浦东新区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310116', '金山区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310117', '松江区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310118', '青浦区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310120', '奉贤区', '310100');
+INSERT INTO `dict_area`
+VALUES ('310151', '崇明区', '310100');
+INSERT INTO `dict_area`
+VALUES ('320000', '江苏省', '-1');
+INSERT INTO `dict_area`
+VALUES ('320100', '南京市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320102', '玄武区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320104', '秦淮区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320105', '建邺区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320106', '鼓楼区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320111', '浦口区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320113', '栖霞区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320114', '雨花台区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320115', '江宁区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320116', '六合区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320117', '溧水区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320118', '高淳区', '320100');
+INSERT INTO `dict_area`
+VALUES ('320200', '无锡市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320205', '锡山区', '320200');
+INSERT INTO `dict_area`
+VALUES ('320206', '惠山区', '320200');
+INSERT INTO `dict_area`
+VALUES ('320211', '滨湖区', '320200');
+INSERT INTO `dict_area`
+VALUES ('320213', '梁溪区', '320200');
+INSERT INTO `dict_area`
+VALUES ('320214', '新吴区', '320200');
+INSERT INTO `dict_area`
+VALUES ('320281', '江阴市', '320200');
+INSERT INTO `dict_area`
+VALUES ('320282', '宜兴市', '320200');
+INSERT INTO `dict_area`
+VALUES ('320300', '徐州市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320302', '鼓楼区', '320300');
+INSERT INTO `dict_area`
+VALUES ('320303', '云龙区', '320300');
+INSERT INTO `dict_area`
+VALUES ('320305', '贾汪区', '320300');
+INSERT INTO `dict_area`
+VALUES ('320311', '泉山区', '320300');
+INSERT INTO `dict_area`
+VALUES ('320312', '铜山区', '320300');
+INSERT INTO `dict_area`
+VALUES ('320321', '丰县', '320300');
+INSERT INTO `dict_area`
+VALUES ('320322', '沛县', '320300');
+INSERT INTO `dict_area`
+VALUES ('320324', '睢宁县', '320300');
+INSERT INTO `dict_area`
+VALUES ('320381', '新沂市', '320300');
+INSERT INTO `dict_area`
+VALUES ('320382', '邳州市', '320300');
+INSERT INTO `dict_area`
+VALUES ('320400', '常州市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320402', '天宁区', '320400');
+INSERT INTO `dict_area`
+VALUES ('320404', '钟楼区', '320400');
+INSERT INTO `dict_area`
+VALUES ('320411', '新北区', '320400');
+INSERT INTO `dict_area`
+VALUES ('320412', '武进区', '320400');
+INSERT INTO `dict_area`
+VALUES ('320413', '金坛区', '320400');
+INSERT INTO `dict_area`
+VALUES ('320481', '溧阳市', '320400');
+INSERT INTO `dict_area`
+VALUES ('320500', '苏州市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320505', '虎丘区', '320500');
+INSERT INTO `dict_area`
+VALUES ('320506', '吴中区', '320500');
+INSERT INTO `dict_area`
+VALUES ('320507', '相城区', '320500');
+INSERT INTO `dict_area`
+VALUES ('320508', '姑苏区', '320500');
+INSERT INTO `dict_area`
+VALUES ('320509', '吴江区', '320500');
+INSERT INTO `dict_area`
+VALUES ('320581', '常熟市', '320500');
+INSERT INTO `dict_area`
+VALUES ('320582', '张家港市', '320500');
+INSERT INTO `dict_area`
+VALUES ('320583', '昆山市', '320500');
+INSERT INTO `dict_area`
+VALUES ('320585', '太仓市', '320500');
+INSERT INTO `dict_area`
+VALUES ('320600', '南通市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320602', '崇川区', '320600');
+INSERT INTO `dict_area`
+VALUES ('320611', '港闸区', '320600');
+INSERT INTO `dict_area`
+VALUES ('320612', '通州区', '320600');
+INSERT INTO `dict_area`
+VALUES ('320621', '海安县', '320600');
+INSERT INTO `dict_area`
+VALUES ('320623', '如东县', '320600');
+INSERT INTO `dict_area`
+VALUES ('320681', '启东市', '320600');
+INSERT INTO `dict_area`
+VALUES ('320682', '如皋市', '320600');
+INSERT INTO `dict_area`
+VALUES ('320684', '海门市', '320600');
+INSERT INTO `dict_area`
+VALUES ('320700', '连云港市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320703', '连云区', '320700');
+INSERT INTO `dict_area`
+VALUES ('320706', '海州区', '320700');
+INSERT INTO `dict_area`
+VALUES ('320707', '赣榆区', '320700');
+INSERT INTO `dict_area`
+VALUES ('320722', '东海县', '320700');
+INSERT INTO `dict_area`
+VALUES ('320723', '灌云县', '320700');
+INSERT INTO `dict_area`
+VALUES ('320724', '灌南县', '320700');
+INSERT INTO `dict_area`
+VALUES ('320800', '淮安市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320803', '淮安区', '320800');
+INSERT INTO `dict_area`
+VALUES ('320804', '淮阴区', '320800');
+INSERT INTO `dict_area`
+VALUES ('320812', '清江浦区', '320800');
+INSERT INTO `dict_area`
+VALUES ('320813', '洪泽区', '320800');
+INSERT INTO `dict_area`
+VALUES ('320826', '涟水县', '320800');
+INSERT INTO `dict_area`
+VALUES ('320830', '盱眙县', '320800');
+INSERT INTO `dict_area`
+VALUES ('320831', '金湖县', '320800');
+INSERT INTO `dict_area`
+VALUES ('320900', '盐城市', '320000');
+INSERT INTO `dict_area`
+VALUES ('320902', '亭湖区', '320900');
+INSERT INTO `dict_area`
+VALUES ('320903', '盐都区', '320900');
+INSERT INTO `dict_area`
+VALUES ('320904', '大丰区', '320900');
+INSERT INTO `dict_area`
+VALUES ('320921', '响水县', '320900');
+INSERT INTO `dict_area`
+VALUES ('320922', '滨海县', '320900');
+INSERT INTO `dict_area`
+VALUES ('320923', '阜宁县', '320900');
+INSERT INTO `dict_area`
+VALUES ('320924', '射阳县', '320900');
+INSERT INTO `dict_area`
+VALUES ('320925', '建湖县', '320900');
+INSERT INTO `dict_area`
+VALUES ('320981', '东台市', '320900');
+INSERT INTO `dict_area`
+VALUES ('321000', '扬州市', '320000');
+INSERT INTO `dict_area`
+VALUES ('321002', '广陵区', '321000');
+INSERT INTO `dict_area`
+VALUES ('321003', '邗江区', '321000');
+INSERT INTO `dict_area`
+VALUES ('321012', '江都区', '321000');
+INSERT INTO `dict_area`
+VALUES ('321023', '宝应县', '321000');
+INSERT INTO `dict_area`
+VALUES ('321081', '仪征市', '321000');
+INSERT INTO `dict_area`
+VALUES ('321084', '高邮市', '321000');
+INSERT INTO `dict_area`
+VALUES ('321100', '镇江市', '320000');
+INSERT INTO `dict_area`
+VALUES ('321102', '京口区', '321100');
+INSERT INTO `dict_area`
+VALUES ('321111', '润州区', '321100');
+INSERT INTO `dict_area`
+VALUES ('321112', '丹徒区', '321100');
+INSERT INTO `dict_area`
+VALUES ('321181', '丹阳市', '321100');
+INSERT INTO `dict_area`
+VALUES ('321182', '扬中市', '321100');
+INSERT INTO `dict_area`
+VALUES ('321183', '句容市', '321100');
+INSERT INTO `dict_area`
+VALUES ('321200', '泰州市', '320000');
+INSERT INTO `dict_area`
+VALUES ('321202', '海陵区', '321200');
+INSERT INTO `dict_area`
+VALUES ('321203', '高港区', '321200');
+INSERT INTO `dict_area`
+VALUES ('321204', '姜堰区', '321200');
+INSERT INTO `dict_area`
+VALUES ('321281', '兴化市', '321200');
+INSERT INTO `dict_area`
+VALUES ('321282', '靖江市', '321200');
+INSERT INTO `dict_area`
+VALUES ('321283', '泰兴市', '321200');
+INSERT INTO `dict_area`
+VALUES ('321300', '宿迁市', '320000');
+INSERT INTO `dict_area`
+VALUES ('321302', '宿城区', '321300');
+INSERT INTO `dict_area`
+VALUES ('321311', '宿豫区', '321300');
+INSERT INTO `dict_area`
+VALUES ('321322', '沭阳县', '321300');
+INSERT INTO `dict_area`
+VALUES ('321323', '泗阳县', '321300');
+INSERT INTO `dict_area`
+VALUES ('321324', '泗洪县', '321300');
+INSERT INTO `dict_area`
+VALUES ('330000', '浙江省', '-1');
+INSERT INTO `dict_area`
+VALUES ('330100', '杭州市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330102', '上城区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330103', '下城区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330104', '江干区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330105', '拱墅区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330106', '西湖区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330108', '滨江区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330109', '萧山区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330110', '余杭区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330111', '富阳区', '330100');
+INSERT INTO `dict_area`
+VALUES ('330122', '桐庐县', '330100');
+INSERT INTO `dict_area`
+VALUES ('330127', '淳安县', '330100');
+INSERT INTO `dict_area`
+VALUES ('330182', '建德市', '330100');
+INSERT INTO `dict_area`
+VALUES ('330185', '临安市', '330100');
+INSERT INTO `dict_area`
+VALUES ('330200', '宁波市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330203', '海曙区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330205', '江北区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330206', '北仑区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330211', '镇海区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330212', '鄞州区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330213', '奉化区', '330200');
+INSERT INTO `dict_area`
+VALUES ('330225', '象山县', '330200');
+INSERT INTO `dict_area`
+VALUES ('330226', '宁海县', '330200');
+INSERT INTO `dict_area`
+VALUES ('330281', '余姚市', '330200');
+INSERT INTO `dict_area`
+VALUES ('330282', '慈溪市', '330200');
+INSERT INTO `dict_area`
+VALUES ('330300', '温州市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330302', '鹿城区', '330300');
+INSERT INTO `dict_area`
+VALUES ('330303', '龙湾区', '330300');
+INSERT INTO `dict_area`
+VALUES ('330304', '瓯海区', '330300');
+INSERT INTO `dict_area`
+VALUES ('330305', '洞头区', '330300');
+INSERT INTO `dict_area`
+VALUES ('330324', '永嘉县', '330300');
+INSERT INTO `dict_area`
+VALUES ('330326', '平阳县', '330300');
+INSERT INTO `dict_area`
+VALUES ('330327', '苍南县', '330300');
+INSERT INTO `dict_area`
+VALUES ('330328', '文成县', '330300');
+INSERT INTO `dict_area`
+VALUES ('330329', '泰顺县', '330300');
+INSERT INTO `dict_area`
+VALUES ('330381', '瑞安市', '330300');
+INSERT INTO `dict_area`
+VALUES ('330382', '乐清市', '330300');
+INSERT INTO `dict_area`
+VALUES ('330400', '嘉兴市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330402', '南湖区', '330400');
+INSERT INTO `dict_area`
+VALUES ('330411', '秀洲区', '330400');
+INSERT INTO `dict_area`
+VALUES ('330421', '嘉善县', '330400');
+INSERT INTO `dict_area`
+VALUES ('330424', '海盐县', '330400');
+INSERT INTO `dict_area`
+VALUES ('330481', '海宁市', '330400');
+INSERT INTO `dict_area`
+VALUES ('330482', '平湖市', '330400');
+INSERT INTO `dict_area`
+VALUES ('330483', '桐乡市', '330400');
+INSERT INTO `dict_area`
+VALUES ('330500', '湖州市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330502', '吴兴区', '330500');
+INSERT INTO `dict_area`
+VALUES ('330503', '南浔区', '330500');
+INSERT INTO `dict_area`
+VALUES ('330521', '德清县', '330500');
+INSERT INTO `dict_area`
+VALUES ('330522', '长兴县', '330500');
+INSERT INTO `dict_area`
+VALUES ('330523', '安吉县', '330500');
+INSERT INTO `dict_area`
+VALUES ('330600', '绍兴市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330602', '越城区', '330600');
+INSERT INTO `dict_area`
+VALUES ('330603', '柯桥区', '330600');
+INSERT INTO `dict_area`
+VALUES ('330604', '上虞区', '330600');
+INSERT INTO `dict_area`
+VALUES ('330624', '新昌县', '330600');
+INSERT INTO `dict_area`
+VALUES ('330681', '诸暨市', '330600');
+INSERT INTO `dict_area`
+VALUES ('330683', '嵊州市', '330600');
+INSERT INTO `dict_area`
+VALUES ('330700', '金华市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330702', '婺城区', '330700');
+INSERT INTO `dict_area`
+VALUES ('330703', '金东区', '330700');
+INSERT INTO `dict_area`
+VALUES ('330723', '武义县', '330700');
+INSERT INTO `dict_area`
+VALUES ('330726', '浦江县', '330700');
+INSERT INTO `dict_area`
+VALUES ('330727', '磐安县', '330700');
+INSERT INTO `dict_area`
+VALUES ('330781', '兰溪市', '330700');
+INSERT INTO `dict_area`
+VALUES ('330782', '义乌市', '330700');
+INSERT INTO `dict_area`
+VALUES ('330783', '东阳市', '330700');
+INSERT INTO `dict_area`
+VALUES ('330784', '永康市', '330700');
+INSERT INTO `dict_area`
+VALUES ('330800', '衢州市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330802', '柯城区', '330800');
+INSERT INTO `dict_area`
+VALUES ('330803', '衢江区', '330800');
+INSERT INTO `dict_area`
+VALUES ('330822', '常山县', '330800');
+INSERT INTO `dict_area`
+VALUES ('330824', '开化县', '330800');
+INSERT INTO `dict_area`
+VALUES ('330825', '龙游县', '330800');
+INSERT INTO `dict_area`
+VALUES ('330881', '江山市', '330800');
+INSERT INTO `dict_area`
+VALUES ('330900', '舟山市', '330000');
+INSERT INTO `dict_area`
+VALUES ('330902', '定海区', '330900');
+INSERT INTO `dict_area`
+VALUES ('330903', '普陀区', '330900');
+INSERT INTO `dict_area`
+VALUES ('330921', '岱山县', '330900');
+INSERT INTO `dict_area`
+VALUES ('330922', '嵊泗县', '330900');
+INSERT INTO `dict_area`
+VALUES ('331000', '台州市', '330000');
+INSERT INTO `dict_area`
+VALUES ('331002', '椒江区', '331000');
+INSERT INTO `dict_area`
+VALUES ('331003', '黄岩区', '331000');
+INSERT INTO `dict_area`
+VALUES ('331004', '路桥区', '331000');
+INSERT INTO `dict_area`
+VALUES ('331022', '三门县', '331000');
+INSERT INTO `dict_area`
+VALUES ('331023', '天台县', '331000');
+INSERT INTO `dict_area`
+VALUES ('331024', '仙居县', '331000');
+INSERT INTO `dict_area`
+VALUES ('331081', '温岭市', '331000');
+INSERT INTO `dict_area`
+VALUES ('331082', '临海市', '331000');
+INSERT INTO `dict_area`
+VALUES ('331083', '玉环市', '331000');
+INSERT INTO `dict_area`
+VALUES ('331100', '丽水市', '330000');
+INSERT INTO `dict_area`
+VALUES ('331102', '莲都区', '331100');
+INSERT INTO `dict_area`
+VALUES ('331121', '青田县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331122', '缙云县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331123', '遂昌县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331124', '松阳县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331125', '云和县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331126', '庆元县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331127', '景宁畲族自治县', '331100');
+INSERT INTO `dict_area`
+VALUES ('331181', '龙泉市', '331100');
+INSERT INTO `dict_area`
+VALUES ('340000', '安徽省', '-1');
+INSERT INTO `dict_area`
+VALUES ('340100', '合肥市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340102', '瑶海区', '340100');
+INSERT INTO `dict_area`
+VALUES ('340103', '庐阳区', '340100');
+INSERT INTO `dict_area`
+VALUES ('340104', '蜀山区', '340100');
+INSERT INTO `dict_area`
+VALUES ('340111', '包河区', '340100');
+INSERT INTO `dict_area`
+VALUES ('340121', '长丰县', '340100');
+INSERT INTO `dict_area`
+VALUES ('340122', '肥东县', '340100');
+INSERT INTO `dict_area`
+VALUES ('340123', '肥西县', '340100');
+INSERT INTO `dict_area`
+VALUES ('340124', '庐江县', '340100');
+INSERT INTO `dict_area`
+VALUES ('340181', '巢湖市', '340100');
+INSERT INTO `dict_area`
+VALUES ('340200', '芜湖市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340202', '镜湖区', '340200');
+INSERT INTO `dict_area`
+VALUES ('340203', '弋江区', '340200');
+INSERT INTO `dict_area`
+VALUES ('340207', '鸠江区', '340200');
+INSERT INTO `dict_area`
+VALUES ('340208', '三山区', '340200');
+INSERT INTO `dict_area`
+VALUES ('340221', '芜湖县', '340200');
+INSERT INTO `dict_area`
+VALUES ('340222', '繁昌县', '340200');
+INSERT INTO `dict_area`
+VALUES ('340223', '南陵县', '340200');
+INSERT INTO `dict_area`
+VALUES ('340225', '无为县', '340200');
+INSERT INTO `dict_area`
+VALUES ('340300', '蚌埠市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340302', '龙子湖区', '340300');
+INSERT INTO `dict_area`
+VALUES ('340303', '蚌山区', '340300');
+INSERT INTO `dict_area`
+VALUES ('340304', '禹会区', '340300');
+INSERT INTO `dict_area`
+VALUES ('340311', '淮上区', '340300');
+INSERT INTO `dict_area`
+VALUES ('340321', '怀远县', '340300');
+INSERT INTO `dict_area`
+VALUES ('340322', '五河县', '340300');
+INSERT INTO `dict_area`
+VALUES ('340323', '固镇县', '340300');
+INSERT INTO `dict_area`
+VALUES ('340400', '淮南市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340402', '大通区', '340400');
+INSERT INTO `dict_area`
+VALUES ('340403', '田家庵区', '340400');
+INSERT INTO `dict_area`
+VALUES ('340404', '谢家集区', '340400');
+INSERT INTO `dict_area`
+VALUES ('340405', '八公山区', '340400');
+INSERT INTO `dict_area`
+VALUES ('340406', '潘集区', '340400');
+INSERT INTO `dict_area`
+VALUES ('340421', '凤台县', '340400');
+INSERT INTO `dict_area`
+VALUES ('340422', '寿县', '340400');
+INSERT INTO `dict_area`
+VALUES ('340500', '马鞍山市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340503', '花山区', '340500');
+INSERT INTO `dict_area`
+VALUES ('340504', '雨山区', '340500');
+INSERT INTO `dict_area`
+VALUES ('340506', '博望区', '340500');
+INSERT INTO `dict_area`
+VALUES ('340521', '当涂县', '340500');
+INSERT INTO `dict_area`
+VALUES ('340522', '含山县', '340500');
+INSERT INTO `dict_area`
+VALUES ('340523', '和县', '340500');
+INSERT INTO `dict_area`
+VALUES ('340600', '淮北市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340602', '杜集区', '340600');
+INSERT INTO `dict_area`
+VALUES ('340603', '相山区', '340600');
+INSERT INTO `dict_area`
+VALUES ('340604', '烈山区', '340600');
+INSERT INTO `dict_area`
+VALUES ('340621', '濉溪县', '340600');
+INSERT INTO `dict_area`
+VALUES ('340700', '铜陵市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340705', '铜官区', '340700');
+INSERT INTO `dict_area`
+VALUES ('340706', '义安区', '340700');
+INSERT INTO `dict_area`
+VALUES ('340711', '郊区', '340700');
+INSERT INTO `dict_area`
+VALUES ('340722', '枞阳县', '340700');
+INSERT INTO `dict_area`
+VALUES ('340800', '安庆市', '340000');
+INSERT INTO `dict_area`
+VALUES ('340802', '迎江区', '340800');
+INSERT INTO `dict_area`
+VALUES ('340803', '大观区', '340800');
+INSERT INTO `dict_area`
+VALUES ('340811', '宜秀区', '340800');
+INSERT INTO `dict_area`
+VALUES ('340822', '怀宁县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340824', '潜山县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340825', '太湖县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340826', '宿松县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340827', '望江县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340828', '岳西县', '340800');
+INSERT INTO `dict_area`
+VALUES ('340881', '桐城市', '340800');
+INSERT INTO `dict_area`
+VALUES ('341000', '黄山市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341002', '屯溪区', '341000');
+INSERT INTO `dict_area`
+VALUES ('341003', '黄山区', '341000');
+INSERT INTO `dict_area`
+VALUES ('341004', '徽州区', '341000');
+INSERT INTO `dict_area`
+VALUES ('341021', '歙县', '341000');
+INSERT INTO `dict_area`
+VALUES ('341022', '休宁县', '341000');
+INSERT INTO `dict_area`
+VALUES ('341023', '黟县', '341000');
+INSERT INTO `dict_area`
+VALUES ('341024', '祁门县', '341000');
+INSERT INTO `dict_area`
+VALUES ('341100', '滁州市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341102', '琅琊区', '341100');
+INSERT INTO `dict_area`
+VALUES ('341103', '南谯区', '341100');
+INSERT INTO `dict_area`
+VALUES ('341122', '来安县', '341100');
+INSERT INTO `dict_area`
+VALUES ('341124', '全椒县', '341100');
+INSERT INTO `dict_area`
+VALUES ('341125', '定远县', '341100');
+INSERT INTO `dict_area`
+VALUES ('341126', '凤阳县', '341100');
+INSERT INTO `dict_area`
+VALUES ('341181', '天长市', '341100');
+INSERT INTO `dict_area`
+VALUES ('341182', '明光市', '341100');
+INSERT INTO `dict_area`
+VALUES ('341200', '阜阳市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341202', '颍州区', '341200');
+INSERT INTO `dict_area`
+VALUES ('341203', '颍东区', '341200');
+INSERT INTO `dict_area`
+VALUES ('341204', '颍泉区', '341200');
+INSERT INTO `dict_area`
+VALUES ('341221', '临泉县', '341200');
+INSERT INTO `dict_area`
+VALUES ('341222', '太和县', '341200');
+INSERT INTO `dict_area`
+VALUES ('341225', '阜南县', '341200');
+INSERT INTO `dict_area`
+VALUES ('341226', '颍上县', '341200');
+INSERT INTO `dict_area`
+VALUES ('341282', '界首市', '341200');
+INSERT INTO `dict_area`
+VALUES ('341300', '宿州市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341302', '埇桥区', '341300');
+INSERT INTO `dict_area`
+VALUES ('341321', '砀山县', '341300');
+INSERT INTO `dict_area`
+VALUES ('341322', '萧县', '341300');
+INSERT INTO `dict_area`
+VALUES ('341323', '灵璧县', '341300');
+INSERT INTO `dict_area`
+VALUES ('341324', '泗县', '341300');
+INSERT INTO `dict_area`
+VALUES ('341500', '六安市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341502', '金安区', '341500');
+INSERT INTO `dict_area`
+VALUES ('341503', '裕安区', '341500');
+INSERT INTO `dict_area`
+VALUES ('341504', '叶集区', '341500');
+INSERT INTO `dict_area`
+VALUES ('341522', '霍邱县', '341500');
+INSERT INTO `dict_area`
+VALUES ('341523', '舒城县', '341500');
+INSERT INTO `dict_area`
+VALUES ('341524', '金寨县', '341500');
+INSERT INTO `dict_area`
+VALUES ('341525', '霍山县', '341500');
+INSERT INTO `dict_area`
+VALUES ('341600', '亳州市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341602', '谯城区', '341600');
+INSERT INTO `dict_area`
+VALUES ('341621', '涡阳县', '341600');
+INSERT INTO `dict_area`
+VALUES ('341622', '蒙城县', '341600');
+INSERT INTO `dict_area`
+VALUES ('341623', '利辛县', '341600');
+INSERT INTO `dict_area`
+VALUES ('341700', '池州市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341702', '贵池区', '341700');
+INSERT INTO `dict_area`
+VALUES ('341721', '东至县', '341700');
+INSERT INTO `dict_area`
+VALUES ('341722', '石台县', '341700');
+INSERT INTO `dict_area`
+VALUES ('341723', '青阳县', '341700');
+INSERT INTO `dict_area`
+VALUES ('341800', '宣城市', '340000');
+INSERT INTO `dict_area`
+VALUES ('341802', '宣州区', '341800');
+INSERT INTO `dict_area`
+VALUES ('341821', '郎溪县', '341800');
+INSERT INTO `dict_area`
+VALUES ('341822', '广德县', '341800');
+INSERT INTO `dict_area`
+VALUES ('341823', '泾县', '341800');
+INSERT INTO `dict_area`
+VALUES ('341824', '绩溪县', '341800');
+INSERT INTO `dict_area`
+VALUES ('341825', '旌德县', '341800');
+INSERT INTO `dict_area`
+VALUES ('341881', '宁国市', '341800');
+INSERT INTO `dict_area`
+VALUES ('350000', '福建省', '-1');
+INSERT INTO `dict_area`
+VALUES ('350100', '福州市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350102', '鼓楼区', '350100');
+INSERT INTO `dict_area`
+VALUES ('350103', '台江区', '350100');
+INSERT INTO `dict_area`
+VALUES ('350104', '仓山区', '350100');
+INSERT INTO `dict_area`
+VALUES ('350105', '马尾区', '350100');
+INSERT INTO `dict_area`
+VALUES ('350111', '晋安区', '350100');
+INSERT INTO `dict_area`
+VALUES ('350121', '闽侯县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350122', '连江县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350123', '罗源县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350124', '闽清县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350125', '永泰县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350128', '平潭县', '350100');
+INSERT INTO `dict_area`
+VALUES ('350181', '福清市', '350100');
+INSERT INTO `dict_area`
+VALUES ('350182', '长乐市', '350100');
+INSERT INTO `dict_area`
+VALUES ('350200', '厦门市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350203', '思明区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350205', '海沧区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350206', '湖里区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350211', '集美区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350212', '同安区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350213', '翔安区', '350200');
+INSERT INTO `dict_area`
+VALUES ('350300', '莆田市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350302', '城厢区', '350300');
+INSERT INTO `dict_area`
+VALUES ('350303', '涵江区', '350300');
+INSERT INTO `dict_area`
+VALUES ('350304', '荔城区', '350300');
+INSERT INTO `dict_area`
+VALUES ('350305', '秀屿区', '350300');
+INSERT INTO `dict_area`
+VALUES ('350322', '仙游县', '350300');
+INSERT INTO `dict_area`
+VALUES ('350400', '三明市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350402', '梅列区', '350400');
+INSERT INTO `dict_area`
+VALUES ('350403', '三元区', '350400');
+INSERT INTO `dict_area`
+VALUES ('350421', '明溪县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350423', '清流县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350424', '宁化县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350425', '大田县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350426', '尤溪县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350427', '沙县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350428', '将乐县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350429', '泰宁县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350430', '建宁县', '350400');
+INSERT INTO `dict_area`
+VALUES ('350481', '永安市', '350400');
+INSERT INTO `dict_area`
+VALUES ('350500', '泉州市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350502', '鲤城区', '350500');
+INSERT INTO `dict_area`
+VALUES ('350503', '丰泽区', '350500');
+INSERT INTO `dict_area`
+VALUES ('350504', '洛江区', '350500');
+INSERT INTO `dict_area`
+VALUES ('350505', '泉港区', '350500');
+INSERT INTO `dict_area`
+VALUES ('350521', '惠安县', '350500');
+INSERT INTO `dict_area`
+VALUES ('350524', '安溪县', '350500');
+INSERT INTO `dict_area`
+VALUES ('350525', '永春县', '350500');
+INSERT INTO `dict_area`
+VALUES ('350526', '德化县', '350500');
+INSERT INTO `dict_area`
+VALUES ('350527', '金门县', '350500');
+INSERT INTO `dict_area`
+VALUES ('350581', '石狮市', '350500');
+INSERT INTO `dict_area`
+VALUES ('350582', '晋江市', '350500');
+INSERT INTO `dict_area`
+VALUES ('350583', '南安市', '350500');
+INSERT INTO `dict_area`
+VALUES ('350600', '漳州市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350602', '芗城区', '350600');
+INSERT INTO `dict_area`
+VALUES ('350603', '龙文区', '350600');
+INSERT INTO `dict_area`
+VALUES ('350622', '云霄县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350623', '漳浦县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350624', '诏安县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350625', '长泰县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350626', '东山县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350627', '南靖县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350628', '平和县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350629', '华安县', '350600');
+INSERT INTO `dict_area`
+VALUES ('350681', '龙海市', '350600');
+INSERT INTO `dict_area`
+VALUES ('350700', '南平市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350702', '延平区', '350700');
+INSERT INTO `dict_area`
+VALUES ('350703', '建阳区', '350700');
+INSERT INTO `dict_area`
+VALUES ('350721', '顺昌县', '350700');
+INSERT INTO `dict_area`
+VALUES ('350722', '浦城县', '350700');
+INSERT INTO `dict_area`
+VALUES ('350723', '光泽县', '350700');
+INSERT INTO `dict_area`
+VALUES ('350724', '松溪县', '350700');
+INSERT INTO `dict_area`
+VALUES ('350725', '政和县', '350700');
+INSERT INTO `dict_area`
+VALUES ('350781', '邵武市', '350700');
+INSERT INTO `dict_area`
+VALUES ('350782', '武夷山市', '350700');
+INSERT INTO `dict_area`
+VALUES ('350783', '建瓯市', '350700');
+INSERT INTO `dict_area`
+VALUES ('350800', '龙岩市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350802', '新罗区', '350800');
+INSERT INTO `dict_area`
+VALUES ('350803', '永定区', '350800');
+INSERT INTO `dict_area`
+VALUES ('350821', '长汀县', '350800');
+INSERT INTO `dict_area`
+VALUES ('350823', '上杭县', '350800');
+INSERT INTO `dict_area`
+VALUES ('350824', '武平县', '350800');
+INSERT INTO `dict_area`
+VALUES ('350825', '连城县', '350800');
+INSERT INTO `dict_area`
+VALUES ('350881', '漳平市', '350800');
+INSERT INTO `dict_area`
+VALUES ('350900', '宁德市', '350000');
+INSERT INTO `dict_area`
+VALUES ('350902', '蕉城区', '350900');
+INSERT INTO `dict_area`
+VALUES ('350921', '霞浦县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350922', '古田县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350923', '屏南县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350924', '寿宁县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350925', '周宁县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350926', '柘荣县', '350900');
+INSERT INTO `dict_area`
+VALUES ('350981', '福安市', '350900');
+INSERT INTO `dict_area`
+VALUES ('350982', '福鼎市', '350900');
+INSERT INTO `dict_area`
+VALUES ('360000', '江西省', '-1');
+INSERT INTO `dict_area`
+VALUES ('360100', '南昌市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360102', '东湖区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360103', '西湖区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360104', '青云谱区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360105', '湾里区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360111', '青山湖区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360112', '新建区', '360100');
+INSERT INTO `dict_area`
+VALUES ('360121', '南昌县', '360100');
+INSERT INTO `dict_area`
+VALUES ('360123', '安义县', '360100');
+INSERT INTO `dict_area`
+VALUES ('360124', '进贤县', '360100');
+INSERT INTO `dict_area`
+VALUES ('360200', '景德镇市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360202', '昌江区', '360200');
+INSERT INTO `dict_area`
+VALUES ('360203', '珠山区', '360200');
+INSERT INTO `dict_area`
+VALUES ('360222', '浮梁县', '360200');
+INSERT INTO `dict_area`
+VALUES ('360281', '乐平市', '360200');
+INSERT INTO `dict_area`
+VALUES ('360300', '萍乡市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360302', '安源区', '360300');
+INSERT INTO `dict_area`
+VALUES ('360313', '湘东区', '360300');
+INSERT INTO `dict_area`
+VALUES ('360321', '莲花县', '360300');
+INSERT INTO `dict_area`
+VALUES ('360322', '上栗县', '360300');
+INSERT INTO `dict_area`
+VALUES ('360323', '芦溪县', '360300');
+INSERT INTO `dict_area`
+VALUES ('360400', '九江市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360402', '濂溪区', '360400');
+INSERT INTO `dict_area`
+VALUES ('360403', '浔阳区', '360400');
+INSERT INTO `dict_area`
+VALUES ('360421', '九江县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360423', '武宁县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360424', '修水县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360425', '永修县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360426', '德安县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360428', '都昌县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360429', '湖口县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360430', '彭泽县', '360400');
+INSERT INTO `dict_area`
+VALUES ('360481', '瑞昌市', '360400');
+INSERT INTO `dict_area`
+VALUES ('360482', '共青城市', '360400');
+INSERT INTO `dict_area`
+VALUES ('360483', '庐山市', '360400');
+INSERT INTO `dict_area`
+VALUES ('360500', '新余市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360502', '渝水区', '360500');
+INSERT INTO `dict_area`
+VALUES ('360521', '分宜县', '360500');
+INSERT INTO `dict_area`
+VALUES ('360600', '鹰潭市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360602', '月湖区', '360600');
+INSERT INTO `dict_area`
+VALUES ('360622', '余江县', '360600');
+INSERT INTO `dict_area`
+VALUES ('360681', '贵溪市', '360600');
+INSERT INTO `dict_area`
+VALUES ('360700', '赣州市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360702', '章贡区', '360700');
+INSERT INTO `dict_area`
+VALUES ('360703', '南康区', '360700');
+INSERT INTO `dict_area`
+VALUES ('360704', '赣县区', '360700');
+INSERT INTO `dict_area`
+VALUES ('360722', '信丰县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360723', '大余县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360724', '上犹县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360725', '崇义县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360726', '安远县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360727', '龙南县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360728', '定南县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360729', '全南县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360730', '宁都县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360731', '于都县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360732', '兴国县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360733', '会昌县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360734', '寻乌县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360735', '石城县', '360700');
+INSERT INTO `dict_area`
+VALUES ('360781', '瑞金市', '360700');
+INSERT INTO `dict_area`
+VALUES ('360800', '吉安市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360802', '吉州区', '360800');
+INSERT INTO `dict_area`
+VALUES ('360803', '青原区', '360800');
+INSERT INTO `dict_area`
+VALUES ('360821', '吉安县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360822', '吉水县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360823', '峡江县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360824', '新干县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360825', '永丰县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360826', '泰和县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360827', '遂川县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360828', '万安县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360829', '安福县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360830', '永新县', '360800');
+INSERT INTO `dict_area`
+VALUES ('360881', '井冈山市', '360800');
+INSERT INTO `dict_area`
+VALUES ('360900', '宜春市', '360000');
+INSERT INTO `dict_area`
+VALUES ('360902', '袁州区', '360900');
+INSERT INTO `dict_area`
+VALUES ('360921', '奉新县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360922', '万载县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360923', '上高县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360924', '宜丰县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360925', '靖安县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360926', '铜鼓县', '360900');
+INSERT INTO `dict_area`
+VALUES ('360981', '丰城市', '360900');
+INSERT INTO `dict_area`
+VALUES ('360982', '樟树市', '360900');
+INSERT INTO `dict_area`
+VALUES ('360983', '高安市', '360900');
+INSERT INTO `dict_area`
+VALUES ('361000', '抚州市', '360000');
+INSERT INTO `dict_area`
+VALUES ('361002', '临川区', '361000');
+INSERT INTO `dict_area`
+VALUES ('361003', '东乡区', '361000');
+INSERT INTO `dict_area`
+VALUES ('361021', '南城县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361022', '黎川县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361023', '南丰县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361024', '崇仁县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361025', '乐安县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361026', '宜黄县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361027', '金溪县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361028', '资溪县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361030', '广昌县', '361000');
+INSERT INTO `dict_area`
+VALUES ('361100', '上饶市', '360000');
+INSERT INTO `dict_area`
+VALUES ('361102', '信州区', '361100');
+INSERT INTO `dict_area`
+VALUES ('361103', '广丰区', '361100');
+INSERT INTO `dict_area`
+VALUES ('361121', '上饶县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361123', '玉山县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361124', '铅山县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361125', '横峰县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361126', '弋阳县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361127', '余干县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361128', '鄱阳县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361129', '万年县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361130', '婺源县', '361100');
+INSERT INTO `dict_area`
+VALUES ('361181', '德兴市', '361100');
+INSERT INTO `dict_area`
+VALUES ('370000', '山东省', '-1');
+INSERT INTO `dict_area`
+VALUES ('370100', '济南市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370102', '历下区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370103', '市中区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370104', '槐荫区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370105', '天桥区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370112', '历城区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370113', '长清区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370114', '章丘区', '370100');
+INSERT INTO `dict_area`
+VALUES ('370124', '平阴县', '370100');
+INSERT INTO `dict_area`
+VALUES ('370125', '济阳县', '370100');
+INSERT INTO `dict_area`
+VALUES ('370126', '商河县', '370100');
+INSERT INTO `dict_area`
+VALUES ('370200', '青岛市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370202', '市南区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370203', '市北区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370211', '黄岛区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370212', '崂山区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370213', '李沧区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370214', '城阳区', '370200');
+INSERT INTO `dict_area`
+VALUES ('370281', '胶州市', '370200');
+INSERT INTO `dict_area`
+VALUES ('370282', '即墨市', '370200');
+INSERT INTO `dict_area`
+VALUES ('370283', '平度市', '370200');
+INSERT INTO `dict_area`
+VALUES ('370285', '莱西市', '370200');
+INSERT INTO `dict_area`
+VALUES ('370300', '淄博市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370302', '淄川区', '370300');
+INSERT INTO `dict_area`
+VALUES ('370303', '张店区', '370300');
+INSERT INTO `dict_area`
+VALUES ('370304', '博山区', '370300');
+INSERT INTO `dict_area`
+VALUES ('370305', '临淄区', '370300');
+INSERT INTO `dict_area`
+VALUES ('370306', '周村区', '370300');
+INSERT INTO `dict_area`
+VALUES ('370321', '桓台县', '370300');
+INSERT INTO `dict_area`
+VALUES ('370322', '高青县', '370300');
+INSERT INTO `dict_area`
+VALUES ('370323', '沂源县', '370300');
+INSERT INTO `dict_area`
+VALUES ('370400', '枣庄市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370402', '市中区', '370400');
+INSERT INTO `dict_area`
+VALUES ('370403', '薛城区', '370400');
+INSERT INTO `dict_area`
+VALUES ('370404', '峄城区', '370400');
+INSERT INTO `dict_area`
+VALUES ('370405', '台儿庄区', '370400');
+INSERT INTO `dict_area`
+VALUES ('370406', '山亭区', '370400');
+INSERT INTO `dict_area`
+VALUES ('370481', '滕州市', '370400');
+INSERT INTO `dict_area`
+VALUES ('370500', '东营市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370502', '东营区', '370500');
+INSERT INTO `dict_area`
+VALUES ('370503', '河口区', '370500');
+INSERT INTO `dict_area`
+VALUES ('370505', '垦利区', '370500');
+INSERT INTO `dict_area`
+VALUES ('370522', '利津县', '370500');
+INSERT INTO `dict_area`
+VALUES ('370523', '广饶县', '370500');
+INSERT INTO `dict_area`
+VALUES ('370600', '烟台市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370602', '芝罘区', '370600');
+INSERT INTO `dict_area`
+VALUES ('370611', '福山区', '370600');
+INSERT INTO `dict_area`
+VALUES ('370612', '牟平区', '370600');
+INSERT INTO `dict_area`
+VALUES ('370613', '莱山区', '370600');
+INSERT INTO `dict_area`
+VALUES ('370634', '长岛县', '370600');
+INSERT INTO `dict_area`
+VALUES ('370681', '龙口市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370682', '莱阳市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370683', '莱州市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370684', '蓬莱市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370685', '招远市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370686', '栖霞市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370687', '海阳市', '370600');
+INSERT INTO `dict_area`
+VALUES ('370700', '潍坊市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370702', '潍城区', '370700');
+INSERT INTO `dict_area`
+VALUES ('370703', '寒亭区', '370700');
+INSERT INTO `dict_area`
+VALUES ('370704', '坊子区', '370700');
+INSERT INTO `dict_area`
+VALUES ('370705', '奎文区', '370700');
+INSERT INTO `dict_area`
+VALUES ('370724', '临朐县', '370700');
+INSERT INTO `dict_area`
+VALUES ('370725', '昌乐县', '370700');
+INSERT INTO `dict_area`
+VALUES ('370781', '青州市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370782', '诸城市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370783', '寿光市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370784', '安丘市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370785', '高密市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370786', '昌邑市', '370700');
+INSERT INTO `dict_area`
+VALUES ('370800', '济宁市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370811', '任城区', '370800');
+INSERT INTO `dict_area`
+VALUES ('370812', '兖州区', '370800');
+INSERT INTO `dict_area`
+VALUES ('370826', '微山县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370827', '鱼台县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370828', '金乡县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370829', '嘉祥县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370830', '汶上县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370831', '泗水县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370832', '梁山县', '370800');
+INSERT INTO `dict_area`
+VALUES ('370881', '曲阜市', '370800');
+INSERT INTO `dict_area`
+VALUES ('370883', '邹城市', '370800');
+INSERT INTO `dict_area`
+VALUES ('370900', '泰安市', '370000');
+INSERT INTO `dict_area`
+VALUES ('370902', '泰山区', '370900');
+INSERT INTO `dict_area`
+VALUES ('370911', '岱岳区', '370900');
+INSERT INTO `dict_area`
+VALUES ('370921', '宁阳县', '370900');
+INSERT INTO `dict_area`
+VALUES ('370923', '东平县', '370900');
+INSERT INTO `dict_area`
+VALUES ('370982', '新泰市', '370900');
+INSERT INTO `dict_area`
+VALUES ('370983', '肥城市', '370900');
+INSERT INTO `dict_area`
+VALUES ('371000', '威海市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371002', '环翠区', '371000');
+INSERT INTO `dict_area`
+VALUES ('371003', '文登区', '371000');
+INSERT INTO `dict_area`
+VALUES ('371082', '荣成市', '371000');
+INSERT INTO `dict_area`
+VALUES ('371083', '乳山市', '371000');
+INSERT INTO `dict_area`
+VALUES ('371100', '日照市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371102', '东港区', '371100');
+INSERT INTO `dict_area`
+VALUES ('371103', '岚山区', '371100');
+INSERT INTO `dict_area`
+VALUES ('371121', '五莲县', '371100');
+INSERT INTO `dict_area`
+VALUES ('371122', '莒县', '371100');
+INSERT INTO `dict_area`
+VALUES ('371200', '莱芜市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371202', '莱城区', '371200');
+INSERT INTO `dict_area`
+VALUES ('371203', '钢城区', '371200');
+INSERT INTO `dict_area`
+VALUES ('371300', '临沂市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371302', '兰山区', '371300');
+INSERT INTO `dict_area`
+VALUES ('371311', '罗庄区', '371300');
+INSERT INTO `dict_area`
+VALUES ('371312', '河东区', '371300');
+INSERT INTO `dict_area`
+VALUES ('371321', '沂南县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371322', '郯城县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371323', '沂水县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371324', '兰陵县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371325', '费县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371326', '平邑县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371327', '莒南县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371328', '蒙阴县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371329', '临沭县', '371300');
+INSERT INTO `dict_area`
+VALUES ('371400', '德州市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371402', '德城区', '371400');
+INSERT INTO `dict_area`
+VALUES ('371403', '陵城区', '371400');
+INSERT INTO `dict_area`
+VALUES ('371422', '宁津县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371423', '庆云县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371424', '临邑县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371425', '齐河县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371426', '平原县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371427', '夏津县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371428', '武城县', '371400');
+INSERT INTO `dict_area`
+VALUES ('371481', '乐陵市', '371400');
+INSERT INTO `dict_area`
+VALUES ('371482', '禹城市', '371400');
+INSERT INTO `dict_area`
+VALUES ('371500', '聊城市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371502', '东昌府区', '371500');
+INSERT INTO `dict_area`
+VALUES ('371521', '阳谷县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371522', '莘县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371523', '茌平县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371524', '东阿县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371525', '冠县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371526', '高唐县', '371500');
+INSERT INTO `dict_area`
+VALUES ('371581', '临清市', '371500');
+INSERT INTO `dict_area`
+VALUES ('371600', '滨州市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371602', '滨城区', '371600');
+INSERT INTO `dict_area`
+VALUES ('371603', '沾化区', '371600');
+INSERT INTO `dict_area`
+VALUES ('371621', '惠民县', '371600');
+INSERT INTO `dict_area`
+VALUES ('371622', '阳信县', '371600');
+INSERT INTO `dict_area`
+VALUES ('371623', '无棣县', '371600');
+INSERT INTO `dict_area`
+VALUES ('371625', '博兴县', '371600');
+INSERT INTO `dict_area`
+VALUES ('371626', '邹平县', '371600');
+INSERT INTO `dict_area`
+VALUES ('371700', '菏泽市', '370000');
+INSERT INTO `dict_area`
+VALUES ('371702', '牡丹区', '371700');
+INSERT INTO `dict_area`
+VALUES ('371703', '定陶区', '371700');
+INSERT INTO `dict_area`
+VALUES ('371721', '曹县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371722', '单县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371723', '成武县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371724', '巨野县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371725', '郓城县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371726', '鄄城县', '371700');
+INSERT INTO `dict_area`
+VALUES ('371728', '东明县', '371700');
+INSERT INTO `dict_area`
+VALUES ('410000', '河南省', '-1');
+INSERT INTO `dict_area`
+VALUES ('410100', '郑州市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410102', '中原区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410103', '二七区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410104', '管城回族区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410105', '金水区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410106', '上街区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410108', '惠济区', '410100');
+INSERT INTO `dict_area`
+VALUES ('410122', '中牟县', '410100');
+INSERT INTO `dict_area`
+VALUES ('410181', '巩义市', '410100');
+INSERT INTO `dict_area`
+VALUES ('410182', '荥阳市', '410100');
+INSERT INTO `dict_area`
+VALUES ('410183', '新密市', '410100');
+INSERT INTO `dict_area`
+VALUES ('410184', '新郑市', '410100');
+INSERT INTO `dict_area`
+VALUES ('410185', '登封市', '410100');
+INSERT INTO `dict_area`
+VALUES ('410200', '开封市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410202', '龙亭区', '410200');
+INSERT INTO `dict_area`
+VALUES ('410203', '顺河回族区', '410200');
+INSERT INTO `dict_area`
+VALUES ('410204', '鼓楼区', '410200');
+INSERT INTO `dict_area`
+VALUES ('410205', '禹王台区', '410200');
+INSERT INTO `dict_area`
+VALUES ('410212', '祥符区', '410200');
+INSERT INTO `dict_area`
+VALUES ('410221', '杞县', '410200');
+INSERT INTO `dict_area`
+VALUES ('410222', '通许县', '410200');
+INSERT INTO `dict_area`
+VALUES ('410223', '尉氏县', '410200');
+INSERT INTO `dict_area`
+VALUES ('410225', '兰考县', '410200');
+INSERT INTO `dict_area`
+VALUES ('410300', '洛阳市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410302', '老城区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410303', '西工区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410304', '瀍河回族区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410305', '涧西区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410306', '吉利区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410311', '洛龙区', '410300');
+INSERT INTO `dict_area`
+VALUES ('410322', '孟津县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410323', '新安县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410324', '栾川县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410325', '嵩县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410326', '汝阳县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410327', '宜阳县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410328', '洛宁县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410329', '伊川县', '410300');
+INSERT INTO `dict_area`
+VALUES ('410381', '偃师市', '410300');
+INSERT INTO `dict_area`
+VALUES ('410400', '平顶山市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410402', '新华区', '410400');
+INSERT INTO `dict_area`
+VALUES ('410403', '卫东区', '410400');
+INSERT INTO `dict_area`
+VALUES ('410404', '石龙区', '410400');
+INSERT INTO `dict_area`
+VALUES ('410411', '湛河区', '410400');
+INSERT INTO `dict_area`
+VALUES ('410421', '宝丰县', '410400');
+INSERT INTO `dict_area`
+VALUES ('410422', '叶县', '410400');
+INSERT INTO `dict_area`
+VALUES ('410423', '鲁山县', '410400');
+INSERT INTO `dict_area`
+VALUES ('410425', '郏县', '410400');
+INSERT INTO `dict_area`
+VALUES ('410481', '舞钢市', '410400');
+INSERT INTO `dict_area`
+VALUES ('410482', '汝州市', '410400');
+INSERT INTO `dict_area`
+VALUES ('410500', '安阳市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410502', '文峰区', '410500');
+INSERT INTO `dict_area`
+VALUES ('410503', '北关区', '410500');
+INSERT INTO `dict_area`
+VALUES ('410505', '殷都区', '410500');
+INSERT INTO `dict_area`
+VALUES ('410506', '龙安区', '410500');
+INSERT INTO `dict_area`
+VALUES ('410522', '安阳县', '410500');
+INSERT INTO `dict_area`
+VALUES ('410523', '汤阴县', '410500');
+INSERT INTO `dict_area`
+VALUES ('410526', '滑县', '410500');
+INSERT INTO `dict_area`
+VALUES ('410527', '内黄县', '410500');
+INSERT INTO `dict_area`
+VALUES ('410581', '林州市', '410500');
+INSERT INTO `dict_area`
+VALUES ('410600', '鹤壁市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410602', '鹤山区', '410600');
+INSERT INTO `dict_area`
+VALUES ('410603', '山城区', '410600');
+INSERT INTO `dict_area`
+VALUES ('410611', '淇滨区', '410600');
+INSERT INTO `dict_area`
+VALUES ('410621', '浚县', '410600');
+INSERT INTO `dict_area`
+VALUES ('410622', '淇县', '410600');
+INSERT INTO `dict_area`
+VALUES ('410700', '新乡市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410702', '红旗区', '410700');
+INSERT INTO `dict_area`
+VALUES ('410703', '卫滨区', '410700');
+INSERT INTO `dict_area`
+VALUES ('410704', '凤泉区', '410700');
+INSERT INTO `dict_area`
+VALUES ('410711', '牧野区', '410700');
+INSERT INTO `dict_area`
+VALUES ('410721', '新乡县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410724', '获嘉县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410725', '原阳县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410726', '延津县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410727', '封丘县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410728', '长垣县', '410700');
+INSERT INTO `dict_area`
+VALUES ('410781', '卫辉市', '410700');
+INSERT INTO `dict_area`
+VALUES ('410782', '辉县市', '410700');
+INSERT INTO `dict_area`
+VALUES ('410800', '焦作市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410802', '解放区', '410800');
+INSERT INTO `dict_area`
+VALUES ('410803', '中站区', '410800');
+INSERT INTO `dict_area`
+VALUES ('410804', '马村区', '410800');
+INSERT INTO `dict_area`
+VALUES ('410811', '山阳区', '410800');
+INSERT INTO `dict_area`
+VALUES ('410821', '修武县', '410800');
+INSERT INTO `dict_area`
+VALUES ('410822', '博爱县', '410800');
+INSERT INTO `dict_area`
+VALUES ('410823', '武陟县', '410800');
+INSERT INTO `dict_area`
+VALUES ('410825', '温县', '410800');
+INSERT INTO `dict_area`
+VALUES ('410882', '沁阳市', '410800');
+INSERT INTO `dict_area`
+VALUES ('410883', '孟州市', '410800');
+INSERT INTO `dict_area`
+VALUES ('410900', '濮阳市', '410000');
+INSERT INTO `dict_area`
+VALUES ('410902', '华龙区', '410900');
+INSERT INTO `dict_area`
+VALUES ('410922', '清丰县', '410900');
+INSERT INTO `dict_area`
+VALUES ('410923', '南乐县', '410900');
+INSERT INTO `dict_area`
+VALUES ('410926', '范县', '410900');
+INSERT INTO `dict_area`
+VALUES ('410927', '台前县', '410900');
+INSERT INTO `dict_area`
+VALUES ('410928', '濮阳县', '410900');
+INSERT INTO `dict_area`
+VALUES ('411000', '许昌市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411002', '魏都区', '411000');
+INSERT INTO `dict_area`
+VALUES ('411003', '建安区', '411000');
+INSERT INTO `dict_area`
+VALUES ('411024', '鄢陵县', '411000');
+INSERT INTO `dict_area`
+VALUES ('411025', '襄城县', '411000');
+INSERT INTO `dict_area`
+VALUES ('411081', '禹州市', '411000');
+INSERT INTO `dict_area`
+VALUES ('411082', '长葛市', '411000');
+INSERT INTO `dict_area`
+VALUES ('411100', '漯河市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411102', '源汇区', '411100');
+INSERT INTO `dict_area`
+VALUES ('411103', '郾城区', '411100');
+INSERT INTO `dict_area`
+VALUES ('411104', '召陵区', '411100');
+INSERT INTO `dict_area`
+VALUES ('411121', '舞阳县', '411100');
+INSERT INTO `dict_area`
+VALUES ('411122', '临颍县', '411100');
+INSERT INTO `dict_area`
+VALUES ('411200', '三门峡市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411202', '湖滨区', '411200');
+INSERT INTO `dict_area`
+VALUES ('411203', '陕州区', '411200');
+INSERT INTO `dict_area`
+VALUES ('411221', '渑池县', '411200');
+INSERT INTO `dict_area`
+VALUES ('411224', '卢氏县', '411200');
+INSERT INTO `dict_area`
+VALUES ('411281', '义马市', '411200');
+INSERT INTO `dict_area`
+VALUES ('411282', '灵宝市', '411200');
+INSERT INTO `dict_area`
+VALUES ('411300', '南阳市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411302', '宛城区', '411300');
+INSERT INTO `dict_area`
+VALUES ('411303', '卧龙区', '411300');
+INSERT INTO `dict_area`
+VALUES ('411321', '南召县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411322', '方城县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411323', '西峡县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411324', '镇平县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411325', '内乡县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411326', '淅川县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411327', '社旗县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411328', '唐河县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411329', '新野县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411330', '桐柏县', '411300');
+INSERT INTO `dict_area`
+VALUES ('411381', '邓州市', '411300');
+INSERT INTO `dict_area`
+VALUES ('411400', '商丘市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411402', '梁园区', '411400');
+INSERT INTO `dict_area`
+VALUES ('411403', '睢阳区', '411400');
+INSERT INTO `dict_area`
+VALUES ('411421', '民权县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411422', '睢县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411423', '宁陵县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411424', '柘城县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411425', '虞城县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411426', '夏邑县', '411400');
+INSERT INTO `dict_area`
+VALUES ('411481', '永城市', '411400');
+INSERT INTO `dict_area`
+VALUES ('411500', '信阳市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411502', '浉河区', '411500');
+INSERT INTO `dict_area`
+VALUES ('411503', '平桥区', '411500');
+INSERT INTO `dict_area`
+VALUES ('411521', '罗山县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411522', '光山县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411523', '新县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411524', '商城县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411525', '固始县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411526', '潢川县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411527', '淮滨县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411528', '息县', '411500');
+INSERT INTO `dict_area`
+VALUES ('411600', '周口市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411602', '川汇区', '411600');
+INSERT INTO `dict_area`
+VALUES ('411621', '扶沟县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411622', '西华县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411623', '商水县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411624', '沈丘县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411625', '郸城县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411626', '淮阳县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411627', '太康县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411628', '鹿邑县', '411600');
+INSERT INTO `dict_area`
+VALUES ('411681', '项城市', '411600');
+INSERT INTO `dict_area`
+VALUES ('411700', '驻马店市', '410000');
+INSERT INTO `dict_area`
+VALUES ('411702', '驿城区', '411700');
+INSERT INTO `dict_area`
+VALUES ('411721', '西平县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411722', '上蔡县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411723', '平舆县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411724', '正阳县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411725', '确山县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411726', '泌阳县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411727', '汝南县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411728', '遂平县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411729', '新蔡县', '411700');
+INSERT INTO `dict_area`
+VALUES ('411800', '济源市', '410000');
+INSERT INTO `dict_area`
+VALUES ('420000', '湖北省', '-1');
+INSERT INTO `dict_area`
+VALUES ('420100', '武汉市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420102', '江岸区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420103', '江汉区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420104', '硚口区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420105', '汉阳区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420106', '武昌区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420107', '青山区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420111', '洪山区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420112', '东西湖区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420113', '汉南区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420114', '蔡甸区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420115', '江夏区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420116', '黄陂区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420117', '新洲区', '420100');
+INSERT INTO `dict_area`
+VALUES ('420200', '黄石市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420202', '黄石港区', '420200');
+INSERT INTO `dict_area`
+VALUES ('420203', '西塞山区', '420200');
+INSERT INTO `dict_area`
+VALUES ('420204', '下陆区', '420200');
+INSERT INTO `dict_area`
+VALUES ('420205', '铁山区', '420200');
+INSERT INTO `dict_area`
+VALUES ('420222', '阳新县', '420200');
+INSERT INTO `dict_area`
+VALUES ('420281', '大冶市', '420200');
+INSERT INTO `dict_area`
+VALUES ('420300', '十堰市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420302', '茅箭区', '420300');
+INSERT INTO `dict_area`
+VALUES ('420303', '张湾区', '420300');
+INSERT INTO `dict_area`
+VALUES ('420304', '郧阳区', '420300');
+INSERT INTO `dict_area`
+VALUES ('420322', '郧西县', '420300');
+INSERT INTO `dict_area`
+VALUES ('420323', '竹山县', '420300');
+INSERT INTO `dict_area`
+VALUES ('420324', '竹溪县', '420300');
+INSERT INTO `dict_area`
+VALUES ('420325', '房县', '420300');
+INSERT INTO `dict_area`
+VALUES ('420381', '丹江口市', '420300');
+INSERT INTO `dict_area`
+VALUES ('420500', '宜昌市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420502', '西陵区', '420500');
+INSERT INTO `dict_area`
+VALUES ('420503', '伍家岗区', '420500');
+INSERT INTO `dict_area`
+VALUES ('420504', '点军区', '420500');
+INSERT INTO `dict_area`
+VALUES ('420505', '猇亭区', '420500');
+INSERT INTO `dict_area`
+VALUES ('420506', '夷陵区', '420500');
+INSERT INTO `dict_area`
+VALUES ('420525', '远安县', '420500');
+INSERT INTO `dict_area`
+VALUES ('420526', '兴山县', '420500');
+INSERT INTO `dict_area`
+VALUES ('420527', '秭归县', '420500');
+INSERT INTO `dict_area`
+VALUES ('420528', '长阳土家族自治县', '420500');
+INSERT INTO `dict_area`
+VALUES ('420529', '五峰土家族自治县', '420500');
+INSERT INTO `dict_area`
+VALUES ('420581', '宜都市', '420500');
+INSERT INTO `dict_area`
+VALUES ('420582', '当阳市', '420500');
+INSERT INTO `dict_area`
+VALUES ('420583', '枝江市', '420500');
+INSERT INTO `dict_area`
+VALUES ('420600', '襄阳市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420602', '襄城区', '420600');
+INSERT INTO `dict_area`
+VALUES ('420606', '樊城区', '420600');
+INSERT INTO `dict_area`
+VALUES ('420607', '襄州区', '420600');
+INSERT INTO `dict_area`
+VALUES ('420624', '南漳县', '420600');
+INSERT INTO `dict_area`
+VALUES ('420625', '谷城县', '420600');
+INSERT INTO `dict_area`
+VALUES ('420626', '保康县', '420600');
+INSERT INTO `dict_area`
+VALUES ('420682', '老河口市', '420600');
+INSERT INTO `dict_area`
+VALUES ('420683', '枣阳市', '420600');
+INSERT INTO `dict_area`
+VALUES ('420684', '宜城市', '420600');
+INSERT INTO `dict_area`
+VALUES ('420700', '鄂州市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420702', '梁子湖区', '420700');
+INSERT INTO `dict_area`
+VALUES ('420703', '华容区', '420700');
+INSERT INTO `dict_area`
+VALUES ('420704', '鄂城区', '420700');
+INSERT INTO `dict_area`
+VALUES ('420800', '荆门市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420802', '东宝区', '420800');
+INSERT INTO `dict_area`
+VALUES ('420804', '掇刀区', '420800');
+INSERT INTO `dict_area`
+VALUES ('420821', '京山县', '420800');
+INSERT INTO `dict_area`
+VALUES ('420822', '沙洋县', '420800');
+INSERT INTO `dict_area`
+VALUES ('420881', '钟祥市', '420800');
+INSERT INTO `dict_area`
+VALUES ('420900', '孝感市', '420000');
+INSERT INTO `dict_area`
+VALUES ('420902', '孝南区', '420900');
+INSERT INTO `dict_area`
+VALUES ('420921', '孝昌县', '420900');
+INSERT INTO `dict_area`
+VALUES ('420922', '大悟县', '420900');
+INSERT INTO `dict_area`
+VALUES ('420923', '云梦县', '420900');
+INSERT INTO `dict_area`
+VALUES ('420981', '应城市', '420900');
+INSERT INTO `dict_area`
+VALUES ('420982', '安陆市', '420900');
+INSERT INTO `dict_area`
+VALUES ('420984', '汉川市', '420900');
+INSERT INTO `dict_area`
+VALUES ('421000', '荆州市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421002', '沙市区', '421000');
+INSERT INTO `dict_area`
+VALUES ('421003', '荆州区', '421000');
+INSERT INTO `dict_area`
+VALUES ('421022', '公安县', '421000');
+INSERT INTO `dict_area`
+VALUES ('421023', '监利县', '421000');
+INSERT INTO `dict_area`
+VALUES ('421024', '江陵县', '421000');
+INSERT INTO `dict_area`
+VALUES ('421081', '石首市', '421000');
+INSERT INTO `dict_area`
+VALUES ('421083', '洪湖市', '421000');
+INSERT INTO `dict_area`
+VALUES ('421087', '松滋市', '421000');
+INSERT INTO `dict_area`
+VALUES ('421100', '黄冈市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421102', '黄州区', '421100');
+INSERT INTO `dict_area`
+VALUES ('421121', '团风县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421122', '红安县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421123', '罗田县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421124', '英山县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421125', '浠水县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421126', '蕲春县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421127', '黄梅县', '421100');
+INSERT INTO `dict_area`
+VALUES ('421181', '麻城市', '421100');
+INSERT INTO `dict_area`
+VALUES ('421182', '武穴市', '421100');
+INSERT INTO `dict_area`
+VALUES ('421200', '咸宁市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421202', '咸安区', '421200');
+INSERT INTO `dict_area`
+VALUES ('421221', '嘉鱼县', '421200');
+INSERT INTO `dict_area`
+VALUES ('421222', '通城县', '421200');
+INSERT INTO `dict_area`
+VALUES ('421223', '崇阳县', '421200');
+INSERT INTO `dict_area`
+VALUES ('421224', '通山县', '421200');
+INSERT INTO `dict_area`
+VALUES ('421281', '赤壁市', '421200');
+INSERT INTO `dict_area`
+VALUES ('421300', '随州市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421303', '曾都区', '421300');
+INSERT INTO `dict_area`
+VALUES ('421321', '随县', '421300');
+INSERT INTO `dict_area`
+VALUES ('421381', '广水市', '421300');
+INSERT INTO `dict_area`
+VALUES ('421400', '仙桃市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421500', '潜江市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421600', '天门市', '420000');
+INSERT INTO `dict_area`
+VALUES ('421700', '神农架林区', '420000');
+INSERT INTO `dict_area`
+VALUES ('422800', '恩施土家族苗族自治州', '420000');
+INSERT INTO `dict_area`
+VALUES ('422801', '恩施市', '422800');
+INSERT INTO `dict_area`
+VALUES ('422802', '利川市', '422800');
+INSERT INTO `dict_area`
+VALUES ('422822', '建始县', '422800');
+INSERT INTO `dict_area`
+VALUES ('422823', '巴东县', '422800');
+INSERT INTO `dict_area`
+VALUES ('422825', '宣恩县', '422800');
+INSERT INTO `dict_area`
+VALUES ('422826', '咸丰县', '422800');
+INSERT INTO `dict_area`
+VALUES ('422827', '来凤县', '422800');
+INSERT INTO `dict_area`
+VALUES ('422828', '鹤峰县', '422800');
+INSERT INTO `dict_area`
+VALUES ('430000', '湖南省', '-1');
+INSERT INTO `dict_area`
+VALUES ('430100', '长沙市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430102', '芙蓉区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430103', '天心区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430104', '岳麓区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430105', '开福区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430111', '雨花区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430112', '望城区', '430100');
+INSERT INTO `dict_area`
+VALUES ('430121', '长沙县', '430100');
+INSERT INTO `dict_area`
+VALUES ('430181', '浏阳市', '430100');
+INSERT INTO `dict_area`
+VALUES ('430182', '宁乡市', '430100');
+INSERT INTO `dict_area`
+VALUES ('430200', '株洲市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430202', '荷塘区', '430200');
+INSERT INTO `dict_area`
+VALUES ('430203', '芦淞区', '430200');
+INSERT INTO `dict_area`
+VALUES ('430204', '石峰区', '430200');
+INSERT INTO `dict_area`
+VALUES ('430211', '天元区', '430200');
+INSERT INTO `dict_area`
+VALUES ('430221', '株洲县', '430200');
+INSERT INTO `dict_area`
+VALUES ('430223', '攸县', '430200');
+INSERT INTO `dict_area`
+VALUES ('430224', '茶陵县', '430200');
+INSERT INTO `dict_area`
+VALUES ('430225', '炎陵县', '430200');
+INSERT INTO `dict_area`
+VALUES ('430281', '醴陵市', '430200');
+INSERT INTO `dict_area`
+VALUES ('430300', '湘潭市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430302', '雨湖区', '430300');
+INSERT INTO `dict_area`
+VALUES ('430304', '岳塘区', '430300');
+INSERT INTO `dict_area`
+VALUES ('430321', '湘潭县', '430300');
+INSERT INTO `dict_area`
+VALUES ('430381', '湘乡市', '430300');
+INSERT INTO `dict_area`
+VALUES ('430382', '韶山市', '430300');
+INSERT INTO `dict_area`
+VALUES ('430400', '衡阳市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430405', '珠晖区', '430400');
+INSERT INTO `dict_area`
+VALUES ('430406', '雁峰区', '430400');
+INSERT INTO `dict_area`
+VALUES ('430407', '石鼓区', '430400');
+INSERT INTO `dict_area`
+VALUES ('430408', '蒸湘区', '430400');
+INSERT INTO `dict_area`
+VALUES ('430412', '南岳区', '430400');
+INSERT INTO `dict_area`
+VALUES ('430421', '衡阳县', '430400');
+INSERT INTO `dict_area`
+VALUES ('430422', '衡南县', '430400');
+INSERT INTO `dict_area`
+VALUES ('430423', '衡山县', '430400');
+INSERT INTO `dict_area`
+VALUES ('430424', '衡东县', '430400');
+INSERT INTO `dict_area`
+VALUES ('430426', '祁东县', '430400');
+INSERT INTO `dict_area`
+VALUES ('430481', '耒阳市', '430400');
+INSERT INTO `dict_area`
+VALUES ('430482', '常宁市', '430400');
+INSERT INTO `dict_area`
+VALUES ('430500', '邵阳市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430502', '双清区', '430500');
+INSERT INTO `dict_area`
+VALUES ('430503', '大祥区', '430500');
+INSERT INTO `dict_area`
+VALUES ('430511', '北塔区', '430500');
+INSERT INTO `dict_area`
+VALUES ('430521', '邵东县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430522', '新邵县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430523', '邵阳县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430524', '隆回县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430525', '洞口县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430527', '绥宁县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430528', '新宁县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430529', '城步苗族自治县', '430500');
+INSERT INTO `dict_area`
+VALUES ('430581', '武冈市', '430500');
+INSERT INTO `dict_area`
+VALUES ('430600', '岳阳市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430602', '岳阳楼区', '430600');
+INSERT INTO `dict_area`
+VALUES ('430603', '云溪区', '430600');
+INSERT INTO `dict_area`
+VALUES ('430611', '君山区', '430600');
+INSERT INTO `dict_area`
+VALUES ('430621', '岳阳县', '430600');
+INSERT INTO `dict_area`
+VALUES ('430623', '华容县', '430600');
+INSERT INTO `dict_area`
+VALUES ('430624', '湘阴县', '430600');
+INSERT INTO `dict_area`
+VALUES ('430626', '平江县', '430600');
+INSERT INTO `dict_area`
+VALUES ('430681', '汨罗市', '430600');
+INSERT INTO `dict_area`
+VALUES ('430682', '临湘市', '430600');
+INSERT INTO `dict_area`
+VALUES ('430700', '常德市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430702', '武陵区', '430700');
+INSERT INTO `dict_area`
+VALUES ('430703', '鼎城区', '430700');
+INSERT INTO `dict_area`
+VALUES ('430721', '安乡县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430722', '汉寿县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430723', '澧县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430724', '临澧县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430725', '桃源县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430726', '石门县', '430700');
+INSERT INTO `dict_area`
+VALUES ('430781', '津市市', '430700');
+INSERT INTO `dict_area`
+VALUES ('430800', '张家界市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430802', '永定区', '430800');
+INSERT INTO `dict_area`
+VALUES ('430811', '武陵源区', '430800');
+INSERT INTO `dict_area`
+VALUES ('430821', '慈利县', '430800');
+INSERT INTO `dict_area`
+VALUES ('430822', '桑植县', '430800');
+INSERT INTO `dict_area`
+VALUES ('430900', '益阳市', '430000');
+INSERT INTO `dict_area`
+VALUES ('430902', '资阳区', '430900');
+INSERT INTO `dict_area`
+VALUES ('430903', '赫山区', '430900');
+INSERT INTO `dict_area`
+VALUES ('430921', '南县', '430900');
+INSERT INTO `dict_area`
+VALUES ('430922', '桃江县', '430900');
+INSERT INTO `dict_area`
+VALUES ('430923', '安化县', '430900');
+INSERT INTO `dict_area`
+VALUES ('430981', '沅江市', '430900');
+INSERT INTO `dict_area`
+VALUES ('431000', '郴州市', '430000');
+INSERT INTO `dict_area`
+VALUES ('431002', '北湖区', '431000');
+INSERT INTO `dict_area`
+VALUES ('431003', '苏仙区', '431000');
+INSERT INTO `dict_area`
+VALUES ('431021', '桂阳县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431022', '宜章县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431023', '永兴县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431024', '嘉禾县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431025', '临武县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431026', '汝城县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431027', '桂东县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431028', '安仁县', '431000');
+INSERT INTO `dict_area`
+VALUES ('431081', '资兴市', '431000');
+INSERT INTO `dict_area`
+VALUES ('431100', '永州市', '430000');
+INSERT INTO `dict_area`
+VALUES ('431102', '零陵区', '431100');
+INSERT INTO `dict_area`
+VALUES ('431103', '冷水滩区', '431100');
+INSERT INTO `dict_area`
+VALUES ('431121', '祁阳县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431122', '东安县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431123', '双牌县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431124', '道县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431125', '江永县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431126', '宁远县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431127', '蓝山县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431128', '新田县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431129', '江华瑶族自治县', '431100');
+INSERT INTO `dict_area`
+VALUES ('431200', '怀化市', '430000');
+INSERT INTO `dict_area`
+VALUES ('431202', '鹤城区', '431200');
+INSERT INTO `dict_area`
+VALUES ('431221', '中方县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431222', '沅陵县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431223', '辰溪县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431224', '溆浦县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431225', '会同县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431226', '麻阳苗族自治县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431227', '新晃侗族自治县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431228', '芷江侗族自治县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431229', '靖州苗族侗族自治县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431230', '通道侗族自治县', '431200');
+INSERT INTO `dict_area`
+VALUES ('431281', '洪江市', '431200');
+INSERT INTO `dict_area`
+VALUES ('431300', '娄底市', '430000');
+INSERT INTO `dict_area`
+VALUES ('431302', '娄星区', '431300');
+INSERT INTO `dict_area`
+VALUES ('431321', '双峰县', '431300');
+INSERT INTO `dict_area`
+VALUES ('431322', '新化县', '431300');
+INSERT INTO `dict_area`
+VALUES ('431381', '冷水江市', '431300');
+INSERT INTO `dict_area`
+VALUES ('431382', '涟源市', '431300');
+INSERT INTO `dict_area`
+VALUES ('433100', '湘西土家族苗族自治州', '430000');
+INSERT INTO `dict_area`
+VALUES ('433101', '吉首市', '433100');
+INSERT INTO `dict_area`
+VALUES ('433122', '泸溪县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433123', '凤凰县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433124', '花垣县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433125', '保靖县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433126', '古丈县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433127', '永顺县', '433100');
+INSERT INTO `dict_area`
+VALUES ('433130', '龙山县', '433100');
+INSERT INTO `dict_area`
+VALUES ('440000', '广东省', '-1');
+INSERT INTO `dict_area`
+VALUES ('440100', '广州市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440103', '荔湾区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440104', '越秀区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440105', '海珠区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440106', '天河区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440111', '白云区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440112', '黄埔区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440113', '番禺区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440114', '花都区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440115', '南沙区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440117', '从化区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440118', '增城区', '440100');
+INSERT INTO `dict_area`
+VALUES ('440200', '韶关市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440203', '武江区', '440200');
+INSERT INTO `dict_area`
+VALUES ('440204', '浈江区', '440200');
+INSERT INTO `dict_area`
+VALUES ('440205', '曲江区', '440200');
+INSERT INTO `dict_area`
+VALUES ('440222', '始兴县', '440200');
+INSERT INTO `dict_area`
+VALUES ('440224', '仁化县', '440200');
+INSERT INTO `dict_area`
+VALUES ('440229', '翁源县', '440200');
+INSERT INTO `dict_area`
+VALUES ('440232', '乳源瑶族自治县', '440200');
+INSERT INTO `dict_area`
+VALUES ('440233', '新丰县', '440200');
+INSERT INTO `dict_area`
+VALUES ('440281', '乐昌市', '440200');
+INSERT INTO `dict_area`
+VALUES ('440282', '南雄市', '440200');
+INSERT INTO `dict_area`
+VALUES ('440300', '深圳市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440303', '罗湖区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440304', '福田区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440305', '南山区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440306', '宝安区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440307', '龙岗区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440308', '盐田区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440309', '龙华区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440310', '坪山区', '440300');
+INSERT INTO `dict_area`
+VALUES ('440400', '珠海市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440402', '香洲区', '440400');
+INSERT INTO `dict_area`
+VALUES ('440403', '斗门区', '440400');
+INSERT INTO `dict_area`
+VALUES ('440404', '金湾区', '440400');
+INSERT INTO `dict_area`
+VALUES ('440499', '香洲区(由澳门特别行政区实施管辖)', '440400');
+INSERT INTO `dict_area`
+VALUES ('440500', '汕头市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440507', '龙湖区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440511', '金平区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440512', '濠江区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440513', '潮阳区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440514', '潮南区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440515', '澄海区', '440500');
+INSERT INTO `dict_area`
+VALUES ('440523', '南澳县', '440500');
+INSERT INTO `dict_area`
+VALUES ('440600', '佛山市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440604', '禅城区', '440600');
+INSERT INTO `dict_area`
+VALUES ('440605', '南海区', '440600');
+INSERT INTO `dict_area`
+VALUES ('440606', '顺德区', '440600');
+INSERT INTO `dict_area`
+VALUES ('440607', '三水区', '440600');
+INSERT INTO `dict_area`
+VALUES ('440608', '高明区', '440600');
+INSERT INTO `dict_area`
+VALUES ('440700', '江门市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440703', '蓬江区', '440700');
+INSERT INTO `dict_area`
+VALUES ('440704', '江海区', '440700');
+INSERT INTO `dict_area`
+VALUES ('440705', '新会区', '440700');
+INSERT INTO `dict_area`
+VALUES ('440781', '台山市', '440700');
+INSERT INTO `dict_area`
+VALUES ('440783', '开平市', '440700');
+INSERT INTO `dict_area`
+VALUES ('440784', '鹤山市', '440700');
+INSERT INTO `dict_area`
+VALUES ('440785', '恩平市', '440700');
+INSERT INTO `dict_area`
+VALUES ('440800', '湛江市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440802', '赤坎区', '440800');
+INSERT INTO `dict_area`
+VALUES ('440803', '霞山区', '440800');
+INSERT INTO `dict_area`
+VALUES ('440804', '坡头区', '440800');
+INSERT INTO `dict_area`
+VALUES ('440811', '麻章区', '440800');
+INSERT INTO `dict_area`
+VALUES ('440823', '遂溪县', '440800');
+INSERT INTO `dict_area`
+VALUES ('440825', '徐闻县', '440800');
+INSERT INTO `dict_area`
+VALUES ('440881', '廉江市', '440800');
+INSERT INTO `dict_area`
+VALUES ('440882', '雷州市', '440800');
+INSERT INTO `dict_area`
+VALUES ('440883', '吴川市', '440800');
+INSERT INTO `dict_area`
+VALUES ('440900', '茂名市', '440000');
+INSERT INTO `dict_area`
+VALUES ('440902', '茂南区', '440900');
+INSERT INTO `dict_area`
+VALUES ('440904', '电白区', '440900');
+INSERT INTO `dict_area`
+VALUES ('440981', '高州市', '440900');
+INSERT INTO `dict_area`
+VALUES ('440982', '化州市', '440900');
+INSERT INTO `dict_area`
+VALUES ('440983', '信宜市', '440900');
+INSERT INTO `dict_area`
+VALUES ('441200', '肇庆市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441202', '端州区', '441200');
+INSERT INTO `dict_area`
+VALUES ('441203', '鼎湖区', '441200');
+INSERT INTO `dict_area`
+VALUES ('441204', '高要区', '441200');
+INSERT INTO `dict_area`
+VALUES ('441223', '广宁县', '441200');
+INSERT INTO `dict_area`
+VALUES ('441224', '怀集县', '441200');
+INSERT INTO `dict_area`
+VALUES ('441225', '封开县', '441200');
+INSERT INTO `dict_area`
+VALUES ('441226', '德庆县', '441200');
+INSERT INTO `dict_area`
+VALUES ('441284', '四会市', '441200');
+INSERT INTO `dict_area`
+VALUES ('441300', '惠州市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441302', '惠城区', '441300');
+INSERT INTO `dict_area`
+VALUES ('441303', '惠阳区', '441300');
+INSERT INTO `dict_area`
+VALUES ('441322', '博罗县', '441300');
+INSERT INTO `dict_area`
+VALUES ('441323', '惠东县', '441300');
+INSERT INTO `dict_area`
+VALUES ('441324', '龙门县', '441300');
+INSERT INTO `dict_area`
+VALUES ('441400', '梅州市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441402', '梅江区', '441400');
+INSERT INTO `dict_area`
+VALUES ('441403', '梅县区', '441400');
+INSERT INTO `dict_area`
+VALUES ('441422', '大埔县', '441400');
+INSERT INTO `dict_area`
+VALUES ('441423', '丰顺县', '441400');
+INSERT INTO `dict_area`
+VALUES ('441424', '五华县', '441400');
+INSERT INTO `dict_area`
+VALUES ('441426', '平远县', '441400');
+INSERT INTO `dict_area`
+VALUES ('441427', '蕉岭县', '441400');
+INSERT INTO `dict_area`
+VALUES ('441481', '兴宁市', '441400');
+INSERT INTO `dict_area`
+VALUES ('441500', '汕尾市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441502', '城区', '441500');
+INSERT INTO `dict_area`
+VALUES ('441521', '海丰县', '441500');
+INSERT INTO `dict_area`
+VALUES ('441523', '陆河县', '441500');
+INSERT INTO `dict_area`
+VALUES ('441581', '陆丰市', '441500');
+INSERT INTO `dict_area`
+VALUES ('441600', '河源市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441602', '源城区', '441600');
+INSERT INTO `dict_area`
+VALUES ('441621', '紫金县', '441600');
+INSERT INTO `dict_area`
+VALUES ('441622', '龙川县', '441600');
+INSERT INTO `dict_area`
+VALUES ('441623', '连平县', '441600');
+INSERT INTO `dict_area`
+VALUES ('441624', '和平县', '441600');
+INSERT INTO `dict_area`
+VALUES ('441625', '东源县', '441600');
+INSERT INTO `dict_area`
+VALUES ('441700', '阳江市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441702', '江城区', '441700');
+INSERT INTO `dict_area`
+VALUES ('441704', '阳东区', '441700');
+INSERT INTO `dict_area`
+VALUES ('441721', '阳西县', '441700');
+INSERT INTO `dict_area`
+VALUES ('441781', '阳春市', '441700');
+INSERT INTO `dict_area`
+VALUES ('441800', '清远市', '440000');
+INSERT INTO `dict_area`
+VALUES ('441802', '清城区', '441800');
+INSERT INTO `dict_area`
+VALUES ('441803', '清新区', '441800');
+INSERT INTO `dict_area`
+VALUES ('441821', '佛冈县', '441800');
+INSERT INTO `dict_area`
+VALUES ('441823', '阳山县', '441800');
+INSERT INTO `dict_area`
+VALUES ('441825', '连山壮族瑶族自治县', '441800');
+INSERT INTO `dict_area`
+VALUES ('441826', '连南瑶族自治县', '441800');
+INSERT INTO `dict_area`
+VALUES ('441881', '英德市', '441800');
+INSERT INTO `dict_area`
+VALUES ('441882', '连州市', '441800');
+INSERT INTO `dict_area`
+VALUES ('441900', '东莞市', '440000');
+INSERT INTO `dict_area`
+VALUES ('442000', '中山市', '440000');
+INSERT INTO `dict_area`
+VALUES ('445100', '潮州市', '440000');
+INSERT INTO `dict_area`
+VALUES ('445102', '湘桥区', '445100');
+INSERT INTO `dict_area`
+VALUES ('445103', '潮安区', '445100');
+INSERT INTO `dict_area`
+VALUES ('445122', '饶平县', '445100');
+INSERT INTO `dict_area`
+VALUES ('445200', '揭阳市', '440000');
+INSERT INTO `dict_area`
+VALUES ('445202', '榕城区', '445200');
+INSERT INTO `dict_area`
+VALUES ('445203', '揭东区', '445200');
+INSERT INTO `dict_area`
+VALUES ('445222', '揭西县', '445200');
+INSERT INTO `dict_area`
+VALUES ('445224', '惠来县', '445200');
+INSERT INTO `dict_area`
+VALUES ('445281', '普宁市', '445200');
+INSERT INTO `dict_area`
+VALUES ('445300', '云浮市', '440000');
+INSERT INTO `dict_area`
+VALUES ('445302', '云城区', '445300');
+INSERT INTO `dict_area`
+VALUES ('445303', '云安区', '445300');
+INSERT INTO `dict_area`
+VALUES ('445321', '新兴县', '445300');
+INSERT INTO `dict_area`
+VALUES ('445322', '郁南县', '445300');
+INSERT INTO `dict_area`
+VALUES ('445381', '罗定市', '445300');
+INSERT INTO `dict_area`
+VALUES ('450000', '广西壮族自治区', '-1');
+INSERT INTO `dict_area`
+VALUES ('450100', '南宁市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450102', '兴宁区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450103', '青秀区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450105', '江南区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450107', '西乡塘区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450108', '良庆区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450109', '邕宁区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450110', '武鸣区', '450100');
+INSERT INTO `dict_area`
+VALUES ('450123', '隆安县', '450100');
+INSERT INTO `dict_area`
+VALUES ('450124', '马山县', '450100');
+INSERT INTO `dict_area`
+VALUES ('450125', '上林县', '450100');
+INSERT INTO `dict_area`
+VALUES ('450126', '宾阳县', '450100');
+INSERT INTO `dict_area`
+VALUES ('450127', '横县', '450100');
+INSERT INTO `dict_area`
+VALUES ('450200', '柳州市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450202', '城中区', '450200');
+INSERT INTO `dict_area`
+VALUES ('450203', '鱼峰区', '450200');
+INSERT INTO `dict_area`
+VALUES ('450204', '柳南区', '450200');
+INSERT INTO `dict_area`
+VALUES ('450205', '柳北区', '450200');
+INSERT INTO `dict_area`
+VALUES ('450206', '柳江区', '450200');
+INSERT INTO `dict_area`
+VALUES ('450222', '柳城县', '450200');
+INSERT INTO `dict_area`
+VALUES ('450223', '鹿寨县', '450200');
+INSERT INTO `dict_area`
+VALUES ('450224', '融安县', '450200');
+INSERT INTO `dict_area`
+VALUES ('450225', '融水苗族自治县', '450200');
+INSERT INTO `dict_area`
+VALUES ('450226', '三江侗族自治县', '450200');
+INSERT INTO `dict_area`
+VALUES ('450300', '桂林市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450302', '秀峰区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450303', '叠彩区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450304', '象山区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450305', '七星区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450311', '雁山区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450312', '临桂区', '450300');
+INSERT INTO `dict_area`
+VALUES ('450321', '阳朔县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450323', '灵川县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450324', '全州县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450325', '兴安县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450326', '永福县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450327', '灌阳县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450328', '龙胜各族自治县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450329', '资源县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450330', '平乐县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450331', '荔浦县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450332', '恭城瑶族自治县', '450300');
+INSERT INTO `dict_area`
+VALUES ('450400', '梧州市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450403', '万秀区', '450400');
+INSERT INTO `dict_area`
+VALUES ('450405', '长洲区', '450400');
+INSERT INTO `dict_area`
+VALUES ('450406', '龙圩区', '450400');
+INSERT INTO `dict_area`
+VALUES ('450421', '苍梧县', '450400');
+INSERT INTO `dict_area`
+VALUES ('450422', '藤县', '450400');
+INSERT INTO `dict_area`
+VALUES ('450423', '蒙山县', '450400');
+INSERT INTO `dict_area`
+VALUES ('450481', '岑溪市', '450400');
+INSERT INTO `dict_area`
+VALUES ('450500', '北海市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450502', '海城区', '450500');
+INSERT INTO `dict_area`
+VALUES ('450503', '银海区', '450500');
+INSERT INTO `dict_area`
+VALUES ('450512', '铁山港区', '450500');
+INSERT INTO `dict_area`
+VALUES ('450521', '合浦县', '450500');
+INSERT INTO `dict_area`
+VALUES ('450600', '防城港市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450602', '港口区', '450600');
+INSERT INTO `dict_area`
+VALUES ('450603', '防城区', '450600');
+INSERT INTO `dict_area`
+VALUES ('450621', '上思县', '450600');
+INSERT INTO `dict_area`
+VALUES ('450681', '东兴市', '450600');
+INSERT INTO `dict_area`
+VALUES ('450700', '钦州市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450702', '钦南区', '450700');
+INSERT INTO `dict_area`
+VALUES ('450703', '钦北区', '450700');
+INSERT INTO `dict_area`
+VALUES ('450721', '灵山县', '450700');
+INSERT INTO `dict_area`
+VALUES ('450722', '浦北县', '450700');
+INSERT INTO `dict_area`
+VALUES ('450800', '贵港市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450802', '港北区', '450800');
+INSERT INTO `dict_area`
+VALUES ('450803', '港南区', '450800');
+INSERT INTO `dict_area`
+VALUES ('450804', '覃塘区', '450800');
+INSERT INTO `dict_area`
+VALUES ('450821', '平南县', '450800');
+INSERT INTO `dict_area`
+VALUES ('450881', '桂平市', '450800');
+INSERT INTO `dict_area`
+VALUES ('450900', '玉林市', '450000');
+INSERT INTO `dict_area`
+VALUES ('450902', '玉州区', '450900');
+INSERT INTO `dict_area`
+VALUES ('450903', '福绵区', '450900');
+INSERT INTO `dict_area`
+VALUES ('450921', '容县', '450900');
+INSERT INTO `dict_area`
+VALUES ('450922', '陆川县', '450900');
+INSERT INTO `dict_area`
+VALUES ('450923', '博白县', '450900');
+INSERT INTO `dict_area`
+VALUES ('450924', '兴业县', '450900');
+INSERT INTO `dict_area`
+VALUES ('450981', '北流市', '450900');
+INSERT INTO `dict_area`
+VALUES ('451000', '百色市', '450000');
+INSERT INTO `dict_area`
+VALUES ('451002', '右江区', '451000');
+INSERT INTO `dict_area`
+VALUES ('451021', '田阳县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451022', '田东县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451023', '平果县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451024', '德保县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451026', '那坡县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451027', '凌云县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451028', '乐业县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451029', '田林县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451030', '西林县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451031', '隆林各族自治县', '451000');
+INSERT INTO `dict_area`
+VALUES ('451081', '靖西市', '451000');
+INSERT INTO `dict_area`
+VALUES ('451100', '贺州市', '450000');
+INSERT INTO `dict_area`
+VALUES ('451102', '八步区', '451100');
+INSERT INTO `dict_area`
+VALUES ('451103', '平桂区', '451100');
+INSERT INTO `dict_area`
+VALUES ('451121', '昭平县', '451100');
+INSERT INTO `dict_area`
+VALUES ('451122', '钟山县', '451100');
+INSERT INTO `dict_area`
+VALUES ('451123', '富川瑶族自治县', '451100');
+INSERT INTO `dict_area`
+VALUES ('451200', '河池市', '450000');
+INSERT INTO `dict_area`
+VALUES ('451202', '金城江区', '451200');
+INSERT INTO `dict_area`
+VALUES ('451203', '宜州区', '451200');
+INSERT INTO `dict_area`
+VALUES ('451221', '南丹县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451222', '天峨县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451223', '凤山县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451224', '东兰县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451225', '罗城仫佬族自治县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451226', '环江毛南族自治县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451227', '巴马瑶族自治县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451228', '都安瑶族自治县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451229', '大化瑶族自治县', '451200');
+INSERT INTO `dict_area`
+VALUES ('451300', '来宾市', '450000');
+INSERT INTO `dict_area`
+VALUES ('451302', '兴宾区', '451300');
+INSERT INTO `dict_area`
+VALUES ('451321', '忻城县', '451300');
+INSERT INTO `dict_area`
+VALUES ('451322', '象州县', '451300');
+INSERT INTO `dict_area`
+VALUES ('451323', '武宣县', '451300');
+INSERT INTO `dict_area`
+VALUES ('451324', '金秀瑶族自治县', '451300');
+INSERT INTO `dict_area`
+VALUES ('451381', '合山市', '451300');
+INSERT INTO `dict_area`
+VALUES ('451400', '崇左市', '450000');
+INSERT INTO `dict_area`
+VALUES ('451402', '江州区', '451400');
+INSERT INTO `dict_area`
+VALUES ('451421', '扶绥县', '451400');
+INSERT INTO `dict_area`
+VALUES ('451422', '宁明县', '451400');
+INSERT INTO `dict_area`
+VALUES ('451423', '龙州县', '451400');
+INSERT INTO `dict_area`
+VALUES ('451424', '大新县', '451400');
+INSERT INTO `dict_area`
+VALUES ('451425', '天等县', '451400');
+INSERT INTO `dict_area`
+VALUES ('451481', '凭祥市', '451400');
+INSERT INTO `dict_area`
+VALUES ('460000', '海南省', '-1');
+INSERT INTO `dict_area`
+VALUES ('460100', '海口市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460105', '秀英区', '460100');
+INSERT INTO `dict_area`
+VALUES ('460106', '龙华区', '460100');
+INSERT INTO `dict_area`
+VALUES ('460107', '琼山区', '460100');
+INSERT INTO `dict_area`
+VALUES ('460108', '美兰区', '460100');
+INSERT INTO `dict_area`
+VALUES ('460200', '三亚市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460202', '海棠区', '460200');
+INSERT INTO `dict_area`
+VALUES ('460203', '吉阳区', '460200');
+INSERT INTO `dict_area`
+VALUES ('460204', '天涯区', '460200');
+INSERT INTO `dict_area`
+VALUES ('460205', '崖州区', '460200');
+INSERT INTO `dict_area`
+VALUES ('460300', '三沙市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460321', '西沙群岛', '460300');
+INSERT INTO `dict_area`
+VALUES ('460322', '南沙群岛', '460300');
+INSERT INTO `dict_area`
+VALUES ('460323', '中沙群岛的岛礁及其海域', '460300');
+INSERT INTO `dict_area`
+VALUES ('460400', '儋州市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460500', '五指山市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460600', '琼海市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460700', '文昌市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460800', '万宁市', '460000');
+INSERT INTO `dict_area`
+VALUES ('460900', '东方市', '460000');
+INSERT INTO `dict_area`
+VALUES ('461000', '定安县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461100', '屯昌县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461200', '澄迈县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461300', '临高县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461400', '白沙黎族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461500', '昌江黎族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461600', '乐东黎族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461700', '陵水黎族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461800', '保亭黎族苗族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('461900', '琼中黎族苗族自治县', '460000');
+INSERT INTO `dict_area`
+VALUES ('500000', '重庆市', '-1');
+INSERT INTO `dict_area`
+VALUES ('500100', '市辖区', '500000');
+INSERT INTO `dict_area`
+VALUES ('500101', '万州区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500102', '涪陵区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500103', '渝中区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500104', '大渡口区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500105', '江北区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500106', '沙坪坝区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500107', '九龙坡区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500108', '南岸区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500109', '北碚区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500110', '綦江区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500111', '大足区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500112', '渝北区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500113', '巴南区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500114', '黔江区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500115', '长寿区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500116', '江津区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500117', '合川区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500118', '永川区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500119', '南川区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500120', '璧山区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500151', '铜梁区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500152', '潼南区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500153', '荣昌区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500154', '开州区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500155', '梁平区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500156', '武隆区', '500100');
+INSERT INTO `dict_area`
+VALUES ('500229', '城口县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500230', '丰都县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500231', '垫江县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500233', '忠县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500235', '云阳县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500236', '奉节县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500237', '巫山县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500238', '巫溪县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500240', '石柱土家族自治县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500241', '秀山土家族苗族自治县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500242', '酉阳土家族苗族自治县', '500100');
+INSERT INTO `dict_area`
+VALUES ('500243', '彭水苗族土家族自治县', '500100');
+INSERT INTO `dict_area`
+VALUES ('510000', '四川省', '-1');
+INSERT INTO `dict_area`
+VALUES ('510100', '成都市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510104', '锦江区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510105', '青羊区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510106', '金牛区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510107', '武侯区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510108', '成华区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510112', '龙泉驿区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510113', '青白江区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510114', '新都区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510115', '温江区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510116', '双流区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510117', '郫都区', '510100');
+INSERT INTO `dict_area`
+VALUES ('510121', '金堂县', '510100');
+INSERT INTO `dict_area`
+VALUES ('510129', '大邑县', '510100');
+INSERT INTO `dict_area`
+VALUES ('510131', '蒲江县', '510100');
+INSERT INTO `dict_area`
+VALUES ('510132', '新津县', '510100');
+INSERT INTO `dict_area`
+VALUES ('510181', '都江堰市', '510100');
+INSERT INTO `dict_area`
+VALUES ('510182', '彭州市', '510100');
+INSERT INTO `dict_area`
+VALUES ('510183', '邛崃市', '510100');
+INSERT INTO `dict_area`
+VALUES ('510184', '崇州市', '510100');
+INSERT INTO `dict_area`
+VALUES ('510185', '简阳市', '510100');
+INSERT INTO `dict_area`
+VALUES ('510300', '自贡市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510302', '自流井区', '510300');
+INSERT INTO `dict_area`
+VALUES ('510303', '贡井区', '510300');
+INSERT INTO `dict_area`
+VALUES ('510304', '大安区', '510300');
+INSERT INTO `dict_area`
+VALUES ('510311', '沿滩区', '510300');
+INSERT INTO `dict_area`
+VALUES ('510321', '荣县', '510300');
+INSERT INTO `dict_area`
+VALUES ('510322', '富顺县', '510300');
+INSERT INTO `dict_area`
+VALUES ('510400', '攀枝花市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510402', '东区', '510400');
+INSERT INTO `dict_area`
+VALUES ('510403', '西区', '510400');
+INSERT INTO `dict_area`
+VALUES ('510411', '仁和区', '510400');
+INSERT INTO `dict_area`
+VALUES ('510421', '米易县', '510400');
+INSERT INTO `dict_area`
+VALUES ('510422', '盐边县', '510400');
+INSERT INTO `dict_area`
+VALUES ('510500', '泸州市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510502', '江阳区', '510500');
+INSERT INTO `dict_area`
+VALUES ('510503', '纳溪区', '510500');
+INSERT INTO `dict_area`
+VALUES ('510504', '龙马潭区', '510500');
+INSERT INTO `dict_area`
+VALUES ('510521', '泸县', '510500');
+INSERT INTO `dict_area`
+VALUES ('510522', '合江县', '510500');
+INSERT INTO `dict_area`
+VALUES ('510524', '叙永县', '510500');
+INSERT INTO `dict_area`
+VALUES ('510525', '古蔺县', '510500');
+INSERT INTO `dict_area`
+VALUES ('510600', '德阳市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510603', '旌阳区', '510600');
+INSERT INTO `dict_area`
+VALUES ('510623', '中江县', '510600');
+INSERT INTO `dict_area`
+VALUES ('510626', '罗江县', '510600');
+INSERT INTO `dict_area`
+VALUES ('510681', '广汉市', '510600');
+INSERT INTO `dict_area`
+VALUES ('510682', '什邡市', '510600');
+INSERT INTO `dict_area`
+VALUES ('510683', '绵竹市', '510600');
+INSERT INTO `dict_area`
+VALUES ('510700', '绵阳市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510703', '涪城区', '510700');
+INSERT INTO `dict_area`
+VALUES ('510704', '游仙区', '510700');
+INSERT INTO `dict_area`
+VALUES ('510705', '安州区', '510700');
+INSERT INTO `dict_area`
+VALUES ('510722', '三台县', '510700');
+INSERT INTO `dict_area`
+VALUES ('510723', '盐亭县', '510700');
+INSERT INTO `dict_area`
+VALUES ('510725', '梓潼县', '510700');
+INSERT INTO `dict_area`
+VALUES ('510726', '北川羌族自治县', '510700');
+INSERT INTO `dict_area`
+VALUES ('510727', '平武县', '510700');
+INSERT INTO `dict_area`
+VALUES ('510781', '江油市', '510700');
+INSERT INTO `dict_area`
+VALUES ('510800', '广元市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510802', '利州区', '510800');
+INSERT INTO `dict_area`
+VALUES ('510811', '昭化区', '510800');
+INSERT INTO `dict_area`
+VALUES ('510812', '朝天区', '510800');
+INSERT INTO `dict_area`
+VALUES ('510821', '旺苍县', '510800');
+INSERT INTO `dict_area`
+VALUES ('510822', '青川县', '510800');
+INSERT INTO `dict_area`
+VALUES ('510823', '剑阁县', '510800');
+INSERT INTO `dict_area`
+VALUES ('510824', '苍溪县', '510800');
+INSERT INTO `dict_area`
+VALUES ('510900', '遂宁市', '510000');
+INSERT INTO `dict_area`
+VALUES ('510903', '船山区', '510900');
+INSERT INTO `dict_area`
+VALUES ('510904', '安居区', '510900');
+INSERT INTO `dict_area`
+VALUES ('510921', '蓬溪县', '510900');
+INSERT INTO `dict_area`
+VALUES ('510922', '射洪县', '510900');
+INSERT INTO `dict_area`
+VALUES ('510923', '大英县', '510900');
+INSERT INTO `dict_area`
+VALUES ('511000', '内江市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511002', '市中区', '511000');
+INSERT INTO `dict_area`
+VALUES ('511011', '东兴区', '511000');
+INSERT INTO `dict_area`
+VALUES ('511024', '威远县', '511000');
+INSERT INTO `dict_area`
+VALUES ('511025', '资中县', '511000');
+INSERT INTO `dict_area`
+VALUES ('511083', '隆昌市', '511000');
+INSERT INTO `dict_area`
+VALUES ('511100', '乐山市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511102', '市中区', '511100');
+INSERT INTO `dict_area`
+VALUES ('511111', '沙湾区', '511100');
+INSERT INTO `dict_area`
+VALUES ('511112', '五通桥区', '511100');
+INSERT INTO `dict_area`
+VALUES ('511113', '金口河区', '511100');
+INSERT INTO `dict_area`
+VALUES ('511123', '犍为县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511124', '井研县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511126', '夹江县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511129', '沐川县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511132', '峨边彝族自治县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511133', '马边彝族自治县', '511100');
+INSERT INTO `dict_area`
+VALUES ('511181', '峨眉山市', '511100');
+INSERT INTO `dict_area`
+VALUES ('511300', '南充市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511302', '顺庆区', '511300');
+INSERT INTO `dict_area`
+VALUES ('511303', '高坪区', '511300');
+INSERT INTO `dict_area`
+VALUES ('511304', '嘉陵区', '511300');
+INSERT INTO `dict_area`
+VALUES ('511321', '南部县', '511300');
+INSERT INTO `dict_area`
+VALUES ('511322', '营山县', '511300');
+INSERT INTO `dict_area`
+VALUES ('511323', '蓬安县', '511300');
+INSERT INTO `dict_area`
+VALUES ('511324', '仪陇县', '511300');
+INSERT INTO `dict_area`
+VALUES ('511325', '西充县', '511300');
+INSERT INTO `dict_area`
+VALUES ('511381', '阆中市', '511300');
+INSERT INTO `dict_area`
+VALUES ('511400', '眉山市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511402', '东坡区', '511400');
+INSERT INTO `dict_area`
+VALUES ('511403', '彭山区', '511400');
+INSERT INTO `dict_area`
+VALUES ('511421', '仁寿县', '511400');
+INSERT INTO `dict_area`
+VALUES ('511423', '洪雅县', '511400');
+INSERT INTO `dict_area`
+VALUES ('511424', '丹棱县', '511400');
+INSERT INTO `dict_area`
+VALUES ('511425', '青神县', '511400');
+INSERT INTO `dict_area`
+VALUES ('511500', '宜宾市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511502', '翠屏区', '511500');
+INSERT INTO `dict_area`
+VALUES ('511503', '南溪区', '511500');
+INSERT INTO `dict_area`
+VALUES ('511521', '宜宾县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511523', '江安县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511524', '长宁县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511525', '高县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511526', '珙县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511527', '筠连县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511528', '兴文县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511529', '屏山县', '511500');
+INSERT INTO `dict_area`
+VALUES ('511600', '广安市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511602', '广安区', '511600');
+INSERT INTO `dict_area`
+VALUES ('511603', '前锋区', '511600');
+INSERT INTO `dict_area`
+VALUES ('511621', '岳池县', '511600');
+INSERT INTO `dict_area`
+VALUES ('511622', '武胜县', '511600');
+INSERT INTO `dict_area`
+VALUES ('511623', '邻水县', '511600');
+INSERT INTO `dict_area`
+VALUES ('511681', '华蓥市', '511600');
+INSERT INTO `dict_area`
+VALUES ('511700', '达州市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511702', '通川区', '511700');
+INSERT INTO `dict_area`
+VALUES ('511703', '达川区', '511700');
+INSERT INTO `dict_area`
+VALUES ('511722', '宣汉县', '511700');
+INSERT INTO `dict_area`
+VALUES ('511723', '开江县', '511700');
+INSERT INTO `dict_area`
+VALUES ('511724', '大竹县', '511700');
+INSERT INTO `dict_area`
+VALUES ('511725', '渠县', '511700');
+INSERT INTO `dict_area`
+VALUES ('511781', '万源市', '511700');
+INSERT INTO `dict_area`
+VALUES ('511800', '雅安市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511802', '雨城区', '511800');
+INSERT INTO `dict_area`
+VALUES ('511803', '名山区', '511800');
+INSERT INTO `dict_area`
+VALUES ('511822', '荥经县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511823', '汉源县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511824', '石棉县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511825', '天全县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511826', '芦山县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511827', '宝兴县', '511800');
+INSERT INTO `dict_area`
+VALUES ('511900', '巴中市', '510000');
+INSERT INTO `dict_area`
+VALUES ('511902', '巴州区', '511900');
+INSERT INTO `dict_area`
+VALUES ('511903', '恩阳区', '511900');
+INSERT INTO `dict_area`
+VALUES ('511921', '通江县', '511900');
+INSERT INTO `dict_area`
+VALUES ('511922', '南江县', '511900');
+INSERT INTO `dict_area`
+VALUES ('511923', '平昌县', '511900');
+INSERT INTO `dict_area`
+VALUES ('512000', '资阳市', '510000');
+INSERT INTO `dict_area`
+VALUES ('512002', '雁江区', '512000');
+INSERT INTO `dict_area`
+VALUES ('512021', '安岳县', '512000');
+INSERT INTO `dict_area`
+VALUES ('512022', '乐至县', '512000');
+INSERT INTO `dict_area`
+VALUES ('513200', '阿坝藏族羌族自治州', '510000');
+INSERT INTO `dict_area`
+VALUES ('513201', '马尔康市', '513200');
+INSERT INTO `dict_area`
+VALUES ('513221', '汶川县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513222', '理县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513223', '茂县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513224', '松潘县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513225', '九寨沟县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513226', '金川县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513227', '小金县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513228', '黑水县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513230', '壤塘县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513231', '阿坝县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513232', '若尔盖县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513233', '红原县', '513200');
+INSERT INTO `dict_area`
+VALUES ('513300', '甘孜藏族自治州', '510000');
+INSERT INTO `dict_area`
+VALUES ('513301', '康定市', '513300');
+INSERT INTO `dict_area`
+VALUES ('513322', '泸定县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513323', '丹巴县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513324', '九龙县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513325', '雅江县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513326', '道孚县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513327', '炉霍县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513328', '甘孜县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513329', '新龙县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513330', '德格县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513331', '白玉县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513332', '石渠县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513333', '色达县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513334', '理塘县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513335', '巴塘县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513336', '乡城县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513337', '稻城县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513338', '得荣县', '513300');
+INSERT INTO `dict_area`
+VALUES ('513400', '凉山彝族自治州', '510000');
+INSERT INTO `dict_area`
+VALUES ('513401', '西昌市', '513400');
+INSERT INTO `dict_area`
+VALUES ('513422', '木里藏族自治县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513423', '盐源县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513424', '德昌县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513425', '会理县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513426', '会东县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513427', '宁南县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513428', '普格县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513429', '布拖县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513430', '金阳县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513431', '昭觉县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513432', '喜德县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513433', '冕宁县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513434', '越西县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513435', '甘洛县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513436', '美姑县', '513400');
+INSERT INTO `dict_area`
+VALUES ('513437', '雷波县', '513400');
+INSERT INTO `dict_area`
+VALUES ('520000', '贵州省', '-1');
+INSERT INTO `dict_area`
+VALUES ('520100', '贵阳市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520102', '南明区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520103', '云岩区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520111', '花溪区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520112', '乌当区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520113', '白云区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520115', '观山湖区', '520100');
+INSERT INTO `dict_area`
+VALUES ('520121', '开阳县', '520100');
+INSERT INTO `dict_area`
+VALUES ('520122', '息烽县', '520100');
+INSERT INTO `dict_area`
+VALUES ('520123', '修文县', '520100');
+INSERT INTO `dict_area`
+VALUES ('520181', '清镇市', '520100');
+INSERT INTO `dict_area`
+VALUES ('520200', '六盘水市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520201', '钟山区', '520200');
+INSERT INTO `dict_area`
+VALUES ('520203', '六枝特区', '520200');
+INSERT INTO `dict_area`
+VALUES ('520221', '水城县', '520200');
+INSERT INTO `dict_area`
+VALUES ('520281', '盘州市', '520200');
+INSERT INTO `dict_area`
+VALUES ('520300', '遵义市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520302', '红花岗区', '520300');
+INSERT INTO `dict_area`
+VALUES ('520303', '汇川区', '520300');
+INSERT INTO `dict_area`
+VALUES ('520304', '播州区', '520300');
+INSERT INTO `dict_area`
+VALUES ('520322', '桐梓县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520323', '绥阳县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520324', '正安县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520325', '道真仡佬族苗族自治县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520326', '务川仡佬族苗族自治县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520327', '凤冈县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520328', '湄潭县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520329', '余庆县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520330', '习水县', '520300');
+INSERT INTO `dict_area`
+VALUES ('520381', '赤水市', '520300');
+INSERT INTO `dict_area`
+VALUES ('520382', '仁怀市', '520300');
+INSERT INTO `dict_area`
+VALUES ('520400', '安顺市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520402', '西秀区', '520400');
+INSERT INTO `dict_area`
+VALUES ('520403', '平坝区', '520400');
+INSERT INTO `dict_area`
+VALUES ('520422', '普定县', '520400');
+INSERT INTO `dict_area`
+VALUES ('520423', '镇宁布依族苗族自治县', '520400');
+INSERT INTO `dict_area`
+VALUES ('520424', '关岭布依族苗族自治县', '520400');
+INSERT INTO `dict_area`
+VALUES ('520425', '紫云苗族布依族自治县', '520400');
+INSERT INTO `dict_area`
+VALUES ('520500', '毕节市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520502', '七星关区', '520500');
+INSERT INTO `dict_area`
+VALUES ('520521', '大方县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520522', '黔西县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520523', '金沙县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520524', '织金县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520525', '纳雍县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520526', '威宁彝族回族苗族自治县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520527', '赫章县', '520500');
+INSERT INTO `dict_area`
+VALUES ('520600', '铜仁市', '520000');
+INSERT INTO `dict_area`
+VALUES ('520602', '碧江区', '520600');
+INSERT INTO `dict_area`
+VALUES ('520603', '万山区', '520600');
+INSERT INTO `dict_area`
+VALUES ('520621', '江口县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520622', '玉屏侗族自治县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520623', '石阡县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520624', '思南县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520625', '印江土家族苗族自治县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520626', '德江县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520627', '沿河土家族自治县', '520600');
+INSERT INTO `dict_area`
+VALUES ('520628', '松桃苗族自治县', '520600');
+INSERT INTO `dict_area`
+VALUES ('522300', '黔西南布依族苗族自治州', '520000');
+INSERT INTO `dict_area`
+VALUES ('522301', '兴义市', '522300');
+INSERT INTO `dict_area`
+VALUES ('522322', '兴仁县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522323', '普安县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522324', '晴隆县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522325', '贞丰县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522326', '望谟县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522327', '册亨县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522328', '安龙县', '522300');
+INSERT INTO `dict_area`
+VALUES ('522600', '黔东南苗族侗族自治州', '520000');
+INSERT INTO `dict_area`
+VALUES ('522601', '凯里市', '522600');
+INSERT INTO `dict_area`
+VALUES ('522622', '黄平县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522623', '施秉县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522624', '三穗县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522625', '镇远县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522626', '岑巩县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522627', '天柱县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522628', '锦屏县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522629', '剑河县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522630', '台江县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522631', '黎平县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522632', '榕江县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522633', '从江县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522634', '雷山县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522635', '麻江县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522636', '丹寨县', '522600');
+INSERT INTO `dict_area`
+VALUES ('522700', '黔南布依族苗族自治州', '520000');
+INSERT INTO `dict_area`
+VALUES ('522701', '都匀市', '522700');
+INSERT INTO `dict_area`
+VALUES ('522702', '福泉市', '522700');
+INSERT INTO `dict_area`
+VALUES ('522722', '荔波县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522723', '贵定县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522725', '瓮安县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522726', '独山县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522727', '平塘县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522728', '罗甸县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522729', '长顺县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522730', '龙里县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522731', '惠水县', '522700');
+INSERT INTO `dict_area`
+VALUES ('522732', '三都水族自治县', '522700');
+INSERT INTO `dict_area`
+VALUES ('530000', '云南省', '-1');
+INSERT INTO `dict_area`
+VALUES ('530100', '昆明市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530102', '五华区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530103', '盘龙区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530111', '官渡区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530112', '西山区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530113', '东川区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530114', '呈贡区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530115', '晋宁区', '530100');
+INSERT INTO `dict_area`
+VALUES ('530124', '富民县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530125', '宜良县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530126', '石林彝族自治县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530127', '嵩明县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530128', '禄劝彝族苗族自治县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530129', '寻甸回族彝族自治县', '530100');
+INSERT INTO `dict_area`
+VALUES ('530181', '安宁市', '530100');
+INSERT INTO `dict_area`
+VALUES ('530300', '曲靖市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530302', '麒麟区', '530300');
+INSERT INTO `dict_area`
+VALUES ('530303', '沾益区', '530300');
+INSERT INTO `dict_area`
+VALUES ('530321', '马龙县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530322', '陆良县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530323', '师宗县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530324', '罗平县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530325', '富源县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530326', '会泽县', '530300');
+INSERT INTO `dict_area`
+VALUES ('530381', '宣威市', '530300');
+INSERT INTO `dict_area`
+VALUES ('530400', '玉溪市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530402', '红塔区', '530400');
+INSERT INTO `dict_area`
+VALUES ('530403', '江川区', '530400');
+INSERT INTO `dict_area`
+VALUES ('530422', '澄江县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530423', '通海县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530424', '华宁县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530425', '易门县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530426', '峨山彝族自治县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530427', '新平彝族傣族自治县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530428', '元江哈尼族彝族傣族自治县', '530400');
+INSERT INTO `dict_area`
+VALUES ('530500', '保山市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530502', '隆阳区', '530500');
+INSERT INTO `dict_area`
+VALUES ('530521', '施甸县', '530500');
+INSERT INTO `dict_area`
+VALUES ('530523', '龙陵县', '530500');
+INSERT INTO `dict_area`
+VALUES ('530524', '昌宁县', '530500');
+INSERT INTO `dict_area`
+VALUES ('530581', '腾冲市', '530500');
+INSERT INTO `dict_area`
+VALUES ('530600', '昭通市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530602', '昭阳区', '530600');
+INSERT INTO `dict_area`
+VALUES ('530621', '鲁甸县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530622', '巧家县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530623', '盐津县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530624', '大关县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530625', '永善县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530626', '绥江县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530627', '镇雄县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530628', '彝良县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530629', '威信县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530630', '水富县', '530600');
+INSERT INTO `dict_area`
+VALUES ('530700', '丽江市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530702', '古城区', '530700');
+INSERT INTO `dict_area`
+VALUES ('530721', '玉龙纳西族自治县', '530700');
+INSERT INTO `dict_area`
+VALUES ('530722', '永胜县', '530700');
+INSERT INTO `dict_area`
+VALUES ('530723', '华坪县', '530700');
+INSERT INTO `dict_area`
+VALUES ('530724', '宁蒗彝族自治县', '530700');
+INSERT INTO `dict_area`
+VALUES ('530800', '普洱市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530802', '思茅区', '530800');
+INSERT INTO `dict_area`
+VALUES ('530821', '宁洱哈尼族彝族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530822', '墨江哈尼族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530823', '景东彝族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530824', '景谷傣族彝族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530825', '镇沅彝族哈尼族拉祜族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530826', '江城哈尼族彝族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530827', '孟连傣族拉祜族佤族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530828', '澜沧拉祜族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530829', '西盟佤族自治县', '530800');
+INSERT INTO `dict_area`
+VALUES ('530900', '临沧市', '530000');
+INSERT INTO `dict_area`
+VALUES ('530902', '临翔区', '530900');
+INSERT INTO `dict_area`
+VALUES ('530921', '凤庆县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530922', '云县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530923', '永德县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530924', '镇康县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530925', '双江拉祜族佤族布朗族傣族自治县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530926', '耿马傣族佤族自治县', '530900');
+INSERT INTO `dict_area`
+VALUES ('530927', '沧源佤族自治县', '530900');
+INSERT INTO `dict_area`
+VALUES ('532300', '楚雄彝族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('532301', '楚雄市', '532300');
+INSERT INTO `dict_area`
+VALUES ('532322', '双柏县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532323', '牟定县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532324', '南华县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532325', '姚安县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532326', '大姚县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532327', '永仁县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532328', '元谋县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532329', '武定县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532331', '禄丰县', '532300');
+INSERT INTO `dict_area`
+VALUES ('532500', '红河哈尼族彝族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('532501', '个旧市', '532500');
+INSERT INTO `dict_area`
+VALUES ('532502', '开远市', '532500');
+INSERT INTO `dict_area`
+VALUES ('532503', '蒙自市', '532500');
+INSERT INTO `dict_area`
+VALUES ('532504', '弥勒市', '532500');
+INSERT INTO `dict_area`
+VALUES ('532523', '屏边苗族自治县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532524', '建水县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532525', '石屏县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532527', '泸西县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532528', '元阳县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532529', '红河县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532530', '金平苗族瑶族傣族自治县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532531', '绿春县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532532', '河口瑶族自治县', '532500');
+INSERT INTO `dict_area`
+VALUES ('532600', '文山壮族苗族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('532601', '文山市', '532600');
+INSERT INTO `dict_area`
+VALUES ('532622', '砚山县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532623', '西畴县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532624', '麻栗坡县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532625', '马关县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532626', '丘北县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532627', '广南县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532628', '富宁县', '532600');
+INSERT INTO `dict_area`
+VALUES ('532800', '西双版纳傣族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('532801', '景洪市', '532800');
+INSERT INTO `dict_area`
+VALUES ('532822', '勐海县', '532800');
+INSERT INTO `dict_area`
+VALUES ('532823', '勐腊县', '532800');
+INSERT INTO `dict_area`
+VALUES ('532900', '大理白族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('532901', '大理市', '532900');
+INSERT INTO `dict_area`
+VALUES ('532922', '漾濞彝族自治县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532923', '祥云县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532924', '宾川县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532925', '弥渡县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532926', '南涧彝族自治县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532927', '巍山彝族回族自治县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532928', '永平县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532929', '云龙县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532930', '洱源县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532931', '剑川县', '532900');
+INSERT INTO `dict_area`
+VALUES ('532932', '鹤庆县', '532900');
+INSERT INTO `dict_area`
+VALUES ('533100', '德宏傣族景颇族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('533102', '瑞丽市', '533100');
+INSERT INTO `dict_area`
+VALUES ('533103', '芒市', '533100');
+INSERT INTO `dict_area`
+VALUES ('533122', '梁河县', '533100');
+INSERT INTO `dict_area`
+VALUES ('533123', '盈江县', '533100');
+INSERT INTO `dict_area`
+VALUES ('533124', '陇川县', '533100');
+INSERT INTO `dict_area`
+VALUES ('533300', '怒江傈僳族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('533301', '泸水市', '533300');
+INSERT INTO `dict_area`
+VALUES ('533323', '福贡县', '533300');
+INSERT INTO `dict_area`
+VALUES ('533324', '贡山独龙族怒族自治县', '533300');
+INSERT INTO `dict_area`
+VALUES ('533325', '兰坪白族普米族自治县', '533300');
+INSERT INTO `dict_area`
+VALUES ('533400', '迪庆藏族自治州', '530000');
+INSERT INTO `dict_area`
+VALUES ('533401', '香格里拉市', '533400');
+INSERT INTO `dict_area`
+VALUES ('533422', '德钦县', '533400');
+INSERT INTO `dict_area`
+VALUES ('533423', '维西傈僳族自治县', '533400');
+INSERT INTO `dict_area`
+VALUES ('540000', '西藏自治区', '-1');
+INSERT INTO `dict_area`
+VALUES ('540100', '拉萨市', '540000');
+INSERT INTO `dict_area`
+VALUES ('540102', '城关区', '540100');
+INSERT INTO `dict_area`
+VALUES ('540103', '堆龙德庆区', '540100');
+INSERT INTO `dict_area`
+VALUES ('540121', '林周县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540122', '当雄县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540123', '尼木县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540124', '曲水县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540126', '达孜县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540127', '墨竹工卡县', '540100');
+INSERT INTO `dict_area`
+VALUES ('540200', '日喀则市', '540000');
+INSERT INTO `dict_area`
+VALUES ('540202', '桑珠孜区', '540200');
+INSERT INTO `dict_area`
+VALUES ('540221', '南木林县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540222', '江孜县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540223', '定日县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540224', '萨迦县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540225', '拉孜县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540226', '昂仁县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540227', '谢通门县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540228', '白朗县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540229', '仁布县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540230', '康马县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540231', '定结县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540232', '仲巴县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540233', '亚东县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540234', '吉隆县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540235', '聂拉木县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540236', '萨嘎县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540237', '岗巴县', '540200');
+INSERT INTO `dict_area`
+VALUES ('540300', '昌都市', '540000');
+INSERT INTO `dict_area`
+VALUES ('540302', '卡若区', '540300');
+INSERT INTO `dict_area`
+VALUES ('540321', '江达县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540322', '贡觉县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540323', '类乌齐县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540324', '丁青县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540325', '察雅县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540326', '八宿县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540327', '左贡县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540328', '芒康县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540329', '洛隆县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540330', '边坝县', '540300');
+INSERT INTO `dict_area`
+VALUES ('540400', '林芝市', '540000');
+INSERT INTO `dict_area`
+VALUES ('540402', '巴宜区', '540400');
+INSERT INTO `dict_area`
+VALUES ('540421', '工布江达县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540422', '米林县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540423', '墨脱县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540424', '波密县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540425', '察隅县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540426', '朗县', '540400');
+INSERT INTO `dict_area`
+VALUES ('540500', '山南市', '540000');
+INSERT INTO `dict_area`
+VALUES ('540502', '乃东区', '540500');
+INSERT INTO `dict_area`
+VALUES ('540521', '扎囊县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540522', '贡嘎县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540523', '桑日县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540524', '琼结县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540525', '曲松县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540526', '措美县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540527', '洛扎县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540528', '加查县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540529', '隆子县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540530', '错那县', '540500');
+INSERT INTO `dict_area`
+VALUES ('540531', '浪卡子县', '540500');
+INSERT INTO `dict_area`
+VALUES ('542400', '那曲地区', '540000');
+INSERT INTO `dict_area`
+VALUES ('542421', '那曲县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542422', '嘉黎县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542423', '比如县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542424', '聂荣县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542425', '安多县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542426', '申扎县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542427', '索县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542428', '班戈县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542429', '巴青县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542430', '尼玛县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542431', '双湖县', '542400');
+INSERT INTO `dict_area`
+VALUES ('542500', '阿里地区', '540000');
+INSERT INTO `dict_area`
+VALUES ('542521', '普兰县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542522', '札达县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542523', '噶尔县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542524', '日土县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542525', '革吉县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542526', '改则县', '542500');
+INSERT INTO `dict_area`
+VALUES ('542527', '措勤县', '542500');
+INSERT INTO `dict_area`
+VALUES ('610000', '陕西省', '-1');
+INSERT INTO `dict_area`
+VALUES ('610100', '西安市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610102', '新城区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610103', '碑林区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610104', '莲湖区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610111', '灞桥区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610112', '未央区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610113', '雁塔区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610114', '阎良区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610115', '临潼区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610116', '长安区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610117', '高陵区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610118', '鄠邑区', '610100');
+INSERT INTO `dict_area`
+VALUES ('610122', '蓝田县', '610100');
+INSERT INTO `dict_area`
+VALUES ('610124', '周至县', '610100');
+INSERT INTO `dict_area`
+VALUES ('610200', '铜川市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610202', '王益区', '610200');
+INSERT INTO `dict_area`
+VALUES ('610203', '印台区', '610200');
+INSERT INTO `dict_area`
+VALUES ('610204', '耀州区', '610200');
+INSERT INTO `dict_area`
+VALUES ('610222', '宜君县', '610200');
+INSERT INTO `dict_area`
+VALUES ('610300', '宝鸡市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610302', '渭滨区', '610300');
+INSERT INTO `dict_area`
+VALUES ('610303', '金台区', '610300');
+INSERT INTO `dict_area`
+VALUES ('610304', '陈仓区', '610300');
+INSERT INTO `dict_area`
+VALUES ('610322', '凤翔县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610323', '岐山县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610324', '扶风县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610326', '眉县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610327', '陇县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610328', '千阳县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610329', '麟游县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610330', '凤县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610331', '太白县', '610300');
+INSERT INTO `dict_area`
+VALUES ('610400', '咸阳市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610402', '秦都区', '610400');
+INSERT INTO `dict_area`
+VALUES ('610403', '杨陵区', '610400');
+INSERT INTO `dict_area`
+VALUES ('610404', '渭城区', '610400');
+INSERT INTO `dict_area`
+VALUES ('610422', '三原县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610423', '泾阳县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610424', '乾县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610425', '礼泉县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610426', '永寿县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610427', '彬县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610428', '长武县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610429', '旬邑县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610430', '淳化县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610431', '武功县', '610400');
+INSERT INTO `dict_area`
+VALUES ('610481', '兴平市', '610400');
+INSERT INTO `dict_area`
+VALUES ('610500', '渭南市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610502', '临渭区', '610500');
+INSERT INTO `dict_area`
+VALUES ('610503', '华州区', '610500');
+INSERT INTO `dict_area`
+VALUES ('610522', '潼关县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610523', '大荔县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610524', '合阳县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610525', '澄城县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610526', '蒲城县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610527', '白水县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610528', '富平县', '610500');
+INSERT INTO `dict_area`
+VALUES ('610581', '韩城市', '610500');
+INSERT INTO `dict_area`
+VALUES ('610582', '华阴市', '610500');
+INSERT INTO `dict_area`
+VALUES ('610600', '延安市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610602', '宝塔区', '610600');
+INSERT INTO `dict_area`
+VALUES ('610603', '安塞区', '610600');
+INSERT INTO `dict_area`
+VALUES ('610621', '延长县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610622', '延川县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610623', '子长县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610625', '志丹县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610626', '吴起县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610627', '甘泉县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610628', '富县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610629', '洛川县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610630', '宜川县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610631', '黄龙县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610632', '黄陵县', '610600');
+INSERT INTO `dict_area`
+VALUES ('610700', '汉中市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610702', '汉台区', '610700');
+INSERT INTO `dict_area`
+VALUES ('610721', '南郑县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610722', '城固县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610723', '洋县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610724', '西乡县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610725', '勉县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610726', '宁强县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610727', '略阳县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610728', '镇巴县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610729', '留坝县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610730', '佛坪县', '610700');
+INSERT INTO `dict_area`
+VALUES ('610800', '榆林市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610802', '榆阳区', '610800');
+INSERT INTO `dict_area`
+VALUES ('610803', '横山区', '610800');
+INSERT INTO `dict_area`
+VALUES ('610822', '府谷县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610824', '靖边县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610825', '定边县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610826', '绥德县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610827', '米脂县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610828', '佳县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610829', '吴堡县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610830', '清涧县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610831', '子洲县', '610800');
+INSERT INTO `dict_area`
+VALUES ('610881', '神木市', '610800');
+INSERT INTO `dict_area`
+VALUES ('610900', '安康市', '610000');
+INSERT INTO `dict_area`
+VALUES ('610902', '汉滨区', '610900');
+INSERT INTO `dict_area`
+VALUES ('610921', '汉阴县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610922', '石泉县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610923', '宁陕县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610924', '紫阳县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610925', '岚皋县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610926', '平利县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610927', '镇坪县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610928', '旬阳县', '610900');
+INSERT INTO `dict_area`
+VALUES ('610929', '白河县', '610900');
+INSERT INTO `dict_area`
+VALUES ('611000', '商洛市', '610000');
+INSERT INTO `dict_area`
+VALUES ('611002', '商州区', '611000');
+INSERT INTO `dict_area`
+VALUES ('611021', '洛南县', '611000');
+INSERT INTO `dict_area`
+VALUES ('611022', '丹凤县', '611000');
+INSERT INTO `dict_area`
+VALUES ('611023', '商南县', '611000');
+INSERT INTO `dict_area`
+VALUES ('611024', '山阳县', '611000');
+INSERT INTO `dict_area`
+VALUES ('611025', '镇安县', '611000');
+INSERT INTO `dict_area`
+VALUES ('611026', '柞水县', '611000');
+INSERT INTO `dict_area`
+VALUES ('620000', '甘肃省', '-1');
+INSERT INTO `dict_area`
+VALUES ('620100', '兰州市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620102', '城关区', '620100');
+INSERT INTO `dict_area`
+VALUES ('620103', '七里河区', '620100');
+INSERT INTO `dict_area`
+VALUES ('620104', '西固区', '620100');
+INSERT INTO `dict_area`
+VALUES ('620105', '安宁区', '620100');
+INSERT INTO `dict_area`
+VALUES ('620111', '红古区', '620100');
+INSERT INTO `dict_area`
+VALUES ('620121', '永登县', '620100');
+INSERT INTO `dict_area`
+VALUES ('620122', '皋兰县', '620100');
+INSERT INTO `dict_area`
+VALUES ('620123', '榆中县', '620100');
+INSERT INTO `dict_area`
+VALUES ('620200', '嘉峪关市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620201', '嘉峪关市', '620200');
+INSERT INTO `dict_area`
+VALUES ('620300', '金昌市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620302', '金川区', '620300');
+INSERT INTO `dict_area`
+VALUES ('620321', '永昌县', '620300');
+INSERT INTO `dict_area`
+VALUES ('620400', '白银市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620402', '白银区', '620400');
+INSERT INTO `dict_area`
+VALUES ('620403', '平川区', '620400');
+INSERT INTO `dict_area`
+VALUES ('620421', '靖远县', '620400');
+INSERT INTO `dict_area`
+VALUES ('620422', '会宁县', '620400');
+INSERT INTO `dict_area`
+VALUES ('620423', '景泰县', '620400');
+INSERT INTO `dict_area`
+VALUES ('620500', '天水市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620502', '秦州区', '620500');
+INSERT INTO `dict_area`
+VALUES ('620503', '麦积区', '620500');
+INSERT INTO `dict_area`
+VALUES ('620521', '清水县', '620500');
+INSERT INTO `dict_area`
+VALUES ('620522', '秦安县', '620500');
+INSERT INTO `dict_area`
+VALUES ('620523', '甘谷县', '620500');
+INSERT INTO `dict_area`
+VALUES ('620524', '武山县', '620500');
+INSERT INTO `dict_area`
+VALUES ('620525', '张家川回族自治县', '620500');
+INSERT INTO `dict_area`
+VALUES ('620600', '武威市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620602', '凉州区', '620600');
+INSERT INTO `dict_area`
+VALUES ('620621', '民勤县', '620600');
+INSERT INTO `dict_area`
+VALUES ('620622', '古浪县', '620600');
+INSERT INTO `dict_area`
+VALUES ('620623', '天祝藏族自治县', '620600');
+INSERT INTO `dict_area`
+VALUES ('620700', '张掖市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620702', '甘州区', '620700');
+INSERT INTO `dict_area`
+VALUES ('620721', '肃南裕固族自治县', '620700');
+INSERT INTO `dict_area`
+VALUES ('620722', '民乐县', '620700');
+INSERT INTO `dict_area`
+VALUES ('620723', '临泽县', '620700');
+INSERT INTO `dict_area`
+VALUES ('620724', '高台县', '620700');
+INSERT INTO `dict_area`
+VALUES ('620725', '山丹县', '620700');
+INSERT INTO `dict_area`
+VALUES ('620800', '平凉市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620802', '崆峒区', '620800');
+INSERT INTO `dict_area`
+VALUES ('620821', '泾川县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620822', '灵台县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620823', '崇信县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620824', '华亭县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620825', '庄浪县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620826', '静宁县', '620800');
+INSERT INTO `dict_area`
+VALUES ('620900', '酒泉市', '620000');
+INSERT INTO `dict_area`
+VALUES ('620902', '肃州区', '620900');
+INSERT INTO `dict_area`
+VALUES ('620921', '金塔县', '620900');
+INSERT INTO `dict_area`
+VALUES ('620922', '瓜州县', '620900');
+INSERT INTO `dict_area`
+VALUES ('620923', '肃北蒙古族自治县', '620900');
+INSERT INTO `dict_area`
+VALUES ('620924', '阿克塞哈萨克族自治县', '620900');
+INSERT INTO `dict_area`
+VALUES ('620981', '玉门市', '620900');
+INSERT INTO `dict_area`
+VALUES ('620982', '敦煌市', '620900');
+INSERT INTO `dict_area`
+VALUES ('621000', '庆阳市', '620000');
+INSERT INTO `dict_area`
+VALUES ('621002', '西峰区', '621000');
+INSERT INTO `dict_area`
+VALUES ('621021', '庆城县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621022', '环县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621023', '华池县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621024', '合水县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621025', '正宁县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621026', '宁县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621027', '镇原县', '621000');
+INSERT INTO `dict_area`
+VALUES ('621100', '定西市', '620000');
+INSERT INTO `dict_area`
+VALUES ('621102', '安定区', '621100');
+INSERT INTO `dict_area`
+VALUES ('621121', '通渭县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621122', '陇西县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621123', '渭源县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621124', '临洮县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621125', '漳县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621126', '岷县', '621100');
+INSERT INTO `dict_area`
+VALUES ('621200', '陇南市', '620000');
+INSERT INTO `dict_area`
+VALUES ('621202', '武都区', '621200');
+INSERT INTO `dict_area`
+VALUES ('621221', '成县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621222', '文县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621223', '宕昌县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621224', '康县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621225', '西和县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621226', '礼县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621227', '徽县', '621200');
+INSERT INTO `dict_area`
+VALUES ('621228', '两当县', '621200');
+INSERT INTO `dict_area`
+VALUES ('622900', '临夏回族自治州', '620000');
+INSERT INTO `dict_area`
+VALUES ('622901', '临夏市', '622900');
+INSERT INTO `dict_area`
+VALUES ('622921', '临夏县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622922', '康乐县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622923', '永靖县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622924', '广河县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622925', '和政县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622926', '东乡族自治县', '622900');
+INSERT INTO `dict_area`
+VALUES ('622927', '积石山保安族东乡族撒拉族自治县', '622900');
+INSERT INTO `dict_area`
+VALUES ('623000', '甘南藏族自治州', '620000');
+INSERT INTO `dict_area`
+VALUES ('623001', '合作市', '623000');
+INSERT INTO `dict_area`
+VALUES ('623021', '临潭县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623022', '卓尼县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623023', '舟曲县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623024', '迭部县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623025', '玛曲县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623026', '碌曲县', '623000');
+INSERT INTO `dict_area`
+VALUES ('623027', '夏河县', '623000');
+INSERT INTO `dict_area`
+VALUES ('630000', '青海省', '-1');
+INSERT INTO `dict_area`
+VALUES ('630100', '西宁市', '630000');
+INSERT INTO `dict_area`
+VALUES ('630102', '城东区', '630100');
+INSERT INTO `dict_area`
+VALUES ('630103', '城中区', '630100');
+INSERT INTO `dict_area`
+VALUES ('630104', '城西区', '630100');
+INSERT INTO `dict_area`
+VALUES ('630105', '城北区', '630100');
+INSERT INTO `dict_area`
+VALUES ('630121', '大通回族土族自治县', '630100');
+INSERT INTO `dict_area`
+VALUES ('630122', '湟中县', '630100');
+INSERT INTO `dict_area`
+VALUES ('630123', '湟源县', '630100');
+INSERT INTO `dict_area`
+VALUES ('630200', '海东市', '630000');
+INSERT INTO `dict_area`
+VALUES ('630202', '乐都区', '630200');
+INSERT INTO `dict_area`
+VALUES ('630203', '平安区', '630200');
+INSERT INTO `dict_area`
+VALUES ('630222', '民和回族土族自治县', '630200');
+INSERT INTO `dict_area`
+VALUES ('630223', '互助土族自治县', '630200');
+INSERT INTO `dict_area`
+VALUES ('630224', '化隆回族自治县', '630200');
+INSERT INTO `dict_area`
+VALUES ('630225', '循化撒拉族自治县', '630200');
+INSERT INTO `dict_area`
+VALUES ('632200', '海北藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632221', '门源回族自治县', '632200');
+INSERT INTO `dict_area`
+VALUES ('632222', '祁连县', '632200');
+INSERT INTO `dict_area`
+VALUES ('632223', '海晏县', '632200');
+INSERT INTO `dict_area`
+VALUES ('632224', '刚察县', '632200');
+INSERT INTO `dict_area`
+VALUES ('632300', '黄南藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632321', '同仁县', '632300');
+INSERT INTO `dict_area`
+VALUES ('632322', '尖扎县', '632300');
+INSERT INTO `dict_area`
+VALUES ('632323', '泽库县', '632300');
+INSERT INTO `dict_area`
+VALUES ('632324', '河南蒙古族自治县', '632300');
+INSERT INTO `dict_area`
+VALUES ('632500', '海南藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632521', '共和县', '632500');
+INSERT INTO `dict_area`
+VALUES ('632522', '同德县', '632500');
+INSERT INTO `dict_area`
+VALUES ('632523', '贵德县', '632500');
+INSERT INTO `dict_area`
+VALUES ('632524', '兴海县', '632500');
+INSERT INTO `dict_area`
+VALUES ('632525', '贵南县', '632500');
+INSERT INTO `dict_area`
+VALUES ('632600', '果洛藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632621', '玛沁县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632622', '班玛县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632623', '甘德县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632624', '达日县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632625', '久治县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632626', '玛多县', '632600');
+INSERT INTO `dict_area`
+VALUES ('632700', '玉树藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632701', '玉树市', '632700');
+INSERT INTO `dict_area`
+VALUES ('632722', '杂多县', '632700');
+INSERT INTO `dict_area`
+VALUES ('632723', '称多县', '632700');
+INSERT INTO `dict_area`
+VALUES ('632724', '治多县', '632700');
+INSERT INTO `dict_area`
+VALUES ('632725', '囊谦县', '632700');
+INSERT INTO `dict_area`
+VALUES ('632726', '曲麻莱县', '632700');
+INSERT INTO `dict_area`
+VALUES ('632800', '海西蒙古族藏族自治州', '630000');
+INSERT INTO `dict_area`
+VALUES ('632801', '格尔木市', '632800');
+INSERT INTO `dict_area`
+VALUES ('632802', '德令哈市', '632800');
+INSERT INTO `dict_area`
+VALUES ('632821', '乌兰县', '632800');
+INSERT INTO `dict_area`
+VALUES ('632822', '都兰县', '632800');
+INSERT INTO `dict_area`
+VALUES ('632823', '天峻县', '632800');
+INSERT INTO `dict_area`
+VALUES ('632824', '冷湖行政区', '632800');
+INSERT INTO `dict_area`
+VALUES ('632825', '大柴旦行政区', '632800');
+INSERT INTO `dict_area`
+VALUES ('632826', '茫崖行政区', '632800');
+INSERT INTO `dict_area`
+VALUES ('640000', '宁夏回族自治区', '-1');
+INSERT INTO `dict_area`
+VALUES ('640100', '银川市', '640000');
+INSERT INTO `dict_area`
+VALUES ('640104', '兴庆区', '640100');
+INSERT INTO `dict_area`
+VALUES ('640105', '西夏区', '640100');
+INSERT INTO `dict_area`
+VALUES ('640106', '金凤区', '640100');
+INSERT INTO `dict_area`
+VALUES ('640121', '永宁县', '640100');
+INSERT INTO `dict_area`
+VALUES ('640122', '贺兰县', '640100');
+INSERT INTO `dict_area`
+VALUES ('640181', '灵武市', '640100');
+INSERT INTO `dict_area`
+VALUES ('640200', '石嘴山市', '640000');
+INSERT INTO `dict_area`
+VALUES ('640202', '大武口区', '640200');
+INSERT INTO `dict_area`
+VALUES ('640205', '惠农区', '640200');
+INSERT INTO `dict_area`
+VALUES ('640221', '平罗县', '640200');
+INSERT INTO `dict_area`
+VALUES ('640300', '吴忠市', '640000');
+INSERT INTO `dict_area`
+VALUES ('640302', '利通区', '640300');
+INSERT INTO `dict_area`
+VALUES ('640303', '红寺堡区', '640300');
+INSERT INTO `dict_area`
+VALUES ('640323', '盐池县', '640300');
+INSERT INTO `dict_area`
+VALUES ('640324', '同心县', '640300');
+INSERT INTO `dict_area`
+VALUES ('640381', '青铜峡市', '640300');
+INSERT INTO `dict_area`
+VALUES ('640400', '固原市', '640000');
+INSERT INTO `dict_area`
+VALUES ('640402', '原州区', '640400');
+INSERT INTO `dict_area`
+VALUES ('640422', '西吉县', '640400');
+INSERT INTO `dict_area`
+VALUES ('640423', '隆德县', '640400');
+INSERT INTO `dict_area`
+VALUES ('640424', '泾源县', '640400');
+INSERT INTO `dict_area`
+VALUES ('640425', '彭阳县', '640400');
+INSERT INTO `dict_area`
+VALUES ('640500', '中卫市', '640000');
+INSERT INTO `dict_area`
+VALUES ('640502', '沙坡头区', '640500');
+INSERT INTO `dict_area`
+VALUES ('640521', '中宁县', '640500');
+INSERT INTO `dict_area`
+VALUES ('640522', '海原县', '640500');
+INSERT INTO `dict_area`
+VALUES ('650000', '新疆维吾尔自治区', '-1');
+INSERT INTO `dict_area`
+VALUES ('650100', '乌鲁木齐市', '650000');
+INSERT INTO `dict_area`
+VALUES ('650102', '天山区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650103', '沙依巴克区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650104', '新市区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650105', '水磨沟区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650106', '头屯河区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650107', '达坂城区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650109', '米东区', '650100');
+INSERT INTO `dict_area`
+VALUES ('650121', '乌鲁木齐县', '650100');
+INSERT INTO `dict_area`
+VALUES ('650200', '克拉玛依市', '650000');
+INSERT INTO `dict_area`
+VALUES ('650202', '独山子区', '650200');
+INSERT INTO `dict_area`
+VALUES ('650203', '克拉玛依区', '650200');
+INSERT INTO `dict_area`
+VALUES ('650204', '白碱滩区', '650200');
+INSERT INTO `dict_area`
+VALUES ('650205', '乌尔禾区', '650200');
+INSERT INTO `dict_area`
+VALUES ('650400', '吐鲁番市', '650000');
+INSERT INTO `dict_area`
+VALUES ('650402', '高昌区', '650400');
+INSERT INTO `dict_area`
+VALUES ('650421', '鄯善县', '650400');
+INSERT INTO `dict_area`
+VALUES ('650422', '托克逊县', '650400');
+INSERT INTO `dict_area`
+VALUES ('650500', '哈密市', '650000');
+INSERT INTO `dict_area`
+VALUES ('650502', '伊州区', '650500');
+INSERT INTO `dict_area`
+VALUES ('650521', '巴里坤哈萨克自治县', '650500');
+INSERT INTO `dict_area`
+VALUES ('650522', '伊吾县', '650500');
+INSERT INTO `dict_area`
+VALUES ('652300', '昌吉回族自治州', '650000');
+INSERT INTO `dict_area`
+VALUES ('652301', '昌吉市', '652300');
+INSERT INTO `dict_area`
+VALUES ('652302', '阜康市', '652300');
+INSERT INTO `dict_area`
+VALUES ('652323', '呼图壁县', '652300');
+INSERT INTO `dict_area`
+VALUES ('652324', '玛纳斯县', '652300');
+INSERT INTO `dict_area`
+VALUES ('652325', '奇台县', '652300');
+INSERT INTO `dict_area`
+VALUES ('652327', '吉木萨尔县', '652300');
+INSERT INTO `dict_area`
+VALUES ('652328', '木垒哈萨克自治县', '652300');
+INSERT INTO `dict_area`
+VALUES ('652700', '博尔塔拉蒙古自治州', '650000');
+INSERT INTO `dict_area`
+VALUES ('652701', '博乐市', '652700');
+INSERT INTO `dict_area`
+VALUES ('652702', '阿拉山口市', '652700');
+INSERT INTO `dict_area`
+VALUES ('652722', '精河县', '652700');
+INSERT INTO `dict_area`
+VALUES ('652723', '温泉县', '652700');
+INSERT INTO `dict_area`
+VALUES ('652800', '巴音郭楞蒙古自治州', '650000');
+INSERT INTO `dict_area`
+VALUES ('652801', '库尔勒市', '652800');
+INSERT INTO `dict_area`
+VALUES ('652822', '轮台县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652823', '尉犁县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652824', '若羌县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652825', '且末县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652826', '焉耆回族自治县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652827', '和静县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652828', '和硕县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652829', '博湖县', '652800');
+INSERT INTO `dict_area`
+VALUES ('652900', '阿克苏地区', '650000');
+INSERT INTO `dict_area`
+VALUES ('652901', '阿克苏市', '652900');
+INSERT INTO `dict_area`
+VALUES ('652922', '温宿县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652923', '库车县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652924', '沙雅县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652925', '新和县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652926', '拜城县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652927', '乌什县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652928', '阿瓦提县', '652900');
+INSERT INTO `dict_area`
+VALUES ('652929', '柯坪县', '652900');
+INSERT INTO `dict_area`
+VALUES ('653000', '克孜勒苏柯尔克孜自治州', '650000');
+INSERT INTO `dict_area`
+VALUES ('653001', '阿图什市', '653000');
+INSERT INTO `dict_area`
+VALUES ('653022', '阿克陶县', '653000');
+INSERT INTO `dict_area`
+VALUES ('653023', '阿合奇县', '653000');
+INSERT INTO `dict_area`
+VALUES ('653024', '乌恰县', '653000');
+INSERT INTO `dict_area`
+VALUES ('653100', '喀什地区', '650000');
+INSERT INTO `dict_area`
+VALUES ('653101', '喀什市', '653100');
+INSERT INTO `dict_area`
+VALUES ('653121', '疏附县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653122', '疏勒县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653123', '英吉沙县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653124', '泽普县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653125', '莎车县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653126', '叶城县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653127', '麦盖提县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653128', '岳普湖县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653129', '伽师县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653130', '巴楚县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653131', '塔什库尔干塔吉克自治县', '653100');
+INSERT INTO `dict_area`
+VALUES ('653200', '和田地区', '650000');
+INSERT INTO `dict_area`
+VALUES ('653201', '和田市', '653200');
+INSERT INTO `dict_area`
+VALUES ('653221', '和田县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653222', '墨玉县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653223', '皮山县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653224', '洛浦县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653225', '策勒县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653226', '于田县', '653200');
+INSERT INTO `dict_area`
+VALUES ('653227', '民丰县', '653200');
+INSERT INTO `dict_area`
+VALUES ('654000', '伊犁哈萨克自治州', '650000');
+INSERT INTO `dict_area`
+VALUES ('654002', '伊宁市', '654000');
+INSERT INTO `dict_area`
+VALUES ('654003', '奎屯市', '654000');
+INSERT INTO `dict_area`
+VALUES ('654004', '霍尔果斯市', '654000');
+INSERT INTO `dict_area`
+VALUES ('654021', '伊宁县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654022', '察布查尔锡伯自治县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654023', '霍城县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654024', '巩留县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654025', '新源县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654026', '昭苏县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654027', '特克斯县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654028', '尼勒克县', '654000');
+INSERT INTO `dict_area`
+VALUES ('654200', '塔城地区', '650000');
+INSERT INTO `dict_area`
+VALUES ('654201', '塔城市', '654200');
+INSERT INTO `dict_area`
+VALUES ('654202', '乌苏市', '654200');
+INSERT INTO `dict_area`
+VALUES ('654221', '额敏县', '654200');
+INSERT INTO `dict_area`
+VALUES ('654223', '沙湾县', '654200');
+INSERT INTO `dict_area`
+VALUES ('654224', '托里县', '654200');
+INSERT INTO `dict_area`
+VALUES ('654225', '裕民县', '654200');
+INSERT INTO `dict_area`
+VALUES ('654226', '和布克赛尔蒙古自治县', '654200');
+INSERT INTO `dict_area`
+VALUES ('654300', '阿勒泰地区', '650000');
+INSERT INTO `dict_area`
+VALUES ('654301', '阿勒泰市', '654300');
+INSERT INTO `dict_area`
+VALUES ('654321', '布尔津县', '654300');
+INSERT INTO `dict_area`
+VALUES ('654322', '富蕴县', '654300');
+INSERT INTO `dict_area`
+VALUES ('654323', '福海县', '654300');
+INSERT INTO `dict_area`
+VALUES ('654324', '哈巴河县', '654300');
+INSERT INTO `dict_area`
+VALUES ('654325', '青河县', '654300');
+INSERT INTO `dict_area`
+VALUES ('654326', '吉木乃县', '654300');
+INSERT INTO `dict_area`
+VALUES ('659100', '石河子市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659200', '阿拉尔市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659300', '图木舒克市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659400', '五家渠市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659500', '北屯市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659600', '铁门关市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659700', '双河市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659800', '可克达拉市', '650000');
+INSERT INTO `dict_area`
+VALUES ('659900', '昆玉市', '650000');
+INSERT INTO `dict_area`
+VALUES ('710000', '台湾省', '-1');
+INSERT INTO `dict_area`
+VALUES ('710100', '台北市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710101', '中正区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710102', '大同区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710103', '中山区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710104', '松山区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710105', '大安区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710106', '万华区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710107', '信义区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710108', '士林区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710109', '北投区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710110', '内湖区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710111', '南港区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710112', '文山区', '710100');
+INSERT INTO `dict_area`
+VALUES ('710200', '高雄市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710201', '新兴区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710202', '前金区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710203', '苓雅区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710204', '盐埕区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710205', '鼓山区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710206', '旗津区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710207', '前镇区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710208', '三民区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710209', '左营区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710210', '楠梓区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710211', '小港区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710242', '仁武区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710243', '大社区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710244', '冈山区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710245', '路竹区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710246', '阿莲区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710247', '田寮区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710248', '燕巢区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710249', '桥头区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710250', '梓官区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710251', '弥陀区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710252', '永安区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710253', '湖内区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710254', '凤山区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710255', '大寮区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710256', '林园区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710257', '鸟松区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710258', '大树区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710259', '旗山区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710260', '美浓区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710261', '六龟区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710262', '内门区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710263', '杉林区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710264', '甲仙区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710265', '桃源区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710266', '那玛夏区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710267', '茂林区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710268', '茄萣区', '710200');
+INSERT INTO `dict_area`
+VALUES ('710300', '台南市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710301', '中西区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710302', '东区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710303', '南区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710304', '北区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710305', '安平区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710306', '安南区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710339', '永康区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710340', '归仁区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710341', '新化区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710342', '左镇区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710343', '玉井区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710344', '楠西区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710345', '南化区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710346', '仁德区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710347', '关庙区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710348', '龙崎区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710349', '官田区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710350', '麻豆区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710351', '佳里区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710352', '西港区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710353', '七股区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710354', '将军区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710355', '学甲区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710356', '北门区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710357', '新营区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710358', '后壁区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710359', '白河区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710360', '东山区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710361', '六甲区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710362', '下营区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710363', '柳营区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710364', '盐水区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710365', '善化区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710366', '大内区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710367', '山上区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710368', '新市区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710369', '安定区', '710300');
+INSERT INTO `dict_area`
+VALUES ('710400', '台中市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710401', '中区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710402', '东区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710403', '南区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710404', '西区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710405', '北区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710406', '北屯区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710407', '西屯区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710408', '南屯区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710431', '太平区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710432', '大里区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710433', '雾峰区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710434', '乌日区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710435', '丰原区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710436', '后里区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710437', '石冈区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710438', '东势区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710439', '和平区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710440', '新社区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710441', '潭子区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710442', '大雅区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710443', '神冈区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710444', '大肚区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710445', '沙鹿区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710446', '龙井区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710447', '梧栖区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710448', '清水区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710449', '大甲区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710450', '外埔区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710451', '大安区', '710400');
+INSERT INTO `dict_area`
+VALUES ('710600', '南投县', '710000');
+INSERT INTO `dict_area`
+VALUES ('710614', '南投市', '710600');
+INSERT INTO `dict_area`
+VALUES ('710615', '中寮乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710616', '草屯镇', '710600');
+INSERT INTO `dict_area`
+VALUES ('710617', '国姓乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710618', '埔里镇', '710600');
+INSERT INTO `dict_area`
+VALUES ('710619', '仁爱乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710620', '名间乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710621', '集集镇', '710600');
+INSERT INTO `dict_area`
+VALUES ('710622', '水里乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710623', '鱼池乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710624', '信义乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710625', '竹山镇', '710600');
+INSERT INTO `dict_area`
+VALUES ('710626', '鹿谷乡', '710600');
+INSERT INTO `dict_area`
+VALUES ('710700', '基隆市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710701', '仁爱区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710702', '信义区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710703', '中正区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710704', '中山区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710705', '安乐区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710706', '暖暖区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710707', '七堵区', '710700');
+INSERT INTO `dict_area`
+VALUES ('710800', '新竹市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710801', '东区', '710800');
+INSERT INTO `dict_area`
+VALUES ('710802', '北区', '710800');
+INSERT INTO `dict_area`
+VALUES ('710803', '香山区', '710800');
+INSERT INTO `dict_area`
+VALUES ('710900', '嘉义市', '710000');
+INSERT INTO `dict_area`
+VALUES ('710901', '东区', '710900');
+INSERT INTO `dict_area`
+VALUES ('710902', '西区', '710900');
+INSERT INTO `dict_area`
+VALUES ('711100', '新北市', '710000');
+INSERT INTO `dict_area`
+VALUES ('711130', '万里区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711131', '金山区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711132', '板桥区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711133', '汐止区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711134', '深坑区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711135', '石碇区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711136', '瑞芳区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711137', '平溪区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711138', '双溪区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711139', '贡寮区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711140', '新店区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711141', '坪林区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711142', '乌来区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711143', '永和区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711144', '中和区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711145', '土城区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711146', '三峡区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711147', '树林区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711148', '莺歌区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711149', '三重区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711150', '新庄区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711151', '泰山区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711152', '林口区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711153', '芦洲区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711154', '五股区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711155', '八里区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711156', '淡水区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711157', '三芝区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711158', '石门区', '711100');
+INSERT INTO `dict_area`
+VALUES ('711200', '宜兰县', '710000');
+INSERT INTO `dict_area`
+VALUES ('711214', '宜兰市', '711200');
+INSERT INTO `dict_area`
+VALUES ('711215', '头城镇', '711200');
+INSERT INTO `dict_area`
+VALUES ('711216', '礁溪乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711217', '壮围乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711218', '员山乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711219', '罗东镇', '711200');
+INSERT INTO `dict_area`
+VALUES ('711220', '三星乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711221', '大同乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711222', '五结乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711223', '冬山乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711224', '苏澳镇', '711200');
+INSERT INTO `dict_area`
+VALUES ('711225', '南澳乡', '711200');
+INSERT INTO `dict_area`
+VALUES ('711300', '新竹县', '710000');
+INSERT INTO `dict_area`
+VALUES ('711314', '竹北市', '711300');
+INSERT INTO `dict_area`
+VALUES ('711315', '湖口乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711316', '新丰乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711317', '新埔镇', '711300');
+INSERT INTO `dict_area`
+VALUES ('711318', '关西镇', '711300');
+INSERT INTO `dict_area`
+VALUES ('711319', '芎林乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711320', '宝山乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711321', '竹东镇', '711300');
+INSERT INTO `dict_area`
+VALUES ('711322', '五峰乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711323', '横山乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711324', '尖石乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711325', '北埔乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711326', '峨眉乡', '711300');
+INSERT INTO `dict_area`
+VALUES ('711400', '桃园市', '710000');
+INSERT INTO `dict_area`
+VALUES ('711414', '中坜区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711415', '平镇区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711416', '龙潭区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711417', '杨梅区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711418', '新屋区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711419', '观音区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711420', '桃园区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711421', '龟山区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711422', '八德区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711423', '大溪区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711424', '复兴区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711425', '大园区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711426', '芦竹区', '711400');
+INSERT INTO `dict_area`
+VALUES ('711500', '苗栗县', '710000');
+INSERT INTO `dict_area`
+VALUES ('711519', '竹南镇', '711500');
+INSERT INTO `dict_area`
+VALUES ('711520', '头份市', '711500');
+INSERT INTO `dict_area`
+VALUES ('711521', '三湾乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711522', '南庄乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711523', '狮潭乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711524', '后龙镇', '711500');
+INSERT INTO `dict_area`
+VALUES ('711525', '通霄镇', '711500');
+INSERT INTO `dict_area`
+VALUES ('711526', '苑里镇', '711500');
+INSERT INTO `dict_area`
+VALUES ('711527', '苗栗市', '711500');
+INSERT INTO `dict_area`
+VALUES ('711528', '造桥乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711529', '头屋乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711530', '公馆乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711531', '大湖乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711532', '泰安乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711533', '铜锣乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711534', '三义乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711535', '西湖乡', '711500');
+INSERT INTO `dict_area`
+VALUES ('711536', '卓兰镇', '711500');
+INSERT INTO `dict_area`
+VALUES ('711700', '彰化县', '710000');
+INSERT INTO `dict_area`
+VALUES ('711727', '彰化市', '711700');
+INSERT INTO `dict_area`
+VALUES ('711728', '芬园乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711729', '花坛乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711730', '秀水乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711731', '鹿港镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711732', '福兴乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711733', '线西乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711734', '和美镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711735', '伸港乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711736', '员林市', '711700');
+INSERT INTO `dict_area`
+VALUES ('711737', '社头乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711738', '永靖乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711739', '埔心乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711740', '溪湖镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711741', '大村乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711742', '埔盐乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711743', '田中镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711744', '北斗镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711745', '田尾乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711746', '埤头乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711747', '溪州乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711748', '竹塘乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711749', '二林镇', '711700');
+INSERT INTO `dict_area`
+VALUES ('711750', '大城乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711751', '芳苑乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711752', '二水乡', '711700');
+INSERT INTO `dict_area`
+VALUES ('711900', '嘉义县', '710000');
+INSERT INTO `dict_area`
+VALUES ('711919', '番路乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711920', '梅山乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711921', '竹崎乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711922', '阿里山乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711923', '中埔乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711924', '大埔乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711925', '水上乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711926', '鹿草乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711927', '太保市', '711900');
+INSERT INTO `dict_area`
+VALUES ('711928', '朴子市', '711900');
+INSERT INTO `dict_area`
+VALUES ('711929', '东石乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711930', '六脚乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711931', '新港乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711932', '民雄乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711933', '大林镇', '711900');
+INSERT INTO `dict_area`
+VALUES ('711934', '溪口乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711935', '义竹乡', '711900');
+INSERT INTO `dict_area`
+VALUES ('711936', '布袋镇', '711900');
+INSERT INTO `dict_area`
+VALUES ('712100', '云林县', '710000');
+INSERT INTO `dict_area`
+VALUES ('712121', '斗南镇', '712100');
+INSERT INTO `dict_area`
+VALUES ('712122', '大埤乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712123', '虎尾镇', '712100');
+INSERT INTO `dict_area`
+VALUES ('712124', '土库镇', '712100');
+INSERT INTO `dict_area`
+VALUES ('712125', '褒忠乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712126', '东势乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712127', '台西乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712128', '仑背乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712129', '麦寮乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712130', '斗六市', '712100');
+INSERT INTO `dict_area`
+VALUES ('712131', '林内乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712132', '古坑乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712133', '莿桐乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712134', '西螺镇', '712100');
+INSERT INTO `dict_area`
+VALUES ('712135', '二仑乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712136', '北港镇', '712100');
+INSERT INTO `dict_area`
+VALUES ('712137', '水林乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712138', '口湖乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712139', '四湖乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712140', '元长乡', '712100');
+INSERT INTO `dict_area`
+VALUES ('712400', '屏东县', '710000');
+INSERT INTO `dict_area`
+VALUES ('712434', '屏东市', '712400');
+INSERT INTO `dict_area`
+VALUES ('712435', '三地门乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712436', '雾台乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712437', '玛家乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712438', '九如乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712439', '里港乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712440', '高树乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712441', '盐埔乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712442', '长治乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712443', '麟洛乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712444', '竹田乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712445', '内埔乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712446', '万丹乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712447', '潮州镇', '712400');
+INSERT INTO `dict_area`
+VALUES ('712448', '泰武乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712449', '来义乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712450', '万峦乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712451', '崁顶乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712452', '新埤乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712453', '南州乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712454', '林边乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712455', '东港镇', '712400');
+INSERT INTO `dict_area`
+VALUES ('712456', '琉球乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712457', '佳冬乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712458', '新园乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712459', '枋寮乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712460', '枋山乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712461', '春日乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712462', '狮子乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712463', '车城乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712464', '牡丹乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712465', '恒春镇', '712400');
+INSERT INTO `dict_area`
+VALUES ('712466', '满州乡', '712400');
+INSERT INTO `dict_area`
+VALUES ('712500', '台东县', '710000');
+INSERT INTO `dict_area`
+VALUES ('712517', '台东市', '712500');
+INSERT INTO `dict_area`
+VALUES ('712518', '绿岛乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712519', '兰屿乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712520', '延平乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712521', '卑南乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712522', '鹿野乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712523', '关山镇', '712500');
+INSERT INTO `dict_area`
+VALUES ('712524', '海端乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712525', '池上乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712526', '东河乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712527', '成功镇', '712500');
+INSERT INTO `dict_area`
+VALUES ('712528', '长滨乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712529', '金峰乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712530', '大武乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712531', '达仁乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712532', '太麻里乡', '712500');
+INSERT INTO `dict_area`
+VALUES ('712600', '花莲县', '710000');
+INSERT INTO `dict_area`
+VALUES ('712615', '花莲市', '712600');
+INSERT INTO `dict_area`
+VALUES ('712616', '新城乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712618', '秀林乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712619', '吉安乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712620', '寿丰乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712621', '凤林镇', '712600');
+INSERT INTO `dict_area`
+VALUES ('712622', '光复乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712623', '丰滨乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712624', '瑞穗乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712625', '万荣乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712626', '玉里镇', '712600');
+INSERT INTO `dict_area`
+VALUES ('712627', '卓溪乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712628', '富里乡', '712600');
+INSERT INTO `dict_area`
+VALUES ('712700', '澎湖县', '710000');
+INSERT INTO `dict_area`
+VALUES ('712707', '马公市', '712700');
+INSERT INTO `dict_area`
+VALUES ('712708', '西屿乡', '712700');
+INSERT INTO `dict_area`
+VALUES ('712709', '望安乡', '712700');
+INSERT INTO `dict_area`
+VALUES ('712710', '七美乡', '712700');
+INSERT INTO `dict_area`
+VALUES ('712711', '白沙乡', '712700');
+INSERT INTO `dict_area`
+VALUES ('712712', '湖西乡', '712700');
+INSERT INTO `dict_area`
+VALUES ('810000', '香港特别行政区', '-1');
+INSERT INTO `dict_area`
+VALUES ('810100', '香港特别行政区', '810000');
+INSERT INTO `dict_area`
+VALUES ('810101', '中西区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810102', '东区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810103', '九龙城区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810104', '观塘区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810105', '南区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810106', '深水埗区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810107', '湾仔区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810108', '黄大仙区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810109', '油尖旺区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810110', '离岛区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810111', '葵青区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810112', '北区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810113', '西贡区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810114', '沙田区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810115', '屯门区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810116', '大埔区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810117', '荃湾区', '810100');
+INSERT INTO `dict_area`
+VALUES ('810118', '元朗区', '810100');
+INSERT INTO `dict_area`
+VALUES ('820000', '澳门特别行政区', '-1');
+INSERT INTO `dict_area`
+VALUES ('820100', '澳门特别行政区', '820000');
+INSERT INTO `dict_area`
+VALUES ('820101', '澳门半岛', '820100');
+INSERT INTO `dict_area`
+VALUES ('820102', '凼仔', '820100');
+INSERT INTO `dict_area`
+VALUES ('820103', '路凼城', '820100');
+INSERT INTO `dict_area`
+VALUES ('820104', '路环', '820100');
+
+INSERT INTO `t_home_model_config` (`id`, `user_id`, `model_config`)
+VALUES (7, 10002,
+        '[{\"id\": 11, \"name\": \"RegularModel\", \"label\": \"常用模块\", \"width\": 100, \"height\": 32}, {\"id\": 1, \"name\": \"StationOverview\", \"label\": \"站所概览\", \"width\": 100, \"height\": 30}, {\"id\": 2, \"name\": \"RobotInfoOverview\", \"label\": \"设备工况\", \"width\": 100, \"height\": 35}, {\"id\": 3, \"name\": \"VideoCarousel\", \"label\": \"视频轮巡\", \"width\": 100, \"height\": 63}, {\"id\": 9, \"name\": \"ReliabilityModel\", \"label\": \"可靠性指标\", \"width\": 100, \"height\": 35}, {\"id\": 12, \"name\": \"TaskOverview\", \"label\": \"巡视任务\", \"width\": 100, \"height\": 30}, {\"id\": 6, \"name\": \"WarningStatistic\", \"label\": \"告警统计\", \"width\": 100, \"height\": 34}, {\"id\": 7, \"name\": \"DefectStatistic\", \"label\": \"缺陷统计\", \"width\": 100, \"height\": 33}]');
