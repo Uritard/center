@@ -14,6 +14,7 @@ import com.yjh.platform.module.task.entity.TStdDevicemete;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -121,8 +122,8 @@ public class DeviceModelService {
         itemList.forEach(item -> {
             if (item.get("standard_device_id") != null) {
                 TStdMete tStdMete = new TStdMete();
-                tStdMete.setStdMeteId((Long) item.get("standard_device_id"));
-                tStdMete.setDeviceType((Integer) item.get("device_type"));
+                tStdMete.setStdMeteId(NumberUtils.toLong((String) item.get("standard_device_id")));
+                tStdMete.setDeviceType(NumberUtils.toInt((String) item.get("device_type")));
                 tStdMete.setMeteType((String) item.get("meter_type"));
                 tStdMete.setMeteName((String) item.get("standard_device_name"));
                 tStdMete.setRedundantType((String) item.get("point_type"));
@@ -140,11 +141,12 @@ public class DeviceModelService {
         itemList.forEach(item -> {
             if (item.get("device_id") != null) {
                 TStdDevicemete tStdDevicemete = new TStdDevicemete();
-                tStdDevicemete.setDeviceMeteId((Long) item.get("device_id"));
+                tStdDevicemete.setDeviceMeteId(NumberUtils.toLong((String) item.get("device_id")));
                 tStdDevicemete.setMeteKind(String.valueOf(0));
                 tStdDevicemete.setAlarmType((String) item.get("alarm_type"));
                 tStdDevicemete.setRemark((String) item.get("alarm_desc"));
-                tStdDevicemete.setAlarmLevel((Integer) item.get("alarm_level"));
+                tStdDevicemete.setAlarmLevel(NumberUtils.toInt((String) item.get("alarm_level")));
+                tStdDevicemete.setRedundantType("1");
                 tStdDevicemeteList.add(tStdDevicemete);
             }
         });

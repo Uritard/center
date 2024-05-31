@@ -134,4 +134,6 @@ public class TStdDevicemete implements Serializable {
     private Integer fValue;
 
     private String labelAttri;
+
+    private String redundantType;
 }
