@@ -147,6 +147,7 @@ public class TMeterService {
             return new ArrayList<>();
         }
         list.forEach(t -> setPower(t, t, false));
+        list = list.stream().filter(t-> !"0.00".equals(t.getTotalPositivePowerLast())).collect(Collectors.toList());
         return list.stream().map(e -> {
             TMeterVo tMeterVo = new TMeterVo();
             BeanUtils.copyProperties(e, tMeterVo);
