@@ -2368,13 +2368,13 @@ public class UPatrolTaskService {
             return;
         }
         String taskId = cruiseResultList.get(0).get("taskId");
+        // 结果判断是否自动审核
+        autoreviewHandler.autoreviewCheckResult(cruiseResultList);
         long abnormalCounts = patrolTaskResult(taskId, cruiseResult, cruiseResultList);
 
         try {
             // 压测模式减少非必要消息传输
             if (!Constant.fastTurbo()) {
-                // 结果判断是否自动审核
-                autoreviewHandler.autoreviewCheckResult(cruiseResultList);
                 // 巡视结果上报上一级系统
                 processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
                 //任务状态上报站端

@@ -16,9 +16,11 @@ import com.yjh.demo.service.ServerService;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.demo.ws.message.AInterfaceMessage;
 import com.yjh.messager.api.msg.BaseMessage;
+import com.yjh.messager.api.msg.Msg;
 import com.yjh.messager.api.msg.SimpleMessageSender;
 import com.yjh.protocol_a.InboundMessage;
 import com.yjh.protocol_a.Message;
+import com.yjh.protocol_a.OutboundMessage;
 import com.yjh.protocol_a.impl.MessageCodecHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -228,9 +230,10 @@ public class AutomationTask {
             return "";
         }
         try {
-            String xml = new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8);
-
-            Message message = XmlToMessageUtil.decode(xml);
+            // String xml = new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8);
+            //
+            // Message message = XmlToMessageUtil.decode(xml);
+            Message message = inboundMessage.getMsg();
             // 判断是否注册，并自动发送心跳
             scheduleHeart(message);
             String type = message.getType() + "_" + message.getCommand();
@@ -249,6 +252,10 @@ public class AutomationTask {
                     wait.notifyAll();
                 }
             }
+            if (StringUtils.isEmpty(requestFile)) {
+                requestFile = getRequestFile(inboundMessage, protocolType);
+            }
+
             String file = findMessage(requestFile, messageFiles);
             if (StringUtils.isNotEmpty(file)) {
                 Message localMessage = loadMessage(file);
@@ -268,6 +275,23 @@ public class AutomationTask {
         }
 
         return outBuilder.toString();
+    }
+
+    String getRequestFile(InboundMessage inboundMessage, String protocolType) {
+        OutboundMessage msg = (OutboundMessage)inboundMessage.getOriginReq();
+        if (msg == null) {
+            log.info("下发返回报文");
+            return "";
+        }
+        Message message = msg.getMsg();
+        String type = message.getType() + "_" + message.getCommand();
+        String cmd = protocolType + "_" + type + "_0";
+        Collection<String> messageFiles = COMMAND_MESSAGE_MAP.get(cmd);
+        if (CollectionUtils.isNotEmpty(messageFiles)) {
+            return messageFiles.stream().findFirst().orElse("");
+        }
+        log.info("没有匹配到请求报文");
+        return "";
     }
 
     private String findMessage(String requestFile, Collection<String> messageFiles) {
