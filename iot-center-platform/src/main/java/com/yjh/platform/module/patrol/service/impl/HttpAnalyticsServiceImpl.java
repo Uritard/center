@@ -134,7 +134,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             return;
         }
 
-        String imageUrl = analysis.getImageUrlList().get(0);
+        String imageUrl = analysis.getImagePathList().get(0);
         String objectId = analysis.getObjectId();
 
         redisTemplate.opsForHash().put("silentMonitorImageUrl", objectId, imageUrl);
@@ -197,7 +197,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                         String[] split = imageNormalUrlPath.split("/");
                         targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
-                    analyseObject.setImageNormalUrlPath(targetNamePath);
+                    analyseObject.setImageNormalPath(targetNamePath);
                 } else {
                     // 拿电科院给的图
                     log.info("flag:{}", flag);
@@ -218,13 +218,13 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                         String[] split = imageNormalUrlPath.split("/");
                         targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
-                    analyseObject.setImageNormalUrlPath(targetNamePath);
+                    analyseObject.setImageNormalPath(targetNamePath);
                 }
                 // 上传基准图
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
-                analyseObject.setImageNormalUrlPath(presetId);
+                analyseObject.setImageNormalPath(presetId);
             }
 
         } catch (Exception e) {
@@ -280,7 +280,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);
-            analyseObject.setImageUrlList(imageUrlList);
+            analyseObject.setImagePathList(imageUrlList);
 
             objectList.add(analyseObject);
             picAnalyseRequest.setObjectList(objectList);
