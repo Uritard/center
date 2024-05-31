@@ -2016,6 +2016,7 @@ CREATE TABLE `t_std_mete`
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `remark` varchar(125) DEFAULT '' COMMENT '备注',
   `redundant_type` varchar(50) NOT NULL DEFAULT '1' COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
+  `label_attri` varchar(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
   PRIMARY KEY (`std_mete_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000020000 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
 
@@ -2069,6 +2070,7 @@ CREATE TABLE `t_std_metemodel_detail`
   `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `redundant_type` varchar(50) NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
+  `label_attri` varchar(32) DEFAULT '' COMMENT '标签属性 1-人工关注',
   PRIMARY KEY (`mete_id`,`model_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='系统测点模版详细表';
 
