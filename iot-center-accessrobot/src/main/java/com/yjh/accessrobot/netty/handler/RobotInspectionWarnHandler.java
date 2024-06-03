@@ -58,6 +58,11 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         RobotServerHandler.send( alarmProtocol, robotCode);
         log.info("本级系统给下级{}响应了", robotCode);
 
+        String ignoreSubordAlarm = (String)redisTemplate.opsForHash().entries("t_sys_param:ignoreSubordAlarm").get("content");
+        if (Boolean.parseBoolean(ignoreSubordAlarm)) {
+            log.info("忽略下级上报告警，robotCode: {}, ignoreSubordAlarm: {}", robotCode, ignoreSubordAlarm);
+            return;
+        }
 
         String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
         // 处理数据
