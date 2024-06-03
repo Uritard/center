@@ -612,7 +612,7 @@ public class TSequentialConfService {
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
             Map<String, String> map = redisTemplate.opsForHash().entries("region:" + (tCfgDevice.getEdgeCode() == null ? edgeCode:tCfgDevice.getEdgeCode()));
-            String stationId = map.get("stationId");
+            String stationId = map.get("stationId") == null ? edgeCode : map.get("stationId");
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}", simpleDateFormat2.format(new Date()));
