@@ -117,7 +117,6 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         //<2>: = 无权限（或高优先级任务存在）
                         //<3>: = 其它异常
                         //taskPatrolledId 不为空 且 error_code 不为 0 边缘节点任务终止
-                        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
                         AtomicReference<String> taskCode = new AtomicReference<>("");
                         Date date = null;
                         if (StringUtils.isNotEmpty(taskPatrolledId) ) {
@@ -126,7 +125,7 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                             String timeStr = StringUtils.substringAfterLast(taskPatrolledId, "_");
                             date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
                         }
-                        if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode) && EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+                        if (StringUtils.isNotEmpty(taskCode.get()) && !success.equals(errorCode)){
                             TaskShutDownThread taskShutDownThread = new TaskShutDownThread(robotService, taskCode.get(), errorCode, date);
                             TaskExecutePool.getInstance().execute(taskShutDownThread);
                         }
