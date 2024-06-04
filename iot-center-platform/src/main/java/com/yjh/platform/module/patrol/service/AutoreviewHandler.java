@@ -54,121 +54,140 @@ public class AutoreviewHandler {
         if (MapUtils.isEmpty(autoreviewMap)) {
             synchronized (AutoreviewHandler.class) {
                 if (MapUtils.isEmpty(autoreviewMap)) {
-                    List<TCfgAutoreview> detailList = autoreviewMapper.detailList(null, -1, null, null);
+                    log.info("加载自动审核配置...");
+                    try {
+                        List<TCfgAutoreview> detailList = autoreviewMapper.detailList(null, -1, null, null);
 
-                    Map<String, List<Map<Integer, Set<String>>>> innerMap = new HashMap<>();
+                        Map<String, List<Map<Integer, Set<String>>>> innerMap = new HashMap<>();
 
-                    detailList.forEach(de -> {
-                        if (CollectionUtils.isNotEmpty(de.getDetail())) {
-                            Map<Integer, Set<String>> dMap = de.getDetail()
-                                .stream()
-                                .collect(Collectors.groupingBy(TCfgAutoreviewDetail::getAutoDetailType,
-                                    Collectors.mapping(TCfgAutoreviewDetail::getRefId, Collectors.toSet())));
-                            String[] types = StringUtils.split(de.getAutoreviewType(), ",");
-                            for (String type : types) {
-                                innerMap.computeIfAbsent(type, k -> new ArrayList<>()).add(dMap);
+                        detailList.forEach(de -> {
+                            if (CollectionUtils.isNotEmpty(de.getDetail())) {
+                                Map<Integer, Set<String>> dMap = de.getDetail()
+                                    .stream()
+                                    .collect(Collectors.groupingBy(TCfgAutoreviewDetail::getAutoDetailType,
+                                        Collectors.mapping(TCfgAutoreviewDetail::getRefId, Collectors.toSet())));
+                                String[] types = StringUtils.split(de.getAutoreviewType(), ",");
+                                for (String type : types) {
+                                    innerMap.computeIfAbsent(type, k -> new ArrayList<>()).add(dMap);
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    autoreviewMap.putAll(innerMap);
+                        autoreviewMap.putAll(innerMap);
+                        log.info("加载自动审核配置成功...");
+                    } catch (Exception e) {
+                        log.error("加载自动审核配置失败", e);
+                    }
                 }
             }
         }
-        return new ArrayList<>(autoreviewMap.get(autoreviewType));
+        return autoreviewMap.containsKey(autoreviewType) ? new ArrayList<>(autoreviewMap.get(autoreviewType)) : Collections.emptyList();
     }
 
     public void resetAutoreviewList() {
         autoreviewMap.clear();
+        log.info("清除缓存自动审核配置...");
     }
 
     public void autoreviewCheckResult(List<Map<String, String>> cruiseResultList) {
         // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
         for (Map<String, String> cruiseResult : cruiseResultList) {
-            Map<Integer, String[]> metes = new HashMap<>();
-            if (MapUtils.getIntValue(cruiseResult, "cruiseResult") != CruiseConstant.CRUISE_RESULT_NORMAL) {
-                if (Constant.logUpLv3()) {
-                    log.info("结果异常，不进行无需审核判断");
+            try {
+                Map<Integer, String[]> metes = new HashMap<>();
+                if (MapUtils.getIntValue(cruiseResult, "cruiseResult") != CruiseConstant.CRUISE_RESULT_NORMAL) {
+                    if (Constant.logUpLv3()) {
+                        log.info("结果异常，不进行无需审核判断");
+                    }
+                    continue;
                 }
-                continue;
-            }
-            String resultDesc = cruiseResult.getOrDefault("resultDesc", "");
-            List<String> defectType = new ArrayList<>();
-            for (String defect : StringUtils.split(resultDesc)) {
-                TAlgorithmInfo defectInfo = algorithmInfoService.getAlgorithmInfo(defect);
-                if (defectInfo != null && defectInfo.getDefectType() != null) {
-                    defectType.add(String.valueOf(defectInfo.getDefectType()));
+                String resultDesc = cruiseResult.getOrDefault("resultDesc", "");
+                List<String> defectType = new ArrayList<>();
+                for (String defect : StringUtils.split(resultDesc)) {
+                    TAlgorithmInfo defectInfo = algorithmInfoService.getAlgorithmInfo(defect);
+                    if (defectInfo != null && defectInfo.getDefectType() != null) {
+                        defectType.add(String.valueOf(defectInfo.getDefectType()));
+                    }
                 }
-            }
-            // 缺陷类型
-            if (CollectionUtils.isNotEmpty(defectType)) {
-                metes.put(1, defectType.toArray(defectType.toArray(new String[0])));
-            }
+                // 缺陷类型
+                if (CollectionUtils.isNotEmpty(defectType)) {
+                    metes.put(1, defectType.toArray(defectType.toArray(new String[0])));
+                }
 
-            metes.put(3, new String[] {cruiseResult.getOrDefault("deviceType", "")});
-            metes.put(4, new String[] {cruiseResult.getOrDefault("deviceId", "")});
-            metes.put(5, new String[] {cruiseResult.getOrDefault("deviceMeteId", "")});
-            metes.put(6, StringUtils.split(cruiseResult.getOrDefault("labelAttri", ""), ","));
+                metes.put(3, new String[] {cruiseResult.getOrDefault("deviceType", "")});
+                metes.put(4, new String[] {cruiseResult.getOrDefault("deviceId", "")});
+                metes.put(5, new String[] {cruiseResult.getOrDefault("deviceMeteId", "")});
+                metes.put(6, StringUtils.split(cruiseResult.getOrDefault("labelAttri", ""), ","));
 
-            if (autoreviewCheck(metes, AUTOREVIEW_TYPE_CRUISE)) {
-                String redisKeyName = PATROL_TASK_PREFIX + cruiseResult.get("taskId") + ":" + cruiseResult.get("instanceId");
-                cruiseResult.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
-                redisTemplate.opsForHash().put(redisKeyName, "evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
+                if (autoreviewCheck(metes, AUTOREVIEW_TYPE_CRUISE)) {
+                    String redisKeyName = PATROL_TASK_PREFIX + cruiseResult.get("taskId") + ":" + cruiseResult.get("instanceId");
+                    cruiseResult.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
+                    redisTemplate.opsForHash().put(redisKeyName, "evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_IGNORE));
+                }
+            } catch (Exception e) {
+                log.error("巡视结果自动审核异常", e);
             }
         }
 
     }
 
     public boolean autoreviewCheckAlarm(TWarnInfo warnInfo) {
-        if (warnInfo == null) {
-            return false;
-        }
-        // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
-        Map<Integer, String[]> metes = new HashMap<>();
+        try {
+            if (warnInfo == null) {
+                return false;
+            }
+            // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
+            Map<Integer, String[]> metes = new HashMap<>();
 
-        // 告警类型
-        if (warnInfo.getAlarmType() != null && warnInfo.getAlarmType() > 0) {
-            metes.put(2, new String[] {String.valueOf(warnInfo.getAlarmType())});
-        }
+            // 告警类型
+            if (warnInfo.getAlarmType() != null && warnInfo.getAlarmType() > 0) {
+                metes.put(2, new String[] {String.valueOf(warnInfo.getAlarmType())});
+            }
 
-        metes.put(3, new String[] {warnInfo.getDeviceType()});
-        metes.put(4, new String[] {String.valueOf(warnInfo.getDeviceId())});
-        metes.put(5, new String[] {String.valueOf(warnInfo.getStdMeteId())});
-        metes.put(6, StringUtils.split(warnInfo.getLabelAttri(), ","));
+            metes.put(3, new String[] {warnInfo.getDeviceType()});
+            metes.put(4, new String[] {String.valueOf(warnInfo.getDeviceId())});
+            metes.put(5, new String[] {String.valueOf(warnInfo.getStdMeteId())});
+            metes.put(6, StringUtils.split(warnInfo.getLabelAttri(), ","));
 
-        if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
-            warnInfo.setConfMode(CruiseConstant.ConfModeEnum.AUTO_CHECKED.getCode());
-            warnInfo.setDealType(286);
-            warnInfo.setDealTime(DateUtils.now());
-            warnInfo.setDealInfo("自动审核");
-            return true;
+            if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
+                warnInfo.setConfMode(CruiseConstant.ConfModeEnum.AUTO_CHECKED.getCode());
+                warnInfo.setDealType(286);
+                warnInfo.setDealTime(DateUtils.now());
+                warnInfo.setDealInfo("自动审核");
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("告警自动审核异常", e);
         }
         return false;
     }
 
     public boolean autoreviewCheckDefect(TDefectInfo tDefectInfo) {
-        if (tDefectInfo == null) {
-            return false;
-        }
-        // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
-        Map<Integer, String[]> metes = new HashMap<>();
+        try {
+            if (tDefectInfo == null) {
+                return false;
+            }
+            // 1-缺陷类型 2-告警类型 3-设备类型 4-设备 5-测点 6-标签
+            Map<Integer, String[]> metes = new HashMap<>();
 
-        // 缺陷类型
-        if (tDefectInfo.getDefectType() != null && tDefectInfo.getDefectType() > 0) {
-            metes.put(1, new String[] {String.valueOf(tDefectInfo.getDefectType())});
-        }
+            // 缺陷类型
+            if (tDefectInfo.getDefectType() != null && tDefectInfo.getDefectType() > 0) {
+                metes.put(1, new String[] {String.valueOf(tDefectInfo.getDefectType())});
+            }
 
-        metes.put(3, new String[] {tDefectInfo.getDeviceType()});
-        metes.put(4, new String[] {String.valueOf(tDefectInfo.getDeviceId())});
-        metes.put(5, new String[] {String.valueOf(tDefectInfo.getStdMeteId())});
-        metes.put(6, StringUtils.split(tDefectInfo.getLabelAttri(), ","));
+            metes.put(3, new String[] {tDefectInfo.getDeviceType()});
+            metes.put(4, new String[] {String.valueOf(tDefectInfo.getDeviceId())});
+            metes.put(5, new String[] {String.valueOf(tDefectInfo.getStdMeteId())});
+            metes.put(6, StringUtils.split(tDefectInfo.getLabelAttri(), ","));
 
-        if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
-            tDefectInfo.setConfMode(CruiseConstant.ConfModeEnum.AUTO_CHECKED.getCode());
-            tDefectInfo.setDealType(286);
-            tDefectInfo.setDealTime(DateUtils.now());
-            tDefectInfo.setDealInfo("自动审核");
-            return true;
+            if (autoreviewCheck(metes, AUTOREVIEW_TYPE_ALARM)) {
+                tDefectInfo.setConfMode(CruiseConstant.ConfModeEnum.AUTO_CHECKED.getCode());
+                tDefectInfo.setDealType(286);
+                tDefectInfo.setDealTime(DateUtils.now());
+                tDefectInfo.setDealInfo("自动审核");
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("缺陷自动审核异常", e);
         }
         return false;
     }

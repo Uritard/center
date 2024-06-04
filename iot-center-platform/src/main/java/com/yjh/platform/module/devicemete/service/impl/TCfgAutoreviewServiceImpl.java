@@ -10,6 +10,7 @@ import com.yjh.platform.module.devicemete.entity.TCfgAutoreview;
 import com.yjh.platform.module.devicemete.entity.TCfgAutoreviewDetail;
 import com.yjh.platform.module.devicemete.service.ITCfgAutoreviewDetailService;
 import com.yjh.platform.module.devicemete.service.ITCfgAutoreviewService;
+import com.yjh.platform.module.patrol.service.AutoreviewHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper, TCfgAutoreview> implements ITCfgAutoreviewService {
     private final ITCfgAutoreviewDetailService autoreviewDetailService;
+    private final AutoreviewHandler autoreviewHandler;
 
     @Override
     public IPage<TCfgAutoreview> selectByPage(IPage<TCfgAutoreview> page, String autoreviewName, String autoreviewType, String defectType,
@@ -85,7 +87,7 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
         super.save(autoreview);
         detailList.forEach(e -> e.setAutoreviewId(autoreview.getAutoreviewId()));
         autoreviewDetailService.saveBatch(detailList);
-
+        autoreviewHandler.resetAutoreviewList();
         return autoreview.getAutoreviewId();
     }
 
@@ -102,7 +104,7 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
         autoreviewDetailService.remove(delWrapper);
         detailList.forEach(e -> e.setAutoreviewId(autoreviewId));
         autoreviewDetailService.saveBatch(detailList);
-
+        autoreviewHandler.resetAutoreviewList();
         return true;
     }
 
@@ -115,7 +117,7 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
         log.info("TCfgAutoreviewDetail deleted {} {}.", id, del);
         super.removeById(id);
         log.info("TCfgAutoreview deleted {} {}.", id, del);
-
+        autoreviewHandler.resetAutoreviewList();
         return true;
     }
 }
