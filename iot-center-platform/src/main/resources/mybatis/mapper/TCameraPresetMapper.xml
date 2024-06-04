@@ -404,7 +404,12 @@
     </select>
 
     <select id="selectKeepWatchList" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
-        select * from t_camera_preset where preset_type = 2
+        select
+            preset.*,
+            camera.camera_ip
+        from t_camera_preset preset
+        left join t_camera_info camera on preset.camera_id = camera.camera_id
+        where preset_type = 2
     </select>
 
     <select id="selectKeepWatchTask" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -520,8 +525,10 @@
 
     <select id="selectCameraByPresetType" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
-        *
-        from t_camera_preset
+        preset.*,
+        camera.camera_ip
+        from t_camera_preset preset
+        left join t_camera_info camera on preset.camera_id = camera.camera_id
         where preset_type = #{presetType}
           and edge_code is null
     </select>

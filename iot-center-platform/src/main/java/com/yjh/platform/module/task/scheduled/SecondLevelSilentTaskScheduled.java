@@ -7,6 +7,7 @@ import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -65,7 +66,7 @@ public class SecondLevelSilentTaskScheduled {
         String user = String.valueOf(map.get("camera_manager"));
         String password = String.valueOf(map.get("camera_code"));
 
-        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + ip);
         String state = redisInfoMap.get("state");
 
         if (StringUtils.isNotEmpty(presetId) && StringUtils.equals("0", state)) {

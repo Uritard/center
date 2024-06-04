@@ -18,6 +18,8 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.dao.CameraConDao;
 import com.yjh.platform.module.video.entity.*;
 import com.yjh.video.api.CameraVendor;
@@ -74,7 +76,8 @@ public class CameraConService {
 
     @SuppressWarnings("unchecked")
     public void isCameraControlled(Long cameraId) {
-        Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+        CameraConInfo cameraInfo = cameraConDao.selectConInfo(cameraId,null);
+        Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + cameraInfo.getCameraIp());
         log.info("camreaStatusMap: {}, camreaStatusMapState: {}", camreaStatusMap, camreaStatusMap.get("state"));
         Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
 
@@ -102,7 +105,8 @@ public class CameraConService {
 
     public void pushCtrlTime(Long cameraId) {
         try {
-            String str = "camera_info:" + cameraId;
+            CameraConInfo cameraInfo = cameraConDao.selectConInfo(cameraId,null);
+            String str = TCameraInfoService.cameraStateKey + cameraInfo.getCameraIp();
             Map<String, String> map = new HashMap<>();
             map.put("cameraId", String.valueOf(cameraId));
             map.put("lastTime", DateTimeUtil.getDateTimeString());

@@ -4,6 +4,7 @@ import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,7 +50,7 @@ public class KeepWatchJob implements Runnable {
             Date start = new Date();
             cameraPresetList.forEach(preset -> {
                 Long cameraId = preset.getCameraId();
-                String str = "camera_info:" + cameraId;
+                String str = TCameraInfoService.cameraStateKey + preset.getCameraIp();
                 Map<String, String> map = redisTemplate.opsForHash().entries(str);
                 if (map != null && map.size() > 0) {
                     if ("0".equals(map.get("state"))) {

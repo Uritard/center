@@ -438,4 +438,19 @@ public class TCameraInfoController {
         return result;
     }
 
+    @ApiOperation(value = "解锁相机状态")
+    @RequestMapping(value = "/changeCameraState", method = RequestMethod.GET)
+    @Logs(title = "解锁相机状态",content = "根据用户传递的参数解锁相机状态",logType = 1)
+    public Result changeCameraState(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+        Result result = new Result();
+        try {
+            TCameraInfoByDict cameraInfo = tCameraInfoService.selectByPrimaryId(cameraId);
+            redisTemplate.opsForHash().put(TCameraInfoService.cameraStateKey+cameraInfo.getCameraIp(),"state","0");
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }

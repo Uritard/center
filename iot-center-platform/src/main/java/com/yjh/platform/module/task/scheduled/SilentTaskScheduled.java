@@ -83,7 +83,7 @@
 //        String presetId = String.valueOf(map.get("preset_id"));
 //        String presetName = String.valueOf(map.get("preset_name"));
 //
-//        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+//        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + ip);
 //        String state = redisInfoMap.get("state");
 //        String lastTime = redisInfoMap.get("lastTime");
 //
@@ -106,7 +106,7 @@
 //            moveMap.put("presetId", presetId);
 //            // 转预置位 先霸占相机
 //            redisInfoMap.put("state", "1");
-//            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+//            redisTemplate.opsForHash().putAll("camera_info:" + ip, redisInfoMap);
 //            moveToPreset(moveMap);
 //            // 等待摄像头转到预置位
 //            Long waitTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content")));
@@ -119,7 +119,7 @@
 //            // 将相机状态置为闲置
 //            redisInfoMap.put("state", "0");
 //            redisInfoMap.put("lastTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-//            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+//            redisTemplate.opsForHash().putAll("camera_info:" + ip, redisInfoMap);
 //            if (result == null || !MSG.equals(result.getMessage())) {
 //                log.info("抓图失败 result:{}", result);
 //                return;
@@ -137,7 +137,7 @@
 //        } catch (Exception e) {
 //            log.error("设置摄像机状态出错" + e.getMessage());
 //            redisInfoMap.put("state", "0");
-//            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+//            redisTemplate.opsForHash().putAll("camera_info:" + ip, redisInfoMap);
 //        }
 //    }
 //

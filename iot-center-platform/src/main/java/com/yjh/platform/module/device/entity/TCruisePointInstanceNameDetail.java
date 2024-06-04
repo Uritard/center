@@ -46,4 +46,6 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String labelAttri;
 
     private String regionName;
+
+    private String cameraIp;
 }

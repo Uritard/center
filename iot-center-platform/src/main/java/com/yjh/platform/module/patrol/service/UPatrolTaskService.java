@@ -539,6 +539,7 @@ public class UPatrolTaskService {
             map.put("deviceType", String.valueOf(item.getDeviceType()));
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));
+            map.put("cameraIp", item.getCameraIp());
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 String rbtId = String.valueOf(item.getRobotId());
@@ -2259,10 +2260,11 @@ public class UPatrolTaskService {
                 case VIDEO: // 视频
                 case INFRARED: // 红外
                     String cameraId = MapUtils.getString(m, "cameraId");
+                    String cameraIp = MapUtils.getString(m, "cameraIp");
                     if (StringUtils.isEmpty(cameraId)) {
                         log.error("task {} cruise data has no cameraId, {}", taskId, JSON.toJSONString(m));
                     } else {
-                        String cameraIp = (String) redisTemplate.opsForHash().get("camera_info:" + cameraId, "cameraIp");
+
                         cruiseGroup(cruiseGroupMap, cameraIp, m);
                     }
                     break;
