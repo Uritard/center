@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.patrol.thread;
 
+import com.alibaba.fastjson2.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.utils.NumberUtil;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -153,26 +154,29 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     }
 
     private boolean pointExecut(Map<String, String> inspectionMap) {
-        long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
-        String taskStatus = uPatrolTaskService.taskStatus(taskId);
-        if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
-            log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
-            // 任务非进行时，停止执行
-            return false;
-        }
+        try {
+            long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
+            String taskStatus = uPatrolTaskService.taskStatus(taskId);
+            if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
+                log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
+                // 任务非进行时，停止执行
+                return false;
+            }
 
+            // 巡检点类型
+            int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");
+            TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+            log.info("巡检执行，cruiseType: {}, cruiseTypeEnum: {}", cruiseType, cruiseTypeEnum);
+            CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
+            boolean isEnded = execute.execute(inspectionMap);
 
-        // 巡检点类型
-        int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");
-        CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-        log.info("巡检执行，cruiseType: {}, cruiseTypeEnum: {}", cruiseType, cruiseTypeEnum);
-        CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
-        boolean isEnded = execute.execute(inspectionMap);
-
-        // 任务结束，调用结束方法
-        if (isEnded) {
-            log.info("当前点位结束，isEnded: {}", isEnded);
-            uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
+            // 任务结束，调用结束方法
+            if (isEnded) {
+                log.info("当前点位结束，isEnded: {}", isEnded);
+                uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
+            }
+        } catch (Exception e) {
+            log.error("测点巡视执行失败， inspectionMap: {}", JSON.toJSONString(inspectionMap), e);
         }
         return true;
     }
