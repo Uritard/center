@@ -17,6 +17,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.service.TCameraInfoService;
@@ -67,12 +68,86 @@ public class CameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
     private static final Set<Long>recordCameraMap = new HashSet<>();
 
     /**
      * 流媒体服务器 ZLMediaKit
      */
     public static final String MEDIA_ZLK = "ZLMediaKit";
+
+    public static final String emergencyAccessKey = "emergencyAccess:";
+
+    /**
+     * 判断相机处于紧急调阅模式
+     * -1-不处于 0-处于且此token可操控 1-处于且此token不可操控
+     * @param token
+     * @return
+     */
+    public String isInEmergencyAccess(String token,Long cameraId){
+        Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        if (map != null && map.get("token") != null){
+            if (token.equals(map.get("token"))){
+                    return "0";
+            } else {
+                    return "1";
+            }
+        } else {
+            return "-1";
+        }
+    }
+
+    public boolean isInEmergencyAccessNumber(Long cameraId){
+        Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        if (map.isEmpty()){
+            return true;
+        }
+        List<String> cameraIdList = getEmergencyAccessCameraList();
+         return cameraIdList.contains(cameraId.toString());
+
+    }
+
+    public Boolean streamGreaterThan(){
+        List<String> streamList = getStreamList();
+        return streamList.size() >= applicationProperties.getVideoServerConfig().getEmergencyAccessNum();
+    }
+
+    public Boolean emergencyAccessCameraGreaterThan(){
+        List<String> emergencyAccessCameraList = getEmergencyAccessCameraList();
+        return emergencyAccessCameraList.size() >= applicationProperties.getVideoServerConfig().getEmergencyAccessNum();
+    }
+
+    public List<String> getEmergencyAccessCameraList(){
+        List<String> cameraIdList = new ArrayList<>();
+        Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        if (map.isEmpty() || StringUtils.isEmpty(map.get("cameraList"))){
+            return cameraIdList;
+        }
+        cameraIdList = Arrays.stream(map.get("cameraList").split(","))
+                .filter(s -> !s.isEmpty())
+                .map(String::trim)
+                .collect(Collectors.toList());
+        return cameraIdList;
+
+    }
+
+    public List<String> getStreamList(){
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        Result result = iPlayService.getMediaList();
+        List<String> streamList = new ArrayList<>();
+        List<String> emergencyAccessCameraIdList = new ArrayList<>();
+        if (result.getData() != null){
+            Map<String,Integer> streamInfo = (Map<String,Integer>)result.getData();
+            streamList = streamInfo.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+        return streamList;
+
+    }
 
     @SuppressWarnings("unchecked")
     public void isCameraControlled(Long cameraId) {
@@ -83,15 +158,15 @@ public class CameraConService {
 
         if (Objects.nonNull(camreaStatusMap.get("state"))) {
             int state = MapUtils.getIntValue(camreaStatusMap, "state");
-            if (1 == state) {
+            if (!(0 == state)) {
                 try {
                     //判断时间问题
                     String lastTime = MapUtils.getString(camreaStatusMap, "lastTime");
                     Date endDate = DateTimeUtil.parse(lastTime);
-                    if (System.currentTimeMillis() - endDate.getTime() > cameraStateTime * 60 * 1000) {
+                    if (System.currentTimeMillis() - endDate.getTime() > cameraStateTime * 60 * 1000 || (state == 2 && Boolean.FALSE.equals(redisTemplate.hasKey(emergencyAccessKey))) ) {
                         //最后一次操控时间距离现在大于10分钟
                         camreaStatusMap.put("state", "0");
-                        redisTemplate.opsForHash().putAll("camera_info", camreaStatusMap);
+                        redisTemplate.opsForHash().putAll(TCameraInfoService.cameraStateKey, camreaStatusMap);
                         return;
                     }
                 } catch (Exception e) {
@@ -2068,5 +2143,186 @@ public class CameraConService {
     public Map<String, String> getServerConfig() {
         IServerConfigService iServerConfigService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IServerConfigService.class);
         return iServerConfigService.getServerConfig().getData();
+    }
+
+    /*
+    * 视频紧急调阅
+    * 1.将次相机的状态 置为紧急调阅模式
+    * 2.关闭多余的并发路数
+    *
+    * */
+    public void emergencyAccess(List<Long> cameraIdList,String token){
+        Object oldToken = redisTemplate.opsForHash().get(emergencyAccessKey,"token");
+        if (oldToken != null){
+            throw new BusinessException("紧急视屏调阅已设置，请勿重复设置");
+        }
+        Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
+
+        Integer num = applicationProperties.getVideoServerConfig().getEmergencyAccessNum();
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        Result result = iPlayService.getMediaList();
+        List<String> streamList = new ArrayList<>();
+        List<String> emergencyAccessCameraIdList = new ArrayList<>();
+        if (result.getData() != null){
+            Map<String,Integer> streamInfo = (Map<String,Integer>)result.getData();
+            streamList = streamInfo.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+        List<String> cameraStream = new ArrayList<>();
+        List<String> saveList = new ArrayList<>();
+        if (cameraIdList != null && !cameraIdList.isEmpty()){
+            List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(cameraIdList);
+
+            Map<String,CameraConInfo> streamMapCameraIp = new HashMap<>();
+            for (CameraConInfo camera:cameraConInfoList){
+                String streamId = camera.getDeviceChannel()+"_"+camera.getCameraChannelId();
+                streamMapCameraIp.put(streamId,camera);
+                cameraStream.add(streamId);
+            }
+
+            for (String streamItem:streamList){
+                if (cameraStream.contains(streamItem)){
+                    saveList.add(streamItem);
+                    if (saveList.size() >= num){
+                        break;
+                    }
+                }
+            }
+            for (String item:saveList) {
+                setCameraEmergencyAccess(streamMapCameraIp.get(item).getCameraIp(),streamMapCameraIp.get(item).getCameraId(),token);
+                emergencyAccessCameraIdList.add(streamMapCameraIp.get(item).getCameraId().toString());
+            }
+        }
+
+        streamList.removeAll(saveList);
+        for (String item:streamList){
+             PlayEntity playEntity =
+                    PlayEntity.builder().deviceId(item).build();
+             iPlayService.closeStream(playEntity);
+        }
+        Map<String,String> map = new HashMap<>(2);
+        map.put("token",token);
+        map.put("cameraList",emergencyAccessCameraIdList.stream().collect(Collectors.joining(",")));
+        redisTemplate.opsForHash().putAll(emergencyAccessKey,map);
+        redisTemplate.expire(emergencyAccessKey,cameraStateTime,TimeUnit.MINUTES);
+    }
+
+    public void setCameraEmergencyAccess(String cameraIp,Long cameraId,String token){
+        if (StringUtils.isEmpty(cameraIp)){
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
+            cameraIp = cameraConInfo.getCameraIp();
+        }
+        String key = TCameraInfoService.cameraStateKey + cameraIp;
+        Map<String, String> cameraState = redisTemplate.opsForHash().entries(key);
+        cameraState.put("state", "2");//紧急调阅状态
+        cameraState.put("token", token);
+        cameraState.put("lastTime", DateTimeUtil.getDateTimeString());
+        redisTemplate.opsForHash().putAll(key, cameraState);Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        List<String> cameraIdList = Arrays.stream(ValueUtil.getOrDefault(map.get("cameraList"),"").split(","))
+                .filter(s -> !s.isEmpty())
+                .map(String::trim)
+                .collect(Collectors.toList());
+        cameraIdList.add(String.valueOf(cameraId));
+        map.put("cameraList",cameraIdList.stream().collect(Collectors.joining(",")));
+        redisTemplate.opsForHash().putAll(emergencyAccessKey,map);
+
+    }
+
+    public void delCameraEmergencyAccess(String cameraIp,Long cameraId){
+        if (StringUtils.isEmpty(cameraIp)){
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId,null);
+            cameraIp = cameraConInfo.getCameraIp();
+        }
+        String key = TCameraInfoService.cameraStateKey + cameraIp;
+        redisTemplate.opsForHash().put(key, "state","0");
+        Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        List<String> cameraIdList = Arrays.stream(ValueUtil.getOrDefault(map.get("cameraList"),"").split(","))
+                .filter(s -> !s.isEmpty())
+                .map(String::trim)
+                .collect(Collectors.toList());
+        cameraIdList.removeIf(cameraId.toString()::equals);
+        map.put("cameraList",cameraIdList.stream().collect(Collectors.joining(",")));
+        redisTemplate.opsForHash().putAll(emergencyAccessKey,map);
+    }
+
+    public void delCameraEmergencyAccessList(String cameraIds){
+        if (StringUtils.isEmpty(cameraIds)){
+            List<Long> cameraIdList = Arrays.stream(cameraIds.split(","))
+                    .filter(s -> !s.isEmpty())
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(cameraIdList);
+            List<Long> emergencyAccessCameraIdList = getEmergencyAccessCameraList().stream()
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            cameraConInfoList.forEach(cameraConInfo -> {
+                if (emergencyAccessCameraIdList.contains(cameraConInfo.getCameraId())){
+                    String key = TCameraInfoService.cameraStateKey + cameraConInfo.getCameraIp();
+                    redisTemplate.opsForHash().put(key, "state","0");
+                }
+            });
+            Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+            emergencyAccessCameraIdList.removeAll(cameraIdList);
+            map.put("cameraList",String.join(",", emergencyAccessCameraIdList.stream().map(Object::toString).toArray(String[]::new)));
+            redisTemplate.opsForHash().putAll(emergencyAccessKey,map);
+        }
+
+    }
+
+    public void closeStream(){
+        Integer num = applicationProperties.getVideoServerConfig().getEmergencyAccessNum();
+        IPlayService iPlayService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IPlayService.class);
+        Result result = iPlayService.getMediaList();
+        List<String> streamList = getStreamList();
+        if (result.getData() != null){
+            Map<String,Integer> streamInfo = (Map<String,Integer>)result.getData();
+            streamList = streamInfo.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+        Map<String,String> map = redisTemplate.opsForHash().entries(emergencyAccessKey);
+        List<Long> cameraIdList = getEmergencyAccessCameraList().stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+        if (cameraIdList.size() < applicationProperties.getVideoServerConfig().getEmergencyAccessNum()){
+            num = num - cameraIdList.size();
+            if (!cameraIdList.isEmpty()){
+                List<CameraConInfo> cameraConInfoList = cameraConDao.batchSelectConInfo(cameraIdList);
+
+                for (CameraConInfo camera:cameraConInfoList){
+                    String streamId = camera.getDeviceChannel()+"_"+camera.getCameraChannelId();
+                    streamList.removeIf(streamId::equals);
+                }
+            }
+
+        }
+        for (int i = streamList.size()-1; i >= 0 ; i--) {
+            if (streamList.size() <= num - 1){
+                break;
+            }
+            String stream = streamList.get(i);
+            PlayEntity playEntity =
+                    PlayEntity.builder().deviceId(stream).build();
+            iPlayService.closeStream(playEntity);
+            //取消紧急调阅
+            try {
+                String deviceChannel = stream.split("_")[0];
+                String cameraChannel = stream.split("_")[1];
+                CameraConInfo cameraConInfo = cameraConDao.selectByChannel(deviceChannel,cameraChannel);
+                if (cameraConInfo != null){
+                    String key = TCameraInfoService.cameraStateKey + cameraConInfo.getCameraIp();
+                    redisTemplate.opsForHash().put(key, "state","0");
+                    cameraIdList.removeIf(cameraConInfo.getCameraId()::equals);
+                }
+
+            }catch (Exception e){
+                log.info("流{}取消紧急调阅状态出错! {}",stream,e);
+            }
+        }
+        map.put("cameraList",String.join(",", cameraIdList.stream().map(Object::toString).toArray(String[]::new)));
+        redisTemplate.opsForHash().putAll(emergencyAccessKey,map);
     }
 }
