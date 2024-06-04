@@ -11,6 +11,7 @@ import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -291,7 +292,7 @@ public class TCfgDataCurrentService {
                         // 将摄像机转到预置位
                         ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                             try {
-                                String str = "camera_info:" + rule.getCameraId();
+                                String str = TCameraInfoService.cameraStateKey + rule.getCameraIp();
                                 Map<String, String> map1 = redisTemplate.opsForHash().entries(str);
                                 if ("0".equals(map1.get("state"))) {
                                     cameraConService.moveToPresetForTask(rule.getPresetId(), rule.getCameraId());
