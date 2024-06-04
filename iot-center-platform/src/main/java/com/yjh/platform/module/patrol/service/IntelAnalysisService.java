@@ -412,7 +412,8 @@ public class IntelAnalysisService {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            res.put("status", "离线");
+            log.error("分析主机离线，无法通信", e);
         }
         return res;
     }
