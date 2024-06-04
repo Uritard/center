@@ -822,7 +822,7 @@ public class ProcessResultToUpSystem {
 //            defectToUpSystem(cruiseResultMap, defectList);
 //        }
         //如果正常需要进行正常样本上报
-        if (normal) {
+        if (normal && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             String remoteorigfilepath = ftpsRemotePath + "/" + "正常" + "/" + yearMonth + "/" + picF + "原图.jpg";
             alarmDetail.setBay_name(nameMap.get("upRegionName"));
             alarmDetail.setDevice_name(deviceName);
