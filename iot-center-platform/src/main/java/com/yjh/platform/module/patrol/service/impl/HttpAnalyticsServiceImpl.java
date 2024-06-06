@@ -88,7 +88,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
-            Response response = picAnalyse(request);
+            Response response = picAnalyse(request, AnalyseStyleEnum.METER);
             responseList.add(response);
             if (200 != response.getCode()) {
                 code = response.getCode();
@@ -147,13 +147,14 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * @param picAnalyseRequest 参数
      * @return Response
      */
-    public Response picAnalyse(PicAnalyseRequest picAnalyseRequest) {
+    public Response picAnalyse(PicAnalyseRequest picAnalyseRequest, AnalyseStyleEnum style) {
 
-        JSONObject testJson = (JSONObject)JSONObject.toJSON(picAnalyseRequest);
+        JSONObject testJson = (JSONObject)JSON.toJSON(picAnalyseRequest);
         log.info(JSONUtil.prettyJSONString(testJson));
 
         try {
-            String result = HttpClientUtils.getInstance().postUrl(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
+            String url = AnalyseStyleEnum.DEFECT == style ? algorithmConfig.getDefectAnalysisUrl() : algorithmConfig.getAnalysisUrl();
+            String result = HttpClientUtils.getInstance().postUrl(url, testJson.toJSONString());
             log.info("result==={}", result);
 
             if (StringUtils.isEmpty(result)) {
@@ -302,7 +303,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
-            Response response = picAnalyse(request);
+            Response response = picAnalyse(request, AnalyseStyleEnum.DEFECT);
             responseList.add(response);
             if (200 != response.getCode()) {
                 code = response.getCode();
@@ -335,5 +336,17 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
     @Override
     public void afterPropertiesSet() {
         AbstractVideoCruise.AnalyticsFactory.registerAnalytics(CruiseConstant.AnalyticsEnum.HTTP, this);
+    }
+
+    enum AnalyseStyleEnum {
+
+        /**
+         * 老的 tcp 协议
+         */
+        METER,
+        /**
+         * 分析主机 http 协议
+         */
+        DEFECT
     }
 }

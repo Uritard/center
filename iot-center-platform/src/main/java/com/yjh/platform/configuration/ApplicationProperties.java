@@ -128,6 +128,7 @@ public class ApplicationProperties {
     @Accessors(chain = false)
     public static class IntelligentAlgorithmConfig {
         private String analysisUrl;
+        private String defectAnalysisUrl;
         private String updateUrl;
         private String algorithmResourceUrl;
         private String systemCheckUrl;
