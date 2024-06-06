@@ -505,7 +505,9 @@ public class HomePageService {
         } else {
             stationCounts = tCruiseTaskDao.queryStations2(regionIdList);
         }
-        stationCounts.add(sta);
+        if (staSize != 0) {
+            stationCounts.add(sta);
+        }
         return stationCounts;
     }
 

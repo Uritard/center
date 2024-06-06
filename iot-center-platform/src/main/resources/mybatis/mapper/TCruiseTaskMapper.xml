@@ -762,7 +762,7 @@ select *from (
                 #{regionIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        GROUP BY a.robot_type
+        GROUP BY a.robot_type,a.drone_type
         UNION
         SELECT '视频设备' type,COUNT(1) AS count FROM t_camera_info b WHERE 1=1
         <if test="list!=null and list.size>0">

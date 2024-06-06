@@ -607,6 +607,11 @@ public class UPatrolResultService {
                 review.setInstanceId(Long.valueOf(instanceId));
                 log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
                 uPatrolResultDao.manualReviewByTaskInstance(review);
+                if (StringUtils.isNotEmpty(review.getRemark())) {
+                    UPatrolResult result = new UPatrolResult();
+                    result.setTaskId(taskId).setRemark(review.getRemark());
+                    uPatrolResultDao.update(result);
+                }
                 //更新测点信息
                 TStdDeviceMeteUpdate stdDeviceMeteUpdate =
                         new TStdDeviceMeteUpdate().setDeviceMeteId(Long.valueOf(instanceId)).setIdentifyResult(Integer.valueOf(review.getPersonCheck())).setUpdateTime(review.getCheckDate());
