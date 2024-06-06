@@ -6,17 +6,20 @@ package com.yjh.demo.task;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.PathUtil;
+import cn.hutool.core.net.URLEncodeUtil;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
 import com.yjh.commons.CollectionUtil;
+import com.yjh.demo.config.DefaultParams;
 import com.yjh.demo.entity.BaseTree;
 import com.yjh.demo.entity.MessageWait;
 import com.yjh.demo.service.ClientService;
 import com.yjh.demo.service.IMessageSender;
 import com.yjh.demo.service.ServerService;
+import com.yjh.demo.util.StringVariableUtil;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.demo.ws.message.AInterfaceMessage;
 import com.yjh.messager.api.msg.BaseMessage;
-import com.yjh.messager.api.msg.Msg;
 import com.yjh.messager.api.msg.SimpleMessageSender;
 import com.yjh.protocol_a.InboundMessage;
 import com.yjh.protocol_a.Message;
@@ -30,6 +33,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
@@ -42,6 +46,8 @@ import java.text.Collator;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -70,10 +76,12 @@ public class AutomationTask {
     private final ServerService serverService;
     private final ClientService clientService;
     private final SimpleMessageSender wsMessageSender;
+    private final DefaultParams defaultParams;
 
     @PostConstruct
     public void initPackets() {
         try {
+            StringVariableUtil.updateParams(defaultParams.getParams());
 
             File root = ResourceUtils.getFile(ResourceUtils.FILE_URL_PREFIX + PACKETS_DIR);
             if (!root.exists()) {
@@ -148,7 +156,28 @@ public class AutomationTask {
         messageXml.setReceiveCode(sender.receiveCode());
         messageXml.setTime(LocalDateTime.now());
 
+        messageItemFill(messageXml);
         return MessageCodecHandler.encodeXml(sender.getMessageCodec(), platform, messageXml);
+    }
+
+    private void messageItemFill(Message messageXml) {
+        if (StringUtils.contains(messageXml.getCode(), "{{")) {
+            String code = StringVariableUtil.variableParse(messageXml.getCode());
+            messageXml.setCode(code);
+        }
+
+        List<Map<String, Object>> items = messageXml.getItems();
+        if (CollectionUtils.isEmpty(items)) {
+            return;
+        }
+
+        for (Map<String, Object> item : items) {
+            for (Map.Entry<String, Object> entry : item.entrySet()) {
+                String value = (String)entry.getValue();
+                String replace = StringVariableUtil.variableParse(value);
+                item.put(entry.getKey(), replace);
+            }
+        }
     }
 
     public void protocolTaskRunning(boolean isServer) {
@@ -201,15 +230,14 @@ public class AutomationTask {
         message.setTime(LocalDateTime.now());
         BaseMessage msg = sender.sendMessage(message, inboundMessage);
 
-        String xml = MessageCodecHandler.encodeXml(sender.getMessageCodec(), message);
-        String name = isServer ? "给客户端": "给服务端";
+        /*String xml = MessageCodecHandler.encodeXml(sender.getMessageCodec(), message);
+        String name = isServer ? "<<<<<< 给客户端" : "<<<<<< 给服务端";
         // 打印发送日志
         AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
-            name + "发送会话序列号：" + msg.getMsgId() + "        " +
-                "接收会话序列号：" + (inboundMessage != null ?inboundMessage.getPacket().getReceiveSessionId() : 0) + "        " +
-                "会话源标识：0x0" + (inboundMessage != null ? 1 : 0) + "        " +
-                "xml内容：\n" + xml, "");
-        wsMessageSender.send(new AInterfaceMessage(data));
+            name + "发送会话序列号：" + msg.getMsgId() + "        " + "接收会话序列号：" + (inboundMessage != null ?
+                inboundMessage.getPacket().getSendSessionId() : 0) + "        " + "会话源标识：0x0" + (inboundMessage != null ? 1 : 0)
+                + "        " + "xml内容：\n" + xml, "");
+        wsMessageSender.send(new AInterfaceMessage(data));*/
 
         return msg;
     }
@@ -236,6 +264,8 @@ public class AutomationTask {
             Message message = inboundMessage.getMsg();
             // 判断是否注册，并自动发送心跳
             scheduleHeart(message);
+            StringVariableUtil.updateParams(message);
+
             String type = message.getType() + "_" + message.getCommand();
             String cmd = protocolType + "_" + type + "_" + retFlag;
             Collection<String> messageFiles = COMMAND_MESSAGE_MAP.get(cmd);
@@ -359,8 +389,15 @@ public class AutomationTask {
                 for (Map<String, Object> inItem : inItems) {
                     inVal = MapUtils.getString(inItem, key);
                     constant = inItem.containsKey(key) && (StringUtils.isEmpty(val) || StringUtils.isNotEmpty(inVal));
-                    if (constant) {
+                    if (!constant) {
                         break;
+                    }
+                    if (inItem.containsKey("value") && inItem.containsKey("unit") && inItem.containsKey("value_unit")) {
+                        boolean equals = StringUtils.equals(MapUtils.getString(inItem, "value") + MapUtils.getString(inItem, "unit"),
+                            MapUtils.getString(inItem, "value_unit"));
+                        if (!equals) {
+                            outJoiner.add("value 与 value_unit 不匹配，值为【" + MapUtils.getString(inItem, "value") + "】");
+                        }
                     }
                 }
                 if (!constant) {

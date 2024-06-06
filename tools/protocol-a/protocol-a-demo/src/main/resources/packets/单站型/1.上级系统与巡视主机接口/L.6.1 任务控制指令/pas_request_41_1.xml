@@ -3,7 +3,7 @@
     <SendCode>Up01</SendCode>
     <ReceiveCode>Region01</ReceiveCode>
     <Type>41</Type>
-    <Code>811d34f90ed84ed2b718c042a7204701</Code>
+    <Code>{{taskCode}}</Code>
     <Time>2024-03-27 18:09:47</Time>
     <Items/>
     <Command>1</Command>

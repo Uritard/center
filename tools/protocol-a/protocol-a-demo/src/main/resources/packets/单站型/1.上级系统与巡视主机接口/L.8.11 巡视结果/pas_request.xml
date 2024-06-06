@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>61</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item task_name="整体测试" file_path="1/2024/03/29/14673505fc354f08802e45547c940899/FIR/83635_Region01_20240329100217.jpg" value_type="0" patroldevice_code="SI100-0001" device_id="83635" patroldevice_name="SI100测试" task_code="{{taskCode}}" abnormal_type="" valid="1" device_name="测温1" recognition_type="4" unit="°C" file_type="2" data_type="2" value_unit="22.6°C" material_id="" rectangle="357,239;882,239;357,589;882,589" time="{{now}}" task_patrolled_id="{{taskPatrolledId}}" value="22.6"/>
+    </Items>
+</PatrolHost>

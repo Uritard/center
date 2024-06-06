@@ -51,7 +51,7 @@ public class DemoServerHandler extends BaseMessageHandler {
         validStr = StringUtils.isBlank(validStr) ? "<b>校验成功</b>" : "<p style='color:Crimson'>" + validStr + "</p>";
 
         AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
-                "接收客户端发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
+                ">>>>>> 接收客户端发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
                         "接收会话序列号：" + inboundMessage.getPacket().getReceiveSessionId() + "        " +
                         "会话源标识：0x0" + inboundMessage.getPacket().getSessionType() + "        " +
                         "xml内容：\n" + new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8), validStr);
