@@ -859,7 +859,7 @@ public class ProcessResultToUpSystem {
                     log.info("cruiseResultMap=={}", cruiseResultMap);
                     Map<String, Object> xmlItem = new HashMap<>(16);
                     String taskId = cruiseResultMap.getTaskId();
-                    String remark = cruiseResultMap.getRemark() == null ? uPatrolTaskDao.selectForTaskId(taskId).getRemark() : cruiseResultMap.getRemark();
+                    String remark = uPatrolTaskDao.selectForTaskId(taskId).getRemark();
                     String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
                     String key = PATROL_SUMMARY_PREFIX+taskId;
                     String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));

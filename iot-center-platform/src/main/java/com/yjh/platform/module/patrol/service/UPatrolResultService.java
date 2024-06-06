@@ -586,7 +586,10 @@ public class UPatrolResultService {
         }
         UPatrolResult review = new UPatrolResult();
         review.setTaskId(reviewResult.getTaskId()).setRemark(reviewResult.getRemark());
-
+        CruiseManualReview curseManualReview = new CruiseManualReview();
+        curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
+        // 审核结果向上级系统同步
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), true);
         return uPatrolResultDao.update(review);
     }
 
@@ -607,6 +610,7 @@ public class UPatrolResultService {
                 review.setInstanceId(Long.valueOf(instanceId));
                 log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
                 uPatrolResultDao.manualReviewByTaskInstance(review);
+                uPatrolResultDao.updateCheck(taskId,review.getCheckUser(),review.getCheckDate(),review.getRemark());
                 //更新测点信息
                 TStdDeviceMeteUpdate stdDeviceMeteUpdate =
                         new TStdDeviceMeteUpdate().setDeviceMeteId(Long.valueOf(instanceId)).setIdentifyResult(Integer.valueOf(review.getPersonCheck())).setUpdateTime(review.getCheckDate());
