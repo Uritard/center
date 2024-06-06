@@ -35,22 +35,22 @@
             FROM t_dict_business WHERE col_name = 'cruise_device_type'
         )
         UNION(
-            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_code AS deviceTypeId
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
             FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '室外轮式机器人' AND robot_position = 156
             WHERE drone_type is null
         )
         UNION(
-            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_code AS deviceTypeId
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
             FROM  t_robot_info JOIN t_dict_business ON  col_name = 'cruise_device_type' and dict_note = '室内轮式机器人' AND robot_position = 155
             WHERE drone_type is null
         )
         UNION(
-            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_code AS deviceTypeId
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
             FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '挂轨机器人' AND robot_position = 399
             WHERE drone_type is null
         )
         UNION  (
-            SELECT robot_id AS Id, robot_name AS label,  dict_code AS upId, dict_note AS upName, "drone" AS infoType, robot_code AS deviceTypeId
+            SELECT robot_id AS Id, robot_name AS label,  dict_code AS upId, dict_note AS upName, "drone" AS infoType, robot_num AS deviceTypeId
             FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '无人机'
             WHERE robot_type is null
         )

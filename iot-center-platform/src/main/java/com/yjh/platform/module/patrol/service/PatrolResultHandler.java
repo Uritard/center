@@ -575,7 +575,7 @@ public class PatrolResultHandler {
                 uPatrolTaskService.patrolTaskResultHandler(cruiseResultMap);
 
                 // 缺陷和判别上报算法管理平台及上级系统
-                processResultToUpSystem.defectToAlgorithmM(cruiseResultMap, msgId);
+                processResultToUpSystem.defectToAlgorithmM(cruiseResultMap, msgId, analyseType);
 
             } catch (Exception e) {
                 log.error("处理算法分析后的巡视结果异常：", e);

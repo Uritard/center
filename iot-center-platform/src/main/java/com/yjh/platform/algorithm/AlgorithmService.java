@@ -1,5 +1,6 @@
 package com.yjh.platform.algorithm;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
@@ -49,8 +50,8 @@ public class AlgorithmService {
                 item.put("defect", alarm.getDefect().size());
                 item.put("different", alarm.getDifferent().size());
                 JSONObject alarms = new JSONObject();
-                alarms.put("defect", alarm.getDefect());
-                alarms.put("different", alarm.getDifferent());
+                alarms.put("defect", JSONArray.from(alarm.getDefect()));
+                alarms.put("different", JSONArray.from(alarm.getDifferent()));
                 item.put("alarms", alarms);
                 items.add(item);
                 xmlBaseModel.setItems(items);
