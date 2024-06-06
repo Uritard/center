@@ -3,7 +3,7 @@
     <SendCode>Up01</SendCode>
     <ReceiveCode>Region01</ReceiveCode>
     <Type>1</Type>
-    <Code>E100-0002</Code>
+    <Code>{{robotCode}}</Code>
     <Time>2024-03-26 16:36:46</Time>
     <Items>
         <Item/>

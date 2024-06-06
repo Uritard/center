@@ -33,3 +33,8 @@ send:
 task:
   thread:
     count: 10
+
+default:
+  params:
+    robotCode: E100-0001
+    droneCode: Drone-0001

@@ -6,7 +6,7 @@
     <Code>1</Code>
     <Time>2024-03-27 20:21:12</Time>
     <Items>
-        <Item start_time="2024-03-27 20:20:27" device_list="700036" enable="0" end_time="2024-03-31 00:00:00" device_level="1" config_code="100001" coordinate_pixel="10,12,30;20;12;30;20,22,30;10,22,30"/>
+        <Item start_time="{{nowDate}} 00:00:00" device_list="700036" enable="0" end_time="{{nowDate}} 23:59:59" device_level="1" config_code="100001" coordinate_pixel="10,12,30;20;12;30;20,22,30;10,22,30"/>
     </Items>
     <Command>4</Command>
 </PatrolHost>

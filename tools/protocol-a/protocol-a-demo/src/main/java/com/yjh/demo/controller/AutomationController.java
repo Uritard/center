@@ -7,11 +7,13 @@ package com.yjh.demo.controller;
 import com.yjh.demo.entity.BaseTree;
 import com.yjh.demo.entity.ResultBean;
 import com.yjh.demo.task.AutomationTask;
+import com.yjh.demo.util.StringVariableUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -67,6 +69,17 @@ public class AutomationController {
         try {
             automationTask.autoReply(autoReply);
             return new ResultBean(200, "success");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return new ResultBean(500, e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/defaultParams")
+    public ResultBean defaultParams(@RequestBody Map<String, String> params) {
+        try {
+            StringVariableUtil.updateParams(params);
+            return new ResultBean(200, "success").setData(StringVariableUtil.getVariableParams());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new ResultBean(500, e.getMessage());

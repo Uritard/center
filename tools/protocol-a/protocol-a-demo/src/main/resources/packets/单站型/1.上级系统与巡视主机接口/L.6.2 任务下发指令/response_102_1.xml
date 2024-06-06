@@ -7,6 +7,6 @@
     <Command>4</Command>
     <Time>2024-03-29 18:23:31</Time>
     <Items>
-        <Item error_code="0" task_patrolled_id="2_400000abcd1234_20240329150430"/>
+        <Item error_code="0" task_patrolled_id="1_{{taskCode}}_{{simpleNow}}"/>
     </Items>
 </PatrolHost>

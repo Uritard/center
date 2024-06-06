@@ -7,6 +7,7 @@ package com.yjh.demo.service;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.yjh.commons.NamedThreadFactory;
+import com.yjh.demo.util.StringVariableUtil;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.messager.api.msg.BaseMessage;
 import com.yjh.messager.api.msg.Msg;
@@ -42,7 +43,7 @@ public interface IMessageSender {
                     inboundMessage = getReqMsg(msgId);
                 }
             }
-
+            StringVariableUtil.updateParams(message);
             return sendMessage(message, inboundMessage);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -58,10 +59,14 @@ public interface IMessageSender {
         if (inboundMessage != null) {
             msg.setOriginReq(inboundMessage);
         }
-        return sendMessage(msg);
+        OutboundMessage baseMessage = sendMessage(msg);
+        sendWs(baseMessage);
+        return baseMessage;
     }
 
-    BaseMessage sendMessage(OutboundMessage outboundMessage);
+    OutboundMessage sendMessage(OutboundMessage outboundMessage);
+
+    void sendWs(OutboundMessage outboundMessage);
 
     String sendCode();
 
