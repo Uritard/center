@@ -10,10 +10,12 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
+import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private PatrolResultHandler patrolResultHandler;
+
+    @Autowired
+    private TUnionTaskDao tUnionTaskDao;
 
     public static String meteValues(String commintValue){
         if("合位".equals(commintValue)){
@@ -305,6 +310,8 @@ public class TCfgDataCurrentService {
                             }
                         });
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
+                        insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, new Date(),
+                                content,rule.getUpdateTime());
                     }
                     unionRule.add(rule);
                     contents.add(content);
@@ -386,6 +393,25 @@ public class TCfgDataCurrentService {
         return tCruiseTasks;
     }
 
+    public void insertIntoTUnionTask(Long meteId,String unionId,Long ruleId,Long robotId,Date createTime,String paramValues,Date triggeringTime){
+        TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
+        TUnionTask tUnionTask = new TUnionTask();
+        tUnionTask.setPlanName("实时视频调阅");
+        tUnionTask.setUnionId(unionId);
+        tUnionTask.setRuleId(ruleId);
+        tUnionTask.setUnionName(tCfgUnionRule.getRuleName());
+        tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
+        tUnionTask.setRobotId(robotId);
+        tUnionTask.setIsFinish(1);
+        tUnionTask.setMeteId(meteId);
+        tUnionTask.setCreateTime(createTime);
+        tUnionTask.setRuleName(tCfgUnionRule.getRuleName());
+        tUnionTask.setRuleContent(tCfgUnionRule.getRuleContent());
+
+        tUnionTask.setParamValues(paramValues);
+        tUnionTask.setTriggeringTime(triggeringTime);
+        tUnionTaskDao.insert(tUnionTask);
+    }
 
 }
 
