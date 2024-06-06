@@ -92,6 +92,10 @@ public class Constant {
      * 请求算法资源信息
      */
     public static final String ALGORITHM_RESOURCE_URL = "http://iot-center-platform/analysis/v1/algorithmResource";
+    /**
+     * 请求系统自检信息
+     */
+    public static final String SYSTEM_CHECK_URL = "http://iot-center-platform/systemInfo/v1/getSystemCheck";
 
     /**
      * 算法可靠性指标统计

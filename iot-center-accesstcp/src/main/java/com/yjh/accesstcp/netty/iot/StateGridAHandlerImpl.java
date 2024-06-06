@@ -94,6 +94,8 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         TCPClientHandlerHashMap.remove(remoteAdds);
         // 暂停心跳发送
         HeartBeatThead.terminate(getServer());
+        // 暂停系统自检数据
+        SystemCheckThread.terminate(getServer());
         // 暂停运行数据发送
         RunningThread.terminate(getServer());
         // 暂停微气象发送

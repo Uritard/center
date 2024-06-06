@@ -928,7 +928,7 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('876', 'cruise_device_type', '声纹', '14', '巡视设备类型', '7');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('877', 'maintenance_type', '缺陷记录', '0', '维护信息类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('878', 'maintenance_type', '大修记录', '0', '维护信息类型', '2');
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('879', 'maintenance_type', '退出再重放记录', '0', '维护信息类型', '3');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('879', 'maintenance_type', '退出再投运记录', '0', '维护信息类型', '3');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('880', 'maintenance_type', '更换记录', '0', '维护信息类型', '4');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('881', 'point_alarm_type', '非同源差值越限报警', '101', '测点告警类型', '1');
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('882', 'point_alarm_type', '非同源状态不一致报警', '102', '测点告警类型', '1');

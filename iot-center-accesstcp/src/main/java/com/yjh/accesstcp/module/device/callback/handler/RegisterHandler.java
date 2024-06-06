@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.callback.handler;
 
+import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.callback.CallbackHandlerStrategy;
 import com.yjh.accesstcp.module.device.callback.CallbackHandlerStrategyFactory;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -64,6 +65,10 @@ public class RegisterHandler implements CallbackHandlerStrategy<XMLBaseModel> {
                 String heartBeat = "heart_beat_interval";
                 if (INTERVAL_MAP.containsKey(heartBeat)) {
                     HeartBeatThead.addThread(clientHandler, taskScheduler, INTERVAL_MAP.getOrDefault(heartBeat, 60L));
+                    //边缘节点需向上级定时上报系统自检信息
+                    if (Constant.ONE.equals(Constant.edgeLevel())) {
+                        SystemCheckThread.addThread(clientHandler, taskScheduler, INTERVAL_MAP.getOrDefault(heartBeat, 60L));
+                    }
                 }
                 //运行参数线程
                 String runParams = "run_params_interval";

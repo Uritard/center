@@ -12,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +40,36 @@ public class SystemInfoController {
         this.systemInfoService = systemInfoService;
     }
 
+
+    @ApiOperation(value = "获取本机自检信息")
+    @GetMapping(value = "/getSystemCheck")
+    public Result getSystemCheck() {
+        Result result = new Result();
+        try {
+            result.setData(systemInfoService.getSystemCheck());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取本机自检信息错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取所有边缘节点自检信息")
+    @GetMapping(value = "/getEdgeSystemCheck")
+    public Result getEdgeSystemCheck() {
+        Result result = new Result();
+        try {
+            result.setData(systemInfoService.getEdgeSystemCheck());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取所有边缘节点自检信息错误:", e);
+        }
+        return result;
+    }
 
     @ApiOperation(value = "获取内存信息")
     @RequestMapping(value = "/getMemory", method = RequestMethod.GET)
