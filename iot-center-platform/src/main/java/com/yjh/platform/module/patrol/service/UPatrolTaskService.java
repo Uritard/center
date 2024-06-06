@@ -539,7 +539,6 @@ public class UPatrolTaskService {
             map.put("deviceType", String.valueOf(item.getDeviceType()));
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             map.put("presetAttribute", String.valueOf(item.getPresetAttribute()));
-            map.put("cameraIp", item.getCameraIp());
             if(ArrayUtils.contains(new int[]{TypeEnum.UAV.getCode(), TypeEnum.ROBOT.getCode()}, item.getCruiseType())){
                 map.put("cameraId","");
                 String rbtId = String.valueOf(item.getRobotId());
@@ -554,6 +553,7 @@ public class UPatrolTaskService {
             }else {
                 String cameraId = CommonUtils.getValue(item.getCameraId());
                 map.put("cameraId", cameraId);
+                map.put("cameraIp", CommonUtils.getValue(item.getCameraIp()));
                 map.put("robotId","");
                 if (item.getCameraId() == null) {
                     cruiseDeviceSet.add(item.getCruiseType() + "_" + item.getCruiseId());
