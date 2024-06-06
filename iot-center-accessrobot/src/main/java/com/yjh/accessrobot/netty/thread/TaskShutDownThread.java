@@ -43,7 +43,7 @@ public class TaskShutDownThread implements Runnable{
                     content = "巡视设备异常";
                     break;
                 case "2":
-                    content = "无权限(或高优先级任务存在)";
+                    content = "无权限（或高优先级任务存在）";
                     break;
                 default:
                     content = "其它异常";

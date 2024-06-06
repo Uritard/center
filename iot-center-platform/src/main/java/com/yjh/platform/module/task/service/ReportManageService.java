@@ -22,9 +22,11 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,10 +188,11 @@ public class ReportManageService {
             REPORT_CACHE.put(taskId, 1);
         }
 
-        ThreadPoolUtil.PATROL_POOL.addThread(()->{
-            TaskVO taskVO = cruiseReportGenerate(taskId, userId);
-            pushDownload(taskVO, taskId, userId, downLoad);
-        });
+        ScheduledMapConfig.schedule(15, Triple.of(taskId, userId, downLoad), tri -> ThreadPoolUtil.PATROL_POOL.addThread(() -> {
+            TaskVO taskVO = cruiseReportGenerate(tri.getLeft(), tri.getMiddle());
+            pushDownload(taskVO, tri.getLeft(), tri.getMiddle(), tri.getRight());
+        }));
+
         return 0;
     }
 
