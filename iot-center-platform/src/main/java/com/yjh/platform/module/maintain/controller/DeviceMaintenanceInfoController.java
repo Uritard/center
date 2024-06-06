@@ -112,7 +112,7 @@ public class DeviceMaintenanceInfoController {
                 queryWrapper.eq("device_id", deviceId);
             }
             if (StringUtils.isNotBlank(deviceName)) {
-                queryWrapper.eq("patroldevice_name", deviceName);
+                queryWrapper.like("patroldevice_name", deviceName);
             }
             if (Objects.nonNull(deviceType) && deviceType != -1) {
                 queryWrapper.eq("patroldevice_type", deviceType);

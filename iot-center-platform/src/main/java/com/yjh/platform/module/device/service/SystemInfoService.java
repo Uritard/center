@@ -4,10 +4,13 @@ import cn.hutool.cache.Cache;
 import cn.hutool.cache.CacheUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.SystemInfoUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
@@ -18,22 +21,34 @@ import com.yjh.video.api.entity.response.DeviceStatusResp;
 import com.yjh.video.api.result.Result;
 import com.yjh.video.api.service.IRecordService;
 import com.yjh.video.api.service.VideoServiceFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +72,8 @@ public class SystemInfoService {
     private TSysParamDao sysParamDao;
     @Autowired
     private CameraConService cameraConService;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     private final static Cache<String, List<Map<String, Object>>> RECORDER_INFO_CACHE = CacheUtil.newTimedCache(5*60*1000);
     private final static String RECORDER_KEY = "RECORDER_INFO";
@@ -315,5 +332,88 @@ public class SystemInfoService {
             }
         }
         return storageInfo;
+    }
+
+    /**
+     * 本机系统自检信息
+     *
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> getSystemCheck() throws Exception {
+        Map<String, Object> res = Maps.newHashMap();
+        SystemInfo systemInfo = new SystemInfo();
+
+        CentralProcessor processor = systemInfo.getHardware().getProcessor();
+        long[] prevTicks = processor.getSystemCpuLoadTicks();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        double cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
+        res.put("cpu", Integer.parseInt(format0Val(cpuUsage * 100)) + "");
+        //内存
+        GlobalMemory memory = systemInfo.getHardware().getMemory();
+        // 总内存
+        long totalMemory = memory.getTotal();
+        // 可用内存
+        long availableMemory = memory.getAvailable();
+        // 已使用内存
+        long usedMemory = totalMemory - availableMemory;
+        double memoryUsageRate = ((double) usedMemory / totalMemory);
+        double memoryTotal = (double) totalMemory / (1024 * 1024 * 1024);
+        res.put("memory_total", Integer.parseInt((format0Val(memoryTotal))) + "GB");
+        res.put("memory_rate", Integer.parseInt(format0Val(memoryUsageRate * 100)) + "");
+
+        FileSystem fileSystem = FileSystems.getDefault();
+        Iterable<FileStore> fileStores = fileSystem.getFileStores();
+        long totalAll = 0;
+        long usable = 0;
+        for (FileStore store : fileStores) {
+            // 总空间
+            long totalSpace = store.getTotalSpace();
+            totalAll = totalAll + totalSpace;
+            // 可用空间
+            long usableSpace = store.getUsableSpace();
+            usable = usable + usableSpace;
+        }
+        double diskUsageRate = ((double) (totalAll - usable) / totalAll);
+        double diskTotal = (double) totalAll / (1024 * 1024 * 1024);
+        res.put("disk_total", Integer.parseInt(format0Val(diskTotal)) + "GB");
+        res.put("disk_rate", Integer.parseInt(format0Val(diskUsageRate * 100)) + "");
+        return res;
+    }
+
+    public static String format0Val(Object num) {
+        DecimalFormat df = new DecimalFormat("0");
+        return df.format(num);
+    }
+
+    /**
+     * 获取边缘节点系统自检信息
+     *
+     * @return
+     */
+    public List<Map<String, String>> getEdgeSystemCheck() {
+        List<Map<String, String>> result = new ArrayList<>();
+        List<TStdRegion> list = tStdRegionDao.selectAllEdgeRegion();
+        Map<String, TStdRegion> regionMap = list.stream().collect(Collectors.toMap(TStdRegion::getRegionCode, Function.identity()));
+        List<String> keys = list.stream().map(t -> "systemCheck:" + t.getRegionCode()).distinct().collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(keys)) {
+            List<Map<String, String>> edgeSystemCheckList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+                keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                return null;
+            });
+            edgeSystemCheckList.forEach(map -> {
+                String edgeCode = map.get("edgeCode");
+                if (regionMap.containsKey(edgeCode)) {
+                    map.put("edgeName", regionMap.get(edgeCode).getRegionName());
+                    map.put("edgeStatus",  regionMap.get(edgeCode).getEdgeStatus());
+                    result.add(map);
+                }
+            });
+        }
+        return result;
     }
 }

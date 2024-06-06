@@ -77,4 +77,6 @@ public interface TStdRegionDao {
 
     List<TStdRegion> getEnvRegion();
     List<IotDeviceDataEx> getEnvByRegion(@Param(value = "regionId") Long regionId);
+
+    List<TStdRegion> selectAllEdgeRegion();
 }
