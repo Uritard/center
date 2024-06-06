@@ -642,7 +642,7 @@ public class ProcessResultToUpSystem {
      * @param cruiseResultMap 任务结果
      * @param msgId
      */
-    public void defectToAlgorithmM(Map<String, String> cruiseResultMap, String msgId) {
+    public void defectToAlgorithmM(Map<String, String> cruiseResultMap, String msgId, String analyseType) {
         if (Constant.fastTurbo()) {
             // 压测模式，结果不上报上级系统
             return;
@@ -821,8 +821,8 @@ public class ProcessResultToUpSystem {
 //            // 缺陷上报上一级系统  不在这里上报了
 //            defectToUpSystem(cruiseResultMap, defectList);
 //        }
-        //如果正常需要进行正常样本上报
-        if (normal && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
+        //缺陷 如果正常需要进行正常样本上报
+        if (normal && "398".equals(analyseType) && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             String remoteorigfilepath = ftpsRemotePath + "/" + "正常" + "/" + yearMonth + "/" + picF + "原图.jpg";
             alarmDetail.setBay_name(nameMap.get("upRegionName"));
             alarmDetail.setDevice_name(deviceName);
