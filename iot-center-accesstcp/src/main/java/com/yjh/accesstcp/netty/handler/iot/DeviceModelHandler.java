@@ -29,7 +29,7 @@ public class DeviceModelHandler implements MessageHandlerStrategy<XMLBaseModel>,
         try {
             log.info("--设备模型下发指令--");
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
-            String filePath = String.valueOf(item.get("value"));
+            String filePath = String.valueOf(item.get("file_path"));
             if (StringUtils.isNotEmpty(filePath)) {
                 switch (xmlBaseModel.getCommand()) {
                     //<1>: =标准点位模型文件
