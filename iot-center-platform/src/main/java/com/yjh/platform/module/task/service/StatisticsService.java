@@ -931,14 +931,15 @@ public class StatisticsService {
                 result.add(dealCount(statisticsDao.countWarnAccuracy(beginTime, endTime)));
                 break;
             case "2":
+
                 List<LabelInfo> labelInfoList = statisticsDao.countLabelAccuracy(beginTime, endTime);
-                Map<String, List<LabelInfo>> groupMap = labelInfoList.stream().collect(Collectors.groupingBy(LabelInfo::getResultDesc));
+                Map<String, List<LabelInfo>> groupMap = labelInfoList.stream().collect(Collectors.groupingBy(LabelInfo::getDefectContent));
                 groupMap.forEach((k, v) -> {
                     String label = algorithmInfo.getAlgorithmName(k);
                     if (StringUtils.isNotBlank(label)) {
                         Map<String, Object> labelMap = new HashMap<>(2);
                         labelMap.put("totalNum", v.size());
-                        labelMap.put("validNum", (int) v.stream().filter(t -> t.getIdentifyState() == 258).count());
+                        labelMap.put("validNum", (int) v.stream().filter(t -> t.getDealType() == 286).count());
                         Map<String, Object> res = dealCount(labelMap);
                         res.put("tag_type", label);
                         result.add(res);

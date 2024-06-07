@@ -543,16 +543,12 @@
     </select>
     <select id="countLabelAccuracy" resultType="com.yjh.platform.module.patrol.entity.LabelInfo">
         SELECT
-            a.identify_state,
-            a.result_desc
+        defect_content,
+        deal_type
         FROM
-            u_patrol_data_result a
-        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-        WHERE
-            b.is_ai = 'on'
-        AND a.identify_state IS NOT NULL AND a.cruise_result = 246
+        `t_defect_info` WHERE deal_type is not null
         <if test="beginTime != null and beginTime != ''and endTime != null and endTime != '' ">
-            AND a.cruise_time BETWEEN #{beginTime} and #{endTime}
+            AND defect_time BETWEEN #{beginTime} and #{endTime}
         </if>
     </select>
 </mapper>

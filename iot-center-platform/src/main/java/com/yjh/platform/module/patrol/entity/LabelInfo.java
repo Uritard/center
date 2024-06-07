@@ -14,9 +14,9 @@ public class LabelInfo {
     /**
      * 标签名称
      */
-    private String resultDesc;
+    private String defectContent;
     /**
-     * 标签是否准确 258 识别正确  259 识别错误
+     * 标签是否准确 286 属实   287 不属实
      */
-    private Integer identifyState;
+    private Integer dealType;
 }

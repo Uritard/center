@@ -398,22 +398,23 @@ public class SystemInfoService {
     public List<Map<String, String>> getEdgeSystemCheck() {
         List<Map<String, String>> result = new ArrayList<>();
         List<TStdRegion> list = tStdRegionDao.selectAllEdgeRegion();
-        Map<String, TStdRegion> regionMap = list.stream().collect(Collectors.toMap(TStdRegion::getRegionCode, Function.identity()));
         List<String> keys = list.stream().map(t -> "systemCheck:" + t.getRegionCode()).distinct().collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(keys)) {
-            List<Map<String, String>> edgeSystemCheckList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
-                keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
-                return null;
-            });
-            edgeSystemCheckList.forEach(map -> {
-                String edgeCode = map.get("edgeCode");
-                if (regionMap.containsKey(edgeCode)) {
-                    map.put("edgeName", regionMap.get(edgeCode).getRegionName());
-                    map.put("edgeStatus",  regionMap.get(edgeCode).getEdgeStatus());
-                    result.add(map);
-                }
-            });
-        }
+        List<Map<String, String>> edgeSystemCheckList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+            keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+            return null;
+        });
+        Map<String, Map<String, String>> redisMap = edgeSystemCheckList.stream()
+                .filter(t -> !t.isEmpty()).collect(Collectors.toMap(t -> t.get("edgeCode"), Function.identity()));
+        list.forEach(tStdRegion -> {
+            Map<String, String> res = Maps.newHashMap();
+            res.put("edgeName", tStdRegion.getRegionName());
+            res.put("edgeStatus", StringUtils.isNotEmpty(tStdRegion.getEdgeStatus()) ? tStdRegion.getEdgeStatus() : "离线");
+            if (redisMap.containsKey(tStdRegion.getRegionCode())){
+                res.putAll(redisMap.get(tStdRegion.getRegionCode()));
+            }
+            result.add(res);
+        });
+
         return result;
     }
 }
