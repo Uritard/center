@@ -277,7 +277,7 @@
     <insert id="insertDeviceMete" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete" useGeneratedKeys="true">
         insert into t_std_devicemete
         ( device_mete_id,device_id,device_point_id
-        ,custom_id,custom_name,mete_id,mete_kind
+        ,custom_id,component_id,custom_name,mete_id,mete_kind
         ,mete_type,meter_type,device_type
         ,inspection_type,mete_name,appearance_type
         ,position_type,analyse_type,is_ai
@@ -289,12 +289,13 @@
         ,low_limit3,high_limit4,low_limit4
         ,alarm_delay,alarm_cnt,threshold_abs
         ,threshold_per,modulus,remark
-        ,redundant_type,origin_id,edge_code
+        ,redundant_type,origin_id,edge_code,label_attri
         )
         values
 <foreach collection="list" separator="," item="item">
     (#{item.deviceMeteId,jdbcType=BIGINT},#{item.deviceId,jdbcType=BIGINT},#{item.devicePointId,jdbcType=VARCHAR}
-    ,#{item.customId,jdbcType=VARCHAR},#{item.customName,jdbcType=VARCHAR},#{item.meteId,jdbcType=BIGINT},#{item.meteKind,jdbcType=VARCHAR}
+    ,#{item.customId,jdbcType=VARCHAR},#{item.componentId,jdbcType=VARCHAR},#{item.customName,jdbcType=VARCHAR}
+    ,#{item.meteId,jdbcType=BIGINT},#{item.meteKind,jdbcType=VARCHAR}
     ,#{item.meteType,jdbcType=VARCHAR},#{item.meterType,jdbcType=INTEGER},#{item.deviceType,jdbcType=INTEGER}
     ,#{item.inspectionType,jdbcType=INTEGER},#{item.meteName,jdbcType=VARCHAR},#{item.appearanceType,jdbcType=INTEGER}
     ,#{item.positionType,jdbcType=VARCHAR},#{item.analyseType,jdbcType=INTEGER},#{item.isAi,jdbcType=VARCHAR}
@@ -306,7 +307,8 @@
     ,#{item.lowLimit3,jdbcType=FLOAT},#{item.highLimit4,jdbcType=FLOAT},#{item.lowLimit4,jdbcType=FLOAT}
     ,#{item.alarmDelay,jdbcType=INTEGER},#{item.alarmCnt,jdbcType=INTEGER},#{item.thresholdAbs,jdbcType=DECIMAL}
     ,#{item.thresholdPer,jdbcType=DECIMAL},#{item.modulus,jdbcType=INTEGER},#{item.remark,jdbcType=VARCHAR}
-    ,#{item.redundantType,jdbcType=VARCHAR},#{item.originId,jdbcType=VARCHAR},#{item.edgeCode,jdbcType=VARCHAR})
+    ,#{item.redundantType,jdbcType=VARCHAR},#{item.originId,jdbcType=VARCHAR},#{item.edgeCode,jdbcType=VARCHAR}
+    ,#{item.labelAttri,jdbcType=VARCHAR})
 
 </foreach>
     </insert>

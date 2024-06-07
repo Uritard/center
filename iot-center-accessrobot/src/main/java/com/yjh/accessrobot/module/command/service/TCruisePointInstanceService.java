@@ -216,6 +216,8 @@ public class TCruisePointInstanceService {
                     tStdDeviceMete.setInspectionType(tRobotInspection.getInspectionType());
                     tStdDeviceMete.setCustomName(CustomTypeEnum.CUSTOM_TYPE_700.getDictNote());
                     tStdDeviceMete.setMeterType(MeterTypeEnum.getDictCodeByUpDict(tRobotInspection.getMeterType()));
+                    tStdDeviceMete.setLabelAttri(tRobotInspection.getLabelAttri());
+                    tStdDeviceMete.setComponentId(tRobotInspection.getComponentId());
                     if (cruiseType == 524) {
                         tStdDeviceMete.setMeteType(String.valueOf(MeteTypeEnum.METE_TYPE_220.getDictCode()));
                     }
@@ -237,7 +239,8 @@ public class TCruisePointInstanceService {
                     tStdDeviceMete.setIsJudge("off");
                     tStdDeviceMete.setAlarmNote("0");
                     tStdDeviceMete.setAlarmState(0);
-                    tStdDeviceMete.setRedundantType("1");
+                    String redundantType = StringUtils.defaultIfBlank(tRobotInspection.getPointType(), "1");
+                    tStdDeviceMete.setRedundantType(redundantType);
                     tStdDeviceMete.setIsTemdif(0);
                     tStdDeviceMete.getTRobotInspections().add(tRobotInspection);
                     tStdDeviceMeteMap.put(tRobotInspection.getDeviceName(),tStdDeviceMete);

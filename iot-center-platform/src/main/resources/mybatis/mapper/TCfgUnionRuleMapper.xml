@@ -228,7 +228,7 @@
             camera.camera_ip
         FROM t_cfg_union_rule rule
         left join t_camera_info camera on rule.camera_id = camera.camera_id
-        WHERE input_param LIKE concat('%',#{inputParam, jdbcType=VARCHAR},'%')
+        WHERE rule.input_param LIKE concat('%',#{inputParam, jdbcType=VARCHAR},'%')
     </select>
     <select id="getPlanName" resultType="java.lang.String" >
         SELECT a.plan_name FROM  t_cruise_plan a  WHERE 1 = 1

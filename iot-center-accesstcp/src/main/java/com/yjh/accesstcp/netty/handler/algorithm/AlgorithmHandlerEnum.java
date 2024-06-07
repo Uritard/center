@@ -1,6 +1,7 @@
 package com.yjh.accesstcp.netty.handler.algorithm;
 
 import com.yjh.accesstcp.netty.handler.IHandlerEnum;
+import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 
 /**
  * <功能描述>
@@ -30,8 +31,8 @@ public enum AlgorithmHandlerEnum implements IHandlerEnum {
 
     static {
         for (AlgorithmHandlerEnum value : AlgorithmHandlerEnum.values()) {
-            handlerEnumHashMap.put(value.getType(), value);
-            handlerEnumHashMap.put(value.getDesc(), value);
+            handlerEnumHashMap.put(ProtocolEnum.CLOUD + "_" + value.getType(), value);
+            handlerEnumHashMap.put(ProtocolEnum.CLOUD + "_" + value.getDesc(), value);
         }
     }
 

@@ -20,7 +20,7 @@ public interface IHandlerEnum {
     String getDesc();
 
 
-    static IHandlerEnum getEnm(String type) {
-        return handlerEnumHashMap.get(type);
+    static IHandlerEnum getEnm(ProtocolEnum protocol, String type) {
+        return handlerEnumHashMap.get(protocol + "_" + type);
     }
 }
