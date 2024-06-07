@@ -1599,12 +1599,12 @@ public class IntelAnalysisService {
         items.add(map);
         XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("315").setItems(items);
         Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
-        if (Objects.nonNull(re)) {
-            List<Map<String, String>> res = Object2List.castListMap(re.getData(), String.class, String.class);
+        List<Map<String, String>> res = new ArrayList<>();
+        if (Objects.nonNull(re.getData())) {
+            res = Object2List.castListMap(re.getData(), String.class, String.class);
             res.forEach(m -> m.put("type", type));
-            return res;
         }
-        return new ArrayList<>();
+        return res;
     }
 
     /**

@@ -503,6 +503,7 @@
             t_std_region
         WHERE
             state = 1
+          AND up_region_id != -1
           AND region_code != ''
     </select>
 </mapper>
