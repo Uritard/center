@@ -411,6 +411,8 @@ public class SystemInfoService {
             res.put("edgeStatus", StringUtils.isNotEmpty(tStdRegion.getEdgeStatus()) ? tStdRegion.getEdgeStatus() : "离线");
             if (redisMap.containsKey(tStdRegion.getRegionCode())){
                 res.putAll(redisMap.get(tStdRegion.getRegionCode()));
+            } else {
+                res.put("edgeCode", tStdRegion.getRegionCode());
             }
             result.add(res);
         });
