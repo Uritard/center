@@ -65,6 +65,8 @@ public class ApplicationProperties {
     private AudioConfig audioConfig;
     //其他配置
     private OtherConfig otherConfig;
+    //video服务配置
+    private VideoServerConfig videoServerConfig;
 
     @PostConstruct
     public void flushCatch() {
@@ -75,6 +77,15 @@ public class ApplicationProperties {
             redisTemplate.opsForHash().putAll(SYSTEM_CONFIG_KEY + systemConfig.getConfigType(),map);
         });
         this.flush();
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class VideoServerConfig{
+
+        //紧急调阅视频并发路数
+        private Integer emergencyAccessNum;
+
     }
 
     @Data
@@ -285,6 +296,11 @@ public class ApplicationProperties {
                 .setCoverResult(redisMap.get("coverResult"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
+
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"videoServerConfig");
+        ApplicationProperties.VideoServerConfig videoServerConfig = new ApplicationProperties.VideoServerConfig();
+        videoServerConfig.setEmergencyAccessNum(ValueUtil.toInteger(redisMap.get("emergencyAccessNum"),10));
+        this.videoServerConfig = videoServerConfig;
 
         Constant.nonhomologousWarn = this.getOtherConfig().getNonhomologousWarn();
         Constant.setUpSystem(this.getUpSystemFtps().isEnable());

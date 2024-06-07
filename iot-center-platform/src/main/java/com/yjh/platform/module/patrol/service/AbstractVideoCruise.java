@@ -156,7 +156,11 @@ public abstract class AbstractVideoCruise {
                         log.error("抓图重试依旧失败", e);
                     }
                 } finally {
-                    hashOperations.put(TCameraInfoService.cameraStateKey + cameraIp, "state", "0");
+                    //判断是否在紧急调阅模式
+                    String state = hashOperations.get(TCameraInfoService.cameraStateKey + cameraIp,"state");
+                    if (!"2".equals(state)){
+                        hashOperations.put(TCameraInfoService.cameraStateKey + cameraId, "state", "0");
+                    }
                 }
             }
 
@@ -352,6 +356,7 @@ public abstract class AbstractVideoCruise {
             "if redis.call('hget', KEYS[1], KEYS[2]) == ARGV[1] then return redis.call('hset', KEYS[1], KEYS[2], ARGV[2]) else return -1 end";
 
         RedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
+        Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
         Long cameraState = redisTemplate.execute(redisScript, Arrays.asList(TCameraInfoService.cameraStateKey + cameraIp, "state"), 0, 1);
         cameraState = cameraState == null ? -1 : cameraState;
         boolean waitFlag = true;
@@ -372,7 +377,7 @@ public abstract class AbstractVideoCruise {
                 cameraState = cameraState == null ? -1 : cameraState;
 
                 waitCount = waitCount + 1;
-                if (waitCount == 30) {
+                if (((waitCount + 1) * waitTime + 1000) / 1000 > (cameraStateTime * 60 )) {
                     log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 直接获取", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
                         presetName, cameraId);
                     hashOperations.put(TCameraInfoService.cameraStateKey + cameraIp, "state", "0");

@@ -62,6 +62,37 @@
         <if test="presetId != null and presetId != ''">and b.preset_id = #{presetId, jdbcType=BIGINT}</if>
         limit 1
     </select>
+    <select id="selectByChannel" parameterType="java.lang.Long"
+            resultType="com.yjh.platform.module.video.entity.CameraConInfo">
+        SELECT
+        a.camera_id,
+        a.channel_num,
+        a.camera_type,
+        c.record_id,
+        c.record_ip,
+        c.http_port as recordPort,
+        c.identity_manager,
+        c.identity_code,
+        c.rtsp_port,
+        c.recorder_type,
+        c.vendor_id recordVendor,
+        a.camera_ip,
+        a.port,
+        a.infread_port,
+        a.camera_manager,
+        a.camera_code,
+        a.camera_num,
+        a.up_region_id,
+        a.camera_channel_id,
+        a.vendor_id,
+        c.device_channel
+        FROM t_camera_info a
+        JOIN t_camera_recorder c ON a.record_id = c.record_id
+        WHERE 1 = 1
+        <if test="cameraChannel != null and cameraChannel != ''">and a.b_camera_channel_id = #{cameraChannel}</if>
+        <if test="deviceChannel != null and deviceChannel != ''">and c.b_device_channel = #{deviceChannel}</if>
+        limit 1
+    </select>
 
     <select id="batchSelectConInfo" resultType="com.yjh.platform.module.video.entity.CameraConInfo">
         SELECT
