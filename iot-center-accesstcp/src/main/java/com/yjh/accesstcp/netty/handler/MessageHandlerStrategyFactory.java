@@ -21,8 +21,8 @@ public class MessageHandlerStrategyFactory {
         // do nothing
     }
 
-    public static MessageHandlerStrategy<? extends BaseModel> getStrategyType(@NonNull ProtocolEnum protocolType, @NonNull IHandlerEnum type) {
-        return STRATEGIES.get(protocolType.name() + "_" + type.getType());
+    public static MessageHandlerStrategy<? extends BaseModel> getStrategyType(@NonNull ProtocolEnum protocolType, @NonNull String type) {
+        return STRATEGIES.get(protocolType.name() + "_" + type);
     }
 
     public static void register(@NonNull ProtocolEnum protocolType, @NonNull IHandlerEnum type, MessageHandlerStrategy<? extends BaseModel> strategy) {

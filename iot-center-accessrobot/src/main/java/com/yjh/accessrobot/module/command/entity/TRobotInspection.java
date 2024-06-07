@@ -108,6 +108,16 @@ public class TRobotInspection implements Serializable {
      */
     private String originId;
 
+    /**
+     * 重要等级
+     */
+    private String pointType;
+
+    /**
+     * 标签属性
+     */
+    private String labelAttri;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

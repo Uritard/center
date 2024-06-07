@@ -1,6 +1,7 @@
 package com.yjh.accesstcp.netty.handler.iot;
 
 import com.yjh.accesstcp.netty.handler.IHandlerEnum;
+import com.yjh.accesstcp.netty.handler.ProtocolEnum;
 
 /**
  * <功能描述>
@@ -72,8 +73,8 @@ public enum IotHandlerEnum implements IHandlerEnum {
 
     static {
         for (IotHandlerEnum value : IotHandlerEnum.values()) {
-            handlerEnumHashMap.put(value.getType(), value);
-            handlerEnumHashMap.put(value.getDesc(), value);
+            handlerEnumHashMap.put(ProtocolEnum.IOT + "_" + value.getType(), value);
+            handlerEnumHashMap.put(ProtocolEnum.IOT + "_" + value.getDesc(), value);
         }
     }
 

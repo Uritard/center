@@ -46,8 +46,7 @@ public class MessageThread {
         try {
             boolean flag = header.getSessionType() == (byte) 1;
             String type = flag ? IHandlerEnum.RES + xmlBaseModel.getType() : xmlBaseModel.getType();
-            MessageHandlerStrategy messageHandlerStrategy =
-                    MessageHandlerStrategyFactory.getStrategyType(protocol, IHandlerEnum.getEnm(type));
+            MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(protocol, type);
             if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
                 messageHandlerStrategy.handler(clientHandler, xmlBaseModel, header);
             } else {

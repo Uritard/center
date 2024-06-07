@@ -647,7 +647,9 @@ public class RobotService {
                                 if (map.containsKey("operation_device_file_path")) {
                                     String operationFilePath = filePathPrefix + File.separator + map.get("operation_device_file_path");
                                     XMLBaseModel operationModel = getXmlMessage(operationFilePath);
-                                    mapList.addAll(operationModel.getItems());
+                                    List<Map<String,Object>> items = operationModel.getItems().stream().peek(m->m.put("inspection_type", "2")).collect(
+                                        Collectors.toList());
+                                    mapList.addAll(items);
                                 }
                                 // Device Point Info
                                 addDevicePoint(mapList, robotId);
@@ -908,16 +910,18 @@ public class RobotService {
                 tRobotInspection.setAreaId(String.valueOf(deviceMap.getOrDefault("area_id", "")));
                 tRobotInspection.setDeviceType(String.valueOf(deviceMap.getOrDefault("device_type", "")));
                 tRobotInspection.setRecognitionTypeList(String.valueOf(deviceMap.getOrDefault("recognition_type_list", "1")));
-                int inspectionType = 1;
-                if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
-                    inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
+
+                tRobotInspection.setInspectionType(MapUtils.getIntValue(deviceMap, "inspection_type", 1));
+                tRobotInspection.setPointType(StringUtils.defaultIfBlank(MapUtils.getString(deviceMap, "point_type"), "1"));
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "label_attri"))) {
+                    tRobotInspection.setLabelAttri(MapUtils.getString(deviceMap, "label_attri"));
                 }
-                tRobotInspection.setInspectionType(inspectionType);
-                if (!"".equals(deviceMap.get("meter_type").toString())) {
+
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "meter_type"))) {
                     Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
                     tRobotInspection.setMeterType(meterType);
                 }
-                if (!"".equals(deviceMap.get("appearance_type").toString())) {
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "appearance_type"))) {
                     Integer appearanceType =
                         selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
                     tRobotInspection.setAppearanceType(appearanceType);
@@ -931,7 +935,7 @@ public class RobotService {
                     Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
                     tRobotInspection.setOperationType(operationType);
                 }
-                if (!"".equals(deviceMap.get("phase").toString())) {
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "phase"))) {
                     tRobotInspection.setPhase(deviceMap.get("phase").toString());
                 }
                 if (!"".equals(deviceMap.get("device_info").toString())) {
