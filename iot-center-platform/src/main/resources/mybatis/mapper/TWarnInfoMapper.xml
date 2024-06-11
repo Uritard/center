@@ -941,7 +941,7 @@
     <select id="countWarnDefectConfMode" resultType="java.util.Map">
         SELECT a.processed + b.processed as '已核查',
                d.untreated + e.untreated as '未核查',
-               f.autoProcessed + g.autoProcessed as '自动审核'
+               f.autoProcessed + g.autoProcessed as '自动核查'
         FROM (
               (select count(conf_mode = 275 or null) as processed
                from t_warn_info
