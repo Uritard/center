@@ -493,7 +493,7 @@ public class HomePageService {
 
         List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
         StationCount sta = new StationCount();
-        sta.setType("物联设备");
+        sta.setType("物联设备").setDeviceType("4");
         int staSize;
         //环控数量
         List<IotDeviceDataEx> iotDeviceDataList = this.queryIotDeviceDataEx(regionIdList);

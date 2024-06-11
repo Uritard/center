@@ -940,7 +940,8 @@
     <!--根据告警和缺陷处理状态统计告警个数-->
     <select id="countWarnDefectConfMode" resultType="java.util.Map">
         SELECT a.processed + b.processed as '已核查',
-               d.untreated + e.untreated as '未核查'
+               d.untreated + e.untreated as '未核查',
+               f.autoProcessed + g.autoProcessed as '自动核查'
         FROM (
               (select count(conf_mode = 275 or null) as processed
                from t_warn_info
@@ -953,7 +954,13 @@
                where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) d,
               (select count(conf_mode = 276 or null) as untreated
                from t_defect_info
-               where defect_time between #{startTime} and #{endTime}) e
+               where defect_time between #{startTime} and #{endTime}) e,
+              (select count(conf_mode = 339 or null) as autoProcessed
+               from t_warn_info
+               where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) f,
+              (select count(conf_mode = 339 or null) as autoProcessed
+               from t_defect_info
+               where defect_time between #{startTime} and #{endTime}) g
                  )
     </select>
     <!--查看告警处理情况-->
