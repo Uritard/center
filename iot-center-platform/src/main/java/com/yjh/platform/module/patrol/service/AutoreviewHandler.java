@@ -25,7 +25,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -48,7 +47,7 @@ public class AutoreviewHandler {
     public static final String AUTOREVIEW_TYPE_CRUISE = "1";
     public static final String AUTOREVIEW_TYPE_ALARM = "2";
 
-    private final Map<String, List<Map<Integer, Set<String>>>> autoreviewMap = new ConcurrentHashMap<>(4);
+    private volatile Map<String, List<Map<Integer, Set<String>>>> autoreviewMap;
 
     private List<Map<Integer, Set<String>>> loadAutoreviewList(String autoreviewType) {
         if (MapUtils.isEmpty(autoreviewMap)) {
@@ -73,7 +72,7 @@ public class AutoreviewHandler {
                             }
                         });
 
-                        autoreviewMap.putAll(innerMap);
+                        autoreviewMap = innerMap;
                         log.info("加载自动审核配置成功...");
                     } catch (Exception e) {
                         log.error("加载自动审核配置失败", e);
@@ -85,7 +84,12 @@ public class AutoreviewHandler {
     }
 
     public void resetAutoreviewList() {
-        autoreviewMap.clear();
+        synchronized (AutoreviewHandler.class) {
+            if (autoreviewMap != null) {
+                autoreviewMap.clear();
+            }
+            autoreviewMap = null;
+        }
         log.info("清除缓存自动审核配置...");
     }
 

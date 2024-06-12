@@ -10,6 +10,7 @@ import org.apache.commons.net.ftp.FTPSClient;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -282,7 +283,9 @@ public class FtpsUtil {
                         ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
                         // Store file on host
                         File localFile = new File(filepath);
-                        OutputStream os = new FileOutputStream(localFile);
+                        // create parent dir
+                        FileUtil.mkParentDirs(localFile);
+                        OutputStream os = Files.newOutputStream(localFile.toPath());
                         ftpClient.retrieveFile(remoteFilename, os);
 
                         os.close();
