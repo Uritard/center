@@ -584,6 +584,9 @@ public class TSequentialConfService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> sequentialInfo(String cfgDeviceId) {
         List<Map<String, Object>> list = tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+        if (list.isEmpty()){
+            return list;
+        }
         Integer state = (Integer) Constant.sequentialState.get("state");
         if (Objects.isNull(state) || state == -1) {
             Map<String, Object> map = new HashMap<>(1);
