@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Robot01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>3</Type>
+    <Code>Robot01</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" coordinate_pixel="4,4,4,4" coordinate_geography="4,4" task_patrolled_id=""/>
+    </Items>
+</PatrolDevice>

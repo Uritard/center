@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Drone01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>10004</Type>
+    <Code/>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+        <Item unit="m/s" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="5m/s" time="2024-03-26 01:38:12" type="1" value="5"/>
+        <Item unit="m" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="100m" time="2024-03-26 01:38:12" type="2" value="100"/>
+        <Item unit="%" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="80%" time="2024-03-26 01:38:12" type="3" value="80"/>
+        <Item unit="m/s" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="1m/s" time="2024-03-26 01:38:12" type="4" value="1"/>
+        <Item unit="m" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="100m" time="2024-03-26 01:38:12" type="5" value="100"/>
+        <Item unit="m" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="100m" time="2024-03-26 01:38:12" type="6" value="100"/>
+        <Item unit="h" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="1h" time="2024-03-26 01:38:12" type="7" value="1"/>
+        <Item unit="°" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="8" value="1"/>
+        <Item unit="°" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="9" value="1"/>
+        <Item unit="°" patroldevice_code="Drone01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="10" value="1"/>
+    </Items>
+</PatrolDevice>
