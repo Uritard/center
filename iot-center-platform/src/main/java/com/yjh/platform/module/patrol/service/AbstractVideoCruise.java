@@ -159,7 +159,7 @@ public abstract class AbstractVideoCruise {
                     //判断是否在紧急调阅模式
                     String state = hashOperations.get(TCameraInfoService.cameraStateKey + cameraIp,"state");
                     if (!"2".equals(state)){
-                        hashOperations.put(TCameraInfoService.cameraStateKey + cameraId, "state", "0");
+                        hashOperations.put(TCameraInfoService.cameraStateKey + cameraIp, "state", "0");
                     }
                 }
             }
