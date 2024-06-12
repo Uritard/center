@@ -96,6 +96,9 @@ public class TCfgAutoreviewServiceImpl extends ServiceImpl<TCfgAutoreviewMapper,
     public boolean updateAutoreview(TCfgAutoreview autoreview) {
         List<TCfgAutoreviewDetail> detailList = autoreview.getDetail();
         autoreview.setCreateTime(null).setCreateUser(null).setUpdateTime(LocalDateTime.now());
+        if (ArrayUtils.isNotEmpty(autoreview.getAutoreviewTypes())) {
+            autoreview.setAutoreviewType(StringUtils.join(autoreview.getAutoreviewTypes(), ","));
+        }
         super.updateById(autoreview);
 
         long autoreviewId = autoreview.getAutoreviewId();

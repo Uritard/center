@@ -156,6 +156,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     private boolean pointExecut(Map<String, String> inspectionMap) {
         try {
             long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
+            String taskId = inspectionMap.get("taskId");
             String taskStatus = uPatrolTaskService.taskStatus(taskId);
             if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
                 log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
