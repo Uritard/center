@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+	<SendCode>Robot01</SendCode>
+	<ReceiveCode>Edge01</ReceiveCode>
+	<Type>21</Type>
+	<Code/>
+	<Command/>
+	<Time>2024-06-12 08:18:30</Time>
+	<Items>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="1" value="0" value_unit="0℃" unit="℃"/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="2" value="0" value_unit="0%" unit="%"/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="3" value="10" value_unit="10m/s" unit="m/s"/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="4" value="" value_unit="" unit=""/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="5" value="" value_unit="" unit=""/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="6" value="" value_unit="" unit=""/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="7" value="" value_unit="" unit=""/>
+		<Item patroldevice_name="Robot01" patroldevice_code="Robot01" time="2024-06-12 08:18:30" type="8" value="0" value_unit="0ppm" unit="ppm"/>
+	</Items>
+</PatrolDevice>

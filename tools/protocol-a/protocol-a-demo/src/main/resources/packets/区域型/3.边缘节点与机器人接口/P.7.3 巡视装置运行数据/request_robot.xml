@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Robot01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>1</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-25 13:33:50</Time>
+    <Items>
+        <Item unit="m/s" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="5m/s" time="2024-03-26 01:38:12" type="1" value="5"/>
+        <Item unit="m" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="100m" time="2024-03-26 01:38:12" type="2" value="100"/>
+        <Item unit="%" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="80%" time="2024-03-26 01:38:12" type="3" value="80"/>
+        <Item unit="°" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="8" value="1"/>
+        <Item unit="°" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="9" value="1"/>
+        <Item unit="°" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="1°" time="2024-03-26 01:38:12" type="10" value="1"/>
+        <Item unit="mA" patroldevice_code="Robot01" patroldevice_name="无人机" value_unit="1mA" time="2024-03-26 01:38:12" type="11" value="1"/>
+    </Items>
+</PatrolDevice>
