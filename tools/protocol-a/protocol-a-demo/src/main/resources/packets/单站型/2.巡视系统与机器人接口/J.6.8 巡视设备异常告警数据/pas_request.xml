@@ -1,0 +1,11 @@
+<PatrolDevice>
+    <SendCode>Robot0002</SendCode>
+    <ReceiveCode>Edge02</ReceiveCode>
+    <Type>5</Type>
+    <Code></Code>
+    <Command></Command>
+    <Time>2024-03-08 09:19:40</Time>
+    <Items>
+        <Item patroldevice_code="E100-0002" time="2024-03-08 09:19:40" patroldevice_name="E100机器人" content="E100机器人告警数据"/>
+    </Items>
+</PatrolDevice>

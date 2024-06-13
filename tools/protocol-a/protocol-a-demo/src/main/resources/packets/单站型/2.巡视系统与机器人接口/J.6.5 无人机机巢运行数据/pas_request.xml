@@ -1,0 +1,16 @@
+<PatrolDevice>
+ <SendCode>Drone01</SendCode>
+ <ReceiveCode>Edge02</ReceiveCode>
+ <Type>10004</Type>
+ <Code></Code>
+ <Command></Command>
+ <Time>2024-03-06 14:45:29</Time>
+ <Items>
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="1" value="77.77" value_unit="77.77%" unit="%" />
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="2" value="2" value_unit="2" unit="" />
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="3" value="1" value_unit="1" unit="" />
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="4" value="66.66" value_unit="66.66v" unit="v" />
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="5" value="55.55" value_unit="55.55℃" unit="℃" />
+       <Item nest_name="测试机巢" nest_code="Nest01" module_no="" type="6" value="44.44" value_unit="44.44%RH" unit="%RH" />
+ </Items>
+</PatrolDevice>
