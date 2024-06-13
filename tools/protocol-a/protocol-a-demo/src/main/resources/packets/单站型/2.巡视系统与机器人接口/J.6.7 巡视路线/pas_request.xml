@@ -1,0 +1,13 @@
+<PatrolDevice>
+    <SendCode>Robot0002</SendCode>
+    <ReceiveCode>Edge02</ReceiveCode>
+    <Type>4</Type>
+    <Code>Drone-0001</Code>
+    <Command/>
+    <Time>2024-03-06 16:05:30</Time>
+    <Items>
+      <Item patroldevice_name="E100机器人" patroldevice_code="E100-0002" time="2024-03-06 16:05:30" coordinate_geography="120,31" coordinate_pixel="11,22,0,0"/>
+      <Item patroldevice_name="E100机器人" patroldevice_code="E100-0002" time="2024-03-06 16:05:30" coordinate_geography="120,32" coordinate_pixel="12,22,0,0"/>
+      <Item patroldevice_name="E100机器人" patroldevice_code="E100-0002" time="2024-03-06 16:05:30" coordinate_geography="120,33" coordinate_pixel="13,22,0,0"/>
+    </Items>
+</PatrolDevice>

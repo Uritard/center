@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Robot01</ReceiveCode>
+    <Type>41</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:39:42</Time>
+    <Items>
+        <Item task_name="整体测试二" task_progress="87.50%" start_time="2024-03-29 10:35:20" plan_start_time="2024-03-29 10:35:20" task_code="f7673bd6e19b4a7e9be5d84624c0ecb9" task_estimated_time="300" task_state="2" description="" task_patrolled_id="1_f7673bd6e19b4a7e9be5d84624c0ecb9_20240329103520"/>
+    </Items>
+</PatrolDevice>

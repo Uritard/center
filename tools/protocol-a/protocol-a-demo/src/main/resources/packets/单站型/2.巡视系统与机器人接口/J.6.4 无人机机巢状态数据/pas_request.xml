@@ -1,0 +1,15 @@
+<PatrolDevice>
+ <SendCode>Drone01</SendCode>
+ <ReceiveCode>Edge02</ReceiveCode>
+ <Type>20001</Type>
+ <Code></Code>
+ <Command></Command>
+ <Time>2024-03-06 14:45:29</Time>
+ <Items>
+    <Item nest_name="测试机巢" nest_code="Nest01" time="2024-03-06 14:45:29" type="1" value="4" value_unit="4" unit="" />
+    <Item nest_name="测试机巢" nest_code="Nest01" time="2024-03-06 14:45:29" type="2" value="1" value_unit="1" unit="" />
+    <Item nest_name="测试机巢" nest_code="Nest01" time="2024-03-06 14:45:29" type="3" value="1" value_unit="1" unit="" />
+    <Item nest_name="测试机巢" nest_code="Nest01" time="2024-03-06 14:45:29" type="4" value="2" value_unit="2" unit="" />
+    <Item nest_name="测试机巢" nest_code="Nest01" time="2024-03-06 14:45:29" type="5" value="1" value_unit="1" unit="" />
+ </Items>
+</PatrolDevice>

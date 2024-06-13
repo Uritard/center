@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Robot01</ReceiveCode>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Command>4</Command>
+    <Time>2024-03-29 18:23:31</Time>
+    <Items>
+        <Item error_code="0" task_patrolled_id="2_400000abcd1234_20240329150430"/>
+    </Items>
+</PatrolDevice>
