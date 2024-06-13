@@ -684,13 +684,13 @@ public class HomePageService {
     public Map<String, Object> countPowerTotalByDay() {
         LocalDate today = LocalDate.now();
         // 获取昨天的日期
-        LocalDate yesterday = today.minusDays(1);
+//        LocalDate yesterday = today.minusDays(1);
         // 昨天的开始时间，即00:00:00
-        LocalDateTime yesterdayStart = LocalDateTime.of(yesterday, LocalTime.MIN);
+        LocalDateTime yesterdayStart = LocalDateTime.of(today, LocalTime.MIN);
         // 昨天的结束时间，即23:59:59.999999999
-        LocalDateTime yesterdayEnd = LocalDateTime.of(yesterday, LocalTime.MAX);
+        LocalDateTime yesterdayEnd = LocalDateTime.of(today, LocalTime.MAX);
 
-        LocalDate beforeYesterday = today.minusDays(2);
+        LocalDate beforeYesterday = today.minusDays(1);
         // 昨天的开始时间，即00:00:00
         LocalDateTime beforeYesterdayStart = LocalDateTime.of(beforeYesterday, LocalTime.MIN);
         // 昨天的结束时间，即23:59:59.999999999
@@ -733,7 +733,7 @@ public class HomePageService {
             for (Map<String, String> beforeItem : beforeYesterdayList) {
                 if (beforeItem.containsValue(item.get("regionName"))) {
                     item.put("beforeYesterdayTotal", beforeItem.get("allTotal"));
-                    Double beforeValue = ValueUtil.toDouble(item.get("allTotal"), 0d);
+                    Double beforeValue = ValueUtil.toDouble(beforeItem.get("allTotal"), 0d);
                     double beforeYesterdayPercentage = beforeValue * 100 / beforeYesterdayAll;
                     item.put("beforeYesterdayPercentage", String.valueOf(Math.round(beforeYesterdayPercentage)));
                     break;

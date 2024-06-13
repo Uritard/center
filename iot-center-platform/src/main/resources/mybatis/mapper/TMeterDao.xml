@@ -134,13 +134,61 @@
 
     <select id="countPowerTotalByEdge" resultType="java.util.Map">
         SELECT
-           ROUND(SUM(a.total_positive_power_difference_value * a.magnification_coefficient),2) as allTotal,
-           b.region_name as regionName
+        ROUND(
+        SUM(
+        a.total_positive_power_difference_value * a.magnification_coefficient
+        ),
+        2
+        ) AS allTotal,
+        b.region_name AS regionName
         FROM
-            `t_meter_log` a
-                left join t_std_region b on a.edge_code = b.region_code
-        where b.state = 1 and a.create_time between #{startTime} and #{endTime}
-        GROUP BY a.edge_code
+        (
+        SELECT
+        b.edge_code,
+        (CASE WHEN b.total_positive_power - a.total_positive_power &lt;= 0 or b.total_positive_power - a.total_positive_power &gt;= 10 THEN 0
+        ELSE b.total_positive_power - a.total_positive_power END ) AS total_positive_power_difference_value,
+        b.create_time,
+        b.magnification_coefficient FROM
+        (
+        SELECT
+        meter_id,
+        edge_code,
+        total_positive_power,
+        total_positive_reactive_power,
+        total_negative_positive_power,
+        create_time,
+        magnification_coefficient,
+        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+        FROM
+        t_meter_log
+        GROUP BY
+        meter_id,lastTime
+        ORDER BY
+        create_time
+        )b LEFT JOIN (
+        SELECT
+        meter_id,
+        edge_code,
+        total_positive_power,
+        total_positive_reactive_power,
+        total_negative_positive_power,
+        create_time,
+        magnification_coefficient,
+        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+        FROM
+        t_meter_log
+        GROUP BY
+        meter_id,lastTime
+        ORDER BY
+        create_time
+        ) a ON b.meter_id = a.meter_id AND b.lastTime = DATE_ADD(a.lastTime,INTERVAL 1 DAY)
+        WHERE b.create_time between #{startTime} and #{endTime}
+        ) a
+        LEFT JOIN t_std_region b ON a.edge_code = b.region_code
+        WHERE
+        b.state = 1
+        GROUP BY
+        a.edge_code;
     </select>
 
     <select id="countPowerTotalAll" resultType="java.lang.String">
