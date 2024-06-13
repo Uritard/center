@@ -602,7 +602,7 @@
         SELECT a.device_mete_id as deviceMeteId,
         a.mete_type as meteType,
         a.meter_type as meterType,
-        e.cruise_time as cruiseTime,
+        DATE_FORMAT(e.cruise_time, '%Y-%m-%d %H:%i:%s') as cruiseTime,
         e.cruise_type as cruiseType,
         e.instance_name as instanceName,
         e.result_num as resultNum,
