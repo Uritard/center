@@ -94,6 +94,23 @@ public class DeviceMaintenanceInfoController {
         return result;
     }
 
+    @ApiOperation(value = "批量删除设备维护信息")
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
+    @Logs(title = "删除设备维护信息", content = "新增设备维护信息", logType = 4, authority = "1234")
+    public Result deleteSelectedDeviceInfo(@RequestParam(value = "ids", required = true) String ids) {
+        Result result = new Result();
+        try {
+            result.setData(deviceMaintenanceInfoService.removeByIds(Arrays.asList(ids.split(","))));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量删除设备维护信息失败：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询设备维护信息")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @Logs(title = "查询设备维护信息", content = "查询设备维护信息", authority = "1234")
