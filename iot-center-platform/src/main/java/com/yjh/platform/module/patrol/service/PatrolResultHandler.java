@@ -17,7 +17,9 @@ import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +58,7 @@ public class PatrolResultHandler {
     private final ApplicationEventPublisher eventPublisher;
     private final TCfgDataCurrentDao tCfgDataCurrentDao;
     private final AutoreviewHandler autoreviewHandler;
+    private final TDictBusinessDao tDictBusinessDao;
 
     private static final String METER = "meter";
 
@@ -64,7 +67,7 @@ public class PatrolResultHandler {
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
                                UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao, AlarmShieldService alarmShieldServic,
                                ApplicationEventPublisher eventPublisher,TCfgDataCurrentDao tCfgDataCurrentDao,
-        AutoreviewHandler autoreviewHandler) {
+        AutoreviewHandler autoreviewHandler,TDictBusinessDao tDictBusinessDao) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -76,6 +79,7 @@ public class PatrolResultHandler {
         this.eventPublisher = eventPublisher;
         this.tCfgDataCurrentDao = tCfgDataCurrentDao;
         this.autoreviewHandler = autoreviewHandler;
+        this.tDictBusinessDao = tDictBusinessDao;
     }
 
     /**
@@ -1050,7 +1054,9 @@ public class PatrolResultHandler {
             tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
             tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
             tWarnInfo.setLabelAttri(warningMsg.get("labelAttri"));
-            tWarnInfo.setAlarmType(ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1));
+            tWarnInfo.setWarnType(ValueUtil.toInteger(
+                    tDictBusinessDao.selectOne(null,null,"point_alarm_type",null,ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1)).getDictCode()
+                    ,-1));
             tWarnInfo.setDeviceType(cruiseResultMap.getOrDefault("deviceType", ""));
             autoreviewHandler.autoreviewCheckAlarm(tWarnInfo);
 

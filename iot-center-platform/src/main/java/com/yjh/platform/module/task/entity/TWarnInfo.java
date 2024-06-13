@@ -169,8 +169,4 @@ public class TWarnInfo implements Serializable {
      * 巡检点ID集合
      */
     private String instanceIds;
-    /**
-     * A接口协议告警类型
-     */
-    private Integer alarmType;
 }

@@ -137,7 +137,7 @@ public class ReportManageController {
     @ApiOperation(value = "下载巡视报告")
     @GetMapping(value = "/downLoadCruiseReport")
     @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9,authority = "1235")
-    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId,@RequestParam(value = "remark")String remark, HttpServletRequest request) {
+    public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId, HttpServletRequest request) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId") + "_" + request.getHeader("token");

@@ -282,7 +282,7 @@ public class TCfgDataCurrentService {
                     }
 
                     // 预案为空
-                    if (rule.getPlanId() == null && rule.getPresetId() != null){
+                    if (rule.getPresetId() != null){
                         // 配了联动预置位
                         Map<String,String> map = new HashMap<>();
                         map.put("type","linkagePresetPopUp");
