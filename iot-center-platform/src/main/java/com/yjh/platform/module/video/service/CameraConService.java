@@ -166,7 +166,7 @@ public class CameraConService {
                     if (System.currentTimeMillis() - endDate.getTime() > cameraStateTime * 60 * 1000 || (state == 2 && Boolean.FALSE.equals(redisTemplate.hasKey(emergencyAccessKey))) ) {
                         //最后一次操控时间距离现在大于10分钟
                         camreaStatusMap.put("state", "0");
-                        redisTemplate.opsForHash().putAll(TCameraInfoService.cameraStateKey, camreaStatusMap);
+                        redisTemplate.opsForHash().putAll(TCameraInfoService.cameraStateKey + cameraInfo.getCameraIp(), camreaStatusMap);
                         return;
                     }
                 } catch (Exception e) {
