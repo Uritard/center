@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Up01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>21</Type>
+    <Code>{{robotCode}}</Code>
+    <Time>2024-03-27 13:55:52</Time>
+    <Items>
+        <Item/>
+    </Items>
+    <Command>3</Command>
+</PatrolHost>

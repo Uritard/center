@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>21</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-06 16:40:46</Time>
+    <Items>
+        <Item unit="℃" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="25℃" time="2024-03-06 16:40:46" type="1" value="25"/>
+        <Item unit="℃" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="25℃" time="2024-03-06 16:40:46" type="2" value="25"/>
+        <Item unit="m/s" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="--" time="2024-03-06 16:40:46" type="3" value="10m/s"/>
+        <Item unit="%" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="10%" time="2024-03-06 16:40:46" type="4" value="10"/>
+        <Item unit="" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="--" time="2024-03-06 16:40:46" type="5" value="--"/>
+        <Item unit="pa" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="10pa" time="2024-03-06 16:40:46" type="6" value="10"/>
+        <Item unit="ppm" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="0ppm" time="2024-03-06 16:40:46" type="7" value="0"/>
+        <Item unit="ppm" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="0ppm" time="2024-03-06 16:40:46" type="8" value="0"/>
+    </Items>
+</PatrolHost>

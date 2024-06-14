@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>1104</Type>
+    <Code>1</Code>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item file_path="1/Model/pont.xml"/>
+    </Items>
+    <Command>1</Command>
+</PatrolHost>

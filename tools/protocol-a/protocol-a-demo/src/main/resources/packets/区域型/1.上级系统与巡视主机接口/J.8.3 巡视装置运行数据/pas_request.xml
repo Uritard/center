@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>2</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-06 11:14:42</Time>
+    <Items>
+        <Item unit="m/s" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="11.11m/s" time="2024-03-06 11:14:42" type="1" value="11.11"/>
+        <Item unit="m" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="6676.86m" time="2024-03-06 11:14:42" type="2" value="6676.86"/>
+        <Item unit="%" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="10%" time="2024-03-06 11:14:42" type="3" value="10"/>
+        <Item unit="°" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="10°" time="2024-03-06 11:14:42" type="8" value="10"/>
+        <Item unit="A" patroldevice_code="E100-0002" patroldevice_name="E100机器人" value_unit="2A" time="2024-03-06 11:14:42" type="11" value="2"/>
+    </Items>
+</PatrolHost>
