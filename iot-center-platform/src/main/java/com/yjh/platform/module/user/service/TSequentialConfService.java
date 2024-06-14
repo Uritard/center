@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
@@ -515,6 +516,9 @@ public class TSequentialConfService {
         log.info("recBack:{},map:{},param:{}", recBack, map, param);
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
         String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
+        if ((CommonUtils.isEmptyOrNullstr(stationId))) {
+            stationId = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+        }
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String path = ftpsFilePath + "/" + stationId + "/linkage/";
 
@@ -613,9 +617,10 @@ public class TSequentialConfService {
 
         try {
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            Map<String, String> map = redisTemplate.opsForHash().entries("region:" + (tCfgDevice.getEdgeCode() == null ? edgeCode:tCfgDevice.getEdgeCode()));
-            String stationId = map.get("stationId") == null ? edgeCode : map.get("stationId");
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+            if ((CommonUtils.isEmptyOrNullstr(stationId))) {
+                stationId = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+            }
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
             String devicePath = path + applicationProperties.getSequentialConfig().getSequentialReturnLinkage().replace("{{date}}", simpleDateFormat2.format(new Date()));
