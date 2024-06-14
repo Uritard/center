@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.io.IORuntimeException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
@@ -408,21 +409,9 @@ public class TCameraPresetService {
     private void deleteZip(String zipPath) {
         //删除zipPath下的所有文件
         try {
-            String cmd = "rm -rf " + zipPath + "/*";
-            String[] cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-            log.info("linux命令：" + cmd);
-            //Runtime.getRuntime().exec(cmd);
-            cmd = "mkdir " + zipPath;
-            log.info("linux命令：" + cmd);
-            cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-            cmd = "mkdir " + zipPath + "/picture";
-            log.info("linux命令：" + cmd);
-            cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-        } catch (IOException e) {
-            log.error("复制文件错误：" + e);
+            cn.hutool.core.io.FileUtil.clean(zipPath);
+        } catch (IORuntimeException e) {
+            log.error("删除文件错误：" + e);
         }
     }
     private void copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath){
