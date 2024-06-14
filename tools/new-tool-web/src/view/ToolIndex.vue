@@ -3,7 +3,8 @@
     <div class="send">
       <el-form :inline="true" style="padding: 10px; text-align: left">
         <el-form-item>
-          <span style="color: #FFFFFF; font-size: 16px">websocket IP: {{ this.wsIp }}</span>
+          <el-button type="primary" size="small" @click="onConnect">WebSocket重连</el-button>
+          <span style="margin-left: 20px; color: #FFFFFF; font-size: 16px">websocket IP: {{ this.wsIp }}</span>
           <span style="color: #FFFFFF; font-size: 16px; margin-left: 20px;">{{ this.isClient ? '客户端' : '服务端' }} IP: {{
               this.ip
             }}</span>
@@ -244,6 +245,10 @@ export default {
             this.sendCode = info.sendCode
             this.receiveCode = info.receiveCode
             this.serverFlag = 0
+            localStorage.setItem('ip', this.ip)
+            localStorage.setItem('port', this.port)
+            localStorage.setItem('client-sendCode', this.sendCode)
+            localStorage.setItem('client-receiveCode', this.receiveCode)
           }
         })
       } else {
@@ -255,6 +260,8 @@ export default {
             this.sendCode = info.sendCode
             this.receiveCode = info.receiveCode
             this.serverFlag = 1
+            localStorage.setItem('server-sendCode', this.sendCode)
+            localStorage.setItem('server-receiveCode', this.receiveCode)
           }
         })
       }
@@ -267,10 +274,10 @@ export default {
       this.operationName = '创建客户端'
       this.visibleFlag = true
       this.submitForm = {
-        ip: '',
-        port: '',
-        sendCode: '',
-        receiveCode: ''
+        ip: localStorage.getItem('ip'),
+        port: localStorage.getItem('port'),
+        sendCode: localStorage.getItem('client-sendCode'),
+        receiveCode: localStorage.getItem('client-receiveCode')
       }
     },
     destroyClient() {
@@ -282,7 +289,7 @@ export default {
           this.port = ''
           this.sendCode = ''
           this.receiveCode = ''
-          this.$message.success('销毁成功!!!');
+          this.$message.success('销毁成功!!!')
         }
       })
     },
@@ -292,8 +299,8 @@ export default {
       this.submitForm = {
         ip: '',
         port: '',
-        sendCode: '',
-        receiveCode: ''
+        sendCode: localStorage.getItem('server-sendCode'),
+        receiveCode: localStorage.getItem('server-receiveCode')
       }
     },
     destroyServer() {
