@@ -159,7 +159,7 @@ public class RobotInspectionWarnThread implements Runnable{
             tDefectInfo.setOriginId(taskAlarm.getOriginId());
             tDefectInfo.setEdgeCode(taskAlarm.getEdgeCode());
             tDefectInfo.setTaskId(taskId);
-            tDefectInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
+            tDefectInfo.setLabelAttri(CommonUtils.defaultEmpty(tStdDevicemete.getLabelAttri()));
             tDefectInfo.setDeviceType(String.valueOf(tStdDevicemete.getDeviceType()));
 
             autoreviewHandler.autoreviewCheckDefect(tDefectInfo);

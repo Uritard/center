@@ -1053,7 +1053,7 @@ public class PatrolResultHandler {
             tWarnInfo.setWarnContent(warningMsg.get("warnContent"));
             tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
             tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
-            tWarnInfo.setLabelAttri(warningMsg.get("labelAttri"));
+            tWarnInfo.setLabelAttri(CommonUtils.defaultEmpty(warningMsg.get("labelAttri")));
             tWarnInfo.setWarnType(ValueUtil.toInteger(
                     tDictBusinessDao.selectOne(null,null,"point_alarm_type",null,ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1)).getDictCode()
                     ,-1));
@@ -1243,7 +1243,7 @@ public class PatrolResultHandler {
             tDefectInfo.setImagePath(defectMap.get("imagePath"));
             tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
             tDefectInfo.setTaskId(defectMap.get("taskId"));
-            tDefectInfo.setLabelAttri(defectMap.get("labelAttri"));
+            tDefectInfo.setLabelAttri(CommonUtils.defaultEmpty(defectMap.get("labelAttri")));
 
             tDefectInfo.setDeviceType(defectMap.getOrDefault("deviceType", ""));
             autoreviewHandler.autoreviewCheckDefect(tDefectInfo);
