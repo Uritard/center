@@ -7,8 +7,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.*;
-import com.yjh.accessrobot.module.command.dao.LinkAutoMapper;
-import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
+import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +40,10 @@ public class TCruisePointInstanceService {
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     /**
      * 新建测点并连接巡视点
@@ -49,6 +52,16 @@ public class TCruisePointInstanceService {
      * @param robotId                        机器人id
      */
     public void instanceLinkAuto(List<TRobotInspection> tRobotInspectionsInfoModelFile, Long robotId) {
+        TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+        TStdRegion region = tStdRegionDao.selectByPrimaryId(robotInfo.getUpRegionId());
+        tRobotInspectionsInfoModelFile.forEach(t -> {
+            if (StringUtils.isBlank(t.getAreaName())) {
+                t.setAreaName(region.getRegionName());
+            }
+            if (StringUtils.isBlank(t.getBayName())) {
+                t.setBayName(region.getRegionName() + "间隔");
+            }
+        });
         //取出当前根节点
         Long rootId = linkAutoMapper.selectRoot();
         Integer cruiseType = linkAutoMapper.selectCruiseTypeByRobotId(robotId);
