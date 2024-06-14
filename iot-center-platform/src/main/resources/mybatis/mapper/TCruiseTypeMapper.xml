@@ -379,7 +379,7 @@
         <foreach collection="list" item="instanceId" separator=",">
             #{instanceId, jdbcType=BIGINT}
         </foreach>
-        )
+        ) and sub_type = #{subType}
     </update>
 
     <update id="tagsAdd" >
@@ -398,7 +398,7 @@
         <foreach collection="list" item="instanceId" separator=",">
             #{instanceId, jdbcType=BIGINT}
         </foreach>
-        )
+        ) and sub_type = #{subType}
     </delete>
 
     <select id="selectIdListByAll" resultType="java.lang.Long">

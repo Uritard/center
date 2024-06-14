@@ -32,8 +32,8 @@ public interface TCruiseTypeDao {
     List<TCruiseTypeDetail>selectByMeterTypeBySF6();
     List<TCruiseTypeDetail>selectByMeterTypeByYY();
     List<TCruiseTypeDetail>selectByAnalyseByWg();
-    int tagsDeleted(@Param(value = "list")List<Long> list);
+    int tagsDeleted(@Param(value = "list")List<Long> list,@Param(value = "subType") Integer subType);
     int tagsAdd(@Param(value = "list")List<Long> list);
-    int batchDeleteByInstance(@Param(value = "list")List<Long> list);
+    int batchDeleteByInstance(@Param(value = "list")List<Long> list,@Param(value = "subType") Integer subType);
     List<Long> selectIdListByAll(@Param(value = "subType") Integer subType);
 }
