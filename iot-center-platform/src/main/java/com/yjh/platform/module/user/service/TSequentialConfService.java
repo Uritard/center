@@ -496,7 +496,7 @@ public class TSequentialConfService {
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
             log.info("顺控执行完毕， {}-{}", JSONUtil.toJSONString(listSort), JSONUtil.toJSONString(map));
-            if (listSort.get(listSort.size() - 1).equals(map.get("cfgDeviceId"))) {
+            if (listSort.contains(String.valueOf(map.get("cfgDeviceId")))) {
                 Constant.sequentialState.put("status", 1);
                 Constant.sequentialState.put("content", param.get("resultValue"));
                 // 这是最后一个步骤
