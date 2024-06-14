@@ -23,6 +23,12 @@ public interface TDictBusinessDao {
                                 @Param(value = "colName") String colName,
                                 @Param(value = "dictNote") String dictNote,
                                 @Param(value = "upDict") Integer upDict);
+
+    TDictBusiness selectOne(@Param(value = "dictId") Integer dictId,
+                               @Param(value = "dictCode") String dictCode,
+                               @Param(value = "colName") String colName,
+                               @Param(value = "dictNote") String dictNote,
+                               @Param(value = "upDict") Integer upDict);
     List<TDictBusiness> selectByPage(TDictBusiness tDictBusiness);
     List<TDictBusiness> selectAll();
 

@@ -192,7 +192,8 @@ public class TWarnInfoService{
                 }
                 tWarnInfoDetail.setThresholdValue(thresholdValue);
                 // 转换字典数据
-                DictConvertUtil.optional("alarmLevel").add("alarmSource").add("confMode").add("defectModel").add("dealType").covertToDict(tWarnInfoDetail);
+                DictConvertUtil.optional("alarmLevel").add("alarmSource").add("confMode").add("defectModel").add("dealType")
+                        .add("pointAlarmType","warnType","warnTypeName").covertToDict(tWarnInfoDetail);
 
                 if (presetInfo != null) {
                     tWarnInfoDetail.setCameraId(presetInfo.getCameraId());
@@ -625,6 +626,7 @@ public class TWarnInfoService{
         }
         tWarnInfoDetail.setStationName(stationName);
         tWarnInfoDetail.setLabelAttriName(tStdDevicemeteService.labelAttriName(tWarnInfoDetail.getLabelAttri()));
+        DictConvertUtil.optional("pointAlarmType","warnType","warnTypeName").covertToDict(tWarnInfoDetail);
         return tWarnInfoDetail;
     }
 

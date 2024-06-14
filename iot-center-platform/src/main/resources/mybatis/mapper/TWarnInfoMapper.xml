@@ -630,7 +630,7 @@
         low_limit2,
         low_limit3,
         low_limit4,
-        custom_name,edge_code,label_attri FROM (
+        custom_name,edge_code,label_attri,warn_type FROM (
         ( SELECT
         a.warn_id,
         a.instance_id,
@@ -661,6 +661,7 @@
         a.deal_type,
         a.defect_model,
         a.label_attri,
+        a.warn_type,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_warn_info a
@@ -704,6 +705,7 @@
         a.deal_type,
         a.defect_type as defect_model,
         a.label_attri,
+        0 as warn_type,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_defect_info a
@@ -1019,6 +1021,7 @@
         d.high_limit3,
         d.high_limit4,
         a.label_attri,
+        a.warn_type,
         b.up_region_name as region_name
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id

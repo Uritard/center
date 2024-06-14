@@ -143,8 +143,8 @@ public class AutoreviewHandler {
             Map<Integer, String[]> metes = new HashMap<>();
 
             // 告警类型
-            if (warnInfo.getAlarmType() != null && warnInfo.getAlarmType() > 0) {
-                metes.put(2, new String[] {String.valueOf(warnInfo.getAlarmType())});
+            if (warnInfo.getWarnType() != null && warnInfo.getWarnType() > 0) {
+                metes.put(2, new String[] {String.valueOf(warnInfo.getWarnType())});
             }
 
             metes.put(3, new String[] {warnInfo.getDeviceType()});

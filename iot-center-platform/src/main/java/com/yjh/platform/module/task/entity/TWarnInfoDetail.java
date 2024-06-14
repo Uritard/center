@@ -146,4 +146,8 @@ public class TWarnInfoDetail implements Serializable {
     private String labelAttri;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<KeyValue<String, String>> labelAttriName;
+
+    private String warnType;
+
+    private String warnTypeName;
 }

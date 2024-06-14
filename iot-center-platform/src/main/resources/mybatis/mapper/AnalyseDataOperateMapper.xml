@@ -223,8 +223,7 @@
             value,
             out_range,
             task_id,
-            label_attri,
-            alarm_type
+            label_attri
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
@@ -253,8 +252,7 @@
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
                 #{taskId, jdbcType=VARCHAR},
-                #{labelAttri,jdbcType=VARCHAR},
-                #{alarmType,jdbcType=INTEGER}
+                #{labelAttri,jdbcType=VARCHAR}
         )
     </insert>
 
