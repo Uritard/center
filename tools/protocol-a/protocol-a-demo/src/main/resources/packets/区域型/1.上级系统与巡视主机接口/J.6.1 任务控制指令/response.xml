@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Command>4</Command>
+    <Time>2024-03-27 18:11:10</Time>
+    <Items>
+        <Item task_patrolled_id="1_{{taskCode}}_{{simpleNow}}"/>
+    </Items>
+</PatrolHost>

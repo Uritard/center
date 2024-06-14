@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>62</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-07 14:49:47</Time>
+    <Items>
+        <Item task_name="11111" file_path="alarm/1/2024/03/07/c43945e168ed4e4f9af4526ba8ebb0ac/CCD/80231_Region01_20240307144946.jpg" patroldevice_code="40033" device_id="80231" patroldevice_name="5楼轨交测试球机" task_code="c43945e168ed4e4f9af4526ba8ebb0ac" alarm_level="2" origin_id="496" content="2-32-运行指示灯:灯灭--一般告警" device_name="2-32-运行指示灯" recognition_type="1" unit="" alarm_type="7" edge_code="Region01" file_type="5" value_unit="1" time="2024-03-07 14:49:43" task_patrolled_id="1_c43945e168ed4e4f9af4526ba8ebb0ac_20240307144926" value="1" defect_type="" link_point="1111"/>
+    </Items>
+</PatrolHost>

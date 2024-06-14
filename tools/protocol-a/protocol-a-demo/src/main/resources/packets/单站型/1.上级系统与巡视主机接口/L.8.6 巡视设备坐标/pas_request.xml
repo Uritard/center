@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>3</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-06 16:29:50</Time>
+    <Items>
+        <Item patroldevice_code="E100-0002" patroldevice_name="E100机器人" coordinate_geography="(16,15)" time="2022-09-04 17:17:55" coordinate_pixel="233,353,0,0" task_patrolled_id="1_0150d74ba8f04207a4994aa7efc7d1b6_20240329100124"/>
+    </Items>
+</PatrolHost>

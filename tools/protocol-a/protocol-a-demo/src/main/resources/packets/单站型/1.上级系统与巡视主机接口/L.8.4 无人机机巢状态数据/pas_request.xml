@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>20001</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-06 11:14:43</Time>
+    <Items>
+        <Item nest_code="q100-01" unit="" nest_name="q100" value_unit="1" time="2024-03-06 11:14:42" type="1" value="1"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" value_unit="1" time="2024-03-06 11:14:42" type="2" value="1"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" value_unit="1" time="2024-03-06 11:14:42" type="3" value="1"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" value_unit="0" time="2024-03-06 11:14:42" type="4" value="0"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" value_unit="1" time="2024-03-06 11:14:42" type="5" value="1"/>
+    </Items>
+</PatrolHost>

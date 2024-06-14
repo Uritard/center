@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>64</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item task_patrolled_id="1_0150d74ba8f04207a4994aa7efc7d1b6_20240329100124" device_id="100000000255" is_alarm="1" confirm_people="business" confirm_date="2024-03-29 10:02:16"/>
+    </Items>
+</PatrolHost>
