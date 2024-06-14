@@ -37,12 +37,12 @@ public class TCruiseTypeService{
         }
         List<TCruiseTypeDetail> list = new ArrayList<>();
         if(list1 != null && list1.size()>0){
-            tCruiseTypeDao.batchDeleteByInstance(listNew);//先把库里有listNew的点删除掉
+            tCruiseTypeDao.batchDeleteByInstance(listNew,cruiseType);//先把库里有listNew的点删除掉
         }
         List<Long> listHave= tCruiseTypeDao.selectIdList(cruiseType);//此时查出来的是要标记删除的
         //此时listHave中剩下的都是此次新增中所不需要的点 需要标记删除
         if(listHave != null && listHave.size()>0){
-            tCruiseTypeDao.tagsDeleted(listHave);//将库里的标记删除了
+            tCruiseTypeDao.tagsDeleted(listHave,cruiseType);//将库里的标记删除了
         }
         for (String item:list1) {
             TCruiseTypeDetail tCruiseType= new TCruiseTypeDetail();
