@@ -94,7 +94,7 @@ public class TMeterService {
      * @param type 单位类型 1 kwh  2 kvarh
      * @return
      */
-    public String getMeterRealNum(String value, int mc, Boolean flag, int type) {
+    public static String getMeterRealNum(String value, int mc, Boolean flag, int type) {
         Double num = StringUtils.isNotBlank(value) ? Double.parseDouble(value) : 0;
         num = num * mc;
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");

@@ -23,48 +23,56 @@
     </sql>
 
     <select id="list" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
-        SELECT
-        b.total_positive_power,
+        SELECT b.total_positive_power,
         b.total_positive_reactive_power,
         b.total_negative_positive_power,
-        IFNULL(b.total_positive_power - a.total_positive_power, 0) AS totalPositivePowerDifferenceValue ,
-        IFNULL(b.total_positive_reactive_power - a.total_positive_reactive_power, 0) AS totalPositiveReactivePowerDifferenceValue,
-        IFNULL(b.total_negative_positive_power - a.total_negative_positive_power, 0) AS totalNegativePositivePowerDifferenceValue,
-        b.create_time, b.magnification_coefficient
-        FROM (
-        SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power,
-        DATE_FORMAT(create_time,'%Y-%m-%d') AS lastTime, create_time, magnification_coefficient
-        FROM t_meter_log
-        WHERE meter_id =  #{id, jdbcType=INTEGER}
-        <if test="startTime != null and startTime != ''">
-            AND create_time &gt;= #{startTime}
-        </if>
-        <if test="endTime != null and endTime != ''">
-            AND create_time &lt;= #{endTime}
-        </if>
-        GROUP BY lastTime
-        ORDER BY create_time
-        ) b LEFT JOIN
+        (CASE WHEN b.total_positive_power - a.total_positive_power &lt;= 0 or b.total_positive_power - a.total_positive_power &gt;= 10 THEN 0
+        ELSE b.total_positive_power - a.total_positive_power END ) AS totalPositivePowerDifferenceValue,
+        (CASE WHEN b.total_positive_reactive_power - a.total_positive_reactive_power &lt;= 0 or b.total_positive_reactive_power - a.total_positive_reactive_power &gt;= 10 THEN 0
+        ELSE b.total_positive_reactive_power - a.total_positive_reactive_power END ) AS totalPositiveReactivePowerDifferenceValue,
+        (CASE WHEN b.total_negative_positive_power - a.total_negative_positive_power &lt;= 0 or b.total_negative_positive_power - a.total_negative_positive_power &gt;= 10 THEN 0
+        ELSE b.total_negative_positive_power - a.total_negative_positive_power END ) AS totalNegativePositivePowerDifferenceValue,
+        b.create_time, b.magnification_coefficient FROM
         (
-        SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power,
-        DATE_FORMAT(create_time,'%Y-%m-%d') AS lastTime
-        FROM t_meter_log
-        WHERE meter_id = #{id, jdbcType=INTEGER}
-        <if test="startTime != null and startTime != ''">
-            AND create_time &gt;= DATE_SUB(#{startTime},INTERVAL 1 DAY)
-        </if>
-        <if test="endTime != null and endTime != ''">
-            AND create_time &lt;= #{endTime}
-        </if>
-        GROUP BY lastTime
-        ORDER BY create_time
+        SELECT
+        total_positive_power,
+        total_positive_reactive_power,
+        total_negative_positive_power,
+        create_time,
+        magnification_coefficient,
+        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+        FROM
+        t_meter_log
+        where meter_id = #{id, jdbcType=INTEGER} and create_time between #{startTime} and #{endTime}
+        GROUP BY
+        lastTime
+        ORDER BY
+        create_time
+        )b LEFT JOIN (
+        SELECT
+        total_positive_power,
+        total_positive_reactive_power,
+        total_negative_positive_power,
+        create_time,
+        magnification_coefficient,
+        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+        FROM
+        t_meter_log
+        where meter_id = #{id, jdbcType=INTEGER} and create_time between #{startTime} and #{endTime}
+        GROUP BY
+        lastTime
+        ORDER BY
+        create_time
         ) a ON b.lastTime = DATE_ADD(a.lastTime,INTERVAL 1 DAY)
     </select>
     <select id="selectPowerDifferenceValue" resultType="com.yjh.platform.module.device.entity.TMeter">
         SELECT
-            b.total_positive_power - a.total_positive_power AS totalPositivePowerDifferenceValue,
-            b.total_positive_reactive_power - a.total_positive_reactive_power AS totalPositiveReactivePowerDifferenceValue,
-            b.total_negative_positive_power - a.total_negative_positive_power AS totalNegativePositivePowerDifferenceValue
+            (CASE WHEN b.total_positive_power - a.total_positive_power &lt;= 0 or b.total_positive_power - a.total_positive_power &gt;= 10 THEN 0
+                  ELSE b.total_positive_power - a.total_positive_power END ) AS totalPositivePowerDifferenceValue,
+            (CASE WHEN b.total_positive_reactive_power - a.total_positive_reactive_power &lt;= 0 or b.total_positive_reactive_power - a.total_positive_reactive_power &gt;= 10 THEN 0
+                  ELSE b.total_positive_reactive_power - a.total_positive_reactive_power END ) AS totalPositiveReactivePowerDifferenceValue,
+            (CASE WHEN b.total_negative_positive_power - a.total_negative_positive_power &lt;= 0 or b.total_negative_positive_power - a.total_negative_positive_power &gt;= 10 THEN 0
+                  ELSE b.total_negative_positive_power - a.total_negative_positive_power END ) AS totalNegativePositivePowerDifferenceValue
         FROM (
                  SELECT total_positive_power,total_positive_reactive_power, total_negative_positive_power
                  FROM t_meter_log,
