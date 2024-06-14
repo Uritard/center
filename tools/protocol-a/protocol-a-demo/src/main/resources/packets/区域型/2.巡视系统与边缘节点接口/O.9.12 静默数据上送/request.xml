@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>64</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item patroldevice_code="40003" device_name="静默监视测点" device_id="21000000006" time="{{now}}" rectangle="" file_type="2" file_path="2/jm/2024/03/29/40003/21000000006.jpg" monitor_type="204"/>
+    </Items>
+</PatrolHost>

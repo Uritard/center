@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>10004</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+        <Item nest_code="{{nestCode}}" unit="%" nest_name="测试机巢" module_no="" value_unit="77.77%" type="1" value="77.77"/>
+        <Item nest_code="{{nestCode}}" unit="" nest_name="测试机巢" module_no="" value_unit="2" type="2" value="2"/>
+        <Item nest_code="{{nestCode}}" unit="" nest_name="测试机巢" module_no="" value_unit="1" type="3" value="1"/>
+        <Item nest_code="{{nestCode}}" unit="v" nest_name="测试机巢" module_no="" value_unit="66.66v" type="4" value="66.66"/>
+        <Item nest_code="{{nestCode}}" unit="℃" nest_name="测试机巢" module_no="" value_unit="55.55℃" type="5" value="55.55"/>
+        <Item nest_code="{{nestCode}}" unit="%RH" nest_name="测试机巢" module_no="" value_unit="44.44%RH" type="6" value="44.44"/>
+    </Items>
+</PatrolHost>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>20002</Type>
+    <Code>{{droneCode}}</Code>
+    <Time>2024-03-27 15:19:46</Time>
+    <Items>
+        <Item value="1"/>
+    </Items>
+    <Command>7</Command>
+</PatrolHost>

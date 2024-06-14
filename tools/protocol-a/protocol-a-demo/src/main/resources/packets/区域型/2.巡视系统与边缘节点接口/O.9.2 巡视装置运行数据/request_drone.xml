@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>2</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+        <Item unit="m/s" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="15.61m/s" time="{{now}}" type="1" value="15.61"/>
+        <Item unit="m" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="10086.86m" time="{{now}}" type="2" value="10086.86"/>
+        <Item unit="%" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="60%" time="{{now}}" type="3" value="60"/>
+        <Item unit="m/s" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="2m/s" time="{{now}}" type="4" value="2"/>
+        <Item unit="m" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="300.86m" time="{{now}}" type="5" value="300.86"/>
+        <Item unit="m" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="120.0m" time="{{now}}" type="6" value="120.0"/>
+        <Item unit="分" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="15分" time="{{now}}" type="7" value="15"/>
+        <Item unit="°" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="15°" time="{{now}}" type="8" value="15"/>
+        <Item unit="°" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="0°" time="{{now}}" type="9" value="0"/>
+        <Item unit="°" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="-15°" time="{{now}}" type="10" value="-15"/>
+    </Items>
+</PatrolHost>
