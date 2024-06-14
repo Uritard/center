@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>200</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item cpu="20" memory_rate="60" memory_total="128" disk_rate="23" disk_total="32768" />
+    </Items>
+</PatrolHost>

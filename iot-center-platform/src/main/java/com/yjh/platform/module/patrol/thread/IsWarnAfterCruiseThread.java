@@ -181,6 +181,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
             warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : Objects.nonNull(map.get("outRange")) ? String.valueOf(map.get("outRange")) : null);
+            warnInfo.setLabelAttri(CommonUtils.defaultEmpty(cruiseMap.get("labelAttri")));
             // 告警自动审核
             autoreviewHandler.autoreviewCheckAlarm(warnInfo);
 

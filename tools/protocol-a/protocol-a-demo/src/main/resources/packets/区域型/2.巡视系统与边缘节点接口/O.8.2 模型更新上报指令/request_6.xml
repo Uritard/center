@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>11</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-27 21:27:01</Time>
+    <Items>
+        <Item file_path="1/Model/voice_model.xml" time="{{now}}" type="1"/>
+    </Items>
+</PatrolHost>

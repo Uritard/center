@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>71</Type>
+    <Code>1</Code>
+    <Time>2024-03-27 20:19:42</Time>
+    <Items>
+        <Item file_path="1/linkage/returnlinkage.cime" />
+    </Items>
+    <Command>3</Command>
+</PatrolHost>

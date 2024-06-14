@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>2</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 13:39:29</Time>
+    <Items>
+        <Item unit="m/s" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="11.11m/s" time="{{now}}" type="1" value="11.11"/>
+        <Item unit="m" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="6676.86m" time="{{now}}" type="2" value="6676.86"/>
+        <Item unit="%" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="60%" time="{{now}}" type="3" value="60"/>
+        <Item unit="°" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="15°" time="{{now}}" type="8" value="15"/>
+        <Item unit="°" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="0°" time="{{now}}" type="9" value="0"/>
+        <Item unit="°" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="-15°" time="{{now}}" type="10" value="-15"/>
+        <Item unit="A" patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" value_unit="3A" time="{{now}}" type="11" value="3"/>
+    </Items>
+</PatrolHost>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>41</Type>
+    <Code>{{taskPatrolledId}}</Code>
+    <Time>2024-03-27 18:09:56</Time>
+    <Items/>
+    <Command>2</Command>
+</PatrolHost>

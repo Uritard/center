@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>2</Type>
+    <Code>{{robotCode}}</Code>
+    <Time>2024-03-26 17:19:08</Time>
+    <Items>
+        <Item value="2"/>
+    </Items>
+    <Command>8</Command>
+</PatrolHost>

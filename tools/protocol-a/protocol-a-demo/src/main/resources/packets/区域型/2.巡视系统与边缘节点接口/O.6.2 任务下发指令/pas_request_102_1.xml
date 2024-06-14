@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>102</Type>
+    <Code>1</Code>
+    <Time>2024-03-29 18:10:23</Time>
+    <Items>
+        <Item task_code="{{uuid}}" task_name="联动任务测试" priority="4" device_level="3" device_list="83409,83410,83411" />
+    </Items>
+    <Command>1</Command>
+</PatrolHost>

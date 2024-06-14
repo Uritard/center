@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Time>2024-03-26 10:49:46</Time>
+    <Items>
+        <Item heart_beat_interval="30" patroldevice_run_interval="120" weather_interval="120" nest_run_interval="120"/>
+    </Items>
+    <Command>4</Command>
+</PatrolHost>

@@ -53,12 +53,15 @@ public class MessageThread {
                 log.warn("消息处理未定义，type: {}", type);
                 clientHandler.normalResponse("400", header.getSessionId());
             }
-            CallbackHandlerStrategy callbackHandlerStrategy =
+
+            // 增加判断，只有返回才需要回调
+            if (flag) {
+                CallbackHandlerStrategy callbackHandlerStrategy =
                     CallbackHandlerStrategyFactory.getStrategyType(clientHandler.getRootName() + header.getReceiveSessionId());
-            if (Optional.ofNullable(callbackHandlerStrategy).isPresent()) {
-                callbackHandlerStrategy.handler(clientHandler, xmlBaseModel, header);
-            } else {
-                log.info("回调未定义,不处理。reSessionId: {}", header.getReceiveSessionId());
+                if (Optional.ofNullable(callbackHandlerStrategy).isPresent()) {
+                    log.info("命中回调函数。reSessionId: {}， class: {}", header.getReceiveSessionId(), callbackHandlerStrategy.getClass());
+                    callbackHandlerStrategy.handler(clientHandler, xmlBaseModel, header);
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

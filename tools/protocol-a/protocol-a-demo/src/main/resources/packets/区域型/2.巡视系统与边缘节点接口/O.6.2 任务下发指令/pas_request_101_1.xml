@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>101</Type>
+    <Code>1</Code>
+    <Time>2024-03-27 17:42:44</Time>
+    <Items>
+        <Item type="4" task_code="{{uuid}}" task_name="巡视下发任务测试" priority="2" device_level="3" device_list="83402,83403,83404,83405" fixed_start_time="{{now}}" cycle_month="" cycle_week="" cycle_execute_time="" cycle_start_time="" cycle_end_time="" interval_number="" interval_type="" interval_execute_time="" interval_start_time="" interval_end_time="" invalid_start_time="" invalid_end_time="" isenable="0" creator="business" create_time="{{now}}" />
+    </Items>
+    <Command>1</Command>
+</PatrolHost>
