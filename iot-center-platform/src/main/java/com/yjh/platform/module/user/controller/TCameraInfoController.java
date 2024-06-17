@@ -75,12 +75,7 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String cameraChannelId = tCameraInfo.getCameraChannelId();
-                if (StringUtils.hasLength(cameraChannelId)) {
-                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
-                        tCameraInfo.setCameraChannelId("");
-                    }
-                }
+                checkChannelId(tCameraInfo);
                 tCameraInfo.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeCode", "content"));
                 int state = tCameraInfoService.insert(tCameraInfo);
                 if (state == 0) {
@@ -100,6 +95,27 @@ public class TCameraInfoController {
             log.error("新增相机错误:", e);
         }
         return result;
+    }
+
+    /**
+     * 检测国标/视频B通道编码
+     * @param tCameraInfo tCameraInfo
+     */
+    private void checkChannelId(TCameraInfo tCameraInfo) {
+        String cameraChannelId = tCameraInfo.getCameraChannelId();
+        if (StringUtils.hasLength(cameraChannelId)) {
+            int c = 20;
+            if (cameraChannelId.length() != c) {
+                tCameraInfo.setCameraChannelId(null);
+            }
+        }
+        String bCameraChannelId = tCameraInfo.getBcameraChannelId();
+        if (StringUtils.hasLength(bCameraChannelId)) {
+            int b = 18;
+            if (bCameraChannelId.length() != b) {
+                tCameraInfo.setBcameraChannelId(null);
+            }
+        }
     }
 
     @ApiOperation(value = "删除")
@@ -171,12 +187,7 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && !tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String cameraChannelId = tCameraInfo.getCameraChannelId();
-                if (StringUtils.hasLength(cameraChannelId)) {
-                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
-                        tCameraInfo.setCameraChannelId(null);
-                    }
-                }
+                checkChannelId(tCameraInfo);
                 int state = tCameraInfoService.update(tCameraInfo);
                 if (state == 0) {
                     result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

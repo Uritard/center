@@ -3090,7 +3090,36 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
-            //只解析相机的  录像机的在录像机报文中解析
+            List<CameraModel> recordModelList = mapList.stream()
+                    .map(JSON::toJSONString)
+                    .map(jsonString -> JSON.parseObject(jsonString, CameraModel.class))
+                    .filter(t -> "11".equals(t.getType()))
+                    .collect(Collectors.toList());
+            List<TCameraRecorder> recorderList = new ArrayList<>();
+            recordModelList.forEach(cameraModel -> {
+                TCameraRecorder tCameraRecorder = new TCameraRecorder();
+                tCameraRecorder.setRecordId(cameraModel.getRecordId());
+                tCameraRecorder.setEdgeCode(cameraModel.getEdgeCode());
+                tCameraRecorder.setOriginId(cameraModel.getOriginId());
+                tCameraRecorder.setRecordName(cameraModel.getPatroldeviceName());
+                tCameraRecorder.setRecorderModel(cameraModel.getCameraModel());
+                tCameraRecorder.setRecorderType(String.valueOf(cameraModel.getCameraType()));
+                tCameraRecorder.setVendorId(Integer.valueOf(cameraModel.getVendorId()));
+                tCameraRecorder.setPmsId(cameraModel.getPmsId());
+                tCameraRecorder.setAliasName(cameraModel.getAliasName());
+                tCameraRecorder.setRecordIp(cameraModel.getCameraIp());
+                tCameraRecorder.setProtocol(String.valueOf(cameraModel.getProtocolType()));
+                tCameraRecorder.setHttpPort(cameraModel.getPort());
+                tCameraRecorder.setRtspPort(cameraModel.getChannelNum());
+                tCameraRecorder.setIdentityManager(cameraModel.getCameraManager());
+                tCameraRecorder.setIdentityCode(cameraModel.getCameraCode());
+                tCameraRecorder.setDeviceChannel(cameraModel.getCameraChannelId());
+                tCameraRecorder.setBdeviceChannel(cameraModel.getPatroldeviceCode());
+                tCameraRecorder.setCommissionDate(cameraModel.getCommissionDate());
+                recorderList.add(tCameraRecorder);
+            });
+            tCameraRecorderService.saveReportData(recorderList,edgeCode);
+
             List<CameraModel> cameraModelList = mapList.stream()
                     .map(JSON::toJSONString)
                     .map(jsonString -> JSON.parseObject(jsonString, CameraModel.class))
@@ -3123,15 +3152,15 @@ public class RobotService {
             log.info("file path is null");
             return;
         }
-        try {
-            XMLBaseModel model = getXmlMessage(filePath);
-            List<Map<String, Object>> mapList = model.getItems();
-            List<TCameraRecorder> tCameraRecorderList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TCameraRecorder.class)).collect(Collectors.toList());
-            tCameraRecorderService.saveReportData(tCameraRecorderList,edgeCode);
-            log.info("录像机文件处理结束 edgeCode:{}", edgeCode);
-        } catch (DocumentException e) {
-            log.error("录像机文件处理失败", e);
-        }
+//        try {
+//            XMLBaseModel model = getXmlMessage(filePath);
+//            List<Map<String, Object>> mapList = model.getItems();
+//            List<TCameraRecorder> tCameraRecorderList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TCameraRecorder.class)).collect(Collectors.toList());
+//            tCameraRecorderService.saveReportData(tCameraRecorderList,edgeCode);
+//            log.info("录像机文件处理结束 edgeCode:{}", edgeCode);
+//        } catch (DocumentException e) {
+//            log.error("录像机文件处理失败", e);
+//        }
     }
 
     public void dealRegionFile(String filePath, String edgeCode) {

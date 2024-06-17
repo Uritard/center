@@ -72,12 +72,7 @@ public class TCameraRecorderController {
             if (StringUtils.hasLength(tCameraRecorder.getPmsId()) &&  selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String deviceChannel = tCameraRecorder.getDeviceChannel();
-                if (StringUtils.hasLength(deviceChannel)) {
-                    if (deviceChannel.length() <= 14 || deviceChannel.length() != 20) {
-                        tCameraRecorder.setDeviceChannel("");
-                    }
-                }
+                checkChannelId(tCameraRecorder);
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
                 // sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
                 if (Constant.updateSyncModel()) {
@@ -91,6 +86,27 @@ public class TCameraRecorderController {
             log.error("添加错误:", e);
         }
         return result;
+    }
+
+    /**
+     * 检测国标/视频B通道编码
+     * @param tCameraRecorder tCameraRecorder
+     */
+    private void checkChannelId(TCameraRecorder tCameraRecorder){
+        String deviceChannel = tCameraRecorder.getDeviceChannel();
+        if (StringUtils.hasLength(deviceChannel)) {
+            int c = 20;
+            if (deviceChannel.length() != c) {
+                tCameraRecorder.setDeviceChannel(null);
+            }
+        }
+        String bDeviceChannel = tCameraRecorder.getBdeviceChannel();
+        if (StringUtils.hasLength(bDeviceChannel)) {
+            int b = 18;
+            if (bDeviceChannel.length() != b) {
+                tCameraRecorder.setBdeviceChannel(null);
+            }
+        }
     }
 
     @ApiOperation(value = "删除")
@@ -155,12 +171,7 @@ public class TCameraRecorderController {
             if (StringUtils.hasLength(tCameraRecorder.getPmsId()) && !tCameraRecorder.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String deviceChannel = tCameraRecorder.getDeviceChannel();
-                if (StringUtils.hasLength(deviceChannel)) {
-                    if (deviceChannel.length() <= 14 || deviceChannel.length() != 20) {
-                        tCameraRecorder.setDeviceChannel("");
-                    }
-                }
+                checkChannelId(tCameraRecorder);
                 log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
                 // sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
