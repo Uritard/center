@@ -126,6 +126,8 @@ public class RobotService {
 
     @Autowired
     private  TVoiceDeviceService tVoiceDeviceService;
+    @Resource
+    private DeviceMaintenanceService deviceMaintenanceService;
 
     @Autowired
     private PlatformProxy platformProxy;
@@ -716,6 +718,10 @@ public class RobotService {
                         case "source_file_path":
                             desc = "设备资源信息配置";
                             dealSourceFile(filePath, nodeCode);
+                            break;
+                        case "maintenance_file_path":
+                            desc = "维护记录文件信息";
+                            dealMaintenanceFile(filePath, nodeCode);
                             break;
                         default:
                             desc = k + " 该模型未定义";
@@ -2847,51 +2853,57 @@ public class RobotService {
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
             filePathMap.put("content", "C:\\robotData\\Model");
         }
+        String ftpsPath = filePathMap.get("content") + File.separator + filePath;
         switch (type) {
             case "1":
                 log.info("设备点位模型 {}", filePath);
-                dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
+                dealDevicePointModel(ftpsPath, filePathMap.get("content"),
                         mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode, edgeLevel);
                 break;
             case "2":
                 log.info("边缘节点模型 {}", filePath);
-                dealHostFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealHostFilePath(ftpsPath, edgeCode);
                 break;
             case "3":
                 log.info("机器人模型 {}", filePath);
-                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.ROBOT);
+                dealRobotFile(ftpsPath, edgeCode, Constant.ROBOT);
                 break;
             case "4":
                 log.info("摄像机模型 {}", filePath);
-                dealCameraFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                dealCameraFile(ftpsPath, edgeCode);
                 break;
             case "5":
                 log.info("无人机模型 {}", filePath);
-                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.DRONE);
+                dealRobotFile(ftpsPath, edgeCode, Constant.DRONE);
                 break;
             case "6":
                 log.info("声纹模型 {}", filePath);
-                dealVoiceFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                dealVoiceFile(ftpsPath, edgeCode);
                 break;
             case "8":
                 log.info("检修区域配置模型 {}", filePath);
-                dealMaintenanceFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealMaintenanceFilePath(ftpsPath, edgeCode);
                 break;
             case "9":
                 log.info("地图文件 {}", filePath);
-                dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealMapFile(ftpsPath, edgeCode);
                 break;
             case "10":
-                log.info("设备资源信息配置文件 {}", filePath);
-                dealSourceFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                if (EdgeEnum.UP_SYSTEM_NODE.getCode().equals(edgeLevel)) {
+                    log.info("设备维护记录 {}", filePath);
+                    dealMaintenanceFile(ftpsPath, edgeCode);
+                } else {
+                    log.info("设备资源信息配置文件 {}", filePath);
+                    dealSourceFile(ftpsPath, edgeCode);
+                }
                 break;
             case "1001":
                 log.info("区域文件模型 {}", filePath);
-                dealRegionFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealRegionFile(ftpsPath, edgeCode);
                 break;
             case "1002":
                 log.info("录像机文件模型 {}", filePath);
-                dealRecordFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealRecordFile(ftpsPath, edgeCode);
                 break;
             default:
                 break;
@@ -3137,6 +3149,29 @@ public class RobotService {
             SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
         } catch (Exception e) {
             log.error("区域文件处理失败", e);
+        }
+    }
+
+    /**
+     * 设备维护记录同步
+     */
+    public void dealMaintenanceFile(String filePath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> mapList = model.getItems();
+            //只解析相机的  录像机的在录像机报文中解析
+            List<DeviceMaintenanceInfo> modelList = mapList.stream()
+                .map(JSON::toJSONString)
+                .map(jsonString -> JSON.parseObject(jsonString, DeviceMaintenanceInfo.class))
+                .collect(Collectors.toList());
+            deviceMaintenanceService.saveReportData(modelList, edgeCode);
+            log.info("设备维护记录处理结束 edgeCode:{}", edgeCode);
+        } catch (DocumentException e) {
+            log.error("设备维护记录处理失败", e);
         }
     }
 

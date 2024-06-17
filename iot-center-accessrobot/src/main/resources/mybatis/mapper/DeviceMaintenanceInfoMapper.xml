@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2024 Yijiahe Technology Co., Ltd. All rights reserved.
+  -->
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.DeviceMaintenanceInfoDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.DeviceMaintenanceInfo">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+        <result property="patroldeviceCode" column="patroldevice_code" jdbcType="VARCHAR"/>
+        <result property="patroldeviceName" column="patroldevice_name" jdbcType="VARCHAR"/>
+        <result property="patroldeviceType" column="patroldevice_type" jdbcType="INTEGER"/>
+        <result property="recordCode" column="record_code" jdbcType="VARCHAR"/>
+        <result property="maintenanceType" column="maintenance_type" jdbcType="INTEGER"/>
+        <result property="faultLevel" column="fault_level" jdbcType="INTEGER"/>
+        <result property="faultDesc" column="fault_desc" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="maintenanceUnit" column="maintenance_unit" jdbcType="VARCHAR"/>
+        <result property="maintenancePerson" column="maintenance_person" jdbcType="VARCHAR"/>
+        <result property="maintenanceStatus" column="maintenance_status" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, device_id, patroldevice_code, patroldevice_name, patroldevice_type, record_code,
+        maintenance_type, fault_level, fault_desc, start_time, update_time, end_time, maintenance_unit,
+        maintenance_person, maintenance_status, remark
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from device_maintenance_info
+    </select>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        <foreach collection="infoList" item="item" index="index" open="" close="" separator=";">
+            update device_maintenance_info
+            <set>
+                <if test="item.maintenanceType != null and item.maintenanceType != 0">
+                    maintenance_type = #{item.maintenanceType, jdbcType=INTEGER},
+                </if>
+                fault_level = #{item.faultLevel,jdbcType=INTEGER},
+                fault_desc = #{item.faultDesc,jdbcType=VARCHAR},
+                start_time = #{item.startTime,jdbcType=TIMESTAMP},
+                update_time = #{item.updateTime,jdbcType=TIMESTAMP},
+                end_time = #{item.endTime,jdbcType=TIMESTAMP},
+                maintenance_unit = #{item.maintenanceUnit,jdbcType=VARCHAR},
+                maintenance_person = #{item.maintenancePerson,jdbcType=VARCHAR},
+                maintenance_status = #{item.maintenanceStatus,jdbcType=INTEGER},
+                <if test="item.remark != null and item.remark != '' ">
+                remark = #{item.remark,jdbcType=VARCHAR},
+                </if>
+            </set>
+            where id = #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <delete id="deleteByCodes">
+        delete from device_maintenance_info where record_code in
+        <foreach collection="deleteIds" item="recordCode" open="(" separator="," close=")"> #{recordCode} </foreach>
+    </delete>
+
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="java.util.Collection">
+        insert into device_maintenance_info
+        ( device_id,
+        patroldevice_code,
+        patroldevice_name,
+        patroldevice_type,
+        record_code,
+        maintenance_type,
+        fault_level,
+        fault_desc,
+        start_time,
+        end_time,
+        maintenance_unit,
+        maintenance_person,
+        maintenance_status,
+        remark
+        ) values
+        <foreach collection="infoList" item="item" separator=",">
+            (
+            #{item.deviceId, jdbcType=VARCHAR},
+            #{item.patroldeviceCode, jdbcType=VARCHAR},
+            #{item.patroldeviceName, jdbcType=VARCHAR},
+            #{item.patroldeviceType, jdbcType=VARCHAR},
+            #{item.recordCode, jdbcType=VARCHAR},
+            #{item.maintenanceType, jdbcType=VARCHAR},
+            #{item.faultLevel, jdbcType=VARCHAR},
+            #{item.faultDesc, jdbcType=VARCHAR},
+            #{item.startTime, jdbcType=VARCHAR},
+            #{item.endTime, jdbcType=VARCHAR},
+            #{item.maintenanceUnit, jdbcType=VARCHAR},
+            #{item.maintenancePerson, jdbcType=VARCHAR},
+            #{item.maintenanceStatus, jdbcType=VARCHAR},
+            #{item.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+</mapper>
