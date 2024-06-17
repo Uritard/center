@@ -36,6 +36,7 @@
         <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
         <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
         <result property="cameraChannelId" column="camera_channel_id" jdbcType="VARCHAR"/>
+        <result property="bcameraChannelId" column="b_camera_channel_id" jdbcType="VARCHAR"/>
         <result property="useType" column="use_type" jdbcType="INTEGER"/>
     </resultMap>
 
@@ -51,7 +52,7 @@
         camera_type,is_control,latitude,
         longitude,address,unit,
         create_time,commission_date,edge_code,
-        origin_id,camera_channel_id,use_type
+        origin_id,camera_channel_id,b_camera_channel_id,use_type
     </sql>
 
     <sql id="tongTong">
@@ -88,6 +89,7 @@
         f.region_name as up_region_name,
         a.commission_date,
         a.camera_channel_id,
+        a.b_camera_channel_id,
         a.use_type
     </sql>
 
@@ -103,7 +105,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id, camera_channel_id,use_type)
+        ,origin_id, camera_channel_id, b_camera_channel_id,use_type)
         values (#{cameraId,jdbcType=BIGINT},#{cameraName,jdbcType=VARCHAR},#{cameraModel,jdbcType=INTEGER}
         ,#{pmsId,jdbcType=VARCHAR},#{aliasName,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT}
         ,#{upRegionId,jdbcType=VARCHAR},#{channelNum,jdbcType=INTEGER},#{cameraNum,jdbcType=INTEGER}
@@ -114,7 +116,8 @@
         ,#{cameraType,jdbcType=INTEGER},#{isControl,jdbcType=INTEGER},#{latitude,jdbcType=VARCHAR}
         ,#{longitude,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
         ,#{createTime,jdbcType=TIMESTAMP},#{commissionDate,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR}, #{cameraChannelId, jdbcType=VARCHAR}, #{useType, jdbcType=INTEGER})
+        ,#{originId,jdbcType=VARCHAR}, #{cameraChannelId, jdbcType=VARCHAR}, #{bcameraChannelId, jdbcType=VARCHAR}
+        , #{useType, jdbcType=INTEGER})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -174,7 +177,8 @@
         <if test="longitude != null ">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
         a.unit = #{unit},
         <if test="commissionDate != null ">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
-        <if test="cameraChannelId != null">a.camera_channel_id = #{cameraChannelId, jdbcType=VARCHAR},</if>
+        a.camera_channel_id = #{cameraChannelId, jdbcType=VARCHAR},
+        a.b_camera_channel_id = #{bcameraChannelId, jdbcType=VARCHAR},
         <if test="useType != null">a.use_type = #{useType, jdbcType=INTEGER},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
@@ -615,7 +619,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id, camera_channel_id, use_type)
+        ,origin_id, camera_channel_id, b_camera_channel_id, use_type)
         values
         <foreach collection="list" item="TCameraInfo" separator=",">
             (
@@ -629,7 +633,8 @@
             ,#{TCameraInfo.cameraType,jdbcType=INTEGER},#{TCameraInfo.isControl,jdbcType=INTEGER},#{TCameraInfo.latitude,jdbcType=VARCHAR}
             ,#{TCameraInfo.longitude,jdbcType=VARCHAR},#{TCameraInfo.address,jdbcType=VARCHAR},#{TCameraInfo.unit,jdbcType=VARCHAR}
             ,#{TCameraInfo.createTime,jdbcType=TIMESTAMP},#{TCameraInfo.commissionDate,jdbcType=TIMESTAMP},#{TCameraInfo.edgeCode,jdbcType=VARCHAR}
-            ,#{TCameraInfo.originId,jdbcType=VARCHAR},#{TCameraInfo.cameraChannelId, jdbcType=VARCHAR},#{TCameraInfo.useType, jdbcType=INTEGER}
+            ,#{TCameraInfo.originId,jdbcType=VARCHAR},#{TCameraInfo.cameraChannelId, jdbcType=VARCHAR},#{TCameraInfo.bcameraChannelId, jdbcType=VARCHAR}
+            ,#{TCameraInfo.useType, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

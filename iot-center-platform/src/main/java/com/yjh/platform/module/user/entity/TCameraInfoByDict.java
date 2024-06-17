@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -117,6 +118,8 @@ public class TCameraInfoByDict implements Serializable {
     private Date commissionDate;
     @ApiModelProperty(value = "相机通道号")
     private String cameraChannelId;
+    @ApiModelProperty(value = "视频B编码")
+    private String bcameraChannelId;
     @ApiModelProperty(value = "相机用途 巡视设备:1 监控设备:2")
     private Integer useType;
 }

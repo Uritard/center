@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -129,17 +130,17 @@ public class TCameraInfo implements Serializable {
     private Integer isControl;
 
     /**
-     * 
+     *
      */
     private String latitude;
 
     /**
-     * 
+     *
      */
     private String longitude;
 
     /**
-     * 
+     *
      */
     private String address;
 
@@ -172,6 +173,11 @@ public class TCameraInfo implements Serializable {
      * 国标相机id(下级同步的id)
      */
     private String cameraChannelId;
+
+    /**
+     * 视频B编码 (下级同步的id)
+     */
+    private String bcameraChannelId;
 
     /**
      * 相机用途 巡视设备1 监控设备 0

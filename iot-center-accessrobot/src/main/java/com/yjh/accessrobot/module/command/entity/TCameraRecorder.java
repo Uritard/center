@@ -1,9 +1,11 @@
 package com.yjh.accessrobot.module.command.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 录像服务器表
@@ -126,6 +128,12 @@ public class TCameraRecorder implements Serializable {
      * 国标设备ID
      */
     private String deviceChannel;
-    
+    /**
+     * 视频B编码
+     */
+    private String bdeviceChannel;
+
+    private Date commissionDate;
+
     private static final long serialVersionUID = 1L;
 }
