@@ -183,11 +183,19 @@ public class SendToUpSystemServices {
                     break;
                 case "10":
                     //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("source_file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourceFilePath = stationCode + "/Model/source_file_model.cime";
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("file_path", maintenanceModelTargetPath);
+                    }
                     break;
                 case "1001":
                     // 区域模型

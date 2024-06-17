@@ -9,6 +9,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -40,22 +41,16 @@ public class ModelUpdateHandler implements MessageHandlerStrategy, InitializingB
         //<6>: =声纹模型
         //<8>: =检修区域配置模型
         //<9>: =地图文件
-        //<10>:=设备资源信息配置文件
+        //<10>:=维护记录文件信息 区域型: 设备资源信息配置文件
         //1001 区域同步
         //边缘节点唯一标识
         String sendCode = xmlBaseModel.getSendCode();
         if (Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
             log.info("巡视主机收到边缘节点{}的模型更新指令了", sendCode);
             if (xmlBaseModel.getItems().get(0).containsKey("type") && xmlBaseModel.getItems().get(0).containsKey("file_path")) {
-                String type = String.valueOf(xmlBaseModel.getItems().get(0).get("type"));
-                if ("9".equals(type)) {
-                    for(Map<String,Object> map:xmlBaseModel.getItems()) {
-                        String filePath = String.valueOf(map.get("file_path"));
-                        robotService.syncModelUpdate(type, filePath, sendCode);
-                    }
-                } else {
-                    String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-                    robotService.syncModelUpdate(type, filePath, sendCode);
+                for (Map<String, Object> map : xmlBaseModel.getItems()) {
+                    String filePath = MapUtils.getString(map, "file_path");
+                    robotService.syncModelUpdate(MapUtils.getString(map, "type"), filePath, sendCode);
                 }
             }
         }
