@@ -310,8 +310,9 @@ public class TCfgDataCurrentService {
                             }
                         });
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
-                        insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, new Date(),
-                                content,rule.getUpdateTime());
+                        Date crateTime = new Date();
+                        insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, crateTime,
+                                content,crateTime);
                     }
                     unionRule.add(rule);
                     contents.add(content);
@@ -397,7 +398,7 @@ public class TCfgDataCurrentService {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
         TUnionTask tUnionTask = new TUnionTask();
         tUnionTask.setPlanName("实时视频调阅");
-        tUnionTask.setUnionId(unionId);
+        tUnionTask.setUnionId(unionId+createTime.getTime());
         tUnionTask.setRuleId(ruleId);
         tUnionTask.setUnionName(tCfgUnionRule.getRuleName());
         tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
