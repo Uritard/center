@@ -398,7 +398,7 @@ public class TCfgDataCurrentService {
         TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
         TUnionTask tUnionTask = new TUnionTask();
         tUnionTask.setPlanName("实时视频调阅");
-        tUnionTask.setUnionId(unionId);
+        tUnionTask.setUnionId(unionId+createTime.getTime());
         tUnionTask.setRuleId(ruleId);
         tUnionTask.setUnionName(tCfgUnionRule.getRuleName());
         tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
