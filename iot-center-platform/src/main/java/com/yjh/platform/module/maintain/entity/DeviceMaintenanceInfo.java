@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * 设备维护信息表
  * @TableName device_maintenance_info
  */
+@TableName(value ="device_maintenance_info")
 @Data
 @Accessors(chain = true)
 public class DeviceMaintenanceInfo implements Serializable {
