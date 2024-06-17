@@ -3,6 +3,7 @@ package com.yjh.platform.module.maintain.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -47,6 +48,11 @@ public class DeviceMaintenanceInfoController {
                     .setRecordCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
             result.setData(deviceMaintenanceInfoService.save(deviceMaintenanceInfo));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+            //有变动 同步模型
+            if (Constant.updateSyncModel()) {
+                String modelType = "10";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -67,6 +73,11 @@ public class DeviceMaintenanceInfoController {
             }
             result.setData(deviceMaintenanceInfoService.updateById(deviceMaintenanceInfo));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+            //有变动 同步模型
+            if (Constant.updateSyncModel()) {
+                String modelType = "10";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -85,6 +96,11 @@ public class DeviceMaintenanceInfoController {
         try {
             result.setData(deviceMaintenanceInfoService.removeById(id));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+            //有变动 同步模型
+            if (Constant.updateSyncModel()) {
+                String modelType = "10";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -102,6 +118,11 @@ public class DeviceMaintenanceInfoController {
         try {
             result.setData(deviceMaintenanceInfoService.removeByIds(Arrays.asList(ids.split(","))));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
+            //有变动 同步模型
+            if (Constant.updateSyncModel()) {
+                String modelType = "10";
+                Constant.modelUpload(modelType);
+            }
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
