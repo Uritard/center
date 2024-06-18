@@ -192,6 +192,10 @@ public class ResultConvertUtil {
     public static String convertOtherResult(String result) {
        String res = SpringBeanUtils.getBean(ApplicationProperties.class).getOtherConfig().getCoverResult();
 
+       if (CommonUtils.containsNumber(result)) {
+           return result;
+       }
+
        String[] resList = res.split(";");
        for (String resultItem : resList){
            String[] resultEnum = resultItem.split(",");
