@@ -73,7 +73,16 @@ public class TCruisePointInstanceService {
         if (CollectionUtils.isNotEmpty(tStdRegionList)) {
             tStdRegionList.forEach(o -> regionNameSet.remove(o.getRegionName()));
         }
-
+        Map<String, String> areaNameToAreaId = buildList.stream()
+                .collect(Collectors.groupingBy(
+                        TRobotInspection::getAreaName,
+                        Collectors.mapping(TRobotInspection::getAreaId, Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> !list.isEmpty() ? list.get(0) : null
+                        ))
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         if (CollectionUtils.isNotEmpty(regionNameSet)) {
             List<TStdRegion> insertList = new ArrayList<>(regionNameSet.size());
             regionNameSet.forEach(o -> {
@@ -81,6 +90,7 @@ public class TCruisePointInstanceService {
                 tStdRegion.setUpRegionId(rootId);
                 tStdRegion.setRegionCode(StringUtils.EMPTY);
                 tStdRegion.setRegionName(o);
+                tStdRegion.setUpRegionIds(areaNameToAreaId.get(o));
                 tStdRegion.setState(1);
                 insertList.add(tStdRegion);
             });
@@ -99,6 +109,16 @@ public class TCruisePointInstanceService {
         Set<Long> areaIdSet = areaToBayMap.keySet();
         List<TRobotInspection> buildListAfterRegion = new LinkedList<>();
         List<TStdRegion> totalRegion = new ArrayList<>();
+        Map<String, String> bayNameToBayId = buildList.stream()
+                .collect(Collectors.groupingBy(
+                        TRobotInspection::getBayName,
+                        Collectors.mapping(TRobotInspection::getBayId, Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> !list.isEmpty() ? list.get(0) : null
+                        ))
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for (Long areaId : areaIdSet) {
             List<TRobotInspection> sameAreaList = new ArrayList<>(areaToBayMap.get(areaId));
             Set<String> bayNameSet = sameAreaList.stream().map(TRobotInspection::getBayName).collect(Collectors.toSet());
@@ -112,6 +132,8 @@ public class TCruisePointInstanceService {
                     tStdRegion.setUpRegionId(areaId);
                     tStdRegion.setRegionCode(StringUtils.EMPTY);
                     tStdRegion.setRegionName(o);
+                    tStdRegion.setUpRegionIds(bayNameToBayId.get(o));
+                    bayNameToBayId.get(o);
                     tStdRegion.setState(1);
                     insertList.add(tStdRegion);
                 });
@@ -145,6 +167,16 @@ public class TCruisePointInstanceService {
             Set<String> deviceNames = new HashSet<>();
             Map<String, String> map = tRobotInspections1.stream().filter(o -> deviceNames.add(o.getMainDeviceName()))
                 .collect(Collectors.toMap(TRobotInspection::getMainDeviceName, TRobotInspection::getDeviceType));
+            Map<String, String> mapDeviceNameToPmsId = tRobotInspections1.stream()
+                    .collect(Collectors.groupingBy(
+                            TRobotInspection::getMainDeviceName,
+                            Collectors.mapping(TRobotInspection::getMainDeviceId, Collectors.collectingAndThen(
+                                    Collectors.toList(),
+                                    list -> !list.isEmpty() ? list.get(0) : null // 或者选择其他逻辑来处理列表
+                            ))
+                    ))
+                    .entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             deviceNames.clear();
             Map<String, String> nameToMainId = tRobotInspections1.stream().filter(o -> deviceNames.add(o.getMainDeviceName()))
                 .collect(Collectors.toMap(TRobotInspection::getMainDeviceName, TRobotInspection::getMainDeviceId));
@@ -166,6 +198,7 @@ public class TCruisePointInstanceService {
                     insertDevices.add(tStdDevice);
                     TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
                     tStdDeviceAttr.setUsedTime(new Date());
+                    tStdDeviceAttr.setPmsId(mapDeviceNameToPmsId.get(deviceName));
                     tStdDevice.setTStdDeviceAttr(tStdDeviceAttr);
 
                 });

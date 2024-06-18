@@ -416,6 +416,20 @@ public class Constant {
         return standardPoints;
     }
 
+    /**
+     * 是否使用业务中台id
+     */
+    public static boolean middlegroundIds() {
+        boolean middlegroundIds;
+        try {
+            middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+            log.debug("middlegroundIds is {}", middlegroundIds);
+        } catch (Exception e) {
+            middlegroundIds = false;
+        }
+        return middlegroundIds;
+    }
+
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人
     public static final String ROBOT_TASK_ISSUE_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";

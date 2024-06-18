@@ -17,6 +17,7 @@ import java.util.Map;
 @Repository
 public interface SendToUpSystemDao {
     List<Map<String,Object>> selectDeviceModel(@Param(value = "standardPoints") Boolean standardPoints,
+                                               @Param(value = "middlegroundIds") Boolean middlegroundIds,
                                                @Param(value = "edgeCode") String edgeCode,
                                                @Param(value = "presetRealImgPath") String presetRealImgPath,
                                                @Param(value = "presetImgPath") String presetImgPath);
@@ -59,6 +60,9 @@ public interface SendToUpSystemDao {
     String selectIsDownSystem(@Param(value = "list") List<String> list);
 
     List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap);
+    List<String> selectInstanceIdsByUpRegionIds(@Param(value = "upRegionIds") String upRegionIds );
+    List<String> selectInstanceIdsByPmsId(@Param(value = "pmsId") String pmsId );
+    List<String> selectInstanceIdsByMiddlegroundComponent(@Param(value = "componentId") String componentId );
 
     List<String> selectInstanceIdsByComponent(@Param(value = "list") List<DeviceModel> deviceModels);
 
