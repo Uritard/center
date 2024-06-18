@@ -1190,16 +1190,23 @@ public class CameraConService {
      */
     public List<Map<String, Object>> recordChannelInfo(List<RecordInfo> listRecord) {
         List<Map<String, Object>> channelInfoList = new ArrayList<>();
+
         if (CollectionUtils.isEmpty(listRecord)) {
             return channelInfoList;
         }
         int i = 1;
         for (RecordInfo info : listRecord) {
             Map<String, Object> chanInfoMap = new LinkedHashMap<>();
+            int[] intact = new int[3];
             chanInfoMap.put("ipChanNum", i++);
             chanInfoMap.put("enable", info.getStatus());
             chanInfoMap.put("channel", info.getChannelId());
             chanInfoMap.put("chanName", info.getName());
+            chanInfoMap.put("intact", intact);
+            chanInfoMap.put("recordTime","");
+            chanInfoMap.put("intactTime","");
+            chanInfoMap.put("recordSpan",new String[]{"",""});
+            chanInfoMap.put("defectTime","");
             channelInfoList.add(chanInfoMap);
 
             List<RecordItem> itemList = info.getRecordList();
@@ -1207,7 +1214,6 @@ public class CameraConService {
                 continue;
             }
 
-            int[] intact = new int[3];
             Date[] recordSpan = new Date[2];
             // 单个通道完整性校验
             integralityCheck(chanInfoMap, itemList, intact, recordSpan);
