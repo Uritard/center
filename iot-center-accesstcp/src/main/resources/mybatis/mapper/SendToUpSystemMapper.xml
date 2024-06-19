@@ -8,18 +8,22 @@
         region.region_id as area_id,
         region.region_name as area_name,
         <if test="standardPoints == true">
+            b.device_point_id AS device_id,
+        </if>
+        <if test="standardPoints == false">
+            a.instance_id AS device_id,
+        </if>
+        <if test="middlegroundIds == true">
             re.up_region_ids as bay_id,
             re.region_name as bay_name,
-            b.device_point_id AS device_id,
             g.pms_id AS main_device_id,
             b.component_id,
         </if>
-        <if test="standardPoints == false">
+        <if test="middlegroundIds == false">
             f.up_region_id as bay_id,
             f.up_region_name as bay_name,
-            a.instance_id AS device_id,
             f.device_id AS main_device_id,
-            b.custom_id as component_id,
+            CONCAT(b.device_id,'_',b.custom_id) as component_id,
         </if>
         (CASE
         WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_id) AND ISNULL(d.preset_name) THEN ''
@@ -557,6 +561,33 @@
             AND FIND_IN_SET(tsd.device_id, #{deviceIds,jdbcType=VARCHAR})
         </if>
     </select>
+
+    <select id="selectInstanceIdsByUpRegionIds" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
+        LEFT JOIN t_std_region region ON tsd.up_region_id = region.region_id
+        WHERE 1 = 1
+        AND FIND_IN_SET(region.up_region_ids, #{upRegionIds})
+    </select>
+
+    <select id="selectInstanceIdsByPmsId" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        LEFT JOIN t_std_device_attr attr ON tcpi.device_id = attr.device_id
+        WHERE 1 = 1
+          AND FIND_IN_SET(attr.pms_id, #{pmsId})
+    </select>
+
+    <select id="selectInstanceIdsByMiddlegroundComponent" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        LEFT JOIN t_std_devicemete mete ON tcpi.device_mete_id = mete.device_mete_id
+        WHERE 1 = 1
+          AND FIND_IN_SET(mete.component_id, #{componentId})
+    </select>
+
+
 
     <select id="selectInstanceIdsByComponent" resultType="java.lang.String">
         SELECT tcpi.instance_id
