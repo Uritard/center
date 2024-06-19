@@ -4,6 +4,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
@@ -204,7 +205,7 @@ public class TStdRegionService{
 
     public int loadRegionIntoRedis() {
         List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
-        Set<String> keys = redisTemplate.keys("region:*");
+        Set<String> keys = RedisUtil.redisScan("region:");
         // 删除所有区域信息重新加载
         if (CollectionUtils.isNotEmpty(keys)) {
             redisTemplate.delete(keys);

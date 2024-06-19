@@ -123,7 +123,7 @@ public class SysParamConfig {
      * 将Redis中保存的配置信息缓存到内存中，减少对Redis使用
      */
     public void initParamCache() {
-        Set<String> tasKeys = redisTemplate.keys(SYS_PREFIX + "*");
+        Set<String> tasKeys = RedisUtil.redisScan(SYS_PREFIX);
         if (CollectionUtils.isEmpty(tasKeys)) {
             log.error("未查询到配置数据: {}", SYS_PREFIX);
         }
