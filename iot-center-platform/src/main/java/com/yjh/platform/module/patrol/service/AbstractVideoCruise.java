@@ -237,6 +237,7 @@ public abstract class AbstractVideoCruise {
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
                         inspectionMap.put("resultNum", resultNum);
+                        CruiseRedisStorage.offer(inspectionMap);
                         resultRecognition(inspectionMap);
                     }
                 }
