@@ -202,18 +202,22 @@ public class TSysParamService{
     }
 
     public int insertIntoRedis(boolean putSysProp){
-        List<TSysParam> list = this.tSysParamDao.selectAll();
-        for (TSysParam item:list) {
-            Map map = Object2Map.objectToMap(item,true);
-            String str = "t_sys_param:"+item.getParamCode();
-            redisTemplate.opsForHash().putAll(str, map);
+        try {
+            List<TSysParam> list = this.tSysParamDao.selectAll();
+            for (TSysParam item:list) {
+                Map map = Object2Map.objectToMap(item,true);
+                String str = "t_sys_param:"+item.getParamCode();
+                redisTemplate.opsForHash().putAll(str, map);
+            }
+            if(putSysProp) {
+                log.info("load secure param to redis...");
+                sysParamConfig.putToRedis();
+            }
+            sysParamConfig.initParamCache();
+            this.syncCommissioningTimeToUpSystem();
+        } catch (Exception e) {
+            log.error("缓存配置加载失败", e);
         }
-        if(putSysProp) {
-            log.info("load secure param to redis...");
-            sysParamConfig.putToRedis();
-        }
-        sysParamConfig.initParamCache();
-        this.syncCommissioningTimeToUpSystem();
         return 1;
     }
 

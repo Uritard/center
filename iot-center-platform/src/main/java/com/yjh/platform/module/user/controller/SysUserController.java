@@ -12,6 +12,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.configuration.UserManager;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserDao;
@@ -701,7 +702,7 @@ public class SysUserController {
     public Result lockUserInfo() {
         Result result = new Result();
         try {
-            Set userInfo = redisTemplate.keys("lockUser" + "*");
+            Set userInfo = RedisUtil.redisScan("lockUser" );
             List<Map> list = new ArrayList();
             if (userInfo.size() > 0) {
                 for (Object value : userInfo) {

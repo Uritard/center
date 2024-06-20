@@ -12,6 +12,7 @@ import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.service.*;
 import com.yjh.platform.netty.client.NettyClient;
 import com.yjh.video.api.VideoConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ import javax.annotation.Resource;
 @EnableFeignClients
 @EnableAsync   //开启异步
 @EnableScheduling
+@Slf4j
 public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired
@@ -79,26 +81,30 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        RedisUtil.setRedisTemplate(redisTemplate);
-        redisTemplate.delete("AllRobotCode");
-        DictConvertUtil.DICT.loadDict(dictBusinessService);
-        VideoConfig.custom(wvpHost);
-        sysKeyService.loadKeysToRedis();
-        tSysParamService.insertIntoRedis(true);
-        tCameraInfoService.intoRedis();
-        tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
-        tCameraPresetService.startSilentTask();//开启摄像头静默任务
-        sysUserService.insertIntoRedis();
-        tVoiceDeviceService.registerAudioDevice();//声纹设备注册
-        //区域信息加载到缓存
-        tStdRegionService.loadRegionIntoRedis();
-        tRobotInfoService.initAllRobotCode(); // RobotCode初始化
-        // 初始化任务优先级
-        uPatrolTaskService.taskPriorityConfigToRedis();
-        Constant.WEBSOCKET_URL = url;
-        Constant.redisTemplate = redisTemplate;
-        tDeviceTypeImgService.findPic();//本地启动把此行注掉
-        CruiseRedisStorage.start(redisTemplate);
+        try {
+            RedisUtil.setRedisTemplate(redisTemplate);
+            redisTemplate.delete("AllRobotCode");
+            DictConvertUtil.DICT.loadDict(dictBusinessService);
+            VideoConfig.custom(wvpHost);
+            sysKeyService.loadKeysToRedis();
+            tSysParamService.insertIntoRedis(true);
+            tCameraInfoService.intoRedis();
+            tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
+            tCameraPresetService.startSilentTask();//开启摄像头静默任务
+            sysUserService.insertIntoRedis();
+            tVoiceDeviceService.registerAudioDevice();//声纹设备注册
+            //区域信息加载到缓存
+            tStdRegionService.loadRegionIntoRedis();
+            tRobotInfoService.initAllRobotCode(); // RobotCode初始化
+            // 初始化任务优先级
+            uPatrolTaskService.taskPriorityConfigToRedis();
+            Constant.WEBSOCKET_URL = url;
+            Constant.redisTemplate = redisTemplate;
+            tDeviceTypeImgService.findPic();//本地启动把此行注掉
+            CruiseRedisStorage.start(redisTemplate);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         // 算法暂时为http方式 先注释
         /*InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);

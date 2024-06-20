@@ -7,8 +7,8 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.user.dao.SysKeyDao;
 import com.yjh.platform.module.user.entity.SysKey;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <功能描述>
@@ -113,17 +114,21 @@ public class SysKeyService {
     }
 
     public void loadKeysToRedis() {
-        Set<String> keys = redisTemplate.keys("sysKey:*");
-        redisTemplate.delete(keys);
+        try {
+            Set<String> keys = RedisUtil.redisScan("sysKey:");
+            redisTemplate.delete(keys);
 
-        List<SysKey> all = sysKeyDao.selectAll();
-        all.forEach(sysKey -> {
-            if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
-                redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());
-            } else {
-                redisTemplate.opsForSet().add("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum());
-            }
-        });
+            List<SysKey> all = sysKeyDao.selectAll();
+            all.forEach(sysKey -> {
+                if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
+                    redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());
+                } else {
+                    redisTemplate.opsForSet().add("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum());
+                }
+            });
+        } catch (Exception e) {
+            log.error("加载 sysKey:* 失败", e);
+        }
     }
 
     public List<SysKey> getUserKeys(Long userId) {

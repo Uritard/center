@@ -14,6 +14,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -89,8 +90,12 @@ public class RedisConfig extends CachingConfigurerSupport {
         RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration(redisConn.getHost(), redisConn.getPort());
         standaloneConfig.setDatabase(redisConn.getDatabase());
         standaloneConfig.setPassword(RedisPassword.of(redisConn.getPassword()));
-
-        return new JedisConnectionFactory(standaloneConfig);
+        JedisClientConfiguration clientConfiguration = JedisClientConfiguration.builder()
+            .readTimeout(redisConn.getTimeout())
+            .usePooling()
+            .poolConfig(redisConn.jedisPool())
+            .build();
+        return new JedisConnectionFactory(standaloneConfig, clientConfiguration);
     }
 
     /**
