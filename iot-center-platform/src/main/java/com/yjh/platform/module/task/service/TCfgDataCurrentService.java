@@ -228,7 +228,9 @@ public class TCfgDataCurrentService {
         for (TCfgUnionRule rule : rules) {
             String[] currentMeteId = rule.getInputParam().split(", ");
             for (int i = 0; i < currentMeteId.length; i++) {
-                meteIdR.add(Long.valueOf(currentMeteId[i]));
+                if (!meteIdR.contains(Long.valueOf(currentMeteId[i]))) {
+                    meteIdR.add(Long.valueOf(currentMeteId[i]));
+                }
             }
         }
 
@@ -311,8 +313,10 @@ public class TCfgDataCurrentService {
                         });
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
                         Date crateTime = new Date();
-                        insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, crateTime,
-                                content,crateTime);
+                        if (rule.getPlanId()==null){
+                            insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, crateTime,
+                                    content,crateTime);
+                        }
                     }
                     unionRule.add(rule);
                     contents.add(content);
@@ -342,9 +346,11 @@ public class TCfgDataCurrentService {
 
         //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
+        int idx = 0;
         for(Long plan : plans){
             log.info("【planId】:{}", plan);
             if (plan == null){
+                idx++;
                 continue;
             }
             TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
@@ -361,9 +367,10 @@ public class TCfgDataCurrentService {
             log.info("联动开始执行");
             // 联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
-            tUnionTaskService.insertRecord(meteIdR.get(0), taskId, unionRule.get(0).getRuleId(), null, new Date(),
+            tUnionTaskService.insertRecord(meteIdR.get(0), taskId, unionRule.get(idx).getRuleId(), null, new Date(),
                     contents.get(0),unionForGetTime.getRecordTime());
 
+            idx++;
             Map<String,String> currentUnionInfo=new HashMap<>();
             currentUnionInfo.put("unionId",taskId);
             currentUnionInfo.put("isPop","false");
