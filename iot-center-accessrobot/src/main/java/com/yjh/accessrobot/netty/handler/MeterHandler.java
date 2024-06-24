@@ -74,6 +74,7 @@ public class MeterHandler implements MessageHandlerStrategy, InitializingBean {
 
             if (tMeter != null){
                 //计算差值
+                tMeter.setType(MapUtils.getInteger(item,"type"));
                 tMeter.setTotalPositivePower(MapUtils.getString(item,"totalPositivePower"));
                 tMeter.setTotalPositiveReactivePower(MapUtils.getString(item,"totalPositiveReactivePower"));
                 tMeter.setTotalNegativePositivePower(MapUtils.getString(item,"totalNegativePositivePower"));
