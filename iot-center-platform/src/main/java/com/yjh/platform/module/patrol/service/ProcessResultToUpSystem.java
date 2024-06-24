@@ -369,6 +369,10 @@ public class ProcessResultToUpSystem {
                 default:
                     break;
             }
+            //操作告警单独处理
+            if (tWarnInfo.getWarnType() == 507) {
+                alarmType = "11";
+            }
             xmlItem.put("file_path", StringUtils.contains(imagePath, ".") ? tagPath : "");
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));

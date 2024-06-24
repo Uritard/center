@@ -134,53 +134,51 @@
 
     <select id="countPowerTotalByEdge" resultType="java.util.Map">
         SELECT
-        ROUND(
-        SUM(
-        a.total_positive_power_difference_value * a.magnification_coefficient
-        ),
-        2
-        ) AS allTotal,
-        b.region_name AS regionName
-        FROM
+            ROUND(SUM(a.total_positive_power_difference_value * a.magnification_coefficient), 2) AS allTotal,
+            b.region_name AS regionName
+        FROM (
+                 SELECT b.edge_code,
+                        (CASE
+                             WHEN b.total_positive_power - a.total_positive_power &lt;= 0 or
+                                  b.total_positive_power - a.total_positive_power &gt;= 10 THEN 0
+                             ELSE b.total_positive_power - a.total_positive_power END) AS total_positive_power_difference_value,
+                        b.create_time,
+                        b.magnification_coefficient
+                 FROM
         (
-        SELECT
-        b.edge_code,
-        (CASE WHEN b.total_positive_power - a.total_positive_power &lt;= 0 or b.total_positive_power - a.total_positive_power &gt;= 10 THEN 0
-        ELSE b.total_positive_power - a.total_positive_power END ) AS total_positive_power_difference_value,
-        b.create_time,
-        b.magnification_coefficient FROM
-        (
-        SELECT
-        meter_id,
-        edge_code,
-        total_positive_power,
-        total_positive_reactive_power,
-        total_negative_positive_power,
-        create_time,
-        magnification_coefficient,
-        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
-        FROM
-        t_meter_log
-        GROUP BY
-        meter_id,lastTime
-        ORDER BY
-        create_time
-        )b LEFT JOIN (
-        SELECT
-        meter_id,
-        edge_code,
-        total_positive_power,
-        total_positive_reactive_power,
-        total_negative_positive_power,
-        create_time,
-        magnification_coefficient,
-        DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
-        FROM
-        t_meter_log
-        GROUP BY
-        meter_id,lastTime
-        ORDER BY
-        create_time
+            SELECT
+                a.meter_id,
+                a.edge_code,
+                a.total_positive_power,
+                a.total_positive_reactive_power,
+                a.total_negative_positive_power,
+                a.create_time,
+                a.magnification_coefficient,
+                DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
+            FROM
+                t_meter_log a LEFT JOIN t_meter b ON a.meter_id = b.id
+            WHERE b.type = 2
+            GROUP BY
+                meter_id,lastTime
+            ORDER BY
+                create_time
+        ) b LEFT JOIN (
+            SELECT
+                a.meter_id,
+                a.edge_code,
+                a.total_positive_power,
+                a.total_positive_reactive_power,
+                a.total_negative_positive_power,
+                a.create_time,
+                a.magnification_coefficient,
+                DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
+            FROM
+                t_meter_log a LEFT JOIN t_meter b ON a.meter_id = b.id
+            WHERE b.type = 2
+            GROUP BY
+                meter_id,lastTime
+            ORDER BY
+                create_time
         ) a ON b.meter_id = a.meter_id AND b.lastTime = DATE_ADD(a.lastTime,INTERVAL 1 DAY)
         WHERE b.create_time between #{startTime} and #{endTime}
         ) a
@@ -188,7 +186,7 @@
         WHERE
         b.state = 1
         GROUP BY
-        a.edge_code;
+        a.edge_code
     </select>
 
     <select id="countPowerTotalAll" resultType="java.lang.String">
