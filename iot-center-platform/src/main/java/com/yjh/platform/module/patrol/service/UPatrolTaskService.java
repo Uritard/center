@@ -467,27 +467,29 @@ public class UPatrolTaskService {
     }
 
 
-    public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task)  {
+    public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task, boolean notInit)  {
 
         List<TCruisePointInstanceNameDetail> detailList =
                 instanceList.size() == 0 ? new ArrayList<>() : tCruisePointInstanceDao.selectForTask(instanceList);
 
-        UPatrolResult uPatrolResult = new UPatrolResult();
         Date now = new Date();
-        uPatrolResult.setTaskId(task.getTaskId())
-                .setTaskName(task.getTaskName())
-                .setTaskCode(task.getTaskCode())
-                .setAreaId(task.getAreaId())
-                .setTaskType(task.getTaskType())
-                .setExecuteType(task.getExecuteType())
-                .setTaskLevel(task.getTaskLevel())
-                .setTaskState(238)
-                .setCreateTime(task.getCreateTime())
-                .setTaskCount(detailList.size())
-                .setTaskWait(detailList.size())
-                .setRobotId(task.getRobotId())
-                .setRemark("0");
-        uPatrolResultDao.add(uPatrolResult);
+        if (notInit) {
+            UPatrolResult uPatrolResult = new UPatrolResult();
+            uPatrolResult.setTaskId(task.getTaskId())
+                    .setTaskName(task.getTaskName())
+                    .setTaskCode(task.getTaskCode())
+                    .setAreaId(task.getAreaId())
+                    .setTaskType(task.getTaskType())
+                    .setExecuteType(task.getExecuteType())
+                    .setTaskLevel(task.getTaskLevel())
+                    .setTaskState(238)
+                    .setCreateTime(task.getCreateTime())
+                    .setTaskCount(detailList.size())
+                    .setTaskWait(detailList.size())
+                    .setRobotId(task.getRobotId())
+                    .setRemark("0");
+            uPatrolResultDao.add(uPatrolResult);
+        }
 
         if (Constant.logUpLv3()) {
             log.info("instancesList==={}", detailList);
@@ -631,7 +633,7 @@ public class UPatrolTaskService {
             ctask = nextTask;
             uPatrolTaskDao.add(nextTask);
         }
-        return initializeTaskInfo(instanceList, ctask);
+        return initializeTaskInfo(instanceList, ctask, true);
     }
 
     public void initializeThisTaskInfo(UPatrolTask task, int allSize, Set<String> nodeSet, Set<ZSetOperations.TypedTuple<String>> itemSets) {
@@ -3964,5 +3966,28 @@ public class UPatrolTaskService {
         String key = PATROL_SUMMARY_PREFIX + taskId + TASK_ALL;
 
         return redisTemplate.opsForZSet().zCard(key);
+    }
+
+    /**
+     * 初始化下次任务
+     *
+     * @param taskId taskId
+     * @return str
+     */
+    public String initializeNextTask(String taskId) {
+        UPatrolTask ancestralTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+        if (ancestralTask.getExecuteType() == 173){
+            throw new RuntimeException("立即任务不能初始化下次任务!");
+        }
+        List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
+        //查询该周期任务的最近一初始化数据
+        UPatrolTask recentTask = uPatrolTaskDao.selectThisTaskByTaskCode(ancestralTask.getTaskCode(), null);
+        //如果 开始时间 大于 当前时间 则 下一次的任务已入库 只需重新加载到缓存。否则加载下一次任务
+        if (recentTask.getStartTime().getTime() > new Date().getTime()) {
+            this.initializeTaskInfo(allInstanceList, recentTask, false);
+        } else {
+            this.initializeNextTaskInfo(ancestralTask, allInstanceList);
+        }
+        return "success";
     }
 }

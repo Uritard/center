@@ -579,4 +579,18 @@ public class UPatrolTaskController {
         }
         return result;
     }
+
+    @ApiOperation(value = "初始化周期任务的下次任务")
+    @PostMapping(value = "/initializeNextTask")
+    public Result initializeNextTask(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.initializeNextTask(taskId));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("初始化下次任务失败描述", e);
+        }
+        return result;
+    }
 }
