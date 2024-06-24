@@ -279,9 +279,10 @@ public class TCameraPresetService {
         return areaInfo;
     }
 
-    public boolean judgePresentNum(Long cameraId,Integer presentNum) {
+    public boolean judgePresentNum(TCameraPreset tCameraPreset, TCameraInfo tCameraInfo) {
         boolean flag = false;
-        List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, cameraId, presentNum, null, null, null, null, null, null, null,null);
+        List<TCameraPreset> tCameraPresetList = tCameraPresetDao.getExistPreset(tCameraInfo.getCameraIp(),
+                tCameraInfo.getPort(), tCameraPreset.getPresetNum());
         if (tCameraPresetList.size()>0) {
             flag=true;
         }
@@ -1001,12 +1002,12 @@ public class TCameraPresetService {
 
     }
 
-    public Result add(TCameraPreset tCameraPreset) {
+    public Result add(TCameraPreset tCameraPreset, TCameraInfo tCameraInfo) {
         int resultNum = 0;
         Result result = new Result();
         //判断该预置位是否已被设置
-        if(judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+        if(judgePresentNum(tCameraPreset, tCameraInfo)){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置或此预置位已被占用");
             return result;
         }else {
             int isMicro = microCamera(tCameraPreset);
