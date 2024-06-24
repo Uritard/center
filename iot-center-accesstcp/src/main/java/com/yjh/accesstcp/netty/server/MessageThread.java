@@ -476,13 +476,23 @@ public class MessageThread {
         String edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
         TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, redisTemplate, isLingAge, edgeLevel);
         String deviceList = item.get("device_list").toString();
-        List<String> instanceIds = new ArrayList<>();
+        List<String> instanceIds;
+        /*
+        middlegroundIds = true
+        间隔：t_std_region.up_region_ids
+        主设备：t_std_device_attr.pms_id
+        部件：t_std_devicemete.component_id
+         */
         switch (device_level) {
             case "1":
                 // 间隔
                 Map<String, String> regionIds = new HashMap<>();
                 regionIds.put("upRegionIds", deviceList);
-                instanceIds = sendToUpSystemServices.selectInstanceIdsByRegionOrDevice(regionIds);
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByUpRegionIds(deviceList);
+                }else {
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByRegionOrDevice(regionIds);
+                }
                 tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                 item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;
@@ -490,15 +500,18 @@ public class MessageThread {
                 // 主设备
                 Map<String, String> deviceIds = new HashMap<>();
                 deviceIds.put("deviceIds", deviceList);
-                instanceIds = sendToUpSystemServices.selectInstanceIdsByRegionOrDevice(deviceIds);
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByPmsId(deviceList);
+                }else {
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByRegionOrDevice(deviceIds);
+                }
                 tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                 item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;
             case "3":
                 // 设备点位
                 // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
-                boolean standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
-                if (standardPoints) {
+                if (Constant.standardPoints()) {
                     instanceIds = sendToUpSystemServices.selectForTaskInstanceId(deviceList);
                     tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                 } else {
@@ -507,17 +520,21 @@ public class MessageThread {
                 break;
             case "4":
                 // 设备部件
-                List<String> list = Arrays.asList(deviceList.split(","));
-                Map<String, String> deviceListMap = list.stream().collect(Collectors.toMap(e -> e.split("_")[0],
-                        e -> e.split("_")[1], (a, b) -> a + "," + b));
-                List<DeviceModel> deviceModels = new ArrayList<>();
-                deviceListMap.forEach((k, v) -> {
-                    DeviceModel dm = new DeviceModel();
-                    dm.setDeviceId(k);
-                    dm.setComponentId(v);
-                    deviceModels.add(dm);
-                });
-                instanceIds = sendToUpSystemServices.selectInstanceIdsByComponent(deviceModels);
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByMiddlegroundComponent(deviceList);
+                } else {
+                    List<String> list = Arrays.asList(deviceList.split(","));
+                    Map<String, String> deviceListMap =
+                        list.stream().collect(Collectors.toMap(e -> e.split("_")[0], e -> e.split("_")[1], (a, b) -> a + "," + b));
+                    List<DeviceModel> deviceModels = new ArrayList<>();
+                    deviceListMap.forEach((k, v) -> {
+                        DeviceModel dm = new DeviceModel();
+                        dm.setDeviceId(k);
+                        dm.setComponentId(v);
+                        deviceModels.add(dm);
+                    });
+                    instanceIds = sendToUpSystemServices.selectInstanceIdsByComponent(deviceModels);
+                }
                 tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                 item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;

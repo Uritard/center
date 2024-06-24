@@ -6,6 +6,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -48,7 +49,7 @@ public class RunningThread implements Runnable{
                 if(s == null){
                     s= "30";
                 }
-                Thread.sleep(Long.valueOf(s)*1000L);
+                Thread.sleep(NumberUtils.toInt(s, 30) * 1000L);
                 {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String now = simpleDateFormat.format(new Date());

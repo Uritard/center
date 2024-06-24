@@ -6,6 +6,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class NestRunThread implements Runnable{
                     s= "30";
                 }
                 log.info("NestRunThread sleep {} s .......", s);
-                Thread.sleep(Long.valueOf(s)*1000L);
+                Thread.sleep(NumberUtils.toInt(s, 30) * 1000L);
                 List<Map<String, Object>> onlinePatrolDevice = sendToUpSystemServices.selectOnlinePatrolDevice();
                 for (Map<String, Object> device : onlinePatrolDevice) {
                     List<Map<String, Object>> list = new ArrayList<>();

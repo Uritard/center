@@ -1500,6 +1500,8 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'reportGroupByStation', '任务报告按站所区分', 'false', '任务报告按站所拆分视图，站所为区域根节点下第一层节点', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'selfDefinedExtensions', '是否启用自定义协议扩展', 'true', '用于内部系统对接，定义了额外的消息类型', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'missedPointRetry', '是否开启遗漏点位重试', 'false', '此参数用于遗漏点位重试,用于巡视任务对遗漏点位的重新巡视', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'middlegroundIds', '是否使用业务中台ID', 'false', '业务中台ID，间隔、主设备、部件使用和业务中台一致的ID，不使用自增ID，此情况需保证对应ID手动设置值正确，true或false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
