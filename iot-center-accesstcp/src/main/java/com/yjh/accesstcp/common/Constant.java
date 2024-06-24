@@ -215,6 +215,31 @@ public class Constant {
     }
 
     /**
+     * 测点使用标准点位
+     */
+    public static boolean standardPoints() {
+        boolean standardPoints;
+        try {
+            standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+            log.warn("standardPoints is {}", standardPoints);
+        } catch (Exception e) {
+            standardPoints = false;
+        }
+        return standardPoints;
+    }
+
+    public static boolean middlegroundIds() {
+        boolean middlegroundIds;
+        try {
+            middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+            log.debug("middlegroundIds is {}", middlegroundIds);
+        } catch (Exception e) {
+            middlegroundIds = false;
+        }
+        return middlegroundIds;
+    }
+
+    /**
      * 上级系统IP
      */
     public static String upSystemIp;

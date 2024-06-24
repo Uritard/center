@@ -5,6 +5,8 @@ import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
@@ -40,10 +42,10 @@ public class WeatherThread implements Runnable{
                     break;
                 }
                 String s = Constant.paramMap.get("weather_interval");
-                if(s == null){
+                if(StringUtils.isEmpty(s)){
                     s= "30";
                 }
-                Thread.sleep(Long.valueOf(s)*1000L);
+                Thread.sleep(NumberUtils.toInt(s, 30) * 1000L);
                 {
                     List<Map<String, Object>> onlinePatrolDevice = sendToUpSystemServices.selectOnlinePatrolDevice();
                     for (Map<String, Object> device : onlinePatrolDevice) {

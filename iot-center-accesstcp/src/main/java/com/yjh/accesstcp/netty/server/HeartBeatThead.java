@@ -1,6 +1,7 @@
 package com.yjh.accesstcp.netty.server;
 
 import com.yjh.accesstcp.common.Constant;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * @author lqh
@@ -34,7 +35,7 @@ public class HeartBeatThead implements Runnable{
                 if(s == null){
                     s= "30";
                 }
-                Thread.sleep(Long.valueOf(s)*1000L);
+                Thread.sleep(NumberUtils.toInt(s, 30) * 1000L);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

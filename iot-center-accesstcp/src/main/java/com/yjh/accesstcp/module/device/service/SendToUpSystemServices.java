@@ -512,7 +512,8 @@ public class SendToUpSystemServices {
 //        }
         String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
-        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(null, presetRealImgPath,presetImgPath);
+        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(), Constant.middlegroundIds(),
+            null, presetRealImgPath,presetImgPath);
         String stationName = getStationName();
         list.forEach(item->{
             item.put("station_code",stationCode);
@@ -533,7 +534,7 @@ public class SendToUpSystemServices {
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
                 item.put("data_type","1");
-                jsonObject.put("device_code",item.get("camera_id"));
+                jsonObject.put("device_code",item.get("b_camera_channel_id"));
                 jsonObject.put("device_pos",item.get("preset_num"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
@@ -546,7 +547,7 @@ public class SendToUpSystemServices {
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
             }
-            item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
+            // item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
             item.remove("cruise_type");
             item.remove("camera_id");
             item.remove("preset_num");
@@ -1733,5 +1734,17 @@ public class SendToUpSystemServices {
 
     public List<String> selectInstanceIdsByComponent(List<DeviceModel> deviceModels) {
         return sendToUpSystemDao.selectInstanceIdsByComponent(deviceModels);
+    }
+
+    public List<String> selectInstanceIdsByUpRegionIds(String deviceList) {
+        return sendToUpSystemDao.selectInstanceIdsByUpRegionIds(deviceList);
+    }
+
+    public List<String> selectInstanceIdsByPmsId(String deviceList) {
+        return sendToUpSystemDao.selectInstanceIdsByPmsId(deviceList);
+    }
+
+    public List<String> selectInstanceIdsByMiddlegroundComponent(String deviceList) {
+        return sendToUpSystemDao.selectInstanceIdsByMiddlegroundComponent(deviceList);
     }
 }

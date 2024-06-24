@@ -614,7 +614,8 @@ CREATE TABLE `t_camera_info` (
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
-  `camera_channel_id` VARCHAR (50)  DEFAULT NULL COMMENT '相机通道id',
+  `camera_channel_id` varchar (50)  DEFAULT NULL COMMENT '相机通道id',
+  `b_camera_channel_id` varchar(50) DEFAULT NULL COMMENT '视频B相机通道id',
   `use_type` int DEFAULT '1' COMMENT '相机用途 巡视设备1 监控设备 2',
   PRIMARY KEY (`camera_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
@@ -674,6 +675,8 @@ CREATE TABLE `t_camera_recorder` (
   `time_long` int(32) DEFAULT '1' COMMENT '录制文件时长 单位秒',
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
   `device_channel` VARCHAR (50)  DEFAULT NULL COMMENT '设备id',
+  `b_device_channel` varchar(50) DEFAULT NULL COMMENT '视频B设备ID',
+  `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
   PRIMARY KEY (`record_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='录像服务器表';
@@ -1792,6 +1795,7 @@ CREATE TABLE `t_std_devicemete` (
   `device_point_id` varchar(64) DEFAULT NULL COMMENT '设备点位ID',
   `custom_id` varchar(50) DEFAULT '' COMMENT '部位ID',
   `custom_name` varchar(64) DEFAULT '' COMMENT '部件名称',
+  `component_id` varchar(50) DEFAULT NULL COMMENT '中台部件Id',
   `mete_id` bigint(50) DEFAULT '1' COMMENT '标准测点ID',
   `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
   `mete_type` varchar(50) DEFAULT '' COMMENT '巡检类型',
