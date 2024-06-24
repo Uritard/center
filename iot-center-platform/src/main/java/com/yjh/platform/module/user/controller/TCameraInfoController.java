@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCameraInfoExcel;
@@ -29,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -51,6 +53,8 @@ public class TCameraInfoController {
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private LogsRecord logsRecord;
+    @Resource
+    private TCameraInfoDao cameraInfoDao;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -116,6 +120,16 @@ public class TCameraInfoController {
                 tCameraInfo.setBcameraChannelId(null);
             }
         }
+
+        // 判断是否存在相同编码的设备
+        TCameraInfo query = new TCameraInfo();
+        query.setCameraChannelId(tCameraInfo.getCameraChannelId());
+        query.setBcameraChannelId(tCameraInfo.getBcameraChannelId());
+        List<TCameraInfo> cameraInfos = cameraInfoDao.queryCameraByCondition(query);
+        if (CollectionUtils.isNotEmpty(cameraInfos)) {
+            throw new BusinessException("相机国标编码或视频B编码重复！");
+        }
+
     }
 
     @ApiOperation(value = "删除")

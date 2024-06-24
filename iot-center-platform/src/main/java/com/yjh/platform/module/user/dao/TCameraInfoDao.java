@@ -95,4 +95,6 @@ public interface TCameraInfoDao {
     List<Long> selectRegionListByUpRegionId(@Param(value = "upRegionList") Set<Long> upRegionList);
 
     int batchInsert(List<TCameraInfo> list);
+
+    List<TCameraInfo> queryCameraByCondition(TCameraInfo tCameraInfo);
 }

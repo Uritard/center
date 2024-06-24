@@ -11,13 +11,16 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.entity.SilentConf;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -39,6 +43,8 @@ public class TCameraPresetController {
 
     @Autowired
     private final TCameraPresetService tCameraPresetService;
+    @Resource
+    private TCameraInfoDao cameraInfoDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetController.class);
 
@@ -54,8 +60,9 @@ public class TCameraPresetController {
         try {
             int resultNum;
             //判断该预置位是否已被设置
-            if(tCameraPresetService.judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
-                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+            TCameraInfo tCameraInfo = cameraInfoDao.selectCamera(tCameraPreset.getCameraId());
+            if(tCameraPresetService.judgePresentNum(tCameraPreset, tCameraInfo)){
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置或此预置位已被占用");
                 return result;
             }else {
                 int isMicro = tCameraPresetService.microCamera(tCameraPreset);

@@ -638,12 +638,15 @@ public class TStdDevicemeteService{
         TCameraPreset tCameraPreset = new TCameraPreset();
         Result result = new Result();
         if (Objects.isNull(lockPresetCommand.getPresetId())) {
+            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
             tCameraPreset.setCameraId(lockPresetCommand.getCameraId());
             tCameraPreset.setPresetNum(lockPresetCommand.getPresetNum());
             tCameraPreset.setPresetName(lockPresetCommand.getPresetName());
             tCameraPreset.setCameraName(lockPresetCommand.getCameraName());
-            result = tCameraPresetService.add(tCameraPreset);
-            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
+            // 查询相同ip的相机 若存在多个 判断预置位是否被其他相机占用
+            // 新增预置位
+            result = tCameraPresetService.add(tCameraPreset, tCameraInfo);
+
             if (HttpStatus.HTTP_OK == result.getCode()) {
                 TCruisePointInstanceDetail tCruisePointInstanceDetail = new TCruisePointInstanceDetail();
                 if (tCameraInfo.getCameraType() == 205) {
@@ -668,6 +671,8 @@ public class TStdDevicemeteService{
                         Constant.modelUpload("1");
                     }
                 }
+            } else {
+                throw new BusinessException(result.getMessage());
             }
         } else {
             try {
