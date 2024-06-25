@@ -42,8 +42,9 @@ public class HttpClientUtils {
             instance = new HttpClientUtils();
             RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(5000).setConnectionRequestTimeout(10000)
-                .setSocketTimeout(10000).build();
-            client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+                .setSocketTimeout(15000).build();
+
+            client = HttpClients.custom().setMaxConnTotal(300).setMaxConnPerRoute(80).setDefaultRequestConfig(requestConfig).build();
         }
         return instance;
     }
@@ -57,7 +58,6 @@ public class HttpClientUtils {
      */
     public String doGet(String url, Map<String, Object> headerMap) {
         String content = null;
-        CloseableHttpClient httpClient = getHttpClient();
         try {
             HttpGet getMethod = new HttpGet(url);
             //头部请求信息
@@ -69,7 +69,7 @@ public class HttpClientUtils {
                 }
             }
             //发送get请求
-            CloseableHttpResponse httpResponse = httpClient.execute(getMethod);
+            CloseableHttpResponse httpResponse = client.execute(getMethod);
             if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 try {
                     //读取内容
@@ -82,12 +82,6 @@ public class HttpClientUtils {
             }
         } catch (IOException ex) {
             throw new BusinessException(ex.getMessage());
-        } finally {
-            try {
-                closeHttpClient(httpClient);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
         }
         return content;
     }
@@ -103,7 +97,6 @@ public class HttpClientUtils {
      */
     public String doPost(String url, Map<String, Object> headerMap, Map<String, Object> parameterMap) {
         String content = null;
-        CloseableHttpClient httpClient = getHttpClient();
         try {
             HttpPost postMethod = new HttpPost(url);
 //            postMethod.setHeader("Content-Type", "application/json;charset=utf-8");
@@ -128,7 +121,7 @@ public class HttpClientUtils {
                 postMethod.setEntity(new UrlEncodedFormEntity(nvps));
             }
 
-            CloseableHttpResponse httpResponse = httpClient.execute(postMethod);
+            CloseableHttpResponse httpResponse = client.execute(postMethod);
             try {
                 //读取内容
                 content = EntityUtils.toString(httpResponse.getEntity());
@@ -138,12 +131,6 @@ public class HttpClientUtils {
 
         } catch (IOException ex) {
             throw new BusinessException(ex.getMessage());
-        } finally {
-            try {
-                closeHttpClient(httpClient);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
         }
         return content;
     }
@@ -171,7 +158,7 @@ public class HttpClientUtils {
     }
 
     public String putUrl(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+        // CloseableHttpClient client = HttpClients.createDefault();
         HttpPut httpPut = new HttpPut(url);
         httpPut.addHeader("Content-type", "application/json;charset=utf-8");
         httpPut.setHeader("Accept", "application/json");
@@ -179,10 +166,6 @@ public class HttpClientUtils {
         CloseableHttpResponse response = client.execute(httpPut);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
-    }
-
-    public CloseableHttpClient getHttpClient() {
-        return HttpClients.createDefault();
     }
 
     public void close() {
@@ -195,16 +178,10 @@ public class HttpClientUtils {
         }
     }
 
-    private void closeHttpClient(CloseableHttpClient client) throws IOException {
-        if (client != null) {
-            client.close();
-        }
-    }
-
     public static void get(String url) {
         HttpGet request = new HttpGet(url);
         try {
-            HttpResponse response = HttpClients.createDefault().execute(request);
+            HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == 200) {
                 EntityUtils.toString(response.getEntity());
             }
