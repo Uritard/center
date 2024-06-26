@@ -1176,6 +1176,7 @@ public class CameraConService {
                 return channleStatusMap;
             } else {
                 log.error("获取存储文件失败: {}", JSON.toJSONString(listResult));
+                channleStatusMap.put("code", listResult.getCode());
             }
         } catch (Exception e) {
             log.error("获取NVR信息失败：{}", entityBuilder.build(), e);

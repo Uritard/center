@@ -284,8 +284,10 @@ public class SystemInfoService {
 
             reList.add(map);
         }
-
-        RECORDER_INFO_CACHE.put(RECORDER_KEY, reList);
+        //接口返回100情况不入JVM缓存
+        if (reList.stream().noneMatch(m -> m.containsKey("code"))){
+            RECORDER_INFO_CACHE.put(RECORDER_KEY, reList);
+        }
         return reList;
     }
 
