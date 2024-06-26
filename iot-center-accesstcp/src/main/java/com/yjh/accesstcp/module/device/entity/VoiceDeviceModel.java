@@ -28,6 +28,7 @@ public class VoiceDeviceModel extends TVoiceDevice{
     private String type;
     private String patroldeviceInfo;
     private String robotsCode;
+    private String mountPatroldeviceCode;
     /**
      * ftp地址
      */
