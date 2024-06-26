@@ -11,6 +11,7 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -87,8 +88,10 @@ public class ProcessResultToUpSystem {
         this.algorithmInfo = algorithmInfo;
     }
 
-    public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
-        return alarmAndResultToUpSystem(Collections.singletonList(cruiseResultMap), alarmLevel, tWarnInfo);
+    public void alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
+        ThreadPoolUtil.PATROL_POOL.addThread(() ->{
+            alarmAndResultToUpSystem(Collections.singletonList(cruiseResultMap), alarmLevel, tWarnInfo);
+        });
     }
 
     /**
