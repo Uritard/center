@@ -28,4 +28,5 @@ public class RobotModel  extends TRobotInfo{
     private String type;
     private String patroldeviceInfo;
     private String robotsCode;
+    private String mountPatroldeviceCode;
 }
