@@ -315,7 +315,7 @@
         a.create_time,a.commission_date,a.edge_code,
         a.origin_id,a.camera_channel_id,a.use_type,
         a.camera_name as patroldevice_name,
-        IFNULL(a.b_camera_channel_id, a.camera_id) as patroldevice_code,
+        IFNULL(a.b_camera_channel_id, a.camera_channel_id) as patroldevice_code,
         b.dict_note as device_model,
         c.dict_note as manufacturer,
         a.unit as use_unit,
