@@ -534,7 +534,9 @@ public class SendToUpSystemServices {
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
                 item.put("data_type","1");
-                jsonObject.put("device_code",item.get("b_camera_channel_id"));
+                String deviceCode = MapUtils.getString(item, "b_camera_channel_id");
+                deviceCode = StringUtils.isEmpty(deviceCode) ? MapUtils.getString(item, "camera_id") : deviceCode;
+                jsonObject.put("device_code", deviceCode);
                 jsonObject.put("device_pos",item.get("preset_num"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
