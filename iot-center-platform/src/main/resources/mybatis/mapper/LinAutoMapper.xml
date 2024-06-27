@@ -275,7 +275,7 @@
         ,low_limit3,high_limit4,low_limit4
         ,alarm_delay,alarm_cnt,threshold_abs
         ,threshold_per,modulus,remark
-        ,redundant_type
+        ,redundant_type,label_attri
         )
         values
 <foreach collection="list" separator="," item="item">
@@ -292,7 +292,7 @@
     ,#{item.lowLimit3,jdbcType=FLOAT},#{item.highLimit4,jdbcType=FLOAT},#{item.lowLimit4,jdbcType=FLOAT}
     ,#{item.alarmDelay,jdbcType=INTEGER},#{item.alarmCnt,jdbcType=INTEGER},#{item.thresholdAbs,jdbcType=DECIMAL}
     ,#{item.thresholdPer,jdbcType=DECIMAL},#{item.modulus,jdbcType=INTEGER},#{item.remark,jdbcType=VARCHAR}
-    ,#{item.redundantType,jdbcType=VARCHAR})
+    ,#{item.redundantType,jdbcType=VARCHAR},#{item.labelAttri,jdbcType=VARCHAR})
 
 </foreach>
     </insert>
