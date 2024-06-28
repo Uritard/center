@@ -117,9 +117,9 @@ public class TMeterController {
         return result;
     }
 
-    @ApiOperation(value = "电量记录历史")
+    @ApiOperation(value = "耗电量记录历史")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @Logs(title = "查询电量历史记录", content = "根据用户传递的参数查询电量历史记录", logType = 1, authority = "1235")
+    @Logs(title = "查询耗电量历史记录", content = "根据用户传递的参数查询耗电量历史记录", logType = 1, authority = "1235")
     public Result list(@RequestBody TMeter tMeter) {
         Result result = new Result();
         try {
@@ -135,6 +135,33 @@ public class TMeterController {
                 tMeter.setEndTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN).format(formatter));
             }
             result.setData(tMeterService.list(tMeter));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("查询耗电量历史记录失败:", e);
+        }
+        return result;
+
+    }
+
+    @ApiOperation(value = "电量记录历史")
+    @RequestMapping(value = "/collectList", method = RequestMethod.POST)
+    @Logs(title = "查询电量历史记录", content = "根据用户传递的参数查询电量历史记录", logType = 1, authority = "1235")
+    public Result collectList(@RequestBody TMeter tMeter) {
+        Result result = new Result();
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            if (StringUtils.isNotEmpty(tMeter.getStartTime()) && StringUtils.isNotEmpty(tMeter.getEndTime())) {
+                LocalDate startTime = LocalDate.parse(tMeter.getStartTime(), formatter);
+                LocalDate endTime = LocalDate.parse(tMeter.getEndTime(), formatter);
+                if (ChronoUnit.DAYS.between(startTime, endTime) > 30) {
+                    throw new RuntimeException("时间范围不可超过30天");
+                }
+            } else {
+                tMeter.setStartTime(LocalDateTime.of(LocalDate.now().minusDays(30), LocalTime.MIN).format(formatter));
+                tMeter.setEndTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN).format(formatter));
+            }
+            result.setData(tMeterService.collectList(tMeter));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -163,6 +190,7 @@ public class TMeterController {
             item.put("ip", meter.getIp());
             item.put("port", meter.getPort());
             item.put("address", meter.getAddress());
+            item.put("type", meter.getType());
             item.put("protocol", meter.getProtocol());
             item.put("upRegionId", meter.getUpRegionId());
             item.put("totalPositivePower", meter.getTotalPositivePower());
