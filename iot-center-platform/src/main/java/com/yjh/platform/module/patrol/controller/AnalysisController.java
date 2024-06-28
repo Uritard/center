@@ -312,6 +312,7 @@ public class AnalysisController {
      */
     @ApiOperation(value = "算法参数获取接口")
     @GetMapping(value = "/getAlgorithmParams")
+    @Logs(title = "查询算法参数信息",content = "根据用户传递的参数查询算法参数信息",authority = "1234")
     public Result getAlgorithmParams(@RequestParam(value = "type") String type) {
         Result result = new Result();
         try {
@@ -333,6 +334,7 @@ public class AnalysisController {
      */
     @ApiOperation(value = "算法版本获取接口")
     @GetMapping(value = "/getAlgorithmVersion")
+    @Logs(title = "查询算法版本信息",content = "根据用户传递的参数查询算法版本信息",authority = "1234")
     public Result getAlgorithmVersion(@RequestParam(value = "type") String type,
                                       @RequestParam(value = "algorithmManufacturer") String algorithmManufacturer) {
         Result result = new Result();
@@ -355,6 +357,7 @@ public class AnalysisController {
      */
     @ApiOperation(value = "算法版本切换接口")
     @PostMapping(value = "/algorithmVersionChange")
+    @Logs(title = "算法版本切换",content = "算法版本切换", logType = 5, authority = "1234")
     public Result algorithmVersionChange(@RequestParam(value = "type") String type,
                                          @RequestParam(value = "version") String version) {
         Result result = new Result();

@@ -58,6 +58,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取所有边缘节点自检信息")
     @GetMapping(value = "/getEdgeSystemCheck")
+    @Logs(title = "查询所有边缘节点自检信息",content = "根据用户传递的参数查询所有边缘节点自检信息", authority = "1234")
     public Result getEdgeSystemCheck() {
         Result result = new Result();
         try {

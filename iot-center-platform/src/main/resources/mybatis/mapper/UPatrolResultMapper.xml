@@ -491,6 +491,8 @@
 
         <if test="customId != null and customId != -1 ">and b.custom_id = #{customId, jdbcType=VARCHAR}</if>
 
+        <if test="labelAttri != null and labelAttri != '-1' ">and FIND_IN_SET(#{labelAttri, jdbcType=VARCHAR}, b.label_attri)</if>
+
         <if test="list != null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
