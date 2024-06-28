@@ -148,6 +148,18 @@ public class TMeterService {
         }
         list.forEach(t -> setPower(t, t, false));
         list = list.stream().filter(t-> !"0.00".equals(t.getTotalPositivePowerLast())).collect(Collectors.toList());
+        return convert(list);
+    }
+
+    public List<TMeterVo> collectList(TMeter tMeter) {
+        List<TMeter> list = tMeterLogDao.collectList(tMeter);
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        return convert(list);
+    }
+
+    private List<TMeterVo> convert( List<TMeter> list){
         return list.stream().map(e -> {
             TMeterVo tMeterVo = new TMeterVo();
             BeanUtils.copyProperties(e, tMeterVo);

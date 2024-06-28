@@ -22,6 +22,20 @@
         total_negative_positive_power_difference_value,magnification_coefficient
     </sql>
 
+    <select id="collectList" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_meter_log
+        WHERE meter_id = #{id, jdbcType=INTEGER}
+        <if test="startTime != null and startTime != ''">
+            AND create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND create_time &lt;= #{endTime}
+        </if>
+        order by create_time
+    </select>
+
     <select id="list" parameterType="com.yjh.platform.module.device.entity.TMeter" resultType="com.yjh.platform.module.device.entity.TMeter">
         SELECT b.total_positive_power,
         b.total_positive_reactive_power,

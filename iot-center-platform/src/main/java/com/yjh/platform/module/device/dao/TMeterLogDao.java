@@ -18,5 +18,7 @@ public interface TMeterLogDao {
 
     List<TMeter> list(TMeter tMeter);
 
+    List<TMeter> collectList(TMeter tMeter);
+
     TMeter selectPowerDifferenceValue(@Param(value = "id") Long id);
 }
