@@ -124,7 +124,7 @@ public class RobotInspectionWarnThread implements Runnable{
             redisTemplate.opsForHash().putAll(PATROL_TASK_PREFIX + taskId + ":" + instanceId, cruiseMap);
 
             // 将产生的告警上送至上一级系统 (操作告警除外)
-            if (warnInfo.getWarnType() != 507) {
+            if (!Objects.equals(warnInfo.getWarnType(), 507)) {
                 alarmToUpSystem(taskAlarm.getAlarmLevel(), warnInfo, taskId, instanceId);
             }
             // 告警推送
