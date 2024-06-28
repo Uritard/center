@@ -370,7 +370,7 @@ public class ProcessResultToUpSystem {
                     break;
             }
             //操作告警单独处理
-            if (tWarnInfo.getWarnType() == 507) {
+            if (Objects.equals(tWarnInfo.getWarnType(), 507)) {
                 alarmType = "11";
             }
             xmlItem.put("file_path", StringUtils.contains(imagePath, ".") ? tagPath : "");
