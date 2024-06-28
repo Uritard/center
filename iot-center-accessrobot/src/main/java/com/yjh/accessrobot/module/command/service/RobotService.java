@@ -1364,31 +1364,22 @@ public class RobotService {
                 redisInfoList.add(redisInfoMap);
             }
             if ("0".equals(isenable)) {
-                if (456 == cruiseType
-                    || 508 == cruiseType
-                        || 509 == cruiseType){
-                    // 操作任务清楚原有缓存
-                    for (int i = 0; i < redisInfoList.size(); i++) {
-                        String key = "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode");
-                        redisTemplate.delete(key);
-                    }
-                }
-                for (int i = 0; i < redisInfoList.size(); i++) {
-                    String key = "Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode") + ":" + redisInfoList.get(i).get("inspectionCode");
-                    Map<String,String> map = redisTemplate.opsForHash().entries(key);
-                    if (!MapUtils.isEmpty(map)){
-                        //判断
-                        String instanceIdInRedis = map.get("instanceId");
-                        String instanceIdInMap = redisInfoList.get(i).get("instanceId");
-                        if (!instanceIdInRedis.contains(instanceIdInMap)){
-                            //不含 加上
-                            redisInfoList.get(i).put("instanceId",instanceIdInRedis+" "+instanceIdInMap);
+                Map<String,List<Map<String, String>>> groupedMap = redisInfoList.stream()
+                        .collect(Collectors.groupingBy(
+                                map -> map.getOrDefault("robotCode", "") + "_" + map.getOrDefault("inspectionCode", ""),
+                                Collectors.toList()
+                        ));
+
+                groupedMap.forEach((key,value) ->{
+                   Map<String,String> item = value.get(0);
+                    key = "Robot_SPAndIN_Info:" + item.get("robotCode") + ":" + item.get("inspectionCode");
+                    if (value.size() > 1){
+                        for (int i = 1; i < value.size(); i++){
+                            item.put("instanceId",item.get("instanceId") + " " + value.get(i).get("instanceId"));
                         }
                     }
-                    redisTemplate.opsForHash().putAll(
-                            key,
-                        redisInfoList.get(i));
-                }
+                    redisTemplate.opsForHash().putAll(key,item);
+                });
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
