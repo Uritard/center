@@ -597,12 +597,12 @@
     </select>
     <select id="getExistPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
-        tcp.camera_id,
+        tcp.camera_id
         from t_camera_preset tcp
         left join t_camera_info tci
         on tcp.camera_id = tci.camera_id
         where tcp.preset_num = #{presetNum, jdbcType=INTEGER}
-        and tci.ip = #{ip}
+        and tci.camera_ip = #{ip}
         and tci.port = #{port}
     </select>
 </mapper>
