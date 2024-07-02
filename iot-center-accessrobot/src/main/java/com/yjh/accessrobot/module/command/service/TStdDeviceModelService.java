@@ -311,6 +311,7 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setStateOne((String) device.get("state_one"));
             tStdDeviceMete.setAlarmState(objToInt(device.get("alarm_state")));
             tStdDeviceMete.setIsTemdif(objToInt(device.get("is_temdif")));
+            tStdDeviceMete.setLabelAttri(String.valueOf(device.get("label_attri")));
         } else {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
         }
@@ -640,6 +641,7 @@ public class TStdDeviceModelService {
                     t.setAlarmCnt(old.getAlarmCnt());
                     t.setThresholdAbs(old.getThresholdAbs());
                     t.setThresholdPer(old.getThresholdPer());
+                    t.setLabelAttri(old.getLabelAttri());
                 }
                 tStdDevicemeteMapper.updateByPrimaryKey(t);
             });
