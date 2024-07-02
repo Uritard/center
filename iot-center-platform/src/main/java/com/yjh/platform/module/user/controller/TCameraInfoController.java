@@ -125,11 +125,11 @@ public class TCameraInfoController {
         TCameraInfo query = new TCameraInfo();
         query.setCameraChannelId(tCameraInfo.getCameraChannelId());
         query.setBcameraChannelId(tCameraInfo.getBcameraChannelId());
-        List<TCameraInfo> cameraInfos = cameraInfoDao.queryCameraByCondition(query);
+        query.setCameraId(tCameraInfo.getCameraId());
+        List<TCameraInfo> cameraInfos = cameraInfoDao.cameraDuplicateCheck(query);
         if (CollectionUtils.isNotEmpty(cameraInfos)) {
             throw new BusinessException("相机国标编码或视频B编码重复！");
         }
-
     }
 
     @ApiOperation(value = "删除")

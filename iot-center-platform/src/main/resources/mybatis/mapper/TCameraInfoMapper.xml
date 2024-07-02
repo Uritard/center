@@ -607,7 +607,7 @@
         </if>
     </select>
 
-    <select id="queryCameraByCondition" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
+    <select id="cameraDuplicateCheck" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
         select camera_id,camera_name,camera_model
                         ,pms_id,alias_name,record_id
                         ,up_region_id,channel_num,camera_num
@@ -620,25 +620,16 @@
                         ,create_time,commission_date,edge_code
                         ,origin_id, camera_channel_id, b_camera_channel_id, use_type
         from t_camera_info where 1 = 1
-        <if test="cameraId != null">
-            and camera_id = #{cameraId}
+        <if test="cameraId != null and cameraId != 0">
+            and camera_id != #{cameraId}
         </if>
-        <if test="cameraName != null">
-            and camera_name like concat('%', #{cameraName}, '%')
-        </if>
-        <if test="cameraIp != null">
-            and camera_ip = #{cameraIp}
-        </if>
-        <if test="port != null">
-            and port = #{port}
-        </if>
-        <if test="cameraChannelId != null and bcameraChannelId != null">
+        <if test="cameraChannelId != null  and cameraChannelId != '' and bcameraChannelId != null and bcameraChannelId != ''">
             and ( camera_channel_id = #{cameraChannelId} or b_camera_channel_id = #{bcameraChannelId} )
         </if>
-        <if test="cameraChannelId != null and bcameraChannelId == null">
+        <if test="(cameraChannelId != null and cameraChannelId != '') and (bcameraChannelId == null or bcameraChannelId == '')">
             and  camera_channel_id = #{cameraChannelId}
         </if>
-        <if test="cameraChannelId == null and bcameraChannelId != null">
+        <if test="(cameraChannelId == null  or cameraChannelId == '') and (bcameraChannelId != null and bcameraChannelId != '')">
             and b_camera_channel_id = #{bcameraChannelId}
         </if>
 
