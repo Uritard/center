@@ -13,6 +13,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.commons.utils.CommonUtils;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
@@ -693,7 +694,11 @@ public class SendToUpSystemServices {
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
                 item.put("data_type","1");
-                jsonObject.put("device_code",item.get("camera_id"));
+                if (CommonUtils.isEmptyOrNullstr(String.valueOf(item.get("b_camera_channel_id")))) {
+                    jsonObject.put("device_code", item.get("camera_channel_id"));
+                } else {
+                    jsonObject.put("device_code", item.get("b_camera_channel_id"));
+                }
                 jsonObject.put("device_pos",item.get("preset_num"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
@@ -759,9 +764,14 @@ public class SendToUpSystemServices {
         List<CameraModel> cameraModelList = tCameraInfoMapper.selectAll();
         String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
         String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        Result re = Constant.getForObject(Constant.GET_WVP_SERVER_CONFIG);
+        JSONObject obj = (JSONObject) JSON.toJSON(re.getData());
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = cameraModelList.stream().peek(cameraModel -> {
+            if ("11".equals(cameraModel.getType())){
+                cameraModel.setCameraChannelId(String.valueOf(obj.get("username")));
+            }
             cameraModel.setStationCode(stationCode);
             cameraModel.setStationName(stationName);
         }).map((Function<CameraModel, Map<String, Object>>) cameraModel -> {

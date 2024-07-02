@@ -117,8 +117,10 @@ public class TStdDeviceModelService {
                             case "1":
                                 //视频
                                 //构建 t_camera_preset
-                                String cameraOriginId = posArray.getJSONObject(0).getString("device_code");
-                                TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
+                                String cameraChannelId = posArray.getJSONObject(0).getString("device_code");
+                                TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t ->
+                                        (cameraChannelId.equals(t.getBcameraChannelId()) || cameraChannelId.equals(t.getCameraChannelId()))
+                                                && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
                                 TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posArray, tCameraInfo.getCameraId());
                                 cruiseDeviceId = String.valueOf(tCameraInfo.getCameraId());
                                 cruiseId = posArray.getJSONObject(0).getLongValue("device_pos");

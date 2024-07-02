@@ -89,6 +89,10 @@ public class CommonUtils {
         return (array == null || array.length == 0);
     }
 
+    public static boolean isEmptyOrNullstr(String str) {
+        return StringUtils.isEmpty(str) || "null".equalsIgnoreCase(str);
+    }
+
     /**
      * @param json String
      * @return true/false
