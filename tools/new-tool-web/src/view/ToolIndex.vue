@@ -246,7 +246,7 @@ export default {
             this.receiveCode = info.receiveCode
             this.serverFlag = 0
             localStorage.setItem('ip', this.ip)
-            localStorage.setItem('port', this.port)
+            localStorage.setItem('client-port', this.port)
             localStorage.setItem('client-sendCode', this.sendCode)
             localStorage.setItem('client-receiveCode', this.receiveCode)
           }
@@ -260,6 +260,7 @@ export default {
             this.sendCode = info.sendCode
             this.receiveCode = info.receiveCode
             this.serverFlag = 1
+            localStorage.setItem('server-port', this.port)
             localStorage.setItem('server-sendCode', this.sendCode)
             localStorage.setItem('server-receiveCode', this.receiveCode)
           }
@@ -275,7 +276,7 @@ export default {
       this.visibleFlag = true
       this.submitForm = {
         ip: localStorage.getItem('ip'),
-        port: localStorage.getItem('port'),
+        port: localStorage.getItem('client-port'),
         sendCode: localStorage.getItem('client-sendCode'),
         receiveCode: localStorage.getItem('client-receiveCode')
       }
@@ -298,7 +299,7 @@ export default {
       this.visibleFlag = true
       this.submitForm = {
         ip: '',
-        port: '',
+        port: localStorage.getItem('server-port'),
         sendCode: localStorage.getItem('server-sendCode'),
         receiveCode: localStorage.getItem('server-receiveCode')
       }

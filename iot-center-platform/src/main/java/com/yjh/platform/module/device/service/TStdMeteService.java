@@ -51,6 +51,8 @@ public class TStdMeteService {
     public int update(TStdMete tStdMete) {
         if (CollectionUtils.isNotEmpty(tStdMete.getLabelAttris())) {
             tStdMete.setLabelAttri(String.join(",",tStdMete.getLabelAttris()));
+        } else {
+            tStdMete.setLabelAttri("");
         }
         return this.tStdMeteDao.update(tStdMete);
     }
