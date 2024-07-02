@@ -14,6 +14,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -365,6 +366,25 @@ public class UPatrolTaskController {
             List<Map<String, Object>> list = uPatrolTaskService.taskCount(taskStartDate, flag);
             result.setData(list);
         }catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务统计")
+    @RequestMapping(value = "/queryTaskForPage", method = RequestMethod.POST)
+    @Logs(title = "查询巡检任务", content = "根据用户传递的参数统计任务", logType = 1, authority = "1235")
+    public Result queryTaskForPage(@RequestBody TaskQuery taskQuery) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(taskQuery.getPageNum(), taskQuery.getPageSize(), true, null, true);
+            List<UPatrolTask> list = uPatrolTaskService.queryTaskForPage(taskQuery);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list",list);
+            result.setData(resultMap);
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
         }

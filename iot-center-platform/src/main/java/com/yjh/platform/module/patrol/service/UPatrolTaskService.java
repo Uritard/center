@@ -38,6 +38,7 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.service.impl.OnLineMonitoringExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
@@ -4025,5 +4026,12 @@ public class UPatrolTaskService {
         String key = PATROL_SUMMARY_PREFIX + taskId + TASK_ALL;
 
         return redisTemplate.opsForZSet().zCard(key);
+    }
+
+    public List<UPatrolTask> queryTaskForPage(TaskQuery taskQuery) {
+        List<UPatrolTask> uPatrolTasks = uPatrolTaskDao.selectTaskForPage(taskQuery);
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("planType", "taskType", "taskTypeName");
+        DictConvertUtil.DICT.covertToDict(uPatrolTasks, optional);
+        return uPatrolTasks;
     }
 }
