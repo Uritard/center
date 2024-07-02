@@ -533,6 +533,7 @@ public class UPatrolTaskService {
                 .setLabelAttri(item.getLabelAttri())
                 .setCreatetime(now);
             Map<String, String> map = Object2Map.objectToMap(uPatrolDataResult, true);
+            map.remove("allFilePath");
             String edgeCode = Optional.ofNullable(item.getEdgeCode()).orElse("");
             map.put("edgeCode", edgeCode);
             map.put("devicePointId", String.valueOf(item.getDevicePointId()));
