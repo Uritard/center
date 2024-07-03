@@ -62,6 +62,7 @@ public class UPatrolTask implements Serializable {
     private Integer taskLevel;
 
     @ApiModelProperty(value = "巡视时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     @ApiModelProperty(value = "创建时间")
@@ -69,10 +70,14 @@ public class UPatrolTask implements Serializable {
     private Date createTime;
 
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     @ApiModelProperty(value = "创建用户id")
     private Long createUserId;
+
+    // 任务状态
+    private Integer taskState;
 
     // 测点总数
     private Integer total;

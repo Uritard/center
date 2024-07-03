@@ -14,13 +14,16 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.service.UpdatePatrolService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
+import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -381,6 +384,25 @@ public class UPatrolTaskController {
         try {
             Page page = PageHelper.startPage(taskQuery.getPageNum(), taskQuery.getPageSize(), true, null, true);
             List<UPatrolTask> list = uPatrolTaskService.queryTaskForPage(taskQuery);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list",list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询任务测点列表")
+    @RequestMapping(value = "/queryTaskMeteListForPage", method = RequestMethod.POST)
+    @Logs(title = "查询任务测点列表", content = "查询任务测点列表", logType = 1, authority = "1235")
+    public Result queryTaskMeteListForPage(@RequestBody TaskMeteQuery taskMeteQuery) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(taskMeteQuery.getPageNum(), taskMeteQuery.getPageSize(), true, null, true);
+            List<TCruiseTaskAttr> list = uPatrolTaskService.queryTaskMeteListForPage(taskMeteQuery);
             resultMap.put("count", page.getTotal());
             resultMap.put("list",list);
             result.setData(resultMap);
