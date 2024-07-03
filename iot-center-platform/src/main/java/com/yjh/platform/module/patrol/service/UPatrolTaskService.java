@@ -38,6 +38,7 @@ import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.service.impl.OnLineMonitoringExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
@@ -4029,10 +4030,30 @@ public class UPatrolTaskService {
         return redisTemplate.opsForZSet().zCard(key);
     }
 
+    /**
+     * 分页查询任务列表
+     * @param taskQuery
+     * @return
+     */
     public List<UPatrolTask> queryTaskForPage(TaskQuery taskQuery) {
         List<UPatrolTask> uPatrolTasks = uPatrolTaskDao.selectTaskForPage(taskQuery);
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("planType", "taskType", "taskTypeName");
         DictConvertUtil.DICT.covertToDict(uPatrolTasks, optional);
         return uPatrolTasks;
+    }
+
+    /**
+     * 分页查询任务测点列表
+     * @param taskMeteQuery
+     * @return
+     */
+    public List<TCruiseTaskAttr> queryTaskMeteListForPage(TaskMeteQuery taskMeteQuery) {
+        List<TCruiseTaskAttr> list = this.uPatrolPlanAttrDao.queryTaskMeteListForPage(taskMeteQuery);
+        DictConvertUtil
+                .optional("customType","customId","customName")
+                .add("cruiseType")
+                .add("meteType")
+                .covertToDict(list);
+        return list;
     }
 }

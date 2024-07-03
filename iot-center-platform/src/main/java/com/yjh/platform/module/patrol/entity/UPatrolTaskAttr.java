@@ -51,5 +51,28 @@ public class UPatrolTaskAttr implements Serializable {
     @ApiModelProperty(value = "设备所属区域")
     private Integer regionId;
 
+    @ApiModelProperty(value = "关联巡检点定义实例表名称")
+    private String cruiseName;
+
+    @ApiModelProperty(value = "关联巡检点定义实例表名称")
+    private String instanceName;
+
+    @ApiModelProperty(value = "部位名称")
+    private String customName;
+
+    // 设备名称
+    private String deviceName;
+
+    // 测点类型名称
+    private String meteTypeName;
+
+    // 巡视设备名称
+    private String cruiseDeviceName;
+
+    //数据来源
+    private Integer cruiseType;
+
+    // 数据来源名称
+    private String cruiseTypeName;
 
 }
