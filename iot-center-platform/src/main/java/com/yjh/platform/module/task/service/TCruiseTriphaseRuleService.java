@@ -56,9 +56,11 @@ public class TCruiseTriphaseRuleService {
     @Logs(title = "更新", code = "module")
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseTriphaseRule tCruiseTriphaseRule) {
-        String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
-        if (!NumberUtils.isParsable(warnThreshold)) {
-            throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+        if (tCruiseTriphaseRule.getTriphaseType() != 3) {
+            String warnThreshold = tCruiseTriphaseRule.getWarnThreshold();
+            if (!NumberUtils.isParsable(warnThreshold)) {
+                throw new BusinessException(ResultCodeEnum.UPDATEERROR.getCode(), "三项同源告警告警阈值必须是数字!");
+            }
         }
         tCruiseTriphaseRule.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceOneId()));
         tCruiseTriphaseRule.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseTriphaseRule.getInstanceTwoId()));
