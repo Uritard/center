@@ -649,9 +649,9 @@ public class NonhomologousWarnThread implements Runnable{
         warnInfo.put("resultsInfo", insResults);
         warnInfo.put("value", value);
         warnInfo.put("deviceMeteId", deviceMeteId);
-        warnInfo.put("oneCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "instanceOneName"));
-        warnInfo.put("twoCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "instanceTwoName"));
-        warnInfo.put("threeCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "instanceTriName"));
+        warnInfo.put("oneCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "oneruiseDeviceName"));
+        warnInfo.put("twoCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "twoCruiseDeviceName"));
+        warnInfo.put("threeCruiseDeviceName", MapUtils.getString(triphaseRuleMap, "triCruiseDeviceName"));
 
         warnInfo.put("deviceName", MapUtils.getString(triphaseRuleMap, "deviceName"));
         warnInfo.put("deviceTypeName", MapUtils.getString(triphaseRuleMap, "deviceTypeName"));
