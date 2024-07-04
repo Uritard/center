@@ -114,7 +114,7 @@ public class RunningThread {
                         Map<String, Object> map11 = createMap(now, 11, mapForChargeCurrent);
                         list.add(map11);
                     }
-                    XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("2").setCode(Constant.stationCode());
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("2").setCode(Constant.stationCode()).setItems(list);
                     clientHandler.send(xmlBaseModel, 0, true);
                     // 发送状态信息
                     sendStatus(device);
