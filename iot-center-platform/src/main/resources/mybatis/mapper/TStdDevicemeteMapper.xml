@@ -504,6 +504,7 @@
         e.up_region_id,
         a.analyse_type,
         a.is_temdif,
+        a.edge_code,
         label_attri
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
