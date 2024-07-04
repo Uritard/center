@@ -218,6 +218,8 @@ public class TStdDeviceMete implements Serializable {
 
     private String redundantType;
 
+    private String edgeCode;
+
     private Integer isBind = 2;//是否绑定 0-否 1-是 2-全部
 
     private Integer bindMultiple = 2;//是否绑定多个 0-否 1-是 2-全部

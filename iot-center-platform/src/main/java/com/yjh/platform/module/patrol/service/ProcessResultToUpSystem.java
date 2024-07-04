@@ -195,6 +195,7 @@ public class ProcessResultToUpSystem {
                     resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath,allFilePath,tagBasePath);
                 } else {
                     xmlBaseModel.setType("62");
+                    xmlItem.put("link_point", "");
                     String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
                     if (StringUtils.isNotEmpty(tagPath)){
                         tagPath = "alarm/" + tagPath;

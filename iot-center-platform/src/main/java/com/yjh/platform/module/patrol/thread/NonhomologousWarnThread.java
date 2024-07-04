@@ -822,7 +822,6 @@ public class NonhomologousWarnThread implements Runnable{
                 patroldeviceJoiner.add((String) warn.get("threeCruiseDeviceName"));
             }
             xmlItem.put("patroldevice_all", patroldeviceJoiner.toString());
-            xmlItem.put("link_point", patroldeviceJoiner.toString());
 
 
             dealImg(xmlItem,insList,taskId);
@@ -861,11 +860,14 @@ public class NonhomologousWarnThread implements Runnable{
         String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
         String simpleDateFormat = DateTimeUtil.format3(new Date());
         StringJoiner joiner = new StringJoiner(",");
+        StringJoiner standardPointsJoiner = new StringJoiner(",");
         for (String instanceId:insList) {
             if (StringUtils.isNotEmpty(instanceId)){
                 joiner.add(instanceId);
                 Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
                 log.info("多张图片 cruiseResultMap=={}", cruiseResultMap);
+                String devicePointId = Optional.ofNullable(cruiseResultMap.get("devicePointId")).orElse("");
+                standardPointsJoiner.add(Constant.standardPoints() ? devicePointId : instanceId);
                 if (StringUtils.isNotEmpty(cruiseResultMap.get("picpath"))){
                     HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
                     // 文件后缀
@@ -887,6 +889,7 @@ public class NonhomologousWarnThread implements Runnable{
             }
         }
         xmlItem.put("device_id_all", joiner.toString());
+        xmlItem.put("link_point", standardPointsJoiner.toString());
         xmlItem.put("file_path", allTar.toString().replaceFirst(",",""));
         xmlItem.put("file_type", allFileType.toString().replaceFirst(",",""));
     }
