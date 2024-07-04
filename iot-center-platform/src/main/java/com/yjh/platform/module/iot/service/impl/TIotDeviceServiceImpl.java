@@ -155,8 +155,12 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             }
         }
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_UPDATE, Result.class, iotDevice.getId());
-        log.info("update device collect, {}", result);
+        try {
+            Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_UPDATE, Result.class, iotDevice.getId());
+            log.info("update device collect, {}", result);
+        } catch (Exception e) {
+            log.error("调用接口失败，继续更新", e);
+        }
         ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return ret;
     }
@@ -179,11 +183,18 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
         String scheduleTaskId = "IotDevice_" + id;
         ScheduledMapConfig.remove(scheduleTaskId);
 
-        Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_DELETE, Result.class, id);
-        if (!(Optional.ofNullable(result).orElseThrow(() -> new BusinessException(ResultCodeEnum.CODE10001, "调用接口删除数据采集失败"))
-            .isSuccess())) {
-            throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());
+        try {
+            Result result = serviceRestTemplate.getForObject(Constant.SEND_IOTDEVICE_URL + DEVICE_DELETE, Result.class, id);
+            if (!(Optional.ofNullable(result).orElseThrow(() -> new BusinessException(ResultCodeEnum.CODE10001, "调用接口删除数据采集失败"))
+                .isSuccess())) {
+                throw new BusinessException(ResultCodeEnum.DELETEERROR, result.getMessage());
+            }
+        } catch (BusinessException e) {
+            throw new BusinessException(e.getCode(), e.getMessage());
+        } catch (Exception e) {
+            log.error("调用接口失败，继续删除", e);
         }
+
         ThreadPoolUtil.COMMON_POOL.addThread(this::needDeviceUpload);
         return super.removeById(id);
     }
