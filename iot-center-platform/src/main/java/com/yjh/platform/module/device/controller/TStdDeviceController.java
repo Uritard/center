@@ -527,19 +527,16 @@ public class TStdDeviceController {
     @Logs(title = "导出模型文件",content = "导出模型文件",logType = 9)
     public Result downloadModel(@RequestParam(value="type")String type){
         Result result=new Result();
-        if (applicationProperties.getUpSystemFtps().isEnable()) {
-            try{
-                Map<String,Object> map = new HashMap<>();
-                map.put("type",type);
-                result = Constant.mapToOtherServer(map,Constant.TCP_MODEL_DOWNLOAD_URL);
-//            result.setData("http://192.168.33.19:10086/files/tcpFiles//01/Model/host_model.zip");
-            }catch (BusinessException e) {
-                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-                log.error("导出模型文件:", e);
-            } catch (Exception e) {
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-                log.error("导出模型文件:", e);
-            }
+        try{
+            Map<String,Object> map = new HashMap<>();
+            map.put("type",type);
+            result = Constant.mapToOtherServer(map,Constant.TCP_MODEL_DOWNLOAD_URL);
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("导出模型文件:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("导出模型文件:", e);
         }
         return result;
     }
