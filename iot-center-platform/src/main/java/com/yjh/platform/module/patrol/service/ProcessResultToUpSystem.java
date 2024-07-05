@@ -385,7 +385,17 @@ public class ProcessResultToUpSystem {
             String resultNum = Optional.ofNullable(tWarnInfo.getValue()).orElse("");
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
-            xmlItem.put("defect_type", Optional.ofNullable(tWarnInfo.getWarnSubtype()).map(String::valueOf).orElse(""));
+            String defectType = Optional.ofNullable(tWarnInfo.getWarnContent()).orElse("");
+            StringBuilder sb = new StringBuilder();
+            String[] defects = defectType.split(" ");
+            for (String defect : defects) {
+                String defectDesc = algorithmInfo.getAlgorithmName(defect);
+                if (StringUtils.isNotEmpty(defectDesc)){
+                    sb.append(",").append(defectDesc);
+                }
+            }
+            defectType  = sb.toString().replaceFirst(",","");
+            xmlItem.put("defect_type", defectType);
             xmlItem.put("origin_id", tWarnInfo.getWarnId());
             xmlItem.put("edge_code", edgeCode);
         }catch (Exception e){

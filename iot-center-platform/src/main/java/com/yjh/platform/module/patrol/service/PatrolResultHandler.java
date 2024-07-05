@@ -727,7 +727,7 @@ public class PatrolResultHandler {
                     warnMap.put("instanceId", cruiseResultMap.get("instanceId"));
                     warnMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                     warnMap.put("taskId", cruiseResultMap.get("taskId"));
-                    warnMap.put("value", resultStringValue);
+                    warnMap.put("value", cruiseResultMap.get("resultDesc"));
                     warnMap.put("imagePath", cruiseResultMap.get("picpath"));
                     warnMap.put("confMode", "276");
                     warnMap.put("deviceName", cruiseResultMap.get("deviceName"));
