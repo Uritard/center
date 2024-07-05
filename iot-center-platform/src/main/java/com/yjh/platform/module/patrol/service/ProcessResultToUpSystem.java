@@ -495,9 +495,12 @@ public class ProcessResultToUpSystem {
             StringBuilder sb = new StringBuilder();
                 String[] defects = defectType.split(" ");
                 for (String defect : defects) {
-                    sb.append(algorithmInfo.getAlgorithmName(defect)).append(",");
+                    String defectDesc = algorithmInfo.getAlgorithmName(defect);
+                    if (StringUtils.isNotEmpty(defectDesc)){
+                        sb.append(",").append(defectDesc);
+                    }
                 }
-                defectType  = sb.toString();
+                defectType  = sb.toString().replaceFirst(",","");
             xmlItem.put("defect_type", defectType);
             String resultValue = resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), "");
             if (StringUtils.containsAny(resultDesc, "dB", "Hz")) {
