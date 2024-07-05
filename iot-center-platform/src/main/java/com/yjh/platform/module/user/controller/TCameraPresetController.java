@@ -11,6 +11,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraInfo;
@@ -158,6 +159,12 @@ public class TCameraPresetController {
         Result result = new Result();
         try {
             if( tCameraPreset.getPresetType() != null && tCameraPreset.getPresetType() != 1 ){//设置预置位特殊预置位
+                // 判断是否是红外相机
+                TCameraInfo tCameraInfo = cameraInfoDao.selectCamera(tCameraPreset.getCameraId());
+                if (tCameraInfo.getCameraType() == 206) {
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"红外相机不可设置特殊预置位");
+                    return result;
+                }
                 //判断这个相机是否已有特殊预置位
                 TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId());
                 if (keepWatchPreset != null){
