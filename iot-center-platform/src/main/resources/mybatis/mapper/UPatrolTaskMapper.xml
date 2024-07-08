@@ -120,7 +120,7 @@
             a.*
         from u_patrol_task a
         RIGHT JOIN u_patrol_result b ON a.task_id = b.task_id
-        where a.task_code = #{taskCode}
+        where a.task_code = #{taskCode} or a.task_id = #{taskCode}
         <if test="executeTime != null">
         and a.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
         </if>
