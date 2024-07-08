@@ -1009,16 +1009,14 @@ public class PatrolResultHandler {
             String alarmLevel = "";
             switch (warnInfo.getWarnLevel()) {
                 case 130:
+                case 131:
                     alarmLevel = "1";
                     break;
-                case 131:
+                case 132:
                     alarmLevel = "2";
                     break;
-                case 132:
-                    alarmLevel = "3";
-                    break;
                 case 133:
-                    alarmLevel = "4";
+                    alarmLevel = "3";
                     break;
                 default:
                     break;

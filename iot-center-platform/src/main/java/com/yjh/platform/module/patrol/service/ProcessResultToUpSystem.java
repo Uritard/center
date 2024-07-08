@@ -565,7 +565,7 @@ public class ProcessResultToUpSystem {
         try {
             for (String value : resultList){
                 // 判别告警等级暂定为一般
-                String alarmLevel = "2";
+                String alarmLevel = "1";
                 TWarnInfo tWarnInfo = new TWarnInfo();
                 tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
 
@@ -594,16 +594,14 @@ public class ProcessResultToUpSystem {
             String alarmLevel = "1";
             switch (level) {
                 case 130:
+                case 131:
                     alarmLevel = "1";
                     break;
-                case 131:
+                case 132:
                     alarmLevel = "2";
                     break;
-                case 132:
-                    alarmLevel = "3";
-                    break;
                 case 133:
-                    alarmLevel = "4";
+                    alarmLevel = "3";
                     break;
                 default:
                     break;
@@ -632,16 +630,14 @@ public class ProcessResultToUpSystem {
                 String defectLevel = redisInfoMap.get("defectLevel");
                 switch (defectLevel){
                     case "130":
+                    case "131":
                         alarmLevel = "1";
                         break;
-                    case "131":
+                    case "132":
                         alarmLevel = "2";
                         break;
-                    case "132":
-                        alarmLevel = "3";
-                        break;
                     case "133":
-                        alarmLevel = "4";
+                        alarmLevel = "3";
                         break;
                     default:
                         break;
