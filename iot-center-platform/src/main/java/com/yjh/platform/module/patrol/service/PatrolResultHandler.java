@@ -1401,7 +1401,7 @@ public class PatrolResultHandler {
                 inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
-//            CruiseRedisStorage.offer(inspectionMap);
+                CruiseRedisStorage.offer(inspectionMap);
                 //判断告警
                 normalRecognitionHandler(inspectionMap.get("resultNum"), inspectionMap, null);
 

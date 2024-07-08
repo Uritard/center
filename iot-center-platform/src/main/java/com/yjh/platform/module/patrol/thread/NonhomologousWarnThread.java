@@ -830,7 +830,7 @@ public class NonhomologousWarnThread implements Runnable{
             String alarmLevel = "2";
             String unit = cruiseResultMap.getOrDefault("unit", "");
             if (StringUtils.isEmpty(value)){
-                value = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+                value = Optional.ofNullable(cruiseResultMap.get("resultDesc")).orElse("");
             }
             packageAlarmInfo(alarmLevel, value, unit, warnContent,  alarmType, xmlItem);
 
@@ -868,7 +868,7 @@ public class NonhomologousWarnThread implements Runnable{
                 log.info("多张图片 cruiseResultMap=={}", cruiseResultMap);
                 String devicePointId = Optional.ofNullable(cruiseResultMap.get("devicePointId")).orElse("");
                 standardPointsJoiner.add(Constant.standardPoints() ? devicePointId : instanceId);
-                if (StringUtils.isNotEmpty(cruiseResultMap.get("picpath"))){
+                if (StringUtils.isNotEmpty(cruiseResultMap.get("picpath")) && !"null".equals(cruiseResultMap.get("picpath"))){
                     HashMap<String, String> typeAndPathName = getTypeAndPathName(cruiseResultMap);
                     // 文件后缀
                     String fileExt = StringUtils.substringAfterLast(cruiseResultMap.get("picpath"), ".");
