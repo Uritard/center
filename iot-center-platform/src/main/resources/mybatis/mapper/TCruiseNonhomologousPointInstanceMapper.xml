@@ -299,6 +299,7 @@
         from t_cruise_nonhomologous_warn_inspection a
         LEFT JOIN u_patrol_data_result b ON a.inspection_id=b.instance_id and a.task_id=b.task_id
         where a.warn_id = #{warnId, jdbcType=VARCHAR}
+        ORDER BY b.cruise_time
     </select>
 
     <select id="getSanxiangInfo" resultType="java.util.Map" parameterType="java.lang.String">

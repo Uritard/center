@@ -156,21 +156,21 @@ public class TCruiseNonhomologousPointInstanceService {
             if (tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName") != null) {
                 String oneCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName").toString();
                 String oneDeviceName = oneCruiseDeviceName.substring(oneCruiseDeviceName.indexOf("-") + 1);
-                if (oneDeviceName.equals(m.get("deviceMeteName").toString())) {
+                if (oneDeviceName.equals(m.get("device_mete_name").toString())) {
                     warnDetail.put("oneDeviceName", m);
                 }
             }
             if (tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName") != null) {
                 String twoCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName").toString();
                 String twoDeviceName = twoCruiseDeviceName.substring(twoCruiseDeviceName.indexOf("-") + 1);
-                if (twoDeviceName.equals(m.get("deviceMeteName").toString())) {
+                if (twoDeviceName.equals(m.get("device_mete_name").toString())) {
                     warnDetail.put("twoDeviceName", m);
                 }
             }
             if (tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName") != null) {
                 String threeCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName").toString();
                 String threeDeviceName = threeCruiseDeviceName.substring(threeCruiseDeviceName.indexOf("-") + 1);
-                if (threeDeviceName.equals(m.get("deviceMeteName").toString())) {
+                if (threeDeviceName.equals(m.get("device_mete_name").toString())) {
                     warnDetail.put("threeDeviceName", m);
                 }
             }
