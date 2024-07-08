@@ -1882,14 +1882,16 @@ public class UPatrolTaskService {
         try {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             UPatrolTask uPatrolTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+
             if (Optional.ofNullable(request).isPresent()) {
                 logsRecord.LogsSend(request, "29", "任务启动", "任务启动-" + uPatrolTask.getTaskName());
             }
+
             TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+            List<String> deviceList = uPatrolTaskAttrDao.selectDeviceList(taskId);
             if (Objects.nonNull(uPatrolTask.getPlanId())){
                 tCruiseTaskAdd.setPlanId(uPatrolTask.getPlanId());
             }else {
-                List<String> deviceList = uPatrolTaskAttrDao.selectDeviceList(taskId);
                 tCruiseTaskAdd.setDeviceList(StringUtils.join(deviceList, ","));
             }
             //创建立即任务
@@ -1903,15 +1905,22 @@ public class UPatrolTaskService {
             tCruiseTaskAdd.setAreaId(uPatrolTask.getAreaId());
             Map<String, Object> taskMap = this.addTask(tCruiseTaskAdd, false);
             taskPatrolledId = String.valueOf(taskMap.get("task_patrolled_id"));
-            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
-            robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(robotCodeList)) {
-                Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", taskId);
-                robotTaskStatesMap.put("commandValue", 1);
-                robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                robotTaskStates(robotTaskStatesMap);
+
+            if (scheduledByLocal(uPatrolTask.getDateType())){
+                log.info("此任务调度在本级系统，任务配置没有下发,生成新的任务来做任务启动");
+                uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName());
+                taskToRobotOrDroneStart(uPatrolTask,uPatrolTask.getDateType(),deviceList.stream().map(Long::parseLong).collect(Collectors.toList()));
+            } else {
+                List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+                log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
+                robotCodeList = robotCodeList.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(robotCodeList)) {
+                    Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                    robotTaskStatesMap.put("taskId", taskId);
+                    robotTaskStatesMap.put("commandValue", 1);
+                    robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                    robotTaskStates(robotTaskStatesMap);
+                }
             }
         } catch (Exception e) {
             log.error("任务启动异常: ", e);
