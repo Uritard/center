@@ -944,6 +944,20 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('4','auto_detail_type','设备','自动审核配置类型', 4);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('5','auto_detail_type','测点','自动审核配置类型', 5);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('6','auto_detail_type','标签','自动审核配置类型', 6);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('1', 'home_model', 'StationOverview', 0, '站所概览', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2', 'home_model', 'RobotInfoOverview', 0, '设备工况', 2);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('3', 'home_model', 'VideoCarousel', 0, '视频轮巡', 3);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('4', 'home_model', 'Map', 0, '地图', 4);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('5', 'home_model', 'WarningActual', 0, '告警记录', 5);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('6', 'home_model', 'WarningStatistic', 0, '告警统计', 6);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('7', 'home_model', 'DefectStatistic', 0, '缺陷统计', 7);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'home_model', 'TaskStatistic', 0, '巡视统计', 8);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'home_model', 'ReliabilityModel', 0, '可靠性指标', 9);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('10', 'home_model', 'RegularModel', 0, '常用模块', 10);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('11', 'home_model', 'TaskOverview', 0, '巡视任务', 11);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('12', 'home_model', 'StationSignboard', 0, '变电站光字牌', 12);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('13', 'home_model', 'WeatherModel', 0, '微气象', 13);
+
 
 -- ----------------------------
 -- Records of t_period_model
@@ -5313,4 +5327,4 @@ INSERT INTO `dict_area` VALUES ('820103', '路凼城', '820100');
 INSERT INTO `dict_area` VALUES ('820104', '路环', '820100');
 
 INSERT INTO `t_home_model_config` (`user_id`, `model_config`) VALUES (10000, '[{\"id\": 10, \"name\": \"RegularModel\", \"label\": \"常用模块\", \"width\": 100, \"height\": 32}, {\"id\": 13, \"name\": \"WeatherModel\", \"label\": \"微气象\", \"width\": 100, \"height\": 30}, {\"id\": 2, \"name\": \"RobotInfoOverview\", \"label\": \"设备工况\", \"width\": 100, \"height\": 35}, {\"id\": 3, \"name\": \"VideoCarousel\", \"label\": \"视频轮巡\", \"width\": 100, \"height\": 63}, {\"id\": 8, \"name\": \"TaskStatistic\", \"label\": \"巡视统计\", \"width\": 100, \"height\": 35}, {\"id\": 11, \"name\": \"TaskOverview\", \"label\": \"巡视任务\", \"width\": 100, \"height\": 30}, {\"id\": 6, \"name\": \"WarningStatistic\", \"label\": \"告警统计\", \"width\": 100, \"height\": 34}, {\"id\": 7, \"name\": \"DefectStatistic\", \"label\": \"缺陷统计\", \"width\": 100, \"height\": 33}]');
-INSERT INTO `t_home_model_config` (`user_id`, `model_config`) VALUES (10002, '[{\"id\": 11, \"name\": \"RegularModel\", \"label\": \"常用模块\", \"width\": 100, \"height\": 32}, {\"id\": 1, \"name\": \"StationOverview\", \"label\": \"站所概览\", \"width\": 100, \"height\": 30}, {\"id\": 2, \"name\": \"RobotInfoOverview\", \"label\": \"设备工况\", \"width\": 100, \"height\": 35}, {\"id\": 3, \"name\": \"VideoCarousel\", \"label\": \"视频轮巡\", \"width\": 100, \"height\": 63}, {\"id\": 9, \"name\": \"ReliabilityModel\", \"label\": \"可靠性指标\", \"width\": 100, \"height\": 35}, {\"id\": 12, \"name\": \"TaskOverview\", \"label\": \"巡视任务\", \"width\": 100, \"height\": 30}, {\"id\": 6, \"name\": \"WarningStatistic\", \"label\": \"告警统计\", \"width\": 100, \"height\": 34}, {\"id\": 7, \"name\": \"DefectStatistic\", \"label\": \"缺陷统计\", \"width\": 100, \"height\": 33}]');
+INSERT INTO `t_home_model_config` (`user_id`, `model_config`) VALUES (10002, '[{\"id\": 10, \"name\": \"RegularModel\", \"label\": \"常用模块\", \"width\": 100, \"height\": 32}, {\"id\": 13, \"name\": \"WeatherModel\", \"label\": \"微气象\", \"width\": 100, \"height\": 30}, {\"id\": 2, \"name\": \"RobotInfoOverview\", \"label\": \"设备工况\", \"width\": 100, \"height\": 35}, {\"id\": 3, \"name\": \"VideoCarousel\", \"label\": \"视频轮巡\", \"width\": 100, \"height\": 63}, {\"id\": 8, \"name\": \"TaskStatistic\", \"label\": \"巡视统计\", \"width\": 100, \"height\": 35}, {\"id\": 11, \"name\": \"TaskOverview\", \"label\": \"巡视任务\", \"width\": 100, \"height\": 30}, {\"id\": 6, \"name\": \"WarningStatistic\", \"label\": \"告警统计\", \"width\": 100, \"height\": 34}, {\"id\": 7, \"name\": \"DefectStatistic\", \"label\": \"缺陷统计\", \"width\": 100, \"height\": 33}]');
