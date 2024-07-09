@@ -483,35 +483,53 @@ public class TCruiseTaskResultService {
             Map<Integer, List<CruiseOfPatrolDevice>> cruiseOfPatrolDeviceMap = patrolDeviceInstanceList.stream().collect(Collectors.groupingBy(CruiseOfPatrolDevice::getCruiseType));
             //从缓存中获取各个巡视类的完成数
             String subsetKey = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId + UPatrolTaskService.SUBSET;
+            Set<String> keys = new HashSet<>();
+            keys.add(subsetKey);
+            List<Map<String, String>> insAndCruiseList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+                keys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                return null;
+            });
+            Map<String, List<String>> groupedByValue = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(insAndCruiseList)) {
+                groupedByValue = insAndCruiseList.stream()
+                        .flatMap(map -> map.entrySet().stream()
+                                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getValue(), entry.getKey())))
+                        .collect(Collectors.groupingBy(
+                                // 按value分组
+                                Map.Entry::getKey,
+                                // 收集具有相同value的所有key
+                                Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                        ));
+            }
             //机器人
             List<CruiseOfPatrolDevice> robotList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.ROBOT.getCode());
             if (CollectionUtils.isNotEmpty(robotList)) {
-                patrolDeviceAdvance(robotList, subsetKey, CruiseConstant.TypeEnum.ROBOT.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(robotList, groupedByValue, CruiseConstant.TypeEnum.ROBOT.getDesc(), detailRateList, typeCountList);
             }
             //无人机
             List<CruiseOfPatrolDevice> droneList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.UAV.getCode());
             if (CollectionUtils.isNotEmpty(droneList)) {
-                patrolDeviceAdvance(droneList, subsetKey, CruiseConstant.TypeEnum.UAV.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(droneList, groupedByValue, CruiseConstant.TypeEnum.UAV.getDesc(), detailRateList, typeCountList);
             }
             //可见光
             List<CruiseOfPatrolDevice> videoList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.VIDEO.getCode());
             if (CollectionUtils.isNotEmpty(videoList)) {
-                patrolDeviceAdvance(videoList, subsetKey, CruiseConstant.TypeEnum.VIDEO.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(videoList, groupedByValue, CruiseConstant.TypeEnum.VIDEO.getDesc(), detailRateList, typeCountList);
             }
             //红外
             List<CruiseOfPatrolDevice> infraredList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.INFRARED.getCode());
             if (CollectionUtils.isNotEmpty(infraredList)) {
-                patrolDeviceAdvance(infraredList, subsetKey, CruiseConstant.TypeEnum.INFRARED.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(infraredList, groupedByValue, CruiseConstant.TypeEnum.INFRARED.getDesc(), detailRateList, typeCountList);
             }
             //声纹
             List<CruiseOfPatrolDevice> voiceList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.VOICE.getCode());
             if (CollectionUtils.isNotEmpty(voiceList)) {
-                patrolDeviceAdvance(voiceList, subsetKey, CruiseConstant.TypeEnum.VOICE.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(voiceList, groupedByValue, CruiseConstant.TypeEnum.VOICE.getDesc(), detailRateList, typeCountList);
             }
             //主辅设备
             List<CruiseOfPatrolDevice> linkageList = cruiseOfPatrolDeviceMap.get(CruiseConstant.TypeEnum.ONLINE.getCode());
             if (CollectionUtils.isNotEmpty(linkageList)) {
-                patrolDeviceAdvance(linkageList, subsetKey, CruiseConstant.TypeEnum.ONLINE.getDesc(), detailRateList, typeCountList);
+                patrolDeviceAdvance(linkageList, groupedByValue, CruiseConstant.TypeEnum.ONLINE.getDesc(), detailRateList, typeCountList);
             }
             rateAndTaskInfo.put("typeCount", typeCountList);
             rateAndTaskInfo.put("detailRateList", detailRateList);
@@ -522,14 +540,14 @@ public class TCruiseTaskResultService {
         return rateAndTaskInfo;
     }
 
-    private void patrolDeviceAdvance(List<CruiseOfPatrolDevice> list, String subsetKey, String typeName, List<Map<String, Object>> detailRateList, List<CruiseCountOfType> typeCountList) {
+    private void patrolDeviceAdvance(List<CruiseOfPatrolDevice> list, Map<String, List<String>> groupedByValue, String typeName, List<Map<String, Object>> detailRateList, List<CruiseCountOfType> typeCountList) {
         if (typeName.equals(CruiseConstant.TypeEnum.ROBOT.getDesc()) || typeName.equals(CruiseConstant.TypeEnum.UAV.getDesc())) {
             AtomicInteger count = new AtomicInteger();
             Map<String, List<CruiseOfPatrolDevice>> robotDeviceMap = list.stream().collect(Collectors.groupingBy(CruiseOfPatrolDevice::getRobotName));
             robotDeviceMap.forEach((k, v) -> {
                 List<String> robotStrList = v.stream().map(CruiseOfPatrolDevice::getInstanceId).collect(Collectors.toList());
-                String value = (String) redisTemplate.opsForHash().get(subsetKey, k);
-                int robotCount = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+                List<String> finish = groupedByValue.get(k);
+                int robotCount = CollectionUtils.isNotEmpty(finish) ? finish.size() : 0;
                 count.set(robotCount + count.get());
                 Map<String, Object> map = getProgressMap(robotCount, robotStrList.size());
                 map.put("deviceName", k);
@@ -538,8 +556,8 @@ public class TCruiseTaskResultService {
             typeCountList.add(getCruiseCountOfType(typeName, count.get(), list.size()));
         } else {
             List<String> insIdList = list.stream().map(CruiseOfPatrolDevice::getInstanceId).collect(Collectors.toList());
-            String value = (String) redisTemplate.opsForHash().get(subsetKey, typeName);
-            int finishCount = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
+            List<String> finish = groupedByValue.get(typeName);
+            int finishCount = CollectionUtils.isNotEmpty(finish) ? finish.size() : 0;
             Map<String, Object> map = getProgressMap(finishCount, insIdList.size());
             map.put("deviceName", typeName);
             detailRateList.add(map);

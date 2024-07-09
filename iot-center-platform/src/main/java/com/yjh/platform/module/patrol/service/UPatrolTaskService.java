@@ -2475,34 +2475,18 @@ public class UPatrolTaskService {
             }
             endOnece = true;
         }
-        Map<Integer, List<Map<String, String>>> cruiseTypeListMap = cruiseResultList.stream().collect(Collectors.groupingBy(c -> Integer.parseInt(c.get("cruiseType"))));
         String subsetKey = PATROL_SUMMARY_PREFIX + taskId + SUBSET;
-        Map<String, String> subsetMap = new HashMap<>(2);
-        //计算机器人
-        List<Map<String, String>> robotList = cruiseTypeListMap.get(TypeEnum.ROBOT.getCode());
-        if (CollectionUtils.isNotEmpty(robotList)) {
-            setSubsetMap(robotList, subsetKey, TypeEnum.ROBOT.getDesc(), subsetMap);
-        }
-        //计算无人机
-        List<Map<String, String>> droneList = cruiseTypeListMap.get(TypeEnum.UAV.getCode());
-        if (CollectionUtils.isNotEmpty(droneList)) {
-            setSubsetMap(droneList, subsetKey, TypeEnum.UAV.getDesc(), subsetMap);
-        }
-        //计算可见光
-        List<Map<String, String>> videoList = cruiseTypeListMap.get(TypeEnum.VIDEO.getCode());
-        if (CollectionUtils.isNotEmpty(videoList)) {
-            setSubsetMap(videoList, subsetKey, TypeEnum.VIDEO.getDesc(), subsetMap);
-        }
-        //计算红外
-        List<Map<String, String>> infraredList = cruiseTypeListMap.get(TypeEnum.INFRARED.getCode());
-        if (CollectionUtils.isNotEmpty(infraredList)) {
-            setSubsetMap(infraredList, subsetKey, TypeEnum.INFRARED.getDesc(), subsetMap);
-        }
-        //计算声纹
-        List<Map<String, String>> voiceList = cruiseTypeListMap.get(TypeEnum.VOICE.getCode());
-        if (CollectionUtils.isNotEmpty(voiceList)) {
-            setSubsetMap(voiceList, subsetKey, TypeEnum.VOICE.getDesc(), subsetMap);
-        }
+        Map<String, String> subsetMap = new HashMap<>(6);
+        cruiseResultList.forEach(result -> {
+            String cruiseType;
+            if (Integer.parseInt(result.get("cruiseType")) == TypeEnum.ROBOT.getCode()
+                    || Integer.parseInt(result.get("cruiseType")) == TypeEnum.UAV.getCode()) {
+                cruiseType = result.get("cruiseDeviceName");
+            } else {
+                cruiseType = TypeEnum.getEnum(Integer.parseInt(result.get("cruiseType"))).getDesc();
+            }
+            subsetMap.put(result.get("instanceId"), cruiseType);
+        });
         redisTemplate.opsForHash().putAll(subsetKey, subsetMap);
         redisTemplate.expire(subsetKey, 7, TimeUnit.DAYS);
 
@@ -2525,23 +2509,6 @@ public class UPatrolTaskService {
             return abnormalCounts;
         }
         return -1;
-    }
-
-    private void setSubsetMap(List<Map<String, String>> list, String subsetKey, String typeName, Map<String, String> subsetMap) {
-        if (typeName.equals(TypeEnum.ROBOT.getDesc()) || typeName.equals(TypeEnum.UAV.getDesc())) {
-            Map<String, List<Map<String, String>>> patrolDeviceMap = list.stream().collect(Collectors.groupingBy(p -> p.get("cruiseDeviceName")));
-            patrolDeviceMap.forEach((k, v) -> {
-                String value = (String) redisTemplate.opsForHash().get(subsetKey, k);
-                int finishNum = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
-                finishNum = finishNum + v.size();
-                subsetMap.put(k, String.valueOf(finishNum));
-            });
-        } else {
-            String value = (String) redisTemplate.opsForHash().get(subsetKey, typeName);
-            int finishNum = StringUtils.isNotBlank(value) ? Integer.parseInt(value) : 0;
-            finishNum = finishNum + list.size();
-            subsetMap.put(typeName, String.valueOf(finishNum));
-        }
     }
 
     /**

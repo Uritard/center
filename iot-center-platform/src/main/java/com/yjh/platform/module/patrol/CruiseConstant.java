@@ -181,7 +181,7 @@ public interface CruiseConstant {
         /**
          * 巡视类型，在线监控
          */
-        ONLINE(231, "在线监控"),
+        ONLINE(231, "主辅设备"),
         /**
          * 其他类型，未识别类型
          */
