@@ -580,27 +580,11 @@ public class UPatrolTaskService {
             // 初始化识别类型和采集文件类型,默认值为位置状态识别和识别图片
             map.put("recognitionType", StringUtils.isNotEmpty(item.getMeteType()) ?
                     RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize() : "2");
-            map.put("fileType", "5");
             map.put("unit", Optional.ofNullable(item.getUnit()).orElse(""));
-            switch (item.getMeteType()){
-                case "222":
-                    map.put("fileType", "1");
-                    break;
-                case "223":
-                    map.put("fileType", "3");
-                    break;
-                case "220":
-                case "433":
-                    map.put("fileType", "2");
-                    break;
-                case "690":
-                case "691":
-                case "692":
-                    map.put("fileType", "");
-                    break;
-                default:
-                    break;
-            }
+
+            String fileType = getFileType(item.getCruiseType(), item.getMeteType());
+            map.put("fileType", fileType);
+
             itemSets.add(new DefaultTypedTuple<>(String.valueOf(item.getInstanceId()), 0D));
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
@@ -614,6 +598,38 @@ public class UPatrolTaskService {
         // 延时上报任务状态，避免上级下发任务启动时，任务状态在任务启动返回报文前返回
         ScheduledMapConfig.schedule(6 , task, t -> sendTaskStateToUp(t, 5));
         return detailList;
+    }
+
+    public String getFileType(Integer cruiseType, String meteType) {
+        TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+        switch (cruiseTypeEnum){
+            case VOICE:
+                return "3";
+            case INFRARED:
+                return "1";
+            case VIDEO:
+                return "220".equals(meteType) ? "5" : "523".equals(meteType) ? "4" : "2";
+            case ROBOT:
+            case UAV:
+                if ("220".equals(meteType)) {
+                    return "5";
+                }
+                if ("222".equals(meteType)) {
+                    return "1";
+                }
+                if ("223".equals(meteType)) {
+                    return "3";
+                }
+                if ("523".equals(meteType)) {
+                    return "4";
+                }
+                if (StringUtils.equalsAny(meteType, "219", "221", "433")) {
+                    return "2";
+                }
+                return "";
+            default:
+                return "";
+        }
     }
 
     /**
