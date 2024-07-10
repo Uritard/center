@@ -2,6 +2,8 @@ package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -46,6 +48,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -53,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
@@ -258,8 +262,8 @@ public class UPatrolResultService {
         if (Objects.nonNull(tCruisePointInstance)) {
             String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
             if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
-                if (!NumberUtils.isNumber(cruiseManualReview.getPersonCheck())){
-                    throw new BusinessException("实物编码应为纯数字！");
+                if (!ReUtil.contains("^[A-Za-z_\\d_#]+$", cruiseManualReview.getPersonCheck())){
+                    throw new BusinessException("实物编码应为字母数字和 _# 符号组成");
                 }
                 TStdDevice tStdDevice = new TStdDevice();
                 tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());

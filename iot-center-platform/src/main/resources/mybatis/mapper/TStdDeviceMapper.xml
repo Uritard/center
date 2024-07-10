@@ -171,8 +171,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 			a.task_id = #{taskId, jdbcType=VARCHAR}
 			AND c.analyse_type = 8
 			AND (
-			person_check REGEXP '[^0-9.]'
-			) = 0
+			person_check REGEXP '^[A-Za-z_\\d_#]+$'
+			) = 1
 			) b ON a.device_id = b.device_id
 			SET real_code = b.person_check
 	</update>

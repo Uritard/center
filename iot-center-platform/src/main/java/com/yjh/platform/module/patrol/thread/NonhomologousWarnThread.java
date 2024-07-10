@@ -61,6 +61,31 @@ public class NonhomologousWarnThread implements Runnable{
     public static final String TRIPHASE_PREFIX = "TRIPHASE_RULE:";
     private static final Map<String, Object> TRIPHASE_LOCK = new ConcurrentHashMap<>(32);
 
+    /**
+     * 三相温差报警
+     */
+    public static final String TRIPHASE_TEMPDIFF = "3";
+    /**
+     * 三相对比报警
+     */
+    public static final String TRIPHASE_CONTRAST = "4";
+    /**
+     * 仪表三相对比报警
+     */
+    public static final String METER_TRIPHASE_CONTRAST = "9";
+    /**
+     * 非同源差值越限报警
+     */
+    public static final String NONHOMOLOGOUS_DIFF_OUTLIMIT = "101";
+    /**
+     * 非同源状态不一致报警
+     */
+    public static final String NONHOMOLOGOUS_CONTRAST_DIFF = "102";
+    /**
+     * 趋势变化越限报警
+     */
+    public static final String NONHOMOLOGOUS_TREND_OUTLIMIT = "103";
+
     public NonhomologousWarnThread(RobotPatrolTaskAlarm robotPatrolTaskAlarm, RedisTemplate redisTemplate, int isResult){
         this.robotPatrolTaskAlarm = robotPatrolTaskAlarm;
         this.redisTemplate = redisTemplate;
@@ -232,7 +257,7 @@ public class NonhomologousWarnThread implements Runnable{
                                 if(dval - threshold > 1e-5){
                                     String dvalStr = CommonUtils.percentFormat(dval, "#.##");
                                     String warnContent = "红外测温非同源结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold;
-                                    insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 1, "1", dvalStr, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
+                                    insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 1, NONHOMOLOGOUS_DIFF_OUTLIMIT, dvalStr, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
                                 }
                             }else{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},红外非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
@@ -246,7 +271,7 @@ public class NonhomologousWarnThread implements Runnable{
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
                                 String warnContent = "位置状态非同源结果不一致: " + robotInsResult + " —— " + videoInsResult;
-                                insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 2, "10", robotInsResult, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
+                                insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 2, NONHOMOLOGOUS_CONTRAST_DIFF, robotInsResult, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果", robotInsResult, videoInsResult);
                             }
@@ -259,7 +284,7 @@ public class NonhomologousWarnThread implements Runnable{
 
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
                                 String warnContent = "数显类表计识别非同源结果不一致: " + robotInsResult + " —— " + videoInsResult;
-                                insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 3, "7", robotInsResult, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
+                                insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 3, NONHOMOLOGOUS_DIFF_OUTLIMIT, robotInsResult, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},表计-数显非同源告警--结果不一致", robotInsResult, videoInsResult);
                             }
@@ -275,7 +300,7 @@ public class NonhomologousWarnThread implements Runnable{
                                 if(dval - threshold > 1e-5){
                                     String dvalStr = CommonUtils.percentFormat(dval, "#.##");
                                     String warnContent = "指针类表计识别非同源结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold;
-                                    insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 4, "7", dvalStr, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
+                                    insertWarnInfo(warnId, instanceId, deviceMeteId, warnContent, taskCode, robotInstanceId, videoInstanceId, 4, NONHOMOLOGOUS_DIFF_OUTLIMIT, dvalStr, oneCruiseName, twoCruiseName, deviceName, deviceTypeName, deviceMeteName, customName, regionName);
                                 }
                             }else{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},表计-指针非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
@@ -324,7 +349,7 @@ public class NonhomologousWarnThread implements Runnable{
                                        warn.put("regionName", regionName);
                                        warn.put("customName", customName);
 
-                                       insertNonhomologousWarnInfo(warn, "103");
+                                       insertNonhomologousWarnInfo(warn, NONHOMOLOGOUS_TREND_OUTLIMIT);
                                    }
                                }
                             }
@@ -405,7 +430,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("regionName", regionName);
                             warn.put("customName", customName);
 
-                            insertNonhomologousWarnInfo(warn, "103");
+                            insertNonhomologousWarnInfo(warn, NONHOMOLOGOUS_TREND_OUTLIMIT);
                         }
                         break;
                     case "7":
@@ -453,7 +478,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("regionName", regionName);
                             warn.put("customName", customName);
 
-                            insertNonhomologousWarnInfo(warn, "102");
+                            insertNonhomologousWarnInfo(warn, NONHOMOLOGOUS_TREND_OUTLIMIT);
                         }
                         break;
                     default:
@@ -659,7 +684,8 @@ public class NonhomologousWarnThread implements Runnable{
         warnInfo.put("regionName", MapUtils.getString(triphaseRuleMap, "regionName"));
         warnInfo.put("customName", MapUtils.getString(triphaseRuleMap, "customName"));
 
-        String alarmType = triphaseType == 2 ? "3" : "4";
+        // 1-三相不平衡 仪表三相对比报警 9   2-三相温差 三相温差告警 3  3-三相不一致 三相对比报警 4
+        String alarmType = triphaseType == 2 ? TRIPHASE_TEMPDIFF : triphaseType == 1 ? METER_TRIPHASE_CONTRAST : TRIPHASE_CONTRAST;
 
         insertNonhomologousWarnInfo(warnInfo, alarmType);
     }
