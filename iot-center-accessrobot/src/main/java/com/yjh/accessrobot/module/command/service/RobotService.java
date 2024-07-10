@@ -3139,7 +3139,7 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
-            List<RobotModel> robotModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
+            List<RobotModel> robotModelList = mapList.stream().filter(map ->!(map.containsKey("type") && map.get("type").equals("15"))).map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
             tRobotInfoService.saveReportData(robotModelList,edgeCode,type);
             log.info("机器人文件处理结束 edgeCode:{} type:{}", edgeCode,type);
         } catch (Exception e) {
