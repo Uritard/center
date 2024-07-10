@@ -1710,9 +1710,9 @@ public class SendToUpSystemServices {
             default:
                 break;
         }
-        if (-1 != taskType) {
+//        if (-1 != taskType) {
             map.put("fixed_start_time", "");
-        }
+//        }
         map.remove("end_time");
         map.remove("time");
     }
@@ -1720,7 +1720,7 @@ public class SendToUpSystemServices {
     /**
      * 根据任务定时执行的表达式，判断任务类型
      * 表达式有：“8 8 *\/2 * * ?     0 0 0 *\/3 * ?  0 0 5,6 ? 1,2 4,5  等类型
-     *
+     * 1-间隔时 2-间隔天 3-周期
      * @param timeStr timeStr
      * @return result
      */
@@ -1729,9 +1729,9 @@ public class SendToUpSystemServices {
             return -1;
         }
 
-        if (timeStr.endsWith("* * ?")) {
+        if (timeStr.startsWith("interval_1")) {
             return 1;
-        } else if (timeStr.endsWith("* ?")) {
+        } else if (timeStr.startsWith("interval_2")) {
             return 2;
         } else if (timeStr.contains("?")) {
             return 3;
@@ -1783,6 +1783,19 @@ public class SendToUpSystemServices {
         return arrSub[1];
     }
 
+
+    /**
+     * 获取间隔任务间隔数量
+     * 格式为：interval_2,2   interval_1,5
+     *
+     * @param timeStr timeStr
+     * @return result
+     */
+    private String getIntervalDayOrHour(String timeStr) {
+        String[] arr = timeStr.split(",");
+        return arr[1];
+    }
+
     /**
      * 获取周期任务执行时间
      * 格式为：0 0 5,6 ? 1,2 4,5     0 0 1,3,4,14 ? 1,3,5 2,3,4,5,6,7
@@ -1829,7 +1842,7 @@ public class SendToUpSystemServices {
      */
     private void processIntervalDayTask(Map<String, Object> map) {
         String timeStr = MapUtils.getString(map, "time");
-        String intervalNumber = getIntervalDay(timeStr);
+        String intervalNumber = getIntervalDayOrHour(timeStr);
         String executeTime = getExecuteTime(map);
         map.put("interval_execute_time", executeTime);
         map.put("interval_number", intervalNumber);
@@ -1845,7 +1858,7 @@ public class SendToUpSystemServices {
      */
     private void processIntervalHourTask(Map<String, Object> map) {
         String timeStr = map.get("time").toString();
-        String intervalNumber = getIntervalHour(timeStr);
+        String intervalNumber = getIntervalDayOrHour(timeStr);
         String executeTime = getExecuteTime(map);
         map.put("interval_execute_time", executeTime);
         map.put("interval_number", intervalNumber);
