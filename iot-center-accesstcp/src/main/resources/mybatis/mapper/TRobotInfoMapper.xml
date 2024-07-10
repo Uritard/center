@@ -487,6 +487,30 @@
         left join t_dict_business b on a.drone_type = b.dict_code
         left join t_dict_business c on a.robot_factory = c.dict_code
         where a.drone_type is not null
+        union all (
+        select a.nest_name as patroldevice_name,
+        a.nest_code as patroldevice_code,
+        '' as device_model,
+        c.dict_note as manufacturer,
+        a.building_user as use_unit,
+        a.robot_source as device_source,
+        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+        a.appearance_number as production_code,
+        '1' as istransport,
+        '' as use_mode,
+        '' as video_mode,
+        a.address as place,
+        '15' as type,
+        '' as patroldevice_info,
+        '' as mount_patroldevice_code,
+        '1' as edge,
+        <include refid="Base_Column_List"/>
+        from t_robot_info a
+        left join t_dict_business b on a.drone_type = b.dict_code
+        left join t_dict_business c on a.robot_factory = c.dict_code
+        where a.drone_type is not null and a.nest_code is not null and a.nest_code != ''
+        group by a.nest_code
+        )
     </select>
 
 
