@@ -122,7 +122,7 @@ public class TCruisePointInstance implements Serializable {
 
     @Max(value=999999999999999999L)
     @ApiModelProperty(value = "边缘节点编码")
-    private Long edgeCode;
+    private String edgeCode;
 
     @Length(max = 32,message = "sort长度必须小于等于32")
     @ApiModelProperty(value = "排序序号")

@@ -602,7 +602,11 @@ public class SendToUpSystemServices {
     public Map<String, Object> getAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
                                            Object value, Integer level, String alarmDesc, String alarmType) {
         Map<String, Object> item = new HashMap<>(11);
-        item.put("device_id", detail.getInstanceId());
+        if (Constant.standardPoints()){
+            item.put("device_id", detail.getDevicePointId());
+        } else {
+            item.put("device_id", detail.getInstanceId());
+        }
         item.put("device_name", detail.getMeteName());
         item.put("defect_type", "");
         item.put("station_code", Constant.stationCode());
@@ -617,7 +621,7 @@ public class SendToUpSystemServices {
     }
 
     private String createLinkageModel(String path) throws Exception {
-        List<Map<String, Object>> list = sendToUpSystemDao.selectLinkageModel();
+        List<Map<String, Object>> list = sendToUpSystemDao.selectLinkageModel(Constant.standardPoints());
         return CreateModeXMLUtil.createXmlFile(list, path, "linkage_model.xml", "Effect_Config");
     }
 
@@ -710,6 +714,9 @@ public class SendToUpSystemServices {
                 item.put("data_type","4");
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
+            }else if (item.get("cruise_type").equals(231)){// 主辅系统
+                item.put("save_type_list","");
+                item.put("data_type","16");
             }
 
             item.remove("cruise_type");
@@ -871,7 +878,12 @@ public class SendToUpSystemServices {
             maintenanceMap.put("start_time", item.getStartTime());
             maintenanceMap.put("end_time", item.getEndTime());
             maintenanceMap.put("device_level", item.getDeviceLevel());
-            maintenanceMap.put("device_list", item.getDeviceIds());
+            if ("3".equals(item.getDeviceLevel()) && Constant.standardPoints()){
+                maintenanceMap.put("device_list", String.join(",",sendToUpSystemDao.selectStandardPointsByInstanceId(item.getDeviceIds())));
+            } else {
+                maintenanceMap.put("device_list", item.getDeviceIds());
+            }
+
             maintenanceMap.put("coordinate_pixel", item.getCoordinatePixel());
             finalList.add(maintenanceMap);
         });

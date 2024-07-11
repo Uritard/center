@@ -72,8 +72,9 @@ public interface SendToUpSystemDao {
     List<Map<String, Object>> selectMaintenanceModel(@Param(value = "stationName") String stationName,
                                                      @Param(value = "stationCode") String stationCode);
 
-    List<Map<String, Object>> selectLinkageModel();
+    List<Map<String, Object>> selectLinkageModel(@Param(value = "standardPoints") Boolean standardPoints);
 
     List<TCruisePointInstanceMeteDetail> selectAlarmThresholdModel();
 
+    List<String> selectStandardPointsByInstanceId(@Param(value = "instanceIds") String instanceIds);
 }
