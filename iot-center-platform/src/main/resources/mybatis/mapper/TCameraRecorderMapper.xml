@@ -68,7 +68,8 @@
         edge_code,
         origin_id,
         a.device_channel,
-        a.b_device_channel
+        a.b_device_channel,
+        a.production_code
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
@@ -79,7 +80,7 @@
         ,http_port,trans_port,rtsp_port
         ,identity_manager,identity_code,protocol_url
         ,max_channel,hdd_size,buffer_day
-        ,time_long,unit,edge_code,origin_id, device_channel, b_device_channel)
+        ,time_long,unit,edge_code,origin_id, device_channel, b_device_channel, production_code)
         values (#{recordName,jdbcType=VARCHAR},#{recorderModel,jdbcType=INTEGER}
         ,#{recorderType,jdbcType=VARCHAR},#{vendorId,jdbcType=INTEGER},#{pmsId,jdbcType=VARCHAR}
         ,#{aliasName,jdbcType=VARCHAR},#{recordIp,jdbcType=VARCHAR},#{protocol,jdbcType=VARCHAR}
@@ -87,7 +88,8 @@
         ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
         ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
         ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=VARCHAR}, #{deviceChannel,jdbcType=VARCHAR}, #{bdeviceChannel,jdbcType=VARCHAR})
+        ,#{originId,jdbcType=VARCHAR}, #{deviceChannel,jdbcType=VARCHAR}, #{bdeviceChannel,jdbcType=VARCHAR}
+        ,#{productionCode, jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -140,6 +142,7 @@
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
         a.device_channel = #{deviceChannel},
         a.b_device_channel = #{bdeviceChannel},
+        <if test="productionCode != null and productionCode != ''">a.production_code = #{productionCode},</if>
         a.max_channel = #{maxChannel, jdbcType=INTEGER},
         a.hdd_size = #{hddSize, jdbcType=INTEGER},
         a.buffer_day = #{bufferDay, jdbcType=INTEGER},

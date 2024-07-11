@@ -92,4 +92,6 @@ public class TCameraRecorderByDict {
     private String deviceChannel;
     @ApiModelProperty(value = "视频B编码")
     private String bdeviceChannel;
+    @ApiModelProperty(value = "生产编号")
+    private String productionCode;
 }

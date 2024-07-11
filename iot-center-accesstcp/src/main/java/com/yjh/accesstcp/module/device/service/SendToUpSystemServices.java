@@ -556,7 +556,7 @@ public class SendToUpSystemServices {
             case 2:
                 return "严重";
             case 3:
-                return "危机";
+                return "危急";
             default:
                 return "一般";
         }
@@ -748,7 +748,7 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
             robotModel.setStationCode(stationCode);
             robotModel.setStationName(stationName);
-            robotModel.setMountPatroldeviceCode(robotModel.getPatroldeviceCode());
+            robotModel.setMountPatroldeviceCode("");
             if (robotModel.getPhotePath() != null){
                 robotModel.setPhotePath(robotModel.getPhotePath().replace(relativeImgMap.get("content"),absoluteImgMap.get("content")));
             }
@@ -822,7 +822,7 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> list = voiceDeviceModelList.stream().peek(voiceDeviceModel -> {
             voiceDeviceModel.setStationCode(stationCode);
             voiceDeviceModel.setStationName(stationName);
-            voiceDeviceModel.setMountPatroldeviceCode(voiceDeviceModel.getPatroldeviceCode());
+            voiceDeviceModel.setMountPatroldeviceCode("");
         }).map((Function<VoiceDeviceModel, Map<String, Object>>) voiceDeviceModel -> {
             JSONObject jsonObject = (JSONObject) JSON.toJSON(voiceDeviceModel, serializeConfig);
             return jsonObject.toJavaObject(Map.class);
@@ -910,6 +910,7 @@ public class SendToUpSystemServices {
             host.put("patroldevice_name", "巡视主机");
         }
         host.put("patroldevice_info", "");
+        host.put("mount_patroldevice_code", "");
         host.put("robots_code", "");
         finalList.add(host);
         return CreateModeXMLUtil.createXmlFile(finalList, path, "host_model.xml", "PatrolDevice_Model");

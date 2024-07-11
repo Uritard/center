@@ -148,4 +148,7 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "投运日期")
     @TableField(value = "commission_date")
     private Date commissionDate;
+
+    @ApiModelProperty(value = "生产编号")
+    private String productionCode;
 }
