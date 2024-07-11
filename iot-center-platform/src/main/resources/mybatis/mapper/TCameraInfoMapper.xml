@@ -90,7 +90,8 @@
         a.commission_date,
         a.camera_channel_id,
         a.b_camera_channel_id,
-        a.use_type
+        a.use_type,
+        a.production_code
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
@@ -105,7 +106,7 @@
         ,camera_type,is_control,latitude
         ,longitude,address,unit
         ,create_time,commission_date,edge_code
-        ,origin_id, camera_channel_id, b_camera_channel_id,use_type)
+        ,origin_id, camera_channel_id, b_camera_channel_id,use_type,production_code)
         values (#{cameraId,jdbcType=BIGINT},#{cameraName,jdbcType=VARCHAR},#{cameraModel,jdbcType=INTEGER}
         ,#{pmsId,jdbcType=VARCHAR},#{aliasName,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT}
         ,#{upRegionId,jdbcType=VARCHAR},#{channelNum,jdbcType=INTEGER},#{cameraNum,jdbcType=INTEGER}
@@ -117,7 +118,7 @@
         ,#{longitude,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
         ,#{createTime,jdbcType=TIMESTAMP},#{commissionDate,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR}
         ,#{originId,jdbcType=VARCHAR}, #{cameraChannelId, jdbcType=VARCHAR}, #{bcameraChannelId, jdbcType=VARCHAR}
-        , #{useType, jdbcType=INTEGER})
+        , #{useType, jdbcType=INTEGER}, #{productionCode,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -180,6 +181,7 @@
         a.camera_channel_id = #{cameraChannelId, jdbcType=VARCHAR},
         a.b_camera_channel_id = #{bcameraChannelId, jdbcType=VARCHAR},
         <if test="useType != null">a.use_type = #{useType, jdbcType=INTEGER},</if>
+        <if test="productionCode != null and productionCode != ''">a.production_code = #{productionCode},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>

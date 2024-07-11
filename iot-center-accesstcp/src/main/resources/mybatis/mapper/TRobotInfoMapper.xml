@@ -433,7 +433,7 @@
         c.dict_note as manufacturer,
         a.building_user as use_unit,
         a.robot_source as device_source,
-        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+        DATE_FORMAT(a.made_date, '%Y-%m-%d %H:%i:%s') as production_date,
         a.appearance_number as production_code,
         if(b.dict_code = 399, 0, 1) as istransport,
         '' as use_mode,

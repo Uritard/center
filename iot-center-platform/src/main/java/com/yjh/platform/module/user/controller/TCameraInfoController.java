@@ -112,6 +112,8 @@ public class TCameraInfoController {
             if (cameraChannelId.length() != c) {
                 tCameraInfo.setCameraChannelId(null);
             }
+        } else {
+            tCameraInfo.setCameraChannelId(null);
         }
         String bCameraChannelId = tCameraInfo.getBcameraChannelId();
         if (StringUtils.hasLength(bCameraChannelId)) {
@@ -119,9 +121,14 @@ public class TCameraInfoController {
             if (bCameraChannelId.length() != b) {
                 tCameraInfo.setBcameraChannelId(null);
             }
+        } else {
+            tCameraInfo.setBcameraChannelId(null);
         }
 
         // 判断是否存在相同编码的设备
+        if (StringUtils.isEmpty(tCameraInfo.getCameraChannelId()) && StringUtils.isEmpty(tCameraInfo.getBcameraChannelId())) {
+            return;
+        }
         TCameraInfo query = new TCameraInfo();
         query.setCameraChannelId(tCameraInfo.getCameraChannelId());
         query.setBcameraChannelId(tCameraInfo.getBcameraChannelId());
