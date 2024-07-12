@@ -10,6 +10,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
@@ -81,6 +82,9 @@ public class TCruisePointInstanceService{
     private CameraConService cameraConService;
     @Autowired
     private TCfgMeteDao tCfgMeteDao;
+
+    @Resource
+    private NonhomologousWarnDao nonhomologousWarnDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -462,11 +466,11 @@ public class TCruisePointInstanceService{
         //删除关联表的巡检实例
         if (cruiseIdList != null && cruiseIdList.size() > 0) {
             List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList, tCruisePointInstanceDetail.getDeviceMeteId());
-//            List<Long> instancePlanList = tCruisePlanAttrDao.batchSelectAttr(instanceIdList);
             List<Long> instancePlanList = uPatrolResultDao.batchSelectAttr(instanceIdList);
-            if (instancePlanList.size() > 0) {
-                result = -3;
-                return result;
+            List<Long> instanceWarnList = nonhomologousWarnDao.queryExistByInstanceIds(instanceIdList);
+            List<Long> triphaseList = nonhomologousWarnDao.queryExistTriphaseByInstanceIds(instanceIdList);
+            if (instancePlanList.size() > 0 || instanceWarnList.size() > 0) {
+                throw new BusinessException("巡视点已经绑定了预案或非同源告警,操作无法生效！");
             }
             tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
             tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);

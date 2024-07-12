@@ -331,7 +331,7 @@
             a.address as place,
             '10' as type,
             '' as patroldevice_info,
-            if(d.b_device_channel is null or a.b_device_channel = '', d.device_channel, d.b_device_channel) as mount_patroldevice_code,
+            if(d.b_device_channel is null or d.b_device_channel = '', d.device_channel, d.b_device_channel) as mount_patroldevice_code,
             '1' as edge
         from t_camera_info a
                  left join t_dict_business b on a.camera_model = b.dict_code

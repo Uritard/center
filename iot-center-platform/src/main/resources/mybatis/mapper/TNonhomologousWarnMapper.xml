@@ -190,4 +190,44 @@
         from t_cruise_triphase_rule
         where triphase_id = #{instanceId}
     </select>
+
+    <select id="queryExistByInstanceIds" resultType="java.lang.Long">
+        select
+        a.instance_id
+        from t_cruise_nonhomologous_point_instance a
+        where 1 = 1
+        and (
+        a.instance_id_one in
+        <foreach collection="instanceIds" item="instanceId" open="(" close=")" separator=",">
+            #{instanceId}
+        </foreach>
+        or
+        a.instance_id_two in
+        <foreach collection="instanceIds" item="instanceId" open="(" close=")" separator=",">
+            #{instanceId}
+        </foreach>
+        )
+    </select>
+    <select id="queryExistTriphaseByInstanceIds" resultType="java.lang.Long">
+        select
+        a.triphase_id
+        from t_cruise_triphase_rule a
+        where 1 = 1
+        and (
+        a.instance_one_id in
+        <foreach collection="instanceIds" item="instanceId" open="(" close=")" separator=",">
+            #{instanceId}
+        </foreach>
+        or
+        a.instance_two_id in
+        <foreach collection="instanceIds" item="instanceId" open="(" close=")" separator=",">
+            #{instanceId}
+        </foreach>
+        or
+        a.instance_tri_id in
+        <foreach collection="instanceIds" item="instanceId" open="(" close=")" separator=",">
+            #{instanceId}
+        </foreach>
+        )
+    </select>
 </mapper>
