@@ -46,6 +46,9 @@ public class DeviceMaintenanceInfoController {
         try {
             deviceMaintenanceInfo.setStartTime(new Date())
                     .setRecordCode(String.valueOf(UUID.randomUUID()).replace("-", ""));
+            if (deviceMaintenanceInfo.getMaintenanceStatus() == 1) {
+                deviceMaintenanceInfo.setEndTime(new Date());
+            }
             result.setData(deviceMaintenanceInfoService.save(deviceMaintenanceInfo));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
             //有变动 同步模型
