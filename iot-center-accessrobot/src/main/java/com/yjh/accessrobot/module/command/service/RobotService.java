@@ -3022,7 +3022,7 @@ public class RobotService {
                 }
                 syAllInfo.setMeteId(stdRegion.getStationId() + strArray[2]);
                 syAllInfo.setMeteName(meteName);
-                syAllInfo.setDeviceId(stdRegion.getStationId() + strArray[2]);
+                syAllInfo.setDeviceId(stdRegion.getStationId() +"_"+ strArray[2]);
                 syAllInfo.setEdgeCode(edgeCode);
                 syAllInfo.setDeviceName(strArray[3]);
                 Integer meteKind = strArray[4].contains("遥信") ? 1 : (strArray[4].contains("遥测") ? 2 : (strArray[4].contains("遥控") ? 3 : (strArray[4].contains("遥调") ? 4 : 5)));

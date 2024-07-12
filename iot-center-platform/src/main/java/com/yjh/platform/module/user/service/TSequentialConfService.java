@@ -617,7 +617,7 @@ public class TSequentialConfService {
 
         try {
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+            String stationId = tCfgDevice.getStationId();
             if ((CommonUtils.isEmptyOrNullstr(stationId))) {
                 stationId = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
             }
@@ -634,7 +634,7 @@ public class TSequentialConfService {
                 txt.createNewFile();
             }
 
-            cfgDeviceId = StringUtils.substringAfter(cfgDeviceId, stationId);
+            cfgDeviceId = cfgDeviceId.contains("_")?StringUtils.substringAfter(cfgDeviceId, "_"):cfgDeviceId;
             FileWriter fw = new FileWriter(txt, true);
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
             BufferedWriter bw = new BufferedWriter(
