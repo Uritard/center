@@ -192,7 +192,7 @@ public class IntelAnalysisService {
         PicAnalyseResponse response = new PicAnalyseResponse();
         response.setRequestId(request.getRequestId());
         AnalyseResult analyseResult = getAnalyseResp(request.getObjectList().get(0));
-        response.setResultsList(Arrays.asList(analyseResult));
+        response.setResultList(Arrays.asList(analyseResult));
 
         return response;
     }
@@ -208,7 +208,7 @@ public class IntelAnalysisService {
 
     private AnalyseResultItem getAnalyseResult(AnalyseObject analyseObject) {
         AnalyseResultItem item = new AnalyseResultItem();
-        item.setResImageUrl(analyseObject.getImagePathList().get(0));
+        item.setResImagePath(analyseObject.getImagePathList().get(0));
         item.setCode("2000");
         item.setConf(0.0f);
         item.setDesc("发现异常");
@@ -250,8 +250,8 @@ public class IntelAnalysisService {
     private void presetCheckHandle(PicAnalyseResponse response, String flagId) {
         try {
             // 只有识别结果明确为偏移时才去修改redis
-            if ("2000".equals(response.getResultsList().get(0).getResults().get(0).getCode())
-                && "1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
+            if ("2000".equals(response.getResultList().get(0).getResults().get(0).getCode())
+                && "1".equals(response.getResultList().get(0).getResults().get(0).getValue())) {
                 log.info("算法识别预置位偏移, flagId: {}", flagId);
                 String[] arr = flagId.split("_");
                 Long cameraId = Long.parseLong(arr[0]);
@@ -441,7 +441,7 @@ public class IntelAnalysisService {
         Boolean isIn = redisTemplate.boundSetOps(key).isMember(response.getRequestId());
         if (isIn){
             //这个条结果算法已经返回过结果
-            List<AnalyseResult> analyseResults = response.getResultsList();
+            List<AnalyseResult> analyseResults = response.getResultList();
             //找到返回结果中出现非2000的结果说明本次返回的结果是不可用的
             boolean isOkResult = true;
             for (AnalyseResult analyseResult: analyseResults){
@@ -504,7 +504,7 @@ public class IntelAnalysisService {
         List<AnalysePatrolTaskResult> resultList = new ArrayList<>();
         List<String> falseDataCruiseList = new ArrayList<>();
         try {
-            for (AnalyseResult analyseResult : response.getResultsList()) {
+            for (AnalyseResult analyseResult : response.getResultList()) {
 
                 String instanceId = analyseResult.getObjectId();
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
@@ -652,7 +652,7 @@ public class IntelAnalysisService {
         String value) {
         String targetPath = null;
         try {
-            String resImageUrl = result.getResImageUrl();
+            String resImageUrl = result.getResImagePath();
             if (StringUtils.isNotEmpty(resImageUrl)) {
                 resImageUrl = resImageUrl.startsWith("/") ? resImageUrl.substring(1) : resImageUrl;
             }
@@ -680,7 +680,7 @@ public class IntelAnalysisService {
         String value, String desc) {
         String targetPath = null;
         try {
-            String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+            String resImageUrl = result.getResImagePath().startsWith("/") ? result.getResImagePath().substring(1) : result.getResImagePath();
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
 
             if (StringUtils.isNotEmpty(resImageUrl)) {
@@ -730,7 +730,7 @@ public class IntelAnalysisService {
 
     private void algorithmTestHandle(PicAnalyseResponse response) {
         //判断是缺陷还是判别
-        List<AnalyseResult> resultsList = response.getResultsList();
+        List<AnalyseResult> resultsList = response.getResultList();
 
         String yearMonth = new SimpleDateFormat("yyyyMM").format(new Date());
         String nowTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -773,7 +773,7 @@ public class IntelAnalysisService {
                         log.info("图像没有差异：{}", item);
                         break;
                     }
-                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImagePath());
                     log.info("resImageUrl:{}", resImageUrl);
 
                     resImageUrl = resImageUrl.replace("//", "/");
@@ -838,7 +838,7 @@ public class IntelAnalysisService {
                         applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
                             + origpcimagename;
 
-                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImagePath());
                     String imgF = imageBaseName + "缺陷告警.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remotefilepath =
@@ -919,12 +919,12 @@ public class IntelAnalysisService {
         Map<String,String> recBack = new HashMap<>(9);
         try{
             recBack.put("meteId",StringUtils.substringAfter(response.getRequestId(),"="));
-            recBack.put("code",response.getResultsList().get(0).getResults().get(0).getCode());
-            recBack.put("conf",String.valueOf(response.getResultsList().get(0).getResults().get(0).getConf()));
-            recBack.put("desc",response.getResultsList().get(0).getResults().get(0).getDesc());
-            recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
-            recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
-            recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
+            recBack.put("code",response.getResultList().get(0).getResults().get(0).getCode());
+            recBack.put("conf",String.valueOf(response.getResultList().get(0).getResults().get(0).getConf()));
+            recBack.put("desc",response.getResultList().get(0).getResults().get(0).getDesc());
+            recBack.put("resImageUrl",response.getResultList().get(0).getResults().get(0).getResImagePath());
+            recBack.put("type",response.getResultList().get(0).getResults().get(0).getType());
+            recBack.put("value",response.getResultList().get(0).getResults().get(0).getValue());
             log.info("一键顺控recBack:{}", JSONUtil.toJSONString(recBack));
             String services = tSequentialConfService.sequentialRecBack(recBack);
             log.info("一键顺控services：{}" , services);
@@ -940,7 +940,7 @@ public class IntelAnalysisService {
      */
     private void silentMonitorHandle(PicAnalyseResponse response) {
         // 遍历多个点的分析结果
-        for (AnalyseResult  analyseResult : response.getResultsList()){
+        for (AnalyseResult  analyseResult : response.getResultList()){
             log.info("遍历当前analyseResult：", JSONUtil.toJSONString(analyseResult));
             List<String> content = new ArrayList<>();
             List<String> resultImg = new ArrayList<>();
@@ -976,7 +976,7 @@ public class IntelAnalysisService {
                 content.add(type);
 
                 // 因为算法端乱改乱改 所以就在这里截取了 不想改动后面的逻辑(拼接路径)
-                String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+                String resImageUrl = result.getResImagePath().startsWith("/") ? result.getResImagePath().substring(1) : result.getResImagePath();
 
                 String targetPath = copyFileFromFtps(type, resImageUrl);
                 String defectResultRealImg = targetPath.replaceAll(SysParamConfig.getSysContent("defectResultImg"),
@@ -1032,7 +1032,7 @@ public class IntelAnalysisService {
                 result.setCode("2000");
                 result.setValue("1");
                 result.setType(type);
-                result.setResImageUrl(analyseImageUrl);
+                result.setResImagePath(analyseImageUrl);
                 setAnalyseArea(result);
             }
 
