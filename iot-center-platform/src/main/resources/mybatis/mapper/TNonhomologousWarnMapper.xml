@@ -75,7 +75,10 @@
         d.mete_name as deviceMeteName,
         d.custom_name as customName,
         f.region_name as regionName,
-        if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
+        CASE
+            WHEN a.instance_id_one = #{deviceId} THEN
+                a.instance_id_one ELSE a.instance_id_two
+            END AS oldId
         from t_cruise_nonhomologous_point_instance a
         LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
         LEFT JOIN t_std_device e ON e.device_id = d.device_id
@@ -91,7 +94,7 @@
         a.result_num as resultValue
         from u_patrol_data_result a
         where a.instance_id = #{inspectionId}
-        and a.createtime is not null and (select (a.result_num REGEXP '[^0-9.]'))=0
+        and a.createtime is not null
         <if test="type == 6" >
             and a.createtime between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
         </if>

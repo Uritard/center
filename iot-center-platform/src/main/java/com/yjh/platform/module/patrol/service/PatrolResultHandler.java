@@ -1219,6 +1219,37 @@ public class PatrolResultHandler {
         }
     }
 
+    public void tcnAlarmPopUp(TStdDeviceMete tStdDevicemete, Map<String, String> infoMap) {
+        try {
+            Map<String, String> currentWarnInfo = new HashMap<>();
+            String warnId = infoMap.get("warnId");
+            currentWarnInfo.put("warnId", warnId);
+            currentWarnInfo.put("defectModel", infoMap.get("defectModel"));
+            currentWarnInfo.put("isPop", "false");
+
+            if (!alarmShieldService.isShield(tStdDevicemete.getDeviceMeteId())) {
+                //webSocket通知前端调用查询告警弹框的接口
+                Map<String, String> jasonMaps = new HashMap<>();
+                jasonMaps.put("type", "tcnAlarmPopUp");
+                jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
+                jasonMaps.put("warnType", "1");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", infoMap.get("defectModel"));
+                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
+                currentWarnInfo.put("isPop", "true");
+                if (!Constant.isUpSystem()) {
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+                }
+            } else {
+                log.info("此告警被屏蔽了，不弹窗！");
+            }
+
+            redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
     /**
      * 缺陷info信息组装
      *
