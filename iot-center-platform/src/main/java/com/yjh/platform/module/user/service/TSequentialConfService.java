@@ -526,19 +526,19 @@ public class TSequentialConfService {
             String value = "";
             switch (param) {
                 case "1":
-                    value = "分位";
+                    value = "分闸正常";
                     break;
                 case "2":
-                    value = "合位";
+                    value = "合闸正常";
                     break;
                 case "3":
-                    value = "分不到位";
+                    value = "分闸异常";
                     break;
                 case "4":
-                    value = "合不到位";
+                    value = "合闸异常";
                     break;
                 default:
-                    value = "无效状态";
+                    value = "分析失败";
                     break;
             }
             FileUtil.createDirectory(path);
