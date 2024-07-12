@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
@@ -148,6 +149,7 @@ public class TCruiseNonhomologousPointInstanceService {
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
         Map<String, Map<String,Object>> warnDetail = new HashMap<>();
         for(Map<String,Object> m : warnDetailInfo){
+            m.put("cruiseTime", DateTimeUtil.getDateTimeString((Date) m.get("cruiseTime")));
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(
                 UPatrolTaskService.PATROL_TASK_PREFIX + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){

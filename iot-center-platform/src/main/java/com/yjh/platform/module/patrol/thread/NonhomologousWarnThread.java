@@ -14,9 +14,11 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
+import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,6 +55,7 @@ public class NonhomologousWarnThread implements Runnable{
     private final NonhomologousWarnDao nonhomologousWarnDao;
     private final TRobotInspectionDao tRobotInspectionDao;
     private final ApplicationProperties applicationProperties;
+    private final PatrolResultHandler patrolResultHandler;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -93,6 +96,7 @@ public class NonhomologousWarnThread implements Runnable{
         this.nonhomologousWarnDao = StaticContextAccessor.getBean(NonhomologousWarnDao.class);
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
         this.applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
+        this.patrolResultHandler =  StaticContextAccessor.getBean(PatrolResultHandler.class);
     }
 
     @Override
@@ -696,6 +700,14 @@ public class NonhomologousWarnThread implements Runnable{
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
+        // 告警推送
+        Map<String, String> infoMap = new HashMap<>(8);
+        infoMap.put("alarmLevel", "1");
+        infoMap.put("flag", "warn");
+        infoMap.put("warnId", String.valueOf(warn.get("warnId")));
+        infoMap.put("defectModel", "1");
+        patrolResultHandler.tcnAlarmPopUp(new TStdDeviceMete().setDeviceMeteId((Long) warn.get("deviceMeteId")), infoMap);
+
         log.info("非同源上报参数：warn={}，taskId={},instanceId={}",
                 warn,robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
         warnToUpSystem(warn, alarmType,

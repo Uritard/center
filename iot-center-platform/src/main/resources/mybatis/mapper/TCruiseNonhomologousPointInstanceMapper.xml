@@ -295,7 +295,8 @@
         b.modify_num,
         b.picpath,
         b.person_check,
-        b.result_desc
+        b.result_desc as resultDesc,
+        b.cruise_time as cruiseTime
         from t_cruise_nonhomologous_warn_inspection a
         LEFT JOIN u_patrol_data_result b ON a.inspection_id=b.instance_id and a.task_id=b.task_id
         where a.warn_id = #{warnId, jdbcType=VARCHAR}
