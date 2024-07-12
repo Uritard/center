@@ -233,7 +233,8 @@ public class ApplicationProperties {
                 this.intelAlgorithmConfig = new IntelligentAlgorithmConfig();
             }
             BeanUtils.populate(this.intelAlgorithmConfig, redisMap);
-
+            //发布参数修改
+            redisTemplate.convertAndSend(SYSTEM_CONFIG_KEY + "algorithmSystem", redisMap);
         } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("智能分析主机配置解析失败", e);
         }
