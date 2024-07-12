@@ -516,8 +516,11 @@ public class TSequentialConfService {
         log.info("recBack:{},map:{},param:{}", recBack, map, param);
         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
         String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
+        String meteId = recBack.get("meteId");
         if ((CommonUtils.isEmptyOrNullstr(stationId))) {
             stationId = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+        }else {
+            meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
         }
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String path = ftpsFilePath + "/" + stationId + "/linkage/";
@@ -552,7 +555,6 @@ public class TSequentialConfService {
             if (!txt.exists()) {
                 txt.createNewFile();
             }
-            String meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(txt, true), applicationProperties.getSequentialConfig().getSequentialFileCharset()));
@@ -617,9 +619,11 @@ public class TSequentialConfService {
 
         try {
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            String stationId = tCfgDevice.getStationId();
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
             if ((CommonUtils.isEmptyOrNullstr(stationId))) {
                 stationId = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
+            }else {
+                cfgDeviceId = StringUtils.substringAfter(cfgDeviceId, stationId);
             }
             String path = ftpsFilePath + "/" + stationId + "/linkage/";
             FileUtil.createDirectory(path);
@@ -634,7 +638,6 @@ public class TSequentialConfService {
                 txt.createNewFile();
             }
 
-            cfgDeviceId = cfgDeviceId.contains("_")?StringUtils.substringAfter(cfgDeviceId, "_"):cfgDeviceId;
             FileWriter fw = new FileWriter(txt, true);
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
             BufferedWriter bw = new BufferedWriter(
