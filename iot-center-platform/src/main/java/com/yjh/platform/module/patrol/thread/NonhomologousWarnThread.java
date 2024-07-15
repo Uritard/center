@@ -701,12 +701,12 @@ public class NonhomologousWarnThread implements Runnable{
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
         // 告警推送
-        Map<String, String> infoMap = new HashMap<>(8);
-        infoMap.put("alarmLevel", "1");
-        infoMap.put("flag", "warn");
-        infoMap.put("warnId", String.valueOf(warn.get("warnId")));
-        infoMap.put("defectModel", "1");
-        patrolResultHandler.tcnAlarmPopUp(new TStdDeviceMete().setDeviceMeteId((Long) warn.get("deviceMeteId")), infoMap);
+//        Map<String, String> infoMap = new HashMap<>(8);
+//        infoMap.put("alarmLevel", "1");
+//        infoMap.put("flag", "warn");
+//        infoMap.put("warnId", String.valueOf(warn.get("warnId")));
+//        infoMap.put("defectModel", "1");
+//        patrolResultHandler.tcnAlarmPopUp(new TStdDeviceMete().setDeviceMeteId((Long) warn.get("deviceMeteId")), infoMap);
 
         log.info("非同源上报参数：warn={}，taskId={},instanceId={}",
                 warn,robotPatrolTaskAlarm.getTaskCode(),robotPatrolTaskAlarm.getDeviceId());
