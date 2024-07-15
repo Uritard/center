@@ -107,6 +107,11 @@ public class SilentTaskJob implements Runnable {
             log.error("该摄像机正在任务中 cameraId:{} presetId:{}",cameraId,presetId);
             return;
         }
+        Map<String, Object> instanceInfoMap = tCameraPresetDao.selectInstanceInfo(presetId);
+        if (MapUtils.isEmpty(instanceInfoMap)) {
+            log.error("该预置位没有关联测点 cameraId:{} presetId:{}", cameraId, presetId);
+            return;
+        }
 
         Date now = new Date();
         Date lastDate = DateUtils.dateFromString(lastTime);
