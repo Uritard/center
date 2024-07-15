@@ -617,6 +617,7 @@ CREATE TABLE `t_camera_info` (
   `camera_channel_id` VARCHAR (50)  DEFAULT NULL COMMENT '相机通道id',
   `use_type` int DEFAULT '1' COMMENT '相机用途 巡视设备1 监控设备 2',
   `b_camera_channel_id` varchar(50) DEFAULT NULL COMMENT '视频B相机通道id',
+  `production_code` varchar(32) DEFAULT NULL COMMENT '生产编码',
   PRIMARY KEY (`camera_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='摄像头信息表';
@@ -677,6 +678,7 @@ CREATE TABLE `t_camera_recorder` (
   `device_channel` VARCHAR (50)  DEFAULT NULL COMMENT '设备id',
   `b_device_channel` varchar(50) DEFAULT NULL COMMENT '视频B设备ID',
   `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
+  `production_code` varchar(32) DEFAULT NULL COMMENT '生产编码',
   PRIMARY KEY (`record_id`) USING BTREE,
   KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='录像服务器表';
