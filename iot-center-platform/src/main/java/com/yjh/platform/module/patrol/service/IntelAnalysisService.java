@@ -35,6 +35,7 @@ import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1315,20 +1316,22 @@ public class IntelAnalysisService {
             Map<String, Object> xmlItem = new HashMap<>(16);
 
             xmlBaseModel.setType("63");
-            xmlItem.put("patroldevice_code", map.get("preset_id"));
-            xmlItem.put("patroldevice_name", map.get("device_name"));
+            String patroldeviceCode = MapUtils.getString(map, "b_camera_channel_id");
+            if (StringUtils.isEmpty(patroldeviceCode)) {
+                patroldeviceCode = StringUtils.isEmpty(MapUtils.getString(map, "camera_channel_id")) ? MapUtils.getString(map, "camera_id") : MapUtils.getString(map, "camera_channel_id");
+            }
+            xmlItem.put("patroldevice_code", patroldeviceCode);
+            xmlItem.put("patroldevice_name", map.get("camera_name"));
             switch (tWarnInfo.getWarnLevel()){
                 case 130:
+                case 131:
                     xmlItem.put("alarm_level", "1");
                     break;
-                case 131:
+                case 132:
                     xmlItem.put("alarm_level", "2");
                     break;
-                case 132:
-                    xmlItem.put("alarm_level", "3");
-                    break;
                 case 133:
-                    xmlItem.put("alarm_level", "4");
+                    xmlItem.put("alarm_level", "3");
                     break;
                 default:
                     break;

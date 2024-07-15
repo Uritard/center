@@ -941,6 +941,9 @@
         SELECT
             a.preset_id,
             a.camera_id,
+            f.b_camera_channel_id,
+            f.camera_channel_id,
+            f.camera_name,
             b.cruise_id,
             b.instance_id,
             b.custom_id,
@@ -949,11 +952,12 @@
             b.device_mete_id,
             e.mete_name
         FROM
-            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
-        where a.preset_id = b.cruise_id
-          and d.device_id = b.device_id
-          AND b.device_mete_id = e.device_mete_id
-          and a.preset_id = #{presetId,jdbcType=BIGINT}
+            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e,t_camera_info f
+        WHERE a.preset_id = b.cruise_id
+            AND d.device_id = b.device_id
+            AND b.device_mete_id = e.device_mete_id
+            AND a.camera_id = f.camera_id
+            AND a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAlgorithmInfo" resultType="com.yjh.platform.module.patrol.entity.TAlgorithmInfo">

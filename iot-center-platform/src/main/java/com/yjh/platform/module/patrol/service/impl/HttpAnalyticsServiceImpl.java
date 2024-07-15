@@ -108,6 +108,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 String recognizeType = tAlgorithmInfoDao.selectRecognizeTypeByPresetId(analysis.getInstanceId());
                 AnalyseObject analyseObject = new AnalyseObject();
                 analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
+                analyseObject.setImageNormalPath("");
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
 
                 saveSilentMonitorImageUrlToRedis(analyseObject);
