@@ -97,6 +97,7 @@
         and a.createtime is not null
         <if test="type == 6" >
             and a.createtime between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}
+            and a.cruise_result = 246
         </if>
         order by a.createtime desc
         <if test="type == 7" >
