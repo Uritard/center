@@ -75,10 +75,7 @@
         d.mete_name as deviceMeteName,
         d.custom_name as customName,
         f.region_name as regionName,
-        CASE
-            WHEN a.instance_id_one = #{deviceId} THEN
-                a.instance_id_one ELSE a.instance_id_two
-            END AS oldId
+        if (a.instance_id_one = #{deviceId},a.instance_id_two,a.instance_id_one) as oldId
         from t_cruise_nonhomologous_point_instance a
         LEFT JOIN t_std_devicemete d ON d.device_mete_id = a.device_mete_id
         LEFT JOIN t_std_device e ON e.device_id = d.device_id
