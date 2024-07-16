@@ -404,9 +404,10 @@ public class NonhomologousWarnThread implements Runnable{
                         nowResult.put("resultValue", robotInsResult);
                         // 过滤非数字结果
                         intervalResults.add(nowResult);
-                        List<Map<String,Object>> numResults= intervalResults.stream()
-                                .filter(mapItem -> isNumeric(mapItem.get("resultValue").toString()))
-                                .collect(Collectors.toList());
+                        intervalResults.forEach(m ->{
+                            m.put("resultValue",m.get("resultValue").toString().split(",")[0]);
+                        });
+                        List<Map<String,Object>> numResults= intervalResults;
                         Optional<Map<String,Object>> maxValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         Optional<Map<String,Object>> minValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo, warnThreshold);
@@ -418,7 +419,7 @@ public class NonhomologousWarnThread implements Runnable{
                             warn.put("warnId", warnId);
                             warn.put("warnType", 6);
                             warn.put("instanceId", Long.parseLong(instanceId));
-                            warn.put("warnContent", "时间范围内表计识别结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold);
+                            warn.put("warnContent", "时间范围内识别结果差值超过阈值告警：" + dvalStr + "，阈值：" + warnThreshold);
                             intervalResults.forEach(i -> i.put("warnId", warn.get("warnId")));
                             List<Map<String, Object>> insResults = new ArrayList<>(numResults);
                             warn.put("resultsInfo", insResults);
