@@ -258,13 +258,13 @@
         ) a
         LEFT JOIN (
         SELECT
-        DATE(start_time) date,
-        start_time,
+        DATE(triggering_time) date,
+            triggering_time,
         count( 1 ) AS count
         FROM
         t_union_task
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 7
+        DATEDIFF( now( ), triggering_time ) &lt;= 7
         GROUP BY
         date
         ) b ON a.timeNode = b.date
@@ -290,12 +290,12 @@
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 11 MONTH), '%Y-%m') AS `month` )a
         LEFT JOIN
         (SELECT
-          DATE_FORMAT(start_time,'%Y-%m') timeNode,
+          DATE_FORMAT(triggering_time,'%Y-%m') timeNode,
           count(union_id) as count
         FROM
           t_union_task
         GROUP BY
-            DATE_FORMAT(start_time,'%Y-%m')) b
+            DATE_FORMAT(triggering_time,'%Y-%m')) b
          on a.month = b.timeNode
          order by timeNode
     </select>
@@ -313,13 +313,13 @@
         ) c )a
         LEFT JOIN (
         SELECT
-        DATE(start_time) date,
-        start_time,
+        DATE(triggering_time) date,
+            triggering_time,
         count( 1 ) AS count
         FROM
         t_union_task
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 31
+        DATEDIFF( now( ), triggering_time ) &lt;= 31
         GROUP BY
         date
         ) b ON a.timeNode = b.date
