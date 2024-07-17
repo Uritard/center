@@ -155,10 +155,10 @@ public class TCruiseNonhomologousPointInstanceService {
             if(redisInfoMap.size()>0){
                 m.putAll(redisInfoMap);
             }
-            String resultDesc = m.get("resultDesc").toString();
-            if (resultDesc.contains(",")){
-                resultDesc = resultDesc.split(",")[0];
-                m.put("resultDesc",resultDesc);
+            String resultNum = m.get("resultNum").toString();
+            if (resultNum.contains(",")){
+                resultNum = resultNum.split(",")[0];
+                m.put("resultNum",resultNum);
             }
             if (tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName") != null) {
                 String oneCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName").toString();
