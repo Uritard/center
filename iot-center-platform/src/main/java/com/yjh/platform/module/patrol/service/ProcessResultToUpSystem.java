@@ -869,17 +869,21 @@ public class ProcessResultToUpSystem {
         if ("true".equals(robotTaskStatusUp)) {
             try {
                 for (CruiseManualReview cruiseResultMap : cruiseResultList) {
-                    log.info("cruiseResultMap=={}", cruiseResultMap);
                     Map<String, Object> xmlItem = new HashMap<>(16);
                     String taskId = cruiseResultMap.getTaskId();
                     String remark = uPatrolTaskDao.selectForTaskId(taskId).getRemark();
                     String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
+                    if (Constant.standardPoints()) {
+                        Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+                        log.info("resultMap=={}", resultMap);
+                        instanceId = Optional.ofNullable(resultMap.get("devicePointId")).orElse("");
+                    }
                     String key = PATROL_SUMMARY_PREFIX+taskId;
                     String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
                     xmlItem.put("task_patrolled_id", taskPatrolledId);
                     xmlItem.put("device_id", instanceId);
                     xmlItem.put("data_update", cruiseResultMap.getPersonCheck());
-                    xmlItem.put("manual_review_conclusi_on", remark);
+                    xmlItem.put("manual_review_conclusion", remark);
                     xmlItem.put("confirm_people", cruiseResultMap.getCheckUser());
                     xmlItem.put("confirm_date", cruiseResultMap.getCheckDate());
                     xmlItems.add(xmlItem);

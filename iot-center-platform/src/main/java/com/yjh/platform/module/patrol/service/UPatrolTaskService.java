@@ -1707,6 +1707,10 @@ public class UPatrolTaskService {
                 deleteTransfer(source, taskCode, taskId, startTime, endTime);
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             } else {
+                //判断当前周期任务是否已执行
+                if (StringUtils.isEmpty(task.getDateType())) {
+                    taskId = task.getTaskCode();
+                }
                 // 删除整个周期任务
                 log.info("del taskId...{}, startTime: {}", taskCode, startTime);
                 JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
