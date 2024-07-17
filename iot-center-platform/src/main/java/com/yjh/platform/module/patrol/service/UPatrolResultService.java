@@ -26,6 +26,7 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -40,6 +41,7 @@ import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.task.service.TCruiseResultService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +63,7 @@ import java.util.stream.Collectors;
 
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getOperationTaskDetailModel;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @Author: lqh
@@ -593,8 +596,9 @@ public class UPatrolResultService {
         CruiseManualReview curseManualReview = new CruiseManualReview();
         curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
         // 审核结果向上级系统同步
+        int a = uPatrolResultDao.update(review);
         processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), true);
-        return uPatrolResultDao.update(review);
+        return a;
     }
 
     /**
@@ -610,16 +614,27 @@ public class UPatrolResultService {
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             review.setTaskId(taskId);
-            for (String instanceId : instanceIds) {
-                review.setInstanceId(Long.valueOf(instanceId));
+            List<Long> instanceList = getInstanceList(instanceIds);
+            for (Long instanceId : instanceList) {
+                Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+                log.info("cruiseResultMap=={}", resultMap);
+                String resultDesc = Optional.ofNullable(resultMap.get("resultDesc")).orElse("");
+                //修正值为空 或者和结果值一致 识别正确 结果正常
+                boolean empty = StringUtils.isBlank(review.getPersonCheck());
+                if (empty || StringUtils.equals(resultDesc, review.getPersonCheck())) {
+                    review.setPersonCheck(resultDesc);
+                    review.setIdentifyState(258);
+                    review.setIdentifyResult(261);
+                } else {
+                    // 否则 识别错误 数据异常
+                    review.setIdentifyState(259);
+                    review.setIdentifyResult(264);
+                }
+                review.setInstanceId(instanceId);
                 log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
                 uPatrolResultDao.manualReviewByTaskInstance(review);
-                uPatrolResultDao.updateCheck(taskId,review.getCheckUser(),review.getCheckDate(),review.getRemark());
-                //更新测点信息
-                TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-                        new TStdDeviceMeteUpdate().setDeviceMeteId(Long.valueOf(instanceId)).setIdentifyResult(Integer.valueOf(review.getPersonCheck())).setUpdateTime(review.getCheckDate());
-                uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
             }
+            uPatrolResultDao.updateCheck(taskId,review.getCheckUser(),review.getCheckDate(),review.getRemark());
             // 下级系统同步审核信息不对告警进行重新判断
             // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
         }
@@ -640,18 +655,48 @@ public class UPatrolResultService {
             String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            tWarnInfo.setDealType(tWarnInfo.getIsWarn() == 1 ? 286 : 287);
+            tWarnInfo.setConfMode(275);
+            tWarnInfo.setDealInfo(tWarnInfo.getIsWarn() == 1 ? "程序正常，告警属实" : "程序异常，告警误报");
+            String userId = (String) redisTemplate.opsForHash().get("userInfo:nameId", tWarnInfo.getDealPersonId());
+            if (!CommonUtils.isEmptyOrNullstr(userId)){
+                tWarnInfo.setDealPersonId(userId);
+            }
             tWarnInfo.setTaskId(taskId);
-            for (String instanceId : instanceIds) {
-                tWarnInfo.setInstanceId(Long.valueOf(instanceId));
+            List<Long> instanceList = getInstanceList(instanceIds);
+            for (Long instanceId : instanceList) {
+                tWarnInfo.setInstanceId(instanceId);
                 result = tWarnInfoDao.updateByTaskIdAndInstanceId(tWarnInfo);
                 TDefectInfo tDefectInfo = new TDefectInfo();
                 tDefectInfo.setTaskId(taskId);
-                tDefectInfo.setInstanceId(Long.valueOf(instanceId));
-                tDefectInfo.setDealType(tWarnInfo.getDefectModel());
+                tDefectInfo.setInstanceId(instanceId);
+                tDefectInfo.setDealType(tWarnInfo.getDealType());
+                tDefectInfo.setConfMode(275);
+                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
+                tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
+                tDefectInfo.setDealTime(tWarnInfo.getDealTime());
                 tDefectInfoDao.updateByDefectType(tDefectInfo);
             }
         }
         return result + tWarnInfoList.size();
+    }
+
+    /**
+     * 获取真正点位id
+     * @param instanceIds
+     * @return
+     */
+    public List<Long> getInstanceList(String[] instanceIds) {
+        List<Long> instanceList = new ArrayList<>();
+        if (Constant.standardPoints()) {
+            List<TCruisePointInstanceNameDetail> list = tRobotInspectionDao.selectRealInstanceByDevicePoints(instanceIds);
+            if (CollectionUtils.isNotEmpty(list)) {
+                instanceList = list.stream().map(TCruisePointInstance::getInstanceId).collect(Collectors.toList());
+            }
+        } else {
+            instanceList = Arrays.stream(instanceIds).map(Long::parseLong).collect(Collectors.toList());
+        }
+        return instanceList;
     }
 
     public Result sendPostRequest(String url, Map<String, Object> params) {

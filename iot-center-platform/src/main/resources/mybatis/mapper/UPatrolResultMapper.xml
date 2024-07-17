@@ -948,6 +948,8 @@
 
     <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
         SELECT
+        b.instance_id,
+        b.person_check,
         b.task_id,
         b.cruise_data_id,
         b.evaluation_state,
