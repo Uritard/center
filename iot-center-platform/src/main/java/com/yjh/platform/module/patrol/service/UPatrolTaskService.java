@@ -4028,7 +4028,8 @@ public class UPatrolTaskService {
      */
     public List<UPatrolTask> queryTaskForPage(TaskQuery taskQuery) {
         List<UPatrolTask> uPatrolTasks = uPatrolTaskDao.selectTaskForPage(taskQuery);
-        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("planType", "taskType", "taskTypeName");
+        DictConvertUtil.DictOptional optional = DictConvertUtil.optional("planType", "taskType", "taskTypeName")
+                .add("ifRun","executeType", "executeTypeName");
         DictConvertUtil.DICT.covertToDict(uPatrolTasks, optional);
         return uPatrolTasks;
     }
