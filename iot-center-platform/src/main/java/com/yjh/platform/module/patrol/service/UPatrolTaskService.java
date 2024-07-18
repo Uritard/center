@@ -1707,22 +1707,17 @@ public class UPatrolTaskService {
                 deleteTransfer(source, taskCode, taskId, startTime, endTime);
                 return tCruiseTaskDelDao.insert(tCruiseTaskDel);
             } else {
-                //判断当前周期任务是否已执行
-                if (StringUtils.isEmpty(task.getDateType())) {
-                    taskId = task.getTaskCode();
-                }
                 // 删除整个周期任务
-                log.info("del taskId...{}, startTime: {}", taskCode, startTime);
-                JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
+                log.info("del taskCode...{}, startTime: {}", taskCode, startTime);
+                JobManager.removeJob(taskCode, jobName, taskCode + "_trg", jobName, true);
 
                 log.info("taskMap del...{}", Constant.taskMap);
                 log.info("del task totally...");
-                deleteTransfer(source, taskCode, taskId, startTime, endTime);
-                tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+                deleteTransfer(source, taskCode, taskCode, startTime, endTime);
+                tCruiseTaskDelDao.deleteByPrimaryId(taskCode);
                 //删除初始化的一条
-                uPatrolTaskDao.deleteInitByPrimaryId(taskId);
-                int result = uPatrolTaskDao.deleteByPrimaryId(taskId);
-                return result;
+                uPatrolTaskDao.deleteInitByPrimaryId(taskCode);
+                return uPatrolTaskDao.deleteByPrimaryId(taskCode);
             }
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
             JobManager.removeJob(taskId, jobName, taskId + "_trg", jobName, true);
