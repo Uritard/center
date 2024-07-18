@@ -198,7 +198,7 @@
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         where 1 = 1 and c.device_mete_id is not null
         <if test="cruiseType != null and cruiseType != ''"> and a.triphase_id = -1 </if>
-        <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name like concat('%',#{cruiseName, jdbcType=VARCHAR},'%')</if>
         )
     </select>
 

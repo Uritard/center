@@ -82,4 +82,7 @@ public class UPatrolTask implements Serializable {
     // 测点总数
     private Integer total;
 
+    @ApiModelProperty(value = "执行类型（172.周期，173.立即，174.定期）")
+    private String executeTypeName;
+
 }

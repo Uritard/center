@@ -1125,5 +1125,6 @@
         <if test="isValid != null and isValid == 1">
             and a.end_time &gt; now()
         </if>
+        order by a.end_time desc
     </select>
 </mapper>
