@@ -257,7 +257,7 @@ public class UPatrolResultService {
         List<TWarnInfo> warnInfoList = afterManualReviewInfo(afterManualReviewInfo, userId, date);
 
         // 审核结果向上级系统同步
-        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), null, false);
 
         int result2 = patrolTaskReview(cruiseManualReview.getTaskId(),"");
         //        insert QrDecode as device's real code. by tt.
@@ -550,7 +550,7 @@ public class UPatrolResultService {
         return map;
     }
 
-    public int manualReviewTask(String taskId, String remark, String userId, String token, HttpServletRequest request) {
+    public int manualReviewTask(String taskId, String temark, String userId, String token, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
@@ -570,13 +570,15 @@ public class UPatrolResultService {
             }
         }
         String checkUserName = StringUtils.join(haS1, ",");
+        String remark = StringUtils.isEmpty(temark) ? null : temark;
         int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, remark);
 
         uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
         tStdDeviceDao.updateByTask(taskId);
 
-        // 审核结果向上级系统同步
-        processResultToUpSystem.reviewToUpSystem(reviewList, true);
+        // 审核结果向上级系统同步，修改审核人为当前用户
+        reviewList.get(0).setCheckUser(userName);
+        processResultToUpSystem.reviewToUpSystem(reviewList, remark, true);
 
         List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
         processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
@@ -597,7 +599,7 @@ public class UPatrolResultService {
         curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
         // 审核结果向上级系统同步
         int a = uPatrolResultDao.update(review);
-        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), true);
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), reviewResult.getRemark(), false);
         return a;
     }
 

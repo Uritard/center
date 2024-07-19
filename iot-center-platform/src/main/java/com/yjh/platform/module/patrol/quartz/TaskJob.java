@@ -139,7 +139,8 @@ public class TaskJob extends QuartzJobBean {
             log.error(e.getMessage(), e);
         }
         //初始化下一次任务信息
-        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType() && nextTime.compareTo(ancestralTask.getEndTime()) <= 0) {
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType() && nextTime != null
+            && nextTime.compareTo(ancestralTask.getEndTime()) <= 0) {
             log.info("周期任务初始化下一次任务");
             uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
         }

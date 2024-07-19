@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.algorithm.AlgorithmService;
@@ -41,6 +42,7 @@ import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_SUMMARY_PREFIX;
@@ -855,9 +857,10 @@ public class ProcessResultToUpSystem {
 
     /**
      * 审核结果上报上级系统
+     * 若 remark==null，则表示上级未传审核意见，需主动去数据库查询
      */
     @Async
-    public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, boolean all){
+    public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, String remark, boolean all){
         if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return null;
         }
@@ -868,26 +871,39 @@ public class ProcessResultToUpSystem {
 
         if ("true".equals(robotTaskStatusUp)) {
             try {
-                for (CruiseManualReview cruiseResultMap : cruiseResultList) {
-                    Map<String, Object> xmlItem = new HashMap<>(16);
-                    String taskId = cruiseResultMap.getTaskId();
-                    String remark = uPatrolTaskDao.selectForTaskId(taskId).getRemark();
-                    String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
-                    if (Constant.standardPoints()) {
-                        Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-                        log.info("resultMap=={}", resultMap);
-                        instanceId = Optional.ofNullable(resultMap.get("devicePointId")).orElse("");
-                    }
-                    String key = PATROL_SUMMARY_PREFIX+taskId;
-                    String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
-                    xmlItem.put("task_patrolled_id", taskPatrolledId);
-                    xmlItem.put("device_id", instanceId);
-                    xmlItem.put("data_update", cruiseResultMap.getPersonCheck());
-                    xmlItem.put("manual_review_conclusion", remark);
-                    xmlItem.put("confirm_people", cruiseResultMap.getCheckUser());
-                    xmlItem.put("confirm_date", cruiseResultMap.getCheckDate());
-                    xmlItems.add(xmlItem);
+                CruiseManualReview cruiseMap = cruiseResultList.get(0);
+                if (remark == null) {
+                    remark = uPatrolTaskDao.selectForTaskId(cruiseMap.getTaskId()).getRemark();
                 }
+                String taskId = cruiseMap.getTaskId();
+                String key = PATROL_SUMMARY_PREFIX + taskId;
+                String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key, "task_patrolled_id"));
+                if (all) {
+                    String ids =
+                        cruiseResultList.stream().map(this::getUpDeviceId).filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+                    Map<String, Object> xmlItem = new HashMap<>(16);
+
+                    xmlItem.put("task_patrolled_id", taskPatrolledId);
+                    xmlItem.put("device_id", ids);
+                    xmlItem.put("data_update", "");
+                    xmlItem.put("manual_review_conclusion", remark);
+                    xmlItem.put("confirm_people", cruiseMap.getCheckUser());
+                    xmlItem.put("confirm_date", DateUtil.now());
+                    xmlItems.add(xmlItem);
+                } else {
+                    for (CruiseManualReview cruiseResultMap : cruiseResultList) {
+                        Map<String, Object> xmlItem = new HashMap<>(16);
+                        String instanceId = getUpDeviceId(cruiseResultMap);
+                        xmlItem.put("task_patrolled_id", taskPatrolledId);
+                        xmlItem.put("device_id", instanceId);
+                        xmlItem.put("data_update", cruiseResultMap.getPersonCheck());
+                        xmlItem.put("manual_review_conclusion", remark);
+                        xmlItem.put("confirm_people", cruiseResultMap.getCheckUser());
+                        xmlItem.put("confirm_date", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                        xmlItems.add(xmlItem);
+                    }
+                }
+
                 xmlBaseModel.setItems(xmlItems);
                 xmlBaseModel.setType("67");
                 List<XMLBaseModel> list = new ArrayList<>();
@@ -901,6 +917,17 @@ public class ProcessResultToUpSystem {
             }
         }
         return xmlBaseModel;
+    }
+
+    private String getUpDeviceId(CruiseManualReview cruiseResultMap) {
+        String taskId = cruiseResultMap.getTaskId();
+        String instanceId = Optional.ofNullable(cruiseResultMap.getInstanceId()).map(Object::toString).orElse("");
+        if (Constant.standardPoints()) {
+            Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            log.info("resultMap=={}", resultMap);
+            instanceId = Optional.ofNullable(resultMap.get("devicePointId")).orElse("");
+        }
+        return instanceId;
     }
 
     /**
