@@ -692,7 +692,7 @@ public class RobotService {
                             dealMapFile(filePath, nodeCode);
                             break;
                         case "host_file_path":
-                            desc = "地图模型";
+                            desc = "下级系统模型";
                             dealHostFilePath(filePath, nodeCode);
                             break;
                         case "video_file_path":
