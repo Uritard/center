@@ -15,13 +15,17 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,6 +70,8 @@ public class ProcessResultToUpSystem {
     private final TRobotInfoDao tRobotInfoDao;
     private final UPatrolTaskDao uPatrolTaskDao;
     private final TAlgorithmInfoService algorithmInfo;
+    private final TCameraInfoDao tCameraInfoDao;
+    private final TVoiceDeviceDao tVoiceDeviceDao;
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
@@ -78,7 +84,9 @@ public class ProcessResultToUpSystem {
 
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
-                                   AlgorithmService algorithmService, ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao, UPatrolTaskDao uPatrolTaskDao, TAlgorithmInfoService algorithmInfo) {
+                                   AlgorithmService algorithmService, ApplicationProperties applicationProperties,
+                                   TRobotInfoDao tRobotInfoDao, UPatrolTaskDao uPatrolTaskDao, TAlgorithmInfoService algorithmInfo,
+                                   TCameraInfoDao tCameraInfoDao, TVoiceDeviceDao tVoiceDeviceDao) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -88,6 +96,8 @@ public class ProcessResultToUpSystem {
         this.tRobotInfoDao = tRobotInfoDao;
         this.uPatrolTaskDao = uPatrolTaskDao;
         this.algorithmInfo = algorithmInfo;
+        this.tCameraInfoDao = tCameraInfoDao;
+        this.tVoiceDeviceDao = tVoiceDeviceDao;
     }
 
     public void alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
@@ -306,6 +316,15 @@ public class ProcessResultToUpSystem {
         String deviceCode = MapUtils.getString(cruiseResultMap, "cruiseDeviceId");
         if (type == CruiseConstant.TypeEnum.ROBOT || type == CruiseConstant.TypeEnum.UAV) {
             deviceCode = Optional.ofNullable(allRobot.get(NumberUtils.toLong(deviceCode))).map(TRobotInfo::getRobotNum).orElse(deviceCode);
+        }
+        if (type == TypeEnum.INFRARED || type == TypeEnum.VIDEO){
+            TCameraInfo cameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(deviceCode));
+            deviceCode = cameraInfo.getBcameraChannelId() == null ? (cameraInfo.getCameraChannelId() == null ? deviceCode:cameraInfo.getCameraChannelId()):cameraInfo.getBcameraChannelId();
+        }
+        if (type == TypeEnum.VOICE){
+            Long voiceId = MapUtils.getLong(cruiseResultMap,"cruiseId");
+            VoiceDeviceAllInfo voice = tVoiceDeviceDao.selectById(voiceId);
+            deviceCode = voice.getVoiceCode() == null ? deviceCode:voice.getVoiceCode();
         }
 
         return deviceCode;
