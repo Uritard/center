@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.CommonUtils;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -40,7 +41,7 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到机器人坐标数据了+++++++++++++++++");
+        log.info("+++++++++++++++++巡视主机收到巡视设备坐标数据了+++++++++++++++++");
         // Deal with robot coordinates data
 
         String sendCode = xmlBaseModel.getSendCode();
@@ -92,7 +93,12 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
             } else {
                 robotCoordinateMap.put("filePath", "");
             }
-
+            String taskPatrolledId = String.valueOf(res.getOrDefault("task_patrolled_id", ""));
+            if (!CommonUtils.isEmptyOrNullstr(taskPatrolledId)){
+                taskPatrolledId = robotService.getRealTaskPatrolledId(taskPatrolledId);
+                log.info("巡视设备坐标 构建本级 taskPatrolledId=={}", taskPatrolledId);
+                res.put("task_patrolled_id", taskPatrolledId);
+            }
             // 2022过检 robot_name -> patroldevice_name
             robotCoordinateList.add(robotCoordinateMap);
         });

@@ -1,5 +1,7 @@
 package com.yjh.accessrobot.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +28,9 @@ public class CommonUtils {
             startIndex = startIndex + batchCount; // 下一批
         }
         return returnList;
+    }
+
+    public static boolean isEmptyOrNullstr(String str) {
+        return StringUtils.isEmpty(str) || "null".equalsIgnoreCase(str);
     }
 }

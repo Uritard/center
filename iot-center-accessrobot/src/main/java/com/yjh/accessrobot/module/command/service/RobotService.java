@@ -3402,5 +3402,36 @@ public class RobotService {
         }
         return StringUtils.EMPTY;
     }
+
+    /**
+     * 获取本级 taskPatrolledId
+     * @param taskPatrolledId taskPatrolledId
+     * @return taskPatrolledId
+     */
+    public String getRealTaskPatrolledId(String taskPatrolledId) {
+        try {
+            String[] taskPatrolledSplit = taskPatrolledId.split("_");
+            String taskCode = "", time = "";
+            if (taskPatrolledSplit.length == 2) {
+                taskCode = taskPatrolledSplit[0];
+                time = taskPatrolledSplit[1];
+            } else {
+                taskCode = taskPatrolledSplit[1];
+                time = taskPatrolledSplit[2];
+            }
+            Date robotTime = DateTimeUtil.parseFormat(time, DateTimeUtil.getDateTimePattern3());
+            //根据taskCode找到taskId
+            UPatrolTask task = this.selectTaskIdByTaskCode(taskCode, robotTime);
+            if (Objects.nonNull(task)) {
+                String taskStartTime = (String) redisTemplate.opsForHash().get("countForAbnormal:" + task.getTaskId(), "taskStart");
+                taskPatrolledId = Constant.stationCode() + "_" + task.getTaskId() + "_" + DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
+                log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
+                return taskPatrolledId;
+            }
+        } catch (Exception e) {
+            log.info("构造本级taskPatrolledId出错：", e);
+        }
+        return taskPatrolledId;
+    }
 }
 
