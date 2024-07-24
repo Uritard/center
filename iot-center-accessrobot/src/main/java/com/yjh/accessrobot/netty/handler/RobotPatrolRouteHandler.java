@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.CommonUtils;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -101,6 +102,13 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                 robotRoadMap.put("relativePath", "");
                 robotRoadMap.put("absolutePath", "");
             }
+            String taskPatrolledId = String.valueOf(res.getOrDefault("task_patrolled_id", ""));
+            if (!CommonUtils.isEmptyOrNullstr(taskPatrolledId)){
+                taskPatrolledId = robotService.getRealTaskPatrolledId(taskPatrolledId);
+                log.info("巡视路线 构建本级 taskPatrolledId=={}", taskPatrolledId);
+                res.put("task_patrolled_id", taskPatrolledId);
+            }
+            robotRoadMap.put("taskPatrolledId", String.valueOf(res.get("task_patrolled_id")));
             robotRoadMap.put("robotCode", robotCode);
             robotRoadMap.put("time", String.valueOf(res.get("time")));
             robotRoadMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
