@@ -21,7 +21,9 @@ import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
@@ -72,6 +74,8 @@ public class TWarnInfoService{
     private ProcessResultToUpSystem processResultToUpSystem;
     @Autowired
     private TStdDevicemeteService tStdDevicemeteService;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
 
@@ -419,6 +423,7 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public int alarmAndDefectProcess(AlarmAndDefectProcess alarmAndDefectProcess,String userId) {
+        SysUser user = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
         Long warnId = alarmAndDefectProcess.getWarnId();
         Integer dealType = alarmAndDefectProcess.getDealType();
         String dealInfo = alarmAndDefectProcess.getDealInfo();
@@ -433,7 +438,7 @@ public class TWarnInfoService{
                         .setWarnId(warnId)
                         .setDealType(dealType)
                         .setDealTime(date)
-                        .setDealPersonId(userId)
+                        .setDealPersonId(user.getUserName())
                         .setConfMode(275);
                 jieGuo = tWarnInfoDao.update(tWarnInfo);
                 if (jieGuo == 1) {
@@ -444,7 +449,7 @@ public class TWarnInfoService{
                         .setDefectId(warnId)
                         .setDealInfo(dealInfo)
                         .setDealType(dealType)
-                        .setDealPersonId(userId)
+                        .setDealPersonId(user.getUserName())
                         .setDealTime(date)
                         .setConfMode(275);
                 jieGuo = tDefectInfoDao.update(tDefectInfo);
