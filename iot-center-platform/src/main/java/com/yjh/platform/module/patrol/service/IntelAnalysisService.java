@@ -987,7 +987,7 @@ public class IntelAnalysisService {
 
             List<String> resultImgList = resultImg.stream().distinct().collect(Collectors.toList());
 
-            if (StringUtils.isNotBlank(resultImgList.get(0))){
+            if (CollectionUtils.isNotEmpty(resultImgList)){
                 String[] resultArr = content.toArray(new String[0]);
 
                 List<TWarnInfo> list = silentAlarmStore(resultArr, map, resultImgList);

@@ -3114,7 +3114,9 @@ public class RobotService {
                 tCameraRecorder.setIdentityManager(cameraModel.getCameraManager());
                 tCameraRecorder.setIdentityCode(cameraModel.getCameraCode());
                 tCameraRecorder.setDeviceChannel(cameraModel.getCameraChannelId());
-                tCameraRecorder.setBdeviceChannel(cameraModel.getPatroldeviceCode());
+                if (StringUtils.length(cameraModel.getPatroldeviceCode()) == 18) {
+                    tCameraRecorder.setBdeviceChannel(cameraModel.getPatroldeviceCode());
+                }
                 tCameraRecorder.setCommissionDate(cameraModel.getCommissionDate());
                 recorderList.add(tCameraRecorder);
             });
