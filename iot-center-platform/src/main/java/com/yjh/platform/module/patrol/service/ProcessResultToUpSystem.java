@@ -1,18 +1,17 @@
 package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.generator.ObjectGenerator;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
@@ -307,7 +306,7 @@ public class ProcessResultToUpSystem {
         return map;
     }
 
-    private String patroldeviceCode(Map<String, String> cruiseResultMap, Map<Long, TRobotInfo> allRobot){
+    private String patroldeviceCode(Map<String, ?extends Object> cruiseResultMap, Map<Long, TRobotInfo> allRobot){
         HashMap<String, String> map = new HashMap<>(4);
         // 识别类型、文件类型、文件名命名
         int cruiseType = MapUtils.getInteger(cruiseResultMap, "cruiseType");
@@ -947,6 +946,78 @@ public class ProcessResultToUpSystem {
             instanceId = Optional.ofNullable(resultMap.get("devicePointId")).orElse("");
         }
         return instanceId;
+    }
+
+    /**
+     * 审核巡视结果产生新的告警上报
+     * @return
+     */
+    @Async
+    public void reviewCreateAlarmToUpSystem(TWarnInfo warnInfo){
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
+            return;
+        }
+
+        List<Map<String,String>> tWarnInfoList = analyseDataOperateDao.selectWarnAndResultListByIds(warnInfo.getInstanceId(),warnInfo.getTaskId());
+
+        for (Map<String,String> cruiseResultMap : tWarnInfoList) {
+            //构建cruiseResultMap
+            cruiseResultMap.put("recognition_type",StringUtils.isNotEmpty(cruiseResultMap.get("meteType")) ?
+                    RecognitionTypeEnum.getProRecognize(cruiseResultMap.get("meteType")).getProtocolRecognize() : "2");
+            String fileType = getFileType(ValueUtil.toInteger(cruiseResultMap.get("cruiseType"),229),cruiseResultMap.get("meteType"));
+            cruiseResultMap.put("fileType",fileType);
+            cruiseResultMap.put("isTemdif","0");
+            cruiseResultMap.put("taskId",warnInfo.getTaskId());
+            cruiseResultMap.put("time",DateTimeUtil.format(warnInfo.getWarnTime()));
+            String alarmLevel = "";
+            switch (ValueUtil.toInteger(warnInfo.getWarnLevel(),133)) {
+                case 130:
+                case 131:
+                    alarmLevel = "1";
+                    break;
+                case 132:
+                    alarmLevel = "2";
+                    break;
+                case 133:
+                    alarmLevel = "3";
+                    break;
+                default:
+                    break;
+            }
+            alarmAndResultToUpSystem(Collections.singletonList(Object2Map.toStringMap(cruiseResultMap)),alarmLevel,warnInfo);
+        }
+
+    }
+    public String getFileType(Integer cruiseType, String meteType) {
+        TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+        switch (cruiseTypeEnum){
+            case VOICE:
+                return "3";
+            case INFRARED:
+                return "1";
+            case VIDEO:
+                return "220".equals(meteType) ? "5" : "523".equals(meteType) ? "4" : "2";
+            case ROBOT:
+            case UAV:
+                if ("220".equals(meteType)) {
+                    return "5";
+                }
+                if ("222".equals(meteType)) {
+                    return "1";
+                }
+                if ("223".equals(meteType)) {
+                    return "3";
+                }
+                if ("523".equals(meteType)) {
+                    return "4";
+                }
+                if (StringUtils.equalsAny(meteType, "219", "221", "433")) {
+                    return "2";
+                }
+                return "";
+            default:
+                return "";
+        }
     }
 
     /**

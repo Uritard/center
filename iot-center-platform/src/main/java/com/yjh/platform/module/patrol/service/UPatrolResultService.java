@@ -40,6 +40,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.task.service.TCruiseResultService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -274,7 +275,7 @@ public class UPatrolResultService {
                 tStdDeviceDao.update(tStdDevice);
             }
         }
-        reviewAlarm(warnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList()));
+        ScheduledMapConfig.schedule(3,warnInfoList,t->reviewAlarm(warnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList())));
         return result2;
     }
 
@@ -447,6 +448,8 @@ public class UPatrolResultService {
                                 "程序异常，告警误报", 287, null, userId, date);
                     }
                     sendWebSocket(tWarnInfo.getWarnId());
+                    //告警审核上报上级系统 
+                    processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(tWarnInfo.getWarnId()),false);
                 }
             } else {
                 //不存在
@@ -460,6 +463,9 @@ public class UPatrolResultService {
                     warnInfo.setDealPersonId(userId);
                     log.info("要插库的告警数据是===" + warnInfo);
                     tWarnInfoService.insert(warnInfo);
+                    //告警上报 上级
+//                    ScheduledMapConfig.schedule(3,warnInfo,t -> processResultToUpSystem.reviewCreateAlarmToUpSystem(Collections.singletonList(warnInfo.getWarnId()),false));
+                    processResultToUpSystem.reviewCreateAlarmToUpSystem(warnInfo);
                     sendWebSocket(warnInfo.getWarnId());
                     uPatrolResultDao.updateIsWarn(taskId, instanceId);
                     tWarnInfoList.add(warnInfo);

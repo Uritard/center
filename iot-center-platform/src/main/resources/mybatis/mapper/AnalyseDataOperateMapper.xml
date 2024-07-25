@@ -1092,11 +1092,32 @@
         )
     </select>
 
+    <select id="selectWarnAndResultListByIds" resultType="java.util.HashMap">
+        SELECT
+        result.cruise_id AS cruiseId,
+        result.cruise_device_id AS cruiseDeviceId,
+        result.cruise_type AS cruiseType,
+        result.cruise_device_name AS cruiseDeviceName,
+        task.task_name AS taskName,
+        task.task_code AS taskCode,
+        result.instance_name AS instanceName,
+        result.instance_id AS instanceId,
+        result.device_point_id AS devicePointId,
+        mete.mete_type AS meteType,
+        result.picpath AS picpath,
+        result.unit
+        FROM
+        u_patrol_data_result result
+        LEFT JOIN t_std_devicemete mete ON result.device_mete_id = mete.device_mete_id
+        LEFT JOIN u_patrol_task task ON result.task_id = task.task_id
+        WHERE result.task_id = #{taskId} and result.instance_id = #{instanceId}
+    </select>
+
     <select id="selectWarnListByIds" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         select
-            warn.*,
-            user.true_name as userName,
-            mete.device_point_id
+        warn.*,
+        user.true_name as userName,
+        mete.device_point_id
         from t_warn_info warn
         left join sys_user user on warn.deal_person_id = user.user_id
         left join t_std_devicemete mete on warn.std_mete_id = mete.device_mete_id
