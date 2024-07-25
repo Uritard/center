@@ -636,9 +636,9 @@ public class UPatrolResultService {
                 log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
                 uPatrolResultDao.manualReviewByTaskInstance(review);
             }
-            uPatrolResultDao.updateCheck(taskId,review.getCheckUser(),review.getCheckDate(),review.getRemark());
-            // 下级系统同步审核信息不对告警进行重新判断
-            // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
+            if (StringUtils.isNotBlank(review.getRemark())) {
+                uPatrolResultDao.updateCheck(taskId, null, null, review.getRemark());
+            }
         }
         // 校验父级是否需要审核并生成巡视报告
         int result = patrolTaskReview(resultList.get(0).getTaskId(),resultList.get(0).getRemark());

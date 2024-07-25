@@ -57,7 +57,7 @@ public class TCameraInfoService {
             cameraModel.setCameraName(cameraModel.getPatroldeviceName());
             cameraModel.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId().toString()));
             cameraModel.setUpRegionId(stdRegionMap.get(cameraModel.getUpRegionId()));
-            if (StringUtils.length(cameraModel.getPatroldeviceCode()) >= 18) {
+            if (StringUtils.length(cameraModel.getPatroldeviceCode()) == 18) {
                 cameraModel.setBcameraChannelId(cameraModel.getPatroldeviceCode());
             }
         }).collect(Collectors.toList());

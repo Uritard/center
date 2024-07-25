@@ -545,6 +545,7 @@ public class TStdDeviceService{
                 Collections.reverse(regionList);
                 regionList.remove(-1L);
                 regionList.addAll(upRegionList);
+                Collections.sort(regionList);
                 regionList.addAll(insList);
                 reMap.put(instanceId,regionList);
             }

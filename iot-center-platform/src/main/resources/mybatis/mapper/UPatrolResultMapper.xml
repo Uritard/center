@@ -871,7 +871,7 @@
     <update id="updateCheck">
         update u_patrol_result a <set>
         <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
-        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
         <if test="remark != null">a.remark = #{remark},</if>
     </set>
         where a.task_id = #{taskId, jdbcType=VARCHAR}
