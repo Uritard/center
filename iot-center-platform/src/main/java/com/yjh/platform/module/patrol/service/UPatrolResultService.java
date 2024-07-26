@@ -617,13 +617,14 @@ public class UPatrolResultService {
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             review.setTaskId(taskId);
             List<Long> instanceList = getInstanceList(instanceIds);
+            String dataUpdate = review.getPersonCheck();
             for (Long instanceId : instanceList) {
                 Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
                 log.info("cruiseResultMap=={}", resultMap);
                 String resultDesc = Optional.ofNullable(resultMap.get("resultDesc")).orElse("");
                 //修正值为空 或者和结果值一致 识别正确 结果正常
-                boolean empty = StringUtils.isBlank(review.getPersonCheck());
-                if (empty || StringUtils.equals(resultDesc, review.getPersonCheck())) {
+                boolean empty = StringUtils.isBlank(dataUpdate);
+                if (empty || StringUtils.equals(resultDesc, dataUpdate)) {
                     review.setPersonCheck(resultDesc);
                     review.setIdentifyState(258);
                     review.setIdentifyResult(261);
