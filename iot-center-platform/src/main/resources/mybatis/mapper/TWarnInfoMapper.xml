@@ -652,7 +652,7 @@
         a.warn_time AS alarm_time,
         a.conf_mode,
         a.deal_person_id,
-        h.user_name as deal_person_name,
+        a.deal_person_id as deal_person_name,
         a.deal_time,
         a.std_mete_id,
         b.real_code,
@@ -667,7 +667,6 @@
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
-        LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
         AND (a.warn_type != '507' OR a.warn_type IS NULL)
@@ -696,7 +695,7 @@
         a.defect_time AS alarm_time,
         a.conf_mode,
         a.deal_person_id,
-        h.user_name as deal_person_name,
+        a.deal_person_id as deal_person_name,
         a.deal_time,
         a.std_mete_id,
         b.real_code,
@@ -711,7 +710,6 @@
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
-        LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
         <if test="deviceName != null and deviceName != ''">and a.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
