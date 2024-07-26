@@ -181,7 +181,7 @@
         a.camera_channel_id = #{cameraChannelId, jdbcType=VARCHAR},
         a.b_camera_channel_id = #{bcameraChannelId, jdbcType=VARCHAR},
         <if test="useType != null">a.use_type = #{useType, jdbcType=INTEGER},</if>
-        <if test="productionCode != null and productionCode != ''">a.production_code = #{productionCode},</if>
+        a.production_code = #{productionCode},
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>

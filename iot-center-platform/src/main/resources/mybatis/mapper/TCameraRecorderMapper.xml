@@ -142,7 +142,7 @@
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
         a.device_channel = #{deviceChannel},
         a.b_device_channel = #{bdeviceChannel},
-        <if test="productionCode != null and productionCode != ''">a.production_code = #{productionCode},</if>
+        a.production_code = #{productionCode},
         a.max_channel = #{maxChannel, jdbcType=INTEGER},
         a.hdd_size = #{hddSize, jdbcType=INTEGER},
         a.buffer_day = #{bufferDay, jdbcType=INTEGER},
