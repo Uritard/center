@@ -87,19 +87,22 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         taskId = faultTolerantId;
                     }
 
-                    String taskPatrolledId = "";
+                    String taskPatrolledId = MapUtils.getString(resultMap, "task_patrolled_id");
                     if (StringUtils.isNotEmpty(errorCode)) {
-                        try {
-                            //根据taskCode找到taskId
-                            UPatrolTask task = robotService.selectTaskByTaskCode(taskId);
-                            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-                            String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey+task.getTaskId(), "taskStart");
-                            taskPatrolledId = stationCode+"_"+taskId+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
-                            log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
-                            xmlBaseModel.getItems().get(0).put("task_patrolled_id",taskPatrolledId);
-                        }catch (Exception e){
-                            log.info("构造本级taskPatrolledId出错：",e);
+                        if (StringUtils.isNotEmpty(taskPatrolledId)) {
+                            try {
+                                //根据taskCode找到taskId
+                                UPatrolTask task = robotService.selectTaskByTaskCode(taskId);
+                                String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+                                String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey+task.getTaskId(), "taskStart");
+                                taskPatrolledId = stationCode+"_"+taskId+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
+                                log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
+                                xmlBaseModel.getItems().get(0).put("task_patrolled_id",taskPatrolledId);
+                            }catch (Exception e){
+                                log.info("构造本级taskPatrolledId出错：",e);
+                            }
                         }
+
                         log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskPatrolledId);
                         // 联动的返回结果直接向上反
                         String success = "0";
