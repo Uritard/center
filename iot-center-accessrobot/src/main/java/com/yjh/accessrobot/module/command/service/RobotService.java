@@ -41,6 +41,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -145,6 +146,11 @@ public class RobotService {
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
 
     public static final Map<String, String> SYNC_MODE_CACHE =  new ConcurrentHashMap<>(16);
+
+    /**
+     * 理论上这里应该做防内存泄露处理，但联动任务少，这里就不做了
+     */
+    public static final Map<Long, String> LINKAGE_TASK_CACHE =  new ConcurrentHashMap<>(16);
 
     /**
      * 需要密码校验的巡视设备控制命令
@@ -525,19 +531,21 @@ public class RobotService {
      * @return byte[]
      */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
+        return generateByteOrderAndSession(xmlString, robotCode).getValue();
+    }
+
+    public Pair<Long, byte[]> generateByteOrderAndSession(String xmlString, String robotCode) {
         long sendSessionId = Constant.AtomicSessionId.incrementAndGet();
         ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
         log.info("context是<start>{}<end>", context);
         if (context != null) {
-            // 请求报文每次累加1
-//            sendSessionId = Constant.AtomicSessionId.addAndGet(1);
             Constant.sendSessionId = sendSessionId;
         } else {
             Constant.sendSessionId = 0L;
             Constant.AtomicSessionId.set(0);
         }
         log.info("-------------这是刚发命令的请求{}-------------", sendSessionId);
-        return PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);
+        return Pair.of(sendSessionId, PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString));
     }
 
     /**
@@ -1464,7 +1472,15 @@ public class RobotService {
                 .setItems((List<Map<String, Object>>) resMap.get("mapList"));
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的任务的xml是<start>{}<end>", xmlString);
-        int number = RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
+        Pair<Long, byte[]> pkg = generateByteOrderAndSession(xmlString, uniqueFlag);
+
+        if (LINKAGE_TASK.getType().equals(MapUtils.getString(resMap, "type"))) {
+            LINKAGE_TASK_CACHE.put(pkg.getKey(), taskId);
+            // 增加一个兼容处理，保留最后一个联动任务的ID，避免下级上报的 seeionId 不正确
+            LINKAGE_TASK_CACHE.put(0L, taskId);
+        }
+
+        int number = RobotServerHandler.send(pkg.getValue(), uniqueFlag);
         if (1 == number) {
             //通道为空 设置为离线
             this.updateRobotInfo(uniqueFlag, "离线");

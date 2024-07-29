@@ -49,12 +49,6 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给下级响应
-        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
-        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, statusXmlString);
-        RobotServerHandler.send(statusProtocol, sendCode);
-        log.info("本级系统给下级{}响应了", sendCode);
-
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> nestStatusList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
@@ -66,9 +60,19 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             nestStatusMap.put("value", res.get("value").toString());
             nestStatusMap.put("valueUnit", res.get("value_unit").toString());
             nestStatusMap.put("unit", res.get("unit").toString());
+            if (!unitCheck(nestStatusMap)) {
+                return;
+            }
             nestStatusList.add(nestStatusMap);
         });
-        log.info("无人机机巢状态数据是：" + nestStatusList);
+        log.info("无人机机巢状态数据是：{}", nestStatusList);
+
+        // 完全解析完成的算成功  否则失败 返回 500给下级
+        boolean isFull = xmlBaseModel.getItems().size() == nestStatusList.size();
+        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
+        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, statusXmlString);
+        RobotServerHandler.send(statusProtocol, sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         for (int i = 0; i < nestStatusList.size(); i++) {
             String nestStatus = "nestStatus:" + robotCode + ":" + nestStatusList.get(i).get("type");
@@ -81,6 +85,15 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
 //        }
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
+    }
+
+    private static boolean unitCheck(Map<String, String> weatherMap) {
+        String type = weatherMap.get("type");
+        String unit = weatherMap.get("unit");
+        String value = weatherMap.get("value");
+        String valueUnit = weatherMap.get("valueUnit");
+
+        return StringUtils.isNotBlank(type) && StringUtils.isEmpty(unit) && valueUnit.equals(value + unit);
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -893,9 +894,7 @@ public class ProcessResultToUpSystem {
                 if (remark == null) {
                     remark = uPatrolTaskDao.selectForTaskId(cruiseMap.getTaskId()).getRemark();
                 }
-                String taskId = cruiseMap.getTaskId();
-                String key = PATROL_SUMMARY_PREFIX + taskId;
-                String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key, "task_patrolled_id"));
+                String taskPatrolledId = getTaskPatrolledId(cruiseMap.getTaskId());
                 if (all) {
                     String ids =
                         cruiseResultList.stream().map(this::getUpDeviceId).filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
@@ -935,6 +934,18 @@ public class ProcessResultToUpSystem {
             }
         }
         return xmlBaseModel;
+    }
+
+    @Nullable
+    private String getTaskPatrolledId(String taskId) {
+        String key = PATROL_SUMMARY_PREFIX + taskId;
+        String taskPatrolledId = (String)redisTemplate.opsForHash().get(key, "task_patrolled_id");
+        if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+            String stationCode = SysParamConfig.getSysContent("edgeId");
+            UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+            taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
+        }
+        return taskPatrolledId;
     }
 
     private String getUpDeviceId(CruiseManualReview cruiseResultMap) {
@@ -1053,7 +1064,7 @@ public class ProcessResultToUpSystem {
                 xmlBaseModel.setType("64");
                 List<XMLBaseModel> list = new ArrayList<>();
                 list.add(xmlBaseModel);
-                Map<String, List<XMLBaseModel>> map = new HashMap<>(1);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>(4);
                 map.put("list", list);
                 log.info("The review warn to be reported one level up is==={}", map);
                 Constant.otherServer(map, Constant.TCP_URL);
@@ -1070,9 +1081,8 @@ public class ProcessResultToUpSystem {
     public Map<String, Object> getReviewAlarmXml(String taskId, String deviceId, String dealPersonId, String dealTime,
                                                  String isWarn) {
 
-        String key = PATROL_SUMMARY_PREFIX+taskId;
-        String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
-        Map<String, Object> xmlItem = new HashMap<>(11);
+        String taskPatrolledId = getTaskPatrolledId(taskId);
+        Map<String, Object> xmlItem = new HashMap<>(8);
         xmlItem.put("task_patrolled_id", taskPatrolledId);
         xmlItem.put("device_id", deviceId);
         xmlItem.put("is_alarm", isWarn);
