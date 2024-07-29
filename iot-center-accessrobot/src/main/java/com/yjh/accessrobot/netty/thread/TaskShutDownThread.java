@@ -18,24 +18,20 @@ import java.util.*;
  */
 public class TaskShutDownThread implements Runnable{
 
-    private final String taskCode;
+    private final String taskId;
     private final String errorCode;
     private final RobotService robotService;
-    private final Date date;
 
-    public TaskShutDownThread(RobotService robotService, String taskCode, String errorCode, Date date){
+    public TaskShutDownThread(RobotService robotService, String taskId, String errorCode){
         this.robotService = robotService;
-        this.taskCode = taskCode;
+        this.taskId = taskId;
         this.errorCode = errorCode;
-        this.date = date;
     }
 
     @Override
     public void run() {
-        // 增加时间判断，避免预先初始化导致数据传入下一个任务
-        String taskId = robotService.selectRealTaskId(taskCode, date);
         if (Optional.ofNullable(taskId).isPresent()){
-            Map<String, Object> params = new HashMap<>(1);
+            Map<String, Object> params = new HashMap<>(4);
             params.put("taskId", taskId);
             String content;
             switch (errorCode) {

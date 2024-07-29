@@ -78,6 +78,7 @@ public class NestRunThread{
                 //舱内湿度
                 addNestItem(list, device, 6);
 
+                xmlBaseModel.setItems(list);
                 clientHandler.send(xmlBaseModel, 0, true);
 
                 sendStatus(device);
@@ -102,7 +103,7 @@ public class NestRunThread{
             addStateMap(list, device, 3, "1");
             addStateMap(list, device, 4, "0");
             addStateMap(list, device, 5, "1");
-            XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("20001").setCode(Constant.stationCode());
+            XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("20001").setCode(Constant.stationCode()).setItems(list);
             clientHandler.send(xmlBaseModel, 0, true);
         }
 
