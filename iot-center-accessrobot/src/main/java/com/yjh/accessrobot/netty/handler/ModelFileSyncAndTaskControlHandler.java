@@ -62,10 +62,12 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                 if (resultMap.containsKey("task_patrolled_id") || resultMap.containsKey("error_code")) {
                     String errorCode = MapUtils.getString(resultMap, "error_code");
                     String taskMsg = "任务控制指令";
+                    Integer isFinish = 0;
                     if (StringUtils.isNotEmpty(errorCode)) {
                         taskMsg = "联动任务指令";
                         switch (resultMap.get("error_code").toString()) {
                             case "0":
+                                isFinish = 1;
                                 log.info("成功");
                                 break;
                             case "1":
@@ -92,6 +94,8 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                         try {
                             //根据taskCode找到taskId
                             UPatrolTask task = robotService.selectTaskByTaskCode(taskId);
+                            //更新联动任务结果 成功还是失败
+                            robotService.updateUnionTask(task.getTaskId(),isFinish);
                             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
                             String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey+task.getTaskId(), "taskStart");
                             taskPatrolledId = stationCode+"_"+taskId+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());

@@ -170,7 +170,5 @@ public class TWarnInfo implements Serializable {
      */
     private String instanceIds;
 
-    private String userName;
-
     private String devicePointId;
 }

@@ -426,4 +426,6 @@ public interface TRobotInfoDao {
 
     List<AlarmShield> selectAlarmShield(@Param(value = "robotId") Long robotId, @Param(value = "warnCount") String warnCount);
 
+    int updateUnionTask(@Param(value = "isFinish") Integer isFinish,
+                        @Param(value = "taskId") String taskId);
 }

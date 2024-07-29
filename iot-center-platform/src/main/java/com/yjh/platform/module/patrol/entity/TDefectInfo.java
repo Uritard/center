@@ -118,7 +118,6 @@ public class TDefectInfo implements Serializable {
     private String labelAttri;
     private List<KeyValue<String, String>> labelAttriName;
 
-    private String userName;
 
     private String devicePointId;
 }

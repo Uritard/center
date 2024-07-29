@@ -1051,13 +1051,13 @@ public class ProcessResultToUpSystem {
                     List<TDefectInfo> tDefectInfoList = analyseDataOperateDao.selectDefectListByIds(warnIdList);
                     for (TDefectInfo tDefectInfo : tDefectInfoList) {
                         xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tDefectInfo.getDevicePointId():tDefectInfo.getDeviceId()),
-                                tDefectInfo.getUserName(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2"));
+                                tDefectInfo.getDealPersonId(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2"));
                     }
                 } else {
                     List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
                     for (TWarnInfo tWarnInfo : tWarnInfoList) {
                         xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tWarnInfo.getDevicePointId():tWarnInfo.getDeviceId()),
-                                tWarnInfo.getUserName(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2"));
+                                tWarnInfo.getDealPersonId(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2"));
                     }
                 }
                 xmlBaseModel.setItems(xmlItems);
