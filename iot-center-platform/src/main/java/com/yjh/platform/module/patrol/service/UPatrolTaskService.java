@@ -582,7 +582,7 @@ public class UPatrolTaskService {
                     RecognitionTypeEnum.getProRecognize(item.getMeteType()).getProtocolRecognize() : "2");
             map.put("unit", Optional.ofNullable(item.getUnit()).orElse(""));
 
-            String fileType = getFileType(item.getCruiseType(), item.getMeteType());
+            String fileType = processResultToUpSystem.getFileType(item.getCruiseType(), item.getMeteType());
             map.put("fileType", fileType);
 
             itemSets.add(new DefaultTypedTuple<>(String.valueOf(item.getInstanceId()), 0D));
@@ -598,38 +598,6 @@ public class UPatrolTaskService {
         // 延时上报任务状态，避免上级下发任务启动时，任务状态在任务启动返回报文前返回
         ScheduledMapConfig.schedule(6 , task, t -> sendTaskStateToUp(t, 5));
         return detailList;
-    }
-
-    public String getFileType(Integer cruiseType, String meteType) {
-        TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
-        switch (cruiseTypeEnum){
-            case VOICE:
-                return "3";
-            case INFRARED:
-                return "1";
-            case VIDEO:
-                return "220".equals(meteType) ? "5" : "523".equals(meteType) ? "4" : "2";
-            case ROBOT:
-            case UAV:
-                if ("220".equals(meteType)) {
-                    return "5";
-                }
-                if ("222".equals(meteType)) {
-                    return "1";
-                }
-                if ("223".equals(meteType)) {
-                    return "3";
-                }
-                if ("523".equals(meteType)) {
-                    return "4";
-                }
-                if (StringUtils.equalsAny(meteType, "219", "221", "433")) {
-                    return "2";
-                }
-                return "";
-            default:
-                return "";
-        }
     }
 
     /**
