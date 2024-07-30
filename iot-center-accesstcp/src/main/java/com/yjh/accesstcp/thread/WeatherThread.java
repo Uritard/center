@@ -107,9 +107,9 @@ public class WeatherThread {
                     }
                     Map<String, Object> map8 = createMap(now, 8, mapForSf6, device);
                     list.add(map8);
-                    xmlBaseModel.setItems(list);
-                    clientHandler.send(xmlBaseModel, 0, true);
                 }
+                xmlBaseModel.setItems(list);
+                clientHandler.send(xmlBaseModel, 0, true);
             }
             log.info("--微气象信息已发送--");
         }
