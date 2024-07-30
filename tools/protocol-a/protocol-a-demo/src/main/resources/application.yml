@@ -38,3 +38,4 @@ default:
   params:
     robotCode: E100-0001
     droneCode: Drone-0001
+    nestCode: Nest-0001
