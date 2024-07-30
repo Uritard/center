@@ -7,15 +7,10 @@
     <Command/>
     <Time>2024-03-26 01:38:12</Time>
     <Items>
-        <Item unit="%" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="80%" time="2024-03-25 13:33:50" type="1" value="80"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="0" time="2024-03-25 13:33:50" type="2" value="0"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="0" time="2024-03-25 13:33:50" type="3" value="0"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="0" time="2024-03-25 13:33:50" type="4" value="0"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="0" time="2024-03-25 13:33:50" type="21" value="0"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="41" value="1"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="61" value="1"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="81" value="1"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="101" value="0"/>
-        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="201" value="1"/>
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="1" value="4" value_unit="4" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="2" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
     </Items>
 </PatrolDevice>

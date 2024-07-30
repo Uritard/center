@@ -423,7 +423,7 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public int alarmAndDefectProcess(AlarmAndDefectProcess alarmAndDefectProcess,String userId) {
-        SysUser user = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
+        String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         Long warnId = alarmAndDefectProcess.getWarnId();
         Integer dealType = alarmAndDefectProcess.getDealType();
         String dealInfo = alarmAndDefectProcess.getDealInfo();
@@ -438,7 +438,7 @@ public class TWarnInfoService{
                         .setWarnId(warnId)
                         .setDealType(dealType)
                         .setDealTime(date)
-                        .setDealPersonId(user.getUserName())
+                        .setDealPersonId(userName)
                         .setConfMode(275);
                 jieGuo = tWarnInfoDao.update(tWarnInfo);
                 if (jieGuo == 1) {
@@ -449,7 +449,7 @@ public class TWarnInfoService{
                         .setDefectId(warnId)
                         .setDealInfo(dealInfo)
                         .setDealType(dealType)
-                        .setDealPersonId(user.getUserName())
+                        .setDealPersonId(userName)
                         .setDealTime(date)
                         .setConfMode(275);
                 jieGuo = tDefectInfoDao.update(tDefectInfo);

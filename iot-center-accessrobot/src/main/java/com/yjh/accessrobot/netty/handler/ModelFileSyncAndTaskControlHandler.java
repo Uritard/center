@@ -88,22 +88,23 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     if (StringUtils.isEmpty(taskId)) {
                         taskId = faultTolerantId;
                     }
-
                     String taskPatrolledId = MapUtils.getString(resultMap, "task_patrolled_id");
+                    log.info("联动任务结果返回，taskId==={}, taskPatrolledId==={}", taskId, taskPatrolledId);
                     if (StringUtils.isNotEmpty(errorCode)) {
-                        try {
-                            //根据taskCode找到taskId
-                            UPatrolTask task = robotService.selectTaskByTaskCode(taskId);
-                            //更新联动任务结果 成功还是失败
-                            robotService.updateUnionTask(task.getTaskId(),isFinish);
-                            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-                            String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey+task.getTaskId(), "taskStart");
-                            taskPatrolledId = stationCode+"_"+taskId+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
-                            log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
-                            xmlBaseModel.getItems().get(0).put("task_patrolled_id",taskPatrolledId);
-                        }catch (Exception e){
-                            log.info("构造本级taskPatrolledId出错：",e);
+                        if (StringUtils.isNotEmpty(taskPatrolledId)) {
+                            try {
+                                String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+                                String taskStartTime = (String) redisTemplate.opsForHash().get(countForAbnormalKey + taskId, "taskStart");
+                                taskPatrolledId = stationCode+"_"+taskId+"_"+DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
+                                log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
+                                xmlBaseModel.getItems().get(0).put("task_patrolled_id",taskPatrolledId);
+                            }catch (Exception e){
+                                log.info("构造本级taskPatrolledId出错：",e);
+                            }
                         }
+
+                        //更新联动任务结果 成功还是失败
+                        robotService.updateUnionTask(taskId, isFinish);
 
                         log.info("机器人收到{}了,这是机器人响应的巡视任务执行Id==={}", taskMsg, taskPatrolledId);
                         // 联动的返回结果直接向上反

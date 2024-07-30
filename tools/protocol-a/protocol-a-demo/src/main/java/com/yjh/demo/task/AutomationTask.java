@@ -68,6 +68,7 @@ public class AutomationTask {
     private static final Map<String, List<String>> MESSAGE_MAP = new LinkedHashMap<>(64);
     private static final Map<String, Collection<String>> COMMAND_MESSAGE_MAP = new LinkedHashMap<>(64);
     public static final Map<Long, MessageWait> SESSION_MESSAGE_MAP = new ConcurrentHashMap<>(8);
+    public static final String SUCCESS = "200";
 
     public String CLIENT_AUTO_PROTOCOL = null;
     public String SERVER_AUTO_PROTOCOL = null;
@@ -263,8 +264,13 @@ public class AutomationTask {
             // Message message = XmlToMessageUtil.decode(xml);
             Message message = inboundMessage.getMsg();
             // 判断是否注册，并自动发送心跳
+            String code = message.getCode();
             scheduleHeart(message);
             StringVariableUtil.updateParams(message);
+
+            if (retFlag == (byte)1 && !SUCCESS.equals(code)) {
+                outBuilder.append("错误返回【").append(code).append("】");
+            }
 
             String type = message.getType() + "_" + message.getCommand();
             String cmd = protocolType + "_" + type + "_" + retFlag;
