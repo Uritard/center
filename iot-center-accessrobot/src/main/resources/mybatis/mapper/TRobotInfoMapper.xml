@@ -1493,4 +1493,10 @@
         where shield_id in (#{robotId})
         and warn_content like concat('%',#{warnCount},'%')
     </select>
+
+    <update id="updateUnionTask" >
+        update t_union_task
+        set is_finish = #{isFinish}
+        where union_id = #{taskId}
+    </update>
 </mapper>

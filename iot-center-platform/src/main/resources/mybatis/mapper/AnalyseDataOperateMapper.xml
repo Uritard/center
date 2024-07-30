@@ -1080,10 +1080,8 @@
     <select id="selectDefectListByIds" resultType="com.yjh.platform.module.patrol.entity.TDefectInfo">
         select
             defect.*,
-            user.true_name as userName,
             mete.device_point_id
         from t_defect_info defect
-        left join sys_user user on defect.deal_person_id = user.user_id
         left join t_std_devicemete mete on defect.std_mete_id = mete.device_mete_id
         WHERE defect_id IN(
         <foreach collection="list" item="defectId" separator=",">
@@ -1116,10 +1114,8 @@
     <select id="selectWarnListByIds" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
         select
         warn.*,
-        user.true_name as userName,
         mete.device_point_id
         from t_warn_info warn
-        left join sys_user user on warn.deal_person_id = user.user_id
         left join t_std_devicemete mete on warn.std_mete_id = mete.device_mete_id
         WHERE warn_id IN(
         <foreach collection="list" item="warnId" separator=",">

@@ -3451,5 +3451,14 @@ public class RobotService {
         }
         return taskPatrolledId;
     }
+
+    /**
+     * 更新联动任务的状态
+     * @param taskId 联动任务的taskId
+     * @param isFinish 状态
+     */
+    public void updateUnionTask(String taskId,Integer isFinish){
+        tRobotInfoDao.updateUnionTask(isFinish,taskId);
+    }
 }
 
