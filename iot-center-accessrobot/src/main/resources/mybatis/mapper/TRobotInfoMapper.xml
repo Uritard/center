@@ -1281,7 +1281,7 @@
         FROM
         `t_robot_info` a
         WHERE
-        a.nets_code = #{nestCode}
+        a.nest_code = #{nestCode}
         limit 1
     </select>
 
