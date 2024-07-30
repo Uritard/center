@@ -3427,7 +3427,7 @@ public class RobotService {
             TRobotInfo robotInfo = ROBOT_INFO_CACHE.get(robotNum, () -> tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, null));
             return Optional.ofNullable(robotInfo).map(TRobotInfo::getRobotName).orElse("");
         } catch (ExecutionException e) {
-            log.error(e.getMessage(), e);
+            log.error("获取对应巡视设备名称失败，使用下级上传值：{}", e.getMessage());
         }
         return StringUtils.EMPTY;
     }
