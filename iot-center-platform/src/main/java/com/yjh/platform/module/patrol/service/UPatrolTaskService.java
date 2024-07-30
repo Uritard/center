@@ -1928,9 +1928,11 @@ public class UPatrolTaskService {
         if (Optional.ofNullable(request).isPresent()) {
             logsRecord.LogsSend(request, "11", "任务暂停", "任务暂停-" + uPatrolResult.getTaskName());
         }
-        if (taskIsEnded(uPatrolResult.getTaskState())) {
+        //判断任务是否终止
+        Integer taskStatus = ValueUtil.toInteger(taskStatus(taskId),TASK_STATE_NOT_START);
+        if (taskIsEnded(uPatrolResult.getTaskState()) || taskIsEnded(taskStatus)) {
             log.info("当前任务已经结束，不可暂停:{}, state: {}", taskId, uPatrolResult.getTaskState());
-            return 1;
+            throw new BusinessException("当前任务已经结束！");
         }
         uPatrolResult.setTaskState(TASK_STATE_PAUSE);
         try {
