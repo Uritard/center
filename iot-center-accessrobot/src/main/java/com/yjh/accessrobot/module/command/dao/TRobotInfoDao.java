@@ -381,6 +381,7 @@ public interface TRobotInfoDao {
     String selectDictCodeByUpdict(@Param(value = "colName") String colName,
                                   @Param(value = "upDict") String upDict);
     TRobotInfo selectRobotInfoByRobotNum(@Param(value = "robotNum") String robotNum, @Param(value = "edgeCode") String edgeCode);
+    TRobotInfo selectRobotInfoByNetsCode(@Param(value = "nestCode") String nestCode);
     /**
      *  根据机巢编码编码查询机器人唯一标识
      * @param nestNum 机巢编码
