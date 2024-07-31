@@ -8,6 +8,7 @@ import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
+import com.sun.corba.se.impl.io.ValueUtility;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
@@ -650,7 +651,7 @@ public class SendToUpSystemServices {
         long sessionId =0L;
         boolean isSend = true;
         if (CollectionUtils.isNotEmpty(xmlBaseModel.getItems()) && xmlBaseModel.getItems().get(0).containsKey("error_code")){
-            sessionId = Constant.getParamMap.get("sendSessionId");
+            sessionId = Constant.getParamMap.getOrDefault("sendSessionId", 0L);
             isSend = false;
         }
         return this.sendResponse(sessionId, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), isSend);
