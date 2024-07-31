@@ -102,6 +102,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		create_time,
 		preset_id,
 		camera_id,
+		real_code,
 		node_id
 		)values(
 		#{deviceId, jdbcType=BIGINT},
@@ -120,6 +121,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		CURRENT_TIMESTAMP,
 		#{presetId, jdbcType=BIGINT},
 		#{cameraId, jdbcType=BIGINT},
+		#{realCode, jdbcType=VARCHAR},
 		#{nodeId, jdbcType=BIGINT}
 		)
 	</insert>
