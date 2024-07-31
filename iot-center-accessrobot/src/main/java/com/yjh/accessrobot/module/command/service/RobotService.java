@@ -525,7 +525,7 @@ public class RobotService {
         Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         String ftpsFilePath = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content");
         List<Map<String,Object>> infoList = tRobotInfoDao.selectTCfgUnionRule(edgeCode);
-        return CreateModeXMLUtil.createXmlFile(infoList, ftpsFilePath, stationCode, "linkage_model.xml", "Effect_Config");
+        return CreateModeXMLUtil.createXmlFile(infoList, ftpsFilePath, stationCode, "effect_model.xml", "Effect_Config");
     }
 
     /**

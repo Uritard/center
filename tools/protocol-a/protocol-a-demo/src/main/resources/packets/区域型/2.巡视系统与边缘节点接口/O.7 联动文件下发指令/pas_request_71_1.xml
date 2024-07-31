@@ -6,7 +6,7 @@
     <Code>1</Code>
     <Time>2024-03-27 20:19:42</Time>
     <Items>
-        <Item file_path="1/linkage/linkage_model.xml" />
+        <Item file_path="1/linkage/effect_model.xml" />
     </Items>
     <Command>1</Command>
 </PatrolHost>

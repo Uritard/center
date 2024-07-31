@@ -320,14 +320,14 @@ public class SendToUpSystemServices {
                     break;
                 case "11":
                     //联动配置文件
-                    String linkageModelTargetPath = stationCode + "/Model/linkage_model.xml";
+                    String linkageModelTargetPath = stationCode + "/Model/effect_model.xml";
                     uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
-                    map.put("maintenance_file_path", linkageModelTargetPath);
+                    map.put("effect_file_path", linkageModelTargetPath);
                     list.add(map);
                     break;
                 case "12":
                     //告警阈值模型
-                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.edgeCode()+ ".xml";
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.stationCode()+ ".xml";
                     uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
                     map.put("alarm_threshold_file_path", alarmThresholdTargetPath);
                     list.add(map);
@@ -466,14 +466,14 @@ public class SendToUpSystemServices {
                     break;
                 case "11":
                     //联动配置文件
-                    String linkageModelTargetPath = stationCode + "/Model/linkage_model.xml";
+                    String linkageModelTargetPath = stationCode + "/Model/effect_model.xml";
                     uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
                     map.put("file_path", linkageModelTargetPath);
                     list.add(map);
                     break;
                 case "12":
                     //告警阈值模型
-                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.edgeCode()+ ".xml";
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.stationCode()+ ".xml";
                     uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
                     map.put("file_path", alarmThresholdTargetPath);
                     list.add(map);
@@ -549,7 +549,7 @@ public class SendToUpSystemServices {
                 }
             }
         });
-        return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.edgeCode() + ".xml", "Alarm_Threshold");
+        return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.stationCode() + ".xml", "Alarm_Threshold");
     }
 
     private String getAlarmLevel(int alarmLevel) {
@@ -623,7 +623,7 @@ public class SendToUpSystemServices {
 
     private String createLinkageModel(String path) throws Exception {
         List<Map<String, Object>> list = sendToUpSystemDao.selectLinkageModel(Constant.standardPoints());
-        return CreateModeXMLUtil.createXmlFile(list, path, "linkage_model.xml", "Effect_Config");
+        return CreateModeXMLUtil.createXmlFile(list, path, "effect_model.xml", "Effect_Config");
     }
 
     private String createMaintenanceModel(String path) throws Exception {
