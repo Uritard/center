@@ -51,4 +51,7 @@ public class TStdMete {
     @TableField(value = "redundant_type",updateStrategy = FieldStrategy.IGNORED)
     private String redundantType;
 
+    @ApiModelProperty(value = "测点标准名")
+    private String remark;
+
 }
