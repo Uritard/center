@@ -2,6 +2,7 @@ package com.yjh.accesstcp.module.device.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.yjh.accesstcp.commons.utils.CommonUtils;
 import com.yjh.accesstcp.commons.utils.file.FileUtil;
 import com.yjh.accesstcp.module.device.dao.DeviceModelDao;
 import com.yjh.accesstcp.module.device.entity.TCfgUnionRule;
@@ -12,7 +13,7 @@ import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.dom4j.Attribute;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -42,7 +44,7 @@ public class DeviceModelService {
     public void handleDeviceModelFile(String filePath,String command) {
         log.info("handleDeviceModelFile begin,filePath:{}", filePath);
         try {
-            String fileName = StringUtils.substringAfter(filePath, "/Model/");
+            String fileName = StringUtils.substringAfterLast(filePath, "/");
             log.info("设备模型文件 fileName {}", fileName);
             String localFilePath = redisTemplate.opsForHash().get("t_sys_param:modelAbsolutePath","content") + "/deviceModel/" ;
             FileUtil.createDirectory(localFilePath);
@@ -61,7 +63,7 @@ public class DeviceModelService {
                         break;
                     case "3":
                         log.info("下载后点位告警阈值配置模型文件 filePath {}", localFilePath + fileName);
-                        saveMeteAlarmData(itemList);
+//                        saveMeteAlarmData(itemList);
                         break;
                     default:
                         break;
@@ -119,18 +121,32 @@ public class DeviceModelService {
 
     private void saveMeteData(List<Map<String, Object>> itemList) {
         List<TStdMete> tCfgUnionRuleList = new ArrayList<>();
+        List<Map<String, String>> dictMapList = deviceModelDao.selectDictCodeByUpDict("device_type,mete_type");
         itemList.forEach(item -> {
-            if (item.get("standard_device_id") != null) {
+            if (!CommonUtils.isEmptyOrNullstr(String.valueOf(item.get("standard_device_id")))) {
                 TStdMete tStdMete = new TStdMete();
-                tStdMete.setStdMeteId(NumberUtils.toLong((String) item.get("standard_device_id")));
-                tStdMete.setDeviceType(NumberUtils.toInt((String) item.get("device_type")));
-                tStdMete.setMeteType((String) item.get("meter_type"));
+                tStdMete.setRemark(String.valueOf(item.get("standard_device_id")));
+                tStdMete.setDeviceType(CollectionUtils.isNotEmpty(dictMapList) ?
+                        Integer.parseInt(dictMapList.stream().filter(s -> "device_type".equals(s.get("col_name"))
+                                        && item.get("device_type").equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code"))
+                                .collect(Collectors.toList()).get(0)) : 194);
+                String recognitionTypeList = String.valueOf(item.get("recognition_type_list"));
+                String meteType = "219";
+                if (!CommonUtils.isEmptyOrNullstr(recognitionTypeList)){
+                    String[] strings = recognitionTypeList.split(",");
+                    meteType = CollectionUtils.isNotEmpty(dictMapList) ?
+                            dictMapList.stream().filter(s -> "mete_type".equals(s.get("col_name"))
+                                    && strings[0].equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code"))
+                                    .collect(Collectors.toList()).get(0) : "219";
+                }
+                tStdMete.setMeteType(meteType);
                 tStdMete.setMeteName((String) item.get("standard_device_name"));
                 tStdMete.setRedundantType((String) item.get("point_type"));
                 tCfgUnionRuleList.add(tStdMete);
             }
         });
         if (tCfgUnionRuleList.size() > 0){
+            deviceModelDao.cleanAll();
             deviceModelDao.batchAdd(tCfgUnionRuleList);
             log.info("标准点位模型文件导入数据成功，共{}条", tCfgUnionRuleList.size());
         }

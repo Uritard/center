@@ -7,7 +7,8 @@
         device_type,
         mete_type,
         mete_name,
-        redundant_type
+        redundant_type,
+        remark
         )values
         <foreach collection="list" item="TStdMete" separator=",">
             (
@@ -15,11 +16,30 @@
             #{TStdMete.deviceType, jdbcType=INTEGER},
             #{TStdMete.meteType, jdbcType=VARCHAR},
             #{TStdMete.meteName, jdbcType=VARCHAR},
-            #{TStdMete.redundantType, jdbcType=VARCHAR}
+            #{TStdMete.redundantType, jdbcType=VARCHAR},
+            #{TStdMete.remark, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
+    <delete id="cleanAll">
+        DELETE
+        FROM
+            t_std_mete
+        WHERE
+            remark IS NOT NULL
+          AND remark != ''
+    </delete>
 
+    <select id="selectDictCodeByUpDict" resultType="java.util.Map">
+        SELECT
+            a.col_name,
+            a.dict_code,
+            a.up_dict
+        FROM
+            `t_dict_business` a
+        WHERE
+            FIND_IN_SET(a.col_name, #{colName, jdbcType=VARCHAR})
+    </select>
 
     <insert id="batchAddDeviceMetes">
         insert into t_std_devicemete(
