@@ -6,9 +6,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
-import com.sun.corba.se.impl.io.ValueUtility;
+import com.google.common.collect.Sets;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
@@ -25,8 +24,8 @@ import com.yjh.accesstcp.netty.TCPClientHandler;
 import com.yjh.accesstcp.netty.algorithm.StateGridAlgorithmHandlerImpl;
 import com.yjh.accesstcp.netty.iot.StateGridADecoder;
 import com.yjh.accesstcp.netty.iot.StateGridAHandlerImpl;
-import com.yjh.accesstcp.thread.*;
-import io.netty.bootstrap.Bootstrap;
+import com.yjh.accesstcp.thread.ReContentManager;
+import com.yjh.accesstcp.thread.RegisterManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -870,20 +869,19 @@ public class SendToUpSystemServices {
         //检修区域模型
         List<MaintenanceModel> infoList = sendToUpSystemDao.selectMaintenanceInfo();
         List<Map<String, Object>> finalList = new ArrayList<>();
+        String stationName = getStationName();
         infoList.forEach(item -> {
             Map<String, Object> maintenanceMap = new HashMap<>();
             maintenanceMap.put("station_code", stationCode);
-            maintenanceMap.put("station_name", getStationName());
+            maintenanceMap.put("station_name", stationName);
             maintenanceMap.put("config_code", item.getConfigCode());
             maintenanceMap.put("enable", "1");
             maintenanceMap.put("start_time", item.getStartTime());
             maintenanceMap.put("end_time", item.getEndTime());
             maintenanceMap.put("device_level", item.getDeviceLevel());
-            if ("3".equals(item.getDeviceLevel()) && Constant.standardPoints()){
-                maintenanceMap.put("device_list", String.join(",",sendToUpSystemDao.selectStandardPointsByInstanceId(item.getDeviceIds())));
-            } else {
-                maintenanceMap.put("device_list", item.getDeviceIds());
-            }
+            int deviceLevel = NumberUtils.toInt(item.getDeviceLevel(), 3);
+            maintenanceMap.put("device_list", maintenanceDeviceIds(deviceLevel, item.getDeviceIds()));
+
 
             maintenanceMap.put("coordinate_pixel", item.getCoordinatePixel());
             finalList.add(maintenanceMap);
@@ -891,6 +889,57 @@ public class SendToUpSystemServices {
         return CreateModeXMLUtil.createXmlFile(finalList, path, "overhaularea_model.xml", "Effect_Config");
 
 
+    }
+
+    // TODO
+    public String maintenanceDeviceIds(int deviceLevel, String ids) {
+        List<Map<String, Object>> deviceInspectionList = sendToUpSystemDao.selectStandardPointsByInstanceId(ids);
+
+            /*
+        middlegroundIds = true
+        间隔：t_std_region.up_region_ids
+        主设备：t_std_device_attr.pms_id
+        部件：t_std_devicemete.component_id
+         */
+        String key = "instance_id";
+        switch (deviceLevel) {
+            case 1:
+                // 间隔
+                if (Constant.middlegroundIds()) {
+                    key = "middle_bay_id";
+                } else {
+                    key = "bay_id";
+                }
+                break;
+            case 2:
+                // 主设备
+                if (Constant.middlegroundIds()) {
+                    key = "middle_device_id";
+                } else {
+                    key = "main_device_id";
+                }
+                break;
+            case 3:
+                // 设备点位
+                // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
+                if (Constant.standardPoints()) {
+                    key = "device_point_id";
+                }
+                break;
+            case 4:
+                // 设备部件
+                if (Constant.middlegroundIds()) {
+                    key = "middle_component_id";
+                } else {
+                    key = "component_id";
+                }
+                break;
+            default:
+                key = "instance_id";
+                break;
+        }
+        final String k = key;
+        return deviceInspectionList.stream().map(r -> MapUtils.getString(r, k)).distinct().collect(Collectors.joining(","));
     }
 
     public String createHostModel(String path, String stationCode) throws Exception {
@@ -1445,63 +1494,64 @@ public class SendToUpSystemServices {
     }
 
 
-    public TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String device_level, Boolean isLingAge) {
+    public TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String deviceLevel, Boolean isLingAge) {
 
         TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, isLingAge, Constant.edgeLevel());
-        String deviceList = item.get("device_list").toString();
-        List<String> instanceIds = new ArrayList<>();
-        boolean standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
-        boolean middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+        String deviceList = MapUtils.getString(item, "device_list");
+        String instanceIds = convertInstances(NumberUtils.toInt(deviceLevel, 3), deviceList);
 
-        /*
+        tCruiseTaskAdd.setDeviceList(instanceIds);
+        item.put("device_list", instanceIds);
+
+        return tCruiseTaskAdd;
+    }
+
+    public String convertInstances(int deviceLevel, String deviceList) {
+        List<String> instanceIds;
+            /*
         middlegroundIds = true
         间隔：t_std_region.up_region_ids
         主设备：t_std_device_attr.pms_id
         部件：t_std_devicemete.component_id
          */
-        switch (device_level) {
-            case "1":
+        switch (deviceLevel) {
+            case 1:
                 // 间隔
                 Map<String, String> regionIds = new HashMap<>();
                 regionIds.put("upRegionIds", deviceList);
-                if (middlegroundIds){
+                if (Constant.middlegroundIds()){
                     instanceIds = sendToUpSystemDao.selectInstanceIdsByUpRegionIds(deviceList);
                 }else {
                     instanceIds = this.selectInstanceIdsByRegionOrDevice(regionIds);
                 }
-                tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
-                item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;
-            case "2":
+            case 2:
                 // 主设备
                 Map<String, String> deviceIds = new HashMap<>();
                 deviceIds.put("deviceIds", deviceList);
-                if (middlegroundIds){
+                if (Constant.middlegroundIds()){
                     instanceIds = sendToUpSystemDao.selectInstanceIdsByPmsId(deviceList);
                 }else {
                     instanceIds = this.selectInstanceIdsByRegionOrDevice(deviceIds);
                 }
-                tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
-                item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;
-            case "3":
+            case 3:
                 // 设备点位
                 // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
-                if (standardPoints) {
+                if (Constant.standardPoints()) {
                     instanceIds = this.selectForTaskInstanceId(deviceList);
-                    tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
                 } else {
-                    tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
+                    return deviceList;
                 }
                 break;
-            case "4":
+            case 4:
                 // 设备部件
-                if (middlegroundIds){
+                if (Constant.middlegroundIds()){
                     instanceIds = sendToUpSystemDao.selectInstanceIdsByMiddlegroundComponent(deviceList);
                 }else {
                     List<String> list = Arrays.asList(deviceList.split(","));
                     Map<String, String> deviceListMap = list.stream().collect(Collectors.toMap(e -> e.split("_")[0],
-                            e -> e.split("_")[1], (a, b) -> a + "," + b));
+                        e -> e.split("_")[1], (a, b) -> a + "," + b));
                     List<DeviceModel> deviceModels = new ArrayList<>();
                     deviceListMap.forEach((k, v) -> {
                         DeviceModel dm = new DeviceModel();
@@ -1511,13 +1561,12 @@ public class SendToUpSystemServices {
                     });
                     instanceIds = this.selectInstanceIdsByComponent(deviceModels);
                 }
-                tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
-                item.put("device_list", StringUtils.join(instanceIds, ","));
                 break;
             default:
-                break;
+                return deviceList;
         }
-        return tCruiseTaskAdd;
+
+        return StringUtils.join(instanceIds, ",");
     }
 
     /**

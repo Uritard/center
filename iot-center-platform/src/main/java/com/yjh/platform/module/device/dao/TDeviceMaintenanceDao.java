@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lqh
@@ -43,11 +44,11 @@ public interface TDeviceMaintenanceDao {
                              @Param(value = "name") String name);
     int deleteByConfigCode(@Param(value = "configCode") String configCode);
 
-    List<String> selectRegionIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
+    List<Map<String,Object>> selectRegionIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
     List<String> selectRobotRegionIdList(@Param(value = "list") List<Long> list, @Param(value = "robot") String robot);
-    List<String> selectMainDeviceIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
+    List<Map<String,Object>> selectMainDeviceIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
     List<String> selectRobotMainDeviceIdList(@Param(value = "list") List<Long> list, @Param(value = "robot") String robot);
-    List<String> selectInstanceIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
+    List<Map<String,Object>> selectInstanceIdList(@Param(value = "list") List<Long> list, @Param(value = "edge") String edge);
     List<String> selectRobotInstanceIdList(@Param(value = "list") List<Long> list, @Param(value = "robot") String robot);
     List<String> selectRobotComponentIdList(@Param(value = "list") List<Long> list, @Param(value = "robot") String robot);
     List<Long>selectDeviceByRegion(@Param(value = "list") List<Long> list);

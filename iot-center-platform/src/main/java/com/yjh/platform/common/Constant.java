@@ -215,6 +215,8 @@ public class Constant {
 
     private static Boolean standardPoints;
 
+    private static Boolean middlegroundIds;
+
     private static String systemLevel;
     /**
      * 是否开启修改同步模型
@@ -437,6 +439,21 @@ public class Constant {
         return standardPoints;
     }
 
+    /**
+     * 使用中台ID下发检修区域
+     */
+    public static boolean middlegroundIds() {
+        if (middlegroundIds == null) {
+            try {
+                middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+                log.warn("middlegroundIds is {}", middlegroundIds);
+            } catch (Exception e) {
+                middlegroundIds = false;
+            }
+        }
+        return middlegroundIds;
+    }
+
     public static int endWaitTimes() {
         if (endWaitTimes == 0) {
             try {
@@ -487,6 +504,7 @@ public class Constant {
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
         standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+        middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
         endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
         logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
