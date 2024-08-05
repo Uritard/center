@@ -558,8 +558,9 @@ public class ProcessResultToUpSystem {
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
                 valid = "0";
-                if (MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") != CRUISE_ABNORMAL_REQUESTFAILED ||
-                        MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") != CRUISE_ABNORMAL_ANALYSEFAILED) {
+                if (MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_REQUESTFAILED ||
+                MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_TIMEOUT ||
+                        MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_ANALYSEFAILED) {
                     valid = "2";
                 }
             }
