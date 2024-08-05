@@ -482,7 +482,7 @@
         SELECT
             2 as device_type,
         camera_id as cameraId,
-        IFNULL(b_camera_channel_id, camera_id) as patrolDeviceCode,
+        IF(b_camera_channel_id is null or b_camera_channel_id = '', camera_channel_id, b_camera_channel_id) as patrolDeviceCode,
         camera_name as patrolDeviceName,
             DATE_FORMAT(commission_date, '%Y-%m-%d %H:%i:%s' ) as commissionTime
         FROM
