@@ -1575,6 +1575,8 @@ INSERT INTO `t_version` VALUES ('9', '1', '2.5.5.230928_relase', '软件易用�
 INSERT INTO `t_version` VALUES ('10', '2', '2.1.0.230928_relase', '性能提升，增加检查类型', '1.修复若干BUG\n2.性能优化，增加识别类型，提高检测精度\n3.表计识别增加去模板化能力', '2023-09-28 15:36:41');
 INSERT INTO `t_version` VALUES ('11', '1', '3.2.5.240131_relase', '接入操作类型机器人，接入环境传感器', '1.修复若干BUG\n2.支持D200操作机器人接入\n3.支持机器人多传感器接入5.其他商业化定制功能', '2024-01-31 14:02:44');
 INSERT INTO `t_version` VALUES ('12', '2', '2.5.1.240105_relase', '性能提升，增加检查类型', '1.修复若干BUG\n2.性能优化，提高检测精度\n3.增加三相电表及人员闯入识别', '2024-01-05 09:40:12');
+INSERT INTO `t_version` VALUES ('13', '1', '3.3.1.240815_RC', '适配24年巡检规范', '1.适配24年巡检规范\n2.修复若干BUG\n3.性能优化，树组件加载优化', '2024-08-15 10:12:13');
+INSERT INTO `t_version` VALUES ('14', '2', '2.6.1.240815_RC', '性能提升，优化模型', '1.修复若干BUG\n2.性能优化，提高检测精度\n3.增加静默监视识别类型', '2024-08-15 09:55:22');
 
 
 INSERT INTO silent_conf (preset_type, preset_type_name, recognize_type, chill_time, editable) VALUES(1, '普通预置位', '', -1, 0);
