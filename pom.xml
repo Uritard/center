@@ -7,7 +7,7 @@
     <groupId>com.yjh</groupId>
     <artifactId>IotCenter</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.1.221031_BETA</version>
+    <version>3.3.1.240815_RC</version>
     <modules>
         <module>iot-center-accessrobot</module>
         <!--<module>iot-center-accessvideo</module>-->
