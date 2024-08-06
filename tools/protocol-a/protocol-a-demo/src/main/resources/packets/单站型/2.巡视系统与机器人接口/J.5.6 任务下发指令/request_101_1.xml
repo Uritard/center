@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Robot01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>101</Type>
+    <Code>1</Code>
+    <Time>2024-03-27 17:42:44</Time>
+    <Items>
+        <Item task_name="上级下发任务测试" device_list="83402,83403,83404,83405" creator="1" cycle_month="" interval_number="" create_time="2024-03-27 17:42:44" task_code="7371e01f49054274b564cdd0c0f065d2" interval_end_time="" plan_code="" device_level="3" type="4" priority="2" cycle_week="" interval_execute_time="" cycle_end_time="" isenable="0" invalid_start_time="" interval_start_time="" invalid_end_time="" fixed_start_time="2024-03-27 17:42:44" cycle_start_time="" interval_type="" cycle_execute_time=""/>
+    </Items>
+    <Command>1</Command>
+</PatrolDevice>

@@ -57,7 +57,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
         if ("1".equals(onlineStatus)) {
             // 给下级响应
             String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(false, sendCode));
-            byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+            byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, sendCode);
             log.info("本级系统给下级{}响应了", sendCode);
             return;
@@ -91,7 +91,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
         //完全解析完成的算成功  否则失败 返回 500给下级
         boolean isFull = xmlBaseModel.getItems().size() == robotOperationList.size();
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(isFull, sendCode));
-        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, operationXmlString);
         RobotServerHandler.send(operationProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 

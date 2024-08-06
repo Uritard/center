@@ -117,8 +117,10 @@ public class TStdDeviceModelService {
                             case "1":
                                 //视频
                                 //构建 t_camera_preset
-                                String cameraOriginId = posArray.getJSONObject(0).getString("device_code");
-                                TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
+                                String cameraChannelId = posArray.getJSONObject(0).getString("device_code");
+                                TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t ->
+                                        (cameraChannelId.equals(t.getBcameraChannelId()) || cameraChannelId.equals(t.getCameraChannelId()))
+                                                && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
                                 TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posArray, tCameraInfo.getCameraId());
                                 cruiseDeviceId = String.valueOf(tCameraInfo.getCameraId());
                                 cruiseId = posArray.getJSONObject(0).getLongValue("device_pos");
@@ -309,6 +311,7 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setStateOne((String) device.get("state_one"));
             tStdDeviceMete.setAlarmState(objToInt(device.get("alarm_state")));
             tStdDeviceMete.setIsTemdif(objToInt(device.get("is_temdif")));
+            tStdDeviceMete.setLabelAttri(String.valueOf(device.get("label_attri")));
         } else {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
         }
@@ -638,6 +641,7 @@ public class TStdDeviceModelService {
                     t.setAlarmCnt(old.getAlarmCnt());
                     t.setThresholdAbs(old.getThresholdAbs());
                     t.setThresholdPer(old.getThresholdPer());
+                    t.setLabelAttri(old.getLabelAttri());
                 }
                 tStdDevicemeteMapper.updateByPrimaryKey(t);
             });

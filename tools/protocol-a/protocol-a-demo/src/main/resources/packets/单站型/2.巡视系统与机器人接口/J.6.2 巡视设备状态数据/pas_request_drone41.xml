@@ -1,0 +1,19 @@
+<PatrolDevice>
+ <SendCode>Drone01</SendCode>
+ <ReceiveCode>Edge02</ReceiveCode>
+ <Type>1</Type>
+ <Code></Code>
+ <Command></Command>
+ <Time>2024-03-06 14:45:29</Time>
+ <Items>
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="1" value="1" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="2" value="0" />  
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="3" value="1" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="4" value="1" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="21" value="1" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="41" value="3" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="61" value="3" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="81" value="0" />
+  <Item unit="" patroldevice_code="Drone-0001" patroldevice_name="无人机" value_unit="" time="2024-03-06 14:45:29" type="201" value="1" />
+ </Items>
+</PatrolDevice>

@@ -4,17 +4,20 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author tt
@@ -211,14 +214,20 @@ public class TStdDeviceMete implements Serializable {
      */
     private int alarmRuleType;
 
+    private String labelAttri;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<KeyValue<String, String>> labelAttriName;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
 
     private String redundantType;
 
+    private String edgeCode;
+
     private Integer isBind = 2;//是否绑定 0-否 1-是 2-全部
 
     private Integer bindMultiple = 2;//是否绑定多个 0-否 1-是 2-全部
-
 }

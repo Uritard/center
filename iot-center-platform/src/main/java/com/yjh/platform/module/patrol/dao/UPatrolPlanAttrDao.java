@@ -1,7 +1,9 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
+import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -39,4 +41,6 @@ public interface UPatrolPlanAttrDao {
     List<Long> seletcInsByPlan (@Param(value = "planId") Long planId);
     List<TCruisePlanAttrDetail> selectByPrimaryId(@Param(value = "planId") Long planId);
     int deleteByInstanceId(@Param(value = "list") List<Long> list);
+
+    List<TCruiseTaskAttr> queryTaskMeteListForPage(TaskMeteQuery taskMeteQuery);
 }

@@ -5,6 +5,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -16,6 +17,7 @@ import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -98,6 +100,7 @@ public abstract class AbstractVideoCruise {
         long presetId = MapUtils.getLongValue(inspectionMap, "cruiseId");
         String cameraId = inspectionMap.get("cameraId");
         String presetName = inspectionMap.get("cruiseName");
+        String cameraIp = inspectionMap.get("cameraIp");
         String taskName = inspectionMap.get("taskName");
         String taskId = inspectionMap.get("taskId");
 
@@ -113,7 +116,7 @@ public abstract class AbstractVideoCruise {
             boolean isThreePhase = "123".contains(presetAttribute);
             List<Map<String, String>> captureList = new ArrayList<>();
             Map<String, String> re = null;
-            boolean waitFlag = waitCamera2(taskId, cameraId, presetName);
+            boolean waitFlag = waitCamera2(taskId, cameraId, presetName,cameraIp);
             long cameraLong = NumberUtils.toLong(cameraId);
             if (waitFlag) {
                 try {
@@ -153,7 +156,11 @@ public abstract class AbstractVideoCruise {
                         log.error("抓图重试依旧失败", e);
                     }
                 } finally {
-                    hashOperations.put("camera_info:" + cameraId, "state", "0");
+                    //判断是否在紧急调阅模式
+                    String state = hashOperations.get(TCameraInfoService.cameraStateKey + cameraIp,"state");
+                    if (!"2".equals(state)){
+                        hashOperations.put(TCameraInfoService.cameraStateKey + cameraIp, "state", "0");
+                    }
                 }
             }
 
@@ -230,6 +237,7 @@ public abstract class AbstractVideoCruise {
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
                         inspectionMap.put("resultNum", resultNum);
+                        CruiseRedisStorage.offer(inspectionMap);
                         resultRecognition(inspectionMap);
                     }
                 }
@@ -343,13 +351,14 @@ public abstract class AbstractVideoCruise {
         ((ZSetOperations<String, String>)redisTemplate.opsForZSet()).add(cruiseScoresKey, instanceId, 1D);
     }
 
-    protected boolean waitCamera2(String taskId, String cameraId, String presetName) {
+    protected boolean waitCamera2(String taskId, String cameraId, String presetName,String cameraIp) {
 
         String script =
             "if redis.call('hget', KEYS[1], KEYS[2]) == ARGV[1] then return redis.call('hset', KEYS[1], KEYS[2], ARGV[2]) else return -1 end";
 
         RedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
-        Long cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
+        Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
+        Long cameraState = redisTemplate.execute(redisScript, Arrays.asList(TCameraInfoService.cameraStateKey + cameraIp, "state"), 0, 1);
         cameraState = cameraState == null ? -1 : cameraState;
         boolean waitFlag = true;
         if (cameraState == -1) {
@@ -365,14 +374,14 @@ public abstract class AbstractVideoCruise {
                 }
                 log.info("任务：【{}】 在 【{}】 时已经等待了 【{}】 预置位,摄像机Id 【{}】 【{}】s", taskId, DateTimeUtil.getDateTimeString(), presetName, cameraId,
                     ((waitCount + 1) * waitTime + 1000) / 1000);
-                cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
+                cameraState = redisTemplate.execute(redisScript, Arrays.asList(TCameraInfoService.cameraStateKey + cameraIp, "state"), 0, 1);
                 cameraState = cameraState == null ? -1 : cameraState;
 
                 waitCount = waitCount + 1;
-                if (waitCount == 30) {
+                if (((waitCount + 1) * waitTime + 1000) / 1000 > (cameraStateTime * 60 )) {
                     log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 直接获取", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
                         presetName, cameraId);
-                    hashOperations.put("camera_info:" + cameraId, "state", "0");
+                    hashOperations.put(TCameraInfoService.cameraStateKey + cameraIp, "state", "0");
                     break;
                 }
             }

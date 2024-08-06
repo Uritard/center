@@ -54,7 +54,8 @@ public interface TStdMetemodelDetailDao {
                                      @Param(value = "alarmCnt") Integer alarmCnt,
                                      @Param(value = "thresholdAbs") BigDecimal thresholdAbs,
                                      @Param(value = "thresholdPer") BigDecimal thresholdPer,
-                                     @Param(value = "modulus") Integer modulus);
+                                     @Param(value = "modulus") Integer modulus,
+                                     @Param(value = "labelAttri") String labelAttri);
     List<TStdMeteModelDetail> selectByPage(TStdMeteModelDetail tStdMeteModelDetail);
 
     int batchAdd(List<TStdMeteModelDetail> list);

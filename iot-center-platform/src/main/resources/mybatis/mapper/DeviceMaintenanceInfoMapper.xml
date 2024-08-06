@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.maintain.dao.DeviceMaintenanceInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.maintain.entity.DeviceMaintenanceInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+            <result property="patroldeviceCode" column="patroldevice_code" jdbcType="VARCHAR"/>
+            <result property="patroldeviceName" column="patroldevice_name" jdbcType="VARCHAR"/>
+            <result property="patroldeviceType" column="patroldevice_type" jdbcType="INTEGER"/>
+            <result property="maintenanceType" column="maintenance_type" jdbcType="INTEGER"/>
+            <result property="faultLevel" column="fault_level" jdbcType="INTEGER"/>
+            <result property="faultDesc" column="fault_desc" jdbcType="VARCHAR"/>
+            <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+            <result property="maintenanceUnit" column="maintenance_unit" jdbcType="VARCHAR"/>
+            <result property="maintenancePerson" column="maintenance_person" jdbcType="VARCHAR"/>
+            <result property="maintenanceStatus" column="maintenance_status" jdbcType="VARCHAR"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,device_id,patroldevice_code,patroldevice_name,
+        patroldevice_type,maintenance_type,fault_level,
+        fault_desc,create_time,update_time,maintenance_unit,
+        maintenance_person,maintenance_status,remark
+    </sql>
+    <select id="selectCruiseDeviceTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT -1 AS Id, '巡视设备' AS label, 0 AS upId, '' AS upName, '' AS infoType, '' AS deviceTypeId
+        UNION(
+            SELECT dict_code AS Id, dict_note AS label, -1 AS upId, '巡视设备' AS upName, '' AS infoType, '' AS deviceTypeId
+            FROM t_dict_business WHERE col_name = 'cruise_device_type'
+        )
+        UNION(
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
+            FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '室外轮式机器人' AND robot_position = 156
+            WHERE drone_type is null
+        )
+        UNION(
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
+            FROM  t_robot_info JOIN t_dict_business ON  col_name = 'cruise_device_type' and dict_note = '室内轮式机器人' AND robot_position = 155
+            WHERE drone_type is null
+        )
+        UNION(
+            SELECT robot_id AS Id, robot_name AS label, dict_code AS upId, dict_note AS upName, "robot" AS infoType, robot_num AS deviceTypeId
+            FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '挂轨机器人' AND robot_position = 399
+            WHERE drone_type is null
+        )
+        UNION  (
+            SELECT robot_id AS Id, robot_name AS label,  dict_code AS upId, dict_note AS upName, "drone" AS infoType, robot_num AS deviceTypeId
+            FROM  t_robot_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '无人机'
+            WHERE robot_type is null
+        )
+        UNION  (
+            SELECT camera_id AS Id, camera_name AS label, dict_code AS upId, dict_note AS upName, "camera" AS infoType, b_camera_channel_id AS deviceTypeId
+            FROM t_camera_info JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '高清视频'
+        )
+        UNION  (
+            SELECT record_id AS Id, record_name AS label, dict_code AS upId, dict_note AS upName, "record" AS infoType, b_device_channel AS deviceTypeId
+            FROM t_camera_recorder JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '硬盘录像机'
+        )
+        UNION ALL (
+            SELECT voice_device_id AS Id, voice_device_name AS label, dict_code AS upId, dict_note AS upName, "voice" AS infoType, voice_code AS deviceTypeId
+            FROM t_voice_device JOIN t_dict_business ON col_name = 'cruise_device_type' and dict_note = '声纹'
+        )
+    </select>
+</mapper>

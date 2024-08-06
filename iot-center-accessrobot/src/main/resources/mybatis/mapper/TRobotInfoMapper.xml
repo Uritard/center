@@ -1275,6 +1275,15 @@
             and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
         </if>
     </select>
+    <select id="selectRobotInfoByNetsCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        `t_robot_info` a
+        WHERE
+        a.nest_code = #{nestCode}
+        limit 1
+    </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">
         SELECT robot_type from t_robot_info where robot_code = #{robotCode}
@@ -1493,4 +1502,10 @@
         where shield_id in (#{robotId})
         and warn_content like concat('%',#{warnCount},'%')
     </select>
+
+    <update id="updateUnionTask" >
+        update t_union_task
+        set is_finish = #{isFinish}
+        where union_id = #{taskId}
+    </update>
 </mapper>

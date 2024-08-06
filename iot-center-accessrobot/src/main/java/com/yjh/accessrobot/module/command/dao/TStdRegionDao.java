@@ -23,6 +23,8 @@ public interface TStdRegionDao {
 
     TStdRegion selectByPrimaryId(@Param(value = "regionId") Long regionId);
 
+    TStdRegion selectByEdgeCode(@Param(value = "edgeCode") String edgeCode);
+
     List<TStdRegion> select(@Param(value = "regionId") Long regionId,
                             @Param(value = "regionName") String regionName,
                             @Param(value = "sort") Integer sort,

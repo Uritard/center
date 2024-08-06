@@ -1,14 +1,17 @@
 package com.yjh.platform.module.patrol.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,9 +70,7 @@ public class IntelAnalysisController {
     public Response algorithmUpdateResult(@Valid @RequestBody UpdateResponse response) {
         try {
             log.info("< < < < < < 收到算法更新结果反馈：{}", JSON.toJSONString(response));
-            if (StringUtils.equals("test666", response.getRequestId())){
-                intelAnalysisService.algorithmUpdateResult(response);
-            }
+            intelAnalysisService.algorithmUpdateResult(response);
         }catch (Exception e){
             log.error(e.getMessage(), e);
             Response.serverError();

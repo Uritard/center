@@ -1,6 +1,7 @@
 package com.yjh.platform.module.video.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -19,10 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tt
@@ -47,8 +46,25 @@ public class CameraConController {
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
 //    @Logs(title = "相机播放",content = "根据用户传递的参数相机播放",logType = 5, authority = "1234,1235")
-    public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId, @RequestParam(value = "presetId", required = false) Long presetId) {
+    public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId,
+                                @RequestParam(value = "presetId", required = false) Long presetId,
+                                HttpServletRequest request) {
         Result result = new Result();
+        String token = request.getHeader("token");
+        String res = cameraConService.isInEmergencyAccess(token,cameraId);
+        Boolean cameraIsIn = cameraConService.isInEmergencyAccessNumber(cameraId);
+        Boolean emergencyAccessCameraGreaterThan = cameraConService.emergencyAccessCameraGreaterThan();
+        Boolean streamGreaterThan = cameraConService.streamGreaterThan();
+        if ("1".equals(res) && !cameraIsIn && streamGreaterThan && !emergencyAccessCameraGreaterThan){
+            cameraConService.closeStream();
+        } else if ("1".equals(res) && !cameraIsIn && streamGreaterThan){
+            result.setCode(209, "视频紧急调阅并并发路数已达上限，无法播放！");
+            return result;
+        } else if ("0".equals(res)){
+            cameraConService.closeStream();
+            //设置为紧急调阅模式
+            cameraConService.setCameraEmergencyAccess(null,cameraId,token);
+        }
         if (presetId != null && presetId > 0) {
             try {
                 cameraConService.isCameraControlled(cameraId);
@@ -73,9 +89,15 @@ public class CameraConController {
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
 //    @Logs(title = "相机停止播放",content = "根据用户传递的参数停止相机播放",logType = 5, authority = "1234,1235")
     public Result stopRealPlay(@RequestParam(value = "cameraId", required = false) Long cameraId,
-                               @RequestParam(value = "rtmpUrl", required = false) String rtmpUrl) {
+                               @RequestParam(value = "rtmpUrl", required = false) String rtmpUrl,
+                               HttpServletRequest request) {
         Result result = new Result();
         try {
+            String token = request.getHeader("token");
+            String res = cameraConService.isInEmergencyAccess(token,cameraId);
+            if ("0".equals(res)){
+                cameraConService.delCameraEmergencyAccess(null,cameraId);
+            }
             result.setData(cameraConService.stopRealPlay(cameraId, rtmpUrl));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -89,9 +111,14 @@ public class CameraConController {
     @ApiOperation(value = "相机批量播放")
     @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
 //    @Logs(title = "相机批量播放",content = "根据用户传递的参数控制相机批量播放",logType = 5, authority = "1234,1235")
-    public Result batchStartRealPlay(@RequestParam(value = "cameraIds") String cameraIds) {
+    public Result batchStartRealPlay(@RequestParam(value = "cameraIds") String cameraIds,HttpServletRequest request) {
         Result result = new Result();
         try {
+            String token = request.getHeader("token");
+            String res = cameraConService.isInEmergencyAccess(token,null);
+            if ("0".equals(res)){
+                cameraConService.delCameraEmergencyAccessList(cameraIds);
+            }
             result.setData(cameraConService.batchStartRealPlay(cameraIds));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -300,9 +327,19 @@ public class CameraConController {
     public Result ptzControl(@RequestParam(value = "dwPTZCommand") int dwPTZCommand,
                              @RequestParam(value = "cameraId") Long cameraId,
                              @RequestParam(value = "dStop") int dStop,
-                             @RequestParam(value = "speed") int speed) {
+                             @RequestParam(value = "speed") int speed,
+                             HttpServletRequest request) {
         Result result = new Result();
         try {
+            String token = request.getHeader("token");
+            String res = cameraConService.isInEmergencyAccess(token,cameraId);
+            if ("0".equals(res)){
+                cameraConService.delCameraEmergencyAccess(null,cameraId);
+            } else if ("1".equals(res)){
+                //处于紧急调阅模式 但是此token无法控制
+                result.setCode(209,"此相机被紧急调阅中，无法控制！");
+                return result;
+            }
             cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.pTZControl(dwPTZCommand, cameraId, dStop, speed));
             cameraConService.pushCtrlTime(cameraId);
@@ -708,6 +745,54 @@ public class CameraConController {
             result.setData(cameraConService.getServerConfig());
         } catch (Exception e) {
             result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("获取国标服务的配置失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "视频紧急调阅开启")
+    @RequestMapping(value = "/emergencyAccess", method = RequestMethod.POST)
+    public Result emergencyAccess(HttpServletRequest request,
+                                  @RequestParam(value = "cameraIdList",required = false) List<Long> cameraIdList,
+                                  @RequestParam(value = "flag") boolean flag)  {
+        Result result = new Result();
+        try {
+            String token = request.getHeader("token");
+            if (flag){
+                cameraConService.emergencyAccess(cameraIdList,token);
+            } else {
+                String res = cameraConService.isInEmergencyAccess(token,null);
+                if (cameraIdList == null){
+                    cameraIdList = cameraConService.getEmergencyAccessCameraList().stream()
+                            .map(Long::valueOf)
+                            .collect(Collectors.toList());
+                }
+                if ("0".equals(res) && cameraIdList != null) {
+                    cameraIdList.forEach(cameraId -> {
+                        cameraConService.delCameraEmergencyAccess(null, cameraId);
+                    });
+                } else if ("1".equals(res)){
+                    result.setCode(209,"");
+                }
+                redisTemplate.delete(CameraConService.emergencyAccessKey);
+            }
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.error("获取国标服务的配置失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "视频紧急调阅状态查询")
+    @RequestMapping(value = "/emergencyAccessState", method = RequestMethod.GET)
+    public Result emergencyAccessState(HttpServletRequest request)  {
+        Result result = new Result();
+        try {
+            String token = request.getHeader("token");
+            Object oldToken = redisTemplate.opsForHash().get(CameraConService.emergencyAccessKey,"token");
+            result.setData(token.equals(oldToken));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
             log.error("获取国标服务的配置失败",e);
         }
         return result;

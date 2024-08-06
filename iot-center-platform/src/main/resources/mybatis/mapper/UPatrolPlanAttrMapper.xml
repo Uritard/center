@@ -288,5 +288,68 @@
         </foreach>
     </delete>
 
-
+    <select id="queryTaskMeteListForPage"
+            resultType="com.yjh.platform.module.patrol.entity.UPatrolTaskAttr"
+            parameterType="com.yjh.platform.module.patrol.entity.query.TaskMeteQuery">
+        SELECT
+        a.task_id,
+        a.device_mete_id,
+        a.region_id,
+        a.instance_id,
+        h.mete_name AS instance_name,
+        a.device_id,
+        d.device_name,
+        h.custom_id,
+        (
+        CASE
+        WHEN a.point_type = '228'
+        OR a.point_type = '524' THEN
+        k.robot_name
+        WHEN a.point_type = '229'
+        OR a.point_type = '230' THEN
+        j.camera_name
+        WHEN a.point_type = '232' THEN
+        c.voice_device_name
+        ELSE
+        '其他'
+        END
+        ) AS cruise_device_name,
+        b.cruise_type,
+        h.mete_type
+        FROM
+        u_patrol_task_attr a
+        LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
+        LEFT JOIN t_std_device d ON a.device_id = d.device_id
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_robot_info k ON f.robot_id = k.robot_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_camera_info j ON g.camera_id = j.camera_id
+        LEFT JOIN t_voice_device c ON b.cruise_id = c.voice_device_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = a.device_mete_id
+        WHERE
+        1 = 1
+        and a.task_id = #{taskId}
+        <if test="meteName != null and meteName != ''">
+            AND h.mete_name like concat("%",#{meteName},"%")
+        </if>
+        <if test="cruiseDeviceList != null and cruiseDeviceList.size > 0">
+            AND k.robot_id in
+            <foreach collection="cruiseDeviceList" item="cruiseDevice" open="(" separator="," close=")">
+                #{cruiseDevice}
+            </foreach>
+        </if>
+        <if test="cruiseTypeList != null and cruiseTypeList.size > 0">
+            AND b.cruise_type in
+            <foreach collection="cruiseTypeList" item="cruiseType" open="(" separator="," close=")">
+                #{cruiseType}
+            </foreach>
+        </if>
+        <if test="meteTypeList != null and meteTypeList.size > 0">
+            AND h.mete_type in
+            <foreach collection="meteTypeList" item="meteType" open="(" separator="," close=")">
+                #{meteType}
+            </foreach>
+        </if>
+        ORDER BY b.device_id, h.custom_id,a.instance_id
+    </select>
 </mapper>

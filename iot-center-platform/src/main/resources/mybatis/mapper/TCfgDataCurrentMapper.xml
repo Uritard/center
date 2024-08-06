@@ -158,4 +158,18 @@
             left join t_cfg_device c on a.mete_id = c.device_id
             where mete_id=#{meteId,jdbcType=BIGINT}
         </select>
+
+    <select id="selectTaskByMeteId" resultType="com.yjh.platform.module.patrol.entity.UPatrolTaskAttr">
+        SELECT
+            task.task_id,
+            attr.device_mete_id,
+            point.instance_id
+        FROM
+            u_patrol_result task
+                LEFT JOIN u_patrol_task_attr attr ON task.task_id = attr.task_id
+                LEFT JOIN t_cruise_point_instance point ON attr.instance_id = point.instance_id
+        WHERE
+            task.task_state IN ( 239, 241 )
+          AND point.cruise_id = #{meteId} and point.cruise_type = 231
+    </select>
 </mapper>

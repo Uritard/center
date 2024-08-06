@@ -14,28 +14,19 @@
             a.instance_id AS device_id,
         </if>
         <if test="middlegroundIds == true">
-            CASE WHEN re.up_region_ids is null or re.up_region_ids='' THEN f.up_region_id ELSE re.up_region_ids END AS bay_id,
-            CASE WHEN re.remark is null or re.remark='' THEN re.region_name ELSE re.remark END AS bay_name,
-            CASE WHEN g.pms_id is null or g.pms_id='' THEN f.device_id ELSE g.pms_id END AS main_device_id,
-            CASE WHEN b.component_id is null or b.component_id='' THEN CONCAT(f.device_id, '_', b.custom_id) ELSE b.component_id END AS component_id,
+            re.up_region_ids as bay_id,
+            re.region_name as bay_name,
+            g.pms_id AS main_device_id,
+            b.component_id,
         </if>
         <if test="middlegroundIds == false">
             f.up_region_id as bay_id,
             f.up_region_name as bay_name,
             f.device_id AS main_device_id,
-            CONCAT(f.device_id, '_', b.custom_id) as component_id,
+            CONCAT(b.device_id,'_',b.custom_id) as component_id,
         </if>
-        (CASE
-        WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_id) AND ISNULL(d.preset_name) THEN ''
-        WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_name) THEN d.preset_name
-        WHEN ISNULL(b.mete_name) AND ISNULL(d.preset_img) THEN c.inspection_name
-        WHEN ISNULL(c.inspection_name) AND ISNULL(d.preset_name) THEN b.mete_name
-        WHEN ISNULL(c.inspection_name) THEN CONCAT(b.mete_name, ' /', d.preset_name)
-        WHEN ISNULL(d.preset_name) THEN CONCAT(b.mete_name, ' /', c.inspection_name)
-        END)         AS device_name,
-        b.custom_id      as component_id,
+        b.mete_name         AS device_name,
         b.custom_name   as component_name,
-        f.device_id AS main_device_id,
         f.device_name    as main_device_name,
         f.preset_id AS device_preset_id,
         f.camera_id AS device_camera_id,
@@ -101,7 +92,9 @@
         b.threshold_abs,
         b.threshold_per,
         b.redundant_type,
+        b.redundant_type AS point_type,
         b.is_temdif,
+        b.label_attri,
         ""               as save_type_list,
         k.up_dict      as recognition_type_list,
         ""               as phase,
@@ -122,7 +115,8 @@
         robot.robot_code,
         robot.robot_num,
         d.camera_id AS camera_id,
-        dc.b_camera_channel_id,
+        e.b_camera_channel_id,
+        e.camera_channel_id,
         i.voice_device_id AS voice_id
         FROM t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
@@ -130,7 +124,7 @@
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         left join t_robot_info robot on c.robot_id = robot.robot_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-        LEFT JOIN t_camera_info dc ON d.camera_id = dc.camera_id
+        LEFT JOIN t_camera_info e ON d.camera_id = e.camera_id
         left join t_std_device f on b.device_id = f.device_id
         LEFT JOIN t_std_device_attr g ON g.device_id= f.device_id
         left join t_std_region re on f.up_region_id = re.region_id
@@ -299,7 +293,7 @@
         select
             maintenance_id,
             maintenance_name,
-            IF(device_level=3 or device_level=4, instance_ids,device_ids) AS device_ids,
+            instance_ids AS device_ids,
             config_code,
             is_valid ,
             DATE_FORMAT(maintenance_start, '%Y-%m-%d %H:%i:%s') as maintenance_start,
@@ -564,16 +558,6 @@
         </if>
     </select>
 
-    <select id="selectInstanceIdsByComponent" resultType="java.lang.String">
-        SELECT tcpi.instance_id
-        FROM t_cruise_point_instance tcpi
-        WHERE 1 = 1
-        <foreach collection="list" open="AND (" close=")" separator="OR" item="deviceModel">
-        tcpi.device_id = #{deviceModel.deviceId}
-        AND FIND_IN_SET(tcpi.custom_id, #{deviceModel.componentId, jdbcType=VARCHAR})
-        </foreach>
-    </select>
-
     <select id="selectInstanceIdsByUpRegionIds" resultType="java.lang.String">
         SELECT tcpi.instance_id
         FROM t_cruise_point_instance tcpi
@@ -588,7 +572,7 @@
         FROM t_cruise_point_instance tcpi
         LEFT JOIN t_std_device_attr attr ON tcpi.device_id = attr.device_id
         WHERE 1 = 1
-        AND FIND_IN_SET(attr.pms_id, #{pmsId})
+          AND FIND_IN_SET(attr.pms_id, #{pmsId})
     </select>
 
     <select id="selectInstanceIdsByMiddlegroundComponent" resultType="java.lang.String">
@@ -596,7 +580,119 @@
         FROM t_cruise_point_instance tcpi
         LEFT JOIN t_std_devicemete mete ON tcpi.device_mete_id = mete.device_mete_id
         WHERE 1 = 1
-        AND FIND_IN_SET(mete.component_id, #{componentId})
+          AND FIND_IN_SET(mete.component_id, #{componentId})
     </select>
 
+
+
+    <select id="selectInstanceIdsByComponent" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        WHERE 1 = 1
+        <foreach collection="list" open="AND (" close=")" separator="OR" item="deviceModel">
+        tcpi.device_id = #{deviceModel.deviceId}
+        AND FIND_IN_SET(tcpi.custom_id, #{deviceModel.componentId, jdbcType=VARCHAR})
+        </foreach>
+    </select>
+    <select id="countLabelAccuracy" resultType="java.util.HashMap">
+        SELECT
+            count(1) AS totalNum,
+            sum(
+                    IF (t.identify_state = 258, 1, 0)
+                ) AS validNum
+        FROM
+            (
+                SELECT
+                    a.identify_state
+                FROM
+                    u_patrol_data_result a
+                        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+                WHERE
+                    b.is_ai = 'on'
+                AND a.identify_state IS NOT NULL
+                AND a.cruise_time BETWEEN #{startTime} and #{endTime}
+            ) t
+    </select>
+    <select id="selectMaintenanceModel" resultType="java.util.Map">
+        SELECT
+            #{stationName} AS station_name,
+            #{stationCode} AS station_code,
+            patroldevice_name,
+            patroldevice_code,
+            up_dict AS patroldevice_type,
+            record_code,
+            DATE_FORMAT(start_time, '%Y-%m-%d %H:%i:%s') as start_time,
+            DATE_FORMAT(end_time, '%Y-%m-%d %H:%i:%s') as end_time,
+            fault_level,
+            fault_desc,
+            maintenance_unit,
+            maintenance_person,
+            maintenance_status
+        FROM
+            `device_maintenance_info` LEFT JOIN t_dict_business ON patroldevice_type = dict_code;
+    </select>
+    <select id="selectLinkageModel" resultType="java.util.Map">
+        SELECT
+            b.device_id AS source_code,
+            b.device_name AS source_name,
+            (
+                CASE (c.mete_kind)
+                    WHEN 1 THEN
+                        '遥信'
+                    WHEN 2 THEN
+                        '遥测'
+                    WHEN 3 THEN
+                        '遥控'
+                    END
+                ) AS source_type,
+            (
+                SELECT
+                    <if test="standardPoints == true">
+                        GROUP_CONCAT(mete.device_point_id)
+                    </if>
+                    <if test="standardPoints == false">
+                        GROUP_CONCAT(d.instance_id)
+                    </if>
+                FROM
+                    u_patrol_plan_attr d
+                        left join t_std_devicemete mete on d.device_mete_id = mete.device_mete_id
+                WHERE
+                    d.plan_id = a.plan_id
+            ) AS device_id
+        FROM
+            `t_cfg_union_rule` a
+        LEFT JOIN t_cfg_device b ON a.input_param = b.device_id
+        LEFT JOIN t_cfg_mete c ON b.device_id = c.mete_id
+    </select>
+    <select id="selectAlarmThresholdModel" resultType="com.yjh.accesstcp.module.device.entity.TCruisePointInstanceMeteDetail">
+        SELECT
+            b.*,
+            c.up_dict AS recognition_type,
+            a.instance_id
+        FROM
+            t_cruise_point_instance a
+                RIGHT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+                LEFT JOIN t_dict_business c ON b.mete_type = c.dict_code AND c.col_name = 'mete_type'
+        WHERE
+            b.mete_kind != '' AND b.mete_kind IS NOT NULL and b.alarm_level is not null
+    </select>
+
+    <select id="selectStandardPointsByInstanceId" resultType="java.util.Map">
+        SELECT  DISTINCT
+            a.instance_id,
+            f.up_region_id as bay_id,
+            f.device_id AS main_device_id,
+            CONCAT(b.device_id,'_',b.custom_id) as component_id,
+            b.device_point_id,
+            re.up_region_ids as middle_bay_id,
+            g.pms_id AS middle_device_id,
+            b.component_id AS middle_component_id
+        FROM t_cruise_point_instance a
+            LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+            LEFT join t_std_device f on b.device_id = f.device_id
+            LEFT JOIN t_std_device_attr g ON g.device_id= f.device_id
+            LEFT join t_std_region re on f.up_region_id = re.region_id
+        WHERE f.up_region_id is not null
+           AND FIND_IN_SET(a.instance_id, #{instanceIds})
+    </select>
 </mapper>

@@ -222,7 +222,8 @@
             video_path,
             value,
             out_range,
-            task_id
+            task_id,
+            label_attri
         )values(
                 #{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
@@ -250,7 +251,8 @@
                 #{videoPath, jdbcType=VARCHAR},
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR},
+                #{labelAttri,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -656,7 +658,8 @@
         a.modulus,
         a.is_temdif,
         a.alarm_rule_type,
-        a.remark
+        a.remark,
+        a.label_attri
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
         where b.instance_id=#{instanceId,jdbcType=BIGINT}
@@ -761,7 +764,8 @@
             VALUE,
             out_range,
             link_message,
-            task_id
+            task_id,
+            label_attri
         )values(
                 #{defectId, jdbcType=BIGINT},
                 #{defectLevel, jdbcType=INTEGER},
@@ -790,7 +794,8 @@
                 #{value, jdbcType=VARCHAR},
                 #{outRange, jdbcType=VARCHAR},
                 #{linkMessage, jdbcType=VARCHAR},
-                #{taskId, jdbcType=VARCHAR}
+                #{taskId, jdbcType=VARCHAR},
+                #{labelAttri, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -937,6 +942,9 @@
         SELECT
             a.preset_id,
             a.camera_id,
+            f.b_camera_channel_id,
+            f.camera_channel_id,
+            f.camera_name,
             b.cruise_id,
             b.instance_id,
             b.custom_id,
@@ -945,11 +953,12 @@
             b.device_mete_id,
             e.mete_name
         FROM
-            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
-        where a.preset_id = b.cruise_id
-          and d.device_id = b.device_id
-          AND b.device_mete_id = e.device_mete_id
-          and a.preset_id = #{presetId,jdbcType=BIGINT}
+            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e,t_camera_info f
+        WHERE a.preset_id = b.cruise_id
+            AND d.device_id = b.device_id
+            AND b.device_mete_id = e.device_mete_id
+            AND a.camera_id = f.camera_id
+            AND a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
 
     <select id="selectAlgorithmInfo" resultType="com.yjh.platform.module.patrol.entity.TAlgorithmInfo">
@@ -1008,8 +1017,8 @@
             tdm.custom_id as customId,
             tdm.custom_name as customName,
             tdm.device_point_id as devicePointId,
-            if(b.preset_id is null,if(c.inspection_id is null,d.voice_code,e.robot_num),b.camera_id) as patroldevice_code ,
-            if(b.preset_id is null,if(c.inspection_id is null,d.voice_device_name,e.robot_name),f.camera_name) as patroldevice_name
+            if(b.preset_id is null,if(c.inspection_id is null,if (d.voice_code is null,cfg.mete_id,d.voice_code),e.robot_num),b.camera_id) as patroldevice_code ,
+            if(b.preset_id is null,if(c.inspection_id is null,if (d.voice_device_name is null,cfg.mete_name,d.voice_device_name),e.robot_name),f.camera_name) as patroldevice_name
         from t_cruise_point_instance a
         left join t_std_devicemete tdm ON a.device_mete_id = tdm.device_mete_id
         left join t_camera_preset b on a.cruise_id = b.preset_id
@@ -1018,6 +1027,7 @@
         left join t_robot_info e on c.robot_id = e.robot_id
         left join t_voice_device d on a.cruise_id = d.voice_device_id
         left join t_std_device tsd on a.device_id = tsd.device_id
+        left join t_cfg_mete cfg on cfg.mete_id = a.cruise_id
         where a.instance_id =  #{instanceId}
     </select>
 
@@ -1069,15 +1079,46 @@
     </select>
 
     <select id="selectDefectListByIds" resultType="com.yjh.platform.module.patrol.entity.TDefectInfo">
-        select * from t_defect_info WHERE defect_id IN(
+        select
+            defect.*,
+            mete.device_point_id
+        from t_defect_info defect
+        left join t_std_devicemete mete on defect.std_mete_id = mete.device_mete_id
+        WHERE defect_id IN(
         <foreach collection="list" item="defectId" separator=",">
             #{defectId}
         </foreach>
         )
     </select>
 
+    <select id="selectWarnAndResultListByIds" resultType="java.util.HashMap">
+        SELECT
+        result.cruise_id AS cruiseId,
+        result.cruise_device_id AS cruiseDeviceId,
+        result.cruise_type AS cruiseType,
+        result.cruise_device_name AS cruiseDeviceName,
+        task.task_name AS taskName,
+        task.task_code AS taskCode,
+        result.instance_name AS instanceName,
+        result.instance_id AS instanceId,
+        result.device_point_id AS devicePointId,
+        mete.mete_type AS meteType,
+        result.picpath AS picpath,
+        result.unit
+        FROM
+        u_patrol_data_result result
+        LEFT JOIN t_std_devicemete mete ON result.device_mete_id = mete.device_mete_id
+        LEFT JOIN u_patrol_task task ON result.task_id = task.task_id
+        WHERE result.task_id = #{taskId} and result.instance_id = #{instanceId}
+    </select>
+
     <select id="selectWarnListByIds" resultType="com.yjh.platform.module.task.entity.TWarnInfo">
-        select * from t_warn_info WHERE warn_id IN(
+        select
+        warn.*,
+        mete.device_point_id
+        from t_warn_info warn
+        left join t_std_devicemete mete on warn.std_mete_id = mete.device_mete_id
+        WHERE warn_id IN(
         <foreach collection="list" item="warnId" separator=",">
             #{warnId}
         </foreach>

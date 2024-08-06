@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>61</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:02:18</Time>
+    <Items>
+        <Item patroldevice_name="SI100测试" patroldevice_code="{{robotCode}}" task_name="测试任务" task_code="{{taskCode}}" device_name="测温1" device_id="83635" value_type="0" value="22.6" value_unit="22.6°C" unit="°C" time="{{now}}" recognition_type="4" file_type="2" file_path="1/2024/03/29/14673505fc354f08802e45547c940899/FIR/83635_Edge01_20240329100217.jpg" rectangle="357,239;882,239;357,589;882,589" task_patrolled_id="{{taskPatrolledId}}" data_type="2" valid="1" />
+    </Items>
+</PatrolHost>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>IotCenter</artifactId>
         <groupId>com.yjh</groupId>
-        <version>2.1.1.221031_BETA</version>
+        <version>3.6.6.240815_RC</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -118,7 +118,7 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.4.1</version>
-            <scope>provied</scope>
+            <scope>provided</scope>
         </dependency>
         <!--自定义velocity格式模版需要-->
         <!--<dependency>
@@ -131,7 +131,7 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.27-incubating</version>
-            <scope>provied</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -354,6 +354,23 @@
             <artifactId>iot-video-api</artifactId>
             <version>1.0.2-SNAPSHOT</version>
         </dependency>
+        <!-- 获取系统信息 -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.12.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -435,7 +452,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!-- The configuration of the plugin -->
                 <configuration>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <!-- Specifies the configuration file of the assembly plugin -->
                     <descriptors>
                         <descriptor>${project.basedir}/package.xml</descriptor>

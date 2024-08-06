@@ -181,8 +181,9 @@ public class UPatrolDataResultService {
                     List<List<Object>> contents = Lists.newArrayList();
                     cruiseResultAnalyzeInfoList.forEach(cruiseResult -> {
                         List<Object> content = Lists.newArrayList();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         strings.forEach(s -> {
-                            String value = String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""));
+                            String value =  String.valueOf(cruiseResult.getOrDefault(ExportUtil.map.get(s), ""));
                             if (StringUtils.contains(s, "图片")) {
                                 content.add(new ImageFile(value));
                             } else {

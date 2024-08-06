@@ -48,6 +48,9 @@ public class Constant {
     public static final String YT="YT";
     public static final String YK="YK";
 
+    public static final String ZERO = "0";
+    public static final String ONE = "1";
+    public static final String TWO = "2";
 
     // 系统属性
     public static final String SYSTEM = "system";
@@ -73,11 +76,6 @@ public class Constant {
 
     public static String TIME= "";
 
-    public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
-
-    public static AtomicLong sendSessionId = new AtomicLong(0L);//发送会话序列号
-    // public static long receiveSessionId = 0L;//接受序列号
-
     public static String Packet = "";
 
     public static Map<String,String> paramMap =new ConcurrentHashMap<>();
@@ -91,14 +89,46 @@ public class Constant {
     public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
 
     /**
+     * 请求算法资源信息
+     */
+    public static final String ALGORITHM_RESOURCE_URL = "http://iot-center-platform/analysis/v1/algorithmResource";
+    /**
+     * 请求系统自检信息
+     */
+    public static final String SYSTEM_CHECK_URL = "http://iot-center-platform/systemInfo/v1/getSystemCheck";
+
+    /**
+     * 算法可靠性指标统计
+     */
+    public static final String ALGORITHM_STATISTICS_URL = "http://iot-center-platform/statistics/v1/algorithmStatics?type={type}&beginTime={beginTime}&endTime={endTime}";
+
+    /**
      * platform接收一键顺控反馈文件
      */
     public static final String PLATFORM_SEND ="http://iot-center-platform/tSequentialConf/v1/receiveFile";
+    /**
+     * platform接收巡视结果审核
+     */
+    public static final String TASK_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotPatrolTaskReview";
+    /**
+     * platform接收下级系统的告警审核
+     */
+    public static final String WARN_REVIEW_PROCESS = "http://iot-center-platform/uPatrolResult/v1/robotWarnReview";
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
         try {
             re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return re;
+    }
+
+    public static<T> Result otherServerByList( List<T> list, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -132,7 +162,7 @@ public class Constant {
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     //任务删除
-    public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&source={source}";
+    public static final String TASK_DELETE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemDelete?taskId={taskId}&startTime={startTime}&endTime={endTime}&type={type}&source={source}";
     public static final String IOT_DEVICE_UPLOAD_URL = "http://iot-center-platform//tStdDevice/v1/uploadModel?type={type}";
     public static final String GET_WVP_SERVER_CONFIG = "http://iot-center-platform/camera/v1/getServerConfig";
     public static  XMLBaseModel weatherXmlModel = null;
@@ -140,21 +170,58 @@ public class Constant {
     public static RedisTemplate redisTemplate;
 
     /**
-     * 变电站名称
+     * 节点级别
+     */
+    public static String edgeLevel;
+
+
+    /**
+     * 获取节点级别
+     */
+    public static String edgeLevel() {
+        try {
+            edgeLevel = (String) redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content");
+            log.debug("edgeLevel is {}", edgeLevel);
+        } catch (Exception e) {
+            edgeLevel = "";
+        }
+        return edgeLevel;
+    }
+
+    /**
+     * 变电站编码
      */
     public static String stationCode;
 
     /**
-     * 获取变电站名称
+     * 获取变电站编码
      */
     public static String stationCode() {
         try {
             stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            log.info("stationCode is {}", stationCode);
+            log.debug("stationCode is {}", stationCode);
         } catch (Exception e) {
             stationCode = "";
         }
         return stationCode;
+    }
+
+    /**
+     * 变电站名称
+     */
+    public static String stationName;
+
+    /**
+     * 获取变电站名称
+     */
+    public static String stationName() {
+        try {
+            stationName = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
+            log.debug("stationName is {}", stationName);
+        } catch (Exception e) {
+            stationName = "";
+        }
+        return stationName;
     }
 
     public static Boolean handlerNew = true;
@@ -165,23 +232,26 @@ public class Constant {
     public static boolean handlerNew() {
         try {
             handlerNew = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("systemConfigKey:robotServerConfig", "nettyHandlerNew"));
-            log.info("handlerNew is {}", handlerNew);
+            log.debug("handlerNew is {}", handlerNew);
         } catch (Exception e) {
             handlerNew = true;
         }
         return handlerNew;
     }
 
-    public static String cruise;
+    /**
+     * 节点编码
+     */
+    public static String edgeCode;
 
-    public static String cruise() {
+    public static String edgeCode() {
         try {
-            cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
-            log.info("cruise is {}", cruise);
+            edgeCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
+            log.debug("edgeCode is {}", edgeCode);
         } catch (Exception e) {
-            cruise = "Client01";
+            edgeCode = "Client01";
         }
-        return cruise;
+        return edgeCode;
     }
 
     public static String server;
@@ -189,11 +259,23 @@ public class Constant {
     public static String server() {
         try {
             server = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
-            log.info("server is {}", server);
+            log.debug("server is {}", server);
         } catch (Exception e) {
             server = "Server01";
         }
         return server;
+    }
+
+    public static String algorithmServer;
+
+    public static String algorithmServer() {
+        try {
+            algorithmServer = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemAlgorithmReceiveCode","content");
+            log.debug("algorithmServer is {}", algorithmServer);
+        } catch (Exception e) {
+            algorithmServer = "Cloud01";
+        }
+        return algorithmServer;
     }
 
     public static String upSystemFlag;
@@ -206,7 +288,7 @@ public class Constant {
         if (upSystemFlag == null) {
             try {
                 upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-                log.info("upSystemFlag is {}", upSystemFlag);
+                log.debug("upSystemFlag is {}", upSystemFlag);
             } catch (Exception e) {
                 upSystemFlag = "1";
             }
@@ -252,7 +334,7 @@ public class Constant {
         if (upSystemIp == null) {
             try {
                 upSystemIp = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
-                log.info("upSystemIp is {}", upSystemIp);
+                log.debug("upSystemIp is {}", upSystemIp);
             } catch (Exception e) {
                 upSystemIp = "127.0.0.1";
             }
@@ -274,7 +356,7 @@ public class Constant {
         if (upSystemPort == null) {
             try {
                 upSystemPort = Integer.valueOf(redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort").toString());
-                log.info("upSystemPort is {}", upSystemPort);
+                log.debug("upSystemPort is {}", upSystemPort);
             } catch (Exception e) {
                 upSystemPort = 10011;
             }
@@ -282,6 +364,96 @@ public class Constant {
         return upSystemPort;
     }
 
+    public static String managerSystemFlag;
+
+    /**
+     * 上级系统算法平台连接开关 1开 0关
+     * @return
+     */
+    public static String managerSystemFlag() {
+        if (managerSystemFlag == null) {
+            try {
+                managerSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag");
+                log.debug("managerSystemFlag is {}", managerSystemFlag);
+            } catch (Exception e) {
+                managerSystemFlag = "1";
+            }
+        }
+        return managerSystemFlag;
+    }
+
+
+    /**
+     * 上级系统算法IP
+     */
+    public static String managerSystemIp;
+
+    /**
+     * 上级系统算法IP
+     * @return 上级系统算法IP
+     */
+    public static String managerSystemIp() {
+        if (managerSystemIp == null) {
+            try {
+                managerSystemIp = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemIp");
+                log.debug("upSystemIp is {}", managerSystemIp);
+            } catch (Exception e) {
+                managerSystemIp = "127.0.0.1";
+            }
+        }
+        return managerSystemIp;
+    }
+
+
+    /**
+     * 上级系统算法端口
+     */
+    public static Integer managerSystemPort;
+
+    /**
+     * 上级系统算法端口
+     * @return 上级系统算法端口
+     */
+    public static Integer managerSystemPort() {
+        if (managerSystemPort == null) {
+            try {
+                managerSystemPort = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemPort")));
+                log.debug("managerSystemPort is {}", managerSystemPort);
+            } catch (Exception e) {
+                managerSystemPort = 10013;
+            }
+        }
+        return managerSystemPort;
+    }
+
+
+    /**
+     * 使用标准点位下发任务
+     */
+    public static boolean standardPoints() {
+        boolean standardPoints;
+        try {
+            standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+            log.debug("standardPoints is {}", standardPoints);
+        } catch (Exception e) {
+            standardPoints = false;
+        }
+        return standardPoints;
+    }
+
+    /**
+     * 是否使用业务中台id
+     */
+    public static boolean middlegroundIds() {
+        boolean middlegroundIds;
+        try {
+            middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+            log.debug("middlegroundIds is {}", middlegroundIds);
+        } catch (Exception e) {
+            middlegroundIds = false;
+        }
+        return middlegroundIds;
+    }
 
     public static final String T_SYS_PARAM = "t_sys_param:";
     //主站任务下发到机器人

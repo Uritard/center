@@ -24,29 +24,13 @@ import java.util.Date;
 public class CruiseManualReview {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "巡视点数据id")
-    private Long cruiseDataId;
     @ApiModelProperty(value = "巡检任务id")
     private String taskResultId;
-    @ApiModelProperty(value = "巡检任务id")
-    private String taskId;
     @ApiModelProperty(value = "巡检点实例id")
     private Long instanceId;
     @ApiModelProperty(value = "人工校核结果")
     @TableField(value = "person_check",updateStrategy = FieldStrategy.IGNORED)
     private String personCheck;
-    @ApiModelProperty(value = "评价状态")
-    private Integer evaluationState;
-    @ApiModelProperty(value = "评价状态-字典表")
-    private String evaluationStateName;
-    @ApiModelProperty(value = "实际结果")
-    private Integer identifyResult;
-    @ApiModelProperty(value = "实际结果-字典表")
-    private String identifyResultName;
-    @ApiModelProperty(value = "识别状态")
-    private Integer identifyState;
-    @ApiModelProperty(value = "识别状态-字典表")
-    private String identifyStateName;
     @ApiModelProperty(value = "审核人")
     @TableField(value = "check_user",updateStrategy = FieldStrategy.IGNORED)
     private String checkUser;
@@ -54,8 +38,10 @@ public class CruiseManualReview {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "审核时间")
     private Date checkDate;
-    @ApiModelProperty(value = "执行时间")
-    private String executeTime;
     @ApiModelProperty(value = "下级同步时需要，下级唯一标识")
     private String sendCode;
+    @ApiModelProperty(value = "巡检点实例id集合")
+    private String instanceIds;
+    @ApiModelProperty(value = "人工审核结论")
+    private String remark;
 }

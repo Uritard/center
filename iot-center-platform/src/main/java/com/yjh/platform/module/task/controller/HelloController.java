@@ -27,8 +27,8 @@ import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
-import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.patrol.service.impl.OnLineMonitoringExecuteImpl;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
@@ -1033,6 +1033,35 @@ public class HelloController {
             jasonMap.put("status", params.getString("status"));
             log.info("发送给前端的消息 —— 巡视报告下载:{}", jasonMap);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap, params.getString("userId"));
+        } catch (Exception e) {
+            log.error("webSocket发送异常", e);
+        }
+        return new Result();
+    }
+
+    @PostMapping(value="/refreshDictCache")
+    public Result refreshDictCache() {
+        try {
+            DictConvertUtil.DICT.loadDict();
+        } catch (Exception e) {
+            log.error("更新字典表缓存失败", e);
+            return new Result(500, "更新字典表缓存失败");
+        }
+        return new Result();
+    }
+
+    @Autowired
+    private OnLineMonitoringExecuteImpl onLineMonitoringExecute;
+
+    @PostMapping(value="dataCellTest")
+    public Result dataCellTest() {
+        try {
+//            List<Long> list = new ArrayList<>();
+//            list.add(21001L);
+//            list.add(21002L);
+//            list.add(21003L);
+//            list.add(21004L);
+//            onLineMonitoringExecute.execute(list);
         } catch (Exception e) {
             log.error("webSocket发送异常", e);
         }

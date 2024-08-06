@@ -10,10 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -74,6 +71,21 @@ public class SendFileController {
             String commit =param.get("commit");
             String time = param.get("time");
             result.setData(tCfgMeteService.dealLinkageSignal(meteId, meteKind, value, commit, time));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("处理失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "数据召唤")
+    @RequestMapping(value = "/dataCall", method = RequestMethod.POST)
+    public Result dataCall(@RequestBody Map<String,Object> param) {
+        Result result = new Result();
+        try {
+            List<Long> meteIds = (List<Long>)param.get("meteIds");
+            String filePath = (String) param.get("filePath");
+            tCfgMeteService.dataCall(meteIds,filePath);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("处理失败描述：", e);

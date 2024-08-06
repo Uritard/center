@@ -6,26 +6,26 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.common.utils.Object2Map;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
-import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
-import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.common.utils.ZipUtil;
 import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.commons.utils.CommonUtils;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.module.device.utils.ValueUtil;
-import com.yjh.accesstcp.netty.server.NettyClient;
-import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import com.yjh.accesstcp.netty.NettyClient;
+import com.yjh.accesstcp.netty.TCPClientHandler;
+import com.yjh.accesstcp.netty.algorithm.StateGridAlgorithmHandlerImpl;
+import com.yjh.accesstcp.netty.iot.StateGridADecoder;
+import com.yjh.accesstcp.netty.iot.StateGridAHandlerImpl;
 import com.yjh.accesstcp.thread.ReContentManager;
 import com.yjh.accesstcp.thread.RegisterManager;
-import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -44,6 +44,7 @@ import redis.clients.jedis.ScanResult;
 
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -77,8 +78,6 @@ public class SendToUpSystemServices {
     @Autowired
     private RegisterManager registerManager;
     @Autowired
-    private ReContentManager reContentManager;
-    @Autowired
     private StatisticsDao statisticsDao;
 
     @Autowired
@@ -95,42 +94,27 @@ public class SendToUpSystemServices {
 
     @Transactional(rollbackFor = Exception.class)
     public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String, Object>> items, boolean isSend) {
-
-        String sendCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
-        String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
-        String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-
-        byte[] bytes = new byte[]{};
-        long sendSessionId;
-        TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(Constant.upSystemPort());
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(Constant.upSystemIp(), Constant.upSystemPort());
+        TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(inetSocketAddress);
         if (tcpClientHandler != null) {
-            sendSessionId = Constant.sendSessionId.incrementAndGet();
+            if (code == null || StringUtils.isEmpty(code)) {
+                code = Constant.stationCode();
+            }
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setType(type)
+                    .setCommand(command)
+                    .setCode(code)
+                    .setItems(items);
+            tcpClientHandler.send(xmlBaseModel, receiveSessionId, true);
+            return 1;
         } else {
-            // 刷新sendSessionId
             log.error("服务未连接，请重试，port: {}", Constant.upSystemPort());
-            Constant.sendSessionId.set(0L);
-
             // 把本级没有上报成功的巡视点结果暂存起来,重连服务后再上报上一级系统
-            if ("61".equals(type)){
+            if ("61".equals(type)) {
                 saveCruiseResultForMoment(items);
             }
             return -1;
         }
-        if (code == null || StringUtils.isEmpty(code)) {
-            code = stationCode;
-        }
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(sendCode)
-                .setReceiveCode(recvCode)
-                .setType(type)
-                .setCommand(command)
-                .setCode(code)
-                .setItems(items);
-        String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("发送给上级系统的消息：{}\nsendSessionId:{}, receiveSessionId:{}", xml, sendSessionId, receiveSessionId);
-        bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, isSend, xml);
-        tcpClientHandler.send(bytes, xmlBaseModel.getReceiveCode());
-        return 1;
     }
 
     public Map<String, Object> creatModel(String type) {
@@ -200,11 +184,19 @@ public class SendToUpSystemServices {
                     break;
                 case "10":
                     //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("source_file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourceFilePath = stationCode + "/Model/source_file_model.cime";
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("file_path", maintenanceModelTargetPath);
+                    }
                     break;
                 case "1001":
                     // 区域模型
@@ -232,7 +224,7 @@ public class SendToUpSystemServices {
     public List<Map<String, Object>> creatModelList(String type) {
         List<Map<String, Object>> list = new ArrayList<>();
         try {
-            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+            String stationCode = Constant.stationCode();
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model"+"/"+stationCode+"/Model":mapForPath.get("content")+"/"+stationCode+"/Model";
@@ -310,12 +302,33 @@ public class SendToUpSystemServices {
                     }
                     break;
                 case "10":
-                    //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("source_file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //设备资源信息配置文件
+                        String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("source_file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("maintenance_file_path", maintenanceModelTargetPath);
+                    }
+                    list.add(map);
+                    break;
+                case "11":
+                    //联动配置文件
+                    String linkageModelTargetPath = stationCode + "/Model/effect_model.xml";
+                    uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
+                    map.put("effect_file_path", linkageModelTargetPath);
+                    list.add(map);
+                    break;
+                case "12":
+                    //告警阈值模型
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.stationCode()+ ".xml";
+                    uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
+                    map.put("alarm_threshold_file_path", alarmThresholdTargetPath);
                     list.add(map);
                     break;
                 case "1001":
@@ -353,7 +366,7 @@ public class SendToUpSystemServices {
     @Async
     public void creatFile(String type) {
         try {
-            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+            String stationCode =  Constant.stationCode();
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
@@ -435,12 +448,33 @@ public class SendToUpSystemServices {
                     }
                     break;
                 case "10":
-                    //设备资源信息配置文件
-                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
-                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
-                    uploadFileToUpFtps(sourceModelPath, sourceFilePath);
-                    map.put("file_path",sourceFilePath);
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourceFilePath = stationCode + "/Model/source_file_model.cime";
+                        String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                        uploadFileToUpFtps(sourceModelPath, sourceFilePath);
+                        map.put("file_path", sourceFilePath);
+                    } else {
+                        //10:维护记录文件
+                        String maintenanceModelTargetPath = stationCode + "/Model/maintenance_model.xml";
+                        uploadFileToUpFtps(createMaintenanceModel(path), maintenanceModelTargetPath);
+                        map.put("file_path", maintenanceModelTargetPath);
+                    }
+                    list.add(map);
+                    break;
+                case "11":
+                    //联动配置文件
+                    String linkageModelTargetPath = stationCode + "/Model/effect_model.xml";
+                    uploadFileToUpFtps(createLinkageModel(path), linkageModelTargetPath);
+                    map.put("file_path", linkageModelTargetPath);
+                    list.add(map);
+                    break;
+                case "12":
+                    //告警阈值模型
+                    String alarmThresholdTargetPath = stationCode + "/Model/alarm_threshold_" + Constant.stationCode()+ ".xml";
+                    uploadFileToUpFtps(createAlarmThresholdModel(path), alarmThresholdTargetPath);
+                    map.put("file_path", alarmThresholdTargetPath);
                     list.add(map);
                     break;
                 case "1001":
@@ -466,6 +500,137 @@ public class SendToUpSystemServices {
         }
     }
 
+    private String createAlarmThresholdModel(String path) throws Exception {
+        List<Map<String, Object>> list = new ArrayList<>();
+        List<TCruisePointInstanceMeteDetail> meteDetails = sendToUpSystemDao.selectAlarmThresholdModel();
+        meteDetails.forEach(t->{
+            String alarmType = recognitionTypeToAlarmType(t.getRecognitionType(), String.valueOf(t.getIsTemdif()));
+            String alarmDesc = "";
+            //遥信
+            if (t.getMeteKind() == 1 && t.getAlarmLevel() > 130) {
+                int alarmLevel = t.getAlarmLevel() == 131 ? 1 : t.getAlarmLevel() == 132 ? 2 : 3;
+                String alarmState = t.getAlarmState() == 0 ? t.getStateZero() : t.getStateOne();
+                alarmDesc = "告警级别：" + getAlarmLevel(alarmLevel) + ";告警状态：" + alarmState;
+                Map<String, Object> item = getAlarmMap(t, 1, alarmState, alarmLevel, alarmDesc, alarmType);
+                list.add(item);
+            }
+            //遥测
+            if (t.getMeteKind() == 2) {
+                if (t.getHighLimit2() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警上限：" + t.getHighLimit2();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit2(), 1, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit2() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(1) + ";告警下限：" + t.getLowLimit2();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit2(), 1, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+                if (t.getHighLimit3() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警上限：" + t.getHighLimit3();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit3(), 2, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit3() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(2) + ";告警下限：" + t.getLowLimit3();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit3(), 2, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+                if (t.getHighLimit4() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警上限：" + t.getHighLimit4();
+                    Map<String, Object> itemHigh = getAlarmMap(t, 6, t.getHighLimit4(), 3, alarmDesc, alarmType);
+                    list.add(itemHigh);
+                }
+                if (t.getLowLimit4() != null) {
+                    alarmDesc =  "告警级别：" + getAlarmLevel(3) + ";告警下限：" + t.getLowLimit4();
+                    Map<String, Object> itemLow = getAlarmMap(t, 7, t.getLowLimit4(), 3, alarmDesc, alarmType);
+                    list.add(itemLow);
+                }
+            }
+        });
+        return CreateModeXMLUtil.createXmlFile(list, path, "alarm_threshold_" + Constant.stationCode() + ".xml", "Alarm_Threshold");
+    }
+
+    private String getAlarmLevel(int alarmLevel) {
+        switch (alarmLevel) {
+            case 2:
+                return "严重";
+            case 3:
+                return "危急";
+            default:
+                return "一般";
+        }
+    }
+
+    public static String recognitionTypeToAlarmType(String recognitionType,String isTemdif){
+        String alarmType = "";
+        switch (recognitionType){
+            case "1":
+            case "11":
+            case "12":
+            case "13":
+                //仪表越限报警
+                alarmType = "7";
+                break;
+            case "2":
+                //变位报警
+                alarmType = "10";
+                break;
+            case "3":
+                //外观异常
+                alarmType = "6";
+                break;
+            case "4":
+                if ("0".equals(isTemdif)) {
+                    //超温报警
+                    alarmType = "1";
+                } else {
+                    //温升报警
+                    alarmType = "2";
+                }
+                break;
+            case "5":
+                //声音异常
+                alarmType = "5";
+                break;
+            default:
+                break;
+        }
+        return alarmType;
+    }
+
+    public Map<String, Object> getAlarmMap(TCruisePointInstanceMeteDetail detail, Integer rule,
+                                           Object value, Integer level, String alarmDesc, String alarmType) {
+        Map<String, Object> item = new HashMap<>(11);
+        if (Constant.standardPoints()){
+            item.put("device_id", detail.getDevicePointId());
+        } else {
+            item.put("device_id", detail.getInstanceId());
+        }
+        item.put("device_name", detail.getMeteName());
+        item.put("defect_type", "");
+        item.put("station_code", Constant.stationCode());
+        item.put("station_name", Constant.stationName());
+        item.put("decide_rule", rule);
+        item.put("decision_value_class", 1);
+        item.put("alarm_desc", alarmDesc);
+        item.put("alarm_type", alarmType);
+        item.put("base_line_value", value);
+        item.put("alarm_level", level);
+        return item;
+    }
+
+    private String createLinkageModel(String path) throws Exception {
+        List<Map<String, Object>> list = sendToUpSystemDao.selectLinkageModel(Constant.standardPoints());
+        return CreateModeXMLUtil.createXmlFile(list, path, "effect_model.xml", "Effect_Config");
+    }
+
+    private String createMaintenanceModel(String path) throws Exception {
+        List<Map<String, Object>> list = sendToUpSystemDao.selectMaintenanceModel(Constant.stationName(), Constant.stationCode());
+        return CreateModeXMLUtil.createXmlFile(list, path, "maintenance_model.xml", "Maintenance_Record");
+    }
+
+
     public String createRecordFile(String path) throws Exception {
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectAll();
         Result re = Constant.getForObject(Constant.GET_WVP_SERVER_CONFIG);
@@ -485,7 +650,7 @@ public class SendToUpSystemServices {
         long sessionId =0L;
         boolean isSend = true;
         if (CollectionUtils.isNotEmpty(xmlBaseModel.getItems()) && xmlBaseModel.getItems().get(0).containsKey("error_code")){
-            sessionId = Constant.getParamMap.get("sendSessionId");
+            sessionId = Constant.getParamMap.getOrDefault("sendSessionId", 0L);
             isSend = false;
         }
         return this.sendResponse(sessionId, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), isSend);
@@ -506,14 +671,13 @@ public class SendToUpSystemServices {
     public String createDeviceModel(String path, String stationCode) throws Exception {
 //        Map<String, String> selectEdgeMap = redisTemplate.opsForHash().entries("t_sys_param:selectEdge");
 //        String selectEdge = selectEdgeMap.get("content");
-        String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+        String edgeLevel = Constant.edgeLevel();
 //        if ("1".equals(edgeLevel)){
 //            selectEdge = null;
 //        }
         String presetRealImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content"));
         String presetImgPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content"));
-        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(), Constant.middlegroundIds(),
-            null, presetRealImgPath,presetImgPath);
+        List<Map<String, Object>> list = sendToUpSystemDao.selectDeviceModel(Constant.standardPoints(),Constant.middlegroundIds(), null, presetRealImgPath, presetImgPath);
         String stationName = getStationName();
         list.forEach(item->{
             item.put("station_code",stationCode);
@@ -534,9 +698,11 @@ public class SendToUpSystemServices {
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
                 item.put("data_type","1");
-                String deviceCode = MapUtils.getString(item, "b_camera_channel_id");
-                deviceCode = StringUtils.isEmpty(deviceCode) ? MapUtils.getString(item, "camera_id") : deviceCode;
-                jsonObject.put("device_code", deviceCode);
+                if (CommonUtils.isEmptyOrNullstr(String.valueOf(item.get("b_camera_channel_id")))) {
+                    jsonObject.put("device_code", item.get("camera_channel_id"));
+                } else {
+                    jsonObject.put("device_code", item.get("b_camera_channel_id"));
+                }
                 jsonObject.put("device_pos",item.get("preset_num"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
@@ -548,8 +714,11 @@ public class SendToUpSystemServices {
                 item.put("data_type","4");
                 jsonObject.put("uav_code", item.get("robot_num"));
                 jsonObject.put("uav_pos",item.get("inspection_id"));
+            }else if (item.get("cruise_type").equals(231)){// 主辅系统
+                item.put("save_type_list","");
+                item.put("data_type","16");
             }
-            // item.put("component_id", StringUtils.joinWith("_", item.get("main_device_id"), item.get("component_id")));
+
             item.remove("cruise_type");
             item.remove("camera_id");
             item.remove("preset_num");
@@ -586,6 +755,7 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
             robotModel.setStationCode(stationCode);
             robotModel.setStationName(stationName);
+            robotModel.setMountPatroldeviceCode("");
             if (robotModel.getPhotePath() != null){
                 robotModel.setPhotePath(robotModel.getPhotePath().replace(relativeImgMap.get("content"),absoluteImgMap.get("content")));
             }
@@ -601,9 +771,14 @@ public class SendToUpSystemServices {
         List<CameraModel> cameraModelList = tCameraInfoMapper.selectAll();
         String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
         String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        Result re = Constant.getForObject(Constant.GET_WVP_SERVER_CONFIG);
+        JSONObject obj = (JSONObject) JSON.toJSON(re.getData());
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = cameraModelList.stream().peek(cameraModel -> {
+            if ("11".equals(cameraModel.getType())){
+                cameraModel.setCameraChannelId(String.valueOf(obj.get("username")));
+            }
             cameraModel.setStationCode(stationCode);
             cameraModel.setStationName(stationName);
         }).map((Function<CameraModel, Map<String, Object>>) cameraModel -> {
@@ -654,6 +829,7 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> list = voiceDeviceModelList.stream().peek(voiceDeviceModel -> {
             voiceDeviceModel.setStationCode(stationCode);
             voiceDeviceModel.setStationName(stationName);
+            voiceDeviceModel.setMountPatroldeviceCode("");
         }).map((Function<VoiceDeviceModel, Map<String, Object>>) voiceDeviceModel -> {
             JSONObject jsonObject = (JSONObject) JSON.toJSON(voiceDeviceModel, serializeConfig);
             return jsonObject.toJavaObject(Map.class);
@@ -693,22 +869,77 @@ public class SendToUpSystemServices {
         //检修区域模型
         List<MaintenanceModel> infoList = sendToUpSystemDao.selectMaintenanceInfo();
         List<Map<String, Object>> finalList = new ArrayList<>();
+        String stationName = getStationName();
         infoList.forEach(item -> {
             Map<String, Object> maintenanceMap = new HashMap<>();
             maintenanceMap.put("station_code", stationCode);
-            maintenanceMap.put("station_name", getStationName());
+            maintenanceMap.put("station_name", stationName);
             maintenanceMap.put("config_code", item.getConfigCode());
             maintenanceMap.put("enable", "1");
             maintenanceMap.put("start_time", item.getStartTime());
             maintenanceMap.put("end_time", item.getEndTime());
             maintenanceMap.put("device_level", item.getDeviceLevel());
-            maintenanceMap.put("device_list", item.getDeviceIds());
+            int deviceLevel = NumberUtils.toInt(item.getDeviceLevel(), 3);
+            maintenanceMap.put("device_list", maintenanceDeviceIds(deviceLevel, item.getDeviceIds()));
+
+
             maintenanceMap.put("coordinate_pixel", item.getCoordinatePixel());
             finalList.add(maintenanceMap);
         });
         return CreateModeXMLUtil.createXmlFile(finalList, path, "overhaularea_model.xml", "Effect_Config");
 
 
+    }
+
+    // TODO
+    public String maintenanceDeviceIds(int deviceLevel, String ids) {
+        List<Map<String, Object>> deviceInspectionList = sendToUpSystemDao.selectStandardPointsByInstanceId(ids);
+
+            /*
+        middlegroundIds = true
+        间隔：t_std_region.up_region_ids
+        主设备：t_std_device_attr.pms_id
+        部件：t_std_devicemete.component_id
+         */
+        String key = "instance_id";
+        switch (deviceLevel) {
+            case 1:
+                // 间隔
+                if (Constant.middlegroundIds()) {
+                    key = "middle_bay_id";
+                } else {
+                    key = "bay_id";
+                }
+                break;
+            case 2:
+                // 主设备
+                if (Constant.middlegroundIds()) {
+                    key = "middle_device_id";
+                } else {
+                    key = "main_device_id";
+                }
+                break;
+            case 3:
+                // 设备点位
+                // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
+                if (Constant.standardPoints()) {
+                    key = "device_point_id";
+                }
+                break;
+            case 4:
+                // 设备部件
+                if (Constant.middlegroundIds()) {
+                    key = "middle_component_id";
+                } else {
+                    key = "component_id";
+                }
+                break;
+            default:
+                key = "instance_id";
+                break;
+        }
+        final String k = key;
+        return deviceInspectionList.stream().map(r -> MapUtils.getString(r, k)).distinct().collect(Collectors.joining(","));
     }
 
     public String createHostModel(String path, String stationCode) throws Exception {
@@ -741,6 +972,7 @@ public class SendToUpSystemServices {
             host.put("patroldevice_name", "巡视主机");
         }
         host.put("patroldevice_info", "");
+        host.put("mount_patroldevice_code", "");
         host.put("robots_code", "");
         finalList.add(host);
         return CreateModeXMLUtil.createXmlFile(finalList, path, "host_model.xml", "PatrolDevice_Model");
@@ -890,12 +1122,18 @@ public class SendToUpSystemServices {
         return result;
     }
 
+    public List<Map<String, Object>> countLabelAccuracy(String startTime, String endTime) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        return result;
+    }
+
     public List<Map<String, Object>> countWarnAccuracy(String type, String startTime, String endTime) {
         // 巡视告警准确率
         // 巡视任务闭环率
         List<Map<String, Object>> result = new ArrayList<>();
         if (StringUtils.isBlank(type)) {
-            result.add(dealCount(sendToUpSystemDao.countWarnCheck(startTime, endTime)));
+            result.add(dealCount(sendToUpSystemDao.countWarnAccuracy(startTime, endTime)));
         } else {
             switch (type) {
                 case "1":
@@ -1096,49 +1334,35 @@ public class SendToUpSystemServices {
 
     public String downloadFile(String type) throws Exception {
             String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-            List<Map<String, Object>> list = new ArrayList<>();
-            Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content") + "/" + stationCode + "/Model";
-            list.add(map);
             Map<String,String> mapForMapPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String mapAbsPath = mapForMapPath.get("content");
-            map.put("time", DateTimeUtil.getDateTimeString());
-            map.put("type", type);
             log.info("模型文件路径：" + path);
             switch (type) {
                 case "4":
                     //点位模型
-                    // map.put("device_file_path",createDeviceModel(path));
-                    String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
                     return createDeviceModel(path, stationCode);
                 case "1":
                     //巡视主机模型
-                    String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
                     return createHostModel(path, stationCode);
                 case "2":
                     //机器人模型
-                    String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
                     return createRobotModel(path);
                 case "3":
                     //摄像机模型
-                    String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
                     return createCameraModel(path);
                 case "5":
                     //无人机
-                    String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
                     return createDroneModel(path);
                 case "6":
                     //声纹模型
-                    String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
                     return createVoiceModel(path);
                 case "7":
                     //任务模型
-                    String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
                     return createTaskModel(path, stationCode);
                 case "8":
                     //检修区域模型
-                    String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
                     return createMaintenanceModel(path, stationCode);
                 case "9":
                     List<String> mapFileList = sendToUpSystemDao.selectMapPathAll();
@@ -1158,18 +1382,33 @@ public class SendToUpSystemServices {
                     ZipUtil.compressFiles(dirPath, zipName, ftpFilePathList);
                     return dirPath+zipName;
                 case "10":
-                    String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
-                    String fileName = "source_file_model.cime";
-                    List<String> fileList = new ArrayList<>();
-                    fileList.add(sourcePath+fileName);
-                    String sourceDirPath = mapAbsPath + "/Model/";
-                    String sourceZipName = "source_model.zip";
-                    File file = new File(sourcePath+fileName);
-                    if (!file.exists()){
-                        throw new BusinessException("设备资源文件不存在");
+                    if ("1".equals(Constant.edgeLevel())) {
+                        //边缘节点 10:设备资源信息配置文件
+                        String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                        String fileName = "source_file_model.cime";
+                        List<String> fileList = new ArrayList<>();
+                        fileList.add(sourcePath + fileName);
+                        String sourceDirPath = mapAbsPath + "/Model/";
+                        String sourceZipName = "source_model.zip";
+                        File file = new File(sourcePath + fileName);
+                        if (!file.exists()) {
+                            throw new BusinessException("设备资源文件不存在");
+                        }
+                        ZipUtil.compressFiles(sourceDirPath, sourceZipName, fileList);
+                        return sourceDirPath + sourceZipName;
+                    } else {
+                        //10:维护记录文件
+                        String sourceDirPath = createMaintenanceModel(path);
+                        File file = cn.hutool.core.util.ZipUtil.zip(sourceDirPath);
+                        sourceDirPath = file.getPath();
+                        return sourceDirPath;
                     }
-                    ZipUtil.compressFiles(sourceDirPath, sourceZipName, fileList);
-                    return sourceDirPath+sourceZipName;
+                case "11":
+                    //联动配置文件
+                    return createLinkageModel(path);
+                case "12":
+                    //告警阈值模型
+                    return createAlarmThresholdModel(path);
                 default:
                     break;
             }
@@ -1245,14 +1484,170 @@ public class SendToUpSystemServices {
         return sendToUpSystemDao.selectEdgeCodeOfRobotOrDrone(robotCode);
     }
 
-    public Integer getUpperTaskLevel(){
-        Integer taskLevel = 2;
-        Object level2 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY+"902","level");
-        if (Objects.nonNull(level2)){
-            taskLevel = Integer.valueOf(String.valueOf(level2));
+    public Integer getUpperTaskLevel(String level) {
+        int taskLevel = 2;
+        Object level2 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + level, "level");
+        if (Objects.nonNull(level2)) {
+            taskLevel = Integer.parseInt(String.valueOf(level2));
+        }
+        return taskLevel;
+    }
+
+
+    public TCruiseTaskAdd buildTaskInfo(Map<String, Object> item, String deviceLevel, Boolean isLingAge) {
+
+        TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, isLingAge, Constant.edgeLevel());
+        String deviceList = MapUtils.getString(item, "device_list");
+        String instanceIds = convertInstances(NumberUtils.toInt(deviceLevel, 3), deviceList);
+
+        tCruiseTaskAdd.setDeviceList(instanceIds);
+        item.put("device_list", instanceIds);
+
+        return tCruiseTaskAdd;
+    }
+
+    public String convertInstances(int deviceLevel, String deviceList) {
+        List<String> instanceIds;
+            /*
+        middlegroundIds = true
+        间隔：t_std_region.up_region_ids
+        主设备：t_std_device_attr.pms_id
+        部件：t_std_devicemete.component_id
+         */
+        switch (deviceLevel) {
+            case 1:
+                // 间隔
+                Map<String, String> regionIds = new HashMap<>();
+                regionIds.put("upRegionIds", deviceList);
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemDao.selectInstanceIdsByUpRegionIds(deviceList);
+                }else {
+                    instanceIds = this.selectInstanceIdsByRegionOrDevice(regionIds);
+                }
+                break;
+            case 2:
+                // 主设备
+                Map<String, String> deviceIds = new HashMap<>();
+                deviceIds.put("deviceIds", deviceList);
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemDao.selectInstanceIdsByPmsId(deviceList);
+                }else {
+                    instanceIds = this.selectInstanceIdsByRegionOrDevice(deviceIds);
+                }
+                break;
+            case 3:
+                // 设备点位
+                // 如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
+                if (Constant.standardPoints()) {
+                    instanceIds = this.selectForTaskInstanceId(deviceList);
+                } else {
+                    return deviceList;
+                }
+                break;
+            case 4:
+                // 设备部件
+                if (Constant.middlegroundIds()){
+                    instanceIds = sendToUpSystemDao.selectInstanceIdsByMiddlegroundComponent(deviceList);
+                }else {
+                    List<String> list = Arrays.asList(deviceList.split(","));
+                    Map<String, String> deviceListMap = list.stream().collect(Collectors.toMap(e -> e.split("_")[0],
+                        e -> e.split("_")[1], (a, b) -> a + "," + b));
+                    List<DeviceModel> deviceModels = new ArrayList<>();
+                    deviceListMap.forEach((k, v) -> {
+                        DeviceModel dm = new DeviceModel();
+                        dm.setDeviceId(k);
+                        dm.setComponentId(v);
+                        deviceModels.add(dm);
+                    });
+                    instanceIds = this.selectInstanceIdsByComponent(deviceModels);
+                }
+                break;
+            default:
+                return deviceList;
         }
 
-        return taskLevel;
+        return StringUtils.join(instanceIds, ",");
+    }
+
+    /**
+     * @param item
+     * @param linkage 是否为联动任务
+     * @return
+     */
+    public TCruiseTaskAdd covertBean(Map<String, Object> item, Boolean linkage, String edgeLevel) {
+        TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
+        tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
+        tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
+        tCruiseTaskAdd.setCreateTime(item.containsKey("create_time") ? DateTimeUtil.getDate(item.get("create_time").toString()) : new Date());
+        tCruiseTaskAdd.setType(item.containsKey("type") ? Integer.parseInt(item.get("type").toString()) : 1);
+        tCruiseTaskAdd.setCycleExecuteTime(item.getOrDefault("cycle_execute_time", "").toString());
+        tCruiseTaskAdd.setCycleMonth(item.getOrDefault("cycle_month", "").toString());
+        tCruiseTaskAdd.setCycleWeek(item.getOrDefault("cycle_week", "").toString());
+        tCruiseTaskAdd.setCycleEndTime(item.getOrDefault("cycle_end_time", "").toString());
+        tCruiseTaskAdd.setCycleStartTime(item.getOrDefault("cycle_start_time", "").toString());
+        tCruiseTaskAdd.setIntervalExecuteTime(item.getOrDefault("interval_execute_time", "").toString());
+        tCruiseTaskAdd.setIntervalNumber(item.getOrDefault("interval_number", "").toString());
+        tCruiseTaskAdd.setIntervalType(item.getOrDefault("interval_type", "").toString());
+        tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
+        tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
+        tCruiseTaskAdd.setIsenable(item.getOrDefault("isenable", "").toString());
+        tCruiseTaskAdd.setInvalidStartTime(item.getOrDefault("invalid_start_time", "").toString());
+        tCruiseTaskAdd.setInvalidEndTime(item.getOrDefault("invalid_end_time", "").toString());
+
+        String priority = item.getOrDefault("priority", "").toString();
+
+        // 周期任务需要处理
+        String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+        if (StringUtils.isNotEmpty(cycleExecuteTime)) {
+            // cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,2);
+            tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTime);
+        }
+        String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+        StringJoiner str = new StringJoiner(",");
+        if (StringUtils.isNotEmpty(cycleWeek)) {
+            String[] split = cycleWeek.split(",");
+            for (int i = 0; i < split.length; i++) {
+                split[i] = String.valueOf((NumberUtils.toInt(split[i]) + 1) == 8 ? 1 : (NumberUtils.toInt(split[i]) + 1));
+                str.add(split[i]);
+            }
+            tCruiseTaskAdd.setCycleWeek(str.toString());
+        }
+        String level;
+        //联动任务立即执行
+        log.info("linkage:{}", linkage);
+        if (linkage) {
+            log.info("配置联动任务立即任务");
+            level = String.valueOf(this.getUpperTaskLevel("904"));
+            tCruiseTaskAdd.setIfRun(173);
+            tCruiseTaskAdd.setStartTime(new Date());
+        } else {
+            level = String.valueOf(this.getUpperTaskLevel("902"));
+            if (StringUtils.isNotEmpty(org.apache.commons.collections.MapUtils.getString(item, "fixed_start_time"))) {
+                long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
+                log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
+                if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)) {
+                    // 立即(fixed_start_time和当前时间相差5min)
+                    tCruiseTaskAdd.setIfRun(173);
+                } else {
+                    // 定期
+                    tCruiseTaskAdd.setIfRun(174);
+                }
+                tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(item.get("fixed_start_time").toString()));
+            } else {
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getCycleStartTime()));
+                } else if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalStartTime())) {
+                    tCruiseTaskAdd.setIfRun(172);
+                    tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(tCruiseTaskAdd.getIntervalStartTime()));
+                }
+            }
+        }
+
+        priority = !StringUtils.equalsAny(priority, "1", "2", "3", "4") || "2".equals(edgeLevel) ? level : priority;
+        tCruiseTaskAdd.setTaskLevel(NumberUtils.toInt(priority));
+
+        return tCruiseTaskAdd;
     }
 
     /**
@@ -1378,9 +1773,9 @@ public class SendToUpSystemServices {
             default:
                 break;
         }
-        if (-1 != taskType) {
+//        if (-1 != taskType) {
             map.put("fixed_start_time", "");
-        }
+//        }
         map.remove("end_time");
         map.remove("time");
     }
@@ -1388,7 +1783,7 @@ public class SendToUpSystemServices {
     /**
      * 根据任务定时执行的表达式，判断任务类型
      * 表达式有：“8 8 *\/2 * * ?     0 0 0 *\/3 * ?  0 0 5,6 ? 1,2 4,5  等类型
-     *
+     * 1-间隔时 2-间隔天 3-周期
      * @param timeStr timeStr
      * @return result
      */
@@ -1397,9 +1792,9 @@ public class SendToUpSystemServices {
             return -1;
         }
 
-        if (timeStr.endsWith("* * ?")) {
+        if (timeStr.startsWith("interval_1")) {
             return 1;
-        } else if (timeStr.endsWith("* ?")) {
+        } else if (timeStr.startsWith("interval_2")) {
             return 2;
         } else if (timeStr.contains("?")) {
             return 3;
@@ -1451,6 +1846,19 @@ public class SendToUpSystemServices {
         return arrSub[1];
     }
 
+
+    /**
+     * 获取间隔任务间隔数量
+     * 格式为：interval_2,2   interval_1,5
+     *
+     * @param timeStr timeStr
+     * @return result
+     */
+    private String getIntervalDayOrHour(String timeStr) {
+        String[] arr = timeStr.split(",");
+        return arr[1];
+    }
+
     /**
      * 获取周期任务执行时间
      * 格式为：0 0 5,6 ? 1,2 4,5     0 0 1,3,4,14 ? 1,3,5 2,3,4,5,6,7
@@ -1497,7 +1905,7 @@ public class SendToUpSystemServices {
      */
     private void processIntervalDayTask(Map<String, Object> map) {
         String timeStr = MapUtils.getString(map, "time");
-        String intervalNumber = getIntervalDay(timeStr);
+        String intervalNumber = getIntervalDayOrHour(timeStr);
         String executeTime = getExecuteTime(map);
         map.put("interval_execute_time", executeTime);
         map.put("interval_number", intervalNumber);
@@ -1513,7 +1921,7 @@ public class SendToUpSystemServices {
      */
     private void processIntervalHourTask(Map<String, Object> map) {
         String timeStr = map.get("time").toString();
-        String intervalNumber = getIntervalHour(timeStr);
+        String intervalNumber = getIntervalDayOrHour(timeStr);
         String executeTime = getExecuteTime(map);
         map.put("interval_execute_time", executeTime);
         map.put("interval_number", intervalNumber);
@@ -1579,6 +1987,33 @@ public class SendToUpSystemServices {
     }
 
     /**
+     * 上级系统 算法交互 ftps 上传
+     * @param sourcePath
+     * @param targetPathName
+     */
+    private void uploadFileToUpCloudFtps(String sourcePath, String targetPathName) {
+        try {
+            if (StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {
+                return;
+            }
+            Map<String, String> upCloudSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:upSystemAlgorithm");
+            String upCloudSystemFtpsFlag = upCloudSystemFtps.get("upCloudSystemFlag");
+            if ("0".equals(upCloudSystemFtpsFlag)){
+                log.info("上级系统开关未开! {}",upCloudSystemFtpsFlag);
+                return;
+            }
+            String upCloudSystemFtpsIp = upCloudSystemFtps.get("upCloudSystemFtpsIp");
+            String upCloudSystemFtpsPort = upCloudSystemFtps.get("upCloudSystemFtpsPort");
+            String upCloudSystemFtpsUsername = upCloudSystemFtps.get("upCloudSystemFtpsUsername");
+            String upCloudSystemFtpsPassword = upCloudSystemFtps.get("upCloudSystemFtpsPassword");
+            FtpsUtil.putFile(sourcePath, targetPathName, upCloudSystemFtpsIp, Integer.parseInt(upCloudSystemFtpsPort),
+                    upCloudSystemFtpsUsername, upCloudSystemFtpsPassword);
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误：", e);
+        }
+    }
+
+    /**
      * ftps下载
      * @param sourcePath
      * @param targetPathName
@@ -1605,42 +2040,61 @@ public class SendToUpSystemServices {
      */
     public void updateTcpContent() {
         try {
+            //上级系统
             String flag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-            if (Objects.isNull(flag)){
-                log.error("上级系统连接开关为空");
-                return;
-            }
             String ip = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemIp");
-            if (Objects.isNull(ip)){
-                log.error("上级系统IP为空");
-                return;
-            }
             String port = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemPort");
-            if (Objects.isNull(port)){
-                log.error("上级系统端口为空");
-                return;
-            }
-            String one = "1";
-            if (!Constant.upSystemFlag().equals(flag)) {
-                //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
-                if (one.equals(flag)) {
-                    this.start(ip, port);
-                } else {
-                    this.stop();
+            if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
+                SocketAddress socketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                if (!Constant.upSystemFlag().equals(flag)) {
+                    //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
+                    if (Constant.ONE.equals(flag)) {
+                        this.start(socketAddress, "upSystem");
+                    } else {
+                        this.stop(socketAddress);
+                    }
+                    Constant.upSystemFlag = flag;
                 }
-                Constant.upSystemFlag = flag;
-            }
-            boolean isChange = one.equals(flag) && !Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port);
-            if (isChange){
-                //ip 端口修改 变更连接
-                if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
-                    this.stop();
-                    this.start(ip, port);
-                } else {
-                    this.start(ip, port);
+                boolean isChange = Constant.ONE.equals(flag) && !Constant.upSystemIp().equals(ip) || !String.valueOf(Constant.upSystemPort()).equals(port);
+                if (isChange) {
+                    //ip 端口修改 变更连接
+                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))) {
+                        this.stop(socketAddress);
+                        this.start(socketAddress, "upSystem");
+                    } else {
+                        this.start(socketAddress, "upSystem");
+                    }
+                    Constant.upSystemIp = ip;
+                    Constant.upSystemPort = Integer.valueOf(port);
                 }
-                Constant.upSystemIp = ip;
-                Constant.upSystemPort = Integer.valueOf(port);
+            }
+            //算法管理平台
+            flag = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemFlag");
+            ip = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemIp");
+            port = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem", "managerSystemPort");
+            if (Objects.nonNull(flag) && Objects.nonNull(ip) && Objects.nonNull(port)) {
+                SocketAddress managerSystemSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
+                if (!Constant.managerSystemFlag().equals(flag)) {
+                    //flag 改动 由0 -> 1 启动 由1 -> 0 关闭
+                    if (Constant.ONE.equals(flag)) {
+                        this.start(managerSystemSocketAddress, "managerSystem");
+                    } else {
+                        this.stop(managerSystemSocketAddress);
+                    }
+                    Constant.managerSystemFlag = flag;
+                }
+                boolean isChange = Constant.ONE.equals(flag) && !Constant.managerSystemIp().equals(ip) || !String.valueOf(Constant.managerSystemPort()).equals(port);
+                if (isChange) {
+                    //ip 端口修改 变更连接
+                    if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(managerSystemSocketAddress))) {
+                        this.stop(managerSystemSocketAddress);
+                        this.start(managerSystemSocketAddress, "managerSystem");
+                    } else {
+                        this.start(managerSystemSocketAddress, "managerSystem");
+                    }
+                    Constant.managerSystemIp = ip;
+                    Constant.managerSystemPort = Integer.valueOf(port);
+                }
             }
         }catch (Exception e){
             log.error("更新TCP连接失败");
@@ -1650,41 +2104,46 @@ public class SendToUpSystemServices {
 
     /**
      * 开启连接
-     * @param ip
-     * @param port
+     *
+     * @param socketAddress
+     * @param type 1 上级系统 2算法平台
      */
-    private void start(String ip, String port){
-        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))){
-            InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
-            Bootstrap bootstrap = Constant.bootstrapHashMap.get(1);
-            reContentManager.reContent(inetSocketAddress, bootstrap);
-        }else {
-            NettyClient nettyClient = new NettyClient();
-            InetSocketAddress inetSocketAddress = new InetSocketAddress(ip, Integer.parseInt(port));
-            nettyClient.start(inetSocketAddress, redisTemplate, this, analysisUnionTaskFileService, registerManager, reContentManager);
+    private void start(SocketAddress socketAddress, String type){
+        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.get(socketAddress))){
+            log.info("重新连接 {} ", socketAddress);
+            ReContentManager.reContent(socketAddress, NettyClient.BOOTSTRAP_MAP.get(socketAddress));
+        } else {
+            log.info("新建连接 {} ", socketAddress);
+            NettyClient nettyClient;
+            if ("upSystem".equals(type)) {
+                nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAHandlerImpl());
+            } else {
+                nettyClient = new NettyClient(StateGridADecoder.class, new StateGridAlgorithmHandlerImpl());
+            }
+            nettyClient.start(socketAddress);
         }
     }
 
     /**
      * 关闭连接
+     *
+     * @param socketAddress
      */
-    private void stop() {
-        if (Objects.nonNull(Constant.bootstrapHashMap.get(1))) {
-            Constant.bootstrapHashMap.remove(1);
-            TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(Constant.upSystemPort());
+    private void stop(SocketAddress socketAddress) {
+        log.info("关闭连接 {} ", socketAddress);
+        if (Objects.nonNull(NettyClient.BOOTSTRAP_MAP.remove(socketAddress))) {
+            TCPClientHandler tcpClientHandler = TCPClientHandler.getTcpClientHandlerHashMap(socketAddress);
             try {
                 if (tcpClientHandler != null) {
-                    tcpClientHandler.setIsThreadStart(false);
                     tcpClientHandler.getChannel().close().sync();
                     tcpClientHandler.getChannel().flush();
+                    registerManager.terminate(tcpClientHandler.getServer());
                 }
-                registerManager.terminate();
-                reContentManager.terminate();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
+        ReContentManager.terminate(socketAddress);
     }
 
     public void saveAInterfaceTaskInfo(List<Map<String,Object>> items){
@@ -1736,17 +2195,5 @@ public class SendToUpSystemServices {
 
     public List<String> selectInstanceIdsByComponent(List<DeviceModel> deviceModels) {
         return sendToUpSystemDao.selectInstanceIdsByComponent(deviceModels);
-    }
-
-    public List<String> selectInstanceIdsByUpRegionIds(String deviceList) {
-        return sendToUpSystemDao.selectInstanceIdsByUpRegionIds(deviceList);
-    }
-
-    public List<String> selectInstanceIdsByPmsId(String deviceList) {
-        return sendToUpSystemDao.selectInstanceIdsByPmsId(deviceList);
-    }
-
-    public List<String> selectInstanceIdsByMiddlegroundComponent(String deviceList) {
-        return sendToUpSystemDao.selectInstanceIdsByMiddlegroundComponent(deviceList);
     }
 }

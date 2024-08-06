@@ -10,6 +10,7 @@ import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
@@ -91,7 +92,7 @@ public class SilentTaskJob implements Runnable {
         long presetId = preset.getPresetId();
         String presetName = preset.getPresetName();
 
-        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + preset.getCameraIp());
         String state = redisInfoMap.get("state");
         String lastTime = redisInfoMap.get("lastTime");
 
@@ -104,6 +105,11 @@ public class SilentTaskJob implements Runnable {
         int count=tCameraPresetDao.selectCameraPresetInTask(String.valueOf(presetId));
         if(count>0){
             log.error("该摄像机正在任务中 cameraId:{} presetId:{}",cameraId,presetId);
+            return;
+        }
+        Map<String, Object> instanceInfoMap = tCameraPresetDao.selectInstanceInfo(presetId);
+        if (MapUtils.isEmpty(instanceInfoMap)) {
+            log.error("该预置位没有关联测点 cameraId:{} presetId:{}", cameraId, presetId);
             return;
         }
 
@@ -139,7 +145,7 @@ public class SilentTaskJob implements Runnable {
             } catch (Exception e) {
                 log.error("设置摄像机状态出错" + e.getMessage());
                 redisInfoMap.put("state", "0");
-                redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+                redisTemplate.opsForHash().putAll(TCameraInfoService.cameraStateKey + preset.getCameraIp(), redisInfoMap);
             }
         }
     }

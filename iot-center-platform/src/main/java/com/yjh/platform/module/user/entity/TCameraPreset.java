@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author YC
@@ -112,4 +113,9 @@ public class TCameraPreset implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private String cameraIp;
+
+    private List<Long> cameraIds;
+
 }

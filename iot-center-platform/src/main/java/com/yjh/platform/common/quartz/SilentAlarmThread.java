@@ -14,6 +14,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -368,10 +369,11 @@ public class SilentAlarmThread implements Runnable {
         try {
             String cameraId = this.cameraId;
             String presetId = this.presetId;
+            String cameraIp = this.ip;
             String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
             Map<String, Object> entries = redisTemplate.opsForHash().entries(key);
             if (cameraId.equals(String.valueOf(entries.get("cameraId"))) && presetId.equals(String.valueOf(entries.get("presetId")))) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + cameraIp);
                 String state = redisInfoMap.get("state");
                 if (!StringUtils.equals("0", state)) {
                     redisTemplate.opsForHash().delete(key);

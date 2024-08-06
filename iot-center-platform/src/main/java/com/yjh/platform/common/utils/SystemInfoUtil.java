@@ -1,11 +1,16 @@
 package com.yjh.platform.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -210,6 +215,38 @@ public class SystemInfoUtil {
             in.close();
         }
         return map;
+    }
+
+    /**
+     * 获取网络延迟
+     * @param url  url
+     * @return 延迟时间
+     */
+    public static String getNetDelay(String url) {
+        String re = "0";
+        try {
+            URL url1 = new URL(url);
+            long startTime = System.nanoTime();
+            boolean isReachable = InetAddress.getByName(url1.getHost()).isReachable(5000);
+            long endTime = System.nanoTime();
+            if (isReachable) {
+                long duration = (endTime - startTime);
+                re = formatVal(TimeUnit.NANOSECONDS.toMillis(duration));
+                log.info("成功连接到{}, 网络延迟大约为: {} ms", url1.getHost(), re);
+            } else {
+                log.error("无法连接到 " + url1.getHost());
+            }
+        } catch (UnknownHostException e) {
+            log.error("未知主机: " + url);
+        } catch (Exception e) {
+            log.error("获取网络延迟失败：", e);
+        }
+        return re;
+    }
+
+    public static String formatVal(Object num) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        return df.format(num);
     }
 
 }

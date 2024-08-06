@@ -1,8 +1,6 @@
 package com.yjh.platform.module.device.service;
 
 import cn.hutool.http.HttpStatus;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.HashMultimap;
@@ -14,6 +12,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
@@ -29,6 +28,9 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -106,6 +108,9 @@ public class TStdDevicemeteService{
             String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
             tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
         }
+        if(ArrayUtils.isNotEmpty(tStdDeviceMeteDetail.getLabelAttris())) {
+            tStdDeviceMeteDetail.setLabelAttri(StringUtils.join(tStdDeviceMeteDetail.getLabelAttris(), ","));
+        }
 
         this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
         //配置算法
@@ -175,6 +180,9 @@ public class TStdDevicemeteService{
             String[] alarmLevelList = tStdDeviceMeteDetail.getAlarmLevelString().split(",");
             tStdDeviceMeteDetail.setAlarmLevel(Integer.parseInt(alarmLevelList[0]));
         }
+        if(ArrayUtils.isNotEmpty(tStdDeviceMeteDetail.getLabelAttris())) {
+            tStdDeviceMeteDetail.setLabelAttri(StringUtils.join(tStdDeviceMeteDetail.getLabelAttris(), ","));
+        }
         //修改测点配置的算法
         if ((Objects.nonNull(tStdDeviceMeteDetail.getAnalyseType())
                 || Objects.equals("on",tStdDeviceMeteDetail.getIsAi())) && Objects.equals("on", tStdDeviceMeteDetail.getIsJudge())) {
@@ -183,14 +191,10 @@ public class TStdDevicemeteService{
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
             TAlgorithmConfBak tAlgorithmConfBak  = new TAlgorithmConfBak();
-            //若配置了算法，则判断数据库中是否存在当前数据，存在则传递edgeCode
-            TAlgorithmConfBak    tAlgorithmMeteBack = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(String.valueOf(tStdDeviceMeteDetail.getAnalyseType()));
             if(tAlgorithmInfo != null){
-                if (Objects.nonNull(tAlgorithmMeteBack)) {
-                    tAlgorithmConfBak.setEdgeCode(tAlgorithmMeteBack.getEdgeCode());
-                }
+                tAlgorithmConfBak.setEdgeCode(tStdDeviceMeteDetail.getEdgeCode());
                 tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
                 tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
                 tAlgorithmConfBakDao.add(tAlgorithmConfBak);
@@ -273,12 +277,13 @@ public class TStdDevicemeteService{
             .add("alarmLevel");
         DictConvertUtil.DICT.covertToDict(list,optional);
 
-
         for (TStdDeviceMeteDetail detail : list) {
             if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
                 String analyseName = "on".equals(detail.getIsAi()) ? "缺陷" : "on".equals(detail.getIsJudge()) ? "判别" : "无";
                 detail.setAnalyseTypeName(analyseName);
             }
+            detail.setLabelAttriName(labelAttriName(detail.getLabelAttri()));
+            detail.setLabelAttris(StringUtils.split(detail.getLabelAttri(), ","));
         }
 
         //填充告警规则信息
@@ -307,6 +312,20 @@ public class TStdDevicemeteService{
             }
             tStdDeviceMeteDetail.setRules(rules.toString());
         });
+    }
+
+    public List<KeyValue<String, String>> labelAttriName(String labelAttri) {
+        String lableNames = DictConvertUtil.DICT.covertToDict("labelAttri", labelAttri);
+        if (StringUtils.isNotEmpty(lableNames)) {
+            List<KeyValue<String, String>> pairNames = new ArrayList<>();
+            String[] is = labelAttri.split(",");
+            String[] names = lableNames.split(",");
+            for (int i = 0; i < is.length; i++) {
+                pairNames.add(new DefaultKeyValue<>(names[i], CommonUtils.color(is[i])));
+            }
+            return pairNames;
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -577,6 +596,7 @@ public class TStdDevicemeteService{
                     tStdDeviceMete.setIsTemdif(0);
                     tStdDeviceMete.setAnalyseType(excelEntity.getAnalyseTypeId());
                     tStdDeviceMete.setAlarmRuleType(NumberUtils.toInt(excelEntity.getAlarmRuleType()));
+                    tStdDeviceMete.setLabelAttri(excelEntity.getLabelAttris());
                     totalMete.add(tStdDeviceMete);
                 }
             });
@@ -615,12 +635,15 @@ public class TStdDevicemeteService{
         TCameraPreset tCameraPreset = new TCameraPreset();
         Result result = new Result();
         if (Objects.isNull(lockPresetCommand.getPresetId())) {
+            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
             tCameraPreset.setCameraId(lockPresetCommand.getCameraId());
             tCameraPreset.setPresetNum(lockPresetCommand.getPresetNum());
             tCameraPreset.setPresetName(lockPresetCommand.getPresetName());
             tCameraPreset.setCameraName(lockPresetCommand.getCameraName());
-            result = tCameraPresetService.add(tCameraPreset);
-            TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(lockPresetCommand.getCameraId());
+            // 查询相同ip的相机 若存在多个 判断预置位是否被其他相机占用
+            // 新增预置位
+            result = tCameraPresetService.add(tCameraPreset, tCameraInfo);
+
             if (HttpStatus.HTTP_OK == result.getCode()) {
                 TCruisePointInstanceDetail tCruisePointInstanceDetail = new TCruisePointInstanceDetail();
                 if (tCameraInfo.getCameraType() == 205) {
@@ -645,6 +668,8 @@ public class TStdDevicemeteService{
                         Constant.modelUpload("1");
                     }
                 }
+            } else {
+                throw new BusinessException(result.getMessage());
             }
         } else {
             try {

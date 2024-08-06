@@ -199,6 +199,6 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CruiseExecuteFactory.CREATE.registerExecute(VOICE, this);
+//        CruiseExecuteFactory.CREATE.registerExecute(VOICE, this);
     }
 }

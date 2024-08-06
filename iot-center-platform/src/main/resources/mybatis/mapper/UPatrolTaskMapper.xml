@@ -120,7 +120,7 @@
             a.*
         from u_patrol_task a
         RIGHT JOIN u_patrol_result b ON a.task_id = b.task_id
-        where a.task_code = #{taskCode}
+        where (a.task_code = #{taskCode} or a.task_id = #{taskCode})
         <if test="executeTime != null">
         and a.start_time <![CDATA[<=]]> DATE_ADD(#{executeTime, jdbcType=TIMESTAMP}, INTERVAL 5 second)
         </if>
@@ -1095,4 +1095,37 @@
     <delete id="deleteResultInfo">delete from u_patrol_result</delete>
     <delete id="deleteTaskInfo">delete from u_patrol_task</delete>
     <delete id="deleteTaskAttrInfo">delete from u_patrol_task_attr</delete>
+
+    <select id="selectTaskForPage" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
+        SELECT
+            a.task_id,
+            a.task_code,
+            a.task_name,
+            a.plan_id,
+            a.area_id,
+            a.task_type,
+            a.execute_type,
+            a.robot_id,
+            a.date_type,
+            a.task_source,
+            a.task_level,
+            a.start_time,
+            a.create_time,
+            a.end_time,
+            a.create_user_id,
+            d.task_state,
+        (SELECT COUNT(*) FROM u_patrol_task_attr c WHERE a.task_code = c.task_id) AS total
+        from u_patrol_task a
+        LEFT JOIN u_patrol_result d ON a.task_id = d.task_id
+        where 1 = 1
+        and a.task_code = a.task_id
+        <if test="taskName != null and taskName != ''">
+            and a.task_name like CONCAT('%',#{taskName, jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''"> and a.start_time BETWEEN #{startTime} AND #{endTime}</if>
+        <if test="isValid != null and isValid == 1">
+            and a.end_time &gt; now()
+        </if>
+        order by a.end_time desc
+    </select>
 </mapper>

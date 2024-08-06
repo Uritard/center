@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>81</Type>
+    <Code>1</Code>
+    <Time>2024-03-27 20:19:42</Time>
+    <Items>
+        <Item config_code="100002" enable="1" start_time="{{nowDate}} 00:00:00" end_time="{{nowDate}} 23:59:59" device_level="1" device_list="700036" coordinate_pixel="10,12,30;20;12;30;20,22,30;10,22,30"/>
+    </Items>
+    <Command>4</Command>
+</PatrolHost>

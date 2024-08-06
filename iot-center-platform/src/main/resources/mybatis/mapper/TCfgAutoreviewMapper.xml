@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.devicemete.dao.TCfgAutoreviewMapper">
+
+    <select id="selectByPage" resultType="com.yjh.platform.module.devicemete.entity.TCfgAutoreview">
+        select distinct a.autoreview_id, a.autoreview_name, a.autoreview_type, a.create_time, a.update_time, a.create_user
+        from t_cfg_autoreview a left join t_cfg_autoreview_detail b on a.autoreview_id=b.autoreview_id where 1=1
+        <if test="defectType != null and defectType != ''"> and b.auto_detail_type = 1 and b.ref_id=#{defectType, jdbcType=VARCHAR}</if>
+        <if test="alarmType != null and alarmType != ''"> and b.auto_detail_type = 2 and b.ref_id=#{alarmType, jdbcType=VARCHAR}</if>
+        <if test="deviceType != null and deviceType != ''"> and b.auto_detail_type = 3 and b.ref_id=#{deviceType, jdbcType=VARCHAR}</if>
+        <if test="deviceName != null and deviceName != ''"> and b.auto_detail_type = 4 and b.ref_name like concat ('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+        <if test="meteName != null and meteName != ''"> and b.auto_detail_type = 5 and b.ref_name like concat ('%',#{meteName, jdbcType=VARCHAR},'%')</if>
+        <if test="labelAttri != null and labelAttri != ''"> and b.auto_detail_type = 6 and b.ref_id=#{labelAttri, jdbcType=VARCHAR}</if>
+        <if test="autoreviewName != null and autoreviewName != ''"> and a.autoreview_name like concat('%',#{autoreviewName, jdbcType=VARCHAR},'%')</if>
+        <if test="autoreviewType != null and autoreviewType != ''"> and FIND_IN_SET(#{autoreviewType, jdbcType=VARCHAR}, a.autoreview_type) > 0</if>
+    </select>
+
+    <select id="selectByPageMini" resultType="com.yjh.platform.module.devicemete.entity.TCfgAutoreview">
+        select distinct a.autoreview_id, a.autoreview_name, a.autoreview_type, a.create_time, a.update_time, a.create_user
+        from t_cfg_autoreview a left join t_cfg_autoreview_detail b on a.autoreview_id=b.autoreview_id where 1=1
+        <if test="autoDetailType != null and autoDetailType > 0 ">and b.auto_detail_type = #{autoDetailType, jdbcType=INTEGER}</if>
+        <if test="typeId != null and typeId != ''"> and b.ref_id=#{typeId, jdbcType=VARCHAR}</if>
+        <if test="typeName != null and typeName != ''"> and b.ref_name like concat ('%',#{typeName, jdbcType=VARCHAR},'%')</if>
+        <if test="autoreviewName != null and autoreviewName != ''"> and a.autoreview_name like concat('%',#{autoreviewName, jdbcType=VARCHAR},'%')</if>
+        <if test="autoreviewType != null and autoreviewType != ''"> and FIND_IN_SET(#{autoreviewType, jdbcType=VARCHAR}, a.autoreview_type) > 0</if>
+    </select>
+
+    <resultMap id="detailMap" type="com.yjh.platform.module.devicemete.entity.TCfgAutoreview">
+        <result column="autoreview_id" property="autoreviewId" />
+        <result column="autoreview_name" property="autoreviewName" />
+        <result column="autoreview_type" property="autoreviewType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_user" property="createUser" />
+        <collection property="detail" notNullColumn="autoreview_id" ofType="com.yjh.platform.module.devicemete.entity.TCfgAutoreviewDetail">
+            <id column="detail_id" property="detailId"/>
+            <result column="autoreview_id" property="autoreviewId" />
+            <result column="auto_detail_type" property="autoDetailType"/>
+            <result column="ref_id" property="refId"/>
+            <result column="ref_name" property="refName"/>
+        </collection>
+    </resultMap>
+    <select id="detailList" resultMap="detailMap">
+        select a.autoreview_id, a.autoreview_name, a.autoreview_type, a.create_time, a.update_time, a.create_user,
+          b.detail_id, b.auto_detail_type, b.ref_id, b.ref_name
+        from t_cfg_autoreview a left join t_cfg_autoreview_detail b on a.autoreview_id=b.autoreview_id where 1=1
+        <if test="autoDetailType != null and autoDetailType > 0 ">and b.auto_detail_type = #{autoDetailType, jdbcType=INTEGER}</if>
+        <if test="typeId != null and typeId != ''"> and b.ref_id=#{typeId, jdbcType=VARCHAR}</if>
+        <if test="typeName != null and typeName != ''"> and b.ref_name like concat ('%',#{typeName, jdbcType=VARCHAR},'%')</if>
+        <if test="autoreviewType != null and autoreviewType != ''"> and FIND_IN_SET(#{autoreviewType, jdbcType=VARCHAR}, a.autoreview_type) > 0</if>
+    </select>
+</mapper>

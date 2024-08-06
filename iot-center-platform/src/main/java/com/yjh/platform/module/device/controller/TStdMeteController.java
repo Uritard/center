@@ -150,10 +150,11 @@ public class TStdMeteController {
                          @RequestParam(value = "remark", required = false) String remark,
                          @RequestParam(value = "stateZero", required = false) String stateZero,
                          @RequestParam(value = "stateOne", required = false) String stateOne,
-                         @RequestParam(value = "meteKind", required = false) Integer meteKind) {
+                         @RequestParam(value = "meteKind", required = false) Integer meteKind,
+                         @RequestParam(value = "labelAttri", required = false) String labelAttri) {
         Result result = new Result();
         try {
-            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne,meteKind);
+            List<TStdMete> list = tStdMeteService.select(stdMeteId, deviceType, meteType, meteName, alarmNote, alarmExplain, alarmType, analyseType, unit, upEffect, lowEffect, alarmLevel, alarmLimit, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne,meteKind, labelAttri);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -232,6 +233,7 @@ public class TStdMeteController {
     public Result batchAdd(@RequestBody List<TStdMete> list, HttpServletRequest request) {
         Result result = new Result();
         try {
+            list.forEach(tStdMete ->tStdMete.setLabelAttri(String.join(",",tStdMete.getLabelAttris())));
             result.setData(tStdMeteService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

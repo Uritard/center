@@ -11,6 +11,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -105,7 +107,18 @@ public class Constant {
     public static<T> Result otherServer(Map<String, List<T>> map, String url) {
         Result re = new Result();
         try {
-            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+            re = otherObjServer(map, url);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        log.info("request: {} \nresult: {}", url, JSON.toJSONString(re));
+        return re;
+    }
+
+    public static<T> Result otherObjServer(Object obj, String url) {
+        Result re = new Result();
+        try {
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, obj, Result.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -117,6 +130,10 @@ public class Constant {
     public static final String TCP_UPLOAD_FILE = "http://iot-center-accesstcp/sendToUpSystem/v1/uploadFile";
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
+
+    public static final String TCP_SYNC_CLOUD_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/syncSendCloudXml";
+
+    public static final String TCP_CLOUD_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendCloudXml";
 
     private static boolean upSystemFlag;
 
@@ -197,6 +214,8 @@ public class Constant {
     private static Boolean fastTurbo;
 
     private static Boolean standardPoints;
+
+    private static Boolean middlegroundIds;
 
     private static String systemLevel;
     /**
@@ -280,6 +299,29 @@ public class Constant {
             log.error(e.getMessage(), e);
         }
         return result;
+    }
+
+    public static String httpPost(String url, String jsonParam) throws IOException {
+        HttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(jsonParam, StandardCharsets.UTF_8));
+        try {
+            HttpResponse response = client.execute(httpPost);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return "-1";
+    }
+    public static Boolean isWindows(){
+        String os = System.getProperty("os.name");
+        if(os.toLowerCase().startsWith("win")){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -397,6 +439,21 @@ public class Constant {
         return standardPoints;
     }
 
+    /**
+     * 使用中台ID下发检修区域
+     */
+    public static boolean middlegroundIds() {
+        if (middlegroundIds == null) {
+            try {
+                middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
+                log.warn("middlegroundIds is {}", middlegroundIds);
+            } catch (Exception e) {
+                middlegroundIds = false;
+            }
+        }
+        return middlegroundIds;
+    }
+
     public static int endWaitTimes() {
         if (endWaitTimes == 0) {
             try {
@@ -447,6 +504,7 @@ public class Constant {
         hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
         fastTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:fastTurbo", "content"));
         standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+        middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
         updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
         endWaitTimes = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:endWaitTimes", "content"), 8);
         logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);

@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.utils;
 
+import cn.hutool.core.io.FileUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -209,6 +210,8 @@ public class FtpsUtil {
                         ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
                         // Store file on host
                         File localFile = new File(filepath);
+                        // create parent dir
+                        FileUtil.mkParentDirs(localFile);
                         OutputStream os = new FileOutputStream(localFile);
                         ftpClient.retrieveFile(remoteFilename, os);
 

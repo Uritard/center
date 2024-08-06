@@ -12,12 +12,14 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolResultService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +148,7 @@ public class UPatrolResultController {
                                      @RequestParam(value = "endTime",required = false) String endTime,
                                      @RequestParam(value = "regionId",required = false) Long regionId,
                                      @RequestParam(value = "customId",required = false) String customId,
+                                     @RequestParam(value = "labelAttri",required = false) String labelAttri,
                                      @RequestParam(value = "isWarn",required = false) Integer isWarn,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
@@ -187,7 +190,7 @@ public class UPatrolResultController {
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType, cruiseResult,deviceType,
-                    meteType,meterType,instanceName,startTime,endTime,deviceIdList,customId,isWarn);
+                    meteType,meterType,instanceName,startTime,endTime,deviceIdList,customId,labelAttri,isWarn);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
@@ -256,9 +259,8 @@ public class UPatrolResultController {
         String userId = request.getHeader("userId");
         Result result = new Result();
         try {
-            List<TWarnInfo> tWarnInfoList = uPatrolResultService.manualReview(cruiseManualReview,userId);
-            result.setData(tWarnInfoList.size());
-            uPatrolResultService.reviewAlarm(tWarnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList()));
+            int review = uPatrolResultService.manualReview(cruiseManualReview,userId);
+            result.setData(review);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -285,15 +287,32 @@ public class UPatrolResultController {
     @ApiOperation(value = "一键审核--任务下的所有巡视点")
     @GetMapping(value = "/manualReviewTask")
     @Logs(title = "审核任务",content = "一键审核",logType = 5, authority = "1235")
-    public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
+    public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId, @RequestParam(value = "remark") String remark, HttpServletRequest request){
         String userId = request.getHeader("userId");
         String token = request.getHeader("token");
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,token,request));
+            result.setData(uPatrolResultService.manualReviewTask(taskResultId, remark, userId, token, request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "审核意见")
+    @PostMapping(value = "/reviewOpinion")
+    @Logs(title = "审核意见",content = "添加审核意见",logType = 5, authority = "1235")
+    public Result reviewOpinion(@RequestBody UPatrolResult reviewResult) {
+
+        Result result = new Result();
+        try {
+            result.setData(uPatrolResultService.reviewOpinion(reviewResult));
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加审核意见失败:", e);
         }
         return result;
     }

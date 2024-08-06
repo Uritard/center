@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +14,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author yc
@@ -137,4 +139,16 @@ public class TCameraRecorder implements Serializable {
      */
     @ApiModelProperty(value = "设备编号")
     private String deviceChannel;
+    /**
+     * 视频B设备编号
+     */
+    @ApiModelProperty(value = "视频B设备编号")
+    private String bdeviceChannel;
+
+    @ApiModelProperty(value = "投运日期")
+    @TableField(value = "commission_date")
+    private Date commissionDate;
+
+    @ApiModelProperty(value = "生产编号")
+    private String productionCode;
 }

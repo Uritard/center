@@ -1,15 +1,14 @@
 package com.yjh.accesstcp.thread;
 
-import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import com.yjh.accesstcp.common.utils.ThreadPoolUtil;
+import com.yjh.accesstcp.netty.TCPClientHandler;
+import com.yjh.accesstcp.netty.handler.iot.IotHandlerEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * <功能描述>
@@ -22,23 +21,22 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class RegisterManager {
 
-
-    private final ConcurrentHashMap<String, InternalRunner> runnerMap = new ConcurrentHashMap<String, InternalRunner>();
+    private final ConcurrentHashMap<String, InternalRunner> runnerMap = new ConcurrentHashMap<>();
 
     public void register(TCPClientHandler clientHandler) {
-        if (Optional.ofNullable(runnerMap.get("register")).isPresent()) {
-            InternalRunner runner = runnerMap.get("register");
+        String serverCode = clientHandler.getServer();
+        if (Optional.ofNullable(runnerMap.get(serverCode)).isPresent()) {
+            InternalRunner runner = runnerMap.get(serverCode);
             runner.clientHandler = clientHandler;
             return;
         }
         InternalRunner internalRunner = new InternalRunner(clientHandler, 10000);
-        TaskExecutePool.getInstance().execute(internalRunner);
-        runnerMap.put("register", internalRunner);
+        ThreadPoolUtil.PATROL_POOL.execute(internalRunner);
+        runnerMap.put(serverCode, internalRunner);
     }
 
-    public void terminate() {
-        Optional.ofNullable(runnerMap.get("register")).ifPresent(InternalRunner::terminate);
-        runnerMap.remove("register");
+    public void terminate(String serverCode) {
+        Optional.ofNullable(runnerMap.remove(serverCode)).ifPresent(InternalRunner::terminate);
     }
 
     static class InternalRunner implements Runnable {

@@ -63,9 +63,10 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         Document document = null;
         long sendSessionId = msg.getSendSessionId();
         long receiveSessionId = msg.getReceiveSessionId();
+        byte sessionType = msg.getSessionType();
         try {
             String content = new String(msg.getContent(), StandardCharsets.UTF_8);
-            log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}", content, sendSessionId, receiveSessionId);
+            log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}, sessionType: {}", content, sendSessionId, receiveSessionId, sessionType);
             document = DocumentHelper.parseText(content);
         } catch (DocumentException e) {
             log.error("parse xml error", e);
@@ -131,7 +132,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
             String responseMsgXmlString = PlatformXMLUtil.generateXml(
                     RobotServerHandler.sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
             byte[] responseMsgProtocol = PlatformPacketUtil
-                    .createPacket(Constant.sendSessionId, sendSessionId, false, responseMsgXmlString);
+                    .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, responseMsgXmlString);
             RobotServerHandler.send(responseMsgProtocol, xmlBaseModel.getSendCode());
             log.info("巡视主机给机器人{}响应了", xmlBaseModel.getSendCode());
         }
@@ -210,7 +211,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         String heartXmlString = PlatformXMLUtil.generateXml(
                 RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] heartProtocol = PlatformPacketUtil
-                .createPacket(Constant.sendSessionId, sendSessionId, false, heartXmlString);
+                .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, heartXmlString);
         RobotServerHandler.send(heartProtocol, robotCode);
         log.info("maps:{}", Constant.maps);
         log.info("robotChannels:{}", Constant.robotChannels);

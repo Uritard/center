@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.scheduled;
 
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 可靠性指标上报上级系统
@@ -83,6 +85,7 @@ public class DeviceStaticsToUpSystem {
             }
         });
         sendInfoToUpSystem(infoMaps);
+        sendAlgorithmInfo();
     }
 
     private void sendInfoToUpSystem(List<Map<String, Object>> infoMaps) {
@@ -100,6 +103,37 @@ public class DeviceStaticsToUpSystem {
         map.put("list", list);
         try {
             Constant.otherServer(map, Constant.TCP_URL);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 算法可靠性统计指标上报
+     */
+    private void sendAlgorithmInfo() {
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        xmlBaseModel.setType("318");
+        Date now = new Date();
+        String commissioningTime = redisTemplate.opsForHash().entries("t_sys_param:commissioningTime").get("content").toString();
+        String commissionTime = commissioningTime + " 00:00:00";
+        List<Map<String, Object>> warn = statisticsService.algorithmStatics("1", "", "");
+        warn.forEach(t -> {
+            t.put("type", "1");
+            t.put("report_time", DateTimeUtil.getDateTimeString(now));
+            t.put("commission_time", commissionTime);
+        });
+        List<Map<String, Object>> items = new ArrayList<>(warn);
+        List<Map<String, Object>> label = statisticsService.algorithmStatics("2", "", "");
+        label.forEach(t -> {
+            t.put("type", "2");
+            t.put("report_time", DateTimeUtil.getDateTimeString(now));
+            t.put("commission_time", commissionTime);
+        });
+        items.addAll(label);
+        xmlBaseModel.setItems(items);
+        try {
+            Constant.otherObjServer(xmlBaseModel, Constant.TCP_CLOUD_URL);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -5,6 +5,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.task.entity.TCruiseTaskCount;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
@@ -188,4 +189,6 @@ public interface UPatrolTaskDao {
     int deleteResultInfo();
     int deleteTaskInfo();
     int deleteTaskAttrInfo();
+
+    List<UPatrolTask> selectTaskForPage(TaskQuery query);
 }

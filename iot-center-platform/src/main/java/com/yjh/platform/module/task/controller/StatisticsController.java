@@ -77,7 +77,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视点位漏检率")
   @GetMapping(value = "/instance")
-  @Logs(title = "巡视点位漏检率",content = "根据用户传递的参数查询巡视点位漏检率",logType = 1, authority = "1234")
+  @Logs(title = "巡视点位漏检率",content = "根据用户传递的参数查询巡视点位漏检率",logType = 1, authority = "1234,1235")
   public Result instance(
           @RequestParam(value = "code",required = false)String regionCode,
       @RequestParam(value = "type") Integer type,
@@ -95,7 +95,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "告警审核完成率")
   @GetMapping(value = "/warnCheck")
-  @Logs(title = "告警审核完成率",content = "根据用户传递的参数查询告警审核完成率",logType = 1, authority = "1234")
+  @Logs(title = "告警审核完成率",content = "根据用户传递的参数查询告警审核完成率",logType = 1, authority = "1234,1235")
   public Result countWarnCheck(
           @RequestParam(value = "code",required = false)String regionCode,
           @RequestParam(value = "type") Integer type,
@@ -115,7 +115,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视告警准确率")
   @GetMapping(value = "/warnAccuracy")
-  @Logs(title = "巡视告警准确率",content = "根据用户传递的参数查询巡视告警准确率",logType = 1, authority = "1234")
+  @Logs(title = "巡视告警准确率",content = "根据用户传递的参数查询巡视告警准确率",logType = 1, authority = "1234,1235")
   public Result countWarnAccuracy(
           @RequestParam(value = "code",required = false)String regionCode,
           @RequestParam(value = "type") Integer type,
@@ -134,7 +134,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视结果人工审核完成率")
   @GetMapping(value = "/resultCheck")
-  @Logs(title = "巡视结果人工审核完成率",content = "根据用户传递的参数查询巡视结果人工审核完成率",logType = 1, authority = "1234")
+  @Logs(title = "巡视结果人工审核完成率",content = "根据用户传递的参数查询巡视结果人工审核完成率",logType = 1, authority = "1234,1235")
   public Result countResultCheck(
           @RequestParam(value = "code",required = false)String regionCode,
           @RequestParam(value = "type") Integer type,
@@ -153,7 +153,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视任务闭环率")
   @GetMapping(value = "/taskCheck")
-  @Logs(title = "巡视任务闭环率",content = "根据用户传递的参数查询巡视任务闭环率",logType = 1, authority = "1234")
+  @Logs(title = "巡视任务闭环率",content = "根据用户传递的参数查询巡视任务闭环率",logType = 1, authority = "1234,1235")
   public Result taskCheck(
           @RequestParam(value = "code",required = false)String regionCode,
           @RequestParam(value = "type") Integer type,
@@ -244,6 +244,20 @@ public class StatisticsController {
     return result;
   }
 
-
+  @ApiOperation(value = "算法可靠性指标统计")
+  @GetMapping(value = "/algorithmStatics")
+  @Logs(title = "算法可靠性指标统计", content = "时间段内算法可靠性指标统计", logType = 1)
+  public Result algorithmStatics(@RequestParam(value = "type") String type,
+                                 @RequestParam(value = "beginTime") String beginTime,
+                                 @RequestParam(value = "endTime") String endTime) {
+    Result result = new Result();
+    try {
+      result.setData(statisticsService.algorithmStatics(type, beginTime, endTime));
+    } catch (Exception e) {
+      log.error("算法可靠性指标统计失败：", e);
+      result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+    }
+    return result;
+  }
 
 }

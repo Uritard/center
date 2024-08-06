@@ -34,9 +34,9 @@ public class AnalyseResultItem {
     private String code;
 
     /**
-     * 结果反馈图像 url 路径
+     * 结果反馈图像 path 路径
      */
-    private String resImageUrl;
+    private String resImagePath;
 
     /**
      * 图中区域，按照顺时针顺序提供的一系列坐标列表

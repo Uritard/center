@@ -88,4 +88,5 @@ public class TCfgUnionRule implements Serializable {
     private Long presetId;
 
 
+    private String cameraIp;
 }

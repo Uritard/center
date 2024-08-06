@@ -118,7 +118,7 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
 
 
             String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);
-            byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
+            byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, registerXmlString);
             RobotServerHandler.send(registerProtocol, robotCode);
 
             try {

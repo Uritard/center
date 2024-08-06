@@ -177,6 +177,43 @@
         limit 1
     </select>
 
+    <select id="selectByIds" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgMete">
+        select
+        a.mete_id,
+        a.mete_type,
+        a.mete_kind,
+        a.mete_name,
+        a.mete_code,
+        a.unit,
+        a.mete_explain_type,
+        a.create_time,
+        a.update_time,
+        a.modulus,
+        a.station_name,
+        a.station_id,
+        a.up_effect,
+        a.down_effect,
+        a.alarmlevel,
+        a.alarmthresbhold,
+        a.describer,
+        a.mete_precision,
+        a.change_limit,
+        a.hilimit1,
+        a.lolimit1,
+        a.hilimit2,
+        a.lolimit2,
+        a.hilimit3,
+        a.lolimit3,
+        a.hilimit4,
+        a.stander,
+        a.controlenable
+        from t_cfg_mete a
+        where 1 = 1
+        and a.mete_id in <foreach collection="list" open="(" close=")" separator="," item="meteId">
+        #{meteId}
+    </foreach>
+    </select>
+
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TCfgMete" resultType="com.yjh.platform.module.device.entity.TCfgMete">
         select
         a.mete_id,
@@ -469,4 +506,17 @@
     </update>
 
 
+    <select id="selectByMeteIds" resultType="com.yjh.platform.module.task.entity.TCfgDataCurrent">
+        SELECT
+            device.device_id,
+            device.device_name,
+            mete.mete_kind
+        FROM
+        t_cfg_device device
+        LEFT JOIN t_cfg_mete mete ON device.device_id = mete.mete_id
+        where device.device_id in
+            <foreach collection="list" item="meteId" separator="," open="(" close=")">
+                #{meteId}
+            </foreach>
+    </select>
 </mapper>

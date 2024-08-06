@@ -11,6 +11,7 @@ import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -49,23 +50,16 @@ public class TDeviceMaintenanceService{
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
         }
-        tDeviceMaintenance.setDeviceIdList(tDeviceMaintenance.getDeviceIdList().stream().distinct().collect(Collectors.toList()));
-        List<Long> deviceList = tDeviceMaintenance.getDeviceIdList();
-        List<DeviceAndInstance> deviceAndInstanceList = tDeviceMaintenance.getDeviceAndInstanceList();
-        List<Long> instanceList = new ArrayList<>();
-        for(DeviceAndInstance item:deviceAndInstanceList){
-            instanceList.add(item.getInstanceId());
-        }
-        tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
-                .toString().replace("[", "").replace("]", "").replace(" ", ""));
-        tDeviceMaintenance.setInstanceIds(instanceList
-                .toString().replace("[", "").replace("]", "").replace(" ", ""));
+        List<Long> deviceList = tDeviceMaintenance.getDeviceIdList().stream().distinct().collect(Collectors.toList());
+        tDeviceMaintenance.setDeviceIdList(deviceList);
+        List<Long> instanceList = tDeviceMaintenance.getDeviceAndInstanceList().stream().map(DeviceAndInstance::getInstanceId).collect(
+            Collectors.toList());
+        tDeviceMaintenance.setDeviceIds(StringUtils.join(deviceList, ","));
+        tDeviceMaintenance.setInstanceIds(StringUtils.join(instanceList, ","));
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         createMaintenance(tDeviceMaintenance, instanceList, deviceList, 1);
         return 1;
     }
-
-
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long maintenanceId) {
@@ -93,9 +87,10 @@ public class TDeviceMaintenanceService{
     private void createMaintenance(TDeviceMaintenance tDeviceMaintenance, List<Long> instanceList, List<Long> deviceList, int enable) {
         //直连型机器人(所选测点所对应的机器人)
         List<String> robotCodeList = tDeviceMaintenanceDao.selectOnlineRobot(instanceList);
+        String deviceLevel = tDeviceMaintenance.getDeviceLevel();
         robotCodeList.forEach(robot -> {
             String deviceListString = "";
-            switch (tDeviceMaintenance.getDeviceLevel()) {
+            switch (deviceLevel) {
                 case "1":
                     List<String> robotRegionList = tDeviceMaintenanceDao.selectRobotRegionIdList(instanceList, robot);
                     if (CollectionUtils.isNotEmpty(robotRegionList)) {
@@ -127,24 +122,34 @@ public class TDeviceMaintenanceService{
         List<String> edgeList = tDeviceMaintenanceDao.selectOnlineEdge(deviceList);
         edgeList.forEach(edge -> {
             String deviceListString = "";
-            switch (tDeviceMaintenance.getDeviceLevel()) {
+            switch (deviceLevel) {
                 case "1":
-                    List<String> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList, edge);
+                    List<Map<String,Object>> regionList = tDeviceMaintenanceDao.selectRegionIdList(deviceList, edge);
                     if (CollectionUtils.isNotEmpty(regionList)) {
-                        deviceListString = StringUtils.join(regionList.toArray(), ",");
+                        deviceListString = regionList.stream()
+                            .map(r -> Constant.middlegroundIds() ? MapUtils.getString(r, "middleBayId") : MapUtils.getString(r, "bayId"))
+                            .collect(Collectors.joining(","));
                     }
                     break;
                 case "2":
-                    List<String> mainDeviceList = tDeviceMaintenanceDao.selectMainDeviceIdList(deviceList, edge);
+                    List<Map<String,Object>> mainDeviceList = tDeviceMaintenanceDao.selectMainDeviceIdList(deviceList, edge);
                     if (CollectionUtils.isNotEmpty(mainDeviceList)) {
-                        deviceListString = StringUtils.join(mainDeviceList.toArray(), ",");
+                        deviceListString = mainDeviceList.stream()
+                            .map(r -> Constant.middlegroundIds() ? MapUtils.getString(r, "middleDeviceId") : MapUtils.getString(r, "mainDeviceId"))
+                            .collect(Collectors.joining(","));
                     }
                     break;
                 case "3":
                 case "4":
-                    List<String> instanceIdList = tDeviceMaintenanceDao.selectInstanceIdList(instanceList, edge);
-                    if (CollectionUtils.isNotEmpty(instanceIdList)) {
-                        deviceListString = StringUtils.join(instanceIdList.toArray(), ",");
+                    List<Map<String,Object>> instanceIdList = tDeviceMaintenanceDao.selectInstanceIdList(instanceList, edge);
+                    if (CollectionUtils.isNotEmpty(instanceIdList) && "3".equals(deviceLevel)) {
+                        deviceListString = instanceIdList.stream()
+                            .map(r -> Constant.standardPoints() ? MapUtils.getString(r, "standPointId") : MapUtils.getString(r, "pointId"))
+                            .collect(Collectors.joining(","));
+                    } else if (CollectionUtils.isNotEmpty(instanceIdList)) {
+                        deviceListString = instanceIdList.stream()
+                            .map(r -> Constant.middlegroundIds() ? MapUtils.getString(r, "middleComponentId") : MapUtils.getString(r, "componentId"))
+                            .collect(Collectors.joining(","));
                     }
                     break;
                 default:
@@ -160,8 +165,8 @@ public class TDeviceMaintenanceService{
         HashMap<String,Object> params = new HashMap<>(8);
         params.put("enable", enable);
         params.put("device_list", deviceListString);
-        params.put("start_time",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
-        params.put("end_time",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
+        params.put("start_time",DateTimeUtil.format(tDeviceMaintenance.getMaintenanceStart()));
+        params.put("end_time",DateTimeUtil.format(tDeviceMaintenance.getMaintenanceStop()));
         params.put("device_level",tDeviceMaintenance.getDeviceLevel());
         params.put("config_code", tDeviceMaintenance.getConfigCode());
         params.put("coordinate_pixel", tDeviceMaintenance.getCoordinatePixel());
@@ -240,7 +245,7 @@ public class TDeviceMaintenanceService{
                 item.setEffectiveState(406);
                 item.setEffectiveStateName("已生效");
             }
-            if(effectiveState != null && item.getEffectiveState() != effectiveState){
+            if(effectiveState != null && !Objects.equals(item.getEffectiveState(), effectiveState)){
                 continue;
             }
             re.add(item);
@@ -411,13 +416,12 @@ public class TDeviceMaintenanceService{
      * @throws Exception Exception
      */
     private void processAdd(Map<String, Object> item) throws Exception {
-        String deviceLevel = item.get("device_level").toString();
-        String deviceList = item.get("device_list").toString();
-
+        String deviceLevel = (String)item.get("device_level");
+        String deviceList = (String)item.get("device_list");
+        List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> NumberUtils.toLong(s.trim())).collect(Collectors.toList());
         if (StringUtils.isNotEmpty(deviceLevel)) {
-            List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
-            List<Long> cruisePoints = getCruisePoints(deviceList, deviceLevel);
-            addDeviceMaintenance(item, deviceIdLst, cruisePoints);
+            List<Long> deviceIdLst = getDeviceIdLst(idList);
+            addDeviceMaintenance(item, deviceIdLst, idList);
         }
     }
 
@@ -433,8 +437,9 @@ public class TDeviceMaintenanceService{
         String deviceList = item.get("device_list").toString();
         String coordinatePixel = item.get("coordinate_pixel").toString();
         String configCode = item.get("config_code").toString();
-        List<Long> deviceIdLst = getDeviceIdLst(deviceList, deviceLevel);
-        List<Long> cruisePoints = getCruisePoints(deviceList, deviceLevel);
+
+        List<Long> cruisePoints = Arrays.stream(deviceList.split(",")).map(s -> NumberUtils.toLong(s.trim())).collect(Collectors.toList());
+        List<Long> deviceIdLst = getDeviceIdLst(cruisePoints);
         TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
         tDeviceMaintenance.setConfigCode(configCode);
         tDeviceMaintenance.setMaintenanceStart(DateTimeUtil.getDate(startTime));
@@ -455,7 +460,6 @@ public class TDeviceMaintenanceService{
      * @throws Exception Exception
      */
     private void addDeviceMaintenance(Map<String, Object> item, List<Long> deviceIdLst, List<Long> cruisePoints) throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String startTime = item.get("start_time").toString();
         String endTime = item.get("end_time").toString();
         String deviceLevel = item.get("device_level").toString();
@@ -472,8 +476,8 @@ public class TDeviceMaintenanceService{
         //设置检修区域
         TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
         tDeviceMaintenance.setMaintenanceName("检修区域" + startTime);
-        tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(startTime));
-        tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(endTime));
+        tDeviceMaintenance.setMaintenanceStart(DateTimeUtil.parse(startTime));
+        tDeviceMaintenance.setMaintenanceStop(DateTimeUtil.parse(endTime));
         tDeviceMaintenance.setDeviceIdList(deviceIdLst);
         tDeviceMaintenance.setDeviceLevel(deviceLevel);
         tDeviceMaintenance.setDeviceAndInstanceList(lists);
@@ -483,64 +487,14 @@ public class TDeviceMaintenanceService{
     }
 
     /**
-     * 获取同步过来的巡视点列表
-     *
-     * @param deviceList deviceList
-     * @param deviceLevel deviceLevel
-     * @return result
-     */
-    private List<Long> getCruisePoints(String deviceList, String deviceLevel) {
-        List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-        List<Long> deviceIdLst = new ArrayList<>();
-        switch (deviceLevel) {
-            case "1":
-                //区域
-                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
-                return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
-            case "2":
-                //设备
-                deviceIdLst = idList;
-                return tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
-            case "3":
-                // 监测点
-            case "4":
-                // 部件
-                return idList;
-            default:
-                return deviceIdLst;
-        }
-    }
-
-    /**
      * 获取同步过来的设备列表
      *
      * @param deviceList deviceList
-     * @param deviceLevel deviceLevel
      * @return result
      */
-    private List<Long> getDeviceIdLst(String deviceList, String deviceLevel) {
-        List<Long> idList = Arrays.stream(deviceList.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
-        List<Long> deviceIdLst = new ArrayList<>();
-        switch (deviceLevel) {
-            case "1":
-                //区域 间隔
-                deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
-                break;
-            case "2":
-                //设备
-                deviceIdLst = idList;
-                break;
-            case "3":
-                // 监测点
-            case "4":
-                //部件
-                deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
-                break;
-            default:
-                break;
-        }
+    private List<Long> getDeviceIdLst(List<Long> deviceList) {
 
-        return deviceIdLst;
+        return tDeviceMaintenanceDao.selectDeviceIdListByIns(deviceList);
     }
 }
 

@@ -19,7 +19,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        maintenance_id,maintenance_name,device_ids,
+        maintenance_id,maintenance_name,config_code,device_ids,
         is_valid,maintenance_start,maintenance_stop,
         edge_code,origin_id,coordinate_pixel,
         device_level,instance_ids
@@ -37,21 +37,22 @@
         from t_device_maintenance
         where edge_code=#{edgeCode}
     </select>
-    <select id="selectDeviceIdsList" resultType="java.lang.String">
-        SELECT
-        device_id
-        FROM
-        t_std_device
-        WHERE
-        FIND_IN_SET(origin_id, #{originIds, jdbcType=VARCHAR})
-    </select>
     <select id="selectInstanceIdsList" resultType="java.lang.String">
         SELECT
         instance_id
         FROM
-        t_cruise_point_instance
-        WHERE
-        FIND_IN_SET(origin_id, #{originIds, jdbcType=VARCHAR})
+        t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        WHERE a.edge_code = #{edgeCode, jdbcType=VARCHAR}
+        <if test="type == 1">
+            AND FIND_IN_SET(a.origin_id, #{originIds, jdbcType=VARCHAR})
+        </if>
+        <if test="type == 2">
+            AND FIND_IN_SET(b.device_point_id, #{originIds, jdbcType=VARCHAR})
+        </if>
+        <if test="type == 3">
+            AND FIND_IN_SET(b.component_id, #{originIds, jdbcType=VARCHAR})
+        </if>
     </select>
     <select id="selectDeviceIdsByInstanceList" resultType="java.lang.String">
         SELECT DISTINCT
@@ -131,16 +132,16 @@
     </insert>
     <insert id="batchInsert">
         insert into t_device_maintenance
-        (maintenance_id,maintenance_name,device_ids
+        (maintenance_id,maintenance_name,config_code,device_ids
         ,is_valid,maintenance_start,maintenance_stop
         ,edge_code,origin_id,coordinate_pixel
         ,device_level,instance_ids
         ) values
         <foreach collection="list" item="TDeviceMaintenance" separator=",">
-            (#{TDeviceMaintenance.maintenanceId,jdbcType=BIGINT},#{TDeviceMaintenance.maintenanceName,jdbcType=VARCHAR},#{TDeviceMaintenance.deviceIds,jdbcType=VARCHAR}
-            ,#{TDeviceMaintenance.isValid,jdbcType=INTEGER},#{TDeviceMaintenance.maintenanceStart,jdbcType=TIMESTAMP},#{TDeviceMaintenance.maintenanceStop,jdbcType=TIMESTAMP}
-            ,#{TDeviceMaintenance.edgeCode,jdbcType=VARCHAR},#{TDeviceMaintenance.originId,jdbcType=VARCHAR},#{TDeviceMaintenance.coordinatePixel,jdbcType=VARCHAR}
-            ,#{TDeviceMaintenance.deviceLevel,jdbcType=VARCHAR},#{TDeviceMaintenance.instanceIds,jdbcType=VARCHAR})
+            (#{TDeviceMaintenance.maintenanceId,jdbcType=BIGINT},#{TDeviceMaintenance.maintenanceName,jdbcType=VARCHAR},#{TDeviceMaintenance.configCode,jdbcType=VARCHAR}
+            ,#{TDeviceMaintenance.deviceIds,jdbcType=VARCHAR},#{TDeviceMaintenance.isValid,jdbcType=INTEGER},#{TDeviceMaintenance.maintenanceStart,jdbcType=TIMESTAMP}
+            ,#{TDeviceMaintenance.maintenanceStop,jdbcType=TIMESTAMP},#{TDeviceMaintenance.edgeCode,jdbcType=VARCHAR},#{TDeviceMaintenance.originId,jdbcType=VARCHAR}
+            ,#{TDeviceMaintenance.coordinatePixel,jdbcType=VARCHAR},#{TDeviceMaintenance.deviceLevel,jdbcType=VARCHAR},#{TDeviceMaintenance.instanceIds,jdbcType=VARCHAR})
         </foreach>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
@@ -194,4 +195,36 @@
             instance_ids =  #{instanceIds,jdbcType=VARCHAR}
         where   maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
     </update>
+
+    <select id="selectInstanceIdsByRegionOrDevice" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
+        LEFT JOIN t_std_device_attr tsda ON tsda.device_id = tsd.device_id
+        LEFT JOIN t_std_region tsr ON tsr.region_id = tsd.up_region_id
+        WHERE tcpi.edge_code = #{edgeCode, jdbcType=VARCHAR}
+        <if test="upRegionIds != null and middlegroundIds == false">
+            AND FIND_IN_SET(tsr.origin_region_id, #{upRegionIds, jdbcType=VARCHAR})
+        </if>
+        <if test="upRegionIds != null and middlegroundIds == true">
+            AND FIND_IN_SET(tsr.up_region_ids, #{upRegionIds, jdbcType=VARCHAR})
+        </if>
+        <if test="deviceIds != null and middlegroundIds == false">
+            AND FIND_IN_SET(tsd.origin_id, #{deviceIds, jdbcType=VARCHAR})
+        </if>
+        <if test="deviceIds != null and middlegroundIds == true">
+            AND FIND_IN_SET(tsda.pms_id, #{deviceIds, jdbcType=VARCHAR})
+        </if>
+    </select>
+
+    <select id="selectInstanceIdsByComponent" resultType="java.lang.String">
+        SELECT tcpi.instance_id
+        FROM t_cruise_point_instance tcpi
+        LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
+        WHERE tsd.edge_code = #{edgeCode, jdbcType=VARCHAR}
+        <foreach collection="list" open="AND (" close=")" separator="OR" item="deviceModel">
+            tsd.origin_id = #{deviceModel.deviceId}
+            AND FIND_IN_SET(tcpi.custom_id, #{deviceModel.customId, jdbcType=VARCHAR})
+        </foreach>
+    </select>
 </mapper>

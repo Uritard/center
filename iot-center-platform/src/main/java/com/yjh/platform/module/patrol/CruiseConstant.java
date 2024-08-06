@@ -131,6 +131,10 @@ public interface CruiseConstant {
      * 审核状态，未审核
      */
     int EVALUATION_STATE_UN = 257;
+    /**
+     * 审核状态，无需审核
+     */
+    int EVALUATION_STATE_IGNORE = 338;
 
     /**
      * 审核结果正常
@@ -177,7 +181,7 @@ public interface CruiseConstant {
         /**
          * 巡视类型，在线监控
          */
-        ONLINE(231, "在线监控"),
+        ONLINE(231, "主辅设备"),
         /**
          * 其他类型，未识别类型
          */
@@ -376,6 +380,33 @@ public interface CruiseConstant {
         public static boolean contains(String desc) {
             return ABNORMAL_ENUM_MAP.containsKey(desc);
         }
+    }
+
+
+    enum ConfModeEnum{
+        /**
+         * 未核查
+         */
+        UN_CHECK(276),
+        /**
+         * 已核查
+         */
+        CHECKED(275),
+        /**
+         * 自动审核
+         */
+        AUTO_CHECKED(339);
+
+        final int code;
+
+        ConfModeEnum(int code){
+            this.code = code;
+        }
+
+        public int getCode(){
+            return code;
+        }
+
     }
 
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>63</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-07 15:21:01</Time>
+    <Items>
+        <Item file_path="1/jm/data/sb_output/21000000456_40035_202403071520566251350.jpg" patroldevice_code="21000000456" edge_code="1" patroldevice_name="静默监视设备" file_type="5" alarm_level="3" origin_id="503" time="2024-03-07 15:21:01" monitor_type="204" content="异物-鸟巢"/>
+    </Items>
+</PatrolHost>

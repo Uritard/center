@@ -3,9 +3,9 @@ package com.yjh.platform.netty.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -61,7 +61,7 @@ public class DataDealThread implements Runnable {
     private String syncWebsocketUrl;
     private String stationCode;
     private FtpsService ftpsService;
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     private ApplicationProperties applicationProperties;
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -80,7 +80,7 @@ public class DataDealThread implements Runnable {
         this.syncWebsocketUrl=syncWebsocketUrl;
         this.remotePort = remotePort;
         ftpsService = StaticContextAccessor.getBean(FtpsService.class);
-        alarmService = StaticContextAccessor.getBean(AlarmService.class);
+        algorithmService = StaticContextAccessor.getBean(AlgorithmService.class);
         applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
     }
 
@@ -898,7 +898,7 @@ public class DataDealThread implements Runnable {
 
                 }
 
-                if(reponseMessage != null && !"".equals(reponseMessage) && applicationProperties.getManagerMqttConfig().isEnable()){
+                if(reponseMessage != null && !"".equals(reponseMessage) && applicationProperties.getManagerAlgorithmConfig().isEnable()){
                     try{
                         //jeff: 每一次算法返回响应处理结束后，上传告警图片信息并发送告警信息到算法管理平台
                         Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
@@ -929,18 +929,18 @@ public class DataDealThread implements Runnable {
                             String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
-                            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
+                            String remoteorigfilepath= applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
                             //,获取结果路径.并拼接算法管理平台对应远程文件路径
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
-                            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
+                            String remotefilepath= applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
                             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
                             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
                             String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
                             String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
                             judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotebaseimagicpath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
+                            String remotebaseimagicpath= applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
                             Iterator it=differentList.iterator();
                             List<Different> defectList1=new ArrayList<>();
                             while (it.hasNext()){
@@ -988,7 +988,7 @@ public class DataDealThread implements Runnable {
                             if( !ftpsService.fileExits(remotefilepath)){
                                 ftpsService.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
                             }
-                            alarmService.PushMsg(alarmDetail);
+                            algorithmService.pushAlarmMsg(alarmDetail);
 
                             // 判别上报站端
                             String taskId = jsonObjectResultbak.getString("taskId");
@@ -1015,12 +1015,12 @@ public class DataDealThread implements Runnable {
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
                             //拼接算法管理平台原始图片推送地址
-                            String remoteorigfilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"原图.jpg";
+                            String remoteorigfilepath= applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"原图.jpg";
                             log.info("开始向算法管理平台发送图片和mqtt消息");
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotefilepath= applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"缺陷告警.jpg";
+                            String remotefilepath= applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"缺陷告警.jpg";
                             Iterator it=defectList.iterator();
 
                             while (it.hasNext()){
@@ -1076,7 +1076,7 @@ public class DataDealThread implements Runnable {
 //                       ftp文件上传测试数据
 //                      String localpath="D://信息化工作.jpg";
 //                      ftpsservice.uploadFile("遥信告警",localpath,remotefilepath);
-                            alarmService.PushMsg(alarmDetail);
+                            algorithmService.pushAlarmMsg(alarmDetail);
                             log.info("发送算法管理平台结束");
 
                             // 缺陷上报站端

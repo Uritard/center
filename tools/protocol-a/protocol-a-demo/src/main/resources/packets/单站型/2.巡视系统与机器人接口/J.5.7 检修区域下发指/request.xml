@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Robot01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>81</Type>
+    <Code>1</Code>
+    <Time>2024-03-27 20:19:42</Time>
+    <Items>
+        <Item start_time="2024-03-27 00:00:00" device_list="83402,83403,83404,83405,83417,83418,83632" enable="1" end_time="2024-04-03 00:00:00" device_level="3" config_code="100001" coordinate_pixel="10,12,30;20;12;30;20,22,30;10,22,30"/>
+    </Items>
+    <Command>4</Command>
+</PatrolDevice>

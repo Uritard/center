@@ -73,7 +73,7 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
         TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
+        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, cruiseResultXmlString);
         RobotServerHandler.send(cruiseResultProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
     }

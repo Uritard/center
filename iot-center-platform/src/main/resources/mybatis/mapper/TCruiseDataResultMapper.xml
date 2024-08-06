@@ -455,6 +455,7 @@
             i.dict_note AS c_type_name,
             e.person_check,
             e.result_num,
+            e.result_desc,
             e.identify_result,
             j.dict_note AS identify_result_name,
             e.cruise_result,

@@ -95,7 +95,8 @@
             is_temdif,
             redundant_type,
             alarm_level_string,
-            alarm_rule_type
+            alarm_rule_type,
+            label_attri
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
@@ -140,7 +141,8 @@
                 #{isTemdif, jdbcType=INTEGER},
                 #{redundantType, jdbcType=VARCHAR},
                 #{alarmLevelString,jdbcType=VARCHAR},
-                #{alarmRuleType,jdbcType=INTEGER}
+                #{alarmRuleType,jdbcType=INTEGER},
+                #{labelAttri,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -188,7 +190,8 @@
         is_temdif,
         alarm_state,
         redundant_type,
-        alarm_rule_type
+        alarm_rule_type,
+        label_attri
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
             (
@@ -234,7 +237,8 @@
             #{TStdMeteModelDetail.isTemdif, jdbcType=INTEGER},
             ifnull(#{TStdMeteModelDetail.alarmState, jdbcType=INTEGER},"1"),
             #{TStdMeteModelDetail.redundantType, jdbcType=VARCHAR},
-            #{TStdMeteModelDetail.alarmRuleType,jdbcType=INTEGER}
+            #{TStdMeteModelDetail.alarmRuleType,jdbcType=INTEGER},
+            #{TStdMeteModelDetail.labelAttri,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -294,6 +298,7 @@
         a.alarm_level_string = #{alarmLevelString,jdbcType=VARCHAR},
         <if test="isTemdif != null ">a.is_temdif = #{isTemdif},</if>
         a.alarm_rule_type = #{alarmRuleType,jdbcType=INTEGER},
+        a.label_attri = #{labelAttri,jdbcType=VARCHAR},
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
@@ -340,7 +345,8 @@
         a.is_temdif,
         a.redundant_type,
         b.device_name,
-        a.alarm_rule_type
+        a.alarm_rule_type,
+        a.label_attri
         from t_std_devicemete a
         left join t_std_device b on a.device_id = b.device_id
         where 1 = 1
@@ -504,12 +510,10 @@
         e.up_region_id,
         a.analyse_type,
         a.is_temdif,
-        a.alarm_rule_type
+        a.alarm_rule_type,
+        a.edge_code,
+        label_attri
         from t_std_devicemete a
-        left join  t_dict_business g on a.alarm_level= g.dict_code
-        left join t_dict_business f on a.alarm_type= f.dict_code
-        left join t_dict_business b on a.mete_type= b.dict_code and b.col_name="mete_type"
-        left join t_dict_business d on a.mete_kind= d.dict_code and d.col_name="mete_kind"
         left join t_std_device e on a.device_id = e.device_id
         where 1=1
           <choose>
@@ -594,7 +598,8 @@
             state_one,
             is_temdif,
             alarm_state,
-            alarm_rule_type
+            alarm_rule_type,
+            label_attri
         )values
         <foreach collection="list" item="TStdDevicemete" separator=",">
             (
@@ -635,7 +640,8 @@
                 #{TStdDevicemete.stateOne, jdbcType=VARCHAR},
                 #{TStdDevicemete.isTemdif, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmState, jdbcType=INTEGER},
-                #{TStdDevicemete.alarmRuleType,jdbcType=INTEGER}
+                #{TStdDevicemete.alarmRuleType,jdbcType=INTEGER},
+                #{TStdDevicemete.labelAttri,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

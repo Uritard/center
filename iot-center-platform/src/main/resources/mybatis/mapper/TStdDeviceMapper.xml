@@ -102,6 +102,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		create_time,
 		preset_id,
 		camera_id,
+		real_code,
 		node_id
 		)values(
 		#{deviceId, jdbcType=BIGINT},
@@ -120,6 +121,7 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		CURRENT_TIMESTAMP,
 		#{presetId, jdbcType=BIGINT},
 		#{cameraId, jdbcType=BIGINT},
+		#{realCode, jdbcType=VARCHAR},
 		#{nodeId, jdbcType=BIGINT}
 		)
 	</insert>
@@ -171,8 +173,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 			a.task_id = #{taskId, jdbcType=VARCHAR}
 			AND c.analyse_type = 8
 			AND (
-			person_check REGEXP '[^0-9.]'
-			) = 0
+			person_check REGEXP '^[A-Za-z_\\d_#]+$'
+			) = 1
 			) b ON a.device_id = b.device_id
 			SET real_code = b.person_check
 	</update>
@@ -704,7 +706,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		UNION ALL (
 		SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		(case when cpi.cruise_type = 228 then "robotCruiseInspection"
-		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
+		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" WHEN cpi.cruise_type = 231 THEN
+		"linkageCruiseInspection" END) AS infoType
 		FROM  t_cruise_point_instance cpi
 		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
 		where 1=1
@@ -731,7 +734,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		UNION ALL (
 		SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		(case when cpi.cruise_type = 228 then "robotCruiseInspection"
-		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
+		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" WHEN cpi.cruise_type = 231 THEN
+		"linkageCruiseInspection" END) AS infoType
 		FROM  t_cruise_point_instance cpi
 		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
 		where cpi.cruise_type = 228
@@ -758,7 +762,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		UNION ALL (
 		SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		(case when cpi.cruise_type = 228 then "robotCruiseInspection"
-		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
+		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" WHEN cpi.cruise_type = 231 THEN
+		"linkageCruiseInspection" END) AS infoType
 		FROM  t_cruise_point_instance cpi
 		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
 		where cpi.cruise_type = 229
@@ -910,7 +915,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		b.device_name AS label,
 		b.up_region_id AS upId,
 		d.region_name AS upName,
-		"device" AS infoType
+		"device" AS infoType,
+		b.device_type AS deviceTypeId
 		FROM
 		t_std_device b
 		LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
@@ -1050,6 +1056,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		"videoCruiseInspection"
 		WHEN cpi.cruise_type = 230 THEN
 		"videoCruiseInspection"
+		WHEN cpi.cruise_type = 231 THEN
+		"linkageCruiseInspection"
 		END
 		) AS infoType
 		FROM
@@ -1128,6 +1136,8 @@ and a.camera_id = #{cameraId} and b.device_mete_id = #{meteId}
 		SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		(case when cpi.cruise_type = 228 then "robotCruiseInspection"
 		when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection"
+		WHEN cpi.cruise_type = 231 THEN
+		"linkageCruiseInspection"
 		END) AS infoType
 		FROM t_cruise_point_instance cpi
 		LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id

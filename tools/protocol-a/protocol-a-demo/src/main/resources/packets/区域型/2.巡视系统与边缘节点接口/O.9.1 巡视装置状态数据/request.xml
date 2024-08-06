@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>1</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 13:39:30</Time>
+    <Items>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="1" value="0"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="2" value="0"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="3" value="1"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="4" value="0"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="21" value="1"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="41" value="3"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="61" value="3"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="81" value="1"/>
+        <Item unit="" patroldevice_code="{{robotCode}}" patroldevice_name="机器人01" value_unit="" time="{{now}}" type="101" value="1"/>
+        <Item unit="" patroldevice_code="{{droneCode}}" patroldevice_name="无人机" value_unit="" time="{{now}}" type="201" value="1"/>
+    </Items>
+</PatrolHost>

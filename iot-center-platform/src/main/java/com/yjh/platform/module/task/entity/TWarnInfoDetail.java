@@ -1,15 +1,17 @@
 package com.yjh.platform.module.task.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 
-import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lqh
@@ -140,4 +142,12 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "告警屏蔽结束时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
+
+    private String labelAttri;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private List<KeyValue<String, String>> labelAttriName;
+
+    private String warnType;
+
+    private String warnTypeName;
 }

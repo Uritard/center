@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -115,6 +116,7 @@ public class InspectionResultThread implements Runnable{
             log.info("tCruiseTaskResultMap {}", tCruiseTaskResultMap);
 
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
+            redisTemplate.expire(redisKeyName, 7, TimeUnit.DAYS);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
             if (Objects.nonNull(waiter)) {
                 synchronized (waiter) {

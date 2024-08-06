@@ -26,5 +26,5 @@ public class PicAnalyseResponse implements Serializable {
     /**
      * 结果集
      */
-    private List<AnalyseResult> resultsList;
+    private List<AnalyseResult> resultList;
 }

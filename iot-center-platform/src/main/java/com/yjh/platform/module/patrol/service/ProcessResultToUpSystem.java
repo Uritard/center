@@ -1,33 +1,38 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.generator.ObjectGenerator;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
+import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.entity.TDefectInfo;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
-import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisCallback;
@@ -41,8 +46,10 @@ import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_SUMMARY_PREFIX;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -59,9 +66,12 @@ public class ProcessResultToUpSystem {
     private final AnalyseDataOperateService analyseDataOperateService;
     private final FtpsService ftpsService;
     private final ApplicationProperties applicationProperties;
-    private final AlarmService alarmService;
+    private final AlgorithmService algorithmService;
     private final TRobotInfoDao tRobotInfoDao;
-
+    private final UPatrolTaskDao uPatrolTaskDao;
+    private final TAlgorithmInfoService algorithmInfo;
+    private final TCameraInfoDao tCameraInfoDao;
+    private final TVoiceDeviceDao tVoiceDeviceDao;
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
@@ -71,20 +81,29 @@ public class ProcessResultToUpSystem {
     private static final Map<String, List<Map<String, String>>> DEFECT_MAP = new ConcurrentHashMap<>(128);
     private static final Map<String, List<String>> DISTING_MAP = new ConcurrentHashMap<>(128);
 
+
     public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao,
                                    AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsService,
-                                   AlarmService alarmService,ApplicationProperties applicationProperties, TRobotInfoDao tRobotInfoDao) {
+                                   AlgorithmService algorithmService, ApplicationProperties applicationProperties,
+                                   TRobotInfoDao tRobotInfoDao, UPatrolTaskDao uPatrolTaskDao, TAlgorithmInfoService algorithmInfo,
+                                   TCameraInfoDao tCameraInfoDao, TVoiceDeviceDao tVoiceDeviceDao) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
         this.ftpsService = ftpsService;
-        this.alarmService = alarmService;
+        this.algorithmService = algorithmService;
         this.applicationProperties = applicationProperties;
         this.tRobotInfoDao = tRobotInfoDao;
+        this.uPatrolTaskDao = uPatrolTaskDao;
+        this.algorithmInfo = algorithmInfo;
+        this.tCameraInfoDao = tCameraInfoDao;
+        this.tVoiceDeviceDao = tVoiceDeviceDao;
     }
 
-    public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
-        return alarmAndResultToUpSystem(Collections.singletonList(cruiseResultMap), alarmLevel, tWarnInfo);
+    public void alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
+        ThreadPoolUtil.PATROL_POOL.addThread(() ->{
+            alarmAndResultToUpSystem(Collections.singletonList(cruiseResultMap), alarmLevel, tWarnInfo);
+        });
     }
 
     /**
@@ -108,7 +127,7 @@ public class ProcessResultToUpSystem {
             String taskId = Optional.ofNullable(cruiseResultList.get(0).get("taskId")).orElse("");
             UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectByPrimaryId(taskId);
             String taskCode = uPatrolTask.getTaskCode();
-            String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX+taskId;
+            String key = PATROL_SUMMARY_PREFIX+taskId;
             String taskPatrolledId = String.valueOf(redisTemplate.opsForHash().get(key,"task_patrolled_id"));
             if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
                 taskPatrolledId = stationCode + "_" + taskCode + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
@@ -188,6 +207,7 @@ public class ProcessResultToUpSystem {
                     resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath,allFilePath,tagBasePath);
                 } else {
                     xmlBaseModel.setType("62");
+                    xmlItem.put("link_point", "");
                     String isTemdif = typeAndPathName.getOrDefault("isTemdif", "0");
                     if (StringUtils.isNotEmpty(tagPath)){
                         tagPath = "alarm/" + tagPath;
@@ -287,7 +307,7 @@ public class ProcessResultToUpSystem {
         return map;
     }
 
-    private String patroldeviceCode(Map<String, String> cruiseResultMap, Map<Long, TRobotInfo> allRobot){
+    private String patroldeviceCode(Map<String, ?extends Object> cruiseResultMap, Map<Long, TRobotInfo> allRobot){
         HashMap<String, String> map = new HashMap<>(4);
         // 识别类型、文件类型、文件名命名
         int cruiseType = MapUtils.getInteger(cruiseResultMap, "cruiseType");
@@ -296,6 +316,15 @@ public class ProcessResultToUpSystem {
         String deviceCode = MapUtils.getString(cruiseResultMap, "cruiseDeviceId");
         if (type == CruiseConstant.TypeEnum.ROBOT || type == CruiseConstant.TypeEnum.UAV) {
             deviceCode = Optional.ofNullable(allRobot.get(NumberUtils.toLong(deviceCode))).map(TRobotInfo::getRobotNum).orElse(deviceCode);
+        }
+        if (type == TypeEnum.INFRARED || type == TypeEnum.VIDEO){
+            TCameraInfo cameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(deviceCode));
+            deviceCode = cameraInfo.getBcameraChannelId() == null ? (cameraInfo.getCameraChannelId() == null ? deviceCode:cameraInfo.getCameraChannelId()):cameraInfo.getBcameraChannelId();
+        }
+        if (type == TypeEnum.VOICE){
+            Long voiceId = MapUtils.getLong(cruiseResultMap,"cruiseId");
+            VoiceDeviceAllInfo voice = tVoiceDeviceDao.selectById(voiceId);
+            deviceCode = voice.getVoiceCode() == null ? deviceCode:voice.getVoiceCode();
         }
 
         return deviceCode;
@@ -381,7 +410,17 @@ public class ProcessResultToUpSystem {
             String resultNum = Optional.ofNullable(tWarnInfo.getValue()).orElse("");
             xmlItem.put("value_unit", resultNum + xmlItem.getOrDefault("unit", ""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
-            xmlItem.put("defect_type", Optional.ofNullable(tWarnInfo.getWarnSubtype()).map(String::valueOf).orElse(""));
+            String defectType = Optional.ofNullable(tWarnInfo.getWarnContent()).orElse("");
+            StringBuilder sb = new StringBuilder();
+            String[] defects = defectType.split(" ");
+            for (String defect : defects) {
+                String defectDesc = algorithmInfo.getAlgorithmName(defect);
+                if (StringUtils.isNotEmpty(defectDesc)){
+                    sb.append(",").append(defectDesc);
+                }
+            }
+            defectType  = sb.toString().replaceFirst(",","");
+            xmlItem.put("defect_type", defectType);
             xmlItem.put("origin_id", tWarnInfo.getWarnId());
             xmlItem.put("edge_code", edgeCode);
         }catch (Exception e){
@@ -390,6 +429,43 @@ public class ProcessResultToUpSystem {
         resultPathMap.put("imgPath", imagePath);
         resultPathMap.put("tagPath", tagPath);
         return resultPathMap;
+    }
+
+    public static String recognitionTypeToAlarmType(String recognitionType,String isTemdif){
+        String alarmType = "";
+        switch (recognitionType){
+            case "1":
+            case "11":
+            case "12":
+            case "13":
+                //仪表越限报警
+                alarmType = "7";
+                break;
+            case "2":
+                //变位报警
+                alarmType = "10";
+                break;
+            case "3":
+                //外观异常
+                alarmType = "6";
+                break;
+            case "4":
+                if ("0".equals(isTemdif)) {
+                    //超温报警
+                    alarmType = "1";
+                } else {
+                    //温升报警
+                    alarmType = "2";
+                }
+                break;
+            case "5":
+                //声音异常
+                alarmType = "5";
+                break;
+            default:
+                break;
+        }
+        return alarmType;
     }
 
     /**
@@ -450,7 +526,17 @@ public class ProcessResultToUpSystem {
                 default:
                     break;
             }
-
+            String defectType = resultDesc;
+            StringBuilder sb = new StringBuilder();
+                String[] defects = defectType.split(" ");
+                for (String defect : defects) {
+                    String defectDesc = algorithmInfo.getAlgorithmName(defect);
+                    if (StringUtils.isNotEmpty(defectDesc)){
+                        sb.append(",").append(defectDesc);
+                    }
+                }
+                defectType  = sb.toString().replaceFirst(",","");
+            xmlItem.put("defect_type", defectType);
             String resultValue = resultDesc.replace(String.valueOf(xmlItem.getOrDefault("unit", "")), "");
             if (StringUtils.containsAny(resultDesc, "dB", "Hz")) {
                 resultValue = resultValue.replaceAll("[dBDbFHz:]", "");
@@ -476,8 +562,11 @@ public class ProcessResultToUpSystem {
             String valid = "1";
             if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
                 valid = "0";
-            } else if("1".equals(MapUtils.getString(cruiseResultMap,"isWarn"))){
-                valid = "1";
+                if (MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_REQUESTFAILED ||
+                MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_TIMEOUT ||
+                        MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_ANALYSEFAILED) {
+                    valid = "2";
+                }
             }
             xmlItem.put("valid", valid);
             xmlItem.put("abnormal_type", cruiseResultMap.get("cruiseAbnormal"));
@@ -502,7 +591,7 @@ public class ProcessResultToUpSystem {
         try {
             for (String value : resultList){
                 // 判别告警等级暂定为一般
-                String alarmLevel = "2";
+                String alarmLevel = "1";
                 TWarnInfo tWarnInfo = new TWarnInfo();
                 tWarnInfo.setImagePath(cruiseResultMap.get("picpath"));
 
@@ -531,16 +620,14 @@ public class ProcessResultToUpSystem {
             String alarmLevel = "1";
             switch (level) {
                 case 130:
+                case 131:
                     alarmLevel = "1";
                     break;
-                case 131:
+                case 132:
                     alarmLevel = "2";
                     break;
-                case 132:
-                    alarmLevel = "3";
-                    break;
                 case 133:
-                    alarmLevel = "4";
+                    alarmLevel = "3";
                     break;
                 default:
                     break;
@@ -569,16 +656,14 @@ public class ProcessResultToUpSystem {
                 String defectLevel = redisInfoMap.get("defectLevel");
                 switch (defectLevel){
                     case "130":
+                    case "131":
                         alarmLevel = "1";
                         break;
-                    case "131":
+                    case "132":
                         alarmLevel = "2";
                         break;
-                    case "132":
-                        alarmLevel = "3";
-                        break;
                     case "133":
-                        alarmLevel = "4";
+                        alarmLevel = "3";
                         break;
                     default:
                         break;
@@ -596,7 +681,7 @@ public class ProcessResultToUpSystem {
      * @param cruiseResultMap 任务结果
      * @param msgId
      */
-    public void defectToAlgorithmM(Map<String, String> cruiseResultMap, String msgId) {
+    public void defectToAlgorithmM(Map<String, String> cruiseResultMap, String msgId, String analyseType) {
         if (Constant.fastTurbo()) {
             // 压测模式，结果不上报上级系统
             return;
@@ -605,26 +690,27 @@ public class ProcessResultToUpSystem {
         // msg：判别告警 defect：缺陷告警
         // Set<String> differentList= redisScan( "msg:" + msgId);
         // Set<String> defectList = redisScan("defect:" + msgId);
-        String ftpsRemotePath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath();
+        String ftpsRemotePath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath();
 
         String nowTime = DateTimeUtil.getDateofFormatString();
         String yearMonth = DateTimeUtil.getMonthDateString();
-
-        List<String> diffList = DISTING_MAP.remove(msgId);
+        boolean normal = true;
         // Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
         Long instanceId = MapUtils.getLong(cruiseResultMap, "instanceId");
-        if(CollectionUtils.isNotEmpty(diffList) && applicationProperties.getManagerMqttConfig().isEnable()){
+        HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
+        Alarm alarmDetail = new Alarm();
+        String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
+
+        // 先取出算法平台返回的resultinfo中的结果图片路径
+        String resultImage;
+        String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
+        String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
+        resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+
+        List<String> diffList = DISTING_MAP.remove(msgId);
+        if(CollectionUtils.isNotEmpty(diffList) && applicationProperties.getManagerAlgorithmConfig().isEnable()){
             log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
-
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
-            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
-
-
-            // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImage;
-            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
-            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
-            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+            normal = false;
 
             String remoteorigfilepath = ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
             //,获取结果路径.并拼接算法管理平台对应远程文件路径
@@ -640,7 +726,7 @@ public class ProcessResultToUpSystem {
             String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
 
             List<Different> defectTempList = new ArrayList<>();
-            Alarm alarmDetail = new Alarm();
+
             for (String resultValue : diffList) {
                 log.info("判别结果：{}",resultValue);
                 Different different = new Different();
@@ -693,7 +779,7 @@ public class ProcessResultToUpSystem {
                 log.info("判别告警图上传失败，再次上传， resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
                 ftpsService.uploadFile("判别告警", resultImage, remotefilepath);
             }
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
         }
 
@@ -703,24 +789,15 @@ public class ProcessResultToUpSystem {
 //        }
 
         List<Map<String, String>> defectList = DEFECT_MAP.remove(msgId);
-        if(CollectionUtils.isNotEmpty(defectList) && applicationProperties.getManagerMqttConfig().isEnable()) {
+        if(CollectionUtils.isNotEmpty(defectList) && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
-
-            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
-            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
-
-            // 先取出算法平台返回的resultinfo中的结果图片路径
-            String resultImage;
-            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
-            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
-            resultImage = replaceResultImgPath(cruiseResultMap.get("picpath"), false);
+            normal = false;
 
             //拼接算法管理平台原始图片推送地址
             String remoteorigfilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
             //拼接算法管理平台分析告警结果图片地址
             String remotefilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
-            Alarm alarmDetail = new Alarm();
             List<Defect> defectTempList = new ArrayList<>();
             for (Map<String, String> defectMap : defectList) {
                 // 获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
@@ -775,7 +852,7 @@ public class ProcessResultToUpSystem {
 
             log.info("缺陷与算法主机：origpicpath:{}，remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
             log.info("缺陷与算法主机：resultImage:{}, remotefilepath:{}", resultImage, remotefilepath);
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             log.info("缺陷告警发送算法管理平台结束");
 
         }
@@ -783,13 +860,31 @@ public class ProcessResultToUpSystem {
 //            // 缺陷上报上一级系统  不在这里上报了
 //            defectToUpSystem(cruiseResultMap, defectList);
 //        }
+        //缺陷 如果正常需要进行正常样本上报
+        if (normal && "398".equals(analyseType) && applicationProperties.getManagerAlgorithmConfig().isEnable()) {
+            String remoteorigfilepath = ftpsRemotePath + "/" + "正常" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            alarmDetail.setBay_name(nameMap.get("upRegionName"));
+            alarmDetail.setDevice_name(deviceName);
+            alarmDetail.setPoint_name(nameMap.get("meteName"));
+            alarmDetail.setTime(DateTimeUtil.format(new Date()));
+            // 原始图片上传
+            ftpsService.uploadFile("正常原图", origPicPath, remoteorigfilepath);
+            if( !ftpsService.fileExits(remoteorigfilepath)){
+                log.info("原图上传失败，再次上传， origPicPath:{}, remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+                ftpsService.uploadFile("正常原图", origPicPath, remoteorigfilepath);
+            }
+            // 原图
+            alarmDetail.setPic_raw(remoteorigfilepath);
+            algorithmService.pushNormalMsg(alarmDetail);
+        }
     }
 
     /**
      * 审核结果上报上级系统
+     * 若 remark==null，则表示上级未传审核意见，需主动去数据库查询
      */
     @Async
-    public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, boolean all){
+    public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, String remark, boolean all){
         if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return null;
         }
@@ -800,30 +895,39 @@ public class ProcessResultToUpSystem {
 
         if ("true".equals(robotTaskStatusUp)) {
             try {
-                for (CruiseManualReview cruiseResultMap : cruiseResultList) {
-                    log.info("cruiseResultMap=={}", cruiseResultMap);
-                    Map<String, Object> xmlItem = new HashMap<>(16);
-                    String taskId = cruiseResultMap.getTaskId();
-                    String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
-                    String simpleDateFormat = DateTimeUtil.format3(new Date());
-
-                    xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
-                    xmlItem.put("task_code", taskId);
-                    xmlItem.put("device_id", instanceId);
-                    xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
-                    xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
-                    xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
-                    xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
-                    xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
-                    xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
-                    xmlItem.put("value", cruiseResultMap.getPersonCheck());
-                    xmlItem.put("check_user", cruiseResultMap.getCheckUser());
-                    xmlItem.put("cruise_time", cruiseResultMap.getCruiseTime());
-                    xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
-                    xmlItems.add(xmlItem);
+                CruiseManualReview cruiseMap = cruiseResultList.get(0);
+                if (remark == null) {
+                    remark = uPatrolTaskDao.selectForTaskId(cruiseMap.getTaskId()).getRemark();
                 }
+                String taskPatrolledId = getTaskPatrolledId(cruiseMap.getTaskId());
+                if (all) {
+                    String ids =
+                        cruiseResultList.stream().map(this::getUpDeviceId).filter(StringUtils::isNotEmpty).collect(Collectors.joining(","));
+                    Map<String, Object> xmlItem = new HashMap<>(16);
+
+                    xmlItem.put("task_patrolled_id", taskPatrolledId);
+                    xmlItem.put("device_id", ids);
+                    xmlItem.put("data_update", "");
+                    xmlItem.put("manual_review_conclusion", remark);
+                    xmlItem.put("confirm_people", cruiseMap.getCheckUser());
+                    xmlItem.put("confirm_date", DateUtil.now());
+                    xmlItems.add(xmlItem);
+                } else {
+                    for (CruiseManualReview cruiseResultMap : cruiseResultList) {
+                        Map<String, Object> xmlItem = new HashMap<>(16);
+                        String instanceId = getUpDeviceId(cruiseResultMap);
+                        xmlItem.put("task_patrolled_id", taskPatrolledId);
+                        xmlItem.put("device_id", instanceId);
+                        xmlItem.put("data_update", cruiseResultMap.getPersonCheck());
+                        xmlItem.put("manual_review_conclusion", remark);
+                        xmlItem.put("confirm_people", cruiseResultMap.getCheckUser());
+                        xmlItem.put("confirm_date", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                        xmlItems.add(xmlItem);
+                    }
+                }
+
                 xmlBaseModel.setItems(xmlItems);
-                xmlBaseModel.setType("611");
+                xmlBaseModel.setType("67");
                 List<XMLBaseModel> list = new ArrayList<>();
                 list.add(xmlBaseModel);
                 Map<String, List<XMLBaseModel>> map = new HashMap<>();
@@ -835,6 +939,101 @@ public class ProcessResultToUpSystem {
             }
         }
         return xmlBaseModel;
+    }
+
+    @Nullable
+    private String getTaskPatrolledId(String taskId) {
+        String key = PATROL_SUMMARY_PREFIX + taskId;
+        String taskPatrolledId = (String)redisTemplate.opsForHash().get(key, "task_patrolled_id");
+        if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+            String stationCode = SysParamConfig.getSysContent("edgeId");
+            UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+            taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
+        }
+        return taskPatrolledId;
+    }
+
+    private String getUpDeviceId(CruiseManualReview cruiseResultMap) {
+        String taskId = cruiseResultMap.getTaskId();
+        String instanceId = Optional.ofNullable(cruiseResultMap.getInstanceId()).map(Object::toString).orElse("");
+        if (Constant.standardPoints()) {
+            Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            log.info("resultMap=={}", resultMap);
+            instanceId = Optional.ofNullable(resultMap.get("devicePointId")).orElse("");
+        }
+        return instanceId;
+    }
+
+    /**
+     * 审核巡视结果产生新的告警上报
+     * @return
+     */
+    @Async
+    public void reviewCreateAlarmToUpSystem(TWarnInfo warnInfo){
+        if (!applicationProperties.getUpSystemFtps().isEnable()) {
+            return;
+        }
+
+        List<Map<String,String>> tWarnInfoList = analyseDataOperateDao.selectWarnAndResultListByIds(warnInfo.getInstanceId(),warnInfo.getTaskId());
+
+        for (Map<String,String> cruiseResultMap : tWarnInfoList) {
+            //构建cruiseResultMap
+            cruiseResultMap.put("recognition_type",StringUtils.isNotEmpty(cruiseResultMap.get("meteType")) ?
+                    RecognitionTypeEnum.getProRecognize(cruiseResultMap.get("meteType")).getProtocolRecognize() : "2");
+            String fileType = getFileType(ValueUtil.toInteger(cruiseResultMap.get("cruiseType"),229),cruiseResultMap.get("meteType"));
+            cruiseResultMap.put("fileType",fileType);
+            cruiseResultMap.put("isTemdif","0");
+            cruiseResultMap.put("taskId",warnInfo.getTaskId());
+            cruiseResultMap.put("time",DateTimeUtil.format(warnInfo.getWarnTime()));
+            String alarmLevel = "";
+            switch (ValueUtil.toInteger(warnInfo.getWarnLevel(),133)) {
+                case 130:
+                case 131:
+                    alarmLevel = "1";
+                    break;
+                case 132:
+                    alarmLevel = "2";
+                    break;
+                case 133:
+                    alarmLevel = "3";
+                    break;
+                default:
+                    break;
+            }
+            alarmAndResultToUpSystem(Collections.singletonList(Object2Map.toStringMap(cruiseResultMap)),alarmLevel,warnInfo);
+        }
+
+    }
+    public String getFileType(Integer cruiseType, String meteType) {
+        TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+        switch (cruiseTypeEnum){
+            case VOICE:
+                return "3";
+            case INFRARED:
+                return "1";
+            case VIDEO:
+                return "220".equals(meteType) ? "5" : "523".equals(meteType) ? "4" : "2";
+            case ROBOT:
+            case UAV:
+                if ("220".equals(meteType)) {
+                    return "5";
+                }
+                if ("222".equals(meteType)) {
+                    return "1";
+                }
+                if ("223".equals(meteType)) {
+                    return "3";
+                }
+                if ("523".equals(meteType)) {
+                    return "4";
+                }
+                if (StringUtils.equalsAny(meteType, "219", "221", "433")) {
+                    return "2";
+                }
+                return "";
+            default:
+                return "";
+        }
     }
 
     /**
@@ -856,25 +1055,21 @@ public class ProcessResultToUpSystem {
                 if (defect) {
                     List<TDefectInfo> tDefectInfoList = analyseDataOperateDao.selectDefectListByIds(warnIdList);
                     for (TDefectInfo tDefectInfo : tDefectInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getDefectId()), tDefectInfo.getDefectName(),
-                                String.valueOf(tDefectInfo.getDefectLevel()), tDefectInfo.getDefectContent(), tDefectInfo.getDealInfo(),
-                                String.valueOf(tDefectInfo.getDealType()), tDefectInfo.getOutRange(), tDefectInfo.getDealPersonId(),
-                                DateTimeUtil.format(tDefectInfo.getDealTime()), String.valueOf(tDefectInfo.getDefectType())));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tDefectInfo.getDevicePointId():tDefectInfo.getDeviceId()),
+                                tDefectInfo.getDealPersonId(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2"));
                     }
                 } else {
                     List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
                     for (TWarnInfo tWarnInfo : tWarnInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getWarnId()), tWarnInfo.getWarnName(),
-                                String.valueOf(tWarnInfo.getWarnLevel()), tWarnInfo.getWarnContent(), tWarnInfo.getDealInfo(),
-                                String.valueOf(tWarnInfo.getDealType()), tWarnInfo.getOutRange(), tWarnInfo.getDealPersonId(),
-                                DateTimeUtil.format(tWarnInfo.getDealTime()), ""));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tWarnInfo.getDevicePointId():tWarnInfo.getDeviceId()),
+                                tWarnInfo.getDealPersonId(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2"));
                     }
                 }
                 xmlBaseModel.setItems(xmlItems);
-                xmlBaseModel.setType("711");
+                xmlBaseModel.setType("64");
                 List<XMLBaseModel> list = new ArrayList<>();
                 list.add(xmlBaseModel);
-                Map<String, List<XMLBaseModel>> map = new HashMap<>(1);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>(4);
                 map.put("list", list);
                 log.info("The review warn to be reported one level up is==={}", map);
                 Constant.otherServer(map, Constant.TCP_URL);
@@ -888,21 +1083,16 @@ public class ProcessResultToUpSystem {
      * 告警审核xml整理
      * @return
      */
-    public Map<String, Object> getReviewAlarmXml(String warnId, String warnName, String warnLevel, String warnContent,
-                                                 String dealInfo, String dealType, String outRange, String dealPersonId,
-                                                 String dealTime, String dealModel) {
-        Map<String, Object> xmlItem = new HashMap<>(11);
-        xmlItem.put("origin_id", warnId);
-        xmlItem.put("warn_name", warnName);
-        xmlItem.put("warn_level", warnLevel);
-        xmlItem.put("warn_time", warnLevel);
-        xmlItem.put("warn_content", warnContent);
-        xmlItem.put("deal_info", dealInfo);
-        xmlItem.put("deal_type", dealType);
-        xmlItem.put("out_range", outRange);
-        xmlItem.put("deal_person_id", dealPersonId);
-        xmlItem.put("deal_time", dealTime);
-        xmlItem.put("defect_model", dealModel);
+    public Map<String, Object> getReviewAlarmXml(String taskId, String deviceId, String dealPersonId, String dealTime,
+                                                 String isWarn) {
+
+        String taskPatrolledId = getTaskPatrolledId(taskId);
+        Map<String, Object> xmlItem = new HashMap<>(8);
+        xmlItem.put("task_patrolled_id", taskPatrolledId);
+        xmlItem.put("device_id", deviceId);
+        xmlItem.put("is_alarm", isWarn);
+        xmlItem.put("confirm_people", dealPersonId);
+        xmlItem.put("confirm_date", dealTime);
         return xmlItem;
     }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Robot01</ReceiveCode>
+    <Type>1</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-25 13:33:50</Time>
+    <Items>
+        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="0" time="2024-03-25 13:33:50" type="2" value="0"/>
+        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="41" value="1"/>
+        <Item unit="" patroldevice_code="Robot01" patroldevice_name="机器人01" value_unit="1" time="2024-03-25 13:33:50" type="61" value="1"/>
+    </Items>
+</PatrolDevice>

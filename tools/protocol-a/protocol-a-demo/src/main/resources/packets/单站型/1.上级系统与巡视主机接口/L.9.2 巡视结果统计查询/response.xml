@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>251</Type>
+    <Code>200</Code>
+    <Command>4</Command>
+    <Time>2024-03-07 16:09:24</Time>
+    <Items>
+        <Item validNum="1090" totalNum="1191" percent="91.52%"/>
+        <Item validNum="11" totalNum="11" percent="100.00%"/>
+        <Item validNum="11" totalNum="11" percent="100.00%"/>
+        <Item validNum="34" totalNum="70" percent="48.57%"/>
+        <Item validNum="172" totalNum="177" percent="97.18%"/>
+        <Item validNum="1119" totalNum="1166" percent="95.97%"/>
+    </Items>
+</PatrolHost>

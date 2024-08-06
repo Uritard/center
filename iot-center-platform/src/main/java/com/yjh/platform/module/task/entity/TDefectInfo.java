@@ -10,12 +10,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -61,6 +62,9 @@ public class TDefectInfo implements Serializable {
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
+
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
 
     private String deviceName;
 
@@ -151,6 +155,9 @@ public class TDefectInfo implements Serializable {
     private String originId;
 
     private String edgeCode;
+
+    private String labelAttri;
+    private List<KeyValue<String, String>> labelAttriName;
 
     private Integer pageNum = 1;
 

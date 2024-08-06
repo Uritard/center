@@ -29,9 +29,9 @@ public class AnalyseObject {
      * 判别基准图(用于判别模板)。
      * 可选
      */
-    private String imageNormalUrlPath;
+    private String imageNormalPath;
     /**
      * 待分析图像的URL(支持多张图像)
      */
-    private List<String> imageUrlList;
+    private List<String> imagePathList;
 }

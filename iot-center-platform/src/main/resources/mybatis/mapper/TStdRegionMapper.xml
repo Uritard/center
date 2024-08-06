@@ -465,11 +465,9 @@
 
     <select id="selectByRegionCode" resultType="com.yjh.platform.module.device.entity.TStdRegion">
         select
-        REPLACE(region_name,'主所','') AS aliasName,
         <include refid="Base_Column_List" />
-        from
-        t_std_region
-        where region_code = #{regionCode} and edge_status = '在线'
+        from t_std_region a
+        where  a.region_code = #{regionCode, jdbcType=VARCHAR} and state = 1 limit 1
     </select>
 
     <select id="getEnvRegion" resultType="com.yjh.platform.module.device.entity.TStdRegion">
@@ -497,5 +495,15 @@
                 LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
         WHERE
             device.up_region_id = #{regionId} and point.channel_num is not null and device.iot_device_type IN ( 850, 851, 852, 858, 859, 860, 861 )
+    </select>
+    <select id="selectAllEdgeRegion" resultType="com.yjh.platform.module.device.entity.TStdRegion">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+            t_std_region
+        WHERE
+            state = 1
+          AND up_region_id != -1
+          AND region_code != ''
     </select>
 </mapper>

@@ -30,8 +30,9 @@ public class UserManager implements UserInterface {
     }
 
     public String getUserName() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        return request.getHeader("userName");
+        HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+        String creatorId = request.getHeader(CREATOR_ID);
+        return StringUtils.isEmpty(creatorId) ? "" : (String)redisTemplate.opsForHash().get("userInfo:" + creatorId, "userName");
     }
 
     public String getAppKey() {

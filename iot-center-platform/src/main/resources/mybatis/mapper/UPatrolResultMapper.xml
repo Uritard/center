@@ -457,7 +457,8 @@
         region.region_name  as  edge_name,
         b.custom_name,
         b.device_point_id,
-        b.all_file_path
+        b.all_file_path,
+        b.label_attri
         FROM u_patrol_data_result b
         LEFT JOIN t_std_device n on n.device_id = b.device_id
         LEFT JOIN t_std_devicemete q on q.device_mete_id = b.device_mete_id
@@ -491,12 +492,14 @@
 
         <if test="customId != null and customId != -1 ">and b.custom_id = #{customId, jdbcType=VARCHAR}</if>
 
+        <if test="labelAttri != null and labelAttri != '-1' ">and FIND_IN_SET(#{labelAttri, jdbcType=VARCHAR}, b.label_attri)</if>
+
         <if test="list != null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY b.cruise_time asc, b.instance_id asc
+        ORDER BY FIND_IN_SET('1', b.label_attri) desc, b.cruise_time asc, b.instance_id asc
     </select>
 
     <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"
@@ -798,13 +801,14 @@
     </update>
 
     <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
-        update u_patrol_data_result set
+        update u_patrol_data_result <set>
         <if test="personCheck != null ">person_check = #{personCheck},</if>
         <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
         evaluation_state = 256,
         <if test="checkUser != null ">check_user = #{checkUser},</if>
         <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
         <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+    </set>
         where task_id = #{taskId,jdbcType =VARCHAR} and instance_id = #{instanceId,jdbcType =BIGINT}
     </update>
 
@@ -856,7 +860,8 @@
         a.remark,
         a.alarm_rule_type,
         conf.db_value as dBValue,
-        conf.f_value as FValue
+        conf.f_value as FValue,
+        a.label_attri
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
         left join t_voice_device v  on b.cruise_id = v.voice_device_id
@@ -868,7 +873,7 @@
     <update id="updateCheck">
         update u_patrol_result a <set>
         <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
-        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
         <if test="remark != null">a.remark = #{remark},</if>
     </set>
         where a.task_id = #{taskId, jdbcType=VARCHAR}
@@ -945,6 +950,8 @@
 
     <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
         SELECT
+        b.instance_id,
+        b.person_check,
         b.task_id,
         b.cruise_data_id,
         b.evaluation_state,
@@ -972,7 +979,8 @@
         d.end_time as cruiseEndTime,
         d.check_user as reviewer,
         d.weather as envInfo,
-        d.check_date as reviewTime
+        d.check_date as reviewTime,
+        d.remark as cruiseConclusion
         from
         u_patrol_result d
         WHERE 1 = 1

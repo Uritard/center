@@ -217,17 +217,15 @@ public class TCruisePointInstanceController {
         Result result = new Result();
         try{
             int i = tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail);
-            if (i==-3) {
-                result.setMessage("巡视点已经绑定了预案,操作无法生效！");
-                result.setCode(10102);
-            } else {
-                result.setData(i);
-                //巡视点有变动 同步模型
-                if (Constant.updateSyncModel()) {
-                    Constant.modelUpload("1");
-                }
+            result.setData(i);
+            //巡视点有变动 同步模型
+            if (Constant.updateSyncModel()) {
+                Constant.modelUpload("1");
             }
-        }catch (Exception e) {
+        } catch (BusinessException be) {
+            result.setMessage(be.getMessage());
+            result.setCode(10102);
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡检点关联配置失败描述：", e);
         }

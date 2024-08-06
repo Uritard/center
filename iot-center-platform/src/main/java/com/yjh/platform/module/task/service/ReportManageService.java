@@ -22,9 +22,11 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +86,7 @@ public class ReportManageService {
         recordData.setTaskVO(taskVO);
 
         // 报表名称:站所名称+报告名称+当前时间
-        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String stationName = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
         String fileNameTemp = stationName + "-" + reportName;
         String fileName = fileNameTemp + "-" + DateTimeUtil.format3(new Date()) + ".xlsx";
 
@@ -186,10 +188,11 @@ public class ReportManageService {
             REPORT_CACHE.put(taskId, 1);
         }
 
-        ThreadPoolUtil.PATROL_POOL.addThread(()->{
-            TaskVO taskVO = cruiseReportGenerate(taskId, userId);
-            pushDownload(taskVO, taskId, userId, downLoad);
-        });
+        ScheduledMapConfig.schedule(15, Triple.of(taskId, userId, downLoad), tri -> ThreadPoolUtil.PATROL_POOL.addThread(() -> {
+            TaskVO taskVO = cruiseReportGenerate(tri.getLeft(), tri.getMiddle());
+            pushDownload(taskVO, tri.getLeft(), tri.getMiddle(), tri.getRight());
+        }));
+
         return 0;
     }
 
@@ -377,7 +380,7 @@ public class ReportManageService {
     public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
         TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
         delaCount(taskVO,tCruiseDataResultDetailList);
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setStationName(stationName);
@@ -410,7 +413,7 @@ public class ReportManageService {
             taskVOtemp = uPatrolResultDao.selectTaskNameAndTime(taskId);
         }
 
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeName", "content"));
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVOtemp.setStationName(stationName);

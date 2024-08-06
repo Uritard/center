@@ -30,4 +30,6 @@ public interface CameraConDao {
     List<RecorderConInfo> SelectRecords();
 
     List<RobotConInfo> selectAllRobotConInfo();
+
+    CameraConInfo selectByChannel(@Param(value = "deviceChannel") String deviceChannel, @Param(value = "cameraChannel") String cameraChannel);
 }

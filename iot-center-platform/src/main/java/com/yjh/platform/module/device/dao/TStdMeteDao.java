@@ -54,7 +54,8 @@ public interface TStdMeteDao {
                           @Param(value = "remark") String remark,
                           @Param(value = "stateZero") String stateZero,
                           @Param(value = "stateOne") String stateOne,
-                          @Param(value = "meteKind") Integer meteKind);
+                          @Param(value = "meteKind") Integer meteKind,
+                          @Param(value = "labelAttri") String labelAttri);
 
     List<TStdMeteDetail> selectByPage(@Param(value = "deviceType") Integer deviceType,
                                       @Param(value = "meteName") String meteName);

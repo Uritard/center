@@ -255,4 +255,11 @@
         select origin_region_id from t_std_region where region_code =#{edgeCode} and state = 1
     </select>
 
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TStdRegion">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_region a
+        where  a.region_code = #{edgeCode, jdbcType=VARCHAR} and state = 1 limit 1
+    </select>
+
 </mapper>

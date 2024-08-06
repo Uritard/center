@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>81</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-07 17:05:14</Time>
+    <Items>
+        <Item unit="分" patroldevice_code="D200-0001" report_time="2024-03-07 17:00:00" patroldevice_name="D200L操作机器人" value_unit="407521分" device_type="0" type="1" value="407521" commission_time="2022-05-18 00:00:00"/>
+        <Item unit="次" patroldevice_code="D200-0001" report_time="2024-03-07 17:00:00" patroldevice_name="D200L操作机器人" value_unit="0次" device_type="0" type="2" value="0" commission_time="2022-05-18 00:00:00"/>
+        <Item unit="天" patroldevice_code="D200-0001" report_time="2024-03-07 17:00:00" patroldevice_name="D200L操作机器人" value_unit="0天" device_type="0" type="3" value="0" commission_time="2022-05-18 00:00:00"/>
+        <Item unit="天" patroldevice_code="D200-0001" report_time="2024-03-07 17:00:00" patroldevice_name="D200L操作机器人" value_unit="291天" device_type="0" type="4" value="291" commission_time="2022-05-18 00:00:00"/>
+        <Item unit="%" patroldevice_code="D200-0001" report_time="2024-03-07 17:00:00" patroldevice_name="D200L操作机器人" value_unit="44.091%" device_type="0" type="5" value="44.091" commission_time="2022-05-18 00:00:00"/>
+        <Item unit="天" patroldevice_code="40005" report_time="2024-03-07 17:00:00" patroldevice_name="1号主变-球机可见光T" value_unit="0天" device_type="2" type="4" value="0" commission_time="2022-05-27 00:00:00"/>
+        <Item unit="%" patroldevice_code="40005" report_time="2024-03-07 17:00:00" patroldevice_name="1号主变-球机可见光T" value_unit="0.0%" device_type="2" type="5" value="0.0" commission_time="2022-05-27 00:00:00"/>
+        <Item unit="%" patroldevice_code="40005" report_time="2024-03-07 17:00:00" patroldevice_name="1号主变-球机可见光T" value_unit="0%" device_type="2" type="6" value="0" commission_time="2022-05-27 00:00:00"/>
+    </Items>
+</PatrolHost>

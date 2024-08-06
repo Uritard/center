@@ -23,10 +23,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <功能描述>
@@ -66,7 +63,7 @@ public class ReviewResultHandler implements MessageHandlerStrategy, Initializing
 
         // 给下级响应
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,sendCode));
-        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
+        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, cruiseResultXmlString);
         RobotServerHandler.send(cruiseResultProtocol, sendCode);
         log.info("本级系统给下级{}响应了", sendCode);
 
@@ -74,18 +71,12 @@ public class ReviewResultHandler implements MessageHandlerStrategy, Initializing
         List<CruiseManualReview> resultList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             CruiseManualReview taskResult = new CruiseManualReview();
-            taskResult.setTaskId((String)item.get("task_code"));
             taskResult.setTaskResultId((String)item.get("task_patrolled_id"));
-            taskResult.setInstanceId(NumberUtils.toLong((String)item.get("device_id")));
-            taskResult.setEvaluationState(NumberUtils.toInt((String)item.get("evaluation_state")));
-            taskResult.setEvaluationStateName((String)item.get("evaluation_state_name"));
-            taskResult.setIdentifyResult(NumberUtils.toInt((String)item.get("identify_result")));
-            taskResult.setIdentifyResultName((String)item.get("identify_result_name"));
-            taskResult.setIdentifyState(NumberUtils.toInt((String)item.get("identify_state")));
-            taskResult.setIdentifyStateName((String)item.get("identify_state_name"));
-            taskResult.setPersonCheck((String)item.get("value"));
-            taskResult.setCheckUser((String)item.get("check_user"));
-            taskResult.setCheckDate(DateTimeUtil.parse((String)item.get("time")));
+            taskResult.setInstanceIds((String)item.get("device_id"));
+            taskResult.setPersonCheck((String)item.get("data_update"));
+            taskResult.setRemark((String)item.get("manual_review_conclusion"));
+            taskResult.setCheckUser((String)item.get("confirm_people"));
+            taskResult.setCheckDate(DateTimeUtil.parse((String)item.get("confirm_date")));
             taskResult.setSendCode(sendCode);
             resultList.add(taskResult);
         }
@@ -93,7 +84,7 @@ public class ReviewResultHandler implements MessageHandlerStrategy, Initializing
 
         try {
             StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_REVIEW_PROCESS, resultList, Result.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("调用platform出错：{}", e.getMessage());
         }
     }

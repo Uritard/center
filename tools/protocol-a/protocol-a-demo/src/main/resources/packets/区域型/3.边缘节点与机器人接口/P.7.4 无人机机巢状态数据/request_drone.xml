@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Drone01</SendCode>
+    <ReceiveCode>Edge01</ReceiveCode>
+    <Type>20001</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="1" value="4" value_unit="4" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="2" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
+        <Item nest_code="{{nestCode}}" nest_name="无人机巢01" time="{{nowDate}}" type="3" value="1" value_unit="1" unit="" />
+    </Items>
+</PatrolDevice>

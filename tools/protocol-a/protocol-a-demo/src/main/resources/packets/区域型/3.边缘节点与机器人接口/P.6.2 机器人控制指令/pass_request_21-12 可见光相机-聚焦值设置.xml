@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Robot01</ReceiveCode>
+    <Type>21</Type>
+    <Code>{{robotCode}}</Code>
+    <Time>2024-03-26 13:46:12</Time>
+        <Items>
+        <Item value="10"/>
+    </Items>
+    <Command>12</Command>
+</PatrolDevice>

@@ -482,7 +482,7 @@
         SELECT
             2 as device_type,
         camera_id as cameraId,
-        camera_id as patrolDeviceCode,
+        IF(b_camera_channel_id is null or b_camera_channel_id = '', camera_channel_id, b_camera_channel_id) as patrolDeviceCode,
         camera_name as patrolDeviceName,
             DATE_FORMAT(commission_date, '%Y-%m-%d %H:%i:%s' ) as commissionTime
         FROM
@@ -525,5 +525,30 @@
         AND a.commission_date IS NOT NULL
         <if test="cameraId != null and cameraId != ''">and tcp.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         GROUP BY cameraId
+    </select>
+    <select id="countWarnAccuracy" resultType="java.util.Map">
+        SELECT count(1)                         as totalNum,
+               sum(if(t.deal_type = 286, 1, 0)) as validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              where deal_type is not null
+              union all
+              (
+                  select deal_type, defect_time warn_time from t_defect_info where deal_type is not null
+              )) t
+        where 1=1
+            <if test="beginTime != null and beginTime != ''and endTime != null and endTime != '' ">
+                AND t.warn_time BETWEEN #{beginTime} and #{endTime}
+            </if>
+    </select>
+    <select id="countLabelAccuracy" resultType="com.yjh.platform.module.patrol.entity.LabelInfo">
+        SELECT
+        defect_content,
+        deal_type
+        FROM
+        `t_defect_info` WHERE deal_type is not null
+        <if test="beginTime != null and beginTime != ''and endTime != null and endTime != '' ">
+            AND defect_time BETWEEN #{beginTime} and #{endTime}
+        </if>
     </select>
 </mapper>

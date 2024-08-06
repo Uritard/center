@@ -37,6 +37,10 @@ public class TCruiseTaskDel implements Serializable {
     @TableField(value = "del_time",updateStrategy = FieldStrategy.IGNORED)
     private Date delTime;
 
+    @ApiModelProperty(value = "任务不可用结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableField(value = "end_time",updateStrategy = FieldStrategy.IGNORED)
+    private Date endTime;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

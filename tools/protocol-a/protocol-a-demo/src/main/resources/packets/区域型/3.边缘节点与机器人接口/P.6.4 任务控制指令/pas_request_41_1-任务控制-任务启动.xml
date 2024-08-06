@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolDevice>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Drone01</ReceiveCode>
+    <Type>41</Type>
+    <Code>{{taskCode}}</Code>
+    <Time>2024-03-27 18:09:47</Time>
+    <Items/>
+    <Command>1</Command>
+</PatrolDevice>

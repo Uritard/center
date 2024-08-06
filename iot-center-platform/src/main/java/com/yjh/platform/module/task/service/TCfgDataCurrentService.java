@@ -2,18 +2,20 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
+import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,12 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private CameraConService cameraConService;
+
+    @Autowired
+    private PatrolResultHandler patrolResultHandler;
+
+    @Autowired
+    private TUnionTaskDao tUnionTaskDao;
 
     public static String meteValues(String commintValue){
         if("合位".equals(commintValue)){
@@ -205,6 +213,7 @@ public class TCfgDataCurrentService {
 
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) {
         log.info("【meteMap】:{}", meteMap);
+        patrolResultHandler.linkageResultHandler(Long.valueOf(meteMap));
         // 联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
         List<TCfgUnionRule> unionRules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
@@ -219,7 +228,9 @@ public class TCfgDataCurrentService {
         for (TCfgUnionRule rule : rules) {
             String[] currentMeteId = rule.getInputParam().split(", ");
             for (int i = 0; i < currentMeteId.length; i++) {
-                meteIdR.add(Long.valueOf(currentMeteId[i]));
+                if (!meteIdR.contains(Long.valueOf(currentMeteId[i]))) {
+                    meteIdR.add(Long.valueOf(currentMeteId[i]));
+                }
             }
         }
 
@@ -273,7 +284,7 @@ public class TCfgDataCurrentService {
                     }
 
                     // 预案为空
-                    if (rule.getPlanId() == null && rule.getPresetId() != null){
+                    if (rule.getPresetId() != null){
                         // 配了联动预置位
                         Map<String,String> map = new HashMap<>();
                         map.put("type","linkagePresetPopUp");
@@ -288,11 +299,12 @@ public class TCfgDataCurrentService {
                         // 将摄像机转到预置位
                         ThreadPoolUtil.COMMON_POOL.addThread(() -> {
                             try {
-                                String str = "camera_info:" + rule.getCameraId();
+                                String str = TCameraInfoService.cameraStateKey + rule.getCameraIp();
                                 Map<String, String> map1 = redisTemplate.opsForHash().entries(str);
                                 if ("0".equals(map1.get("state"))) {
                                     cameraConService.moveToPresetForTask(rule.getPresetId(), rule.getCameraId());
                                     map1.put("lastTime",DateTimeUtil.format(new Date()));
+                                    map1.put("state","1");
                                     redisTemplate.opsForHash().putAll(str, map1);
                                 }
                             } catch (Exception e) {
@@ -300,6 +312,11 @@ public class TCfgDataCurrentService {
                             }
                         });
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL, map);
+                        Date crateTime = new Date();
+                        if (rule.getPlanId()==null){
+                            insertIntoTUnionTask(meteIdR.get(0), String.valueOf(rule.getPresetId()), rule.getRuleId(), null, crateTime,
+                                    content,crateTime);
+                        }
                     }
                     unionRule.add(rule);
                     contents.add(content);
@@ -329,9 +346,11 @@ public class TCfgDataCurrentService {
 
         //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
+        int idx = 0;
         for(Long plan : plans){
             log.info("【planId】:{}", plan);
             if (plan == null){
+                idx++;
                 continue;
             }
             TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
@@ -348,9 +367,10 @@ public class TCfgDataCurrentService {
             log.info("联动开始执行");
             // 联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
-            tUnionTaskService.insertRecord(meteIdR.get(0), taskId, unionRule.get(0).getRuleId(), null, new Date(),
+            tUnionTaskService.insertRecord(meteIdR.get(0), taskId, unionRule.get(idx).getRuleId(), null, new Date(),
                     contents.get(0),unionForGetTime.getRecordTime());
 
+            idx++;
             Map<String,String> currentUnionInfo=new HashMap<>();
             currentUnionInfo.put("unionId",taskId);
             currentUnionInfo.put("isPop","false");
@@ -380,5 +400,26 @@ public class TCfgDataCurrentService {
         log.info("【联动任务】:{}", tCruiseTasks);
         return tCruiseTasks;
     }
+
+    public void insertIntoTUnionTask(Long meteId,String unionId,Long ruleId,Long robotId,Date createTime,String paramValues,Date triggeringTime){
+        TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(ruleId);
+        TUnionTask tUnionTask = new TUnionTask();
+        tUnionTask.setPlanName("实时视频调阅");
+        tUnionTask.setUnionId(unionId+createTime.getTime());
+        tUnionTask.setRuleId(ruleId);
+        tUnionTask.setUnionName(tCfgUnionRule.getRuleName());
+        tUnionTask.setRuleDelay(tCfgUnionRule.getRuleDelay());
+        tUnionTask.setRobotId(robotId);
+        tUnionTask.setIsFinish(1);
+        tUnionTask.setMeteId(meteId);
+        tUnionTask.setCreateTime(createTime);
+        tUnionTask.setRuleName(tCfgUnionRule.getRuleName());
+        tUnionTask.setRuleContent(tCfgUnionRule.getRuleContent());
+
+        tUnionTask.setParamValues(paramValues);
+        tUnionTask.setTriggeringTime(triggeringTime);
+        tUnionTaskDao.insert(tUnionTask);
+    }
+
 }
 

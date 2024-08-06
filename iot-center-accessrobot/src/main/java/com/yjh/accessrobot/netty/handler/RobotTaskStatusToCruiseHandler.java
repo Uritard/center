@@ -56,7 +56,7 @@ public class RobotTaskStatusToCruiseHandler implements MessageHandlerStrategy, I
 
         // 给下级响应
         String taskStatusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
+        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, taskStatusXmlString);
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("本级系统给下级{}响应了", robotCode);
 

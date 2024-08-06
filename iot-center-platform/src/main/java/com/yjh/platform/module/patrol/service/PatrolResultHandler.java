@@ -14,9 +14,13 @@ import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
+import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
+import com.yjh.platform.module.task.entity.TCfgDataCurrent;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
+import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +58,9 @@ public class PatrolResultHandler {
     private final TCruisePointInstanceDao tCruisePointInstanceDao;
     private final AlarmShieldService alarmShieldService;
     private final ApplicationEventPublisher eventPublisher;
+    private final TCfgDataCurrentDao tCfgDataCurrentDao;
+    private final AutoreviewHandler autoreviewHandler;
+    private final TDictBusinessDao tDictBusinessDao;
 
     private static final String METER = "meter";
 
@@ -61,7 +68,8 @@ public class PatrolResultHandler {
 
     public PatrolResultHandler(RedisTemplate redisTemplate, TRobotInspectionDao tRobotInspectionDao, AnalyseDataOperateService analyseDataOperateService, ProcessResultToUpSystem processResultToUpSystem,
                                UPatrolTaskService uPatrolTaskService, TVoiceDeviceService tVoiceDeviceService, TCruisePointInstanceDao tCruisePointInstanceDao, AlarmShieldService alarmShieldServic,
-                               ApplicationEventPublisher eventPublisher) {
+                               ApplicationEventPublisher eventPublisher,TCfgDataCurrentDao tCfgDataCurrentDao,
+        AutoreviewHandler autoreviewHandler,TDictBusinessDao tDictBusinessDao) {
         this.redisTemplate = redisTemplate;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.analyseDataOperateService = analyseDataOperateService;
@@ -71,6 +79,9 @@ public class PatrolResultHandler {
         this.tCruisePointInstanceDao = tCruisePointInstanceDao;
         this.alarmShieldService = alarmShieldServic;
         this.eventPublisher = eventPublisher;
+        this.tCfgDataCurrentDao = tCfgDataCurrentDao;
+        this.autoreviewHandler = autoreviewHandler;
+        this.tDictBusinessDao = tDictBusinessDao;
     }
 
     /**
@@ -580,7 +591,7 @@ public class PatrolResultHandler {
                 uPatrolTaskService.patrolTaskResultHandler(cruiseResultMap);
 
                 // 缺陷和判别上报算法管理平台及上级系统
-                processResultToUpSystem.defectToAlgorithmM(cruiseResultMap, msgId);
+                processResultToUpSystem.defectToAlgorithmM(cruiseResultMap, msgId, analyseType);
 
             } catch (Exception e) {
                 log.error("处理算法分析后的巡视结果异常：", e);
@@ -697,6 +708,28 @@ public class PatrolResultHandler {
                 // cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 // cruiseResultMap.put("cruiseAbnormal", "0");
 
+                boolean isSimulationTool = false;
+                String edgeCode = cruiseResultMap.get("edgeCode");
+                if (StringUtils.isNotEmpty(edgeCode)) {
+                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
+                    String robotCode = edgeCode;
+                    if (countRegion != 0) {
+                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
+                    }
+                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
+                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
+                }
+                //检测工具上报的调用算法的需要走非同源逻辑
+                if (isSimulationTool || !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
+                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+                    robotPatrolTaskAlarm.setValue(resultStringValue);
+                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
+                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                }
+
                 if (warnFlag == 1) {
                     Map<String, String> warnMap = new HashMap<>(16);
                     String warnPrefix = "warnInfo:" + cruiseResultMap.get("taskId");
@@ -707,7 +740,7 @@ public class PatrolResultHandler {
                     warnMap.put("instanceId", cruiseResultMap.get("instanceId"));
                     warnMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                     warnMap.put("taskId", cruiseResultMap.get("taskId"));
-                    warnMap.put("value", resultStringValue);
+                    warnMap.put("value", cruiseResultMap.get("resultDesc"));
                     warnMap.put("imagePath", cruiseResultMap.get("picpath"));
                     warnMap.put("confMode", "276");
                     warnMap.put("deviceName", cruiseResultMap.get("deviceName"));
@@ -719,6 +752,7 @@ public class PatrolResultHandler {
 
                     warnMap.put("alarmSource", alarmSource);
                     warnMap.put("defectModel", DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
+                    warnMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
 
                     switch (meteKind) {
                         case "1":
@@ -841,7 +875,7 @@ public class PatrolResultHandler {
                             break;
                     }
 
-                    TWarnInfo tWarnInfo = getWarnInfo(warnMap);
+                    TWarnInfo tWarnInfo = getWarnInfo(warnMap,cruiseResultMap);
                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
                     warnMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
                     log.info("warnMap=={}", warnMap);
@@ -859,27 +893,6 @@ public class PatrolResultHandler {
 
                     // 将产生的告警上送至上一级系统
                     alarmToUpSystem(tWarnInfo, cruiseResultMap);
-                }
-                boolean isSimulationTool = false;
-                String edgeCode = cruiseResultMap.get("edgeCode");
-                if (StringUtils.isNotEmpty(edgeCode)) {
-                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
-                    String robotCode = edgeCode;
-                    if (countRegion != 0) {
-                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
-                    }
-                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
-                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-                }
-                //检测工具上报的调用算法的需要走非同源逻辑
-                if (isSimulationTool || !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
-                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
-                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
-                    robotPatrolTaskAlarm.setValue(resultStringValue);
-                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
-                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
-                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
-                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
                 // } else {
                 //     cruiseResultMap.put("resultNum", resultValue);
@@ -963,7 +976,7 @@ public class PatrolResultHandler {
             warnMap.put("warnLevel", DictConvertUtil.DICT.getDictCode("alarmLevel", "一般告警"));
             warnMap.put("warnContent", meteName + alarmPrefix + ":" + resultValue + "--" + "一般告警");
             warnMap.put("outRange", String.valueOf(outRang));
-
+            warnMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
 
             // 巡视结果告警处理
             cruiseResultMap.put("isWarn", "1");
@@ -971,7 +984,7 @@ public class PatrolResultHandler {
             // cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
 
             // 告警入库
-            TWarnInfo tWarnInfo = getWarnInfo(warnMap);
+            TWarnInfo tWarnInfo = getWarnInfo(warnMap,cruiseResultMap);
             analyseDataOperateService.insertWarnInfo(tWarnInfo);
             warnMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
             log.info("warnMap=={}", warnMap);
@@ -1008,16 +1021,14 @@ public class PatrolResultHandler {
             String alarmLevel = "";
             switch (warnInfo.getWarnLevel()) {
                 case 130:
+                case 131:
                     alarmLevel = "1";
                     break;
-                case 131:
+                case 132:
                     alarmLevel = "2";
                     break;
-                case 132:
-                    alarmLevel = "3";
-                    break;
                 case 133:
-                    alarmLevel = "4";
+                    alarmLevel = "3";
                     break;
                 default:
                     break;
@@ -1034,7 +1045,7 @@ public class PatrolResultHandler {
      * @param warningMsg 缺陷map信息
      * @return TWarnInfo
      */
-    private TWarnInfo getWarnInfo(Map<String, String> warningMsg) {
+    private TWarnInfo getWarnInfo(Map<String, String> warningMsg,Map<String,String> cruiseResultMap) {
         TWarnInfo tWarnInfo = new TWarnInfo();
         try {
             tWarnInfo.setWarnLevel(NumberUtils.toInt(warningMsg.get("warnLevel")));
@@ -1052,6 +1063,14 @@ public class PatrolResultHandler {
             tWarnInfo.setWarnContent(warningMsg.get("warnContent"));
             tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
             tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
+            tWarnInfo.setLabelAttri(CommonUtils.defaultEmpty(warningMsg.get("labelAttri")));
+            tWarnInfo.setWarnType(ValueUtil.toInteger(
+                    tDictBusinessDao.selectOne(null,null,"point_alarm_type",null,ValueUtil.toInteger(ProcessResultToUpSystem.recognitionTypeToAlarmType(cruiseResultMap.get("recognitionType"),cruiseResultMap.getOrDefault("isTemdif", "0")),-1)).getDictCode()
+                    ,-1));
+            tWarnInfo.setDeviceType(cruiseResultMap.getOrDefault("deviceType", ""));
+            autoreviewHandler.autoreviewCheckAlarm(tWarnInfo);
+
+            warningMsg.put("confMode", String.valueOf(tWarnInfo.getConfMode()));
         } catch (Exception e) {
             log.error("告警info信息组装异常:", e);
         }
@@ -1123,13 +1142,11 @@ public class PatrolResultHandler {
             }
             // 缺陷信息存redis
             redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-            Map<String, String> defectMap = getDefectMap(resultImage, val, cruiseResultMap, tStdDevicemete, res.getResultDesc());
             StringBuilder retVal = new StringBuilder().append(val).append(",").append(CommonUtils.rectangleToPos(res.getRectangle())).append(",").append(res.getConf()).append(",");
-
-
-            processResultToUpSystem.addDefect(msgId, defectMap);
+            Map<String, String> defectMap = getDefectMap(resultImage, val, retVal.toString(), cruiseResultMap, tStdDevicemete, res.getResultDesc());
 
             TDefectInfo tDefectInfo = getDefectInfo(defectMap);
+            processResultToUpSystem.addDefect(msgId, defectMap);
             log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));
             analyseDataOperateService.insertDefectInfo(tDefectInfo);
             defectMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
@@ -1214,6 +1231,37 @@ public class PatrolResultHandler {
         }
     }
 
+    public void tcnAlarmPopUp(TStdDeviceMete tStdDevicemete, Map<String, String> infoMap) {
+        try {
+            Map<String, String> currentWarnInfo = new HashMap<>();
+            String warnId = infoMap.get("warnId");
+            currentWarnInfo.put("warnId", warnId);
+            currentWarnInfo.put("defectModel", infoMap.get("defectModel"));
+            currentWarnInfo.put("isPop", "false");
+
+            if (!alarmShieldService.isShield(tStdDevicemete.getDeviceMeteId())) {
+                //webSocket通知前端调用查询告警弹框的接口
+                Map<String, String> jasonMaps = new HashMap<>();
+                jasonMaps.put("type", "tcnAlarmPopUp");
+                jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
+                jasonMaps.put("warnType", "1");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", infoMap.get("defectModel"));
+                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
+                currentWarnInfo.put("isPop", "true");
+                if (!Constant.isUpSystem()) {
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+                }
+            } else {
+                log.info("此告警被屏蔽了，不弹窗！");
+            }
+
+            redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
     /**
      * 缺陷info信息组装
      *
@@ -1236,6 +1284,12 @@ public class PatrolResultHandler {
             tDefectInfo.setImagePath(defectMap.get("imagePath"));
             tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
             tDefectInfo.setTaskId(defectMap.get("taskId"));
+            tDefectInfo.setLabelAttri(CommonUtils.defaultEmpty(defectMap.get("labelAttri")));
+
+            tDefectInfo.setDeviceType(defectMap.getOrDefault("deviceType", ""));
+            autoreviewHandler.autoreviewCheckDefect(tDefectInfo);
+
+            defectMap.put("confMode", String.valueOf(tDefectInfo.getConfMode()));
         } catch (Exception e) {
             log.error("缺陷info信息组装异常：", e);
         }
@@ -1251,13 +1305,13 @@ public class PatrolResultHandler {
      * @param tStdDevicemete  测点信息
      * @return Map<String, String>
      */
-    private Map<String, String> getDefectMap(String resultImage, String resultValueItem,
+    private Map<String, String> getDefectMap(String resultImage, String val, String resultValueItem,
                                              Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
                                              String resultValue) {
         log.info("resultImage:{},resultValue:{},resultValueItem:{}", resultImage, resultValue, resultValueItem);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
-            TAlgorithmInfo defect = analyseDataOperateService.getAlgorithmDefectInfo(resultValueItem);
+            TAlgorithmInfo defect = analyseDataOperateService.getAlgorithmDefectInfo(val);
             defectMap.put("defectType", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectType).orElse(450).toString());
             defectMap.put("defectModel", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectType).orElse(450).toString());
             defectMap.put("defectLevel", Optional.ofNullable(defect).map(TAlgorithmInfo::getDefectLevel).orElse(131).toString());
@@ -1273,10 +1327,12 @@ public class PatrolResultHandler {
             defectMap.put("value", resultValueItem);
 
             defectMap.put("deviceName", cruiseResultMap.get("deviceName"));
+            defectMap.put("deviceType", cruiseResultMap.getOrDefault("deviceType", ""));
             defectMap.put("instanceName", cruiseResultMap.get("instanceName"));
             defectMap.put("cruiseType", cruiseResultMap.get("cruiseType"));
             defectMap.put("cruiseTime", cruiseResultMap.get("cruiseTime"));
             defectMap.put("taskId", cruiseResultMap.get("taskId"));
+            defectMap.put("labelAttri", cruiseResultMap.getOrDefault("labelAttri", ""));
         } catch (Exception e) {
             log.error("缺陷map信息组装异常：", e);
         }
@@ -1362,5 +1418,38 @@ public class PatrolResultHandler {
                 break;
         }*/
         return alarmSource;
+    }
+
+    public void linkageResultHandler(Long meteId){
+        TCfgDataCurrent tCfgDataCurrent = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);
+        //组装结果
+        List<UPatrolTaskAttr> taskList = tCfgDataCurrentDao.selectTaskByMeteId(meteId);
+        if (taskList.isEmpty()){
+            return;
+        }
+        for (UPatrolTaskAttr task: taskList){
+            String key = PATROL_TASK_PREFIX + task.getTaskId() + ":" + task.getInstanceId();
+            Map<String, String> inspectionMap = redisTemplate.opsForHash().entries(key);
+
+            if (CRUISE_STATE_UN == ValueUtil.toInteger(inspectionMap.get("cruiseStatus"),-1)) {
+                inspectionMap.put("cruiseTime", DateTimeUtil.getDateTimeString());
+                inspectionMap.put("endTime", DateTimeUtil.getDateTimeString());
+                // 未审核
+                inspectionMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+                inspectionMap.put("resultDesc", tCfgDataCurrent.getMeteValue());
+                inspectionMap.put("resultNum", ResultConvertUtil.convertResult(tCfgDataCurrent.getMeteValue(),"主辅监控"));
+                // 巡视结果，正常
+                inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+
+                CruiseRedisStorage.offer(inspectionMap);
+                //判断告警
+                normalRecognitionHandler(inspectionMap.get("resultNum"), inspectionMap, null);
+
+                uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
+                CruiseRedisStorage.offer(inspectionMap);
+            }
+
+        }
     }
 }

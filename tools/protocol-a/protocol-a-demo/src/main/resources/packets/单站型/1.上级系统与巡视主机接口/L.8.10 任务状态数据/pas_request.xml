@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>41</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-29 10:39:42</Time>
+    <Items>
+        <Item task_name="整体测试二" task_progress="87.50%" start_time="{{now}}" plan_start_time="{{now}}" task_code="{{taskCode}}" task_estimated_time="300" task_state="2" description="111" task_patrolled_id="1_{{taskCode}}_{{simpleNow}}"/>
+    </Items>
+</PatrolHost>

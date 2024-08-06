@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Up01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>121</Type>
+    <Code>3003</Code>
+    <Time>2024-03-07 16:09:26</Time>
+    <Items>
+        <Item end_time="2024-03-31 23:59:59" begin_time="2024-03-01 00:00:00"/>
+    </Items>
+    <Command>1</Command>
+</PatrolHost>

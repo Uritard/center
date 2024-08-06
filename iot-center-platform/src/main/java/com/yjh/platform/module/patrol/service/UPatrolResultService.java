@@ -2,6 +2,8 @@ package com.yjh.platform.module.patrol.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -14,7 +16,9 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.ResultConvertUtil;
 import com.yjh.platform.common.utils.smUtil.report.FileUtil;
@@ -22,7 +26,10 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TStdDevice;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.enums.IdentifyStateEnum;
@@ -33,7 +40,9 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import com.yjh.platform.module.task.service.TCruiseResultService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +51,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -49,10 +59,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
 import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getOperationTaskDetailModel;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @Author: lqh
@@ -88,6 +100,8 @@ public class UPatrolResultService {
     private LogsRecord logsRecord;
     @Autowired
     private TCruiseResultService cruiseResultService;
+    @Autowired
+    private TStdDevicemeteService devicemeteService;
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -101,17 +115,17 @@ public class UPatrolResultService {
     }
 
     public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType, Integer meteType, Integer meterType,
-                                                       String instanceName, String startTime, String endTime, List<Long> deviceIdList, String customId,Integer isWarn) {
+                                                       String instanceName, String startTime, String endTime, List<Long> deviceIdList, String customId,String labelAttri,Integer isWarn) {
         List<CruiseResultDetail> cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, meteType, meterType, instanceName, startTime, endTime, deviceIdList,
-                    customId, isWarn);
+                    customId, labelAttri, isWarn);
 
         DictConvertUtil.DictOptional optional = DictConvertUtil.optional("cruiseType").add("cruiseResult").add("evaluationState")
                 .add("abnormalType", "cruiseAbnormal", "abnormalType")
                 .add("meteType").add("meterType").add("identifyResult").add("alarmLevel").add("meteKind").add("alarmRuleType");
         DictConvertUtil.DICT.covertToDict(cruiseResultDetailList, optional);
 
-        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+        String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:stationName", "content");
         cruiseResultDetailList.forEach(c -> {
             if (StringUtils.isBlank(c.getEdgeName())) {
                 c.setEdgeName(currentEdge);
@@ -119,6 +133,7 @@ public class UPatrolResultService {
             if (StringUtils.isNotBlank(c.getMeterTypeName())) {
                 c.setMeteTypeName(c.getMeteTypeName() + "-" + c.getMeterTypeName());
             }
+            c.setLabelAttriName(devicemeteService.labelAttriName(c.getLabelAttri()));
         });
         return cruiseResultDetailList;
     }
@@ -194,7 +209,7 @@ public class UPatrolResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TWarnInfo> manualReview(CruiseManualReview cruiseManualReview, String userId) {
+    public int manualReview(CruiseManualReview cruiseManualReview, String userId) {
         String thisPointType = "表计";
         Map<String,Object> result = uPatrolResultDao.selectMeteInfoByInstanceId(cruiseManualReview.getInstanceId());
         if (Objects.nonNull(result)){
@@ -236,23 +251,23 @@ public class UPatrolResultService {
             uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
         //更新测点信息
         TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate().setDeviceMeteId(afterManualReviewInfo.getDeviceMeteId())
-            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(afterManualReviewInfo.getCruiseTime());
+            .setIdentifyResult(cruiseManualReview.getIdentifyResult()).setUpdateTime(cruiseManualReview.getCruiseTime());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         // 对审核后的任务进行处理，判断告警
         List<TWarnInfo> warnInfoList = afterManualReviewInfo(afterManualReviewInfo, userId, date);
 
         // 审核结果向上级系统同步
-        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), null, false);
 
-        int result2 = patrolTaskReview(cruiseManualReview.getTaskId());
+        int result2 = patrolTaskReview(cruiseManualReview.getTaskId(),"");
         //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
         if (Objects.nonNull(tCruisePointInstance)) {
             String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
             if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
-                if (!NumberUtils.isNumber(cruiseManualReview.getPersonCheck())){
-                    throw new BusinessException("实物编码应为纯数字！");
+                if (!ReUtil.contains("^[A-Za-z_\\d_#]+$", cruiseManualReview.getPersonCheck())){
+                    throw new BusinessException("实物编码应为字母数字和 _# 符号组成");
                 }
                 TStdDevice tStdDevice = new TStdDevice();
                 tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
@@ -260,7 +275,8 @@ public class UPatrolResultService {
                 tStdDeviceDao.update(tStdDevice);
             }
         }
-        return warnInfoList;
+        ScheduledMapConfig.schedule(3,warnInfoList,t->reviewAlarm(warnInfoList.stream().map(TWarnInfo::getWarnId).collect(Collectors.toList())));
+        return result2;
     }
 
     /**
@@ -274,7 +290,7 @@ public class UPatrolResultService {
     /**
      * 对整个任务状态进行判断，修改审核状态，并生成巡视报告
      */
-    private int patrolTaskReview(String taskId) {
+    private int patrolTaskReview(String taskId,String remark) {
         //获取审核后该任务下的巡检点审核信息
         List<CruiseManualReview> cruiseManualReviewList = uPatrolResultDao.selectManualDetail(taskId);
 
@@ -283,19 +299,24 @@ public class UPatrolResultService {
         int checkedSize = 0;
         Date lastDate = null;
         for (CruiseManualReview cmr : cruiseManualReviewList) {
-            if (cmr.getEvaluationState() == 256) {
-                haS1.add(cmr.getCheckUser());
+            if (cmr.getEvaluationState() == CruiseConstant.EVALUATION_STATE_DONE || cmr.getEvaluationState() == CruiseConstant.EVALUATION_STATE_IGNORE) {
+                if (!CommonUtils.isEmptyOrNullstr(cmr.getCheckUser())) {
+                    haS1.add(cmr.getCheckUser());
+                }
                 checkedSize++;
                 if (lastDate == null || (cmr.getCheckDate() != null && cmr.getCheckDate().after(lastDate))) {
                     lastDate = cmr.getCheckDate();
                 }
             }
         }
+        if (lastDate == null) {
+            lastDate = new Date();
+        }
         String checkUserName = StringUtils.join(haS1, ",");
 
         int result2 = 0;
         if (checkedSize == cruiseManualReviewList.size()) {
-            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
+            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, remark);
             //自动生成巡视报告
             Integer progress = reportManageService.reportCheckGenerate(taskId, null, false);
             log.info("开始生成巡视报告=={}", progress);
@@ -307,6 +328,7 @@ public class UPatrolResultService {
      * 对审核后的任务进行处理，判断告警
      */
     private List<TWarnInfo> afterManualReviewInfo(AfterManualReviewInfo afterManualReviewInfo, String userId, Date date) {
+        String userName = (String)redisTemplate.opsForHash().get("userInfo:" + userId,"userName");
         String taskId = afterManualReviewInfo.getTaskId();
         Long instanceId = afterManualReviewInfo.getInstanceId();
         //查询该巡检点对应测点配置的告警阈值相关信息
@@ -397,6 +419,7 @@ public class UPatrolResultService {
         warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
         warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
         warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
+        warnInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
         log.info("warnInfo==" + warnInfo);
 
         //判断该点是否已在告警表  声纹测点分开处理
@@ -404,7 +427,7 @@ public class UPatrolResultService {
             //声纹测点 声纹告警规则
             map = voiceIsWarn(afterManualReviewInfo.getModifyNum(),tStdDevicemete.getDBValue(),
                     tStdDevicemete.getFValue(),tStdDevicemete.getMeteName());
-            return  reviewVoiceWarn(afterManualReviewInfo,map,userId,date,warnInfo,taskId,instanceId);
+            return  reviewVoiceWarn(afterManualReviewInfo,map,userName,date,warnInfo,taskId,instanceId);
         }else {
             if (afterManualReviewInfo.getIsWarn() >= 1) {
                 tWarnInfoList = uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
@@ -420,13 +443,15 @@ public class UPatrolResultService {
                         // 修改告警信息表
                         uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), isTemDif ? initInfo.get("warnName") : MapUtils.getString(map, "warnName"),
                                 MapUtils.getInteger(map, "warnLevel"), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map, "warnContent"),
-                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userId,
+                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userName,
                                 date);
                     } else {
                         uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
-                                "程序异常，告警误报", 287, null, userId, date);
+                                "程序异常，告警误报", 287, null, userName, date);
                     }
                     sendWebSocket(tWarnInfo.getWarnId());
+                    //告警审核上报上级系统 
+                    processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(tWarnInfo.getWarnId()),false);
                 }
             } else {
                 //不存在
@@ -437,9 +462,12 @@ public class UPatrolResultService {
                     warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
                     warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : outRange);
                     warnInfo.setDealTime(date);
-                    warnInfo.setDealPersonId(userId);
+                    warnInfo.setDealPersonId(userName);
                     log.info("要插库的告警数据是===" + warnInfo);
                     tWarnInfoService.insert(warnInfo);
+                    //告警上报 上级
+//                    ScheduledMapConfig.schedule(3,warnInfo,t -> processResultToUpSystem.reviewCreateAlarmToUpSystem(Collections.singletonList(warnInfo.getWarnId()),false));
+                    processResultToUpSystem.reviewCreateAlarmToUpSystem(warnInfo);
                     sendWebSocket(warnInfo.getWarnId());
                     uPatrolResultDao.updateIsWarn(taskId, instanceId);
                     tWarnInfoList.add(warnInfo);
@@ -449,7 +477,7 @@ public class UPatrolResultService {
         }
     }
 
-    public List<TWarnInfo> reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userId, Date date,
+    public List<TWarnInfo> reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userName, Date date,
                                 TWarnInfo warnInfo,String taskId,Long instanceId){
         List<TWarnInfo> warnIdList =
                 uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
@@ -458,18 +486,18 @@ public class UPatrolResultService {
             if (tWarnInfo.getWarnName().contains("分贝") && ValueUtil.toBoolean(map.get("isDbWarn"),false) ){
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
                         null, MapUtils.getString(map, "dbWarnContent"),
-                        "程序正常，告警属实", 286, MapUtils.getString(map, "outDbRange"), userId,
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outDbRange"), userName,
                         date);
                 map.remove("isDbWarn");
             } else if (tWarnInfo.getWarnName().contains("频率") && ValueUtil.toBoolean(map.get("isFWarn"),false)){
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
                         null, MapUtils.getString(map, "fWarnContent"),
-                        "程序正常，告警属实", 286, MapUtils.getString(map, "outFRange"), userId,
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outFRange"), userName,
                         date);
                 map.remove("isFWarn");
             } else {
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
-                        "程序异常，告警误报", 287, null, userId, date);
+                        "程序异常，告警误报", 287, null, userName, date);
             }
         });
         //处理声纹的
@@ -480,7 +508,7 @@ public class UPatrolResultService {
             warnInfo.setWarnContent(MapUtils.getString(map, "dbWarnContent"));
             warnInfo.setOutRange(MapUtils.getString(map, "outDbRange"));
             warnInfo.setDealTime(date);
-            warnInfo.setDealPersonId(userId);
+            warnInfo.setDealPersonId(userName);
             log.info("要插库的告警数据是===" + warnInfo);
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
@@ -494,7 +522,7 @@ public class UPatrolResultService {
             warnInfo.setWarnContent(MapUtils.getString(map, "fWarnContent"));
             warnInfo.setOutRange(MapUtils.getString(map, "outFRange"));
             warnInfo.setDealTime(date);
-            warnInfo.setDealPersonId(userId);
+            warnInfo.setDealPersonId(userName);
             log.info("要插库的告警数据是===" + warnInfo);
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
@@ -530,7 +558,7 @@ public class UPatrolResultService {
         return map;
     }
 
-    public int manualReviewTask(String taskId, String userId, String token, HttpServletRequest request) {
+    public int manualReviewTask(String taskId, String temark, String userId, String token, HttpServletRequest request) {
         Date date = new Date();
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         //审核任务
@@ -545,16 +573,20 @@ public class UPatrolResultService {
         //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
         HashSet<String> haS1 = new HashSet<>();
         for (CruiseManualReview cmr : reviewList) {
-            haS1.add(cmr.getCheckUser());
+            if (!CommonUtils.isEmptyOrNullstr(cmr.getCheckUser())) {
+                haS1.add(cmr.getCheckUser());
+            }
         }
         String checkUserName = StringUtils.join(haS1, ",");
-        int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, "1");
+        String remark = StringUtils.isEmpty(temark) ? null : temark;
+        int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, remark);
 
-        uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
+        uPatrolResultDao.updateWarnInfoByTask(userName, date, taskId);
         tStdDeviceDao.updateByTask(taskId);
 
-        // 审核结果向上级系统同步
-        processResultToUpSystem.reviewToUpSystem(reviewList, true);
+        // 审核结果向上级系统同步，修改审核人为当前用户
+        reviewList.get(0).setCheckUser(userName);
+        processResultToUpSystem.reviewToUpSystem(reviewList, remark, true);
 
         List<Long> warnId = tWarnInfoDao.selectWarnIdByTaskId(taskId);
         processResultToUpSystem.reviewAlarmToUpSystem(warnId, false);
@@ -564,30 +596,61 @@ public class UPatrolResultService {
         return result + reviewList.size();
     }
 
+    public int reviewOpinion(UPatrolResult reviewResult) {
+        UPatrolResult result = uPatrolResultDao.selectByPrimaryId(reviewResult.getTaskId());
+        if (Objects.isNull(result)){
+            throw new BusinessException(ResultCodeEnum.CODE10005, "审核任务不存在");
+        }
+        UPatrolResult review = new UPatrolResult();
+        review.setTaskId(reviewResult.getTaskId()).setRemark(reviewResult.getRemark());
+        CruiseManualReview curseManualReview = new CruiseManualReview();
+        curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
+        // 审核结果向上级系统同步
+        int a = uPatrolResultDao.update(review);
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), reviewResult.getRemark(), false);
+        return a;
+    }
+
     /**
      * 下级系统审核信息同步
      */
     public int manualReviewTask(List<CruiseManualReview> resultList) {
         // 审核任务
         for (CruiseManualReview review : resultList) {
-            Long originId = review.getInstanceId();
-            TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(String.valueOf(originId), review.getSendCode());
-            log.info("originId: {}, edgeCode: {}, instanceInfo: {}", originId, review.getSendCode(), JSON.toJSONString(insInfo));
-            review.setInstanceId(insInfo.getInstanceId());
-
-            log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
-            uPatrolResultDao.manualReviewByTaskInstance(review);
-
-            //更新测点信息
-            Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(review.getInstanceId());
-            TStdDeviceMeteUpdate stdDeviceMeteUpdate =
-                new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult()).setUpdateTime(review.getCruiseTime());
-            uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
-            // 下级系统同步审核信息不对告警进行重新判断
-            // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
+            String[] taskPatrolledId = review.getTaskResultId().split("_");
+            String[] instanceIds = review.getInstanceIds().split(",");
+            String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
+            String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            review.setTaskId(taskId);
+            List<Long> instanceList = getInstanceList(instanceIds);
+            String dataUpdate = review.getPersonCheck();
+            for (Long instanceId : instanceList) {
+                Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+                log.info("cruiseResultMap=={}", resultMap);
+                String resultDesc = Optional.ofNullable(resultMap.get("resultDesc")).orElse("");
+                //修正值为空 或者和结果值一致 识别正确 结果正常
+                boolean empty = StringUtils.isBlank(dataUpdate);
+                if (empty || StringUtils.equals(resultDesc, dataUpdate)) {
+                    review.setPersonCheck(resultDesc);
+                    review.setIdentifyState(258);
+                    review.setIdentifyResult(261);
+                } else {
+                    // 否则 识别错误 数据异常
+                    review.setIdentifyState(259);
+                    review.setIdentifyResult(264);
+                }
+                review.setInstanceId(instanceId);
+                log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
+                uPatrolResultDao.manualReviewByTaskInstance(review);
+            }
+            if (StringUtils.isNotBlank(review.getRemark())) {
+                uPatrolResultDao.updateCheck(taskId, null, null, review.getRemark());
+            }
         }
         // 校验父级是否需要审核并生成巡视报告
-        int result = patrolTaskReview(resultList.get(0).getTaskId());
+        int result = patrolTaskReview(resultList.get(0).getTaskId(),resultList.get(0).getRemark());
         return result + resultList.size();
     }
 
@@ -597,28 +660,50 @@ public class UPatrolResultService {
     public int manualReviewWarn(List<TWarnInfo> tWarnInfoList) {
         int result = 0;
         for (TWarnInfo tWarnInfo : tWarnInfoList) {
-            if (tWarnInfo.getDefectModel() == 0) {
-                tWarnInfo.setDefectModel(Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他")));
-                tWarnInfo.setConfMode(275);
-                result = tWarnInfoDao.updateByEdgeCodeOriginIds(tWarnInfo);
-            } else {
+            String[] taskPatrolledId = tWarnInfo.getTaskId().split("_");
+            String[] instanceIds = tWarnInfo.getInstanceIds().split(",");
+            String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
+            String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            tWarnInfo.setDealType(tWarnInfo.getIsWarn() == 1 ? 286 : 287);
+            tWarnInfo.setConfMode(275);
+            tWarnInfo.setDealInfo(tWarnInfo.getIsWarn() == 1 ? "程序正常，告警属实" : "程序异常，告警误报");
+            tWarnInfo.setTaskId(taskId);
+            List<Long> instanceList = getInstanceList(instanceIds);
+            for (Long instanceId : instanceList) {
+                tWarnInfo.setInstanceId(instanceId);
+                result = tWarnInfoDao.updateByTaskIdAndInstanceId(tWarnInfo);
                 TDefectInfo tDefectInfo = new TDefectInfo();
-                tDefectInfo.setConfMode(275);
-                tDefectInfo.setOriginId(tWarnInfo.getOriginId());
-                tDefectInfo.setDefectName(tWarnInfo.getWarnName());
-                tDefectInfo.setDefectLevel(tWarnInfo.getWarnLevel());
-                tDefectInfo.setDefectContent(tWarnInfo.getWarnContent());
-                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
+                tDefectInfo.setTaskId(taskId);
+                tDefectInfo.setInstanceId(instanceId);
                 tDefectInfo.setDealType(tWarnInfo.getDealType());
-                tDefectInfo.setOutRange(tWarnInfo.getOutRange());
+                tDefectInfo.setConfMode(275);
+                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
                 tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
                 tDefectInfo.setDealTime(tWarnInfo.getDealTime());
-                tDefectInfo.setDefectType(tWarnInfo.getDefectModel());
-                tDefectInfo.setEdgeCode(tWarnInfo.getEdgeCode());
-                result = tDefectInfoDao.updateByEdgeCodeOriginIds(tDefectInfo);
+                tDefectInfoDao.updateByDefectType(tDefectInfo);
             }
         }
         return result + tWarnInfoList.size();
+    }
+
+    /**
+     * 获取真正点位id
+     * @param instanceIds
+     * @return
+     */
+    public List<Long> getInstanceList(String[] instanceIds) {
+        List<Long> instanceList = new ArrayList<>();
+        if (Constant.standardPoints()) {
+            List<TCruisePointInstanceNameDetail> list = tRobotInspectionDao.selectRealInstanceByDevicePoints(instanceIds);
+            if (CollectionUtils.isNotEmpty(list)) {
+                instanceList = list.stream().map(TCruisePointInstance::getInstanceId).collect(Collectors.toList());
+            }
+        } else {
+            instanceList = Arrays.stream(instanceIds).map(Long::parseLong).collect(Collectors.toList());
+        }
+        return instanceList;
     }
 
     public Result sendPostRequest(String url, Map<String, Object> params) {

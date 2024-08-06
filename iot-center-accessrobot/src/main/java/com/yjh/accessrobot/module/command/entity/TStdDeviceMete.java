@@ -50,6 +50,10 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customId;
 
+    @ApiModelProperty(value = "中台部件ID")
+    @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
+    private String componentId;
+
     @Length(max = 32, message = "customName长度必须小于等于32")
     @ApiModelProperty(value = "部位名称")
     @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
@@ -181,6 +185,7 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
+    @ApiModelProperty(value = "重要等级")
     private String redundantType;
 
     @Length(max = 20, message = "stateZero长度必须小于等于20")
@@ -200,6 +205,8 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
     private Integer isTemdif;
 
+    @ApiModelProperty(value = "标签属性")
+    private String labelAttri;
     /**
      * 节点编码
      */

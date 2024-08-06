@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.DeviceModelDao">
+    <insert id="batchAdd">
+        insert into t_std_mete(
+        std_mete_id,
+        device_type,
+        mete_type,
+        mete_name,
+        redundant_type,
+        remark
+        )values
+        <foreach collection="list" item="TStdMete" separator=",">
+            (
+            #{TStdMete.stdMeteId, jdbcType=BIGINT},
+            #{TStdMete.deviceType, jdbcType=INTEGER},
+            #{TStdMete.meteType, jdbcType=VARCHAR},
+            #{TStdMete.meteName, jdbcType=VARCHAR},
+            #{TStdMete.redundantType, jdbcType=VARCHAR},
+            #{TStdMete.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <delete id="cleanAll">
+        DELETE
+        FROM
+            t_std_mete
+        WHERE
+            remark IS NOT NULL
+          AND remark != ''
+    </delete>
+
+    <select id="selectDictCodeByUpDict" resultType="java.util.Map">
+        SELECT
+            a.col_name,
+            a.dict_code,
+            a.up_dict
+        FROM
+            `t_dict_business` a
+        WHERE
+            FIND_IN_SET(a.col_name, #{colName, jdbcType=VARCHAR})
+    </select>
+
+    <insert id="batchAddDeviceMetes">
+        insert into t_std_devicemete(
+        device_mete_id,
+        mete_kind,
+        alarm_type,
+        alarm_level,
+        remark,
+        redundant_type
+        )values
+        <foreach collection="list" item="TStdDevicemete" separator=",">
+            (
+            #{TStdDevicemete.deviceMeteId, jdbcType=BIGINT},
+            #{TStdDevicemete.meteKind, jdbcType=INTEGER},
+            #{TStdDevicemete.alarmType, jdbcType=VARCHAR},
+            #{TStdDevicemete.alarmLevel, jdbcType=INTEGER},
+            #{TStdDevicemete.remark, jdbcType=VARCHAR},
+            #{TStdDevicemete.redundantType, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

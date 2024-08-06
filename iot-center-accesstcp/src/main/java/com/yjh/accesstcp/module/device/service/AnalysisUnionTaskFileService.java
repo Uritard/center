@@ -41,7 +41,7 @@ public class AnalysisUnionTaskFileService {
         try {
             String fileName = StringUtils.substringAfter(filePath, "/linkage/");
             log.info("联动配置文件 fileName {}", fileName);
-            String localFilePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/linkage/" ;
+            String localFilePath = redisTemplate.opsForHash().get("t_sys_param:modelAbsolutePath","content") + "/linkage/" ;
             FileUtil.createDirectory(localFilePath);
             downloadFile(localFilePath + fileName, filePath);
             List<Map<String, Object>> itemList = readUnionTaskXml(localFilePath + fileName);

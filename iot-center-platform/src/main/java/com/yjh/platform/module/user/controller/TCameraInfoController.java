@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.ExcelReadListener;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
 import com.yjh.platform.module.user.entity.TCameraInfoExcel;
@@ -29,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -51,6 +53,8 @@ public class TCameraInfoController {
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private LogsRecord logsRecord;
+    @Resource
+    private TCameraInfoDao cameraInfoDao;
 
     @Autowired
     private final TStdDeviceService tStdDeviceService;
@@ -75,12 +79,7 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String cameraChannelId = tCameraInfo.getCameraChannelId();
-                if (StringUtils.hasLength(cameraChannelId)) {
-                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
-                        tCameraInfo.setCameraChannelId("");
-                    }
-                }
+                checkChannelId(tCameraInfo);
                 tCameraInfo.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeCode", "content"));
                 int state = tCameraInfoService.insert(tCameraInfo);
                 if (state == 0) {
@@ -100,6 +99,44 @@ public class TCameraInfoController {
             log.error("新增相机错误:", e);
         }
         return result;
+    }
+
+    /**
+     * 检测国标/视频B通道编码
+     * @param tCameraInfo tCameraInfo
+     */
+    private void checkChannelId(TCameraInfo tCameraInfo) {
+        String cameraChannelId = tCameraInfo.getCameraChannelId();
+        if (StringUtils.hasLength(cameraChannelId)) {
+            int c = 20;
+            if (cameraChannelId.length() != c) {
+                tCameraInfo.setCameraChannelId(null);
+            }
+        } else {
+            tCameraInfo.setCameraChannelId(null);
+        }
+        String bCameraChannelId = tCameraInfo.getBcameraChannelId();
+        if (StringUtils.hasLength(bCameraChannelId)) {
+            int b = 18;
+            if (bCameraChannelId.length() != b) {
+                tCameraInfo.setBcameraChannelId(null);
+            }
+        } else {
+            tCameraInfo.setBcameraChannelId(null);
+        }
+
+        // 判断是否存在相同编码的设备
+        if (StringUtils.isEmpty(tCameraInfo.getCameraChannelId()) && StringUtils.isEmpty(tCameraInfo.getBcameraChannelId())) {
+            return;
+        }
+        TCameraInfo query = new TCameraInfo();
+        query.setCameraChannelId(tCameraInfo.getCameraChannelId());
+        query.setBcameraChannelId(tCameraInfo.getBcameraChannelId());
+        query.setCameraId(tCameraInfo.getCameraId());
+        List<TCameraInfo> cameraInfos = cameraInfoDao.cameraDuplicateCheck(query);
+        if (CollectionUtils.isNotEmpty(cameraInfos)) {
+            throw new BusinessException("相机国标编码或视频B编码重复！");
+        }
     }
 
     @ApiOperation(value = "删除")
@@ -171,12 +208,7 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && !tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
-                String cameraChannelId = tCameraInfo.getCameraChannelId();
-                if (StringUtils.hasLength(cameraChannelId)) {
-                    if (cameraChannelId.length() <= 14 || cameraChannelId.length() != 20) {
-                        tCameraInfo.setCameraChannelId(null);
-                    }
-                }
+                checkChannelId(tCameraInfo);
                 int state = tCameraInfoService.update(tCameraInfo);
                 if (state == 0) {
                     result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -431,6 +463,21 @@ public class TCameraInfoController {
         Result result = new Result();
         try {
             result.setData(this.tCameraInfoService.getCameraStatusByCameraId(cameraId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "解锁相机状态")
+    @RequestMapping(value = "/changeCameraState", method = RequestMethod.GET)
+    @Logs(title = "解锁相机状态",content = "根据用户传递的参数解锁相机状态",logType = 1)
+    public Result changeCameraState(@RequestParam(value = "cameraId", required = true) Long cameraId) {
+        Result result = new Result();
+        try {
+            TCameraInfoByDict cameraInfo = tCameraInfoService.selectByPrimaryId(cameraId);
+            redisTemplate.opsForHash().put(TCameraInfoService.cameraStateKey+cameraInfo.getCameraIp(),"state","0");
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("失败描述：", e);

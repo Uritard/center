@@ -404,7 +404,12 @@
     </select>
 
     <select id="selectKeepWatchList" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
-        select * from t_camera_preset where preset_type = 2
+        select
+            preset.*,
+            camera.camera_ip
+        from t_camera_preset preset
+        left join t_camera_info camera on preset.camera_id = camera.camera_id
+        where preset.preset_type = 2
     </select>
 
     <select id="selectKeepWatchTask" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -448,7 +453,7 @@
         FROM
             t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
         where a.preset_id = b.cruise_id
-          and d.device_id = b.device_id and e.custom_id = b.custom_id
+          and d.device_id = b.device_id
           AND b.device_mete_id = e.device_mete_id
           and a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
@@ -520,10 +525,12 @@
 
     <select id="selectCameraByPresetType" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
-        *
-        from t_camera_preset
-        where preset_type = #{presetType}
-          and edge_code is null
+        preset.*,
+        camera.camera_ip
+        from t_camera_preset preset
+        left join t_camera_info camera on preset.camera_id = camera.camera_id
+        where preset.preset_type = #{presetType}
+          and preset.edge_code is null
     </select>
 
     <select id="selectIsDownSystemPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -587,5 +594,15 @@
         <foreach collection="list" item="presetId" open="(" separator="," close=")">
             #{presetId, jdbcType=BIGINT}
         </foreach>
+    </select>
+    <select id="getExistPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        tcp.camera_id
+        from t_camera_preset tcp
+        left join t_camera_info tci
+        on tcp.camera_id = tci.camera_id
+        where tcp.preset_num = #{presetNum, jdbcType=INTEGER}
+        and tci.camera_ip = #{ip}
+        and tci.port = #{port}
     </select>
 </mapper>

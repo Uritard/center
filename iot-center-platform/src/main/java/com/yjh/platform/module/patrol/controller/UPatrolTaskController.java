@@ -14,12 +14,16 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.RobotProxy;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
+import com.yjh.platform.module.patrol.entity.query.TaskQuery;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.service.UpdatePatrolService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
+import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
+import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -176,13 +180,12 @@ public class UPatrolTaskController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
-    public Result delete(HttpServletRequest request,
-                         @RequestParam(value = "taskId", required = true) String taskId,
+    public Result delete(HttpServletRequest request, @RequestParam(value = "taskId") String taskId,
         @RequestParam(value = "startTime", required = false) String startTime,
         @RequestParam(value = "source", required = false) String source) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime,source,request));
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId, startTime, null, source, 1, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);
@@ -196,12 +199,14 @@ public class UPatrolTaskController {
     @ApiOperation(value = "上级系统删除")
     @RequestMapping(value = "/upSystemDelete", method = RequestMethod.GET)
     public Result upSystemDelete(HttpServletRequest request,
-                         @RequestParam(value = "taskId", required = true) String taskId,
+                         @RequestParam(value = "taskId") String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime,
-                         @RequestParam(value = "source", required = false) String source) {
+                         @RequestParam(value = "type", defaultValue = "1") int type,
+                         @RequestParam(value = "endTime", required = false) String endTime) {
         Result result = new Result();
         try {
-            result = this.delete(request,taskId,startTime,source);
+            String source = 2 == type ? "-999" : "";
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId, startTime, endTime, source, type, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("上级系统删除任务异常:", e);
@@ -364,6 +369,44 @@ public class UPatrolTaskController {
             List<Map<String, Object>> list = uPatrolTaskService.taskCount(taskStartDate, flag);
             result.setData(list);
         }catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务统计")
+    @RequestMapping(value = "/queryTaskForPage", method = RequestMethod.POST)
+    @Logs(title = "查询巡检任务", content = "根据用户传递的参数统计任务", logType = 1, authority = "1235")
+    public Result queryTaskForPage(@RequestBody TaskQuery taskQuery) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(taskQuery.getPageNum(), taskQuery.getPageSize(), true, null, true);
+            List<UPatrolTask> list = uPatrolTaskService.queryTaskForPage(taskQuery);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list",list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询任务测点列表")
+    @RequestMapping(value = "/queryTaskMeteListForPage", method = RequestMethod.POST)
+    @Logs(title = "查询任务测点列表", content = "查询任务测点列表", logType = 1, authority = "1235")
+    public Result queryTaskMeteListForPage(@RequestBody TaskMeteQuery taskMeteQuery) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(taskMeteQuery.getPageNum(), taskMeteQuery.getPageSize(), true, null, true);
+            List<TCruiseTaskAttr> list = uPatrolTaskService.queryTaskMeteListForPage(taskMeteQuery);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list",list);
+            result.setData(resultMap);
+        } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
         }

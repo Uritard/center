@@ -2,9 +2,9 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.algorithm.AlgorithmService;
+import com.yjh.platform.algorithm.FtpsService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -13,12 +13,11 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.RedisUtil;
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.AutoreviewHandler;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -50,24 +49,22 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private RedisTemplate redisTemplate;
     private UPatrolTaskService uPatrolTaskService;
     private FtpsService ftpsService;
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     private PatrolResultHandler patrolResultHandler;
     private ApplicationProperties applicationProperties;
-    private TStdRegionDao tStdRegionDao;
-    private TCruisePointInstanceDao tCruisePointInstanceDao;
     private TStdDeviceDao tStdDeviceDao;
+    private AutoreviewHandler autoreviewHandler;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         ftpsService = StaticContextAccessor.getBean(FtpsService.class);
-        alarmService = StaticContextAccessor.getBean(AlarmService.class);
+        algorithmService = StaticContextAccessor.getBean(AlgorithmService.class);
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
-        this.tStdRegionDao = StaticContextAccessor.getBean(TStdRegionDao.class);
-        this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
         this.tStdDeviceDao = StaticContextAccessor.getBean(TStdDeviceDao.class);
         this.applicationProperties = StaticContextAccessor.getBean(ApplicationProperties.class);
+        this.autoreviewHandler = StaticContextAccessor.getBean(AutoreviewHandler.class);
     }
 
     @Override
@@ -170,10 +167,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+            warnInfo.setDeviceType(cruiseMap.getOrDefault("deviceType", ""));
             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
             warnInfo.setInstanceId(instanceId);
             warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-            warnInfo.setConfMode(276);
+            warnInfo.setConfMode(CruiseConstant.ConfModeEnum.UN_CHECK.getCode());
             warnInfo.setDefectModel(Integer.valueOf(uPatrolTaskService.selectDictCodeByNote("其他", "defect_model")));
             warnInfo.setAlarmSource(NumberUtils.toInt(PatrolResultHandler.getAlarmSource(cruiseType), 998));
             warnInfo.setImagePath(threadMap.getOrDefault("relativePath", ""));
@@ -184,12 +182,17 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
             warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : Objects.nonNull(map.get("outRange")) ? String.valueOf(map.get("outRange")) : null);
+            warnInfo.setLabelAttri(CommonUtils.defaultEmpty(cruiseMap.get("labelAttri")));
+            // 告警自动审核
+            autoreviewHandler.autoreviewCheckAlarm(warnInfo);
+
             log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
             // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             // redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
             //redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "resultDesc", initInfo.get("valueTemp"));
+            cruiseMap.put("isWarn", "1");
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "isWarn", "1");
 
 
@@ -207,10 +210,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
             StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
-            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             // 将产生的告警上送至上一级系统
-            patrolResultHandler.alarmToUpSystem(warnInfo, cruiseResultMap);
+            patrolResultHandler.alarmToUpSystem(warnInfo, cruiseMap);
 
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
@@ -227,7 +228,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param warnMap 告警信息
      */
     private void alarmToAmPlatform(Map<String, String> warnMap) {
-        if (!applicationProperties.getManagerMqttConfig().isEnable()) {
+        if (!applicationProperties.getManagerAlgorithmConfig().isEnable()) {
             return;
         }
         try {
@@ -246,13 +247,13 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String origpicpath = cruiseResult2.get("origpic").toString();
             String[] str2 = origpicpath.split("/");
             String origpcimagename = str2[str2.length - 1];
-            String remoteorigfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
+            String remoteorigfilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
             //结果文件
             String resultImagebak = threadMap.get("absolutePath");
             String[] str3 = resultImagebak.split("/");
             //获取结果图名称，然后拼接远程文件全路径
             String resultimagename = str3[str3.length - 1];
-            String remoteresultfilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
+            String remoteresultfilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + resultimagename;
             //原图  算法管理平台对应的原始文件路径
             alarm.setPic_raw(remoteresultfilepath);
             //机器人分析结果图 算法管理平台对应的原始文件路径
@@ -270,7 +271,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 //判别结果图片
                 ftpsService.uploadFile("判别告警", resultImagebak, remoteresultfilepath);
             }
-            alarmService.PushMsg(alarm);
+            algorithmService.pushAlarmMsg(alarm);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -295,12 +296,12 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("taskId", warnInfo.getTaskId());
             warnMap.put("value", warnInfo.getValue());
             warnMap.put("imagePath", warnInfo.getImagePath());
-            warnMap.put("confMode", "276");
+            warnMap.put("confMode", String.valueOf(warnInfo.getConfMode()));
             warnMap.put("alarmSource", String.valueOf(warnInfo.getAlarmSource()));
             warnMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
             warnMap.put("warnLevel", String.valueOf(warnInfo.getWarnLevel()));
             warnMap.put("warnName", warnInfo.getWarnName());
-            warnMap.put("warnTime", DateTimeUtil.format(warnInfo.getWarnTime()));
+            warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
             warnMap.put("outRange", Objects.nonNull(warnInfo.getOutRange()) ? warnInfo.getOutRange() : "");
 

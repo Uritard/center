@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.quartz.KeepWatchJob;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -60,6 +62,7 @@ public class TCameraInfoService {
     private CameraConService cameraConService;
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
+    public static final String cameraStateKey = "camera_state:";
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
     @Transactional(rollbackFor = Exception.class)
@@ -448,18 +451,23 @@ public class TCameraInfoService {
     private void intoRedis(TCameraInfo item) {
         Long cameraId = item.getCameraId();
         String str = "camera_info:" + cameraId;
-        Map<String, String> map = redisTemplate.opsForHash().entries(str);
-        if (MapUtils.isEmpty(map)) {
-            map = new HashMap<>(8);
-        }
-        if (StringUtils.isEmpty(map.get("state"))) {
-            map.put("state", "0");
-        }
+        Map<String, String> map = new HashMap<>(8);
         map.put("cameraId", String.valueOf(cameraId));
         map.put("cameraName", item.getCameraName());
         map.put("cameraIp", item.getCameraIp());
         map.put("pmsId", item.getPmsId());
         redisTemplate.opsForHash().putAll(str, map);
+
+        String stateKey = cameraStateKey + item.getCameraIp();
+        map = redisTemplate.opsForHash().entries(stateKey);
+        if (MapUtils.isEmpty(map)) {
+            map = new HashMap<>(2);
+        }
+        if (StringUtils.isEmpty(map.get("state"))) {
+            map.put("state", "0");
+        }
+        // TCameraInfoService.cameraStateKey
+        redisTemplate.opsForHash().putAll(stateKey, map);
     }
 
     @Transactional(rollbackFor = Exception.class)

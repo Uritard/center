@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
@@ -20,7 +21,9 @@ import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
@@ -69,6 +72,10 @@ public class TWarnInfoService{
     private TStdRegionService stdRegionService;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
+    @Autowired
+    private TStdDevicemeteService tStdDevicemeteService;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
 
@@ -189,7 +196,8 @@ public class TWarnInfoService{
                 }
                 tWarnInfoDetail.setThresholdValue(thresholdValue);
                 // 转换字典数据
-                DictConvertUtil.optional("alarmLevel").add("alarmSource").add("confMode").add("defectModel").add("dealType").covertToDict(tWarnInfoDetail);
+                DictConvertUtil.optional("alarmLevel").add("alarmSource").add("confMode").add("defectModel").add("dealType")
+                        .add("pointAlarmType","warnType","warnTypeName").covertToDict(tWarnInfoDetail);
 
                 if (presetInfo != null) {
                     tWarnInfoDetail.setCameraId(presetInfo.getCameraId());
@@ -200,6 +208,7 @@ public class TWarnInfoService{
                 if (edgeInfo != null) {
                     tWarnInfoDetail.setStationName(edgeInfo.getStationName());
                 }
+                tWarnInfoDetail.setLabelAttriName(tStdDevicemeteService.labelAttriName(tWarnInfoDetail.getLabelAttri()));
             }
         }
         log.info("_________________________________time3________________________________:{}\n",System.currentTimeMillis() -time);
@@ -414,6 +423,7 @@ public class TWarnInfoService{
     }
     @Transactional(rollbackFor = Exception.class)
     public int alarmAndDefectProcess(AlarmAndDefectProcess alarmAndDefectProcess,String userId) {
+        String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         Long warnId = alarmAndDefectProcess.getWarnId();
         Integer dealType = alarmAndDefectProcess.getDealType();
         String dealInfo = alarmAndDefectProcess.getDealInfo();
@@ -428,7 +438,7 @@ public class TWarnInfoService{
                         .setWarnId(warnId)
                         .setDealType(dealType)
                         .setDealTime(date)
-                        .setDealPersonId(userId)
+                        .setDealPersonId(userName)
                         .setConfMode(275);
                 jieGuo = tWarnInfoDao.update(tWarnInfo);
                 if (jieGuo == 1) {
@@ -439,7 +449,7 @@ public class TWarnInfoService{
                         .setDefectId(warnId)
                         .setDealInfo(dealInfo)
                         .setDealType(dealType)
-                        .setDealPersonId(userId)
+                        .setDealPersonId(userName)
                         .setDealTime(date)
                         .setConfMode(275);
                 jieGuo = tDefectInfoDao.update(tDefectInfo);
@@ -620,6 +630,8 @@ public class TWarnInfoService{
             stationName = tWarnInfoDao.selectStationNameByThis();
         }
         tWarnInfoDetail.setStationName(stationName);
+        tWarnInfoDetail.setLabelAttriName(tStdDevicemeteService.labelAttriName(tWarnInfoDetail.getLabelAttri()));
+        DictConvertUtil.optional("pointAlarmType","warnType","warnTypeName").covertToDict(tWarnInfoDetail);
         return tWarnInfoDetail;
     }
 

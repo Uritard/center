@@ -206,7 +206,7 @@
         left join t_std_device b on a.device_id = b.device_id
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         where 1 = 1
-        <if test="triphaseName != null and triphaseName != ''"> and a.triphase_name = #{triphaseName, jdbcType=VARCHAR}</if>
+        <if test="triphaseName != null and triphaseName != ''"> and a.triphase_name like concat('%',#{triphaseName, jdbcType=VARCHAR},'%')</if>
     </select>
 
     <insert id="batchAdd">

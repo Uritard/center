@@ -16,8 +16,8 @@ import java.util.Map;
  */
 @Repository
 public interface SendToUpSystemDao {
-    List<Map<String,Object>> selectDeviceModel(@Param(value = "standardPoints") boolean standardPoints,
-                                               @Param(value = "middlegroundIds") boolean middlegroundIds,
+    List<Map<String,Object>> selectDeviceModel(@Param(value = "standardPoints") Boolean standardPoints,
+                                               @Param(value = "middlegroundIds") Boolean middlegroundIds,
                                                @Param(value = "edgeCode") String edgeCode,
                                                @Param(value = "presetRealImgPath") String presetRealImgPath,
                                                @Param(value = "presetImgPath") String presetImgPath);
@@ -60,11 +60,21 @@ public interface SendToUpSystemDao {
     String selectIsDownSystem(@Param(value = "list") List<String> list);
 
     List<String> selectInstanceIdsByRegionOrDevice(Map<String, String> idMap);
-
-    List<String> selectInstanceIdsByComponent(@Param(value = "list") List<DeviceModel> deviceModels);
-
     List<String> selectInstanceIdsByUpRegionIds(@Param(value = "upRegionIds") String upRegionIds );
     List<String> selectInstanceIdsByPmsId(@Param(value = "pmsId") String pmsId );
     List<String> selectInstanceIdsByMiddlegroundComponent(@Param(value = "componentId") String componentId );
 
+    List<String> selectInstanceIdsByComponent(@Param(value = "list") List<DeviceModel> deviceModels);
+
+    HashMap<String, Object> countLabelAccuracy(@Param(value = "startTime") String startTime,
+                                               @Param(value = "endTime") String endTime);
+
+    List<Map<String, Object>> selectMaintenanceModel(@Param(value = "stationName") String stationName,
+                                                     @Param(value = "stationCode") String stationCode);
+
+    List<Map<String, Object>> selectLinkageModel(@Param(value = "standardPoints") Boolean standardPoints);
+
+    List<TCruisePointInstanceMeteDetail> selectAlarmThresholdModel();
+
+    List<Map<String, Object>> selectStandardPointsByInstanceId(@Param(value = "instanceIds") String instanceIds);
 }

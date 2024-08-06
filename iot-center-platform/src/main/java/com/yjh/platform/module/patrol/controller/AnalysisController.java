@@ -1,8 +1,9 @@
 package com.yjh.platform.module.patrol.controller;
 
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -47,7 +49,7 @@ public class AnalysisController {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     @Autowired
     private FtpsService ftpsService;
     @Autowired
@@ -173,6 +175,40 @@ public class AnalysisController {
         intelAnalysisService.algorithmUpdate(request);
     }
 
+    @ApiOperation(value = "请求算法资源信息接口")
+    @GetMapping(value = "/algorithmResource")
+    @Logs(title = "查询算法资源信息",content = "根据用户传递的参数查询算法资源信息",logType = 1,authority = "1234")
+    public Result algorithmResource(){
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.algorithmResource());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法资源信息接口错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "请求系统自检信息接口")
+    @GetMapping(value = "/systemCheck")
+    @Logs(title = "查询系统自检信息",content = "根据用户传递的参数查询系统自检信息",logType = 1,authority = "1234")
+    public Result systemCheck(HttpServletRequest request){
+        Result result = new Result();
+        try {
+            Long userId=Long.valueOf(StringUtils.isBlank(request.getHeader("userId")) ? "10001" : request.getHeader("userId"));
+            result.setData(intelAnalysisService.systemCheck(request, userId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("系统自检信息接口错误:", e);
+        }
+        return result;
+    }
+
+
     @ApiOperation(value = "告警判断处理接口")
     @GetMapping(value = "/warnInfo")
     public Result alarmJudge(@RequestParam String value, @RequestParam(value = "valueDesc", required = false) String valueDesc, @RequestParam String stdDeviceMeteName,
@@ -243,10 +279,10 @@ public class AnalysisController {
 
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
-            String remoteImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
-            String remoteBaseImgPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
-            String remoteDifResultPath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
-            String remoteDefectFilepath = applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
+            String remoteImgPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            String remoteBaseImgPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
+            String remoteDifResultPath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
+            String remoteDefectFilepath = applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
 
             ftpsService.uploadFile("原始图片",path+"/img.jpg",remoteImgPath);  //原始图片上传
             ftpsService.uploadFile("缺陷告警结果图片",path+"/defectResultImg.jpg",remoteDefectFilepath);  //缺陷告警
@@ -261,11 +297,78 @@ public class AnalysisController {
             alarmDetail.setDefect(defectList);
 
             log.info("算法发送测试消息：{} ", alarmDetail);
-            alarmService.PushMsg(alarmDetail);
+            algorithmService.pushAlarmMsg(alarmDetail);
             result.setMessage("success");
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "与算法管理平台交互失败");
             log.info("与算法管理平台交互失败" + e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法参数获取
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @return 算法参数
+     */
+    @ApiOperation(value = "算法参数获取接口")
+    @GetMapping(value = "/getAlgorithmParams")
+    @Logs(title = "查询算法参数信息",content = "根据用户传递的参数查询算法参数信息",authority = "1234")
+    public Result getAlgorithmParams(@RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.getAlgorithmParams(type));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法参数获取接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法版本获取接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param algorithmManufacturer 算法厂商 当值为空时， 代表获取所有厂商的算法历史版本
+     * @return 算法版本信息
+     */
+    @ApiOperation(value = "算法版本获取接口")
+    @GetMapping(value = "/getAlgorithmVersion")
+    @Logs(title = "查询算法版本信息",content = "根据用户传递的参数查询算法版本信息",authority = "1234")
+    public Result getAlgorithmVersion(@RequestParam(value = "type") String type,
+                                      @RequestParam(value = "algorithmManufacturer") String algorithmManufacturer) {
+        Result result = new Result();
+        try {
+            result.setData(intelAnalysisService.getAlgorithmVersion(type, algorithmManufacturer));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法版本获取接口错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 算法版本切换接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param version 算法版本号
+     * @return
+     */
+    @ApiOperation(value = "算法版本切换接口")
+    @PostMapping(value = "/algorithmVersionChange")
+    @Logs(title = "算法版本切换",content = "算法版本切换", logType = 5, authority = "1234")
+    public Result algorithmVersionChange(@RequestParam(value = "type") String type,
+                                         @RequestParam(value = "version") String version) {
+        Result result = new Result();
+        try {
+            intelAnalysisService.algorithmVersionChange(type, version);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("算法版本切换接口错误:", e);
         }
         return result;
     }

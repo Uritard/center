@@ -54,4 +54,12 @@ public class SpringBeanUtils implements ApplicationContextAware {
             return null;
         }
     }
+
+    public static <T> T getBean(Class<T> clazz) {
+        try {
+            return getApplicationContext().getBean(clazz);
+        } catch (NoSuchBeanDefinitionException e) {
+            return null;
+        }
+    }
 }

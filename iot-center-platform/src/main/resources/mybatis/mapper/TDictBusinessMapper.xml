@@ -101,6 +101,24 @@
         <if test="dictNote != null and dictNote != ''"> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
         <if test="upDict != null "> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
     </select>
+    <select id="selectOne" parameterType="com.yjh.platform.module.user.entity.TDictBusiness" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
+        select
+        a.dict_id,
+        a.dict_code,
+        a.col_name,
+        a.dict_note,
+        a.up_dict,
+        a.remark,
+        a.sort
+        from t_dict_business a
+        where 1 = 1
+        <if test="dictId != null "> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
+        <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
+        <if test="colName != null and colName != ''"> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null and dictNote != ''"> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="upDict != null "> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
+        limit 1
+    </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TDictBusiness" resultType="com.yjh.platform.module.user.entity.TDictBusiness">
         select

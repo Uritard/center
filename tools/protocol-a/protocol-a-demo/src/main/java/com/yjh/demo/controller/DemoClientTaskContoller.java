@@ -123,7 +123,7 @@ public class DemoClientTaskContoller {
         return new ResultBean(200, "创建客户端成功");
     }
 
-    @RequestMapping(value = "/destroy")
+    @PostMapping(value = "/destroy")
     public ResultBean destroyClient() {
         if (!baseSocketClientList.isEmpty()) {
             for (BaseSocketClient socketClient : baseSocketClientList) {

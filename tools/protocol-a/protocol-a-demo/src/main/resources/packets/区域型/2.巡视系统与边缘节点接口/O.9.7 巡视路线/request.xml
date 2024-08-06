@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>4</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+        <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" coordinate_geography="120,33" time="{{now}}" coordinate_pixel="233,353,0,0" task_patrolled_id="{{taskPatrolledId}}"/>
+        <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" coordinate_geography="120,34" time="{{now}}" coordinate_pixel="232,370,0,0" task_patrolled_id="{{taskPatrolledId}}"/>
+        <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" coordinate_geography="120,35" time="{{now}}" coordinate_pixel="233,353,0,0" task_patrolled_id="{{taskPatrolledId}}"/>
+        <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" coordinate_geography="120,36" time="{{now}}" coordinate_pixel="233,334,0,0" task_patrolled_id="{{taskPatrolledId}}"/>
+        <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" coordinate_geography="120,37" time="{{now}}" coordinate_pixel="233,321,0,0" task_patrolled_id="{{taskPatrolledId}}"/>
+    </Items>
+</PatrolHost>

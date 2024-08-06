@@ -198,7 +198,7 @@
         left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
         where 1 = 1 and c.device_mete_id is not null
         <if test="cruiseType != null and cruiseType != ''"> and a.triphase_id = -1 </if>
-        <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.triphase_name like concat('%',#{cruiseName, jdbcType=VARCHAR},'%')</if>
         )
     </select>
 
@@ -210,12 +210,13 @@
 
     <select id="selectCruiseDeviceByInstanceId" resultType="java.lang.String">
         select
-        IFNULL(h.robot_name,j.camera_name) as name
+        IFNULL(IFNULL(f.device_name,h.robot_name),j.camera_name) as name
         from t_cruise_point_instance a
         left join t_robot_inspection g on g.inspection_id = a.cruise_id
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_camera_preset i on i.preset_id = a.cruise_id
         left join t_camera_info j on j.camera_id = i.camera_id
+        left join t_cfg_device f on f.device_id = a.cruise_id
         where a.instance_id = #{instanceId}
     </select>
 
@@ -294,10 +295,12 @@
         b.modify_num,
         b.picpath,
         b.person_check,
-        b.result_desc
+        b.result_desc as resultDesc,
+        b.cruise_time as cruiseTime
         from t_cruise_nonhomologous_warn_inspection a
         LEFT JOIN u_patrol_data_result b ON a.inspection_id=b.instance_id and a.task_id=b.task_id
         where a.warn_id = #{warnId, jdbcType=VARCHAR}
+        ORDER BY b.cruise_time
     </select>
 
     <select id="getSanxiangInfo" resultType="java.util.Map" parameterType="java.lang.String">

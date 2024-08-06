@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.dao;
 import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -104,4 +105,8 @@ public interface TCameraPresetDao {
     int queryMaxPresetNum(@Param(value = "cameraId") Long cameraId);
 
     List<String> selectImgListById(@Param(value = "list") List<Long> list);
+
+    List<TCameraPreset> getExistPreset(@Param(value = "ip") String ip,
+                                       @Param(value = "port") Integer port,
+                                       @Param(value = "presetNum") Integer presetNum);
 }

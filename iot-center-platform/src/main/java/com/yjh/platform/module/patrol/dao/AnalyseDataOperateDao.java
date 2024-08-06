@@ -105,4 +105,7 @@ public interface AnalyseDataOperateDao {
 
     List<TWarnInfo> selectWarnListByIds(List<Long> list);
 
+    List<Map<String,String>> selectWarnAndResultListByIds(@Param(value = "instanceId") Long instanceId,
+                                                          @Param(value = "taskId") String taskId);
+
 }

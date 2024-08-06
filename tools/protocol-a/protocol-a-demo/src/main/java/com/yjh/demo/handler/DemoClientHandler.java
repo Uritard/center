@@ -1,6 +1,8 @@
 package com.yjh.demo.handler;
 
 import com.yjh.commons.rxbus.RxBus;
+import com.yjh.demo.config.ClientConfig;
+import com.yjh.demo.task.AutomationTask;
 import com.yjh.demo.ws.message.AInterfaceMessage;
 import com.yjh.messager.api.msg.BaseMessage;
 import com.yjh.messager.api.msg.BaseMessageHandler;
@@ -11,10 +13,12 @@ import com.yjh.protocol_a.Message;
 import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.OutboundMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
+
 
 /**
  * <功能描述>
@@ -25,21 +29,20 @@ import java.util.concurrent.ExecutorService;
 @Component
 @Slf4j
 public class DemoClientHandler extends BaseMessageHandler {
-    final MessageSender sender;
-    long sessionId= 0l;
-
+    private final MessageSender sender;
     private final SimpleMessageSender wsMessageSender;
+    private final AutomationTask automationTask;
 
     public DemoClientHandler(
             ExecutorService clientMsgProcessingExecutor,
             RxBus clientRxBus,
             MessageSender clientMessageSender,
-            SimpleMessageSender wsMessageSender
-    ) {
+            SimpleMessageSender wsMessageSender, AutomationTask automationTask) {
         super(clientMsgProcessingExecutor, clientRxBus);
 
         this.sender = clientMessageSender;
         this.wsMessageSender = wsMessageSender;
+        this.automationTask = automationTask;
         subscribeInbound(ExtPeerState.class, InboundMessage.class);
     }
 
@@ -58,19 +61,22 @@ public class DemoClientHandler extends BaseMessageHandler {
             }
         } else if (baseMsg instanceof InboundMessage) {
             InboundMessage inboundMessage = (InboundMessage) baseMsg;
-            this.sessionId = inboundMessage.getSessionId();
-            log.info("接收到服务端的内容: \n{}\n", new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
-            log.info("接收到服务端的sessionId: {}", sessionId);
+            ClientConfig.sessionId = inboundMessage.getSessionId();
+            log.info("接收到服务端的内容: \n{}\n接收到服务端的sessionId: {}, 发送会话序列号：{}, 接收会话序列号: {}, 会话源标识：0x0{}",
+                new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8), ClientConfig.sessionId,
+                inboundMessage.getPacket().getSendSessionId(), inboundMessage.getPacket().getReceiveSessionId(),
+                inboundMessage.getPacket().getSessionType());
+
+            String validStr = automationTask.validMessage(inboundMessage, false);
+            validStr = StringUtils.isBlank(validStr) ? "<b>校验成功</b>" : "<p style='color:Crimson'>" + validStr + "</p>";
+
             AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
-                    "发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
+                    ">>>>>> 接收服务端发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
                     "接收会话序列号：" + inboundMessage.getPacket().getReceiveSessionId() + "        " +
                     "会话源标识：0x0" + inboundMessage.getPacket().getSessionType()+ "        " +
-                    "xml内容：" + new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8)+ "\n");
+                    "xml内容：\n" + new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8), validStr);
             wsMessageSender.send(new AInterfaceMessage(data));
         }
     }
 
-    public Long getSessionId(){
-        return sessionId;
-    }
 }

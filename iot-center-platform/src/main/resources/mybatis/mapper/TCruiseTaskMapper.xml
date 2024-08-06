@@ -752,7 +752,11 @@ select *from (
     <select id="queryStations" resultType="com.yjh.platform.module.task.entity.StationCount">
        SELECT
         b.dict_note as type,
-        COUNT(1) AS count
+        COUNT(1) AS count,
+        (CASE
+        WHEN a.robot_type IS NOT NULL THEN "1"
+        WHEN a.drone_type IS NOT NULL THEN "2"
+        END)as deviceType
         FROM t_robot_info a
         LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code OR a.drone_type = b.dict_code
         WHERE 1=1 and is_use = 166
@@ -762,9 +766,9 @@ select *from (
                 #{regionIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        GROUP BY a.robot_type
+        GROUP BY a.robot_type,a.drone_type
         UNION
-        SELECT '视频设备' type,COUNT(1) AS count FROM t_camera_info b WHERE 1=1
+        SELECT '视频设备' type,COUNT(1) AS count,'3' as deviceType FROM t_camera_info b WHERE 1=1
         <if test="list!=null and list.size>0">
             and b.up_region_id IN
             <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">

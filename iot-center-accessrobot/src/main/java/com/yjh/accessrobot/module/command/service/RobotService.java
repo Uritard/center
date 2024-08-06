@@ -41,6 +41,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -126,6 +127,8 @@ public class RobotService {
 
     @Autowired
     private  TVoiceDeviceService tVoiceDeviceService;
+    @Resource
+    private DeviceMaintenanceService deviceMaintenanceService;
 
     @Autowired
     private PlatformProxy platformProxy;
@@ -143,6 +146,11 @@ public class RobotService {
     private static final Set<String> NEED_CONFIRM_SET = new HashSet<>();
 
     public static final Map<String, String> SYNC_MODE_CACHE =  new ConcurrentHashMap<>(16);
+
+    /**
+     * 理论上这里应该做防内存泄露处理，但联动任务少，这里就不做了
+     */
+    public static final Map<Long, String> LINKAGE_TASK_CACHE =  new ConcurrentHashMap<>(16);
 
     /**
      * 需要密码校验的巡视设备控制命令
@@ -276,11 +284,16 @@ public class RobotService {
             if (tRobotInfo.getOriginId() != null){
                 robotCode = tRobotInfo.getEdgeCode();
             }
+            String code = tRobotInfo.getRobotNum();
+            if ("20005".equals(type)){
+                //无人机机巢控制命令
+                code = tRobotInfo.getNestCode();
+            }
 
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode())
                     .setReceiveCode(robotCode)
-                    .setCode(String.valueOf(tRobotInfo.getRobotNum()))
+                    .setCode(code)
                     .setTime(DateTimeUtil.format(new Date()))
                     .setType(type)
                     .setCommand(command)
@@ -512,7 +525,7 @@ public class RobotService {
         Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         String ftpsFilePath = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content");
         List<Map<String,Object>> infoList = tRobotInfoDao.selectTCfgUnionRule(edgeCode);
-        return CreateModeXMLUtil.createXmlFile(infoList, ftpsFilePath, stationCode, "linkage_model.xml", "Effect_Config");
+        return CreateModeXMLUtil.createXmlFile(infoList, ftpsFilePath, stationCode, "effect_model.xml", "Effect_Config");
     }
 
     /**
@@ -523,19 +536,21 @@ public class RobotService {
      * @return byte[]
      */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
-        long sendSessionId = Constant.AtomicSessionId.addAndGet(1);
+        return generateByteOrderAndSession(xmlString, robotCode).getValue();
+    }
+
+    public Pair<Long, byte[]> generateByteOrderAndSession(String xmlString, String robotCode) {
+        long sendSessionId = Constant.AtomicSessionId.incrementAndGet();
         ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
         log.info("context是<start>{}<end>", context);
         if (context != null) {
-            // 请求报文每次累加1
-//            sendSessionId = Constant.AtomicSessionId.addAndGet(1);
             Constant.sendSessionId = sendSessionId;
         } else {
             Constant.sendSessionId = 0L;
             Constant.AtomicSessionId.set(0);
         }
         log.info("-------------这是刚发命令的请求{}-------------", sendSessionId);
-        return PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);
+        return Pair.of(sendSessionId, PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString));
     }
 
     /**
@@ -647,7 +662,9 @@ public class RobotService {
                                 if (map.containsKey("operation_device_file_path")) {
                                     String operationFilePath = filePathPrefix + File.separator + map.get("operation_device_file_path");
                                     XMLBaseModel operationModel = getXmlMessage(operationFilePath);
-                                    mapList.addAll(operationModel.getItems());
+                                    List<Map<String,Object>> items = operationModel.getItems().stream().peek(m->m.put("inspection_type", "2")).collect(
+                                        Collectors.toList());
+                                    mapList.addAll(items);
                                 }
                                 // Device Point Info
                                 addDevicePoint(mapList, robotId);
@@ -688,7 +705,7 @@ public class RobotService {
                             dealMapFile(filePath, nodeCode);
                             break;
                         case "host_file_path":
-                            desc = "地图模型";
+                            desc = "下级系统模型";
                             dealHostFilePath(filePath, nodeCode);
                             break;
                         case "video_file_path":
@@ -714,6 +731,10 @@ public class RobotService {
                         case "source_file_path":
                             desc = "设备资源信息配置";
                             dealSourceFile(filePath, nodeCode);
+                            break;
+                        case "maintenance_file_path":
+                            desc = "维护记录文件信息";
+                            dealMaintenanceFile(filePath, nodeCode);
                             break;
                         default:
                             desc = k + " 该模型未定义";
@@ -908,16 +929,18 @@ public class RobotService {
                 tRobotInspection.setAreaId(String.valueOf(deviceMap.getOrDefault("area_id", "")));
                 tRobotInspection.setDeviceType(String.valueOf(deviceMap.getOrDefault("device_type", "")));
                 tRobotInspection.setRecognitionTypeList(String.valueOf(deviceMap.getOrDefault("recognition_type_list", "1")));
-                int inspectionType = 1;
-                if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
-                    inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
+
+                tRobotInspection.setInspectionType(MapUtils.getIntValue(deviceMap, "inspection_type", 1));
+                tRobotInspection.setPointType(StringUtils.defaultIfBlank(MapUtils.getString(deviceMap, "point_type"), "1"));
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "label_attri"))) {
+                    tRobotInspection.setLabelAttri(MapUtils.getString(deviceMap, "label_attri"));
                 }
-                tRobotInspection.setInspectionType(inspectionType);
-                if (!"".equals(deviceMap.get("meter_type").toString())) {
+
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "meter_type"))) {
                     Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
                     tRobotInspection.setMeterType(meterType);
                 }
-                if (!"".equals(deviceMap.get("appearance_type").toString())) {
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "appearance_type"))) {
                     Integer appearanceType =
                         selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
                     tRobotInspection.setAppearanceType(appearanceType);
@@ -931,7 +954,7 @@ public class RobotService {
                     Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
                     tRobotInspection.setOperationType(operationType);
                 }
-                if (!"".equals(deviceMap.get("phase").toString())) {
+                if (StringUtils.isNotEmpty(MapUtils.getString(deviceMap, "phase"))) {
                     tRobotInspection.setPhase(deviceMap.get("phase").toString());
                 }
                 if (!"".equals(deviceMap.get("device_info").toString())) {
@@ -1454,7 +1477,15 @@ public class RobotService {
                 .setItems((List<Map<String, Object>>) resMap.get("mapList"));
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的任务的xml是<start>{}<end>", xmlString);
-        int number = RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
+        Pair<Long, byte[]> pkg = generateByteOrderAndSession(xmlString, uniqueFlag);
+
+        if (LINKAGE_TASK.getType().equals(MapUtils.getString(resMap, "type"))) {
+            LINKAGE_TASK_CACHE.put(pkg.getKey(), taskId);
+            // 增加一个兼容处理，保留最后一个联动任务的ID，避免下级上报的 seeionId 不正确
+            LINKAGE_TASK_CACHE.put(0L, taskId);
+        }
+
+        int number = RobotServerHandler.send(pkg.getValue(), uniqueFlag);
         if (1 == number) {
             //通道为空 设置为离线
             this.updateRobotInfo(uniqueFlag, "离线");
@@ -1860,8 +1891,14 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-        //上级下发的 code 是robotNum
-        TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByRobotNum(xmlBaseModel.getCode(), "");
+        TRobotInfo tRobotInfo;
+        if ("20005".equals(xmlBaseModel.getType())){
+            //无人机机巢控制
+            tRobotInfo = tRobotInfoDao.selectRobotInfoByNetsCode(xmlBaseModel.getCode());
+        } else {
+            //上级下发的 code 是robotNum
+            tRobotInfo = tRobotInfoDao.selectRobotInfoByRobotNum(xmlBaseModel.getCode(), "");
+        }
         String receiveCode = tRobotInfo.getEdgeCode();
         //到边缘节点 receiveCode 为巡视设备的唯一标识
         if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel) || tRobotInfo.getOriginId() == null) {
@@ -2843,51 +2880,57 @@ public class RobotService {
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
             filePathMap.put("content", "C:\\robotData\\Model");
         }
+        String ftpsPath = filePathMap.get("content") + File.separator + filePath;
         switch (type) {
             case "1":
                 log.info("设备点位模型 {}", filePath);
-                dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
+                dealDevicePointModel(ftpsPath, filePathMap.get("content"),
                         mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode, edgeLevel);
                 break;
             case "2":
                 log.info("边缘节点模型 {}", filePath);
-                dealHostFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealHostFilePath(ftpsPath, edgeCode);
                 break;
             case "3":
                 log.info("机器人模型 {}", filePath);
-                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.ROBOT);
+                dealRobotFile(ftpsPath, edgeCode, Constant.ROBOT);
                 break;
             case "4":
                 log.info("摄像机模型 {}", filePath);
-                dealCameraFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                dealCameraFile(ftpsPath, edgeCode);
                 break;
             case "5":
                 log.info("无人机模型 {}", filePath);
-                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.DRONE);
+                dealRobotFile(ftpsPath, edgeCode, Constant.DRONE);
                 break;
             case "6":
                 log.info("声纹模型 {}", filePath);
-                dealVoiceFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                dealVoiceFile(ftpsPath, edgeCode);
                 break;
             case "8":
                 log.info("检修区域配置模型 {}", filePath);
-                dealMaintenanceFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealMaintenanceFilePath(ftpsPath, edgeCode);
                 break;
             case "9":
                 log.info("地图文件 {}", filePath);
-                dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealMapFile(ftpsPath, edgeCode);
                 break;
             case "10":
-                log.info("设备资源信息配置文件 {}", filePath);
-                dealSourceFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                if (EdgeEnum.UP_SYSTEM_NODE.getCode().equals(edgeLevel)) {
+                    log.info("设备维护记录 {}", filePath);
+                    dealMaintenanceFile(ftpsPath, edgeCode);
+                } else {
+                    log.info("设备资源信息配置文件 {}", filePath);
+                    dealSourceFile(ftpsPath, edgeCode);
+                }
                 break;
             case "1001":
                 log.info("区域文件模型 {}", filePath);
-                dealRegionFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealRegionFile(ftpsPath, edgeCode);
                 break;
             case "1002":
                 log.info("录像机文件模型 {}", filePath);
-                dealRecordFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                dealRecordFile(ftpsPath, edgeCode);
                 break;
             default:
                 break;
@@ -3074,7 +3117,43 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
-            List<CameraModel> cameraModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, CameraModel.class)).filter(c->StringUtils.equals(c.getType(), "10")).collect(Collectors.toList());
+            List<CameraModel> recordModelList = mapList.stream()
+                    .map(JSON::toJSONString)
+                    .map(jsonString -> JSON.parseObject(jsonString, CameraModel.class))
+                    .filter(t -> "11".equals(t.getType()))
+                    .collect(Collectors.toList());
+            List<TCameraRecorder> recorderList = new ArrayList<>();
+            recordModelList.forEach(cameraModel -> {
+                TCameraRecorder tCameraRecorder = new TCameraRecorder();
+                tCameraRecorder.setRecordId(cameraModel.getRecordId());
+                tCameraRecorder.setEdgeCode(cameraModel.getEdgeCode());
+                tCameraRecorder.setOriginId(cameraModel.getOriginId());
+                tCameraRecorder.setRecordName(cameraModel.getPatroldeviceName());
+                tCameraRecorder.setRecorderModel(cameraModel.getCameraModel());
+                tCameraRecorder.setRecorderType(String.valueOf(cameraModel.getCameraType()));
+                tCameraRecorder.setVendorId(Integer.valueOf(cameraModel.getVendorId()));
+                tCameraRecorder.setPmsId(cameraModel.getPmsId());
+                tCameraRecorder.setAliasName(cameraModel.getAliasName());
+                tCameraRecorder.setRecordIp(cameraModel.getCameraIp());
+                tCameraRecorder.setProtocol(String.valueOf(cameraModel.getProtocolType()));
+                tCameraRecorder.setHttpPort(cameraModel.getPort());
+                tCameraRecorder.setRtspPort(cameraModel.getChannelNum());
+                tCameraRecorder.setIdentityManager(cameraModel.getCameraManager());
+                tCameraRecorder.setIdentityCode(cameraModel.getCameraCode());
+                tCameraRecorder.setDeviceChannel(cameraModel.getCameraChannelId());
+                if (StringUtils.length(cameraModel.getPatroldeviceCode()) == 18) {
+                    tCameraRecorder.setBdeviceChannel(cameraModel.getPatroldeviceCode());
+                }
+                tCameraRecorder.setCommissionDate(cameraModel.getCommissionDate());
+                recorderList.add(tCameraRecorder);
+            });
+            tCameraRecorderService.saveReportData(recorderList,edgeCode);
+
+            List<CameraModel> cameraModelList = mapList.stream()
+                    .map(JSON::toJSONString)
+                    .map(jsonString -> JSON.parseObject(jsonString, CameraModel.class))
+                    .filter(t -> "10".equals(t.getType()))
+                    .collect(Collectors.toList());
             tCameraInfoService.saveReportData(cameraModelList,edgeCode);
             log.info("摄像机文件处理结束 edgeCode:{}", edgeCode);
         } catch (DocumentException e) {
@@ -3089,7 +3168,7 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
-            List<RobotModel> robotModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
+            List<RobotModel> robotModelList = mapList.stream().filter(map ->!(map.containsKey("type") && map.get("type").equals("15"))).map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
             tRobotInfoService.saveReportData(robotModelList,edgeCode,type);
             log.info("机器人文件处理结束 edgeCode:{} type:{}", edgeCode,type);
         } catch (Exception e) {
@@ -3102,15 +3181,15 @@ public class RobotService {
             log.info("file path is null");
             return;
         }
-        try {
-            XMLBaseModel model = getXmlMessage(filePath);
-            List<Map<String, Object>> mapList = model.getItems();
-            List<TCameraRecorder> tCameraRecorderList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TCameraRecorder.class)).collect(Collectors.toList());
-            tCameraRecorderService.saveReportData(tCameraRecorderList,edgeCode);
-            log.info("录像机文件处理结束 edgeCode:{}", edgeCode);
-        } catch (DocumentException e) {
-            log.error("录像机文件处理失败", e);
-        }
+//        try {
+//            XMLBaseModel model = getXmlMessage(filePath);
+//            List<Map<String, Object>> mapList = model.getItems();
+//            List<TCameraRecorder> tCameraRecorderList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TCameraRecorder.class)).collect(Collectors.toList());
+//            tCameraRecorderService.saveReportData(tCameraRecorderList,edgeCode);
+//            log.info("录像机文件处理结束 edgeCode:{}", edgeCode);
+//        } catch (DocumentException e) {
+//            log.error("录像机文件处理失败", e);
+//        }
     }
 
     public void dealRegionFile(String filePath, String edgeCode) {
@@ -3128,6 +3207,29 @@ public class RobotService {
             SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
         } catch (Exception e) {
             log.error("区域文件处理失败", e);
+        }
+    }
+
+    /**
+     * 设备维护记录同步
+     */
+    public void dealMaintenanceFile(String filePath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> mapList = model.getItems();
+            //只解析相机的  录像机的在录像机报文中解析
+            List<DeviceMaintenanceInfo> modelList = mapList.stream()
+                .map(JSON::toJSONString)
+                .map(jsonString -> JSON.parseObject(jsonString, DeviceMaintenanceInfo.class))
+                .collect(Collectors.toList());
+            deviceMaintenanceService.saveReportData(modelList, edgeCode);
+            log.info("设备维护记录处理结束 edgeCode:{}", edgeCode);
+        } catch (DocumentException e) {
+            log.error("设备维护记录处理失败", e);
         }
     }
 
@@ -3325,9 +3427,49 @@ public class RobotService {
             TRobotInfo robotInfo = ROBOT_INFO_CACHE.get(robotNum, () -> tRobotInfoDao.selectRobotInfoByRobotNum(robotNum, null));
             return Optional.ofNullable(robotInfo).map(TRobotInfo::getRobotName).orElse("");
         } catch (ExecutionException e) {
-            log.error(e.getMessage(), e);
+            log.error("获取对应巡视设备名称失败，使用下级上传值：{}", e.getMessage());
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取本级 taskPatrolledId
+     * @param taskPatrolledId taskPatrolledId
+     * @return taskPatrolledId
+     */
+    public String getRealTaskPatrolledId(String taskPatrolledId) {
+        try {
+            String[] taskPatrolledSplit = taskPatrolledId.split("_");
+            String taskCode = "", time = "";
+            if (taskPatrolledSplit.length == 2) {
+                taskCode = taskPatrolledSplit[0];
+                time = taskPatrolledSplit[1];
+            } else {
+                taskCode = taskPatrolledSplit[1];
+                time = taskPatrolledSplit[2];
+            }
+            Date robotTime = DateTimeUtil.parseFormat(time, DateTimeUtil.getDateTimePattern3());
+            //根据taskCode找到taskId
+            UPatrolTask task = this.selectTaskIdByTaskCode(taskCode, robotTime);
+            if (Objects.nonNull(task)) {
+                String taskStartTime = (String) redisTemplate.opsForHash().get("countForAbnormal:" + task.getTaskId(), "taskStart");
+                taskPatrolledId = Constant.stationCode() + "_" + task.getTaskId() + "_" + DateTimeUtil.format(DateTimeUtil.getDate(taskStartTime), DateTimeUtil.getDateTimePattern3());
+                log.info("本级上报的taskPatrolledId：{}", taskPatrolledId);
+                return taskPatrolledId;
+            }
+        } catch (Exception e) {
+            log.info("构造本级taskPatrolledId出错：", e);
+        }
+        return taskPatrolledId;
+    }
+
+    /**
+     * 更新联动任务的状态
+     * @param taskId 联动任务的taskId
+     * @param isFinish 状态
+     */
+    public void updateUnionTask(String taskId,Integer isFinish){
+        tRobotInfoDao.updateUnionTask(isFinish,taskId);
     }
 }
 

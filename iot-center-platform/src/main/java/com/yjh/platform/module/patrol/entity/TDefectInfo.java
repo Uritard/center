@@ -8,9 +8,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author czh
@@ -46,6 +48,9 @@ public class TDefectInfo implements Serializable {
 
     @ApiModelProperty(value = "设备Id")
     private Long deviceId;
+
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
 
     @ApiModelProperty(value = "部位ID")
     private String cunstomId;
@@ -110,5 +115,9 @@ public class TDefectInfo implements Serializable {
 
     private String edgeCode;
 
+    private String labelAttri;
+    private List<KeyValue<String, String>> labelAttriName;
 
+
+    private String devicePointId;
 }

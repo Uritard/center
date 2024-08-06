@@ -29,6 +29,13 @@ public class UpdateRequest {
     private String requestId;
 
     /**
+     * 算法类型
+     * <1>:=识别类型
+     * <2>:=缺陷类型
+     */
+    private String type;
+
+    /**
      * 待获取更新算法路径(待获取更新算法路径)
      */
     private String algorithmPath;

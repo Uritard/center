@@ -46,6 +46,7 @@
             <result property="modulus" column="modulus" jdbcType="INTEGER"/>
             <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="redundantType" column="redundant_type" jdbcType="VARCHAR"/>
+            <result property="labelAttri" column="label_attri" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
     </resultMap>
@@ -64,7 +65,7 @@
         low_limit3,high_limit4,low_limit4,
         alarm_delay,alarm_cnt,threshold_abs,
         threshold_per,modulus,remark,
-        redundant_type,origin_id,edge_code
+        redundant_type,label_attri,origin_id,edge_code
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -234,7 +235,7 @@
         ,low_limit3,high_limit4,low_limit4
         ,alarm_delay,alarm_cnt,threshold_abs
         ,threshold_per,modulus,remark,is_temdif
-        ,redundant_type,origin_id,edge_code
+        ,redundant_type,label_attri,origin_id,edge_code
         )
         values
         <foreach collection="list"  item="tStdDeviceMete" separator=",">
@@ -251,7 +252,8 @@
             ,#{tStdDeviceMete.lowLimit3,jdbcType=FLOAT},#{tStdDeviceMete.highLimit4,jdbcType=FLOAT},#{tStdDeviceMete.lowLimit4,jdbcType=FLOAT}
             ,#{tStdDeviceMete.alarmDelay,jdbcType=INTEGER},#{tStdDeviceMete.alarmCnt,jdbcType=INTEGER},#{tStdDeviceMete.thresholdAbs,jdbcType=DECIMAL}
             ,#{tStdDeviceMete.thresholdPer,jdbcType=DECIMAL},#{tStdDeviceMete.modulus,jdbcType=INTEGER},#{tStdDeviceMete.remark,jdbcType=VARCHAR}
-            ,#{tStdDeviceMete.isTemdif,jdbcType=INTEGER},#{tStdDeviceMete.redundantType,jdbcType=VARCHAR},#{tStdDeviceMete.originId,jdbcType=VARCHAR},#{tStdDeviceMete.edgeCode,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.isTemdif,jdbcType=INTEGER},#{tStdDeviceMete.redundantType,jdbcType=VARCHAR},#{tStdDeviceMete.labelAttri,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.originId,jdbcType=VARCHAR},#{tStdDeviceMete.edgeCode,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -432,6 +434,7 @@
             redundant_type =  #{redundantType,jdbcType=VARCHAR},
             origin_id =  #{originId,jdbcType=VARCHAR},
             is_temdif =  #{isTemdif,jdbcType=INTEGER},
+            label_attri =  #{labelAttri,jdbcType=VARCHAR},
             edge_code =  #{edgeCode,jdbcType=VARCHAR}
         where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </update>

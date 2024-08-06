@@ -5,20 +5,21 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
+import com.yjh.platform.module.patrol.entity.LabelInfo;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.ExportedStatisticsTableVo;
 import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,17 +43,19 @@ public class StatisticsService {
     private final UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CameraConService cameraConService;
+    private final TAlgorithmInfoService algorithmInfo;
 
     public static final String ROBOT = "robot";
     public static final String DRONE = "drone";
     public static final String CAMERA = "CAMERA";
 
     public StatisticsService(StatisticsDao statisticsDao, UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao,
-        RedisTemplate<String, Object> redisTemplate, CameraConService cameraConService) {
+        RedisTemplate<String, Object> redisTemplate, CameraConService cameraConService, TAlgorithmInfoService algorithmInfo) {
         this.statisticsDao = statisticsDao;
         this.uPatrolDeviceStaticsDao = uPatrolDeviceStaticsDao;
         this.redisTemplate = redisTemplate;
         this.cameraConService = cameraConService;
+        this.algorithmInfo = algorithmInfo;
     }
 
     private Result getNVRInfo(Object recordId) {
@@ -609,8 +612,8 @@ public class StatisticsService {
             if (mapData.get("channel") != null) {
                 List<Map<String, Object>> chanInfo = (List<Map<String, Object>>) mapData.get("channel");
                 for (Map<String, Object> mapChannel : chanInfo) {
-                    int intactTime = mapChannel.containsKey("intactTime") ? (int) mapChannel.get("intactTime") : 0;
-                    int ipChanNum = mapChannel.containsKey("ipChanNum") ? (int) mapChannel.get("ipChanNum") : 0;
+                    int intactTime = MapUtils.getIntValue(mapChannel, "intactTime");
+                    int ipChanNum = MapUtils.getIntValue(mapChannel, "ipChanNum");
                     if (intactTime != 0) {
                         String intactPercent = String.format("%.3f", intactTime / 100d);
                         percentMap.put(ipChanNum, intactPercent + "%");
@@ -913,5 +916,52 @@ public class StatisticsService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * @param type      类型 1巡视告警准确率 2 算法标签对应准确率
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @return 统计结果
+     */
+    public List<Map<String, Object>> algorithmStatics(String type, String beginTime, String endTime) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        switch (type) {
+            case "1":
+                result.add(dealCount(statisticsDao.countWarnAccuracy(beginTime, endTime)));
+                break;
+            case "2":
+
+                List<LabelInfo> labelInfoList = statisticsDao.countLabelAccuracy(beginTime, endTime);
+                Map<String, List<LabelInfo>> groupMap = labelInfoList.stream().collect(Collectors.groupingBy(LabelInfo::getDefectContent));
+                groupMap.forEach((k, v) -> {
+                    String label = algorithmInfo.getAlgorithmName(k);
+                    if (StringUtils.isNotBlank(label)) {
+                        Map<String, Object> labelMap = new HashMap<>(2);
+                        labelMap.put("totalNum", v.size());
+                        labelMap.put("validNum", (int) v.stream().filter(t -> t.getDealType() == 286).count());
+                        Map<String, Object> res = dealCount(labelMap);
+                        res.put("tag_type", label);
+                        result.add(res);
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    private Map<String, Object> dealCount(Map<String, Object> countMap) {
+        String totalNumStr = MapUtils.getString(countMap, "totalNum", "0");
+        String validNumStr = MapUtils.getString(countMap, "validNum", "0");
+        double totalNum = NumberUtils.toDouble(totalNumStr);
+        double validNum = NumberUtils.toDouble(validNumStr);
+        String percent = totalNum > 0 ? String.format("%.3f", validNum * 100 / totalNum) : "0.000";
+        Map<String, Object> reMap = new HashMap<>();
+        reMap.put("total_num", totalNumStr);
+        reMap.put("valid_num", validNumStr);
+        reMap.put("percent", percent + "%");
+        return reMap;
     }
 }

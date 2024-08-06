@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,6 +44,8 @@ public class UPatrolTask implements Serializable {
     @ApiModelProperty(value = "任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义")
     private Integer taskType;
 
+    private String taskTypeName;
+
     @ApiModelProperty(value = "执行类型（172.周期，173.立即，174.定期）")
     private Integer executeType;
 
@@ -59,16 +62,27 @@ public class UPatrolTask implements Serializable {
     private Integer taskLevel;
 
     @ApiModelProperty(value = "巡视时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     @ApiModelProperty(value = "创建用户id")
     private Long createUserId;
 
+    // 任务状态
+    private Integer taskState;
+
+    // 测点总数
+    private Integer total;
+
+    @ApiModelProperty(value = "执行类型（172.周期，173.立即，174.定期）")
+    private String executeTypeName;
 
 }

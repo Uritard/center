@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>11</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-27 21:27:01</Time>
+    <Items>
+        <Item file_path="1/Model/device_model.xml" time="2024-03-27 21:27:00" type="1"/>
+    </Items>
+</PatrolHost>

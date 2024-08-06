@@ -2,11 +2,13 @@ package com.yjh.accessrobot.module.command.dao;
 
 
 import com.yjh.accessrobot.module.command.entity.TDeviceMaintenance;
+import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author YIJIAHE
@@ -36,11 +38,19 @@ public interface TDeviceMaintenanceMapper {
 
     int batchInsert(List<TDeviceMaintenance> list);
 
-    List<String> selectDeviceIdsList(@Param(value = "originIds") String originIds);
-
-    List<String> selectInstanceIdsList(@Param(value = "originIds") String originIds);
+    /**
+     * @param type 1: 测点  2: 标准点位  3: 中台部件
+     */
+    List<String> selectInstanceIdsList(@Param(value = "edgeCode") String edgeCode, @Param(value = "type") int type,
+        @Param(value = "originIds") String originIds);
 
     List<String> selectDeviceIdsByInstanceList(List<String> list);
 
     List<String> selectInstanceIdsByDeviceIdList(List<String> list);
+
+    List<String> selectInstanceIdsByRegionOrDevice(@Param(value = "edgeCode") String edgeCode,
+        @Param(value = "middlegroundIds") boolean middlegroundIds, @Param(value = "upRegionIds") String upRegionIds,
+        @Param(value = "deviceIds") String deviceIds);
+
+    List<String> selectInstanceIdsByComponent(@Param(value = "edgeCode") String edgeCode, @Param(value = "list") List<TStdDeviceMete> deviceModels);
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Region01</SendCode>
+    <ReceiveCode>Up01</ReceiveCode>
+    <Type>10004</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-06 11:14:42</Time>
+    <Items>
+        <Item nest_code="q100-01" unit="%" nest_name="q100" module_no="1" value_unit="10%" type="1" value="10"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" module_no="2" value_unit="1" type="2" value="1"/>
+        <Item nest_code="q100-01" unit="" nest_name="q100" module_no="3" value_unit="1" type="3" value="1"/>
+        <Item nest_code="q100-01" unit="V" nest_name="q100" module_no="4" value_unit="2V" type="4" value="2"/>
+        <Item nest_code="q100-01" unit="℃" nest_name="q100" module_no="5" value_unit="26℃" type="5" value="26"/>
+        <Item nest_code="q100-01" unit="℃" nest_name="q100" module_no="6" value_unit="26℃" type="6" value="26"/>
+    </Items>
+</PatrolHost>

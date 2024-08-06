@@ -54,5 +54,6 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private Integer isRedundant;//是否冗余配置
     private String rules;//告警规则
 
+    private String[] labelAttris;
 }
 

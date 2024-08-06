@@ -45,5 +45,8 @@ public class TaskSimpleInfo implements Serializable {
     @ApiModelProperty(value = "声纹设备点位")
     private Long voicePointsCount = 0L;
 
+    @ApiModelProperty(value = "声纹设备点位")
+    private Long linkagePointsCount = 0L;
+
 
 }

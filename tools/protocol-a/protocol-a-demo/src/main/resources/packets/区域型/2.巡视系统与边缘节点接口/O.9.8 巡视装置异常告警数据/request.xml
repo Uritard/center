@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PatrolHost>
+    <SendCode>Edge01</SendCode>
+    <ReceiveCode>Region01</ReceiveCode>
+    <Type>5</Type>
+    <Code>1</Code>
+    <Command/>
+    <Time>2024-03-26 01:38:12</Time>
+    <Items>
+         <Item patroldevice_code="{{robotCode}}" patroldevice_name="E100机器人" time="{{now}}" content="接口测试机器人告警数据"/>
+    </Items>
+</PatrolHost>

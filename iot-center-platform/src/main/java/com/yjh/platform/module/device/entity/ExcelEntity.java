@@ -87,6 +87,8 @@ public class ExcelEntity implements Serializable {
     private String customId;
     private Integer meterTypeId;
     private Integer analyseTypeId;
+    @ExcelProperty(value = "测点标签")
+    private String labelAttris;
 
     private Long deviceId;
 

@@ -31,7 +31,7 @@ public class RobotOperationStepsHandler implements MessageHandlerStrategy, Initi
         String robotCode = xmlBaseModel.getSendCode();
         robotService.updateOperationStepsForRedis(xmlBaseModel);
         String roadXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
+        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, roadXmlString);
         RobotServerHandler.send( roadProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
     }

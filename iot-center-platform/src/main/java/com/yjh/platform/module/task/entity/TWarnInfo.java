@@ -10,11 +10,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.KeyValue;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -61,6 +63,8 @@ public class TWarnInfo implements Serializable {
     private Long deviceId;
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
+    @ApiModelProperty(value = "设备类型")
+    private String deviceType;
 
     @Length(max = 32,message = "cunstomId长度必须小于等于32")
     @ApiModelProperty(value = "部位ID")
@@ -158,4 +162,13 @@ public class TWarnInfo implements Serializable {
     private String originId;
 
     private String edgeCode;
+
+    private String labelAttri;
+    private List<KeyValue<String, String>> labelAttriName;
+    /**
+     * 巡检点ID集合
+     */
+    private String instanceIds;
+
+    private String devicePointId;
 }

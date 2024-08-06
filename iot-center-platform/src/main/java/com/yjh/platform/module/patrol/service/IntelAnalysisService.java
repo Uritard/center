@@ -3,10 +3,12 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Maps;
 import com.yjh.commons.ValueUtil;
+import com.yjh.platform.algorithm.AlgorithmService;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.algorithm.FtpsService;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -26,13 +28,14 @@ import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Point;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
-import com.yjh.platform.module.patrol.event.TaskEndEvent;
 import com.yjh.platform.module.patrol.service.impl.HttpAnalyticsServiceImpl;
 import com.yjh.platform.module.patrol.thread.AlgorithmAnalyseThread;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import com.yjh.platform.module.user.service.TSequentialConfService;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +44,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -51,14 +55,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -97,7 +100,7 @@ public class IntelAnalysisService {
     @Autowired
     private FtpsService ftpsService;
     @Autowired
-    private AlarmService alarmService;
+    private AlgorithmService algorithmService;
     @Lazy
     @Autowired
     private TSequentialConfService tSequentialConfService;
@@ -112,9 +115,13 @@ public class IntelAnalysisService {
     private HttpAnalyticsServiceImpl analyticsService;
     @Autowired
     private AlarmShieldService alarmShieldService;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private List<String> TASK_RESULT = new ArrayList<>();
     private final String TASK_INTEL_ANALYSIS_RESULT="TASK_INTEL_ANALYSIS_RESULT:";
+
+    private final String ALGORITHM_PARAMS = "ALGORITHM_PARAMS:";
 
     /**
      * 巡视主机请求图像分析--功能
@@ -186,7 +193,7 @@ public class IntelAnalysisService {
         PicAnalyseResponse response = new PicAnalyseResponse();
         response.setRequestId(request.getRequestId());
         AnalyseResult analyseResult = getAnalyseResp(request.getObjectList().get(0));
-        response.setResultsList(Arrays.asList(analyseResult));
+        response.setResultList(Arrays.asList(analyseResult));
 
         return response;
     }
@@ -196,13 +203,13 @@ public class IntelAnalysisService {
         AnalyseResultItem item = getAnalyseResult(analyseObject);
         analyseResult.setResults(Arrays.asList(item));
         analyseResult.setObjectId(analyseObject.getObjectId());
-        redisTemplate.opsForHash().put("silentMonitorImageUrl", analyseResult.getObjectId(), analyseObject.getImageUrlList().get(0));
+        redisTemplate.opsForHash().put("silentMonitorImageUrl", analyseResult.getObjectId(), analyseObject.getImagePathList().get(0));
         return analyseResult;
     }
 
     private AnalyseResultItem getAnalyseResult(AnalyseObject analyseObject) {
         AnalyseResultItem item = new AnalyseResultItem();
-        item.setResImageUrl(analyseObject.getImageUrlList().get(0));
+        item.setResImagePath(analyseObject.getImagePathList().get(0));
         item.setCode("2000");
         item.setConf(0.0f);
         item.setDesc("发现异常");
@@ -244,8 +251,8 @@ public class IntelAnalysisService {
     private void presetCheckHandle(PicAnalyseResponse response, String flagId) {
         try {
             // 只有识别结果明确为偏移时才去修改redis
-            if ("2000".equals(response.getResultsList().get(0).getResults().get(0).getCode())
-                && "1".equals(response.getResultsList().get(0).getResults().get(0).getValue())) {
+            if ("2000".equals(response.getResultList().get(0).getResults().get(0).getCode())
+                && "1".equals(response.getResultList().get(0).getResults().get(0).getValue())) {
                 log.info("算法识别预置位偏移, flagId: {}", flagId);
                 String[] arr = flagId.split("_");
                 Long cameraId = Long.parseLong(arr[0]);
@@ -271,6 +278,7 @@ public class IntelAnalysisService {
         param.put("requestHostIp", applicationProperties.getIntelAlgorithmConfig().getResultIp());
         param.put("requestHostPort", applicationProperties.getIntelAlgorithmConfig().getResultPort());
         param.put("requestId", request.getRequestId());
+        param.put("type", request.getType());
 
         String[] split = request.getAlgorithmPath().split("/");
         String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
@@ -298,6 +306,119 @@ public class IntelAnalysisService {
         return new Response(code);
     }
 
+    /**
+     * 请求算法资源信息接口
+     *
+     * @return 算法资源信息
+     */
+    public JSONObject algorithmResource() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            String url = applicationProperties.getIntelAlgorithmConfig().getAlgorithmResourceUrl();
+            String result = HttpClientUtils.getInstance().getUrl(url, null);
+//            log.info("result==={}", result);
+            if (StringUtils.isNotBlank(result)) {
+                jsonObject = JSONObject.parseObject(result);
+                if ("200".equals(jsonObject.getObject("code", String.class))) {
+                    jsonObject.remove("code");
+                    jsonObject.put("network_rtt_avg", SystemInfoUtil.getNetDelay(url) + "ms");
+                    List<Map<String, String>> versionInfo = new ArrayList<>();
+                    String version1 = String.valueOf(redisTemplate.opsForHash().entries(ALGORITHM_PARAMS + "1").get("version"));
+                    if (StringUtils.isNotBlank(version1)) {
+                        Map<String, String> versionMap = new HashMap<>(2);
+                        versionMap.put("type", "1");
+                        versionMap.put("version", version1);
+                        versionInfo.add(versionMap);
+                    }
+                    String version2 = String.valueOf(redisTemplate.opsForHash().entries(ALGORITHM_PARAMS + "2").get("version"));
+                    if (StringUtils.isNotBlank(version2)) {
+                        Map<String, String> versionMap = new HashMap<>(2);
+                        versionMap.put("type", "2");
+                        versionMap.put("version", version2);
+                        versionInfo.add(versionMap);
+                    }
+                    jsonObject.put("version_info", versionInfo);
+                    jsonObject.put("province_name", applicationProperties.getManagerAlgorithmConfig().getProvinceName());
+                    jsonObject.put("city_name", applicationProperties.getManagerAlgorithmConfig().getCityName());
+                    jsonObject.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+                    jsonObject.put("section_name", applicationProperties.getManagerAlgorithmConfig().getSectionName());
+                    jsonObject.put("volt_level", applicationProperties.getManagerAlgorithmConfig().getVoltLevel());
+                    jsonObject.put("station_name", applicationProperties.getManagerAlgorithmConfig().getStationName());
+                    jsonObject.put("service_port", applicationProperties.getManagerAlgorithmConfig().isEnable() ? "1" : "0");
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return jsonObject;
+    }
+
+    /**
+     * 请求系统自检信息
+     *
+     * @return 自检信息
+     */
+    public Map<String, Object> systemCheck(HttpServletRequest request, Long userId) {
+        Map<String, Object> res = Maps.newHashMap();
+        String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
+        try {
+            String url = applicationProperties.getIntelAlgorithmConfig().getSystemCheckUrl();
+            String result = HttpClientUtils.getInstance().getUrl(url, null);
+            if (StringUtils.isNotBlank(result)) {
+                JSONObject json = JSONObject.parseObject(result);
+                if (200 == Integer.parseInt(String.valueOf(json.get("code")))) {
+                    JSONObject data = (JSONObject) json.get("data");
+                    if (data.containsKey("cpu")) {
+                        Map<String, Object> cpuMap = new HashMap<>(2);
+                        cpuMap.put("rate", data.get("cpu"));
+                        int cpuUse = Integer.parseInt(String.valueOf(data.get("cpu")));
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:cpuFreeMin");
+                        double cpuFreeMin = Double.parseDouble(redisMap.get("content"));
+                        if ((100 - cpuUse) < cpuFreeMin) {
+                            logsRecord.LoginLogsSend(request, "5", "cpu最小空闲报警", "分析主机cpu最小空闲报警", userName, String.valueOf(userId), 1);
+                            cpuMap.put("code", "01");
+                        } else {
+                            cpuMap.put("code", "02");
+                        }
+                        res.put("cpu", cpuMap);
+                    }
+                    if (data.containsKey("memory")) {
+                        Map<String, Object> memoryMap = (Map<String, Object>) data.get("memory");
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
+                        double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
+                        int memoryUse = Integer.parseInt(String.valueOf(memoryMap.get("rate")));
+                        if (100 - memoryUse < memoryFreeMin) {
+                            logsRecord.LoginLogsSend(request, "5", "内存最小空闲报警", "分析主机内存最小空闲报警", userName, String.valueOf(userId), 1);
+                            memoryMap.put("code", "01");
+                        } else {
+                            memoryMap.put("code", "02");
+                        }
+                        res.put("memory", memoryMap);
+                    }
+                    if (data.containsKey("disk")) {
+                        Map<String, Object> diskMap = (Map<String, Object>) data.get("disk");
+                        Map<String, String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
+                        double memoryFreeMin = Double.parseDouble(redisMap.get("content"));
+                        int diskUse = Integer.parseInt(String.valueOf(diskMap.get("rate")));
+                        if (100 - diskUse < memoryFreeMin) {
+                            logsRecord.LoginLogsSend(request, "5", "磁盘最小空闲报警", "分析主机磁盘最小空闲报警", userName, String.valueOf(userId), 1);
+                            diskMap.put("code", "01");
+                        } else {
+                            diskMap.put("code", "02");
+                        }
+                        res.put("disk", diskMap);
+                    }
+                    res.put("gpu", data.get("gpu"));
+                    res.put("gpu_memory", data.get("gpu_memory"));
+                }
+            }
+        } catch (Exception e) {
+            res.put("status", "离线");
+            log.error("分析主机离线，无法通信", e);
+        }
+        return res;
+    }
+
     public void picAnalyseRetNotify(PicAnalyseResponse response){
         log.info("巡视主机收到分析结果开始解析: {}", JSONUtil.toJSONString(response));
         response = checkIsIn(response);
@@ -321,7 +442,7 @@ public class IntelAnalysisService {
         Boolean isIn = redisTemplate.boundSetOps(key).isMember(response.getRequestId());
         if (isIn){
             //这个条结果算法已经返回过结果
-            List<AnalyseResult> analyseResults = response.getResultsList();
+            List<AnalyseResult> analyseResults = response.getResultList();
             //找到返回结果中出现非2000的结果说明本次返回的结果是不可用的
             boolean isOkResult = true;
             for (AnalyseResult analyseResult: analyseResults){
@@ -384,7 +505,7 @@ public class IntelAnalysisService {
         List<AnalysePatrolTaskResult> resultList = new ArrayList<>();
         List<String> falseDataCruiseList = new ArrayList<>();
         try {
-            for (AnalyseResult analyseResult : response.getResultsList()) {
+            for (AnalyseResult analyseResult : response.getResultList()) {
 
                 String instanceId = analyseResult.getObjectId();
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
@@ -532,7 +653,7 @@ public class IntelAnalysisService {
         String value) {
         String targetPath = null;
         try {
-            String resImageUrl = result.getResImageUrl();
+            String resImageUrl = result.getResImagePath();
             if (StringUtils.isNotEmpty(resImageUrl)) {
                 resImageUrl = resImageUrl.startsWith("/") ? resImageUrl.substring(1) : resImageUrl;
             }
@@ -560,7 +681,7 @@ public class IntelAnalysisService {
         String value, String desc) {
         String targetPath = null;
         try {
-            String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+            String resImageUrl = result.getResImagePath().startsWith("/") ? result.getResImagePath().substring(1) : result.getResImagePath();
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
 
             if (StringUtils.isNotEmpty(resImageUrl)) {
@@ -610,7 +731,7 @@ public class IntelAnalysisService {
 
     private void algorithmTestHandle(PicAnalyseResponse response) {
         //判断是缺陷还是判别
-        List<AnalyseResult> resultsList = response.getResultsList();
+        List<AnalyseResult> resultsList = response.getResultList();
 
         String yearMonth = new SimpleDateFormat("yyyyMM").format(new Date());
         String nowTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -653,7 +774,7 @@ public class IntelAnalysisService {
                         log.info("图像没有差异：{}", item);
                         break;
                     }
-                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImagePath());
                     log.info("resImageUrl:{}", resImageUrl);
 
                     resImageUrl = resImageUrl.replace("//", "/");
@@ -662,13 +783,13 @@ public class IntelAnalysisService {
                     String imgF = imageBaseName + "判别告警.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remotefilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + imgF;
 
                     String imgBase = imageBaseName + "判别基准.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remoteBaseFilePath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + imgBase;
 
                     //基准图
@@ -678,7 +799,7 @@ public class IntelAnalysisService {
                     log.info("判别基准：{}", basePath);
 
                     String remoteorigfilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/"
                             + origpcimagename;
 
                     try {
@@ -715,14 +836,14 @@ public class IntelAnalysisService {
                         break;
                     }
                     String remoteorigfilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
                             + origpcimagename;
 
-                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImageUrl());
+                    String resImageUrl = copyFileFromFtps(item.getType(), item.getResImagePath());
                     String imgF = imageBaseName + "缺陷告警.jpg";
                     //拼接算法管理平台分析告警结果图片地址
                     String remotefilepath =
-                        applicationProperties.getManagerMqttConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
+                        applicationProperties.getManagerAlgorithmConfig().getManagerServerFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/"
                             + imgF;
 
                     try {
@@ -787,7 +908,7 @@ public class IntelAnalysisService {
         }
 
         if (!alarms.isEmpty()) {
-            alarmService.PushMsg(alarms);
+            algorithmService.pushAlarmMsg(alarms);
         }
     }
 
@@ -799,12 +920,12 @@ public class IntelAnalysisService {
         Map<String,String> recBack = new HashMap<>(9);
         try{
             recBack.put("meteId",StringUtils.substringAfter(response.getRequestId(),"="));
-            recBack.put("code",response.getResultsList().get(0).getResults().get(0).getCode());
-            recBack.put("conf",String.valueOf(response.getResultsList().get(0).getResults().get(0).getConf()));
-            recBack.put("desc",response.getResultsList().get(0).getResults().get(0).getDesc());
-            recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
-            recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
-            recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
+            recBack.put("code",response.getResultList().get(0).getResults().get(0).getCode());
+            recBack.put("conf",String.valueOf(response.getResultList().get(0).getResults().get(0).getConf()));
+            recBack.put("desc",response.getResultList().get(0).getResults().get(0).getDesc());
+            recBack.put("resImageUrl",response.getResultList().get(0).getResults().get(0).getResImagePath());
+            recBack.put("type",response.getResultList().get(0).getResults().get(0).getType());
+            recBack.put("value",response.getResultList().get(0).getResults().get(0).getValue());
             log.info("一键顺控recBack:{}", JSONUtil.toJSONString(recBack));
             String services = tSequentialConfService.sequentialRecBack(recBack);
             log.info("一键顺控services：{}" , services);
@@ -820,7 +941,7 @@ public class IntelAnalysisService {
      */
     private void silentMonitorHandle(PicAnalyseResponse response) {
         // 遍历多个点的分析结果
-        for (AnalyseResult  analyseResult : response.getResultsList()){
+        for (AnalyseResult  analyseResult : response.getResultList()){
             log.info("遍历当前analyseResult：", JSONUtil.toJSONString(analyseResult));
             List<String> content = new ArrayList<>();
             List<String> resultImg = new ArrayList<>();
@@ -856,7 +977,7 @@ public class IntelAnalysisService {
                 content.add(type);
 
                 // 因为算法端乱改乱改 所以就在这里截取了 不想改动后面的逻辑(拼接路径)
-                String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+                String resImageUrl = result.getResImagePath().startsWith("/") ? result.getResImagePath().substring(1) : result.getResImagePath();
 
                 String targetPath = copyFileFromFtps(type, resImageUrl);
                 String defectResultRealImg = targetPath.replaceAll(SysParamConfig.getSysContent("defectResultImg"),
@@ -866,7 +987,7 @@ public class IntelAnalysisService {
 
             List<String> resultImgList = resultImg.stream().distinct().collect(Collectors.toList());
 
-            if (StringUtils.isNotBlank(resultImgList.get(0))){
+            if (CollectionUtils.isNotEmpty(resultImgList)){
                 String[] resultArr = content.toArray(new String[0]);
 
                 List<TWarnInfo> list = silentAlarmStore(resultArr, map, resultImgList);
@@ -912,7 +1033,7 @@ public class IntelAnalysisService {
                 result.setCode("2000");
                 result.setValue("1");
                 result.setType(type);
-                result.setResImageUrl(analyseImageUrl);
+                result.setResImagePath(analyseImageUrl);
                 setAnalyseArea(result);
             }
 
@@ -1114,6 +1235,7 @@ public class IntelAnalysisService {
                     TStdDeviceMete tStdDevicemete = tStdDevicemeteService.selectByPrimaryId(tWarnInfo.getStdMeteId());
                     if (Objects.nonNull(tStdDevicemete)) {
                         tWarnInfo.setDeviceMeteName(tStdDevicemete.getMeteName());
+                        tWarnInfo.setLabelAttri(tStdDevicemete.getLabelAttri());
                     }
                 }
                 analyseDataOperateDao.insertWarnInfo(tWarnInfo);
@@ -1194,20 +1316,22 @@ public class IntelAnalysisService {
             Map<String, Object> xmlItem = new HashMap<>(16);
 
             xmlBaseModel.setType("63");
-            xmlItem.put("patroldevice_code", map.get("preset_id"));
-            xmlItem.put("patroldevice_name", map.get("device_name"));
+            String patroldeviceCode = MapUtils.getString(map, "b_camera_channel_id");
+            if (StringUtils.isEmpty(patroldeviceCode)) {
+                patroldeviceCode = StringUtils.isEmpty(MapUtils.getString(map, "camera_channel_id")) ? MapUtils.getString(map, "camera_id") : MapUtils.getString(map, "camera_channel_id");
+            }
+            xmlItem.put("patroldevice_code", patroldeviceCode);
+            xmlItem.put("patroldevice_name", map.get("camera_name"));
             switch (tWarnInfo.getWarnLevel()){
                 case 130:
+                case 131:
                     xmlItem.put("alarm_level", "1");
                     break;
-                case 131:
+                case 132:
                     xmlItem.put("alarm_level", "2");
                     break;
-                case 132:
-                    xmlItem.put("alarm_level", "3");
-                    break;
                 case 133:
-                    xmlItem.put("alarm_level", "4");
+                    xmlItem.put("alarm_level", "3");
                     break;
                 default:
                     break;
@@ -1311,9 +1435,10 @@ public class IntelAnalysisService {
                     targetPath = SysParamConfig.getSysContent("defectResultImg") + "/" +sourcePath;
                 }
             }
-            // 图片在ftps上的全路径
-            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
-            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
+            downloadFile(sourcePath, targetPath);
+//            // 图片在ftps上的全路径
+//            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
+//            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
             return targetPath;
         }catch (Exception e){
             log.error("将ftps的文件复制到指定目录异常：", e);
@@ -1340,6 +1465,25 @@ public class IntelAnalysisService {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * 请求其他服务
+     * @param url
+     * @return String
+     */
+    private String getUtl(String url) {
+        HttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet();
+        httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+        httpGet.setHeader("Accept", "application/json");
+        try {
+            HttpResponse response = client.execute(httpGet);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            log.error("get请求失败", e);
+        }
+        return "";
     }
 
     /**
@@ -1417,4 +1561,92 @@ public class IntelAnalysisService {
         postUrl(Constant.WEBSOCKET_URL, json);
     }
 
+    /**
+     * 算法参数获取
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @return 算法参数
+     */
+    public Map<String, String> getAlgorithmParams(String type) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(3);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("314").setItems(items);
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        Map<String, String> prams = new HashMap<>();
+        if (Objects.nonNull(re)) {
+            List<Map<String, String>> res = Object2List.castListMap(re.getData(), String.class, String.class);
+            if (CollectionUtils.isNotEmpty(res)) {
+                prams = res.get(0);
+                redisTemplate.opsForHash().putAll(ALGORITHM_PARAMS + type, prams);
+            }
+        }
+        return prams;
+    }
+
+    /**
+     * 算法版本获取接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param algorithmManufacturer 算法厂商 当值为空时， 代表获取所有厂商的算法历史版本
+     * @return 算法版本信息
+     */
+    public List<Map<String, String>> getAlgorithmVersion(String type, String algorithmManufacturer) {
+        List<Map<String,Object>> items = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>(4);
+        map.put("algorithm_manufacturer", algorithmManufacturer);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("315").setItems(items);
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        List<Map<String, String>> res = new ArrayList<>();
+        if (Objects.nonNull(re.getData())) {
+            res = Object2List.castListMap(re.getData(), String.class, String.class);
+            res.forEach(m -> m.put("type", type));
+        }
+        return res;
+    }
+
+    /**
+     * 算法版本切换接口
+     * @param type <1>:=状态类型 <2>:=缺陷类型
+     * @param version 算法版本号
+     */
+    public void algorithmVersionChange(String type, String version) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(4);
+        map.put("section_id", applicationProperties.getManagerAlgorithmConfig().getSectionId());
+        map.put("station_id", SysParamConfig.getSysContent("edgeId"));
+        map.put("version", version);
+        map.put("type", type);
+        items.add(map);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel().setType("316").setItems(items);
+        Result re = Constant.otherObjServer(xmlBaseModel, Constant.TCP_SYNC_CLOUD_URL);
+        if (Objects.nonNull(re.getData())) {
+            List<Map<String, Object>> list = Object2List.castListMap(re.getData(), String.class, Object.class);
+            if (CollectionUtils.isNotEmpty(list)) {
+                Map<String, Object> res = list.get(0);
+                ThreadPoolUtil.PATROL_POOL.addThread(()->{
+                    String algorithmManufacturer = String.valueOf(res.get("algorithm_manufacturer"));
+                    String recordTime = String.valueOf(res.get("record_time"));
+                    String algorithmPath = String.valueOf(res.get("algorithm_path"));
+                    log.info("算法切换请求完成, 算法厂商：{}, 算法版本ID：{}, 算法版本记录时间：{}, 算法FTPS路径：{}",
+                            algorithmManufacturer, version, recordTime, algorithmPath);
+                    String algorithmPathName = StringUtils.substringAfterLast(algorithmPath, "/");
+                    //存放到临时文件
+                    String localAlgorithmPath = SysParamConfig.getSysContent("tempReflect") + "/" + algorithmPathName;
+                    ftpsService.downLoadFile(localAlgorithmPath, algorithmPath);
+                    //开始算法更新
+                    UpdateRequest request = new UpdateRequest()
+                            .setType(type)
+                            .setRequestId(String.valueOf(UUID.randomUUID()))
+                            .setAlgorithmPath(localAlgorithmPath);
+                    algorithmUpdate(request);
+                });
+            }
+        }
+    }
 }

@@ -88,7 +88,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
-            Response response = picAnalyse(request);
+            Response response = picAnalyse(request, AnalyseStyleEnum.METER);
             responseList.add(response);
             if (200 != response.getCode()) {
                 code = response.getCode();
@@ -108,6 +108,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 String recognizeType = tAlgorithmInfoDao.selectRecognizeTypeByPresetId(analysis.getInstanceId());
                 AnalyseObject analyseObject = new AnalyseObject();
                 analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
+                analyseObject.setImageNormalPath("");
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
 
                 saveSilentMonitorImageUrlToRedis(analyseObject);
@@ -134,7 +135,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             return;
         }
 
-        String imageUrl = analysis.getImageUrlList().get(0);
+        String imageUrl = analysis.getImagePathList().get(0);
         String objectId = analysis.getObjectId();
 
         redisTemplate.opsForHash().put("silentMonitorImageUrl", objectId, imageUrl);
@@ -147,13 +148,14 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
      * @param picAnalyseRequest 参数
      * @return Response
      */
-    public Response picAnalyse(PicAnalyseRequest picAnalyseRequest) {
+    public Response picAnalyse(PicAnalyseRequest picAnalyseRequest, AnalyseStyleEnum style) {
 
-        JSONObject testJson = (JSONObject)JSONObject.toJSON(picAnalyseRequest);
+        JSONObject testJson = (JSONObject)JSON.toJSON(picAnalyseRequest);
         log.info(JSONUtil.prettyJSONString(testJson));
 
         try {
-            String result = HttpClientUtils.getInstance().postUrl(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
+            String url = AnalyseStyleEnum.DEFECT == style ? algorithmConfig.getDefectAnalysisUrl() : algorithmConfig.getAnalysisUrl();
+            String result = HttpClientUtils.getInstance().postUrl(url, testJson.toJSONString());
             log.info("result==={}", result);
 
             if (StringUtils.isEmpty(result)) {
@@ -197,7 +199,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                         String[] split = imageNormalUrlPath.split("/");
                         targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
-                    analyseObject.setImageNormalUrlPath(targetNamePath);
+                    analyseObject.setImageNormalPath(targetNamePath);
                 } else {
                     // 拿电科院给的图
                     log.info("flag:{}", flag);
@@ -218,13 +220,13 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                         String[] split = imageNormalUrlPath.split("/");
                         targetNamePath = targetParent + split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     }
-                    analyseObject.setImageNormalUrlPath(targetNamePath);
+                    analyseObject.setImageNormalPath(targetNamePath);
                 }
                 // 上传基准图
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
-                analyseObject.setImageNormalUrlPath(presetId);
+                analyseObject.setImageNormalPath(presetId);
             }
 
         } catch (Exception e) {
@@ -280,7 +282,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
 
             imageUrlList.add(targetNamePath);
-            analyseObject.setImageUrlList(imageUrlList);
+            analyseObject.setImagePathList(imageUrlList);
 
             objectList.add(analyseObject);
             picAnalyseRequest.setObjectList(objectList);
@@ -302,7 +304,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         List<PicAnalyseRequest> list = formatTransition(analysisList);
         int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
-            Response response = picAnalyse(request);
+            Response response = picAnalyse(request, AnalyseStyleEnum.DEFECT);
             responseList.add(response);
             if (200 != response.getCode()) {
                 code = response.getCode();
@@ -335,5 +337,17 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
     @Override
     public void afterPropertiesSet() {
         AbstractVideoCruise.AnalyticsFactory.registerAnalytics(CruiseConstant.AnalyticsEnum.HTTP, this);
+    }
+
+    enum AnalyseStyleEnum {
+
+        /**
+         * 老的 tcp 协议
+         */
+        METER,
+        /**
+         * 分析主机 http 协议
+         */
+        DEFECT
     }
 }

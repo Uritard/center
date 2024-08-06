@@ -15,5 +15,8 @@ public class StationCount {
 
     private Integer count;
 
+    //1:机器人，2：无人机，3：视频设备，4：物联设备
+    private  String deviceType;
+
 
 }

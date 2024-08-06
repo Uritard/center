@@ -165,7 +165,8 @@
                                 task_id,
                                 alarm_owner,
                                 origin_id,
-                                edge_code)
+                                edge_code,
+                                label_attri)
         values (#{warnId, jdbcType=BIGINT},
                 #{warnLevel, jdbcType=INTEGER},
                 #{warnTime, jdbcType=TIMESTAMP},
@@ -195,7 +196,8 @@
                 #{taskId, jdbcType=VARCHAR},
                 #{alarmOwner, jdbcType=INTEGER},
                 #{originId, jdbcType=VARCHAR},
-                #{edgeCode, jdbcType=VARCHAR})
+                #{edgeCode, jdbcType=VARCHAR},
+                #{labelAttri,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -264,6 +266,36 @@
             <if test="taskId != null ">a.task_id = #{taskId},</if>
         </set>
         where a.origin_id = #{originId} and a.edge_code = #{edgeCode}
+    </update>
+    <update id="updateByTaskIdAndInstanceId">
+        update t_warn_info a
+        <set>
+            <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+            <if test="warnTime != null ">a.warn_time = #{warnTime, jdbcType=TIMESTAMP},</if>
+            <if test="warnType != null ">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
+            <if test="warnName != null and warnName != ''">a.warn_name = #{warnName},</if>
+            <if test="warnContent != null">a.warn_content = #{warnContent},</if>
+            <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+            <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
+            <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+            <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+            <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
+            <if test="isWarn != null ">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+            <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+            <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
+            <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+            <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+            <if test="defectModel != null ">a.defect_model = #{defectModel, jdbcType=INTEGER},</if>
+            <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
+            <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
+            <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
+            <if test="imagePath != null ">a.image_path = #{imagePath},</if>
+            <if test="videoPath != null ">a.video_path = #{videoPath},</if>
+            <if test="value != null ">a.value = #{value},</if>
+            <if test="outRange != null ">a.out_range = #{outRange},</if>
+            <if test="taskId != null ">a.task_id = #{taskId},</if>
+        </set>
+        where a.task_id = #{taskId} and a.instance_id = #{instanceId}
     </update>
     <update id="batchUpDate">
         update t_warn_info a
@@ -598,7 +630,7 @@
         low_limit2,
         low_limit3,
         low_limit4,
-        custom_name,edge_code FROM (
+        custom_name,edge_code,label_attri,warn_type FROM (
         ( SELECT
         a.warn_id,
         a.instance_id,
@@ -620,7 +652,7 @@
         a.warn_time AS alarm_time,
         a.conf_mode,
         a.deal_person_id,
-        h.user_name as deal_person_name,
+        a.deal_person_id as deal_person_name,
         a.deal_time,
         a.std_mete_id,
         b.real_code,
@@ -628,12 +660,13 @@
         a.deal_info,
         a.deal_type,
         a.defect_model,
+        a.label_attri,
+        a.warn_type,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
-        LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
         AND (a.warn_type != '507' OR a.warn_type IS NULL)
@@ -662,7 +695,7 @@
         a.defect_time AS alarm_time,
         a.conf_mode,
         a.deal_person_id,
-        h.user_name as deal_person_name,
+        a.deal_person_id as deal_person_name,
         a.deal_time,
         a.std_mete_id,
         b.real_code,
@@ -670,12 +703,13 @@
         a.deal_info,
         a.deal_type,
         a.defect_type as defect_model,
+        a.label_attri,
+        0 as warn_type,
         b.up_region_name as regionName, k.custom_name
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
-        LEFT JOIN sys_user h ON h.user_id = a.deal_person_id
         WHERE
         1 = 1
         <if test="deviceName != null and deviceName != ''">and a.device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
@@ -906,7 +940,8 @@
     <!--根据告警和缺陷处理状态统计告警个数-->
     <select id="countWarnDefectConfMode" resultType="java.util.Map">
         SELECT a.processed + b.processed as '已核查',
-               d.untreated + e.untreated as '未核查'
+               d.untreated + e.untreated as '未核查',
+               f.autoProcessed + g.autoProcessed as '自动核查'
         FROM (
               (select count(conf_mode = 275 or null) as processed
                from t_warn_info
@@ -919,7 +954,13 @@
                where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) d,
               (select count(conf_mode = 276 or null) as untreated
                from t_defect_info
-               where defect_time between #{startTime} and #{endTime}) e
+               where defect_time between #{startTime} and #{endTime}) e,
+              (select count(conf_mode = 339 or null) as autoProcessed
+               from t_warn_info
+               where (warn_type != '507' or warn_type is null)  and warn_time between #{startTime} and #{endTime}) f,
+              (select count(conf_mode = 339 or null) as autoProcessed
+               from t_defect_info
+               where defect_time between #{startTime} and #{endTime}) g
                  )
     </select>
     <!--查看告警处理情况-->
@@ -977,6 +1018,8 @@
         d.high_limit2,
         d.high_limit3,
         d.high_limit4,
+        a.label_attri,
+        a.warn_type,
         b.up_region_name as region_name
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id

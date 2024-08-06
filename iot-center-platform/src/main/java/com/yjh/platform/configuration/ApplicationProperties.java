@@ -53,8 +53,8 @@ public class ApplicationProperties {
     private FtpsConfig intelAnalysisFtps;
     //算法管理平台
     private FtpsConfig managerSystemFtps;
-    //算法管理平台mqtt配置
-    private ManagerMqttConfig managerMqttConfig;
+    //算法管理平台配置
+    private ManagerAlgorithmConfig managerAlgorithmConfig;
     //算法调用配置
     private AlgorithmServerConfig algorithmServerConfig;
     // 分析主机配置
@@ -65,6 +65,8 @@ public class ApplicationProperties {
     private AudioConfig audioConfig;
     //其他配置
     private OtherConfig otherConfig;
+    //video服务配置
+    private VideoServerConfig videoServerConfig;
 
     @PostConstruct
     public void flushCatch() {
@@ -75,6 +77,15 @@ public class ApplicationProperties {
             redisTemplate.opsForHash().putAll(SYSTEM_CONFIG_KEY + systemConfig.getConfigType(),map);
         });
         this.flush();
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class VideoServerConfig{
+
+        //紧急调阅视频并发路数
+        private Integer emergencyAccessNum;
+
     }
 
     @Data
@@ -94,19 +105,12 @@ public class ApplicationProperties {
 
     @Data
     @Accessors(chain = true)
-    public static class ManagerMqttConfig {
-
-        private String mqttHost;
-        private String mqttUser;
-        private String mqttPwd;
-        private String mqttTopic;
-        private String mqttHeartTopic;
-        private String mqttProvinceName;
-        private String mqttCityName;
-        private String mqttStationName;
-        private String mqttSectionName;
-        private String mqttSectionIp;
-        private String mqttNodeId;
+    public static class ManagerAlgorithmConfig {
+        private String provinceName;
+        private String cityName;
+        private String sectionId;
+        private String sectionName;
+        private String stationName;
         private Integer voltLevel;
         private String managerServerFtpsRemotePath;
         private boolean managerSystemFlag;
@@ -135,7 +139,10 @@ public class ApplicationProperties {
     @Accessors(chain = false)
     public static class IntelligentAlgorithmConfig {
         private String analysisUrl;
+        private String defectAnalysisUrl;
         private String updateUrl;
+        private String algorithmResourceUrl;
+        private String systemCheckUrl;
         private String resultIp;
         private String resultPort;
         private String presetCheck;
@@ -157,6 +164,10 @@ public class ApplicationProperties {
         private String sequentialFileCharset;
         //顺控是否自定义结果
         private String sequentialResultFlag;
+        //数据召唤文件生成路径
+        private String dataCallPath;
+        //数据召唤文件名称
+        private String dataCallName;
     }
 
     @Data
@@ -173,6 +184,15 @@ public class ApplicationProperties {
         private String audioMqttUser;
         //声纹mqtt登录密码
         private String audioMqttPwd;
+        //请求采集声纹数据接口
+        private String voiceprintDataCollectUrl;
+        //请求声纹分析接口
+        private String voiceprintAnalyseUrl;
+        //请求声纹结果反馈ip地址
+        private String requestHostIp;
+        //请求声纹结果返回端口
+        private String requestHostPort;
+
     }
 
     @Data
@@ -185,6 +205,8 @@ public class ApplicationProperties {
         private String nonhomologousWarn;
         //stationCode
         private String stationCode;
+        //结果对应数字
+        private String coverResult;
     }
 
     public void flush(){
@@ -211,7 +233,8 @@ public class ApplicationProperties {
                 this.intelAlgorithmConfig = new IntelligentAlgorithmConfig();
             }
             BeanUtils.populate(this.intelAlgorithmConfig, redisMap);
-
+            //发布参数修改
+            redisTemplate.convertAndSend(SYSTEM_CONFIG_KEY + "algorithmSystem", redisMap);
         } catch (IllegalAccessException | InvocationTargetException e) {
             log.error("智能分析主机配置解析失败", e);
         }
@@ -232,29 +255,26 @@ public class ApplicationProperties {
         this.managerSystemFtps = managerSystemFtps;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"managerSystem");
-        ApplicationProperties.ManagerMqttConfig managerMqttConfig = new ApplicationProperties.ManagerMqttConfig();
-        managerMqttConfig.setMqttHost(redisMap.get("mqttHost"))
-                .setMqttUser(redisMap.get("mqttUser"))
-                .setMqttPwd(redisMap.get("mqttPwd"))
-                .setMqttTopic(redisMap.get("mqttTopic"))
-                .setMqttHeartTopic(redisMap.get("mqttHeartTopic"))
-                .setMqttProvinceName(redisMap.get("mqttProvinceName"))
-                .setMqttCityName(redisMap.get("mqttCityName"))
-                .setMqttStationName(redisMap.get("mqttStationName"))
-                .setMqttSectionName(redisMap.get("mqttSectionName"))
-                .setMqttSectionIp(redisMap.get("mqttSectionIp"))
-                .setMqttNodeId(redisMap.get("mqttNodeId"))
+        ApplicationProperties.ManagerAlgorithmConfig managerAlgorithmConfig = new ApplicationProperties.ManagerAlgorithmConfig();
+        managerAlgorithmConfig
+                .setProvinceName(redisMap.get("provinceName"))
+                .setCityName(redisMap.get("cityName"))
+                .setSectionId(redisMap.get("sectionId"))
+                .setSectionName(redisMap.get("sectionName"))
+                .setStationName(redisMap.get("stationName"))
                 .setVoltLevel(ValueUtil.toInteger(redisMap.get("voltLevel"),220))
                 .setManagerServerFtpsRemotePath(redisMap.get("managerServerFtpsRemotePath"))
                 .setManagerSystemFlag("1".equals(redisMap.get("managerSystemFlag")));
-        this.managerMqttConfig = managerMqttConfig;
+        this.managerAlgorithmConfig = managerAlgorithmConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"sequentialConfig");
         ApplicationProperties.SequentialConfig sequentialConfig = new ApplicationProperties.SequentialConfig();
         sequentialConfig.setSequentialVideocfmResult(redisMap.get("sequentialVideocfmResult"))
                 .setSequentialReturnLinkage(redisMap.get("sequentialReturnLinkage"))
                 .setSequentialFileCharset(redisMap.get("sequentialFileCharset"))
-                .setSequentialResultFlag(sequentialResultFlag);
+                .setSequentialResultFlag(sequentialResultFlag)
+                .setDataCallPath(redisMap.get("dataCallPath"))
+                .setDataCallName(redisMap.get("dataCallName"));
         this.sequentialConfig = sequentialConfig;
 
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"audioConfig");
@@ -263,14 +283,25 @@ public class ApplicationProperties {
                 .setAudioTcpByteOrderLittleEndianEnabled(ValueUtil.toBoolean(redisMap.get("audioTcpByteOrderLittleEndianEnabled"),false))
                 .setAudioMqttHost(redisMap.get("audioMqttHost"))
                 .setAudioMqttUser(redisMap.get("audioMqttUser"))
-                .setAudioMqttPwd(redisMap.get("audioMqttPwd"));
+                .setAudioMqttPwd(redisMap.get("audioMqttPwd"))
+                .setVoiceprintDataCollectUrl(redisMap.get("voiceprintDataCollectUrl"))
+                .setVoiceprintAnalyseUrl(redisMap.get("voiceprintAnalyseUrl"))
+                .setRequestHostIp(redisMap.get("requestHostIp"))
+                .setRequestHostPort(redisMap.get("requestHostPort"))
+        ;
         this.audioConfig = audioConfig;
         redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"otherConfig");
         ApplicationProperties.OtherConfig otherConfig = new ApplicationProperties.OtherConfig();
         otherConfig.setCameraPresetSecondCheck(ValueUtil.toBoolean(redisMap.get("cameraPresetSecondCheck"),false))
                 .setStationCode((String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content"))
+                .setCoverResult(redisMap.get("coverResult"))
                 .setNonhomologousWarn(redisMap.get("nonhomologousWarn"));
         this.otherConfig = otherConfig;
+
+        redisMap = redisTemplate.opsForHash().entries(SYSTEM_CONFIG_KEY +"videoServerConfig");
+        ApplicationProperties.VideoServerConfig videoServerConfig = new ApplicationProperties.VideoServerConfig();
+        videoServerConfig.setEmergencyAccessNum(ValueUtil.toInteger(redisMap.get("emergencyAccessNum"),10));
+        this.videoServerConfig = videoServerConfig;
 
         Constant.nonhomologousWarn = this.getOtherConfig().getNonhomologousWarn();
         Constant.setUpSystem(this.getUpSystemFtps().isEnable());

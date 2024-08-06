@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
@@ -19,10 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -149,19 +147,61 @@ public class TCruiseNonhomologousPointInstanceService {
             tCruiseNonhomologousWarnInfo = tCruiseNonhomologousPointInstanceDao.selectWarnByPrimaryId(warnId);
         }
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
+        Map<String, Map<String,Object>> warnDetail = new HashMap<>();
         for(Map<String,Object> m : warnDetailInfo){
+            m.put("cruiseTime", DateTimeUtil.getDateTimeString((Date) m.get("cruiseTime")));
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(
                 UPatrolTaskService.PATROL_TASK_PREFIX + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
-                /*if (tCruiseNonhomologousWarnDO.getWarnType() == 6){
-                    redisInfoMap.put("resultNum",dealResultNum(redisInfoMap.get("resultNum")));
-                }*/
                 m.putAll(redisInfoMap);
             }
+            String resultNum = m.get("resultNum").toString();
+            if (resultNum.contains(",")){
+                resultNum = resultNum.split(",")[0];
+                m.put("resultNum",resultNum);
+            }
+            if (tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName") != null) {
+                String oneCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName").toString();
+                String oneDeviceName = oneCruiseDeviceName.substring(oneCruiseDeviceName.indexOf("-") + 1);
+                if (oneDeviceName.equals(m.get("device_mete_name").toString())) {
+                    warnDetail.put("oneDeviceName", m);
+                }
+            }
+            if (tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName") != null) {
+                String twoCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName").toString();
+                String twoDeviceName = twoCruiseDeviceName.substring(twoCruiseDeviceName.indexOf("-") + 1);
+                if (twoDeviceName.equals(m.get("device_mete_name").toString())) {
+                    warnDetail.put("twoDeviceName", m);
+                }
+            }
+            if (tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName") != null) {
+                String threeCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName").toString();
+                String threeDeviceName = threeCruiseDeviceName.substring(threeCruiseDeviceName.indexOf("-") + 1);
+                if (threeDeviceName.equals(m.get("device_mete_name").toString())) {
+                    warnDetail.put("threeDeviceName", m);
+                }
+            }
         }
-        if(tCruiseNonhomologousWarnInfo != null){
-            tCruiseNonhomologousWarnInfo.put("warnInspectionsInfo",warnDetailInfo);
+        if (warnDetail.isEmpty()) {
+            if(tCruiseNonhomologousWarnInfo != null){
+                tCruiseNonhomologousWarnInfo.put("warnInspectionsInfo",warnDetailInfo);
+            }
+        } else {
+            List<Map<String,Object>> sortedList = new ArrayList<>();
+            if (warnDetail.get("oneDeviceName") != null) {
+                sortedList.add(warnDetail.get("oneDeviceName"));
+            }
+            if (warnDetail.get("twoDeviceName") != null) {
+                sortedList.add(warnDetail.get("twoDeviceName"));
+            }
+            if (warnDetail.get("threeDeviceName") != null) {
+                sortedList.add(warnDetail.get("threeDeviceName"));
+            }
+            if(tCruiseNonhomologousWarnInfo != null){
+                tCruiseNonhomologousWarnInfo.put("warnInspectionsInfo",sortedList);
+            }
         }
+
         return tCruiseNonhomologousWarnInfo;
     }
 

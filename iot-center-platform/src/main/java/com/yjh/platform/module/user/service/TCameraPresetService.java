@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.io.IORuntimeException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
@@ -278,15 +279,16 @@ public class TCameraPresetService {
         return areaInfo;
     }
 
-    public boolean judgePresentNum(Long cameraId,Integer presentNum) {
+    public boolean judgePresentNum(TCameraPreset tCameraPreset, TCameraInfo tCameraInfo) {
         boolean flag = false;
-        List<TCameraPreset> tCameraPresetList = this.tCameraPresetDao.select(null, cameraId, presentNum, null, null, null, null, null, null, null,null);
+        List<TCameraPreset> tCameraPresetList = tCameraPresetDao.getExistPreset(tCameraInfo.getCameraIp(),
+                tCameraInfo.getPort(), tCameraPreset.getPresetNum());
         if (tCameraPresetList.size()>0) {
             flag=true;
         }
         return flag;
     }
-    private   long getFileSize(File f){long size = 0;
+    private long getFileSize(File f){long size = 0;
         //取得文件夹大小
         try {
             File flist[] = f.listFiles();
@@ -316,24 +318,11 @@ public class TCameraPresetService {
         String picUrl = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
 
         FileUtil.mkdir(zipPath);
-        {
-            //判断文件大小
-            Map<String, String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
-            String zipFileSize = "20";
-            if (mapForZipSize != null && mapForZipSize.size() > 0) {
-                zipFileSize = mapForZipSize.get("content");
-            }
-            //picPath ="D:\\code\\qhTest\\presets";
-            File file = new File(picPath);
-            if (file.exists()) {
-                long size = getFileSize(file) / (1024 * 1024);
-//                log.info("file.length():"+size);
-                log.info("采集文件大小：" + size + "M");
-                if (size > Long.valueOf(zipFileSize)) {
-                    result.setCode(209, "采集文件大于" + zipFileSize + "M，禁止下载");
-                    return result;
-                }
-            }
+        //判断文件大小
+        Map<String, String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
+        String zipFileSize = "20";
+        if (mapForZipSize != null && mapForZipSize.size() > 0) {
+            zipFileSize = mapForZipSize.get("content");
         }
 
         List<String> presetImgList;
@@ -344,14 +333,24 @@ public class TCameraPresetService {
                 return result;
             }
             deleteZip(zipPath);
-            copePresetImage(presetImgList, picUrl, picPath, zipPath);
+            Result copyResult = copePresetImage(presetImgList, picUrl, picPath, zipPath, zipFileSize);
+            if (copyResult.getCode() != 200) {
+                return copyResult;
+            }
         } else {
-            if (cameraIdList == null) {
+            if (CollectionUtils.isEmpty(cameraIdList)) {
+                File file = new File(picPath);
+                if (file.exists()) {
+                    long size = getFileSize(file) / (1024 * 1024);
+                    log.info("采集文件大小：" + size + "M");
+                    if (size > Long.valueOf(zipFileSize)) {
+                        result.setCode(209, "采集文件大于" + zipFileSize + "M，禁止下载");
+                        return result;
+                    }
+                }
                 cameraIdList = tCameraPresetDao.selectCameraIdList();
             }
-            if (cameraIdList != null && cameraIdList.size() == 0) {
-                cameraIdList = tCameraPresetDao.selectCameraIdList();
-            }
+
             if (cameraIdList != null && cameraIdList.size() > 0) {
                 List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
                 if (cameraHavePresetList == null) {
@@ -369,7 +368,10 @@ public class TCameraPresetService {
                     log.info("cameraId: {}", cameraId);
                     log.info("presetImgList: {}", presetImgList);
                     if (!CollectionUtils.isEmpty(presetImgList)) {
-                        copePresetImage(presetImgList, picUrl, picPath, zipPath);
+                        Result copyResult = copePresetImage(presetImgList, picUrl, picPath, zipPath, zipFileSize);
+                        if (copyResult.getCode() != 200) {
+                            return copyResult;
+                        }
                     } else {
                         if (cameraIdList.size() == 1) {
                             result.setCode(209, "fail");
@@ -408,29 +410,31 @@ public class TCameraPresetService {
     private void deleteZip(String zipPath) {
         //删除zipPath下的所有文件
         try {
-            String cmd = "rm -rf " + zipPath + "/*";
-            String[] cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-            log.info("linux命令：" + cmd);
-            //Runtime.getRuntime().exec(cmd);
-            cmd = "mkdir " + zipPath;
-            log.info("linux命令：" + cmd);
-            cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-            cmd = "mkdir " + zipPath + "/picture";
-            log.info("linux命令：" + cmd);
-            cmds = new String[]{"sh", "-c", cmd};
-            Runtime.getRuntime().exec(cmds);
-        } catch (IOException e) {
-            log.error("复制文件错误：" + e);
+            cn.hutool.core.io.FileUtil.clean(zipPath);
+        } catch (IORuntimeException e) {
+            log.error("删除文件错误：" + e);
         }
     }
-    private void copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath){
+    private Result copePresetImage(List<String> presetImgList, String picUrl, String picPath, String zipPath, String zipFileSize){
+        Result result = new Result();
+        Long fileTotalSize = 0L;
+        for (String presetImgInfo : presetImgList) {
+            String realPath = presetImgInfo.replace(picUrl, picPath);
+            realPath = StringUtils.substringBeforeLast(realPath, "/");
+            File file = new File(realPath);
+            fileTotalSize += (getFileSize(file) / (1024 * 1024));
+            if (fileTotalSize > Long.valueOf(zipFileSize)) {
+                result.setCode(209, "采集文件大于" + zipFileSize + "M，禁止下载");
+                return result;
+            }
+        }
         for (String presetImg : presetImgList) {
             try {
                 if (StringUtils.isNotEmpty(presetImg)) {
                     String realPath = presetImg.replace(picUrl, picPath);
                     realPath = StringUtils.substringBeforeLast(realPath, "/");
+                    File file = new File(realPath);
+                    long fileSize = getFileSize(file);
                     //将所有的文件移动到一个文件内
                     //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
                     FileUtils.copyDirectoryToDirectory(new File(realPath), new File(zipPath + "/picture/"));
@@ -442,6 +446,8 @@ public class TCameraPresetService {
                 log.error("复制文件错误：" + e);
             }
         }
+        result.setCode(200, "复制文件");
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1012,12 +1018,12 @@ public class TCameraPresetService {
 
     }
 
-    public Result add(TCameraPreset tCameraPreset) {
+    public Result add(TCameraPreset tCameraPreset, TCameraInfo tCameraInfo) {
         int resultNum = 0;
         Result result = new Result();
         //判断该预置位是否已被设置
-        if(judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
+        if(judgePresentNum(tCameraPreset, tCameraInfo)){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置或此预置位已被占用");
             return result;
         }else {
             int isMicro = microCamera(tCameraPreset);

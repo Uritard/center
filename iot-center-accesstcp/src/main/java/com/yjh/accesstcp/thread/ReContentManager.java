@@ -1,11 +1,13 @@
 package com.yjh.accesstcp.thread;
 
+import com.yjh.accesstcp.common.utils.ThreadPoolUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,34 +23,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class ReContentManager {
 
-    private final ConcurrentHashMap<String, InternalRunner> runnerMap = new ConcurrentHashMap<String, InternalRunner>();
+    private static final ConcurrentHashMap<SocketAddress, InternalRunner> RUNNER_MAP = new ConcurrentHashMap<>();
 
-    private final String RE_CONTENT = "reContent";
-
-    public void reContent(InetSocketAddress remoteAddress, Bootstrap bootstrap) {
-        if (Optional.ofNullable(runnerMap.get(RE_CONTENT)).isPresent()) {
-            InternalRunner runner = runnerMap.get(RE_CONTENT);
+    public static void reContent(SocketAddress remoteAddress, Bootstrap bootstrap) {
+        if (Optional.ofNullable(RUNNER_MAP.get(remoteAddress)).isPresent()) {
+            InternalRunner runner = RUNNER_MAP.get(remoteAddress);
             runner.bootstrap = bootstrap;
             return;
         }
         InternalRunner internalRunner = new InternalRunner(remoteAddress, bootstrap, 60000);
-        TaskExecutePool.getInstance().execute(internalRunner);
-        runnerMap.put(RE_CONTENT, internalRunner);
+        ThreadPoolUtil.PATROL_POOL.execute(internalRunner);
+        RUNNER_MAP.put(remoteAddress, internalRunner);
     }
 
-    public void terminate() {
-        Optional.ofNullable(runnerMap.get(RE_CONTENT)).ifPresent(InternalRunner::terminate);
-        runnerMap.remove(RE_CONTENT);
+    public static void terminate(SocketAddress remoteAddress) {
+        Optional.ofNullable(RUNNER_MAP.remove(remoteAddress)).ifPresent(InternalRunner::terminate);
     }
 
     static class InternalRunner implements Runnable {
         private final AtomicBoolean keepRunning = new AtomicBoolean(true);
         private final long recoverDuration;
         private final Object waiter = new Object();
-        private final InetSocketAddress remoteAddress;
+        private final SocketAddress remoteAddress;
         private Bootstrap bootstrap;
 
-        public InternalRunner(InetSocketAddress remoteAddress, Bootstrap bootstrap, long recoverDuration) {
+        public InternalRunner(SocketAddress remoteAddress, Bootstrap bootstrap, long recoverDuration) {
             this.remoteAddress = remoteAddress;
             this.bootstrap = bootstrap;
             this.recoverDuration = recoverDuration;
@@ -78,6 +77,7 @@ public class ReContentManager {
         }
 
         void terminate() {
+            ReContentManager.terminate(remoteAddress);
             keepRunning.set(false);
             synchronized (waiter) {
                 waiter.notifyAll();
