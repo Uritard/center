@@ -328,6 +328,7 @@ public class UPatrolResultService {
      * 对审核后的任务进行处理，判断告警
      */
     private List<TWarnInfo> afterManualReviewInfo(AfterManualReviewInfo afterManualReviewInfo, String userId, Date date) {
+        String userName = (String)redisTemplate.opsForHash().get("userInfo:" + userId,"userName");
         String taskId = afterManualReviewInfo.getTaskId();
         Long instanceId = afterManualReviewInfo.getInstanceId();
         //查询该巡检点对应测点配置的告警阈值相关信息
@@ -425,7 +426,7 @@ public class UPatrolResultService {
             //声纹测点 声纹告警规则
             map = voiceIsWarn(afterManualReviewInfo.getModifyNum(),tStdDevicemete.getDBValue(),
                     tStdDevicemete.getFValue(),tStdDevicemete.getMeteName());
-            return  reviewVoiceWarn(afterManualReviewInfo,map,userId,date,warnInfo,taskId,instanceId);
+            return  reviewVoiceWarn(afterManualReviewInfo,map,userName,date,warnInfo,taskId,instanceId);
         }else {
             if (afterManualReviewInfo.getIsWarn() >= 1) {
                 tWarnInfoList = uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
@@ -441,11 +442,11 @@ public class UPatrolResultService {
                         // 修改告警信息表
                         uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), isTemDif ? initInfo.get("warnName") : MapUtils.getString(map, "warnName"),
                                 MapUtils.getInteger(map, "warnLevel"), isTemDif ? initInfo.get("warnContent") : MapUtils.getString(map, "warnContent"),
-                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userId,
+                                "程序正常，告警属实", 286, isTemDif ? initInfo.get("outRange") : outRange, userName,
                                 date);
                     } else {
                         uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
-                                "程序异常，告警误报", 287, null, userId, date);
+                                "程序异常，告警误报", 287, null, userName, date);
                     }
                     sendWebSocket(tWarnInfo.getWarnId());
                     //告警审核上报上级系统 
@@ -460,7 +461,7 @@ public class UPatrolResultService {
                     warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
                     warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : outRange);
                     warnInfo.setDealTime(date);
-                    warnInfo.setDealPersonId(userId);
+                    warnInfo.setDealPersonId(userName);
                     log.info("要插库的告警数据是===" + warnInfo);
                     tWarnInfoService.insert(warnInfo);
                     //告警上报 上级
@@ -475,7 +476,7 @@ public class UPatrolResultService {
         }
     }
 
-    public List<TWarnInfo> reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userId, Date date,
+    public List<TWarnInfo> reviewVoiceWarn(AfterManualReviewInfo afterManualReviewInfo,Map<String, Object> map,String userName, Date date,
                                 TWarnInfo warnInfo,String taskId,Long instanceId){
         List<TWarnInfo> warnIdList =
                 uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
@@ -484,18 +485,18 @@ public class UPatrolResultService {
             if (tWarnInfo.getWarnName().contains("分贝") && ValueUtil.toBoolean(map.get("isDbWarn"),false) ){
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
                         null, MapUtils.getString(map, "dbWarnContent"),
-                        "程序正常，告警属实", 286, MapUtils.getString(map, "outDbRange"), userId,
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outDbRange"), userName,
                         date);
                 map.remove("isDbWarn");
             } else if (tWarnInfo.getWarnName().contains("频率") && ValueUtil.toBoolean(map.get("isFWarn"),false)){
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null,
                         null, MapUtils.getString(map, "fWarnContent"),
-                        "程序正常，告警属实", 286, MapUtils.getString(map, "outFRange"), userId,
+                        "程序正常，告警属实", 286, MapUtils.getString(map, "outFRange"), userName,
                         date);
                 map.remove("isFWarn");
             } else {
                 uPatrolResultDao.updateWarnInfo(tWarnInfo.getWarnId(), null, null, null,
-                        "程序异常，告警误报", 287, null, userId, date);
+                        "程序异常，告警误报", 287, null, userName, date);
             }
         });
         //处理声纹的
@@ -506,7 +507,7 @@ public class UPatrolResultService {
             warnInfo.setWarnContent(MapUtils.getString(map, "dbWarnContent"));
             warnInfo.setOutRange(MapUtils.getString(map, "outDbRange"));
             warnInfo.setDealTime(date);
-            warnInfo.setDealPersonId(userId);
+            warnInfo.setDealPersonId(userName);
             log.info("要插库的告警数据是===" + warnInfo);
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
@@ -520,7 +521,7 @@ public class UPatrolResultService {
             warnInfo.setWarnContent(MapUtils.getString(map, "fWarnContent"));
             warnInfo.setOutRange(MapUtils.getString(map, "outFRange"));
             warnInfo.setDealTime(date);
-            warnInfo.setDealPersonId(userId);
+            warnInfo.setDealPersonId(userName);
             log.info("要插库的告警数据是===" + warnInfo);
             tWarnInfoService.insert(warnInfo);
             sendWebSocket(warnInfo.getWarnId());
@@ -579,7 +580,7 @@ public class UPatrolResultService {
         String remark = StringUtils.isEmpty(temark) ? null : temark;
         int result = uPatrolResultDao.updateCheck(taskId, checkUserName, date, remark);
 
-        uPatrolResultDao.updateWarnInfoByTask(userId, date, taskId);
+        uPatrolResultDao.updateWarnInfoByTask(userName, date, taskId);
         tStdDeviceDao.updateByTask(taskId);
 
         // 审核结果向上级系统同步，修改审核人为当前用户
@@ -667,10 +668,6 @@ public class UPatrolResultService {
             tWarnInfo.setDealType(tWarnInfo.getIsWarn() == 1 ? 286 : 287);
             tWarnInfo.setConfMode(275);
             tWarnInfo.setDealInfo(tWarnInfo.getIsWarn() == 1 ? "程序正常，告警属实" : "程序异常，告警误报");
-            String userId = (String) redisTemplate.opsForHash().get("userInfo:nameId", tWarnInfo.getDealPersonId());
-            if (!CommonUtils.isEmptyOrNullstr(userId)){
-                tWarnInfo.setDealPersonId(userId);
-            }
             tWarnInfo.setTaskId(taskId);
             List<Long> instanceList = getInstanceList(instanceIds);
             for (Long instanceId : instanceList) {
