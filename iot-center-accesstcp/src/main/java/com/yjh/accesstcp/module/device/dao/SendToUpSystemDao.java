@@ -76,5 +76,5 @@ public interface SendToUpSystemDao {
 
     List<TCruisePointInstanceMeteDetail> selectAlarmThresholdModel();
 
-    List<String> selectStandardPointsByInstanceId(@Param(value = "instanceIds") String instanceIds);
+    List<Map<String, Object>> selectStandardPointsByInstanceId(@Param(value = "instanceIds") String instanceIds);
 }

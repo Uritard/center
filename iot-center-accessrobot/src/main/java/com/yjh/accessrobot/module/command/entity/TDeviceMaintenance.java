@@ -22,6 +22,11 @@ public class TDeviceMaintenance implements Serializable {
     private String maintenanceName;
 
     /**
+     * 唯一标识
+     */
+    private String configCode;
+
+    /**
      * 设备ID
      */
     private String deviceIds;
