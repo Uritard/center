@@ -310,6 +310,9 @@ public class Constant {
         return standardPoints;
     }
 
+    /**
+     * 是否使用业务中台id
+     */
     public static boolean middlegroundIds() {
         boolean middlegroundIds;
         try {
@@ -424,35 +427,6 @@ public class Constant {
             }
         }
         return managerSystemPort;
-    }
-
-
-    /**
-     * 使用标准点位下发任务
-     */
-    public static boolean standardPoints() {
-        boolean standardPoints;
-        try {
-            standardPoints = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
-            log.debug("standardPoints is {}", standardPoints);
-        } catch (Exception e) {
-            standardPoints = false;
-        }
-        return standardPoints;
-    }
-
-    /**
-     * 是否使用业务中台id
-     */
-    public static boolean middlegroundIds() {
-        boolean middlegroundIds;
-        try {
-            middlegroundIds = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:middlegroundIds", "content"));
-            log.debug("middlegroundIds is {}", middlegroundIds);
-        } catch (Exception e) {
-            middlegroundIds = false;
-        }
-        return middlegroundIds;
     }
 
     public static final String T_SYS_PARAM = "t_sys_param:";
