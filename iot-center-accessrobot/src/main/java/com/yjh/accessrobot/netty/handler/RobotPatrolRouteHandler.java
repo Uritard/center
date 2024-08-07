@@ -6,12 +6,14 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.module.command.entity.UPatrolTask;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +122,26 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             redisTemplate.opsForHash().putAll("RobotRoad:" + robotCode, robotRoadList.get(i));
             redisTemplate.expire("RobotRoad:" + robotCode, 7, TimeUnit.DAYS);
         }
+        String taskPatrolledId = MapUtils.getString(xmlBaseModel.getItems().get(0), "task_patrolled_id");
+        String taskCode = taskPatrolledId.split("_")[1];
+        String timeSrt = taskPatrolledId.split("_")[2];
+        Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
+        UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,date);
+        if (task != null){
+            taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
+            if (StringUtils.isNotEmpty(taskPatrolledId)){
+                String finalTaskPatrolledId = taskPatrolledId;
+                xmlBaseModel.getItems().forEach(item ->{
+                    item.put("task_patrolled_id", finalTaskPatrolledId);
+                });
+            }
+        }
 
+        taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
+        String finalTaskPatrolledId = taskPatrolledId;
+        xmlBaseModel.getItems().forEach(item ->{
+            item.put("task_patrolled_id", finalTaskPatrolledId);
+        });
         roadToUpSystem(xmlBaseModel);
     }
 

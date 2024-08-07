@@ -4,7 +4,9 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.CommonUtils;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.entity.UPatrolTask;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -12,16 +14,14 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,6 +70,20 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
 
         // 国网要求
         //上报 Code 为 变电站编码
+        String taskPatrolledId = MapUtils.getString(xmlBaseModel.getItems().get(0), "task_patrolled_id");
+        String taskCode = taskPatrolledId.split("_")[1];
+        String timeSrt = taskPatrolledId.split("_")[2];
+        Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
+        UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,date);
+        if (task != null){
+            taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
+            if (StringUtils.isNotEmpty(taskPatrolledId)){
+                String finalTaskPatrolledId = taskPatrolledId;
+                xmlBaseModel.getItems().forEach(item ->{
+                    item.put("task_patrolled_id", finalTaskPatrolledId);
+                });
+            }
+        }
         String stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         xmlBaseModel.setCode(stationCode);
         robotService.upToCruise(xmlBaseModel);
