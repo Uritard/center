@@ -87,7 +87,7 @@ public class RobotService {
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
     private static final String OFF_LINE = "离线";
-
+    public static final String countForAbnormalKey = "countForAbnormal:";
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
