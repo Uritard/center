@@ -113,8 +113,8 @@ public class NestRunThread{
                 stateMap = new HashMap<>(8);
                 stateMap.put("value", valueDef);
             }
-            stateMap.put("nestCode", device.get("nest_name"));
-            stateMap.put("nestName", device.get("nest_code"));
+            stateMap.put("nestCode", device.get("nest_code"));
+            stateMap.put("nestName", device.get("nest_name"));
             Map<String, Object> mapUp = createMap(type, stateMap, nowTime);
             list.add(mapUp);
         }
