@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.service.TCfgDataCurrentService;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
@@ -36,6 +38,8 @@ public class TCfgDataCurrentController {
 
     @Autowired
     private final TCfgDataCurrentService tCfgDataCurrentService;
+    @Autowired
+    private PatrolResultHandler patrolResultHandler;
 
     private Logger log = LoggerFactory.getLogger(TCfgDataCurrentController.class);
 
@@ -180,6 +184,19 @@ public class TCfgDataCurrentController {
         Result result=new Result();
         try {
             result.setData(tCfgDataCurrentService.unionRulesMatchAndCalculate(meteId.get("meteId")));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "数据召回-结果处理")
+    @GetMapping(value = "/signalTaskDeal")
+    public Result signalTaskDeal(@RequestParam Map<String,String> meteId){
+        Result result=new Result();
+        try {
+            patrolResultHandler.linkageResultHandler(ValueUtil.toLong(meteId.get("meteId")));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -213,7 +213,6 @@ public class TCfgDataCurrentService {
 
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) {
         log.info("【meteMap】:{}", meteMap);
-        patrolResultHandler.linkageResultHandler(Long.valueOf(meteMap));
         // 联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
         List<TCfgUnionRule> unionRules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
