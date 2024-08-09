@@ -650,7 +650,12 @@ public class SendToUpSystemServices {
         long sessionId =0L;
         boolean isSend = true;
         if (CollectionUtils.isNotEmpty(xmlBaseModel.getItems()) && xmlBaseModel.getItems().get(0).containsKey("error_code")){
-            sessionId = Constant.getParamMap.getOrDefault("sendSessionId", 0L);
+            Long sId = Constant.getParamMap.remove("sendSessionId");
+            sessionId = sId == null ? 0L : sId;
+            if (sessionId == 0L) {
+                log.warn("非上级系统系统下发的任务，无须上报");
+                return 0;
+            }
             isSend = false;
         }
         return this.sendResponse(sessionId, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), isSend);
