@@ -111,6 +111,17 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!-- git 信息获取 -->
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>4.0.5</version>
+				<configuration>
+					<offline>true</offline>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					<dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -151,7 +162,8 @@
 					<!-- 过滤掉不希望包含在jar中的文件 -->
 					<excludes>
 						<classesDirectory>${project.basedir}/src/main/resources/</classesDirectory>
-						<exclude>*.properties</exclude>
+						<exclude>application*.properties</exclude>
+						<exclude>log*.properties</exclude>
 						<exclude>*.yml</exclude>
 						<exclude>*.xml</exclude>
 						<exclude>voice/**</exclude>

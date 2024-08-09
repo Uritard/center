@@ -417,7 +417,8 @@
                     <!-- 过滤掉不希望包含在jar中的文件 -->
                     <excludes>
                         <classesDirectory>${project.basedir}/src/main/resources/</classesDirectory>
-                        <exclude>*.properties</exclude>
+                        <exclude>application*.properties</exclude>
+                        <exclude>log*.properties</exclude>
                         <exclude>*.yml</exclude>
                         <!--<exclude>*/*.*</exclude>-->
                     </excludes>

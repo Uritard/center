@@ -241,6 +241,19 @@ public class TSysParamController {
         return result;
     }
 
+    @ApiOperation(value = "查询系统编译信息")
+    @RequestMapping(value = "/versionInfo", method = RequestMethod.GET)
+    public Result versionInfo() {
+        Result result = new Result();
+        try {
+            result.setData(this.tSysParamService.versionInfo());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询系统版本失败", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询算法版本")
     @RequestMapping(value = "/algorithmVersion", method = RequestMethod.GET)
     @Logs(title = "查询算法版本", content = "查询算法版本信息")
