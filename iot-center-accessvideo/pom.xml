@@ -315,7 +315,8 @@
                     <!-- 过滤掉不希望包含在jar中的文件 -->
                     <excludes>
                         <classesDirectory>${project.basedir}/src/main/resources/</classesDirectory>
-                        <exclude>*.properties</exclude>
+                        <exclude>application*.properties</exclude>
+                        <exclude>log*.properties</exclude>
                         <exclude>*.yml</exclude>
                         <exclude>lib*/**</exclude>
                         <!--<exclude>*/*.*</exclude>-->
@@ -351,7 +352,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!-- The configuration of the plugin -->
                 <configuration>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <!-- Specifies the configuration file of the assembly plugin -->
                     <descriptors>
                         <descriptor>${project.basedir}/package.xml</descriptor>

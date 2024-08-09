@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.GitUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
@@ -41,6 +42,8 @@ public class TSysParamService{
     private TCameraPresetService tCameraPresetService;
     @Autowired
     private ApplicationProperties applicationProperties;
+    @Autowired
+    private GitUtil gitUtil;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -276,6 +279,10 @@ public class TSysParamService{
 
     public List<Version> selectVersion(int type){
         return tSysParamDao.selectVersion(type);
+    }
+
+    public GitUtil versionInfo(){
+        return gitUtil;
     }
 
     public void syncCommissioningTimeToUpSystem() {
