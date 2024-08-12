@@ -647,8 +647,8 @@
                         '遥控'
                     END
                 ) AS source_type,
-            (
-                SELECT
+            (if (a.plan_id is null,'',
+                (SELECT
                     <if test="standardPoints == true">
                         GROUP_CONCAT(mete.device_point_id)
                     </if>
@@ -659,7 +659,7 @@
                     u_patrol_plan_attr d
                         left join t_std_devicemete mete on d.device_mete_id = mete.device_mete_id
                 WHERE
-                    d.plan_id = a.plan_id
+                    d.plan_id = a.plan_id))
             ) AS device_id
         FROM
             `t_cfg_union_rule` a
