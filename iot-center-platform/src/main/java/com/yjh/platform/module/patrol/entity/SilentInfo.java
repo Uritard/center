@@ -31,4 +31,6 @@ public class SilentInfo {
     private String filePath;
     @ApiModelProperty(value = "静默监视类型")
     private String monitorType;
+    @ApiModelProperty(value = "边缘节点编码")
+    private String edgeCode;
 }

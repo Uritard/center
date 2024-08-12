@@ -100,7 +100,7 @@ public interface TCameraPresetDao {
 
     int updateSilentConf(SilentConf silentConf);
 
-    TCameraPreset selectIsDownSystemPreset(@Param(value = "presetId") Long presetId);
+    TCameraPreset selectIsDownSystemPreset(@Param(value = "instanceId") String instanceId, @Param(value = "edgeCode") String edgeCode, @Param(value = "standardPoints") boolean standardPoints);
     TCameraPreset queryPresetByCameraAndMete(@Param(value = "cameraId") Long cameraId,@Param(value = "meteId")Long meteId);
     int queryMaxPresetNum(@Param(value = "cameraId") Long cameraId);
 

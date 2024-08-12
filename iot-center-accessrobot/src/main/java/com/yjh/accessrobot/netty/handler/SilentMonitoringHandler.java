@@ -93,7 +93,8 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
                     .setRectangle(String.valueOf(item.get("rectangle")))
                     .setFileType(String.valueOf(item.get("file_type")))
                     .setFilePath(String.valueOf(item.get("file_path")))
-                    .setMonitorType(String.valueOf(item.get("monitor_type")));
+                    .setMonitorType(String.valueOf(item.get("monitor_type")))
+                    .setEdgeCode(sendCode);
             silentInfos.add(silentInfo);
         }
         try {

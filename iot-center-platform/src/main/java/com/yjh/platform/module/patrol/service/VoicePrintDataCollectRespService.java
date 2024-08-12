@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.patrol.CruiseConstant;
@@ -16,16 +17,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.CruiseConstant.AbnormalResDescEnum.ANALYSE_REQFAILED;
 import static com.yjh.platform.module.patrol.CruiseConstant.AbnormalResDescEnum.ANALYSISING;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
 
 /**
  * @Author: lqh
@@ -183,30 +182,32 @@ public class VoicePrintDataCollectRespService {
             String code = resultListData.getCode();
             if ("2000".equals(code) && objectId.equals(cruiseId)) {
                 isContains = true;
-                String type = "";
-                String typeName = "";
-                String points = "";
-                Integer num = 0;
-                Boolean isWarn = false;
+                StringBuilder type = new StringBuilder();
+                StringJoiner typeName = new StringJoiner(" ");
+                StringBuilder points = new StringBuilder();
+                int num = 0;
+                boolean isWarn = false;
                 for (ResultData resultData : resultListData.getResults()) {
                     if ("1".equals(resultData.getValue())) {
-                        type = type + "," + resultData.getType();
-                        typeName = typeName + "," + resultData.getDesc();
-                        points = points + ";" + resultData.getStartTime() + "," + resultData.getEndTime();
+                        type.append(resultData.getType()).append(",");
+                        typeName.add(resultData.getDesc());
+                        points.append(resultData.getStartTime()).append(",").append(resultData.getEndTime()).append(";");
                         num ++;
                         isWarn = true;
                     }
                 }
-                typeName =  typeName.replaceFirst(",","");
-                if (isWarn){
-                    patrolResultHandler.voiceResultHandler(typeName, inspectionMap, 0, "声纹分析");
-                } else {
-                    typeName = "正常";
-                }
 
-                inspectionMap.put("resultNum", num.toString());
-                inspectionMap.put("resultDesc", typeName);
-                inspectionMap.put("points", points.replaceFirst(";",""));
+                if (isWarn){
+                    patrolResultHandler.voiceResultHandler(typeName.toString(), inspectionMap, 0, "声纹分析");
+                } else {
+                    typeName.add("正常");
+                }
+                String typeNameStr =  typeName.toString();
+                CommonUtils.clearLastChar(points);
+
+                inspectionMap.put("resultNum", String.valueOf(num));
+                inspectionMap.put("resultDesc", typeNameStr);
+                inspectionMap.put("points", points.toString());
             }
             if (!isContains) {
                 // 录音结果处理
