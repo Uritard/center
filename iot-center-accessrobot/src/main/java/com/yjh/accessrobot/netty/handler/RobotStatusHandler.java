@@ -75,14 +75,14 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             robotStatusList.add(robotStatusMap);
             if ("2".equals(res.get("type").toString())) {
                 if ("0".equals(res.get("value").toString())) {
-                    robotService.updateRobotInfo(robotCode, "在线");
+                    robotService.updateRobotInfo(robotCode, "在线",false);
                     if (!"0".equals(onlineStatus)) {
                         redisTemplate.opsForValue().set("onlineStatus:" + robotCode, "0");
                         changeOnline = !changeOnline;
                         onlineStatus = "0";
                     }
                 } else if ("1".equals(res.get("value").toString())) {
-                    robotService.updateRobotInfo(robotCode, "离线");
+                    robotService.updateRobotInfo(robotCode, "离线",false);
                     if (!"1".equals(onlineStatus)) {
                         redisTemplate.opsForValue().set("onlineStatus:" + robotCode, "1");
                         onlineStatus = "1";
