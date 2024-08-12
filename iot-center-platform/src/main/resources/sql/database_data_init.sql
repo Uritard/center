@@ -959,7 +959,8 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('11', 'home_model', 'TaskOverview', 0, '巡视任务', 11);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('12', 'home_model', 'StationSignboard', 0, '变电站光字牌', 12);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('13', 'home_model', 'WeatherModel', 0, '微气象', 13);
-
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('881', 'operation_type', '紧急合闸_夹爪横置', 50, '操作类型', 1);
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('882', 'operation_type', '轨交_紧急分合闸_夹爪横置', 51, '操作类型', 1);
 
 -- ----------------------------
 -- Records of t_period_model
