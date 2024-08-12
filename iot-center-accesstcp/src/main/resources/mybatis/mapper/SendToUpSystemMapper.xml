@@ -117,6 +117,7 @@
         d.camera_id AS camera_id,
         e.b_camera_channel_id,
         e.camera_channel_id,
+        m.mete_id AS mete_id,
         i.voice_device_id AS voice_id
         FROM t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
@@ -132,6 +133,7 @@
         left join t_dict_business j on f.device_type = j.dict_code and j.col_name = 'device_type'
         left join t_dict_business k on b.mete_type = k.dict_code and k.col_name = 'mete_type'
         LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
+        LEFT JOIN t_cfg_mete m ON a.cruise_id = m.mete_id
         where 1=1 and f.up_region_id is not null
         <if test="edgeCode != null and edgeCode != ''"> and a.edge_code = #{edgeCode}</if>
     </select>

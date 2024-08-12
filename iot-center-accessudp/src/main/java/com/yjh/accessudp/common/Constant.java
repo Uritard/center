@@ -57,6 +57,8 @@ public class Constant {
 
     public static final String UNION_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest?meteId={meteId}";
 
+    public static final String SIGNAL_TASK_DEAL_URL = "http://iot-center-platform/tCfgDataCurrent/v1/signalTaskDeal?meteId={meteId}";
+
     public static Result restTemplateGet(String url, Map<String, Object> params) {
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class, params);
     }

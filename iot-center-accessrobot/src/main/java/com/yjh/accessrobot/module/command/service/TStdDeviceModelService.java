@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
@@ -110,6 +111,7 @@ public class TStdDeviceModelService {
                         }
 
                         JSONArray posArray = JSON.parseArray(MapUtils.getString(device, "video_pos"));
+                        JSONObject posJson = posArray.getJSONObject(0);
                         long cruiseId;
                         int cruiseType;
                         String cruiseDeviceId;
@@ -117,13 +119,13 @@ public class TStdDeviceModelService {
                             case "1":
                                 //视频
                                 //构建 t_camera_preset
-                                String cameraChannelId = posArray.getJSONObject(0).getString("device_code");
+                                String cameraChannelId = posJson.getString("device_code");
                                 TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t ->
                                         (cameraChannelId.equals(t.getBcameraChannelId()) || cameraChannelId.equals(t.getCameraChannelId()))
                                                 && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
-                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posArray, tCameraInfo.getCameraId());
+                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posJson, tCameraInfo.getCameraId());
                                 cruiseDeviceId = String.valueOf(tCameraInfo.getCameraId());
-                                cruiseId = posArray.getJSONObject(0).getLongValue("device_pos");
+                                cruiseId = posJson.getLongValue("device_pos");
                                 cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
                                 finalCameraPresetList.add(tCameraPreset);
                                 break;
@@ -132,18 +134,35 @@ public class TStdDeviceModelService {
                                 //机器人、无人机
                                 //构建 t_robot_inspection
                                 String keyPos = "2".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
-                                cruiseId = posArray.getJSONObject(0).getLongValue(keyPos);
+                                cruiseId = posJson.getLongValue(keyPos);
                                 cruiseType = "2".equals(device.get("data_type")) ? 228 : 524;
-                                TRobotInspection tRobotInspection = createRobotInspection(edgeCode, cruiseId, device, tRobotInfoList, posArray);
+                                TRobotInspection tRobotInspection = createRobotInspection(edgeCode, cruiseId, device, tRobotInfoList, posJson);
                                 cruiseDeviceId = String.valueOf(tRobotInspection.getRobotId());
                                 finalRobotInspectionList.add(tRobotInspection);
                                 break;
                             case "8":
                                 //声纹
-                                boolean voiceFlag = posArray.getJSONObject(0).containsKey("voice_pos");
-                                cruiseId = voiceFlag ? posArray.getJSONObject(0).getLongValue("voice_pos") : posArray.getJSONObject(0).getLongValue("device_pos");
+                                boolean voiceFlag = posJson.containsKey("voice_pos");
+                                cruiseId = voiceFlag ? posJson.getLongValue("voice_pos") : posJson.getLongValue("device_pos");
                                 cruiseDeviceId = String.valueOf(cruiseId);
                                 cruiseType = 232;
+                                break;
+                            case "16":
+                                //主辅设备
+                                Optional<String> optionalFirstStationId = tStdRegionList.stream()
+                                        .filter(tStdRegion -> tStdRegion.getState() == 1)
+                                        .map(TStdRegion::getStationId)
+                                        .findFirst();
+                                String stationId = optionalFirstStationId.orElse("");
+                                if (StringUtils.isBlank(stationId)) {
+                                    log.error("未配置该边缘节点 edgeCode:{}", edgeCode);
+                                    return;
+                                }
+                                boolean onlineFlag = posJson.containsKey("online_pos");
+                                cruiseId = onlineFlag ? Long.parseLong(stationId + posJson.getString("online_pos")) : posJson.getLongValue("device_pos");
+                                //cruiseDeviceId为mete_id
+                                cruiseDeviceId = String.valueOf(cruiseId);
+                                cruiseType = 231;
                                 break;
                             default:
                                 return;
@@ -355,18 +374,18 @@ public class TStdDeviceModelService {
      * @param cruiseId
      * @param device
      * @param tRobotInfoList
-     * @param robotArray
+     * @param posJson
      * @return
      */
     private TRobotInspection createRobotInspection(String edgeCode, long cruiseId, Map<String, Object> device,
-                                                   List<TRobotInfo> tRobotInfoList, JSONArray robotArray) {
+                                                   List<TRobotInfo> tRobotInfoList, JSONObject posJson) {
         TRobotInspection tRobotInspection = new TRobotInspection();
         String keyCode = "2".equals(device.get("data_type")) ? "robot_code" : "uav_code";
         tRobotInspection.setEdgeCode(edgeCode);
         tRobotInspection.setOriginId(String.valueOf(cruiseId));
         tRobotInspection.setInspectionCode(String.valueOf(device.getOrDefault("inspection_code", "")));
         TRobotInfo tRobotInfo = tRobotInfoList.stream().filter(t ->
-                String.valueOf(robotArray.getJSONObject(0).get(keyCode)).equals(String.valueOf(t.getRobotNum())))
+                String.valueOf(posJson.get(keyCode)).equals(String.valueOf(t.getRobotNum())))
                 .collect(Collectors.toList()).get(0);
         tRobotInspection.setRobotId(tRobotInfo.getRobotId());
         tRobotInspection.setInspectionName(String.valueOf(device.get("device_name")).contains("/")
@@ -380,11 +399,11 @@ public class TStdDeviceModelService {
      * 创建 TCameraPreset 表信息
      * @param edgeCode
      * @param device
-     * @param cameraArray
+     * @param posJson
      * @param cameraId
      * @return
      */
-    private TCameraPreset createCameraPreset(String edgeCode, Map<String, Object> device, JSONArray cameraArray,
+    private TCameraPreset createCameraPreset(String edgeCode, Map<String, Object> device, JSONObject posJson,
                                              Long cameraId) {
         TCameraPreset tCameraPreset = new TCameraPreset();
         tCameraPreset.setEdgeCode(edgeCode);
@@ -394,7 +413,7 @@ public class TStdDeviceModelService {
         tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
                 : String.valueOf(device.get("device_name")));
-        tCameraPreset.setPresetNum(cameraArray.getJSONObject(0).getIntValue("device_pos"));
+        tCameraPreset.setPresetNum(posJson.getIntValue("device_pos"));
         tCameraPreset.setPresetType(objToInt(device.getOrDefault("preset_type", 1)));
         tCameraPreset.setPresetPtz(String.valueOf(device.getOrDefault("preset_ptz", "")));
 //        tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
@@ -584,10 +603,15 @@ public class TStdDeviceModelService {
                                         String.valueOf(tCruisePointInstance.getCruiseId()).equals(tRobotInspection.getOriginId()))
                                 .collect(Collectors.toList()).get(0).getInspectionId());
                         break;
-                    default:
+                    case 232:
                         tCruisePointInstance.setCruiseId(tVoiceDeviceList.stream().filter(tVoiceDevice ->
                                         String.valueOf(tCruisePointInstance.getCruiseId()).equals(tVoiceDevice.getOriginId()))
                                 .collect(Collectors.toList()).get(0).getVoiceDeviceId());
+                        break;
+                    case 231:
+                        tCruisePointInstance.setCruiseId(tCruisePointInstance.getCruiseId());
+                        break;
+                    default:
                         break;
                 }
             });
