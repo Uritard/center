@@ -553,6 +553,10 @@ public class RobotService {
         return Pair.of(sendSessionId, PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString));
     }
 
+    public void updateRobotInfo(String robotCode, String robotStatus) {
+        updateRobotInfo(robotCode,robotStatus,true);
+    }
+
     /**
      * 更新机器人的在线状态
      *
@@ -560,7 +564,7 @@ public class RobotService {
      * @param robotStatus 在线状态
      */
     @Transactional(rollbackFor = Exception.class)
-    public void updateRobotInfo(String robotCode, String robotStatus) {
+    public void updateRobotInfo(String robotCode, String robotStatus,Boolean needUpToCruise) {
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
         boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
@@ -584,7 +588,9 @@ public class RobotService {
                 int res = tRobotInfoDao.update(tRobotInfo);
                 log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
                 TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
-                RobotStatusObserver.postNetStatus(robotInfo.getRobotName(), robotInfo.getRobotNum(), robotStatus);
+                if (needUpToCruise){
+                    RobotStatusObserver.postNetStatus(robotInfo.getRobotName(), robotInfo.getRobotNum(), robotStatus);
+                }
             }
         }
     }
