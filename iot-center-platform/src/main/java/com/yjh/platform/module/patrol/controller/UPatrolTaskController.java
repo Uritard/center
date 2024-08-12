@@ -8,7 +8,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsRecord;
-import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -21,13 +20,11 @@ import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.service.UpdatePatrolService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
-import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -568,9 +565,7 @@ public class UPatrolTaskController {
         Result result = new Result();
         try {
             log.info("The silentInfo from accessRobot is=={}", silentInfos);
-            silentInfos.forEach(silentInfo -> {
-                silentHandler.silentHandler(silentInfo.getFilePath(),silentInfo.getDeviceId());
-            });
+            silentInfos.forEach(silentInfo -> silentHandler.silentHandler(silentInfo));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

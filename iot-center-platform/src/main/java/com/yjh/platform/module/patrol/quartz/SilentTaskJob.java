@@ -90,7 +90,6 @@ public class SilentTaskJob implements Runnable {
     private void process(TCameraPreset preset) {
         long cameraId = preset.getCameraId();
         long presetId = preset.getPresetId();
-        String presetName = preset.getPresetName();
 
         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + preset.getCameraIp());
         String state = redisInfoMap.get("state");
@@ -119,10 +118,14 @@ public class SilentTaskJob implements Runnable {
         if ((now.getTime() - lastDate.getTime()) >= ((waitTime-1)* 1000L) ){
             log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
             try {
+                String patroldeviceCode = MapUtils.getString(instanceInfoMap, "patroldevice_code");
+                String meteName = MapUtils.getString(instanceInfoMap, "mete_name");
+                String pointId = Constant.standardPoints() ? MapUtils.getString(instanceInfoMap, "device_point_id") :
+                    MapUtils.getString(instanceInfoMap, "instance_id");
                 cameraConService.moveToPreset(presetId, cameraId);
                 // 静默不等待摄像头转到预置位
                 // 拍照
-                Map<String, String> result = cameraConService.capturePicture("silent", null, cameraId, presetName);
+                Map<String, String> result = cameraConService.capturePicture("silent", null, cameraId, meteName);
                 if (MapUtils.isEmpty(result)) {
                     log.info("抓图失败 result:{}", result);
                     return;
@@ -133,7 +136,7 @@ public class SilentTaskJob implements Runnable {
                 //如果是边缘节点 上传巡视主机
                 String resultImgPath = null;
                 if (Constant.LEVEL_EDGE.equals(edgeLevel)) {
-                    resultImgPath = uploadPicture(absPath, String.valueOf(cameraId), String.valueOf(presetId), presetName);
+                    resultImgPath = uploadPicture(absPath, patroldeviceCode, pointId, meteName);
                     //否则调用算法分析
                 } else {
                     // 分析
@@ -154,10 +157,10 @@ public class SilentTaskJob implements Runnable {
      * 拿到相机拍照结果，边缘节点将图片上传至巡检主机
      *
      * @param absPath   相机抓图返回结果
-     * @param cameraId 相机id  充当巡检设备编码
+     * @param patroldeviceCode 相机编码  充当巡检设备编码
      * @param presetId 预置位id  充当巡视点ID
      */
-    private String uploadPicture(String absPath, String cameraId, String presetId, String presetName) {
+    private String uploadPicture(String absPath, String patroldeviceCode, String presetId, String presetName) {
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -168,7 +171,7 @@ public class SilentTaskJob implements Runnable {
             xmlBaseModel.setType("64");
             String edgeId = (String) redisTemplate.opsForHash().entries(Constant.T_SYS_PARAM + "edgeId").get("content");
             xmlBaseModel.setCode(edgeId);
-            xmlItem.put("patroldevice_code", cameraId);
+            xmlItem.put("patroldevice_code", patroldeviceCode);
             xmlItem.put("device_name", presetName);
             xmlItem.put("device_id", presetId);
             xmlItem.put("time", simpleDateFormat.format(new Date()));
@@ -178,7 +181,7 @@ public class SilentTaskJob implements Runnable {
             //上传图片
             String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
-            String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
+            String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/CCD/" + timeFormat.substring(6,8)+"/"+patroldeviceCode+"/"+presetId + "_" + timeFormat + ".jpg";
             if ("0".equals(applicationProperties.getUpSystemFtps().getFlag())){
                 log.info("上级系统开关未开！ {}",applicationProperties.getUpSystemFtps().getFlag());
             }else {

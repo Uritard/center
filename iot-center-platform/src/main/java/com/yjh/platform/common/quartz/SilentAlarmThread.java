@@ -17,6 +17,7 @@ import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -461,10 +462,10 @@ public class SilentAlarmThread implements Runnable {
                     .setWarnTime(new Date())
                     .setWarnName("静默监视告警数据")
                     .setWarnContent(desc)
-                    .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
-                    .setCunstomId(String.valueOf(map.get("custom_id")))
-                    .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
-                    .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
+                    .setDeviceId(MapUtils.getLong(map, "device_id"))
+                    .setCunstomId(MapUtils.getString(map, "custom_id"))
+                    .setInstanceId(MapUtils.getLong(map, "instance_id"))
+                    .setStdMeteId(MapUtils.getLong(map, "device_mete_id"))
                     .setConfMode(276)
                     .setDefectModel(450)
                     .setAlarmSource(689) // 静默监视
@@ -510,22 +511,20 @@ public class SilentAlarmThread implements Runnable {
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             List<Map<String, Object>> xmlItems = new ArrayList<>();
             Map<String, Object> xmlItem = new HashMap<>(16);
-
+            String patroldeviceCode = MapUtils.getString(map, "patroldevice_code");
             xmlBaseModel.setType("63");
-            xmlItem.put("patroldevice_code", map.get("preset_id"));
-            xmlItem.put("patroldevice_name", map.get("device_name"));
+            xmlItem.put("patroldevice_code", patroldeviceCode);
+            xmlItem.put("patroldevice_name", map.get("camera_name"));
             switch (tWarnInfo.getWarnLevel()) {
                 case 130:
+                case 131:
                     xmlItem.put("alarm_level", "1");
                     break;
-                case 131:
+                case 132:
                     xmlItem.put("alarm_level", "2");
                     break;
-                case 132:
-                    xmlItem.put("alarm_level", "3");
-                    break;
                 case 133:
-                    xmlItem.put("alarm_level", "4");
+                    xmlItem.put("alarm_level", "3");
                     break;
                 default:
                     break;

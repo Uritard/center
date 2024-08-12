@@ -416,9 +416,9 @@ public class InspectionResultThread implements Runnable{
             if (fileFound){
                 if (TypeEnum.VOICE.getCode() != cruiseType) {
                     resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
-                } else {
-                    // 声纹告警处理
-                    resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
+                // } else {
+                //     // 声纹告警处理
+                //     resultHandler.voiceAlarmHandler(resultValue, tCruiseTaskResultMap);
                 }
             }
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();

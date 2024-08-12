@@ -906,6 +906,10 @@ public class PatrolResultHandler {
         return cruiseResultMap;
     }
 
+    /**
+     * 声纹逻辑修改，声纹不在由本级判断是否产生告警
+     */
+    @Deprecated
     public Map<String, String> voiceAlarmHandler(String resultValue, Map<String, String> cruiseResultMap) {
         /*if (!StringUtils.containsAny(resultValue, "dB", "Hz")) {
             log.warn("voice is not analyse, resultValue: {}, cruiseResultMap: {}", resultValue, JSON.toJSONString(cruiseResultMap));

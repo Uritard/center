@@ -231,9 +231,7 @@ public class ProcessResultToUpSystem {
                 alarmAndResultToUpSystem(cruiseResultNewList, alarmLevel, tWarnInfo);
             }
             xmlBaseModel.setItems(xmlItems);
-            if (Constant.isEdge()) {
-                xmlBaseModel.setCommand("1");
-            }
+
             if (StringUtils.isBlank(xmlBaseModel.getType())){
                 return null;
             }
@@ -319,12 +317,12 @@ public class ProcessResultToUpSystem {
         }
         if (type == TypeEnum.INFRARED || type == TypeEnum.VIDEO){
             TCameraInfo cameraInfo = tCameraInfoDao.selectCamera(Long.valueOf(deviceCode));
-            deviceCode = cameraInfo.getBcameraChannelId() == null ? (cameraInfo.getCameraChannelId() == null ? deviceCode:cameraInfo.getCameraChannelId()):cameraInfo.getBcameraChannelId();
+            deviceCode = StringUtils.isEmpty(cameraInfo.getBcameraChannelId()) ? (StringUtils.isEmpty(cameraInfo.getCameraChannelId()) ? deviceCode:cameraInfo.getCameraChannelId()):cameraInfo.getBcameraChannelId();
         }
         if (type == TypeEnum.VOICE){
             Long voiceId = MapUtils.getLong(cruiseResultMap,"cruiseId");
             VoiceDeviceAllInfo voice = tVoiceDeviceDao.selectById(voiceId);
-            deviceCode = voice.getVoiceCode() == null ? deviceCode:voice.getVoiceCode();
+            deviceCode = StringUtils.isEmpty(voice.getVoiceCode()) ? deviceCode : voice.getVoiceCode();
         }
 
         return deviceCode;

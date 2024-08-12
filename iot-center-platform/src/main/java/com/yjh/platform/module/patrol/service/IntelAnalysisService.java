@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.io.file.PathUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -1075,57 +1076,13 @@ public class IntelAnalysisService {
 
         String analyseImageUrl = String.format("/data/sb_output/%s_%s.jpg", objectId, filePathTem);
         String localPath = String.format("/home/yjh_iot_center/iot-picture/resultImg/%s_%s.jpg", objectId, filePathTem);
-        downloadFile(imageUrl, localPath);
+        ftpsService.downloadAnalysisFile(imageUrl, localPath);
 
         // 绘制告警图像
         pictureWaterMark(localPath, type);
 
-        uploadFile(analyseImageUrl, localPath);
+        ftpsService.uploadAnalysisFile(analyseImageUrl, localPath);
         return analyseImageUrl;
-    }
-
-    /**
-     * 将图片从ftps下载到本地
-     *
-     * @param ftpsPath ftpsPath
-     * @param localPath localPath
-     */
-    private void downloadFile(String ftpsPath, String localPath){
-        log.info("将图片从ftps下载到本地, ftpsPath: {}, localPath: {}", ftpsPath, localPath);
-        try {
-            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
-                log.info("ftpsPath或localPath为空，返回");
-                return;
-            }
-
-            log.info("开始执行：FtpsUtil.downloadFile");
-            FtpsUtil.downloadFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort(), applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
-            log.info("结束执行：FtpsUtil.downloadFile");
-        } catch (Exception e) {
-            log.error("将文件从 platform ftp 服务器下载到本地错误:", e);
-        }
-    }
-
-    /**
-     * 将本地文件上传到ftps
-     *
-     * @param ftpsPath ftpsPath
-     * @param localPath localPath
-     */
-    private void uploadFile(String ftpsPath, String localPath){
-        log.info("将本地文件上传到ftps, ftpsPath: {}, localPath: {}", ftpsPath, localPath);
-        try {
-            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
-                log.info("ftpsPath或localPath为空，返回");
-                return;
-            }
-
-            log.info("开始执行：FtpsUtil.putFile");
-            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getIntelAnalysisFtps().getIp(), applicationProperties.getIntelAnalysisFtps().getPort() , applicationProperties.getIntelAnalysisFtps().getUserName(), applicationProperties.getIntelAnalysisFtps().getPassword());
-            log.info("结束执行：FtpsUtil.putFile");
-        } catch (Exception e) {
-            log.error("将文件上传至 platform ftp 服务器错误:", e);
-        }
     }
 
     /**
@@ -1353,7 +1310,7 @@ public class IntelAnalysisService {
                     SysParamConfig.getSysContent("defectResultImg"));
                 String targetNamePath = imgPath.replace(SysParamConfig.getSysContent("defectResultImg"), "").substring(1);
                 String edgeId = SysParamConfig.getSysContent("edgeId");
-                targetNamePath = edgeId + "/jm/" + targetNamePath;
+                targetNamePath = cn.hutool.core.io.FileUtil.normalize(edgeId + "/jm/" + targetNamePath);
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 uploadFileToUpFtps(imgPath, targetNamePath, applicationProperties.getUpSystemFtps());
 
@@ -1435,7 +1392,7 @@ public class IntelAnalysisService {
                     targetPath = SysParamConfig.getSysContent("defectResultImg") + "/" +sourcePath;
                 }
             }
-            downloadFile(sourcePath, targetPath);
+            ftpsService.downloadAnalysisFile(sourcePath, targetPath);
 //            // 图片在ftps上的全路径
 //            String resultAbsolutePath = SysParamConfig.getSysContent("ftpsFilePath") + "/" +sourcePath;
 //            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
