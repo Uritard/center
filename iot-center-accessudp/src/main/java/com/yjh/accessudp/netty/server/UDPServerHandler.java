@@ -211,6 +211,10 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             params.put("meteId", meteId.toString());
             //边缘节点处理方式
             if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+
+                //调用platform 信号点位是否配了巡视点
+                Constant.restTemplateGet(Constant.SIGNAL_TASK_DEAL_URL, params);
+
                 //联动信息上送 A接口
                 LinkageUploadThread linkageUploadThread = new LinkageUploadThread(meteId.toString(), meteKind == 3 ? "0" : meteKind.toString(), value, commit, time);
                 TaskExecutePool.getInstance().execute(linkageUploadThread);

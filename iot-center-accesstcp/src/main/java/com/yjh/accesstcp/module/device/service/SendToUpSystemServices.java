@@ -722,6 +722,8 @@ public class SendToUpSystemServices {
             }else if (item.get("cruise_type").equals(231)){// 主辅系统
                 item.put("save_type_list","");
                 item.put("data_type","16");
+                jsonObject.put("online_code",item.get("mete_id"));
+                jsonObject.put("online_pos",item.get("mete_id"));
             }
 
             item.remove("cruise_type");
