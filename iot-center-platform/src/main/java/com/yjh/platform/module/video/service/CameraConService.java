@@ -2161,7 +2161,7 @@ public class CameraConService {
     public void emergencyAccess(List<Long> cameraIdList,String token){
         Object oldToken = redisTemplate.opsForHash().get(emergencyAccessKey,"token");
         if (oldToken != null){
-            throw new BusinessException("紧急视屏调阅已设置，请勿重复设置");
+            throw new BusinessException("紧急视频调阅已设置，请勿重复设置");
         }
         Integer cameraStateTime = ValueUtil.toInteger(redisTemplate.opsForHash().get("t_sys_param:cameraStateTime", "content"),10);
 
