@@ -31,4 +31,6 @@ public interface UnionTaskDao {
 
     void deleteAll();
 
+    List<Long> selectRealInstanceByDevicePoints(@Param(value = "list") String[] devicePointIds);
+
 }
