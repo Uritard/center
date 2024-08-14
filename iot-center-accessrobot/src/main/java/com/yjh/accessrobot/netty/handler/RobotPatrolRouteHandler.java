@@ -137,11 +137,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             }
         }
 
-        taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
-        String finalTaskPatrolledId = taskPatrolledId;
-        xmlBaseModel.getItems().forEach(item ->{
-            item.put("task_patrolled_id", finalTaskPatrolledId);
-        });
         roadToUpSystem(xmlBaseModel);
     }
 
