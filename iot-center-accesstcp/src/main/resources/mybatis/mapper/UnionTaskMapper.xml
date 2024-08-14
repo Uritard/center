@@ -135,7 +135,14 @@
             </foreach>
         )
     </select>
-
+    <select id="selectRealInstanceByDevicePoints" resultType="java.lang.Long">
+        SELECT
+        a.instance_id
+        FROM t_cruise_point_instance a
+        left join t_std_devicemete b on a.device_mete_id = b.device_mete_id
+        WHERE b.device_point_id in
+        <foreach collection="list" item="pointId" open="(" separator="," close=")"> #{pointId} </foreach>
+    </select>
     <delete id="deleteUnionRule">
         delete from t_cfg_union_rule where plan_id in (
             <foreach collection="planIdList" separator="," item="planId">

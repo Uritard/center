@@ -2,6 +2,7 @@ package com.yjh.accesstcp.module.device.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.utils.file.FileUtil;
 import com.yjh.accesstcp.module.device.dao.UnionTaskDao;
 import com.yjh.accesstcp.module.device.entity.TCfgUnionRule;
@@ -120,7 +121,12 @@ public class AnalysisUnionTaskFileService {
         itemList.forEach(item -> {
             if (item.get("device_id") != null) {
                 String instanceIds = String.valueOf(item.get("device_id"));
-                instanceIdList.addAll(ValueUtil.stringToList(instanceIds, ",", Long::parseLong));
+                if (Constant.standardPoints()) {
+                    List<Long> list = unionTaskDao.selectRealInstanceByDevicePoints(instanceIds.split(","));
+                    instanceIdList.addAll(list);
+                } else {
+                    instanceIdList.addAll(ValueUtil.stringToList(instanceIds, ",", Long::parseLong));
+                }
                 TCfgUnionRule tCfgUnionRule = new TCfgUnionRule();
                 tCfgUnionRule.setRuleName(String.valueOf(item.get("source_name")));
                 String inputParam = String.valueOf(item.get("source_code"));
