@@ -264,6 +264,13 @@ public class TSysParamService{
         result.put("logoImage", SysParamConfig.getSysContent("logoImage"));
         result.put("loginLogoImage", SysParamConfig.getSysContent("loginLogoImage"));
 
+        result.put("serviceAddress", sysParamConfig.getSecure().get("serviceAddress"));
+        result.put("vocalPrintSrc", sysParamConfig.getSecure().get("vocalPrintSrc"));
+        result.put("mrtName", sysParamConfig.getSecure().get("mrtName"));
+        result.put("center", sysParamConfig.getSecure().get("center"));
+        result.put("theme", sysParamConfig.getSecure().get("theme"));
+        result.put("homeType", sysParamConfig.getSecure().get("homeType"));
+
         return result;
     }
     public Map<String,String > homePageInfo(){
