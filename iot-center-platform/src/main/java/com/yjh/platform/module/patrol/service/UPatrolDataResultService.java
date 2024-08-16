@@ -10,8 +10,6 @@ import com.alibaba.excel.write.style.row.SimpleRowHeightStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.report.ExportUtil;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -27,7 +25,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -562,6 +559,15 @@ public class UPatrolDataResultService {
         }
 
         return cruiseResultList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void batchUpdateByTaskIdAndInstanceId(List<UPatrolDataResult> list) {
+        uPatrolDataResultDao.batchUpdateByTaskIdAndInstanceId(list);
+    }
+
+    public Map<String, Object> selectWaitAndAbnormalByTaskId(String taskId) {
+        return uPatrolDataResultDao.selectWaitAndAbnormalByTaskId(taskId);
     }
 }
 

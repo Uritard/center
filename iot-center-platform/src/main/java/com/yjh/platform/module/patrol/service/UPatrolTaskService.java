@@ -103,6 +103,7 @@ public class UPatrolTaskService {
     public static final String INTERVAL = "interval_";
     public static final String TASK_ALL = "--ALL";
     public static final String SUBSET = "--subset";
+    public static final String REISSUE_PREFIX = "reissue_result";
     public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
     /**
      / 限流 10s一次
@@ -2430,6 +2431,9 @@ public class UPatrolTaskService {
 
         abnormalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL);
         normalCounts = redisTemplate.opsForSet().size(strForCountAll + "--" + CRUISE_RESULT_NORMAL);
+        Set inter = redisTemplate.opsForSet().intersect(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL, strForCountAll + "--" + CRUISE_RESULT_NORMAL);
+        abnormalCounts = abnormalCounts - inter.size();
+
         allCounts = NumberUtils.toLong(resultCountsMap.get("all"));
         boolean ended = Boolean.parseBoolean(resultCountsMap.getOrDefault("ended", "false"));
         log.info("From redis---task:{}, all:{}, abnormalCounts:{}, normalCounts:{}", taskId, allCounts, abnormalCounts, normalCounts);
@@ -2446,7 +2450,6 @@ public class UPatrolTaskService {
         resultCountsMap.put("normal", String.valueOf(normalCounts));
         resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
 
-        Set inter = redisTemplate.opsForSet().intersect(strForCountAll + "--" + CRUISE_RESULT_ABNORMAL, strForCountAll + "--" + CRUISE_RESULT_NORMAL);
         if (CollectionUtils.isNotEmpty(inter)) {
             log.error("执行完成点位重复：【{}】", JSON.toJSONString(inter));
         }
@@ -2474,6 +2477,13 @@ public class UPatrolTaskService {
             }
             subsetMap.put(result.get("instanceId"), cruiseType);
         });
+        if (ended) {
+            //任务已经结束 补发测点入 reissue_result redis中
+            String[] reissues = cruiseResultList.stream()
+                    .map(m -> PATROL_TASK_PREFIX + taskId + ":" + MapUtils.getString(m, "instanceId"))
+                    .distinct().toArray(String[]::new);
+            redisTemplate.opsForSet().add(REISSUE_PREFIX, reissues);
+        }
         redisTemplate.opsForHash().putAll(subsetKey, subsetMap);
         redisTemplate.expire(subsetKey, 7, TimeUnit.DAYS);
 

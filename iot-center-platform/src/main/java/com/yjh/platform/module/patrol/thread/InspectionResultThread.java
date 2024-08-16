@@ -111,7 +111,11 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("unit", robotPatrolTaskResult.getUnit());
             }
             // 巡视结果、异常原因、执行状态处理
-            setCruiseResult(tCruiseTaskResultMap, instanceId);
+            boolean res = setCruiseResult(tCruiseTaskResultMap, instanceId);
+            if (res) {
+                log.info("本测点结果下级已经返回过并且正常，本次返回的结果不正确，本次结果不处理！");
+                return;
+            }
 
             log.info("tCruiseTaskResultMap {}", tCruiseTaskResultMap);
 
@@ -139,8 +143,9 @@ public class InspectionResultThread implements Runnable{
     /**
      * 判断当前点位的异常状态和点位结果是否正常
      */
-    private void setCruiseResult(Map<String, String> tCruiseTaskResultMap, String instanceId) {
+    private boolean setCruiseResult(Map<String, String> tCruiseTaskResultMap, String instanceId) {
         String taskId = infoMap.get("taskId");
+        String oldCruiseResult = tCruiseTaskResultMap.get("cruiseResult");
 
         boolean isnormal = true;
         String sendCode = robotPatrolTaskResult.getSendCode();
@@ -171,7 +176,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("cruiseAbnormal", "" + CRUISE_ABNORMAL_DATAABNORMAL);
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             robotPatrolTaskResult.setValid("0");
-            return;
+            return whetherDiscarded(oldCruiseResult, String.valueOf(CRUISE_RESULT_ABNORMAL));
         }
         String cruiseResult;
         String cruiseAbnormal = "";
@@ -187,7 +192,6 @@ public class InspectionResultThread implements Runnable{
                     break;
                 //分析失败
                 case "2":
-                    break;
                 //采集失败
                 case "0":
                 default:
@@ -203,8 +207,11 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("resultNum", "-1");
             tCruiseTaskResultMap.put("resultDesc", val);
         }
-        computeEmpty(tCruiseTaskResultMap, "cruiseResult", cruiseResult);
-        computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", cruiseAbnormal);
+
+        tCruiseTaskResultMap.put("cruiseResult", cruiseResult);
+        tCruiseTaskResultMap.put("cruiseAbnormal", cruiseAbnormal);
+//        computeEmpty(tCruiseTaskResultMap, "cruiseResult", cruiseResult);
+//        computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", cruiseAbnormal);
 
         // 重新获取一下异常状态，可能异常状态已经设置过了，譬如超时，终止
         cruiseAbnormal = tCruiseTaskResultMap.get("cruiseAbnormal");
@@ -229,6 +236,23 @@ public class InspectionResultThread implements Runnable{
                 break;
         }
         tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(cruiseStatus));
+        return whetherDiscarded(oldCruiseResult, cruiseResult);
+    }
+
+    /**
+     *
+     * @param oldCruiseResult 已入库数据
+     * @param cruiseResult 当前数据
+     * @return 是否丢弃消息
+     */
+    private boolean whetherDiscarded(String oldCruiseResult, String cruiseResult) {
+        //未入库 不丢弃
+        if (CommonUtils.isEmptyOrNullstr(oldCruiseResult)) {
+            return false;
+        } else {
+            //已入库 当前结果正常则更新 不正常 则丢弃
+            return !String.valueOf(CRUISE_RESULT_NORMAL).equals(cruiseResult);
+        }
     }
 
     private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
