@@ -42,6 +42,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.xpath.operations.Bool;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -522,9 +523,11 @@ public class RobotService {
      */
     private String createLinkageModel(String edgeCode, String stationCode) throws Exception {
         //联动配置文件
+        Boolean standardPoints = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:standardPoints", "content"));
+
         Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         String ftpsFilePath = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content");
-        List<Map<String,Object>> infoList = tRobotInfoDao.selectTCfgUnionRule(edgeCode);
+        List<Map<String,Object>> infoList = tRobotInfoDao.selectTCfgUnionRule(edgeCode,standardPoints);
         return CreateModeXMLUtil.createXmlFile(infoList, ftpsFilePath, stationCode, "effect_model.xml", "Effect_Config");
     }
 
