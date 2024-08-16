@@ -419,7 +419,8 @@ public interface TRobotInfoDao {
      */
     Long selectRobotIdByRobotNum(@Param(value = "robotNum") String robotNum, @Param(value = "edgeCode") String edgeCode);
 
-    List<Map<String, Object>> selectTCfgUnionRule(@Param(value = "edgeCode") String edgeCode);
+    List<Map<String, Object>> selectTCfgUnionRule(@Param(value = "edgeCode") String edgeCode,
+                                                  @Param(value = "standardPoints")Boolean standardPoints);
 
     int deleteByEdgeCodeAndType(@Param(value = "edgeCode") String edgeCode, @Param("type") String type);
 
