@@ -2919,3 +2919,13 @@ CREATE TABLE `t_cfg_autoreview_detail` (
   KEY `detail_autoreview_id` (`autoreview_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='自动审核配置详细表';
 
+DROP TABLE IF EXISTS `sip_b_dict_area`;
+CREATE TABLE `sip_b_dict_area` (
+ `id` int NOT NULL  AUTO_INCREMENT,
+ `name` varchar(48) DEFAULT '' COMMENT '名称',
+ `code` varchar(48) DEFAULT '' COMMENT '对应编码',
+ `parent_id` int DEFAULT NULL COMMENT '父节点',
+ `type` int DEFAULT NULL COMMENT '类型 SIP编码： 1-网省级 2-地市 3-平台级 4-前段系统 5-对象类型 7-对象数量 国标编码：10001-行业编码 10002-类型编码 666-国标最终生成的编码 777-视频B最终生成的编码',
+ PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SIP-B和国标编码字典表';
+
