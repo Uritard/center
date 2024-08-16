@@ -9,7 +9,13 @@ import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
+import com.yjh.platform.module.video.dao.CameraConDao;
+import com.yjh.platform.module.video.entity.CameraConInfo;
 import com.yjh.platform.module.video.service.CameraConService;
+import com.yjh.video.api.CameraVendor;
+import com.yjh.video.api.entity.DeviceChannelEntity;
+import com.yjh.video.api.service.IWvpPlatformService;
+import com.yjh.video.api.service.VideoServiceFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -60,6 +66,10 @@ public class TCameraInfoService {
     private TStdRegionDao tStdRegionDao;
     @Resource
     private CameraConService cameraConService;
+    @Autowired
+    private CameraConDao cameraConDao;
+    private IWvpPlatformService wvpPlatformService = VideoServiceFactory.loadSnapService(CameraVendor.DEF, IWvpPlatformService.class);
+
 
     public static final Long BUSINESS_ROLE_ID = 1235L;
     public static final String cameraStateKey = "camera_state:";
@@ -116,7 +126,24 @@ public class TCameraInfoService {
             });
             sysUserDevicePermissionDao.batchInsert(permissionDOS);
         }
+        updateSipBCode(tCameraInfo);
         return ret;
+    }
+
+    private void updateSipBCode(TCameraInfo tCameraInfo){
+        if (StringUtils.isNotEmpty(tCameraInfo.getCameraChannelId()) && StringUtils.isNotEmpty(tCameraInfo.getBcameraChannelId())){
+            try {
+                CameraConInfo cameraConInfo = cameraConDao.selectConInfo(tCameraInfo.getCameraId(), null);
+                DeviceChannelEntity entity = DeviceChannelEntity.builder()
+                        .channelId(cameraConInfo.getCameraChannelId())
+                        .deviceId(cameraConInfo.getDeviceChannel())
+                        .videobDeviceId(tCameraInfo.getBcameraChannelId())
+                        .build();
+                wvpPlatformService.updateChannel(entity);
+            }catch (Exception e){
+                log.info("更新wvp服务视频B编码出错！");
+            }
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -219,6 +246,7 @@ public class TCameraInfoService {
         } */
         this.intoRedis(tCameraInfo);
         ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
+        updateSipBCode(tCameraInfo);
         return this.tCameraInfoDao.update(tCameraInfo);
 
     }

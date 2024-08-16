@@ -352,7 +352,7 @@
         <dependency>
             <groupId>com.yjh</groupId>
             <artifactId>iot-video-api</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
         <!-- 获取系统信息 -->
         <dependency>

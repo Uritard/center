@@ -13,4 +13,34 @@
     <sql id="Base_Column_List">
         id,name,parent_id
     </sql>
+
+
+    <select id="selectSipBDictArea" resultType="com.yjh.platform.module.device.entity.SipBDictArea">
+        select * from sip_b_dict_area where 1=1
+        <if test="id != null ">and id = #{id}</if>
+        <if test="code != null and code != ''">and code = #{code}</if>
+    </select>
+
+    <select id="selectSipBDictAreaByType" resultType="com.yjh.platform.module.device.entity.SipBDictArea">
+        select * from sip_b_dict_area where 1=1
+        <if test="type != null ">and type = #{type}</if>
+    </select>
+
+    <insert id="insertSipBConfig" parameterType="com.yjh.platform.module.device.entity.SipBDictArea">
+        insert into sip_b_dict_area(
+            name,
+            code,
+            parent_id,
+            type
+        ) values (
+            #{name},
+            #{code},
+            #{parentId},
+            #{type}
+        ) ON DUPLICATE KEY UPDATE `code` = #{code}
+    </insert>
+
+    <update id="updateSipBConfig" parameterType="com.yjh.platform.module.device.entity.SipBDictArea">
+        update sip_b_dict_area set code = #{code} where `type` = #{type}
+    </update>
 </mapper>
