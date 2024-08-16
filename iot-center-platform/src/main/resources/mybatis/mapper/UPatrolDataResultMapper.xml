@@ -214,6 +214,48 @@
             where a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>
 
+    <update id="batchUpdateByTaskIdAndInstanceId">
+        <foreach collection="list" item="item" separator=";">
+            update u_patrol_data_result a
+            <set>
+                <if test="item.deviceId != null and item.deviceId != ''">a.device_id = #{item.deviceId, jdbcType=BIGINT},</if>
+                <if test="item.deviceName != null and item.deviceName != ''">a.device_name = #{item.deviceName, jdbcType=VARCHAR},</if>
+                <if test="item.instanceName != null and item.instanceName != ''">a.instance_name = #{item.instanceName, jdbcType=VARCHAR},</if>
+                <if test="item.cruiseId != null and item.cruiseId != ''">a.cruise_id = #{item.cruiseId, jdbcType=BIGINT},</if>
+                <if test="item.cruiseName != null and item.cruiseName != ''">a.cruise_name = #{item.cruiseName, jdbcType=VARCHAR},</if>
+                <if test="item.cruiseTime != null and item.cruiseTime != ''">a.cruise_time = #{item.cruiseTime, jdbcType=TIMESTAMP},</if>
+                <if test="item.cruiseStatus != null and item.cruiseStatus != ''">a.cruise_status = #{item.cruiseStatus, jdbcType=INTEGER},</if>
+                <if test="item.cruiseType != null and item.cruiseType != ''">a.cruise_type = #{item.cruiseType, jdbcType=INTEGER},</if>
+                <if test="item.resultDesc != null and item.resultDesc != ''">a.result_desc = #{item.resultDesc, jdbcType=VARCHAR},</if>
+                <if test="item.resultNum != null and item.resultNum != ''">a.result_num = #{item.resultNum, jdbcType=VARCHAR},</if>
+                <if test="item.modifyNum != null and item.modifyNum != ''">a.modify_num = #{item.modifyNum, jdbcType=VARCHAR},</if>
+                <if test="item.picpath != null and item.picpath != ''">a.picpath = #{item.picpath, jdbcType=VARCHAR},</if>
+                <if test="item.confirmPicPath != null and item.confirmPicPath != ''">a.confirm_pic_path = #{item.confirmPicPath, jdbcType=VARCHAR},</if>
+                <if test="item.picPathAnl != null and item.picPathAnl != ''">a.pic_path_anl = #{item.picPathAnl, jdbcType=VARCHAR},</if>
+                <if test="item.personCheck != null and item.personCheck != ''">a.person_check = #{item.personCheck, jdbcType=VARCHAR},</if>
+                <if test="item.origpic != null and item.origpic != ''">a.origpic = #{item.origpic, jdbcType=VARCHAR},</if>
+                <if test="item.origConfirmPicPath != null and item.origConfirmPicPath != ''">a.orig_confirm_pic_path = #{item.origConfirmPicPath, jdbcType=VARCHAR},</if>
+                <if test="item.origPicAnl != null and item.origPicAnl != ''">a.orig_pic_anl = #{item.origPicAnl, jdbcType=VARCHAR},</if>
+                a.cruise_abnormal = #{item.cruiseAbnormal, jdbcType=INTEGER},
+                <if test="item.evaluationState != null and item.evaluationState != ''">a.evaluation_state = #{item.evaluationState, jdbcType=INTEGER},</if>
+                <if test="item.identifyState != null and item.identifyState != ''">a.identify_state = #{item.identifyState, jdbcType=INTEGER},</if>
+                <if test="item.identifyResult != null and item.identifyResult != ''">a.identify_result = #{item.identifyResult, jdbcType=INTEGER},</if>
+                <if test="item.createtime != null and item.createtime != ''">a.createtime = #{item.createtime, jdbcType=TIMESTAMP},</if>
+                <if test="item.remark != null and item.remark != ''">a.remark = #{item.remark, jdbcType=VARCHAR},</if>
+                <if test="item.checkUser != null and item.checkUser != ''">a.check_user = #{item.checkUser, jdbcType=VARCHAR},</if>
+                <if test="item.checkDate != null and item.checkDate != ''">a.check_date = #{item.checkDate, jdbcType=TIMESTAMP},</if>
+                <if test="item.isWarn != null and item.isWarn != ''">a.is_warn = #{item.isWarn, jdbcType=INTEGER},</if>
+                <if test="item.cruiseResult != null and item.cruiseResult != ''">a.cruise_result = #{item.cruiseResult, jdbcType=INTEGER},</if>
+                <if test="item.firName != null and item.firName != ''">a.fir_name = #{item.firName, jdbcType=VARCHAR},</if>
+                <if test="item.firDate != null and item.firDate != ''">a.fir_date = #{item.firDate, jdbcType=TIMESTAMP},</if>
+                <if test="item.resultPic != null and item.resultPic != ''">a.result_pic = #{item.resultPic, jdbcType=VARCHAR},</if>
+                <if test="item.points != null and item.points != ''">a.points = #{item.points, jdbcType=VARCHAR},</if>
+                <if test="item.voicePath != null and item.voicePath != ''">a.voice_path = #{item.voicePath, jdbcType=VARCHAR}</if>
+            </set>
+            where a.task_id = #{item.taskId, jdbcType=VARCHAR} and a.instance_id = #{item.instanceId, jdbcType=BIGINT}
+        </foreach>
+    </update>
+
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
         select
         a.cruise_data_id,
@@ -990,5 +1032,13 @@
         </if>
 
         ORDER BY b.cruise_time desc
+    </select>
+    <select id="selectWaitAndAbnormalByTaskId" resultType="java.util.Map">
+        SELECT
+            SUM(CASE WHEN cruise_status != 252 THEN 1 ELSE 0 END) AS taskWait,
+            SUM(CASE WHEN cruise_result != 246 THEN 1 ELSE 0 END) AS abnormal
+        FROM u_patrol_data_result
+        WHERE
+            task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 </mapper>

@@ -398,7 +398,7 @@ public class PatrolResultHandler {
         }
 
         try {
-            if (filePathList.length >= 1) {
+            if (StringUtils.isNotBlank(robotPatrolTaskResult.getFilePath()) && filePathList.length >= 1) {
                 String firstImgAbsFilePath = "";
                 String firstImgRealFilePath = "";
                 String allFilePath = "";
