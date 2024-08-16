@@ -258,7 +258,7 @@ public class Constant {
 
     public static String server() {
         try {
-            server = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+            server = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem","upSystemReceiveCode");
             log.debug("server is {}", server);
         } catch (Exception e) {
             server = "Server01";
@@ -270,7 +270,7 @@ public class Constant {
 
     public static String algorithmServer() {
         try {
-            algorithmServer = (String) redisTemplate.opsForHash().get("t_sys_param:upSystemAlgorithmReceiveCode","content");
+            algorithmServer = (String) redisTemplate.opsForHash().get("systemConfigKey:managerSystem","upSystemAlgorithmReceiveCode");
             log.debug("algorithmServer is {}", algorithmServer);
         } catch (Exception e) {
             algorithmServer = "Cloud01";

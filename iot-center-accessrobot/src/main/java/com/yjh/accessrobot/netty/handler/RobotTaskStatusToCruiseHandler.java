@@ -71,7 +71,7 @@ public class RobotTaskStatusToCruiseHandler implements MessageHandlerStrategy, I
 
         String systemLevel = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content").toString();
          if (!"1".equals(systemLevel) && Constant.upSystemFlag()) {
-             String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+             String recvCode = (String)redisTemplate.opsForHash().get("systemConfigKey:upSystem","upSystemReceiveCode");
              XMLBaseModel upXmlBaseModel = new XMLBaseModel()
                  .setSendCode(Constant.sendCode())
                  .setReceiveCode(recvCode)
