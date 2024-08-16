@@ -108,7 +108,7 @@ public class NestRunThread{
         }
 
         private void addStateMap(List<Map<String, Object>> list, Map<String, Object> device, int type, String valueDef) {
-            Map<String, Object> stateMap = redisTemplate.opsForHash().entries("RobotStatus:" + device.get("robot_code") + ":" + type);
+            Map<String, Object> stateMap = redisTemplate.opsForHash().entries("nestStatus:" + device.get("robot_code") + ":" + type);
             if (MapUtils.isEmpty(stateMap)) {
                 stateMap = new HashMap<>(8);
                 stateMap.put("value", valueDef);
