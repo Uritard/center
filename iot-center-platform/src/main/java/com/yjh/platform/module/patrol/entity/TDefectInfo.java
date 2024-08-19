@@ -38,7 +38,7 @@ public class TDefectInfo implements Serializable {
     private Date defectTime;
 
     @ApiModelProperty(value = "缺陷类型")
-    private Integer defectType;
+    private String defectType;
 
     @ApiModelProperty(value = "缺陷名称")
     private String defectName;

@@ -1295,7 +1295,7 @@ CREATE TABLE `t_defect_info` (
   `defect_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '缺陷ID',
   `defect_level` int(11) DEFAULT '0' COMMENT '缺陷等级',
   `defect_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '缺陷时间',
-  `defect_type` int(11) DEFAULT '0' COMMENT '缺陷类型',
+  `defect_type` VARCHAR ( 125 ) DEFAULT '0' COMMENT '缺陷类型',
   `defect_name` varchar(125) DEFAULT '' COMMENT '缺陷名称',
   `defect_content` varchar(512) DEFAULT '' COMMENT '缺陷内容',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备Id',

@@ -30,6 +30,6 @@ public class AlarmAndDefectProcess implements Serializable {
     private String dealInfo;
 
     @ApiModelProperty(value = "缺陷类型")
-    private Integer defectModel;
+    private String defectModel;
 
 }

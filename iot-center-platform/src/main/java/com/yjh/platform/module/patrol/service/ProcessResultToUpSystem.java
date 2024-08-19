@@ -605,7 +605,7 @@ public class ProcessResultToUpSystem {
     }
 
     public void defectOrDistinguishWarn(Long Id,String warnContent,
-                                         Integer warnSubType,Integer level,Map<String, String> cruiseResultMap){
+                                         String warnSubType,Integer level,Map<String, String> cruiseResultMap){
         try {
             TWarnInfo tWarnInfo = new TWarnInfo();
             tWarnInfo.setWarnId(Id);
@@ -650,7 +650,7 @@ public class ProcessResultToUpSystem {
                 tWarnInfo.setValue(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
                 tWarnInfo.setWarnContent(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
 
-                tWarnInfo.setWarnSubtype(Integer.valueOf(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450")));
+                tWarnInfo.setWarnSubtype(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450"));
                 String defectLevel = redisInfoMap.get("defectLevel");
                 switch (defectLevel){
                     case "130":
