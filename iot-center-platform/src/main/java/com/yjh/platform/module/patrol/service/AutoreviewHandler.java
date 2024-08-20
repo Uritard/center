@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.module.devicemete.dao.TCfgAutoreviewMapper;
 import com.yjh.platform.module.devicemete.entity.TCfgAutoreview;
 import com.yjh.platform.module.devicemete.entity.TCfgAutoreviewDetail;
@@ -174,8 +175,8 @@ public class AutoreviewHandler {
             Map<Integer, String[]> metes = new HashMap<>();
 
             // 缺陷类型
-            if (tDefectInfo.getDefectType() != null && tDefectInfo.getDefectType() > 0) {
-                metes.put(1, new String[] {String.valueOf(tDefectInfo.getDefectType())});
+            if (!CommonUtils.isEmptyOrNullstr(tDefectInfo.getDefectType()) ) {
+                metes.put(1, tDefectInfo.getDefectType().split(","));
             }
 
             metes.put(3, new String[] {tDefectInfo.getDeviceType()});

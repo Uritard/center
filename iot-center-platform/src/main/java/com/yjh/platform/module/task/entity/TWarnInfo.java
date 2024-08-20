@@ -119,7 +119,7 @@ public class TWarnInfo implements Serializable {
 
     @Max(value=999999999)
     @ApiModelProperty(value = "告警子类型")
-    private Integer warnSubtype;
+    private String warnSubtype;
 
     @Length(max = 64,message = "deviceCode长度必须小于等于64")
     @ApiModelProperty(value = "设备编码")

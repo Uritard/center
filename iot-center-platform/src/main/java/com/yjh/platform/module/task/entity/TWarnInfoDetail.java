@@ -93,7 +93,7 @@ public class TWarnInfoDetail implements Serializable {
     private Long instanceId;
 
     @ApiModelProperty(value = "缺陷类型")
-    private Integer defectModel;
+    private String defectModel;
 
     @ApiModelProperty(value = "缺陷类型--字典表")
     private String defectModelName;

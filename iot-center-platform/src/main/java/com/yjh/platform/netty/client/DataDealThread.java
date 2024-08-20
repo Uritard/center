@@ -667,7 +667,7 @@ public class DataDealThread implements Runnable {
                                         //缺陷插库  To be continue。。。
                                         tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
                                         tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
-                                        tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+                                        tDefectInfo.setDefectType(defectMap.get("defectType"));
                                         tDefectInfo.setDefectContent(defectMap.get("defectContent"));
                                         tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
                                         tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));
@@ -752,7 +752,7 @@ public class DataDealThread implements Runnable {
                                             //缺陷插库
                                             tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
                                             tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
-                                            tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+                                            tDefectInfo.setDefectType(defectMap.get("defectType"));
                                             tDefectInfo.setDefectContent(defectMap.get("defectContent"));
                                             tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
                                             tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));

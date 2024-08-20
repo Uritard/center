@@ -427,7 +427,7 @@ public class TWarnInfoService{
         Long warnId = alarmAndDefectProcess.getWarnId();
         Integer dealType = alarmAndDefectProcess.getDealType();
         String dealInfo = alarmAndDefectProcess.getDealInfo();
-        Integer defectModel = alarmAndDefectProcess.getDefectModel();
+        String defectModel = alarmAndDefectProcess.getDefectModel();
         Date date = new Date();
         int jieGuo = 0;
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
@@ -586,7 +586,7 @@ public class TWarnInfoService{
     }
     //告警弹窗
     @Transactional(rollbackFor = Exception.class)
-    public TWarnInfoDetail selectWarnPopUp(String warnId,Integer defectModel){
+    public TWarnInfoDetail selectWarnPopUp(String warnId,String defectModel){
         TWarnInfoDetail tWarnInfoDetail;
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
         // 告警信息

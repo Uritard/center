@@ -474,7 +474,7 @@ public class TWarnInfoController {
         String userId = request.getHeader("userId");
         try {
             result.setData(tWarnInfoService.alarmAndDefectProcess(alarmAndDefectProcess,userId));
-            Integer defectModel = alarmAndDefectProcess.getDefectModel();
+            String defectModel = alarmAndDefectProcess.getDefectModel();
             Integer warnFlag = Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
             if (Objects.nonNull(defectModel)) {
                 if (defectModel.equals(warnFlag)) {
@@ -540,7 +540,7 @@ public class TWarnInfoController {
     @GetMapping(value = "/warnPopUp")
     @Logs(title = "巡视任务告警",content = "巡视任务告警",logType = 1,authority = "1235")
     public Result warnPopUp(@RequestParam(value = "warnId") String warnId,
-                            @RequestParam(value = "defectModel") Integer defectModel) {
+                            @RequestParam(value = "defectModel") String defectModel) {
         Result result = new Result();
         try {
             TWarnInfoDetail tWarnInfoDetail = tWarnInfoService.selectWarnPopUp(warnId,defectModel);

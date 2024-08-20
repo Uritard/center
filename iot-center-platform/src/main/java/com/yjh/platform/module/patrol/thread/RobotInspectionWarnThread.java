@@ -10,14 +10,13 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
-import com.yjh.platform.module.patrol.entity.TDefectInfo;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.service.TAlgorithmInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -44,6 +43,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private final String taskCode;
     private final TRobotInspectionDao tRobotInspectionDao;
     private AutoreviewHandler autoreviewHandler;
+    private final TAlgorithmInfoService tAlgorithmInfoService;
 
     private Map<String, String> tCruiseTaskResultMap = Collections.EMPTY_MAP;
 
@@ -58,6 +58,7 @@ public class RobotInspectionWarnThread implements Runnable{
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
         this.autoreviewHandler = StaticContextAccessor.getBean(AutoreviewHandler.class);
+        this.tAlgorithmInfoService = StaticContextAccessor.getBean(TAlgorithmInfoService.class);
     }
 
     @Override
@@ -152,7 +153,14 @@ public class RobotInspectionWarnThread implements Runnable{
             }
             tDefectInfo.setAlarmSource(alarmSource);
             tDefectInfo.setValue(taskAlarm.getValue());
-            tDefectInfo.setDefectType(Integer.valueOf(taskAlarm.getDefectType()));
+            //转成数字
+            String[] defcetTypeList = taskAlarm.getDefectType().split(",");
+            String numDefectType = "";
+            for (String defectType:defcetTypeList){
+                TAlgorithmInfo defect = tAlgorithmInfoService.getDefectInfo(defectType);
+                numDefectType = ","+defect.getDefectType()+numDefectType;
+            }
+            tDefectInfo.setDefectType(numDefectType.replaceFirst(",",""));
 
             Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
             tDefectInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
@@ -269,6 +277,7 @@ public class RobotInspectionWarnThread implements Runnable{
             defectMap.put("cruiseTime", tCruiseTaskResultMap.get("cruiseTime"));
             defectMap.put("taskId", taskId);
             defectMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
+            defectMap.put("defectModel", String.valueOf(tDefectInfo.getDefectType()));
         }catch (Exception e){
             log.error("组装缺陷map异常：" , e);
         }
