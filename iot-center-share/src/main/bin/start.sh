@@ -4,7 +4,9 @@ SH_DIR=${PWD%/*}
 java_home=env|grep "JAVA_HOME";
 latestjar=`ls $SH_DIR/ -lt | grep '.jar'| awk '{print $9}' | sed -n '1p'`
 echo 'start:'$latestjar
-process_exists=`ps -ef|grep $latestjar|grep -v grep|awk '{print $2}'`
+stopjar=`echo $latestjar |cut -d"-" -f1,2,3`
+process_exists=`ps -ef|grep -E ${stopjar}'\S+\.jar'|grep -v grep|awk '{print $2}'`
+echo 'stop process:'$stopjar'  '$process_exists
 if [ -n "${process_exists}" ];then
     kill -9 ${process_exists}
 fi
