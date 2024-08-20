@@ -588,7 +588,7 @@ public class TWarnInfoService{
     @Transactional(rollbackFor = Exception.class)
     public TWarnInfoDetail selectWarnPopUp(String warnId,String defectModel){
         TWarnInfoDetail tWarnInfoDetail;
-        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
+        String warnFlag = tWarnInfoDao.selectDictCodeByNote("其他","defect_model");
         // 告警信息
         if (defectModel.equals(warnFlag)){
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
