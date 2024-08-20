@@ -464,20 +464,21 @@ public class TWarnInfoService{
     @Transactional(rollbackFor = Exception.class)
     public int alarmAndDefectProcessList(List<AlarmAndDefectProcess> list, String userId) {
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
+        String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         int warn = 0;
         List<Long> warnIdList = list.stream()
-                .filter(t -> t.getDefectModel().equals(warnFlag))
+                .filter(t -> t.getDefectModel() == null || t.getDefectModel().equals(warnFlag))
                 .map(AlarmAndDefectProcess::getWarnId).collect(Collectors.toList());
         int defect = 0;
         List<Long> defectIdList = list.stream()
                 .filter(t -> Objects.nonNull(t.getDefectModel()) && !t.getDefectModel().equals(warnFlag))
                 .map(AlarmAndDefectProcess::getWarnId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(warnIdList)) {
-            warn = tWarnInfoDao.batchUpDate(warnIdList, userId);
+            warn = tWarnInfoDao.batchUpDate(warnIdList, userName);
             processResultToUpSystem.reviewAlarmToUpSystem(warnIdList, false);
         }
         if (CollectionUtils.isNotEmpty(defectIdList)) {
-            defect = tDefectInfoDao.batchUpDate(defectIdList, userId);
+            defect = tDefectInfoDao.batchUpDate(defectIdList, userName);
             processResultToUpSystem.reviewAlarmToUpSystem(defectIdList, true);
         }
         return warn + defect;
