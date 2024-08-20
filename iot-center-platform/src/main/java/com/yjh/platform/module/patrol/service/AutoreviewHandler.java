@@ -115,7 +115,9 @@ public class AutoreviewHandler {
                 }
                 // 缺陷类型
                 if (CollectionUtils.isNotEmpty(defectType)) {
-                    metes.put(1, defectType.toArray(defectType.toArray(new String[0])));
+                    metes.put(1, defectType.toArray(new String[0]));
+                } else {
+                    metes.put(1, ArrayUtils.EMPTY_STRING_ARRAY);
                 }
 
                 metes.put(3, new String[] {cruiseResult.getOrDefault("deviceType", "")});
@@ -146,6 +148,8 @@ public class AutoreviewHandler {
             // 告警类型
             if (warnInfo.getWarnType() != null && warnInfo.getWarnType() > 0) {
                 metes.put(2, new String[] {String.valueOf(warnInfo.getWarnType())});
+            } else {
+                metes.put(2, ArrayUtils.EMPTY_STRING_ARRAY);
             }
 
             metes.put(3, new String[] {warnInfo.getDeviceType()});
@@ -177,6 +181,8 @@ public class AutoreviewHandler {
             // 缺陷类型
             if (!CommonUtils.isEmptyOrNullstr(tDefectInfo.getDefectType()) ) {
                 metes.put(1, tDefectInfo.getDefectType().split(","));
+            } else {
+                metes.put(1, ArrayUtils.EMPTY_STRING_ARRAY);
             }
 
             metes.put(3, new String[] {tDefectInfo.getDeviceType()});
@@ -207,7 +213,7 @@ public class AutoreviewHandler {
             flag = true;
             for (Map.Entry<Integer, Set<String>> entry : review.entrySet()) {
                 String[] val = metes.get(entry.getKey());
-                boolean contains = ArrayUtils.isNotEmpty(val) && CollectionUtils.containsAny(entry.getValue(), val);
+                boolean contains = val  == null || (ArrayUtils.isNotEmpty(val) && CollectionUtils.containsAny(entry.getValue(), val));
                 if (!contains) {
                     flag = false;
                     break;
