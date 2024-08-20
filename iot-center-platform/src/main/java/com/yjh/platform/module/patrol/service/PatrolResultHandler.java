@@ -250,8 +250,10 @@ public class PatrolResultHandler {
                 }
                 Integer type = uPatrolTaskService.selectRobotType(robotCode);
                 boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-                //机器人是有值的处理非同源/模拟机器人需要算法处理不走这里的非同源
-                if (Constant.isHost() && !isSimulationTool && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType()) && !Constant.fastTurbo()) {
+                //机器人是有值的处理非同源 + 下级主辅设备结果处理非同源/模拟机器人需要算法处理不走这里的非同源
+                if (Constant.isHost() && !isSimulationTool
+                        && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode(), TypeEnum.ONLINE.getCode()}, instance.getCruiseType())
+                        && !Constant.fastTurbo()) {
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
