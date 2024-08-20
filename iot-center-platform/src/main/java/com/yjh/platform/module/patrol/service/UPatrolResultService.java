@@ -606,7 +606,7 @@ public class UPatrolResultService {
         CruiseManualReview curseManualReview = new CruiseManualReview();
         curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
         // 审核结果向上级系统同步
-        int a = uPatrolResultDao.update(review);
+        int a = uPatrolResultDao.updateCheck(reviewResult.getTaskId(), null, null, reviewResult.getRemark());
         processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), reviewResult.getRemark(), false);
         return a;
     }
