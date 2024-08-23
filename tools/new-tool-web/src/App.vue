@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <tool-index></tool-index>
+    <router-view v-if="isRouterAlive"></router-view>
   </div>
 </template>
 
 <script>
-import ToolIndex from './view/ToolIndex.vue'
 
 export default {
   name: 'App',
-  components: {
-    ToolIndex
+  data() {
+    return {
+      isRouterAlive: true,
+    }
   }
 }
 </script>
