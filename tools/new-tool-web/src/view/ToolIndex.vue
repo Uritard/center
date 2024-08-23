@@ -371,6 +371,7 @@ export default {
       this.textReceptionList = [];
     },
     gotoBatchTask() {
+      this.$router.push('/batchTask');
     },
   }
 }
