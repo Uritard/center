@@ -5371,8 +5371,8 @@ INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网直流工程�
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网交流工程建设有限公司','34', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('内蒙古东部电力有限公司','35', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网新源控股有限公司','46', 1);
-INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国电通信中心','47', 1);
-INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国家电网有限公司总部','48', 1);
+INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国电通信中心','49', 1);
+INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国家电网有限公司总部','99', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('视频监控平台','0000', 5);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('前端系统-主站','0100', 5);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('前端系统-35 kV 及其以下','0101', 5);
@@ -5402,6 +5402,6 @@ INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('物流企业接入'
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('信息企业接入','49', 10001);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('视频服务器编码','112', 10002);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('网络视频录像机(NVR) 编码','118', 10002);
-INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('混合硬盘录像机(HVR) 编码','119', 10002);
+INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('混合硬盘录像机(HVR) 编码','130', 10002);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('摄像机编码','131', 10002);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('网络摄像机(IPC) 编码','132', 10002);
