@@ -123,17 +123,19 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             redisTemplate.expire("RobotRoad:" + robotCode, 7, TimeUnit.DAYS);
         }
         String taskPatrolledId = MapUtils.getString(xmlBaseModel.getItems().get(0), "task_patrolled_id");
-        String taskCode = taskPatrolledId.split("_")[1];
-        String timeSrt = taskPatrolledId.split("_")[2];
-        Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
-        UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,date);
-        if (task != null){
-            taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
-            if (StringUtils.isNotEmpty(taskPatrolledId)){
-                String finalTaskPatrolledId = taskPatrolledId;
-                xmlBaseModel.getItems().forEach(item ->{
-                    item.put("task_patrolled_id", finalTaskPatrolledId);
-                });
+        if(StringUtils.isNotEmpty(taskPatrolledId)){
+            String taskCode = taskPatrolledId.split("_")[1];
+            String timeSrt = taskPatrolledId.split("_")[2];
+            Date date = DateTimeUtil.parseFormat(timeSrt, DateTimeUtil.getDateTimePattern3());
+            UPatrolTask task = robotService.selectTaskIdByTaskCode(taskCode,date);
+            if (task != null){
+                taskPatrolledId = (String)redisTemplate.opsForHash().get(RobotService.countForAbnormalKey+task.getTaskId(),"task_patrolled_id");
+                if (StringUtils.isNotEmpty(taskPatrolledId)){
+                    String finalTaskPatrolledId = taskPatrolledId;
+                    xmlBaseModel.getItems().forEach(item ->{
+                        item.put("task_patrolled_id", finalTaskPatrolledId);
+                    });
+                }
             }
         }
 
