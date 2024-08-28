@@ -65,7 +65,7 @@ public class WvpController {
         try {
             Result re = wvpPlatformService.add(parentPlatform);
             if (re.getCode() != 200){
-                throw new BusinessException("添加国标级联配置失败!");
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), re.getMsg());
             }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -86,7 +86,10 @@ public class WvpController {
     com.yjh.platform.common.result.Result update(@RequestBody ParentPlatformEntity parentPlatform) {
         com.yjh.platform.common.result.Result result = new com.yjh.platform.common.result.Result();
         try {
-            wvpPlatformService.update(parentPlatform);
+            Result re =  wvpPlatformService.update(parentPlatform);
+            if (re.getCode() != 200){
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), re.getMsg());
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
