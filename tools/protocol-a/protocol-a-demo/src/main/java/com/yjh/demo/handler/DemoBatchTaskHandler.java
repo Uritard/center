@@ -5,7 +5,11 @@ import com.yjh.commons.rxbus.RxBus;
 import com.yjh.demo.config.ClientConfig;
 import com.yjh.demo.controller.DemoClientBatchController;
 import com.yjh.demo.controller.DemoClientTaskContoller;
+import com.yjh.demo.task.AutomationTask;
+import com.yjh.demo.task.HeartBeatThead;
+import com.yjh.demo.task.ServerHeartBeatThead;
 import com.yjh.demo.util.FtpsUtil;
+import com.yjh.demo.util.ThreadPoolUtil;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.demo.ws.message.BatchTaskMessage;
 import com.yjh.messager.api.msg.BaseMessage;
@@ -17,13 +21,16 @@ import com.yjh.protocol_a.Message;
 import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.OutboundMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -54,7 +61,6 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
     private final int threadCount;
 
     public static final byte[] lock = new byte[0];
-    public static volatile ExecutorService executorService = null;
     long sessionId = 0L;
 
     public DemoBatchTaskHandler(Executor messageProcessingExecutor, RxBus bus, MessageSender sender, SimpleMessageSender wsMessageSender,
@@ -66,14 +72,6 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
         this.receiveCode = receiveCode;
         this.index = index;
         this.threadCount = threadCount;
-        if (executorService == null) {
-            synchronized (lock) {
-                if (executorService == null) {
-                    executorService = Executors.newFixedThreadPool(threadCount);
-                    log.info("Executors pool: {}", executorService);
-                }
-            }
-        }
         subscribeInbound(ExtPeerState.class, InboundMessage.class);
 
     }
@@ -116,9 +114,26 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             }
             //如果是任务需要返回
             if (StringUtils.equals("101", message.getType()) && StringUtils.equals("1", message.getCommand())) {
-                sendTaskResult(message);
+                Message finalMessage = message;
+                ThreadPoolUtil.PATROL_POOL.addThread(() -> sendTaskResult(finalMessage));
             }
-
+            if ("251".equals(message.getType()) && "4".equals(message.getCommand())) {
+                List<Map<String, Object>> items = message.getItems();
+                if (CollectionUtils.isNotEmpty(items)) {
+                    long heartBeatInterval = 0L;
+                    for (Map<String, Object> item : items) {
+                        Object interval = item.get("heart_beat_interval");
+                        if (interval != null) {
+                            heartBeatInterval = NumberUtils.toLong((String)interval);
+                            break;
+                        }
+                    }
+                    if (heartBeatInterval > 0L) {
+                        log.info("增加心跳定时器: {}", heartBeatInterval);
+                        ServerHeartBeatThead.addThread(sender, this, heartBeatInterval);
+                    }
+                }
+            }
         }
     }
 
@@ -208,10 +223,10 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
                 Message taskResponseMsgClone = JSON.parseObject(jsonStr, Message.class);
                 OutboundMessage outboundMessage = new OutboundMessage(taskResponseMsgClone);
                 outboundMessage.setSessionId(sessionId);
-                executorService.execute(() -> {
+                ThreadPoolUtil.PATROL_POOL.addThread(() -> {
                     uplaodAndResponse(remoteFile, taskCode, finalData, deviceId, taskResponseMsgClone, outboundMessage);
                 });
-                if (DemoClientTaskContoller.sleepTime > 0 && i > threadCount) {
+                if (DemoClientTaskContoller.sleepTime > 0) {
                     try {
                         Thread.sleep(DemoClientTaskContoller.sleepTime);
                     } catch (InterruptedException e) {

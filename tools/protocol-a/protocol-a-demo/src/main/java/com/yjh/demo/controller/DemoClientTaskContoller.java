@@ -6,6 +6,7 @@ import com.yjh.demo.entity.BatchClientParam;
 import com.yjh.demo.entity.MessageParam;
 import com.yjh.demo.entity.ResultBean;
 import com.yjh.demo.handler.DemoBatchTaskHandler;
+import com.yjh.demo.task.ServerHeartBeatThead;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.messager.api.channel.MsgChannel;
 import com.yjh.messager.api.channel.RxBusMsgChannel;
@@ -123,7 +124,7 @@ public class DemoClientTaskContoller {
         return new ResultBean(200, "创建客户端成功");
     }
 
-    @PostMapping(value = "/destroy")
+    @GetMapping(value = "/destroy")
     public ResultBean destroyClient() {
         if (!baseSocketClientList.isEmpty()) {
             for (BaseSocketClient socketClient : baseSocketClientList) {
@@ -131,6 +132,7 @@ public class DemoClientTaskContoller {
             }
         }
         baseSocketClientList.clear();
+        messageSenderList.forEach(ServerHeartBeatThead::terminate);
         messageSenderList.clear();
         sendCodeList.clear();
         demoBatchTaskHandlerList.clear();

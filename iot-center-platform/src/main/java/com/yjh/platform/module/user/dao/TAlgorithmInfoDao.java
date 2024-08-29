@@ -44,4 +44,6 @@ public interface TAlgorithmInfoDao {
     String selectEdgeCodeByInstanceId(@Param(value = "instanceId") Long instanceId);
 
     String selectRecognizeTypeByPresetId(@Param(value = "presetId") Long presetId);
+
+    int selectPresetCountByPresetId(@Param(value = "presetId") Long parseLong);
 }
