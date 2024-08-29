@@ -50,6 +50,7 @@ dependencies {
 
     implementation 'com.alibaba:fastjson:1.2.49'
     implementation 'cn.hutool:hutool-core:5.8.27'
+    implementation 'com.yjh.commons:jcommons-core:0.2-SNAPSHOT'
 
 }
 

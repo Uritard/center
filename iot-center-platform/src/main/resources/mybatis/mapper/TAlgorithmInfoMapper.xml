@@ -240,4 +240,7 @@
         left join silent_conf silent on preset.preset_type = silent.preset_type
         where preset.preset_id = #{presetId}
     </select>
+    <select id="selectPresetCountByPresetId" resultType="java.lang.Integer">
+        select  count(1) from  t_camera_preset where preset_id = #{presetId}
+    </select>
 </mapper>

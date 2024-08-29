@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
@@ -226,7 +227,15 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, applicationProperties.getIntelAnalysisFtps());
             } else {
                 String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
-                analyseObject.setImageNormalPath(presetId);
+                //急速模式 非相机任务的表计算法
+                int cameraCount = tAlgorithmInfoDao.selectPresetCountByPresetId(Long.parseLong(presetId));
+                boolean isMeter = !StringUtils.equals("11", analysis.getAnalyseType()) || !StringUtils.equals("398", analysis.getAnalyseType());
+                if (Constant.fastTurbo() && cameraCount == 0 && isMeter) {
+                    log.info("急速模式 非相机上报的表计识别");
+                    analyseObject.setImageNormalPath("");
+                } else {
+                    analyseObject.setImageNormalPath(presetId);
+                }
             }
 
         } catch (Exception e) {
