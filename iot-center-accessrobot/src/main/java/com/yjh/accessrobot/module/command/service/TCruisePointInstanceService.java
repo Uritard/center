@@ -145,7 +145,7 @@ public class TCruisePointInstanceService {
                     tStdRegion.setUpRegionId(areaId);
                     tStdRegion.setRegionCode(StringUtils.EMPTY);
                     tStdRegion.setRegionName(o);
-                    tStdRegion.setUpRegionIds(bayNameToBayId.get(o));
+//                    tStdRegion.setUpRegionIds(bayNameToBayId.get(o));
                     bayNameToBayId.get(o);
                     tStdRegion.setState(1);
                     insertList.add(tStdRegion);
@@ -211,7 +211,7 @@ public class TCruisePointInstanceService {
                     insertDevices.add(tStdDevice);
                     TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
                     tStdDeviceAttr.setUsedTime(new Date());
-                    tStdDeviceAttr.setPmsId(mapDeviceNameToPmsId.get(deviceName));
+//                    tStdDeviceAttr.setPmsId(mapDeviceNameToPmsId.get(deviceName));
                     tStdDevice.setTStdDeviceAttr(tStdDeviceAttr);
 
                 });
