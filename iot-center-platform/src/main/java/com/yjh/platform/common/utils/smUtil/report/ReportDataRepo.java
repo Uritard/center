@@ -1,6 +1,9 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.DictConvertUtil;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -73,14 +76,33 @@ public class ReportDataRepo {
         List<TCruiseDataResultDetail> normalList = new ArrayList<>();
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
-            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && !Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                cbsInspectionResultVo.setIdentifyResultName("异常");
-                abnormalList.add(cbsInspectionResultVo);
-            }else if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResultName()) && Objects.equals("正常", cbsInspectionResultVo.getIdentifyResultName())){
-                normalList.add(cbsInspectionResultVo);
-            }else if (Objects.nonNull(cbsInspectionResultVo.getEvaluationStateName()) && Objects.equals("未审核", cbsInspectionResultVo.getEvaluationStateName())){
-                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-                unReviewList.add(cbsInspectionResultVo);
+            cbsInspectionResultVo.setIdentifyResultName("正常");
+            // 正常结果 巡视结果正常 246， 无告警
+            boolean isNormal =  CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0) && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL);
+            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResult())) {
+                if (CommonUtils.equals(cbsInspectionResultVo.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL) && isNormal) {
+                    normalList.add(cbsInspectionResultVo);
+                } else {
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                    if (isNormal) {
+                        String desc = cbsInspectionResultVo.getResultDesc() + "(" + DictConvertUtil.DICT.covertToDict("identifyResult", cbsInspectionResultVo.getIdentifyResult()) + ")";
+                        cbsInspectionResultVo.setResultDesc(desc);
+                    }
+                }
+            } else {
+                if (isNormal) {
+                    // 无告警放入正常
+                    normalList.add(cbsInspectionResultVo);
+                } else if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 1)) {
+                    // 告警放入异常
+                    cbsInspectionResultVo.setIdentifyResultName("异常");
+                    abnormalList.add(cbsInspectionResultVo);
+                } else {
+                    // 巡视结果异常放入待人工确认
+                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                    unReviewList.add(cbsInspectionResultVo);
+                }
             }
 
         }
