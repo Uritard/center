@@ -82,6 +82,7 @@ public class SystemInfoUtil {
                     map.put("free",strArray[3]);
                     Long other = Long.parseLong(strArray[1])-Long.parseLong(strArray[2])-Long.parseLong(strArray[3]);
                     map.put("other",other.toString());
+                    map.put("available",strArray[6]);
                 }
             } catch (Exception e) {
                 log.error("获取内存信息错误:", e);

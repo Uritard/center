@@ -85,7 +85,7 @@ public class SystemInfoService {
         Map<String,String> menUsage=systemInfoUtil.getMemUsage();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
         Double cpuFreeMin=Double.parseDouble(map.get("content"));
-        if(Double.parseDouble(menUsage.get("free"))/Double.parseDouble(menUsage.get("total"))*100<cpuFreeMin){
+        if(Double.parseDouble(menUsage.get("available"))/Double.parseDouble(menUsage.get("total"))*100<cpuFreeMin){
             String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
             param.set("logType", "5");
