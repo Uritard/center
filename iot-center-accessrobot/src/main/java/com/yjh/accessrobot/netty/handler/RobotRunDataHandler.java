@@ -81,7 +81,8 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             robotOperationMap.put("value", res.get("value").toString());
             robotOperationMap.put("valueUnit", res.get("value_unit").toString());
             robotOperationMap.put("unit", res.get("unit").toString());
-            if (!unitCheck(robotOperationMap)) {
+            boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
+            if (validateValueUnit && !unitCheck(robotOperationMap)) {
                 continue;
             }
             robotOperationList.add(robotOperationMap);

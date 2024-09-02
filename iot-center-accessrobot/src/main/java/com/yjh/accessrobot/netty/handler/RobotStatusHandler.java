@@ -69,7 +69,8 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             robotStatusMap.put("value", res.get("value").toString());
             robotStatusMap.put("valueUnit", res.containsKey("value_unit") ? String.valueOf(res.get("value_unit")) : "");
             robotStatusMap.put("unit", res.containsKey("unit") ? String.valueOf(res.get("unit")) : "");
-            if (!unitCheck(robotStatusMap)) {
+            boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
+            if (validateValueUnit && !unitCheck(robotStatusMap)) {
                 continue;
             }
             robotStatusList.add(robotStatusMap);

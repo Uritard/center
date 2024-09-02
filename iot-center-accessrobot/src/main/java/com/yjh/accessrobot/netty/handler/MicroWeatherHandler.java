@@ -86,7 +86,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             weatherMap.put("unit", MapUtils.getString(res,"unit"));
             weatherMap.put("value", MapUtils.getString(res,"value"));
             weatherMap.put("valueUnit", MapUtils.getString(res,"value_unit"));
-            if (!unitCheck(weatherMap)) {
+            boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
+            if (validateValueUnit && !unitCheck(weatherMap)) {
                 continue;
             }
             weatherList.add(weatherMap);

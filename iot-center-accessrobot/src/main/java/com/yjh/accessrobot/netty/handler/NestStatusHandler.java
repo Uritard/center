@@ -60,7 +60,8 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             nestStatusMap.put("value", res.get("value").toString());
             nestStatusMap.put("valueUnit", res.get("value_unit").toString());
             nestStatusMap.put("unit", res.get("unit").toString());
-            if (!unitCheck(nestStatusMap)) {
+            boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
+            if (validateValueUnit && !unitCheck(nestStatusMap)) {
                 return;
             }
             nestStatusList.add(nestStatusMap);
