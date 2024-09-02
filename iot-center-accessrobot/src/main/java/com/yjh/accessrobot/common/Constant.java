@@ -361,13 +361,11 @@ public class Constant {
     private static Boolean updateSyncModel;
 
     public static boolean updateSyncModel() {
-        if (updateSyncModel == null) {
-            try {
-                updateSyncModel = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
-                log.warn("updateSyncModel is {}", updateSyncModel);
-            } catch (Exception e) {
-                updateSyncModel = false;
-            }
+        try {
+            updateSyncModel = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:updateSyncModel", "content"));
+            log.warn("updateSyncModel is {}", updateSyncModel);
+        } catch (Exception e) {
+            updateSyncModel = false;
         }
         return updateSyncModel;
     }
@@ -404,13 +402,11 @@ public class Constant {
      * @return
      */
     public static Boolean upSystemFlag() {
-        if (upSystemFlag == null) {
-            try {
-                upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
-                log.info("upSystemFlag is {}", upSystemFlag);
-            } catch (Exception e) {
-                upSystemFlag = "1";
-            }
+        try {
+            upSystemFlag = (String) redisTemplate.opsForHash().get("systemConfigKey:upSystem", "upSystemFlag");
+            log.info("upSystemFlag is {}", upSystemFlag);
+        } catch (Exception e) {
+            upSystemFlag = "1";
         }
         return "1".equals(upSystemFlag);
     }
