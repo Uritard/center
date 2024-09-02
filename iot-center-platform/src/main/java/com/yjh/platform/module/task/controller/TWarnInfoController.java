@@ -475,7 +475,7 @@ public class TWarnInfoController {
         try {
             result.setData(tWarnInfoService.alarmAndDefectProcess(alarmAndDefectProcess,userId));
             String defectModel = alarmAndDefectProcess.getDefectModel();
-            Integer warnFlag = Integer.valueOf(DictConvertUtil.DICT.getDictCode("defectModel", "其他"));
+            String warnFlag = DictConvertUtil.DICT.getDictCode("defectModel", "其他");
             if (Objects.nonNull(defectModel)) {
                 if (defectModel.equals(warnFlag)) {
                     processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(alarmAndDefectProcess.getWarnId()), false);
