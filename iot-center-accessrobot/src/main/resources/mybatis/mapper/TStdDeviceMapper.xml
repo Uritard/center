@@ -246,23 +246,25 @@
     </select>
 
     <select id="selectInstanceInfo" resultType="java.util.Map">
-    SELECT
-    a.preset_id,
-    a.camera_id,
-    b.cruise_id,
-    b.instance_id,
-    b.custom_id,
-    b.device_id,
-    d.device_name,
-    b.device_mete_id,
-    e.mete_name
-    FROM
-    t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
-    where a.preset_id = b.cruise_id
-    and d.device_id = b.device_id and e.custom_id = b.custom_id
-    AND b.device_mete_id = e.device_mete_id
-    and a.origin_id = #{originId}
-    and a.edge_code = #{edgeCode}
+        SELECT
+            a.preset_id,
+            a.camera_id,
+            b.cruise_id,
+            b.instance_id,
+            b.custom_id,
+            b.device_id,
+            d.device_name,
+            b.device_mete_id,
+            e.mete_name
+        FROM
+            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e,t_camera_info f
+        where a.preset_id = b.cruise_id
+          AND a.camera_id = f.camera_id
+          and d.device_id = b.device_id and e.custom_id = b.custom_id
+          AND b.device_mete_id = e.device_mete_id
+          and a.preset_type IN (3,4,5,6)
+          and (f.b_camera_channel_id = #{patrolDeviceCode} OR f.camera_channel_id = #{patrolDeviceCode} OR f.origin_id = #{patrolDeviceCode})
+          and f.edge_code = #{edgeCode}
     </select>
 
     <delete id="deleteAllMete">
