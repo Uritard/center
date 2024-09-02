@@ -1,6 +1,7 @@
 package com.yjh.platform.common.quartz;
 
 import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
@@ -46,8 +47,7 @@ public class KeepWatchJob implements Runnable {
             try {
                 List<TCameraPreset> cameraPresetList = tCameraPresetDao.selectKeepWatchList();
                 //获取间隔时间
-                Map<String, String> mapForKeepWatchTime = redisTemplate.opsForHash().entries("t_sys_param:keepWatchTime");
-                Integer keepWatchTime = Integer.parseInt(mapForKeepWatchTime.get("content")) * 60 * 1000;
+                Integer keepWatchTime = Integer.parseInt(SysParamConfig.getSysContent("keepWatchTime")) * 60 * 1000;
                 Date start = new Date();
                 cameraPresetList.forEach(preset -> {
                     Long cameraId = preset.getCameraId();

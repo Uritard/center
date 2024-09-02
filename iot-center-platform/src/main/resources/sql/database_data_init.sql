@@ -1561,7 +1561,10 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'middlegroundIds', '是否使用业务中台ID', 'false', '设备、区域、部件使用业务中台id', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'weatherMenuShowConfig', '微气象展示配置', '1,2,3,4,5,6,7,8', '配置需要展示那些微气象菜单', NULL);
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'validateValueUnit', '是否校验机器人上报的value和unit', 'false', '是否校验机器人上报的value和unit', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
-
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'serviceAddress', '三维地址', 'https://172.24.39.9:18889/space_mg/index.html?placeId=1&sceneOrder=1', '三维页面链接地址', '{\"rule\":\"^(http|https):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'vocalPrintSrc', '声纹地址', 'http://192.168.2.221:10010/#/login', '声纹页面链接地址', '{\"rule\":\"^(http|https):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'mrtName', '首页展示名称', '地铁一号线', '首页展示当前站所名称，原无锡地铁展示地铁线路使用', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'center', '无人机地图中心坐标', '32.30096967,119.2600425', '无人机地图默认展示中心点坐标', '{\"rule\":\"^[0-9,\\\\.]+$\",\"msg\":\"请不要输入特殊字符\"}');
 
 -- ----------------------------
 -- Records of t_version

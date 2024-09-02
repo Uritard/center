@@ -264,12 +264,12 @@ public class TSysParamService{
         result.put("logoImage", SysParamConfig.getSysContent("logoImage"));
         result.put("loginLogoImage", SysParamConfig.getSysContent("loginLogoImage"));
 
-        result.put("serviceAddress", sysParamConfig.getSecure().get("serviceAddress"));
-        result.put("vocalPrintSrc", sysParamConfig.getSecure().get("vocalPrintSrc"));
-        result.put("mrtName", sysParamConfig.getSecure().get("mrtName"));
-        result.put("center", sysParamConfig.getSecure().get("center"));
-        result.put("theme", sysParamConfig.getSecure().get("theme"));
-        result.put("homeType", sysParamConfig.getSecure().get("homeType"));
+        result.put("serviceAddress", SysParamConfig.getSysContent("serviceAddress"));
+        result.put("vocalPrintSrc", SysParamConfig.getSysContent("vocalPrintSrc"));
+        result.put("mrtName", SysParamConfig.getSysContent("mrtName"));
+        result.put("center", SysParamConfig.getSysContent("center"));
+        result.put("theme", SysParamConfig.getSysContent("theme"));
+        result.put("homeType", SysParamConfig.getSysContent("homeType"));
 
         return result;
     }
@@ -289,7 +289,8 @@ public class TSysParamService{
     }
 
     public GitUtil versionInfo(){
-        return gitUtil;
+        boolean flag = Boolean.parseBoolean(SysParamConfig.getSysContent("versionInfo"));
+        return flag ? gitUtil : null;
     }
 
     public void syncCommissioningTimeToUpSystem() {

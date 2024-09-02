@@ -10,6 +10,7 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.service.AlarmShieldService;
@@ -116,7 +117,7 @@ public class SilentAlarmThread implements Runnable {
         log.info("秒级静默监视数据处理 -- xml");
         try {
             // 静默任务开关
-            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
                 HttpAysncClientUtil.StopLink();
@@ -161,7 +162,7 @@ public class SilentAlarmThread implements Runnable {
         log.info(content);
         try {
             // 静默任务开关
-            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
                 HttpAysncClientUtil.StopLink();
@@ -207,7 +208,7 @@ public class SilentAlarmThread implements Runnable {
         log.info("秒级静默监视数据处理 -- img");
         try {
             // 静默任务开关
-            String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+            String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
                 HttpAysncClientUtil.StopLink();
@@ -451,8 +452,8 @@ public class SilentAlarmThread implements Runnable {
 //            String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") + imageUrl;
 //            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
 //
-            String defectResultRealImg = imageUrl.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")));
+            String defectResultRealImg = imageUrl.replaceAll(SysParamConfig.getSysContent("resultImgPath"),
+                SysParamConfig.getSysContent("resultImgRealPath"));
             String alarmLevel = tCameraPresetService.selectAlarmLevel("defect_model", desc);
             if (alarmLevel == null) {
                 alarmLevel = "132";

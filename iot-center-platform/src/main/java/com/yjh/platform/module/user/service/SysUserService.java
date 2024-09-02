@@ -95,7 +95,7 @@ public class SysUserService {
         sysUserBackUp.setVerfiCode(Demo.summary(JSONUtil.toJSONString(map)));
         SysUserBackUpDao.insert(sysUserBackUp);
         // 用户唯一，删除后也不可创建同名用户
-        if ("true".equals(redisTemplate.opsForHash().get("t_sys_param:uniqueUser", "content"))) {
+        if ("true".equals(SysParamConfig.getSysContent("uniqueUser"))) {
             sysKeyService.insertUser(sysUser.getUserName());
         }
         logsRecord.LoginLogsSend(request, "25", "数据备份", userName + "备份了" + sysUser.getUserName() + "用户信息", userName, String.valueOf(userIds), 1);
@@ -193,11 +193,11 @@ public class SysUserService {
             if (!userMap.isEmpty() && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
-                String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
-                String lockTimes = (String)redisTemplate.opsForHash().get("t_sys_param:lockTime", "content");
-                int loginNum = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:loginErrorNum", "content"));
-                String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
-                String isUkey = (String) redisTemplate.opsForHash().get("t_sys_param:isUkey", "content");
+                String isDecode = SysParamConfig.getSysContent("isEncryption");
+                String lockTimes = SysParamConfig.getSysContent("lockTime");
+                int loginNum = NumberUtils.toInt(SysParamConfig.getSysContent("loginErrorNum"));
+                String isLogin = SysParamConfig.getSysContent("isLogin");
+                String isUkey = SysParamConfig.getSysContent("isUkey");
                 int lockTimeOne = NumberUtils.toInt(lockTimes);
                 if ("true".equals(isDecode)) {
                     userName = demo.decryptIdentifier(userMap.get("userName"), userMap.get("identifier"));
@@ -256,7 +256,7 @@ public class SysUserService {
                         Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());
                         if (appKeymap.size() != 0) {
                             Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:" + sysUserLogin.getUserId(), "expireTime")));
-                            int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                            int logoutTime = NumberUtils.toInt(SysParamConfig.getSysContent("logoutTime"));
                             if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
                                 throw new BusinessException(500, "用户已登录");
                             }
@@ -478,11 +478,9 @@ public class SysUserService {
         mapResult.put("subMenuList", subMenuList);
         mapResult.put("menuFirstChild", menuFirstChild);
         mapResult.put("sysUserLogin", sysUserSelect);
-        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-        mapResult.put("systemName",systemNameMap.get("content"));
+        mapResult.put("systemName",SysParamConfig.getSysContent("stationName"));
         mapResult.put("systemLevel", Constant.getLevelEdge());
-        Map<String,String> stationList = redisTemplate.opsForHash().entries("t_sys_param:stationList");
-        String stationListStr = stationList.get("content");
+        String stationListStr = SysParamConfig.getSysContent("stationList");
         mapResult.put("stationList", stationListStr);
         String userId = String.valueOf(sysUserLogin.getUserId());
         Map<String, Object> mapAccount = new HashMap<>();
@@ -631,8 +629,7 @@ public class SysUserService {
     public int unlockUserAccount(Map<String, String> map) throws IOException {
         SysUser sysUserLocked = new SysUser();
         sysUserLocked.setState(1);
-        Map<String, String> maps = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-        String isDecode = maps.get("content");
+        String isDecode = SysParamConfig.getSysContent("isEncryption");
         if ("true".equals(isDecode)) {
             sysUserLocked.setUserId(Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"), map.get("identifier"))));
             redisTemplate.delete("account_lock_time:" + Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"), map.get("identifier"))));
@@ -651,8 +648,7 @@ public class SysUserService {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
-        Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-        String isDecode = enmap.get("content");
+        String isDecode = SysParamConfig.getSysContent("isEncryption");
         if ("true".equals(isDecode)) {
             linkedHashMap.put("password", demo.decryptIdentifier(map.get("newPCode"), map.get("identifier")));
             sysUser.setPassword(Demo.encryption(demo.decryptIdentifier(map.get("newPCode"), map.get("identifier"))));
