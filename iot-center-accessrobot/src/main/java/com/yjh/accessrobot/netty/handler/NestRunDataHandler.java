@@ -62,7 +62,8 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
             nestOperationMap.put("value", res.get("value").toString());
             nestOperationMap.put("valueUnit", res.get("value_unit").toString());
             nestOperationMap.put("unit", res.get("unit").toString());
-            if (!unitCheck(nestOperationMap)) {
+            boolean validateValueUnit = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:validateValueUnit", "content"));
+            if (validateValueUnit && !unitCheck(nestOperationMap)) {
                 continue;
             }
             nestOperationList.add(nestOperationMap);

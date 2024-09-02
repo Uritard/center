@@ -1560,6 +1560,8 @@ INSERT INTO `t_sys_param`( `param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'invalidTaskToRobot', '任务不可用是否下发机器人', 'false', '部分机器人仅支持任务删除，不支持周期任务部分时间段不可用，则此项改为false', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'middlegroundIds', '是否使用业务中台ID', 'false', '设备、区域、部件使用业务中台id', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'weatherMenuShowConfig', '微气象展示配置', '1,2,3,4,5,6,7,8', '配置需要展示那些微气象菜单', NULL);
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES (404, 'validateValueUnit', '是否校验机器人上报的value和unit', 'false', '是否校验机器人上报的value和unit', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+
 
 -- ----------------------------
 -- Records of t_version
