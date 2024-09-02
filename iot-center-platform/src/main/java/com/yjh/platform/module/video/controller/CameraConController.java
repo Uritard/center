@@ -432,9 +432,19 @@ public class CameraConController {
     @ApiOperation(value = "转到预置点")
     @RequestMapping(value = "/moveToPreset", method = RequestMethod.GET)
     public Result moveToPreset(@RequestParam(value = "presetId") Long presetId,
-                               @RequestParam(value = "cameraId") Long cameraId) {
+                               @RequestParam(value = "cameraId") Long cameraId,
+                               HttpServletRequest request) {
         Result result = new Result();
         try {
+            String token = request.getHeader("token");
+            String res = cameraConService.isInEmergencyAccess(token,cameraId);
+            if ("0".equals(res)){
+                cameraConService.delCameraEmergencyAccess(null,cameraId);
+            } else if ("1".equals(res)){
+                //处于紧急调阅模式 但是此token无法控制
+                result.setCode(209,"此相机被紧急调阅中，无法控制！");
+                return result;
+            }
             result.setData(cameraConService.moveToPreset(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
