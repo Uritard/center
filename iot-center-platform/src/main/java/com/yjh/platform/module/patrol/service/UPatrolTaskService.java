@@ -865,17 +865,18 @@ public class UPatrolTaskService {
         // 是否下级主动创建任务
         boolean subCreateTask = "1".equals(countMap.get("taskSource"));
         try {
+            // 如果下级节点提前上报任务状态，则将任务置为开始
+            if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
+                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                    .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
+                log.info("TaskResult start, taskId: {}", taskId);
+                uPatrolResultDao.update(result);
+            }
+
             countChangeMap.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             countChangeMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
             if (subCreateTask) {
                 // 下级主动创建任务第一次启动更新任务状态，更新任务进度
-                if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
-                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
-                        .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
-                    log.info("TaskResult start, taskId: {}", taskId);
-                    uPatrolResultDao.update(result);
-                }
-
                 String progress = robotPatrolTaskStatus.getTaskProgress();
                 if (StringUtils.contains(progress, "%")) {
                     float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
@@ -2614,6 +2615,7 @@ public class UPatrolTaskService {
 
             List<Long> missInstanceMapList = new ArrayList<>();
 
+            Date firstTime = new Date();
             for (Map<String, String> redisInfoMap : taskInfoList) {
                 UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                 uPatrolDataResult.setTaskId(taskId);
@@ -2628,7 +2630,9 @@ public class UPatrolTaskService {
                 uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
                 uPatrolDataResult.setCruiseId(NumberUtils.toLong(redisInfoMap.get("cruiseId")));
                 uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
-                uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                Date cruiseTime = DateTimeUtil.parse(redisInfoMap.get("cruiseTime"));
+                firstTime = DateTimeUtil.earliestDate(firstTime, cruiseTime);
+                uPatrolDataResult.setCruiseTime(cruiseTime);
                 uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
                 uPatrolDataResult.setCruiseDeviceId(redisInfoMap.get("cruiseDeviceId"));
                 uPatrolDataResult.setCruiseDeviceName(redisInfoMap.get("cruiseDeviceName"));
@@ -2675,11 +2679,15 @@ public class UPatrolTaskService {
 
             // 更新upr
             int allCounts = robotInfoKeys.size();
+            UPatrolResult oldResult = uPatrolResultDao.selectByPrimaryId(taskId);
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskStatus).setTaskWait(taskWaitCounts).setEndTime(new Date()).setTaskAbnormal(abnormalCounts);
             // 如果 Redis 状态中总点数为 0，则表示非上级系统下发任务，需更新总点数值
             if ( all == 0) {
                 uPatrolResult.setTaskCount(allCounts);
+            }
+            if (Objects.isNull(oldResult.getExecuteTime())) {
+                uPatrolResult.setExecuteTime(firstTime);
             }
             // 获取当前站内的环境数据并添加
             String stationWeather = getStationWeather();
