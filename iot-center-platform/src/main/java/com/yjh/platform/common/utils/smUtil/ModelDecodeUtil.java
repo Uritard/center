@@ -5,6 +5,7 @@
 package com.yjh.platform.common.utils.smUtil;
 
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.configuration.SysParamConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class ModelDecodeUtil {
             log.error("对象或需解密字段为空， Obj:{}, field: {}", obj, fields);
             return;
         }
-        String isDecode = (String)redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
+        String isDecode = SysParamConfig.getSysContent("isEncryption");
         // 不需要解密操作
         if (!"true".equals(isDecode)) {
             return;
