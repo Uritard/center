@@ -227,6 +227,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     }
                 }
             }else {
+                //调用platform 信号点位是否配了巡视点
+                Constant.restTemplateGet(Constant.SIGNAL_TASK_DEAL_URL, params);
                 {//遥控信号
                     Constant.restTemplateGet(Constant.UNION_URL, params);
                     if(meteKind == 3){
