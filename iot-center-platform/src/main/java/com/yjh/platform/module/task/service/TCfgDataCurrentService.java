@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.ResultConvertUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
@@ -68,97 +69,6 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TUnionTaskDao tUnionTaskDao;
-
-    public static String meteValues(String commintValue){
-        if("合位".equals(commintValue)){
-            return "1";
-        }
-        if("分位".equals(commintValue)){
-            return "0";
-        }
-        if("返回".equals(commintValue)){
-            return "1";
-        }
-        if("启动".equals(commintValue)){
-            return "0";
-        }
-        if("合".equals(commintValue)){
-            return "1";
-        }
-        if("分".equals(commintValue)){
-            return "0";
-        }
-        if("降".equals(commintValue)){
-            return "1";
-        }
-        if("升".equals(commintValue)){
-            return "0";
-        }
-        if("停".equals(commintValue)){
-            return "2";
-        }
-        if("投入".equals(commintValue)){
-            return "1";
-        }
-        if("退出".equals(commintValue)){
-            return "0";
-        }
-        if("控合".equals(commintValue)){
-            return "1";
-        }
-        if("控分".equals(commintValue)){
-            return "0";
-        }
-        if("未储能".equals(commintValue)){
-            return "1";
-        }
-        if("已储能".equals(commintValue)){
-            return "0";
-        }
-        if("联锁".equals(commintValue)){
-            return "1";
-        }
-        if("解锁".equals(commintValue)){
-            return "0";
-        }
-        if("成功".equals(commintValue)){
-            return "1";
-        }
-        if("失败".equals(commintValue)){
-            return "0";
-        }
-        if("远方".equals(commintValue)){
-            return "1";
-        }
-        if("本地".equals(commintValue)){
-            return "0";
-        }
-        if("合上".equals(commintValue)){
-            return "1";
-        }
-        if("断开".equals(commintValue)){
-            return "0";
-        }
-        if("中断".equals(commintValue)){
-            return "1";
-        }
-        if("恢复".equals(commintValue)){
-            return "0";
-        }
-        if("复归".equals(commintValue)){
-            return "2";
-        }
-        if("上限".equals(commintValue)){
-            return "1";
-        }
-        if("下限".equals(commintValue)){
-            return "0";
-        }
-        if("触发".equals(commintValue)){
-            return "2";
-        }
-        return null;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCfgDataCurrent tCfgDataCurrent) {
@@ -240,7 +150,7 @@ public class TCfgDataCurrentService {
             TCfgDataCurrent currentDatas = tCfgDataCurrentDao.selectCurrentDataByMeteId(meteId);
             if (currentDatas != null) {
                 // 汉字四遥值映射转换
-                String finalValues = meteValues(currentDatas.getMeteValue());
+                String finalValues = ResultConvertUtil.convertResult(currentDatas.getMeteValue(),"主辅监控");
                 if(Objects.nonNull(finalValues)){
                     currentDatas.setMeteValue(finalValues);
                 }
