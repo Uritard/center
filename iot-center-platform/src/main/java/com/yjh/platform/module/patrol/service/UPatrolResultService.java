@@ -601,13 +601,12 @@ public class UPatrolResultService {
         if (Objects.isNull(result)){
             throw new BusinessException(ResultCodeEnum.CODE10005, "审核任务不存在");
         }
-        UPatrolResult review = new UPatrolResult();
-        review.setTaskId(reviewResult.getTaskId()).setRemark(reviewResult.getRemark());
+        String remark = StringUtils.defaultString(reviewResult.getRemark());
         CruiseManualReview curseManualReview = new CruiseManualReview();
-        curseManualReview.setRemark(reviewResult.getRemark()).setTaskId(reviewResult.getTaskId());
+        curseManualReview.setRemark(remark).setTaskId(reviewResult.getTaskId());
         // 审核结果向上级系统同步
-        int a = uPatrolResultDao.updateCheck(reviewResult.getTaskId(), null, null, reviewResult.getRemark());
-        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), reviewResult.getRemark(), false);
+        int a = uPatrolResultDao.updateCheck(reviewResult.getTaskId(), null, null, remark);
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(curseManualReview), remark, false);
         return a;
     }
 
