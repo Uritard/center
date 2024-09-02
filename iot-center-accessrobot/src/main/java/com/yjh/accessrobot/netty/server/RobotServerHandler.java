@@ -1,10 +1,12 @@
 package com.yjh.accessrobot.netty.server;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.handler.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,6 +18,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
 import java.util.Map;
@@ -41,10 +44,56 @@ public interface RobotServerHandler {
     Map<String, Object> channelPacket = new ConcurrentHashMap<>();
     Map<String, Object> robotResultMap = new ConcurrentHashMap<>();
 
-    void heartBeatSuccessAfter(ChannelHandlerContext ctx, String robotCode, long sendSessionId,
-            Map<String, String> robotStatusMap);
 
-    void heartBeatFailAfter(String robotCode, Map<String, String> robotStatusMap);
+    RobotService getRobotService();
+
+    RedisTemplate getRedisTemplate();
+
+    /**
+     * 成功收到心跳指令,发送响应并更新机器人状态
+     *
+     * @param ctx            通道
+     * @param robotCode      机器人唯一标识
+     * @param sendSessionId  发送会话序列号
+     * @param robotStatusMap 机器人在线状态
+     * @return void
+     */
+    default void heartBeatSuccessAfter(ChannelHandlerContext ctx, String robotCode, long sendSessionId,
+        Map<String, String> robotStatusMap) {
+        String heartXmlString = PlatformXMLUtil.generateXml(
+            RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        byte[] heartProtocol = PlatformPacketUtil
+            .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, heartXmlString);
+        RobotServerHandler.send(heartProtocol, robotCode);
+        log.info("maps:{}", Constant.maps);
+        log.info("robotChannels:{}", Constant.robotChannels);
+        // 为了等待客户端和服务端连接稳定,收到三次以上再修改
+        if (Constant.robotChannels.containsKey(robotCode)) {
+            log.info("连接稳定且注册成功,客户端:{}正常", robotCode);
+            getRobotService().updateRobotInfo(robotCode, "在线");
+            // normal
+            robotStatusMap.put("value", "0");
+            // Update Robot Network Status
+            getRedisTemplate().opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
+        }
+    }
+
+
+    /**
+     * 没有收到心跳指令,removeLink && updateRobotStatus
+     *
+     * @param robotCode      机器人唯一标识
+     * @param robotStatusMap 机器人在线状态
+     * @return void
+     */
+    default void heartBeatFailAfter(String robotCode, Map<String, String> robotStatusMap) {
+        RobotServerHandler.removeLink(robotCode);
+        getRobotService().updateRobotInfo(robotCode, "离线");
+        // abnormal
+        robotStatusMap.put("value", "1");
+        // Update Robot Network Status
+        getRedisTemplate().opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
+    }
 
     static Map<String, Object> getRobotResultMap() {
         return robotResultMap;
@@ -56,7 +105,7 @@ public interface RobotServerHandler {
      * @param filePathAndName 文件路径
      * @return XMLBaseModel
      */
-    public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
+    static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
         SAXReader reader = new SAXReader();
         Document document = reader.read(new File(filePathAndName));
         return PlatformXMLUtil.readStringXmlOut(document);
@@ -127,7 +176,7 @@ public interface RobotServerHandler {
      * @param robotCode 机器人唯一标识
      * @return void
      */
-    public static void removeLink(String robotCode) {
+    static void removeLink(String robotCode) {
         log.info("+++++++++++++++++robotCode:{}断连开始+++++++++++++++++", robotCode);
         if (StringUtils.isNotEmpty(robotCode)) {
             ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);

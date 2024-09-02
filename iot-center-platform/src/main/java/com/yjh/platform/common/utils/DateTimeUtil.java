@@ -1458,4 +1458,14 @@ public class DateTimeUtil {
         }
         return true;
     }
+
+    public static Date earliestDate(Date first, Date second) {
+        if (Objects.isNull(first) && Objects.isNull(second)) {
+            return null;
+        }
+        if (Objects.isNull(first) || Objects.isNull(second)) {
+            return Objects.isNull(first) ? second : first;
+        }
+        return first.compareTo(second) <= 0 ? first : second;
+    }
 }

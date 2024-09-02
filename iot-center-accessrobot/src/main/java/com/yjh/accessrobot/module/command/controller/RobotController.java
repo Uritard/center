@@ -478,7 +478,7 @@ public class RobotController {
                 messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
             }
             if (Optional.ofNullable(messageHandlerStrategy).isPresent()) {
-                messageHandlerStrategy.handler(null, new RobotServerHandlerImpl(), xmlBaseModel, 0, 0);
+                messageHandlerStrategy.handler(null, new RobotServerHandlerImpl(robotService, redisTemplate), xmlBaseModel, 0, 0);
             }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

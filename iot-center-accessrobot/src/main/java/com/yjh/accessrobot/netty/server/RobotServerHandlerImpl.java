@@ -42,17 +42,22 @@ import static com.yjh.accessrobot.common.Constant.robotRemoveCounts;
 @Slf4j
 public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter implements RobotServerHandler {
 
-    private RobotService robotService;
-    private RedisTemplate redisTemplate;
+    private final RobotService robotService;
+    private final RedisTemplate redisTemplate;
     private ChannelHandlerContext ctx;
     private static final String TAG = "eb90";
 
-    public void setRobotService(RobotService robotService) {
+    public RobotServerHandlerImpl(RobotService robotService, RedisTemplate redisTemplate) {
         this.robotService = robotService;
+        this.redisTemplate = redisTemplate;
     }
 
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
+    public RobotService getRobotService() {
+        return robotService;
+    }
+
+    public RedisTemplate getRedisTemplate() {
+        return redisTemplate;
     }
 
     public ChannelHandlerContext getCtx() {
@@ -314,64 +319,6 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
         xmlBaseModelEmpty.setSendCode(Constant.sendCode());
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
-    }
-
-    /**
-     * 通过文件路径解析XML
-     *
-     * @param filePathAndName 文件路径
-     * @return XMLBaseModel
-     */
-    public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(new File(filePathAndName));
-        return PlatformXMLUtil.readStringXmlOut(document);
-    }
-
-    /**
-     * 成功收到心跳指令,发送响应并更新机器人状态
-     *
-     * @param ctx            通道
-     * @param robotCode      机器人唯一标识
-     * @param sendSessionId  发送会话序列号
-     * @param robotStatusMap 机器人在线状态
-     * @return void
-     */
-    @Override
-    public void heartBeatSuccessAfter(ChannelHandlerContext ctx, String robotCode, long sendSessionId,
-            Map<String, String> robotStatusMap) {
-        String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, robotCode));
-        byte[] heartProtocol = PlatformPacketUtil
-                .createPacket(Constant.AtomicSessionId.incrementAndGet(), sendSessionId, false, heartXmlString);
-        send(heartProtocol, robotCode);
-        log.info("maps:{}", maps);
-        log.info("robotChannels:{}", robotChannels);
-        // 为了等待客户端和服务端连接稳定,收到三次以上再修改
-        if (Constant.robotChannels.containsKey(robotCode)) {
-            log.info("连接稳定且注册成功,客户端:{}正常", robotCode);
-            robotService.updateRobotInfo(robotCode, "在线");
-            // normal
-            robotStatusMap.put("value", "0");
-            // Update Robot Network Status
-            redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
-        }
-    }
-
-    /**
-     * 没有收到心跳指令,removeLink && updateRobotStatus
-     *
-     * @param robotCode      机器人唯一标识
-     * @param robotStatusMap 机器人在线状态
-     * @return void
-     */
-    @Override
-    public void heartBeatFailAfter(String robotCode, Map<String, String> robotStatusMap) {
-        removeLink(robotCode);
-        robotService.updateRobotInfo(robotCode, "离线");
-        // abnormal
-        robotStatusMap.put("value", "1");
-        // Update Robot Network Status
-        redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
     }
 
     /**

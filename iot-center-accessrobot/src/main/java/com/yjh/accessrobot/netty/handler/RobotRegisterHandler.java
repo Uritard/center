@@ -10,6 +10,7 @@ import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
+import com.yjh.accessrobot.netty.scheduled.HeartBeatCheckScheduled;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     private RedisTemplate redisTemplate;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private HeartBeatCheckScheduled heartBeatCheckScheduled;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -57,12 +60,14 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
                 code = "200";
                 log.info("robotCode：{},缓存有,可以注册", robotCode);
                 Constant.robotRegisterFlag.put(robotCode, true);
+                heartBeatCheckScheduled.renewHeartBeat();
             } else {
                 List<String> robotCodeList = robotService.selectAllRobotCode();
                 if (robotCodeList.contains(robotCode)) {
                     code = "200";
                     log.info("robotCode：{},缓存无，表中有，可以注册", robotCode);
                     Constant.robotRegisterFlag.put(robotCode, true);
+                    heartBeatCheckScheduled.renewHeartBeat();
                 } else {
                     code = "400";
                     log.info("robotCode：{},缓存无，表中无，不可以注册", robotCode);

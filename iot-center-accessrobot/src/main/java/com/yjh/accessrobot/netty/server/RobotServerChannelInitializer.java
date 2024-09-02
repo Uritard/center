@@ -40,14 +40,10 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         /*channel.pipeline().addLast(new IdleStateHandler(30,0,0, TimeUnit.SECONDS));*/
         if (Constant.handlerNew()) {
             channel.pipeline().addLast(new StateGridADecoder());
-            StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl();
-            robotServerHandler.setRedisTemplate(redisTemplate);
-            robotServerHandler.setRobotService(robotService);
+            StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl(robotService, redisTemplate);
             channel.pipeline().addLast(group, robotServerHandler);
         } else {
-            RobotServerHandlerImpl robotServerHandler = new RobotServerHandlerImpl();
-            robotServerHandler.setRedisTemplate(redisTemplate);
-            robotServerHandler.setRobotService(robotService);
+            RobotServerHandlerImpl robotServerHandler = new RobotServerHandlerImpl(robotService, redisTemplate);
             channel.pipeline().addLast(group, robotServerHandler);
         }
         //添加心跳检查包
