@@ -64,14 +64,14 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         log.info("本级系统给下级{}响应了", sendCode);
 
         String filePath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-        String presetOriginId = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
+        String patrolDeviceCode = String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code"));
         String content= String.valueOf(xmlBaseModel.getItems().get(0).get("content"));
         String alarmLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
         String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("origin_id"));
 
-        Map<String,String> map =tStdDeviceMapper.selectInstanceInfo(Long.valueOf(presetOriginId), sendCode);
+        Map<String,String> map = tStdDeviceMapper.selectInstanceInfo(patrolDeviceCode, sendCode);
         if(map==null){
-            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode,presetOriginId);
+            log.error("tStdDevice is null,edgeCode:{}, deviceId:{} ",sendCode, patrolDeviceCode);
             return;
         }
         // 图片在ftps上的全路径

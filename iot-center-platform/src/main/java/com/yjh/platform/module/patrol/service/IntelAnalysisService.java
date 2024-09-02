@@ -1236,7 +1236,7 @@ public class IntelAnalysisService {
         if (!applicationProperties.getUpSystemFtps().isEnable()) {
             return;
         }
-        String edgeCode = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content");
+        String edgeCode = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content");
         for (TWarnInfo tWarnInfo : tWarnInfoList){
             String warnTime = DateTimeUtil.format(tWarnInfo.getWarnTime());
             // 针对渗漏油、设备变形、设备断裂、设备倾斜四类隐患，每小时一次采集与识别
