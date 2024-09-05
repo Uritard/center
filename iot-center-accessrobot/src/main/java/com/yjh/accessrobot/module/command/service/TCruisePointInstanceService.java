@@ -266,8 +266,7 @@ public class TCruisePointInstanceService {
                     tStdDeviceMete.setComponentId(tRobotInspection.getComponentId());
                     if (cruiseType == 524) {
                         tStdDeviceMete.setMeteType(String.valueOf(MeteTypeEnum.METE_TYPE_220.getDictCode()));
-                    }
-                    else {
+                    } else {
                         if (StringUtils.isNotBlank(tRobotInspection.getRecognitionTypeList())) {
                             String[] meteTypes = tRobotInspection.getRecognitionTypeList().split(",");
                             if (meteTypes.length != 0) {

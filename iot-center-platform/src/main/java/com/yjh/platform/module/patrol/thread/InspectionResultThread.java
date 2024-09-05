@@ -14,6 +14,7 @@ import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,7 @@ public class InspectionResultThread implements Runnable{
     private final AnalyseDataOperateDao analyseDataOperateDao;
     private final PatrolResultHandler resultHandler;
     private final ApplicationEventPublisher eventPublisher;
+    private final TRobotInfoDao tRobotInfoDao;
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
@@ -66,6 +68,7 @@ public class InspectionResultThread implements Runnable{
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
+        this.tRobotInfoDao = StaticContextAccessor.getBean(TRobotInfoDao.class);
         this.resultHandler = resultHandler;
         this.eventPublisher = eventPublisher;
     }
@@ -155,6 +158,7 @@ public class InspectionResultThread implements Runnable{
             robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
         }
         Integer type = uPatrolTaskService.selectRobotType(robotCode);
+        TRobotInfo robotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
         boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
         String val = robotPatrolTaskResult.getValue();
         // 非模拟工具上来的结果，如果值为空，则结果为异常
@@ -192,11 +196,16 @@ public class InspectionResultThread implements Runnable{
                     break;
                 //分析失败
                 case "2":
+                    if (robotInfo.getApiType() != null && robotInfo.getApiType() == 2024){
+                        //2024版本协议
+                        cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED);
+                    }
+                    break;
                 //采集失败
                 case "0":
                 default:
                     isnormal = false;
-                    cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL);
+                    cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_NOPIC);
                     break;
             }
         } else {
