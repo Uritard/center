@@ -113,7 +113,7 @@ public class InspectionResultThread implements Runnable{
             // 巡视结果、异常原因、执行状态处理
             boolean res = setCruiseResult(tCruiseTaskResultMap, instanceId);
             if (res) {
-                log.info("本测点结果下级已经返回过并且正常，本次返回的结果不正确，本次结果不处理！");
+                log.info("本测点 {} 结果下级已经返回过并且正常，本次返回的结果不正确，本次结果不处理！", instanceId);
                 return;
             }
 
@@ -250,8 +250,9 @@ public class InspectionResultThread implements Runnable{
         if (CommonUtils.isEmptyOrNullstr(oldCruiseResult)) {
             return false;
         } else {
-            //已入库 当前结果正常则更新 不正常 则丢弃
-            return !String.valueOf(CRUISE_RESULT_NORMAL).equals(cruiseResult);
+            //已入库 入库结果为异常都更新 入库结果正常，后收到结果为异常 则丢弃 否则更新
+            return String.valueOf(CRUISE_RESULT_ABNORMAL).equals(oldCruiseResult)
+                    || String.valueOf(CRUISE_RESULT_NORMAL).equals(cruiseResult);
         }
     }
 
