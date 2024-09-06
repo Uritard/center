@@ -1975,6 +1975,7 @@ public class RobotService {
      */
     public String removeLink(String robotCode, Long robotId) {
         RobotServerHandler.removeLink(robotCode);
+        updateRobotInfo(robotCode, "离线");
         return OFF_LINE;
     }
 
@@ -3388,6 +3389,7 @@ public class RobotService {
             log.info("当前的robotChannels的key为" + vo.getKey());
             String robotCode = vo.getKey();
             RobotServerHandler.removeLink(robotCode);
+            updateRobotInfo(robotCode, "离线");
         }
         Constant.futureServerBootstrapHashMap.remove(1);
     }

@@ -61,6 +61,7 @@ public class ReissueResultHandler {
                 uPatrolDataResult.setCruiseResult(NumberUtils.toInt(resultMap.get("cruiseResult")));
                 uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(resultMap.get("cruiseAbnormal")));
                 uPatrolDataResult.setUnit(MapUtils.getString(resultMap, "unit", ""));
+                uPatrolDataResult.setCreatetime(new Date());
                 uPatrolDataResultList.add(uPatrolDataResult);
             });
             int maxLength = 1000;
