@@ -18,6 +18,7 @@ import com.yjh.platform.module.config.service.FileProcess;
 import com.yjh.platform.module.config.service.ISysDiskCleanupService;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.scheduled.ScheduledMapConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
@@ -37,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -151,12 +153,28 @@ public class SysDiskCleanupServiceImpl extends ServiceImpl<SysDiskCleanupMapper,
         flag = stepProcess(stepList, "del_logs", cleanup.getDelLogs(), flag);
         // 结束
         stepProcess(stepList, "end", flag ? 1 : SUCCESS, flag);
+        if (!flag && cleanup.getCleanStatus() == 0 ) {
+            upStatus(cleanup, stepList);
+        }
 
         Map<String, Object> map = new HashMap<>(4);
         map.put("id", cleanup.getId());
         map.put("cleanStatus", flag ? 0 : SUCCESS);
         map.put("list", stepList);
         return map;
+    }
+
+    private void upStatus(SysDiskCleanup cleanup, List<CleanStep> stepList) {
+        String content = stepList.stream().map(CleanStep::getStepName).collect(Collectors.joining("-"));
+        ScheduledMapConfig.schedule(5, cleanup, c -> {
+            try {
+                if (c.getCleanStatus() == 0 ) {
+                    super.update().set("clean_status", 1).set("clean_content", content).eq("id", c.getId()).update();
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        });
     }
 
     private boolean stepProcess(List<CleanStep> stepList, String stpOrder, int status, boolean waitClean) {

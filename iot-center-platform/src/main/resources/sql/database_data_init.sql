@@ -479,8 +479,8 @@ INSERT INTO `t_dict_business` VALUES ('300128', '242', 'task_state', '任务终�
 INSERT INTO `t_dict_business` VALUES ('300129', '243', 'task_state', '任务异常终止', '0', '任务状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300130', '244', 'task_state', '任务超期', '0', '任务状态', '1');
 INSERT INTO `t_dict_business` VALUES ('300131', '245', 'data_state', '数据异常', '0', '巡检数据状态', '1');
-INSERT INTO `t_dict_business` VALUES ('300132', '246', 'cruise_result', '正常', '0', '巡视执行结果', '1');
-INSERT INTO `t_dict_business` VALUES ('300133', '247', 'cruise_result', '异常', '0', '巡视执行结果', '1');
+INSERT INTO `t_dict_business` VALUES ('300132', '246', 'cruise_result', '成功', '0', '巡视执行结果', '1');
+INSERT INTO `t_dict_business` VALUES ('300133', '247', 'cruise_result', '失败', '0', '巡视执行结果', '1');
 INSERT INTO `t_dict_business` VALUES ('300134', '248', 'abnormal_type', '采集失败', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300135', '249', 'abnormal_type', '数据异常', '0', '巡视异常原因', '1');
 INSERT INTO `t_dict_business` VALUES ('300137', '251', 'abnormal_type', '执行超时', '0', '巡视异常原因', '1');
@@ -862,8 +862,8 @@ INSERT INTO `t_dict_business` VALUES ('300737', '901', 'prioritized_task_type', 
 INSERT INTO `t_dict_business` VALUES ('300738', '902', 'prioritized_task_type', '上级系统控制任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300739', '903', 'prioritized_task_type', '区域巡视系统控制任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business` VALUES ('300740', '904', 'prioritized_task_type', '主辅设备联动任务', '0', '执行等级配置任务类型', '1');
-INSERT INTO `t_dict_business` VALUES ('300741', '810', 'robot_type', '模拟机器人', NULL, '机器人类型', '0');
-INSERT INTO `t_dict_business` VALUES ('300742', '811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
+INSERT INTO `t_dict_business` VALUES ('300741', '810', 'robot_type', '通用机器人', NULL, '机器人类型', '0');
+INSERT INTO `t_dict_business` VALUES ('300742', '811', 'drone_type', '通用无人机', NULL, '无人机型号', '1');
 INSERT INTO `t_dict_business` VALUES ('300743', '812', 'device_type', '变电站环境', '32', '设备类型', '23');
 INSERT INTO `t_dict_business` VALUES ('300744', '813', 'recorder_type', '海康超脑', '0', 'NVR类型', '1' );
 INSERT INTO `t_dict_business` VALUES ('300745', '814', 'mete_type', '环境温度检测', '101', '巡视内容', '10');
@@ -5379,7 +5379,7 @@ INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网直流工程�
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网交流工程建设有限公司','34', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('内蒙古东部电力有限公司','35', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国网新源控股有限公司','46', 1);
-INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国电通信中心','49', 1);
+INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国电通信中心','48', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('国家电网有限公司总部','99', 1);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('视频监控平台','0000', 5);
 INSERT INTO `sip_b_dict_area`(`name`,`code`,`type`) VALUES ('前端系统-主站','0100', 5);

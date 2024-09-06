@@ -2569,6 +2569,7 @@ CREATE TABLE `sys_disk_cleanup` (
   `clean_content` varchar(512) DEFAULT NULL COMMENT '清理具体内容说明',
   `clean_status` int DEFAULT '0' COMMENT '清理状态，0: 未完成 1: 待确认  2: 已确认',
   `expiry_date` datetime DEFAULT NULL COMMENT '清理时限',
+  `remark` varchar(258) DEFAULT NULL COMMENT '备注',
   `creator` varchar(64) DEFAULT NULL COMMENT '创建人',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
