@@ -196,7 +196,7 @@ public class InspectionResultThread implements Runnable{
                     break;
                 //分析失败
                 case "2":
-                    if (robotInfo.getApiType() != null && robotInfo.getApiType() == 2024){
+                    if (robotInfo.getApiType() == null || robotInfo.getApiType() == 2024){
                         //2024版本协议
                         cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED);
                     }
