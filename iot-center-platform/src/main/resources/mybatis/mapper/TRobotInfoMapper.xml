@@ -78,7 +78,7 @@
         channel_num_inferad,last_online_time,duration,
         off_line_count,edge_code,origin_id,image_size,
         env_region_id,light_channel_id,infrared_channel_id,
-        light_vendor,infrared_vendor
+        light_vendor,infrared_vendor,api_type
     </sql>
 
 
@@ -101,7 +101,7 @@
         ,channel_num_inferad,last_online_time,duration
         ,off_line_count,edge_code,origin_id,image_size
         ,light_channel_id,infrared_channel_id
-        ,light_vendor,infrared_vendor,env_region_id
+        ,light_vendor,infrared_vendor,env_region_id,api_type
         )
         values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
                ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
@@ -121,6 +121,7 @@
                ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{imageSize,jdbcType=VARCHAR}
                ,#{lightChannelId,jdbcType=VARCHAR},#{infraredChannelId,jdbcType=VARCHAR}
                ,#{lightVendor,jdbcType=VARCHAR},#{infraredVendor,jdbcType=VARCHAR},#{envRegionId,jdbcType=BIGINT}
+               ,#{apiType,jdbcType=INTEGER}
                )
     </insert>
 
@@ -206,6 +207,7 @@
         <if test="lightVendor != null ">a.light_vendor = #{lightVendor},</if>
         <if test="infraredVendor != null ">a.infrared_vendor = #{infraredVendor},</if>
         <if test="envRegionId != null">a.env_region_id = #{envRegionId},</if>
+        <if test="apiType != null">a.api_type = #{apiType},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -370,7 +372,8 @@
         a.light_channel_id,
         a.infrared_channel_id,
         a.light_vendor,
-        a.infrared_vendor
+        a.infrared_vendor,
+        a.api_type
         from t_robot_info a
         JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
@@ -512,7 +515,8 @@
         a.light_channel_id,
         a.infrared_channel_id,
         a.light_vendor,
-        a.infrared_vendor
+        a.infrared_vendor,
+        a.api_type
         from t_robot_info a
         JOIN t_dict_business d ON a.drone_type=d.dict_code and d.col_name = 'drone_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'

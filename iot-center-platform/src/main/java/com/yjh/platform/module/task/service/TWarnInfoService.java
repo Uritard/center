@@ -430,7 +430,7 @@ public class TWarnInfoService{
         String defectModel = alarmAndDefectProcess.getDefectModel();
         Date date = new Date();
         int jieGuo = 0;
-        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
+        String warnFlag = tWarnInfoDao.selectDictCodeByNote("其他","defect_model");
         if (Objects.nonNull(defectModel)){
             if (defectModel.equals(warnFlag)){//告警产生的缺陷：其他
                 TWarnInfo tWarnInfo = new TWarnInfo()
@@ -463,7 +463,7 @@ public class TWarnInfoService{
 
     @Transactional(rollbackFor = Exception.class)
     public int alarmAndDefectProcessList(List<AlarmAndDefectProcess> list, String userId) {
-        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
+        String warnFlag = tWarnInfoDao.selectDictCodeByNote("其他", "defect_model");
         String userName = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("userName");
         int warn = 0;
         List<Long> warnIdList = list.stream()
