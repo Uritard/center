@@ -223,7 +223,7 @@
                 <if test="item.instanceName != null and item.instanceName != ''">a.instance_name = #{item.instanceName, jdbcType=VARCHAR},</if>
                 <if test="item.cruiseId != null and item.cruiseId != ''">a.cruise_id = #{item.cruiseId, jdbcType=BIGINT},</if>
                 <if test="item.cruiseName != null and item.cruiseName != ''">a.cruise_name = #{item.cruiseName, jdbcType=VARCHAR},</if>
-                <if test="item.cruiseTime != null and item.cruiseTime != ''">a.cruise_time = #{item.cruiseTime, jdbcType=TIMESTAMP},</if>
+                <if test="item.cruiseTime != null">a.cruise_time = #{item.cruiseTime, jdbcType=TIMESTAMP},</if>
                 <if test="item.cruiseStatus != null and item.cruiseStatus != ''">a.cruise_status = #{item.cruiseStatus, jdbcType=INTEGER},</if>
                 <if test="item.cruiseType != null and item.cruiseType != ''">a.cruise_type = #{item.cruiseType, jdbcType=INTEGER},</if>
                 <if test="item.resultDesc != null and item.resultDesc != ''">a.result_desc = #{item.resultDesc, jdbcType=VARCHAR},</if>
@@ -918,7 +918,7 @@
             a.identify_result = b.identify_result,
             a.pic_path = b.picpath
         </set>
-        WHERE a.update_time <![CDATA[<]]> b.cruise_time;
+        WHERE a.update_time <![CDATA[<=]]> b.cruise_time;
     </update>
 
     <insert id="batchInsertDeviceMeteUpdate">
