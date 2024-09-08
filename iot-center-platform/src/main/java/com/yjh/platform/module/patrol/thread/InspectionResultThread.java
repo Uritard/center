@@ -259,9 +259,9 @@ public class InspectionResultThread implements Runnable{
         if (CommonUtils.isEmptyOrNullstr(oldCruiseResult)) {
             return false;
         } else {
-            //已入库 入库结果为异常都更新 入库结果正常，后收到结果为异常 则丢弃 否则更新
-            return String.valueOf(CRUISE_RESULT_ABNORMAL).equals(oldCruiseResult)
-                    || String.valueOf(CRUISE_RESULT_NORMAL).equals(cruiseResult);
+            //已入库 入库结果为正常 并且 新的结果是异常 丢弃 不更新，其余情况都更新
+            return String.valueOf(CRUISE_RESULT_NORMAL).equals(oldCruiseResult)
+                    && String.valueOf(CRUISE_RESULT_ABNORMAL).equals(cruiseResult);
         }
     }
 

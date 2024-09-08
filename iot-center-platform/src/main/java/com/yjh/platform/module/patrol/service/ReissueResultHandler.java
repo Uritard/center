@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.google.common.collect.Lists;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
@@ -61,7 +62,8 @@ public class ReissueResultHandler {
                 uPatrolDataResult.setCruiseResult(NumberUtils.toInt(resultMap.get("cruiseResult")));
                 uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(resultMap.get("cruiseAbnormal")));
                 uPatrolDataResult.setUnit(MapUtils.getString(resultMap, "unit", ""));
-                uPatrolDataResult.setCreatetime(new Date());
+                Date cruiseTime = DateTimeUtil.parse(resultMap.get("cruiseTime"));
+                uPatrolDataResult.setCruiseTime(cruiseTime);
                 uPatrolDataResultList.add(uPatrolDataResult);
             });
             int maxLength = 1000;
