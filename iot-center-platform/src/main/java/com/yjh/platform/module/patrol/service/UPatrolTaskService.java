@@ -865,18 +865,17 @@ public class UPatrolTaskService {
         // 是否下级主动创建任务
         boolean subCreateTask = "1".equals(countMap.get("taskSource"));
         try {
-            // 如果下级节点提前上报任务状态，则将任务置为开始
-            if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
-                UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
-                    .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
-                log.info("TaskResult start, taskId: {}", taskId);
-                uPatrolResultDao.update(result);
-            }
-
             countChangeMap.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             countChangeMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
             if (subCreateTask) {
-                // 下级主动创建任务第一次启动更新任务状态，更新任务进度
+                // 如果下级节点提前上报任务状态，则将任务置为开始
+                if (TASK_STATE_NOT_START == oldState && TASK_STATE_EXECUTING == taskState) {
+                    UPatrolResult result = new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                        .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
+                    log.info("TaskResult start, taskId: {}", taskId);
+                    uPatrolResultDao.update(result);
+                }
+
                 String progress = robotPatrolTaskStatus.getTaskProgress();
                 if (StringUtils.contains(progress, "%")) {
                     float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
