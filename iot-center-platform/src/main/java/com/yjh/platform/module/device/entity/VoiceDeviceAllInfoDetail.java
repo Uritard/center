@@ -113,6 +113,8 @@ public class VoiceDeviceAllInfoDetail{
     private String fValue;
 
     @Length(max = 11, message = "幅值限值长度必须小于等于11")
+    @ApiModelProperty(value = "增幅限值")
+    @ExcelProperty(value = "增幅限值")
     private String mpValue;
 
     @Length(max = 255, message = "算法配置文件路径长度必须小于等于255")
