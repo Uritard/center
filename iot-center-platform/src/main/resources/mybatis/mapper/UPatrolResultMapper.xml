@@ -399,7 +399,7 @@
 
         and a.task_state != 239 and a.task_state != 241 and a.task_state != 238 and a.task_type not in (508,509,456)
         GROUP BY task_id
-        order by a.execute_time desc
+        order by a.execute_time desc,a.task_id
     </select>
 
     <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"

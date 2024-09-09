@@ -874,7 +874,7 @@
         <if test="customId != -1 and customId != null">and f.custom_id = #{customId,jdbcType = BIGINT} </if>
         <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (246,261)</if>
         GROUP BY f.device_mete_id
-        ORDER BY cruise_time desc
+        ORDER BY cruise_time desc,e.instance_id
     </select>
     <select id="selectCruiseResultAnalyze2" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo">
         SELECT
@@ -914,7 +914,7 @@
         <if test="customId != -1 and customId != null">and f.custom_id = #{customId,jdbcType = BIGINT} </if>
         <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (247,262,263,264)</if>
         GROUP BY f.device_mete_id
-        ORDER BY cruise_time desc
+        ORDER BY cruise_time desc,e.instance_id
     </select>
 
     <select id="getdeviceMeteByPointinstance" parameterType="java.lang.Long" resultType="java.lang.Long">
