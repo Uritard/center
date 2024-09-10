@@ -88,7 +88,11 @@ public class TCameraRecorderExcel implements Serializable {
     @ApiModelProperty(value = "生产厂家")
     private Integer vendorId;
 
-    @ExcelProperty(value = "国标编码")
+    @ExcelProperty(value = "设备国标编码")
     @ExcelExtend
     private String deviceChannel;
+
+    @ExcelProperty(value = "视频B编码")
+    @ExcelExtend
+    private String bdeviceChannel;
 }

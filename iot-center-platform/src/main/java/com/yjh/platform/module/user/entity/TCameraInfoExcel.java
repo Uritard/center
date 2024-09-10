@@ -104,8 +104,12 @@ public class TCameraInfoExcel implements Serializable {
     @ExcelExtend
     private Date commissionDate;
 
-    @ExcelProperty(value = "国标编码")
+    @ExcelProperty(value = "设备国标编码")
     @ExcelExtend
     private String cameraChannelId;
+
+    @ExcelProperty(value = "视频B编码")
+    @ExcelExtend
+    private String bcameraChannelId;
 
 }

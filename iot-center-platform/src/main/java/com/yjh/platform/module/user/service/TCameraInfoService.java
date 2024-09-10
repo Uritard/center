@@ -634,6 +634,7 @@ public class TCameraInfoService {
                 tCameraInfo.setUseType("监控".equals(t.getUseTypeStr()) ? 2 : 1);
                 tCameraInfo.setCommissionDate(t.getCommissionDate());
                 tCameraInfo.setCameraChannelId(t.getCameraChannelId());
+                tCameraInfo.setBcameraChannelId(t.getBcameraChannelId());
                 tCameraInfos.add(tCameraInfo);
             } else {
                 errorList.add("【" + t.getCameraName() + "】设备所属区域或录像机不存在");

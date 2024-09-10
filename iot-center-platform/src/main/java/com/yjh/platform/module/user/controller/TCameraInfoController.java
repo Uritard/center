@@ -432,7 +432,7 @@ public class TCameraInfoController {
         try {
             InputStream inputStream = file.getInputStream();
             String[] heads = new String[] {"所属区域", "PMS编码", "设备类型", "设备型号", "设备名称", "IP", "服务端口", "录像机", "RTSP端口",
-                    "用户名", "密码", "录像机通道号", "使用单位", "安装位置", "生产厂家", "经度", "纬度", "是否可控", "投运时间", "国标编码", "相机使用类型"};
+                    "用户名", "密码", "录像机通道号", "使用单位", "安装位置", "生产厂家", "经度", "纬度", "是否可控", "投运时间", "设备国标编码", "视频B编码", "相机使用类型"};
             ExcelReadListener<TCameraInfoExcel> modelExcelListener = new ExcelReadListener<>(heads);
             ReadSheet readSheet = new ReadSheet(0);
             EasyExcelFactory.read(inputStream, TCameraInfoExcel.class, modelExcelListener).headRowNumber(1).build().read(readSheet);

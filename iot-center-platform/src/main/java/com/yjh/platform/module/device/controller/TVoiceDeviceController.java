@@ -367,7 +367,7 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             InputStream inputStream = file.getInputStream();
-            String[] heards = new String[] {"设备名称", "所属区域", "IP", "端口号", "通道号", "分贝告警值", "频率告警值", "设备类型", "设备型号", "生产厂家"};
+            String[] heards = new String[] {"设备名称", "所属区域", "IP", "端口号", "通道号", "分贝告警值", "频率告警值", "增幅限值", "设备类型", "设备型号", "生产厂家"};
             ExcelReadListener<VoiceDeviceAllInfoDetail> modelExcelListener = new ExcelReadListener<>(heards);
             ReadSheet readSheet = new ReadSheet(0);
             EasyExcelFactory.read(inputStream, VoiceDeviceAllInfoDetail.class, modelExcelListener).headRowNumber(1).build().read(readSheet);

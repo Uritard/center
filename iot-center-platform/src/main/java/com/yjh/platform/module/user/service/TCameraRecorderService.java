@@ -252,6 +252,7 @@ public class TCameraRecorderService {
             tCameraRecorder.setHddSize(t.getHddSize());
             tCameraRecorder.setTimeLong(t.getTimeLong());
             tCameraRecorder.setDeviceChannel(t.getDeviceChannel());
+            tCameraRecorder.setBdeviceChannel(t.getBdeviceChannel());
             tCameraRecorders.add(tCameraRecorder);
         });
         if (CollectionUtils.isNotEmpty(tCameraRecorders)) {
