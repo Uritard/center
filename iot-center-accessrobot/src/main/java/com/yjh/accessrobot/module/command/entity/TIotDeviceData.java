@@ -77,7 +77,7 @@ public class TIotDeviceData implements Serializable {
 
     private String address;
 
-    private Long deviceId;
+    private Integer meterType;
 
     private String upRegionName;
 

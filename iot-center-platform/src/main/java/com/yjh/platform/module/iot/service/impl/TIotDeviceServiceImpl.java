@@ -287,7 +287,7 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
                 item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
                 item.put("channelNum", tIotDeviceData.getChannelNum());
                 item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
-                item.put("deviceId", tIotDeviceData.getDeviceId());
+                item.put("meterType", tIotDeviceData.getMeterType());
                 item.put("upRegionName", tIotDeviceData.getUpRegionName());
                 item.put("controllable", tIotDeviceData.getControllable());
                 item.put("extend", tIotDeviceData.getExtend());

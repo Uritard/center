@@ -89,10 +89,12 @@ public class TIotDeviceDataController {
     @Logs(title = "查询物联设备结果曲线", content = "查询物联设备结果曲线", logType = 1, authority = "1235")
     public Result selectIotLine(@RequestParam(value = "iotDeviceId") Long iotDeviceId,
                                 @RequestParam(value = "startTime") String startTime,
-                                @RequestParam(value = "endTime") String endTime) {
+                                @RequestParam(value = "endTime") String endTime,
+                                @RequestParam(value = "meterFlag", required = false, defaultValue = "false") Boolean meterFlag,
+                                @RequestParam(value = "powerFlag", required = false, defaultValue = "false") Boolean powerFlag) {
         Result result = new Result();
         try {
-            result.setData(tIotDeviceDataService.selectIotLine(iotDeviceId, startTime, endTime));
+            result.setData(tIotDeviceDataService.selectIotLine(iotDeviceId, startTime, endTime, meterFlag, powerFlag));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
@@ -106,10 +108,11 @@ public class TIotDeviceDataController {
     @ApiOperation(value = "查询物联设备结果")
     @RequestMapping(value = "/selectIotData", method = RequestMethod.GET)
     @Logs(title = "查询物联设备结果", content = "查询物联设备结果", logType = 1, authority = "1235")
-    public Result selectIotData(@RequestParam(value = "upRegionId", required = false) Long upRegionId) {
+    public Result selectIotData(@RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                                @RequestParam(value = "meterFlag", required = false, defaultValue = "false") Boolean meterFlag) {
         Result result = new Result();
         try {
-            result.setData(tIotDeviceDataService.selectIotData(upRegionId));
+            result.setData(tIotDeviceDataService.selectIotData(upRegionId,meterFlag));
             result.setCode(ResultCodeEnum.NORMAL.getCode());
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());

@@ -194,7 +194,7 @@ public class TIotDeviceWarnServiceImpl extends ServiceImpl<TIotDeviceWarnMapper,
         if (StringUtils.isEmpty(robotCode)) {
             TIotDevice iotDevice = tIotDeviceMapper.selectById(deviceId);
             item.put("device_ip", iotDevice.getIp());
-            item.put("patroldevice_code", iotDevice.getDeviceId());
+            item.put("patroldevice_code", iotDevice.getId());
             item.put("patroldevice_name", iotDevice.getDeviceName());
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectByRobotCode(robotCode);

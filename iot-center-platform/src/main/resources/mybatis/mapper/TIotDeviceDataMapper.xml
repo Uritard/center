@@ -52,10 +52,12 @@
         SELECT
         point.iot_device_id,
         point.iot_device_name,
+        point.id AS point_id,
         point.channel_num,
         point.point_name,
         device.iot_device_type,
         device.controllable,
+        device.magnification_coefficient,
         point.unit,
         robot.robot_code,
         b.up_dict AS type
@@ -65,10 +67,89 @@
         LEFT JOIN t_robot_info robot ON robot.robot_ip = device.ip AND device.protocol_model = 7
         LEFT JOIN t_dict_business b ON device.iot_device_type = b.dict_code AND b.col_name = 'iot_device_type'
         WHERE 1 = 1
+        <if test="iotDeviceType == null">
+            and device.iot_device_type != 840
+        </if>
+        <if test="iotDeviceType == 840">
+            and device.iot_device_type = 840
+        </if>
         <if test="list.size > 0"> and device.up_region_id in
             <foreach collection="list" item="regionId" separator="," open="(" close=")">
                 #{regionId}
             </foreach></if>
         GROUP BY point.id
+    </select>
+    <select id="selectMeterData" resultType="com.yjh.platform.module.iot.entity.TIotDeviceData">
+        SELECT
+            a.*
+        FROM
+            (
+                SELECT
+                    *, DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+                FROM
+                    t_iot_device_data
+                WHERE
+                    point_id IN
+                    <foreach collection="list" item="pointId" separator="," open="(" close=")">
+                        #{pointId}
+                    </foreach>
+            ) a
+                LEFT JOIN (
+                SELECT
+                    create_time,
+                    point_id,
+                    DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+                FROM
+                    t_iot_device_data
+                WHERE
+                    point_id IN
+                    <foreach collection="list" item="pointId" separator="," open="(" close=")">
+                        #{pointId}
+                    </foreach>
+                GROUP BY
+                    point_id
+            ) b ON a.point_id = b.point_id
+                AND b.lastTime = DATE_ADD(a.lastTime, INTERVAL 1 DAY)
+        WHERE
+            a.create_time <![CDATA[<]]> b.create_time
+    </select>
+    <select id="selectMeterLine" resultType="com.yjh.platform.module.iot.entity.TIotDeviceData">
+        SELECT
+            b.id,
+            b.point_id,
+            b.point_name,
+            b.iot_device_id,
+            b.iot_device_name,
+            ROUND(b.`value` - a.`value`, 2) * b.magnification_coefficient AS `value`,
+            b.unit,
+            b.up_region_id,
+            b.create_time,
+            b.magnification_coefficient
+        FROM
+            (
+                SELECT
+                    *, DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+                FROM
+                    t_iot_device_data
+                where iot_device_id = #{iotDeviceId}
+                   and create_time between #{startTime} and #{endTime}
+                GROUP BY
+                    lastTime
+                ORDER BY
+                    create_time
+            ) b
+                LEFT JOIN (
+                SELECT
+                    *, DATE_FORMAT(create_time, '%Y-%m-%d') AS lastTime
+                FROM
+                    t_iot_device_data
+                where iot_device_id = #{iotDeviceId}
+                  and create_time between #{startTime} and #{endTime}
+                GROUP BY
+                    lastTime
+                ORDER BY
+                    create_time
+            ) a ON b.lastTime = DATE_ADD(a.lastTime, INTERVAL 1 DAY)
+        WHERE a.`value` is not null
     </select>
 </mapper>

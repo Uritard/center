@@ -15,11 +15,11 @@ import java.util.Map;
 */
 public interface TIotDeviceDataService extends IService<TIotDeviceData> {
 
-    List<Map<String, Object>> selectIotData(Long upRegionId);
+    List<Map<String, Object>> selectIotData(Long upRegionId, Boolean meterFlag);
 
-    List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime);
+    List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime, Boolean meterFlag, Boolean powerFlag);
 
-    List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList);
+    List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList, Boolean meterFlag);
 
     Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 

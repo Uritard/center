@@ -559,7 +559,7 @@ public class HomePageService {
     }
 
     public List<IotDeviceDataEx> queryIotDeviceDataEx(List<Long> regionIdList) {
-        return tIotDeviceDataService.selectIotDataEx(regionIdList);
+        return tIotDeviceDataService.selectIotDataEx(regionIdList, false);
     }
 
     /**
@@ -801,7 +801,7 @@ public class HomePageService {
     }
 
     public List<Map<String, Object>> getEnvByRegion(Long regionId){
-        List<Map<String, Object>> resultList = tIotDeviceDataService.selectIotData(regionId);
+        List<Map<String, Object>> resultList = tIotDeviceDataService.selectIotData(regionId, false);
         List<Map<String, Object>> re = new ArrayList<>();
         for (Map<String, Object> item: resultList){
             if ("850".equals(item.get("iotDeviceType").toString()) ||

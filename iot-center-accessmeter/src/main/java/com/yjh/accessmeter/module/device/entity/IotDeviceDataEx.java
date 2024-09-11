@@ -17,7 +17,7 @@ public class IotDeviceDataEx extends IotDeviceData{
 
     private String address;
 
-    private Long deviceId;
+    private Integer meterType;
 
     private String upRegionName;
 

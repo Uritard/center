@@ -19,7 +19,7 @@ public class IotDeviceDataEx extends TIotDeviceData{
 
     private String address;
 
-    private Long deviceId;
+    private Integer meterType;
 
     private String upRegionName;
 
@@ -34,4 +34,6 @@ public class IotDeviceDataEx extends TIotDeviceData{
     private String robotCode;
 
     private String extend;
+
+    private String powerValue;
 }

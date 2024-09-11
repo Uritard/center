@@ -18,6 +18,7 @@ import com.yjh.platform.module.task.entity.EnvDeviceStatus;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -28,7 +29,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -48,9 +51,9 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     private TStdRegionDao tStdRegionDao;
 
     @Override
-    public List<Map<String, Object>> selectIotData(Long upRegionId) {
+    public List<Map<String, Object>> selectIotData(Long upRegionId, Boolean meterFlag) {
         List<Long> regionList = tStdRegionDao.selectDownId(upRegionId);
-        List<IotDeviceDataEx> tIotDeviceList = this.selectIotDataEx(regionList);
+        List<IotDeviceDataEx> tIotDeviceList = this.selectIotDataEx(regionList, meterFlag);
         Map<Long, List<IotDeviceDataEx>> resultMap = tIotDeviceList.stream().collect(Collectors.groupingBy(IotDeviceDataEx::getIotDeviceId));
         List<Map<String, Object>> resultList = Lists.newArrayList();
         resultMap.forEach((k, v) -> {
@@ -71,12 +74,22 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     }
 
     @Override
-    public List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList) {
-        List<IotDeviceDataEx> tIotDeviceList = getBaseMapper().selectIotData(regionList);
-        tIotDeviceList.forEach(data ->{
-            if (data.getChannelNum() != null){
-                String key = Constant.envKey+data.getIotDeviceId();
-                Map<String,String> map = redisTemplate.opsForHash().entries(key);
+    public List<IotDeviceDataEx> selectIotDataEx(List<Long> regionList, Boolean meterFlag) {
+        int iotMeterType = 840;
+        List<IotDeviceDataEx> tIotDeviceList = meterFlag ? getBaseMapper().selectIotData(regionList, iotMeterType)
+                : getBaseMapper().selectIotData(regionList, null);
+        //筛选出电表的设备
+        List<Long> pointList = tIotDeviceList.stream().filter(t -> t.getIotDeviceType() == iotMeterType)
+                .map(IotDeviceDataEx::getPointId).collect(Collectors.toList());
+        List<TIotDeviceData> tIotDeviceDataList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(pointList)) {
+            tIotDeviceDataList = getBaseMapper().selectMeterData(pointList);
+        }
+        Map<Long, TIotDeviceData> dataMap = tIotDeviceDataList.stream().collect(Collectors.toMap(TIotDeviceData::getPointId, Function.identity()));
+        tIotDeviceList.forEach(data -> {
+            if (data.getChannelNum() != null) {
+                String key = Constant.envKey + data.getIotDeviceId();
+                Map<String, String> map = redisTemplate.opsForHash().entries(key);
                 String value = map.get(data.getChannelNum());
                 data.setValue(ValueUtil.getOrDefault(value,""));
                 data.setCreateTime(DateTimeUtil.parse(map.get("time")));
@@ -90,18 +103,70 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     data.setValue(valueMap.getOrDefault(data.getValue(), ""));
                     data.setUnit("");
                 }
+                if (data.getIotDeviceType() == iotMeterType) {
+                    TIotDeviceData iotDeviceData = dataMap.get(data.getPointId());
+                    //没有前一天的数据直接给0
+                    if (Objects.isNull(iotDeviceData)) {
+                        data.setPowerValue("");
+                    } else {
+                        double num = Double.parseDouble(StringUtils.isNotBlank(data.getValue()) ? data.getValue() : "0")
+                                - Double.parseDouble(StringUtils.isNotBlank(iotDeviceData.getValue()) ? iotDeviceData.getValue() : "0");
+                        //差值太大也是0
+                        if (num < 0 || num > 10) {
+                            data.setPowerValue("");
+                        } else {
+                            DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                            float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
+                            data.setPowerValue(decimalFormat.format(num * nc));
+                        }
+                    }
+                }
             }
         });
         return tIotDeviceList;
     }
 
     @Override
-    public List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime) {
+    public List<List<String>> selectIotLine(Long iotDeviceId, String startTime, String endTime, Boolean meterFlag, Boolean powerFlag) {
+        List<TIotDeviceData> tIotDeviceList = new ArrayList<>();
         QueryWrapper<TIotDeviceData> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("iot_device_id", iotDeviceId);
         queryWrapper.between("create_time", startTime, endTime);
         queryWrapper.orderByAsc("create_time");
-        List<TIotDeviceData> tIotDeviceList = this.list(queryWrapper);
+        if (meterFlag){
+            queryWrapper.eq("iot_device_type", 840);
+        }
+        List<TIotDeviceData> tIotDeviceDataList = this.list(queryWrapper);
+
+        //查询耗电量
+        if (powerFlag) {
+            //根据点位进行分组
+            Map<Long, List<TIotDeviceData>> pointGroupMap = tIotDeviceDataList.stream().collect(Collectors.groupingBy(TIotDeviceData::getPointId));
+
+            pointGroupMap.forEach((key, value) -> {
+                value.forEach( v -> v.setLastTime(DateTimeUtil.parseFormat(DateTimeUtil.getDateString(v.getCreateTime()), DateTimeUtil.getDatePattern())));
+                //根据时间分组
+                Map<Date, List<TIotDeviceData>> timeGroupMap = value.stream().collect(Collectors.groupingBy(TIotDeviceData::getLastTime));
+                timeGroupMap.forEach((time, l) -> {
+                    TIotDeviceData data = l.get(0);
+                    List<TIotDeviceData> lastList = timeGroupMap.get(DateTimeUtil.lastDay(time));
+                    if (CollectionUtils.isNotEmpty(lastList) ) {
+                        TIotDeviceData lastData = lastList.get(0);
+                        if (StringUtils.isNotBlank(data.getValue()) && StringUtils.isNotBlank(lastData.getValue()) ){
+                            double num = Double.parseDouble(data.getValue()) - Double.parseDouble(lastData.getValue());
+                            if (num > 0 || num < 10) {
+                                DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                                float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
+                                data.setValue(decimalFormat.format(num * nc));
+                                tIotDeviceList.add(data);
+                            }
+                        }
+                    }
+                });
+            });
+        } else {
+            tIotDeviceList.addAll(tIotDeviceDataList);
+        }
 
         List<List<String>> line = new ArrayList<>();
         List<String> fir = new ArrayList<>();
@@ -308,7 +373,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                 item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
                 item.put("channelNum", tIotDeviceData.getChannelNum());
                 item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
-                item.put("deviceId", tIotDeviceData.getDeviceId());
+                item.put("meterType", tIotDeviceData.getMeterType());
                 item.put("upRegionName", tIotDeviceData.getUpRegionName());
                 item.put("controllable", tIotDeviceData.getControllable());
                 itemList.add(item);
