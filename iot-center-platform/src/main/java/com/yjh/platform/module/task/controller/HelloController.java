@@ -989,31 +989,31 @@ public class HelloController {
     public Result meterInfoTest() throws Exception{
         Result result = new Result();
         try {
-            InspectionResultEvent event = new InspectionResultEvent();
-            event.setTaskId("666666");
-            event.setDeviceId("156");
-            event.setResult("正向有功总:2131.17");
-            eventPublisher.publishEvent(event);
-
-            event.setResult("无功IV总:226.88");
-            eventPublisher.publishEvent(event);
-
-            event.setResult("无功I总:16.07");
-            eventPublisher.publishEvent(event);
-
-            event.setDeviceId("123");
-            event.setResult("正向有功总:111");
-            eventPublisher.publishEvent(event);
-
-            event.setResult("无功IV总:222");
-            eventPublisher.publishEvent(event);
-
-            event.setResult("无功I总:333");
-            eventPublisher.publishEvent(event);
-
-            TaskEndEvent endEvent = new TaskEndEvent();
-            endEvent.setTaskId("666666");
-            eventPublisher.publishEvent(endEvent);
+//            InspectionResultEvent event = new InspectionResultEvent();
+//            event.setTaskId("666666");
+//            event.setDeviceId("156");
+//            event.setResult("正向有功总:2131.17");
+//            eventPublisher.publishEvent(event);
+//
+//            event.setResult("无功IV总:226.88");
+//            eventPublisher.publishEvent(event);
+//
+//            event.setResult("无功I总:16.07");
+//            eventPublisher.publishEvent(event);
+//
+//            event.setDeviceId("123");
+//            event.setResult("正向有功总:111");
+//            eventPublisher.publishEvent(event);
+//
+//            event.setResult("无功IV总:222");
+//            eventPublisher.publishEvent(event);
+//
+//            event.setResult("无功I总:333");
+//            eventPublisher.publishEvent(event);
+//
+//            TaskEndEvent endEvent = new TaskEndEvent();
+//            endEvent.setTaskId("666666");
+//            eventPublisher.publishEvent(endEvent);
 
         } catch (Exception e) {
             log.error("获取区域信息异常", e);

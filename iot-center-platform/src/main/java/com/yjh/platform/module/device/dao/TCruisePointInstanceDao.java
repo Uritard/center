@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
+import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -99,4 +100,6 @@ public interface TCruisePointInstanceDao {
     TCruisePointInstance selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
 
     List<AreaInfoDeviceId> selectDeviceByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+
+    TIotDevicePoint getBindIotDevicePoint(@Param(value = "instanceId") Long instanceId);
 }

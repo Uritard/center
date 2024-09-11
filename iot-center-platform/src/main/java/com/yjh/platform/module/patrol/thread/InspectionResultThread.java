@@ -90,7 +90,7 @@ public class InspectionResultThread implements Runnable{
 
             InspectionResultEvent event = new InspectionResultEvent();
             event.setTaskId(taskId);
-            event.setDeviceId(ValueUtil.getOrDefault(tCruiseTaskResultMap.get("deviceId"),null));
+            event.setInstanceId(instanceId);
             event.setResult(robotPatrolTaskResult.getValue());
             eventPublisher.publishEvent(event);
 

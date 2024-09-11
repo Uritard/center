@@ -869,4 +869,12 @@
             d.drone_type is not null and
             b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
+    <select id="getBindIotDevicePoint" resultType="com.yjh.platform.module.iot.entity.TIotDevicePoint">
+        select c.id,c.iot_device_id, c.iot_device_name, c.channel_num, c.point_name, c.unit
+        from t_iot_device_point c
+        where c.channel_num in (select a.device_point_id
+                                from t_std_devicemete a
+                                         left join t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
+                                where a.instance_id = #{instanceId})
+    </select>
 </mapper>

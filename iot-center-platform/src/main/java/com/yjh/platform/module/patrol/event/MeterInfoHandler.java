@@ -1,10 +1,18 @@
 package com.yjh.platform.module.patrol.event;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TMeterLogDao;
 import com.yjh.platform.module.device.entity.TMeter;
+import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
+import com.yjh.platform.module.iot.dao.TIotDeviceMapper;
+import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.TIotDevice;
+import com.yjh.platform.module.iot.entity.TIotDeviceData;
+import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +22,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -33,108 +42,58 @@ public class MeterInfoHandler {
 
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private TMeterDao tMeterDao;
-    @Autowired
-    private TMeterLogDao tMeterLogDao;
+    @Resource
+    private TCruisePointInstanceDao cruisePointInstanceDao;
+    @Resource
+    private TIotDeviceDataMapper iotDeviceDataMapper;
+    @Resource
+    private TIotDeviceMapper iotDeviceMapper;
 
     @EventListener
     public void handleResultEvent(InspectionResultEvent event) {
         // 巡视结果
+        TIotDevicePoint iotDevicePoint = new TIotDevicePoint();
         if (StringUtils.isNotEmpty(event.getResult())) {
-            String key = meterKey + event.getTaskId() + ":" + event.getDeviceId();
-            Map<String, String> meterInfo = new HashMap<>(4);
             String value = getNumeric(event.getResult());
-            if (StringUtils.isEmpty(value)){
-                log.info("结果为空：{}",value);
-//                return;
+            if (StringUtils.isEmpty(value)) {
+                return;
             }
-            if (event.getResult().contains("正向有功总")) {
-                meterInfo.put("totalPositivePower", value);
-            } else if (event.getResult().contains("无功I总")) {
-                meterInfo.put("totalPositiveReactivePower", value);
-            } else if (event.getResult().contains("无功IV总")) {
-                meterInfo.put("totalNegativePositivePower", value);
+            // 根据instanceId查询关联的测点及判断物联设备是否绑定测定
+            iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
+            if (iotDevicePoint != null) {
+                handleMeterEndEvent(iotDevicePoint, event);
             }
-            redisTemplate.opsForHash().putAll(key, meterInfo);
-            log.info("巡视：{}结束了", meterInfo);
-        }
-        Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + event.getDeviceId());
-        if (meterInfo.size() == 3) {
-            if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
-                log.info("电表数值小于0！");
-            }
-            log.info("电表：{}结束了", event.getDeviceId());
-            handleMeterEndEvent(event.getTaskId());
-        }
 
-    }
-    public void handleMeterEndEvent(String taskId) {
-        List<TMeter> meterList = tMeterDao.selectMeterByDeviceId();
-        for (TMeter meter : meterList) {
-            Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + taskId + ":" + meter.getDeviceId());
-            if (meterInfo.size() == 3) {
-                if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
-                    log.info("数值小于0！{}",meterInfo);
-                    continue;
-                }
-                //正向有功与上一次的差值
-                Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
-                if (value < 0 || value > 100){
-                    value = 0f;
-                }
-                meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-                //正向无功与上一次的差值
-                value = NumberUtils.toFloat(meterInfo.get("totalPositiveReactivePower")) - NumberUtils.toFloat(meter.getTotalPositiveReactivePower());
-                if (value < 0 || value > 100){
-                    value = 0f;
-                }
-                meter.setTotalPositiveReactivePowerDifferenceValue(String.valueOf(value));
-                //反向无功与上一次的差值
-                value = NumberUtils.toFloat(meterInfo.get("totalNegativePositivePower")) - NumberUtils.toFloat(meter.getTotalNegativePositivePower());
-                if (value < 0 || value > 100){
-                    value = 0f;
-                }
-                meter.setTotalNegativePositivePowerDifferenceValue(String.valueOf(value));
-
-                meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
-                meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
-                meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
-                meter.setCollectPowerTime(new Date());
-                tMeterDao.updateByPrimaryKey(meter);
-                tMeterLogDao.insert(meter);
-                meterInfoUpload(meter);
-                //处理完了  删除电表数据
-                log.info("电表：{} 数据已处理完毕！删除redis数据:{}",meter.getName(),meterInfo);
-                redisTemplate.delete(meterKey + taskId + ":" + meter.getDeviceId());
-            }
         }
     }
-    public void handleTaskEndEvent(TaskEndEvent event) {
-        // 任务结束后 处理电表数据
-        log.info("任务：{}结束了", event.getTaskId());
-        List<TMeter> meterList = tMeterDao.selectMeterByDeviceId();
-        for (TMeter meter : meterList) {
-            Map<String, String> meterInfo = redisTemplate.opsForHash().entries(meterKey + event.getTaskId() + ":" + meter.getDeviceId());
-            if (meterInfo.size() == 3) {
-                if (NumberUtils.toFloat(meterInfo.get("totalPositivePower")) <= 0){
-                    log.info("数值小于0！{}",meterInfo);
-                    continue;
-                }
-                Float value = NumberUtils.toFloat(meterInfo.get("totalPositivePower")) - NumberUtils.toFloat(meter.getTotalPositivePower());
-                if (value < 0){
-                    value = 0f;
-                }
-                meter.setTotalPositivePowerDifferenceValue(String.valueOf(value));
-                meter.setTotalPositivePower(meterInfo.getOrDefault("totalPositivePower", "0"));
-                meter.setTotalPositiveReactivePower(meterInfo.getOrDefault("totalPositiveReactivePower", "0"));
-                meter.setTotalNegativePositivePower(meterInfo.getOrDefault("totalNegativePositivePower", "0"));
-                meter.setCollectPowerTime(new Date());
-                tMeterDao.updateByPrimaryKey(meter);
-                tMeterLogDao.insert(meter);
-                meterInfoUpload(meter);
-            }
-        }
+    public void handleMeterEndEvent(TIotDevicePoint iotDevicePoint, InspectionResultEvent event) {
+        // 查询物联设备信息
+        TIotDevice iotDevice = iotDeviceMapper.selectById(iotDevicePoint.getIotDeviceId());
+
+        TIotDeviceData iotDeviceData = new TIotDeviceData();
+        iotDeviceData.setPointId(iotDevicePoint.getId());
+        iotDeviceData.setPointName(iotDevicePoint.getPointName());
+        iotDeviceData.setIotDeviceId(iotDevicePoint.getIotDeviceId());
+        iotDeviceData.setIotDeviceName(iotDevice.getDeviceName());
+        iotDeviceData.setValue(getNumeric(event.getResult()));
+        iotDeviceData.setUnit(iotDevicePoint.getUnit());
+        iotDeviceData.setUpRegionId(iotDevice.getUpRegionId());
+        iotDeviceData.setCreateTime(new Date());
+        iotDeviceData.setMagnificationCoefficient(iotDevice.getMagnificationCoefficient());
+        iotDeviceData.setIotDeviceType(iotDevice.getIotDeviceType());
+        iotDeviceDataMapper.insert(iotDeviceData);
+
+        IotDeviceDataEx iotDeviceDataEx = new IotDeviceDataEx();
+        BeanUtil.copyProperties(iotDeviceData, iotDeviceDataEx);
+        iotDeviceDataEx.setIp(iotDevice.getIp());
+        iotDeviceDataEx.setPort(iotDevice.getPort());
+        iotDeviceDataEx.setAddress(iotDevice.getAddress());
+        iotDeviceDataEx.setDeviceId(iotDevice.getDeviceId());
+        iotDeviceDataEx.setControllable(iotDevice.getControllable());
+        iotDeviceDataEx.setChannelNum(iotDevicePoint.getChannelNum());
+        List<IotDeviceDataEx> list = new ArrayList<>();
+        list.add(iotDeviceDataEx);
+        iotDeviceDataUpload(list);
     }
 
     public static String getNumeric(String str) {
@@ -150,11 +109,7 @@ public class MeterInfoHandler {
         return str2;
     }
 
-    public static void main(String[] args) {
-        System.out.println(getNumeric("正向有功总:2131.17 "));
-    }
-
-    private void meterInfoUpload(TMeter meter){
+    private void iotDeviceDataUpload(List<IotDeviceDataEx> deviceDataList) {
         try {
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             List<XMLBaseModel> xmlBaseModelList = new ArrayList<>();
@@ -162,30 +117,34 @@ public class MeterInfoHandler {
             List<Map<String, Object>> itemList = new ArrayList<>();
 
             xmlBaseModel.setItems(itemList);
-            xmlBaseModel.setType("meter");
+            xmlBaseModel.setType("iotDeviceData");
             xmlBaseModelList.add(xmlBaseModel);
 
             map.put("list", xmlBaseModelList);
-            Map<String, Object> item = new HashMap<>();
-            item.put("name", meter.getName());
-            item.put("ip", meter.getIp());
-            item.put("port", meter.getPort());
-            item.put("address", meter.getAddress());
-            item.put("type", meter.getType());
-            item.put("upRegionId", meter.getUpRegionId());
-            item.put("totalPositivePower", meter.getTotalPositivePower());
-            item.put("totalPositiveReactivePower", meter.getTotalPositiveReactivePower());
-            item.put("totalNegativePositivePower", meter.getTotalNegativePositivePower());
-            item.put("collectPowerTime", DateTimeUtil.format(meter.getCollectPowerTime()));
-            item.put("totalPositivePowerDifferenceValue", meter.getTotalPositivePowerDifferenceValue());
-            item.put("totalNegativePositivePowerDifferenceValue", meter.getTotalNegativePositivePowerDifferenceValue());
-            item.put("totalPositiveReactivePowerDifferenceValue", meter.getTotalPositiveReactivePowerDifferenceValue());
-            item.put("magnificationCoefficient", meter.getMagnificationCoefficient());
-            itemList.add(item);
-
+            deviceDataList.forEach(tIotDeviceData -> {
+                Map<String, Object> item = new HashMap<>();
+                item.put("pointId", tIotDeviceData.getPointId());
+                item.put("pointName", tIotDeviceData.getPointName());
+                item.put("iotDeviceId", tIotDeviceData.getIotDeviceId());
+                item.put("iotDeviceName", tIotDeviceData.getIotDeviceName());
+                item.put("ip", tIotDeviceData.getIp());
+                item.put("port", tIotDeviceData.getPort());
+                item.put("address", tIotDeviceData.getAddress());
+                item.put("value", tIotDeviceData.getValue());
+                item.put("unit", tIotDeviceData.getUnit());
+                item.put("upRegionId", tIotDeviceData.getUpRegionId());
+                item.put("createTime", DateTimeUtil.format(tIotDeviceData.getCreateTime()));
+                item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
+                item.put("channelNum", tIotDeviceData.getChannelNum());
+                item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
+                item.put("deviceId", tIotDeviceData.getDeviceId());
+                item.put("upRegionName", tIotDeviceData.getUpRegionName());
+                item.put("controllable", tIotDeviceData.getControllable());
+                itemList.add(item);
+            });
             Constant.otherServer(map, Constant.TCP_URL);
-        }catch (Exception e){
-            log.info("上报电表数出错！",e);
+        } catch (Exception e) {
+            log.info("上报环控数据出错！", e);
         }
     }
 }
