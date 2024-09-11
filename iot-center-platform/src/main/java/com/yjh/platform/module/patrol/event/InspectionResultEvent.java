@@ -11,7 +11,7 @@ public class InspectionResultEvent {
 
     private String taskId;
 
-    private String deviceId;
+    private String instanceId;
 
     private String result;
 }
