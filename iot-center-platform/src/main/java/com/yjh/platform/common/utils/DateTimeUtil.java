@@ -955,6 +955,13 @@ public class DateTimeUtil {
         return cal.getTime();
     }
 
+    public static Date lastDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -1);// 日期加n个小时
+        return cal.getTime();
+    }
+
     /**
      * 日期加n个小时
      *

@@ -17,7 +17,13 @@ public interface TIotDeviceDataMapper extends BaseMapper<TIotDeviceData> {
 
     List<IotDeviceDataEx> selectInfoByIp(@Param(value = "ip") String ip);
 
-    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list);
+    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list, @Param(value = "iotDeviceType") Integer iotDeviceType);
+
+    List<TIotDeviceData> selectMeterData(@Param(value = "list") List<Long> list);
+
+    List<TIotDeviceData> selectMeterLine(@Param(value = "iotDeviceId") Long iotDeviceId,
+                                         @Param(value = "startTime") String startTime,
+                                         @Param(value = "endTime") String endTime);
 }
 
 
