@@ -6,6 +6,7 @@ import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
@@ -87,7 +88,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
         TWarnInfo tWarnInfo = new TWarnInfo()
                 .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alarmLevel).getCode()))
-                .setWarnTime(new Date())
+                .setWarnTime(DateTimeUtil.parse(map.get("time")))
                 .setWarnName("静默监视告警数据")
                 .setWarnContent(content)
                 .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
