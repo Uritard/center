@@ -29,7 +29,7 @@ public class TRobotInspectionAttrService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectByInspectionCode(String inspectionCode) {
         Map<String, Object> map = new HashMap<>();
-        Map<String, Object> inspectionMap = tRobotInspectionDao.selectInspection(inspectionCode);
+        Map<String, Object> inspectionMap = tRobotInspectionDao.selectInspection(inspectionCode, null);
         if (Objects.isNull(inspectionMap)) return map;
         List<TRobotInspectionAttr> robotInspectionAttrList = tRobotInspectionAttrDao.selectByInspectionCode(inspectionCode);
         map.put("propertyPicPath", inspectionMap.get("property_pic_path").toString());
