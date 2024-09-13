@@ -49,7 +49,7 @@ public interface TRobotInspectionDao {
     List<Long> selectDeviceMeteIdByInstanceId(List<Long> list);
     List<Long> selectDeviceMeteIdByDeviceMeteId(List<Long> list);
     int batchDeleteTCruisePlanAttr(List<Long> list);
-    Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
+    Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode, @Param(value = "robotId") Long robotId);
 
     List<TRobotInspection> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
