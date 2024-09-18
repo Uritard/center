@@ -450,7 +450,7 @@ public class UPatrolResultService {
                                 "程序异常，告警误报", 287, null, userName, date);
                     }
                     sendWebSocket(tWarnInfo.getWarnId());
-                    //告警审核上报上级系统 
+                    //告警审核上报上级系统
                     processResultToUpSystem.reviewAlarmToUpSystem(Collections.singletonList(tWarnInfo.getWarnId()),false);
                 }
             } else {
@@ -623,7 +623,7 @@ public class UPatrolResultService {
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             review.setTaskId(taskId);
-            List<Long> instanceList = getInstanceList(instanceIds);
+            List<Long> instanceList = getInstanceList(instanceIds, review.getSendCode());
             String dataUpdate = review.getPersonCheck();
             for (Long instanceId : instanceList) {
                 Map<String, String> resultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
@@ -659,29 +659,40 @@ public class UPatrolResultService {
     public int manualReviewWarn(List<TWarnInfo> tWarnInfoList) {
         int result = 0;
         for (TWarnInfo tWarnInfo : tWarnInfoList) {
-            String[] taskPatrolledId = tWarnInfo.getTaskId().split("_");
+            //静默单独处理
             String[] instanceIds = tWarnInfo.getInstanceIds().split(",");
-            String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
-            String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
-            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
-            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            List<Long> instanceList = getInstanceList(instanceIds, tWarnInfo.getEdgeCode());
             tWarnInfo.setDealType(tWarnInfo.getIsWarn() == 1 ? 286 : 287);
             tWarnInfo.setConfMode(275);
             tWarnInfo.setDealInfo(tWarnInfo.getIsWarn() == 1 ? "程序正常，告警属实" : "程序异常，告警误报");
-            tWarnInfo.setTaskId(taskId);
-            List<Long> instanceList = getInstanceList(instanceIds);
-            for (Long instanceId : instanceList) {
-                tWarnInfo.setInstanceId(instanceId);
-                result = tWarnInfoDao.updateByTaskIdAndInstanceId(tWarnInfo);
-                TDefectInfo tDefectInfo = new TDefectInfo();
-                tDefectInfo.setTaskId(taskId);
-                tDefectInfo.setInstanceId(instanceId);
-                tDefectInfo.setDealType(tWarnInfo.getDealType());
-                tDefectInfo.setConfMode(275);
-                tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
-                tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
-                tDefectInfo.setDealTime(tWarnInfo.getDealTime());
-                tDefectInfoDao.updateByDefectType(tDefectInfo);
+            if (tWarnInfo.getTaskId().contains("jm_")) {
+                String time = StringUtils.substringAfter(tWarnInfo.getTaskId(), "_");
+                Date date = DateTimeUtil.parseFormat(time, DateTimeUtil.getDateTimePattern3());
+                tWarnInfo.setWarnTime(date);
+                for (Long instanceId : instanceList) {
+                    tWarnInfo.setInstanceId(instanceId);
+                    result = tWarnInfoDao.updateByWarnTimeAndInstanceId(tWarnInfo);
+                }
+            } else {
+                String[] taskPatrolledId = tWarnInfo.getTaskId().split("_");
+                String timeStr = taskPatrolledId.length == 3 ? taskPatrolledId[2] : taskPatrolledId[1];
+                String taskCode = taskPatrolledId.length == 3 ? taskPatrolledId[1] : taskPatrolledId[0];
+                Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+                tWarnInfo.setTaskId(taskId);
+                for (Long instanceId : instanceList) {
+                    tWarnInfo.setInstanceId(instanceId);
+                    result = tWarnInfoDao.updateByTaskIdAndInstanceId(tWarnInfo);
+                    TDefectInfo tDefectInfo = new TDefectInfo();
+                    tDefectInfo.setTaskId(taskId);
+                    tDefectInfo.setInstanceId(instanceId);
+                    tDefectInfo.setDealType(tWarnInfo.getDealType());
+                    tDefectInfo.setConfMode(275);
+                    tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
+                    tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
+                    tDefectInfo.setDealTime(tWarnInfo.getDealTime());
+                    tDefectInfoDao.updateByDefectType(tDefectInfo);
+                }
             }
         }
         return result + tWarnInfoList.size();
@@ -692,7 +703,7 @@ public class UPatrolResultService {
      * @param instanceIds
      * @return
      */
-    public List<Long> getInstanceList(String[] instanceIds) {
+    public List<Long> getInstanceList(String[] instanceIds, String edgeCode) {
         List<Long> instanceList = new ArrayList<>();
         if (Constant.standardPoints()) {
             List<TCruisePointInstanceNameDetail> list = tRobotInspectionDao.selectRealInstanceByDevicePoints(instanceIds);
@@ -700,7 +711,10 @@ public class UPatrolResultService {
                 instanceList = list.stream().map(TCruisePointInstance::getInstanceId).collect(Collectors.toList());
             }
         } else {
-            instanceList = Arrays.stream(instanceIds).map(Long::parseLong).collect(Collectors.toList());
+            List<TCruisePointInstanceNameDetail> list = tRobotInspectionDao.selectRealInstances(instanceIds, edgeCode);
+            if (CollectionUtils.isNotEmpty(list)) {
+                instanceList = list.stream().map(TCruisePointInstance::getInstanceId).collect(Collectors.toList());
+            }
         }
         return instanceList;
     }

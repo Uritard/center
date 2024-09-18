@@ -212,24 +212,5 @@ public interface RobotServerHandler {
             robotRemoveCounts.remove(robotCode);
         }
     }
-    default MessageHandlerStrategy buildMessageHandlerStrategy(String type, boolean isSubSystem) {
-        MessageHandlerStrategy messageHandlerStrategy;
-        //下级系统
-        if (isSubSystem) {
-            if ("63".equals(type)) {
-                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandlerUpSystem.class);
-            } else {
-                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandler.class);
-            }
-            // 机器人
-        } else {
-            if ("63".equals(type)) {
-                messageHandlerStrategy = StaticContextAccessor.getBean(RobotCruiseReportHandler.class);
-            } else {
-                messageHandlerStrategy = StaticContextAccessor.getBean(OperationResultHandler.class);
-            }
-        }
-        return messageHandlerStrategy;
-    }
 
 }
