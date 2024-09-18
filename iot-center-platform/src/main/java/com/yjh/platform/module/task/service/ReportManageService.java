@@ -377,31 +377,6 @@ public class ReportManageService {
         taskVO.setUnReview(unReviewList.size());
     }
 
-    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
-        TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
-        delaCount(taskVO,tCruiseDataResultDetailList);
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
-        String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
-        String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
-        taskVO.setStationName(stationName);
-        taskVO.setVoltageClasses(voltageClasses);
-        taskVO.setStationType(stationType);
-
-        String cruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
-                + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
-        if (Objects.nonNull(taskVO.getUnReview())){
-            cruiseStatistics = cruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
-        }
-        taskVO.setCruiseStatistics(cruiseStatistics);
-        if ("1".equals(remark)) {
-            taskVO.setCruiseConclusion("已审核");
-        } else {
-            taskVO.setCruiseConclusion("未审核");
-        }
-
-        return taskVO;
-    }
-
     public TaskVO getTaskVoDefined(String taskId) {
         // 报告名称:站所名称+任务名称+巡视时间
         TaskVO taskVOtemp;
