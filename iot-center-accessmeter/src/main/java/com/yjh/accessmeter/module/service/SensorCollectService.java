@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,14 @@ public class SensorCollectService {
             log.error("初始化设备连接出错", e);
         }
 
+    }
+
+    @Scheduled(cron = "${accessmeter.collectdata.cron}")
+    public void collectMeterDataTask() {
+        log.info("开始采集所有电表电量");
+        List<IotDevice> iotDeviceList = iotDeviceDao.selectAllMeter();
+        DataCollectTask dataCollectTask = new DataCollectTask(iotDeviceList, iotDeviceDao, asyncExecutor, platformProxy);
+        dataCollectTask.collectMeter(iotDeviceList);
     }
 
     /**

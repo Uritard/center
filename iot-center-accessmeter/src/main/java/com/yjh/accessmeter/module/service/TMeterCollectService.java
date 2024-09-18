@@ -112,7 +112,7 @@ public class TMeterCollectService {
                     handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel channel) throws Exception {
-                            channel.pipeline().addLast(new DLT645Decoder(sendMeterCodeManager),
+                            channel.pipeline().addLast(new DLT645Decoder(),
                                     new DLT645Encoder(),
                                     new DLT645MessgeHandler(tMeterDao, tMeterLogDao, platformProxy, dynamicTask, sendMeterCodeManager));
                         }
@@ -131,7 +131,7 @@ public class TMeterCollectService {
         }
     }
 
-    @Scheduled(cron = "${accessmeter.collectdata.cron}")
+//    @Scheduled(cron = "${accessmeter.collectdata.cron}")
     public void collectDataTask() {
         log.info("开始采集所有电表电量");
         for (Channel channel : map.values()) {

@@ -24,15 +24,8 @@ import java.util.List;
 @Slf4j
 public class DLT645Decoder extends ByteToMessageDecoder {
 
-    private final SendMeterCodeManager sendMeterCodeManager;
-
-    public DLT645Decoder(SendMeterCodeManager sendMeterCodeManager) {
-        this.sendMeterCodeManager = sendMeterCodeManager;
-    }
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
-        log.info("消息进站 before decode remoteAddress:{} msg: {}", ctx.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         if (byteBuf.readableBytes() < Constant.MIN_LENGTH) {
             log.error("length 小于最小 ,length:{}", byteBuf.readableBytes());
             byteBuf.skipBytes(byteBuf.readableBytes());
@@ -115,7 +108,6 @@ public class DLT645Decoder extends ByteToMessageDecoder {
         dlt645Message.setDataType(dataType);
         dlt645Message.setAddress(addressStr);
         dlt645Message.setValue(powerTotalString);
-        sendMeterCodeManager.terminate(dlt645Message);
         log.info("消息进站 after decode message :{}", dlt645Message);
         list.add(dlt645Message);
     }

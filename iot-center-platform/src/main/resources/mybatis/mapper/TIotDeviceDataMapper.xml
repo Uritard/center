@@ -93,7 +93,9 @@
                     <foreach collection="list" item="pointId" separator="," open="(" close=")">
                         #{pointId}
                     </foreach>
-            ) a
+                GROUP BY point_id,lastTime
+                ORDER BY lastTime DESC
+        ) a
                 LEFT JOIN (
                 SELECT
                     create_time,
@@ -106,12 +108,10 @@
                     <foreach collection="list" item="pointId" separator="," open="(" close=")">
                         #{pointId}
                     </foreach>
-                GROUP BY
-                    point_id
+                GROUP BY point_id,lastTime
+                ORDER BY lastTime DESC
             ) b ON a.point_id = b.point_id
-                AND b.lastTime = DATE_ADD(a.lastTime, INTERVAL 1 DAY)
-        WHERE
-            a.create_time <![CDATA[<]]> b.create_time
+                AND a.lastTime = DATE_ADD(b.lastTime, INTERVAL 1 DAY)
     </select>
     <select id="selectMeterLine" resultType="com.yjh.platform.module.iot.entity.TIotDeviceData">
         SELECT
@@ -151,5 +151,58 @@
                     create_time
             ) a ON b.lastTime = DATE_ADD(a.lastTime, INTERVAL 1 DAY)
         WHERE a.`value` is not null
+    </select>
+    <select id="countPowerTotalByEdge" resultType="java.util.Map">
+        SELECT ROUND(SUM(a.`value` * a.magnification_coefficient), 2) AS allTotal,
+               b.region_name  AS regionName
+        FROM (
+                 SELECT (CASE
+                             WHEN a.`value` - b.`value` &lt;= 0 or a.`value` - b.`value` &gt; 10 THEN 0
+                             ELSE a.`value` - b.`value` END) AS `value`,
+                        a.edge_code,
+                        a.magnification_coefficient
+                 FROM (
+                          SELECT a.point_id,
+                                 a.`value`,
+                                 a.magnification_coefficient,
+                                 a.create_time,
+                                 a.edge_code,
+                                 DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
+                          FROM t_iot_device_data a
+                                   LEFT JOIN t_iot_device_point b ON a.point_id = b.id
+                                   LEFT JOIN t_iot_device c ON b.iot_device_id = c.id
+                          WHERE a.id in (SELECT id
+                                         FROM t_iot_device_data
+                                         WHERE iot_device_type = 840
+                                           AND channel_num IN ('1090', '00000100'))
+                            AND c.meter_type = 1
+                          GROUP BY a.point_id, lastTime
+                          ORDER BY lastTime DESC
+                      ) a
+                          LEFT JOIN
+                      (
+                          SELECT a.point_id,
+                                 a.`value`,
+                                 a.magnification_coefficient,
+                                 a.create_time,
+                                 a.edge_code,
+                                 DATE_FORMAT(a.create_time, '%Y-%m-%d') AS lastTime
+                          FROM t_iot_device_data a
+                                   LEFT JOIN t_iot_device_point b ON a.point_id = b.id
+                                   LEFT JOIN t_iot_device c ON b.iot_device_id = c.id
+                          WHERE a.id in (SELECT id
+                                         FROM t_iot_device_data
+                                         WHERE iot_device_type = 840
+                                           AND channel_num IN ('1090', '00000100'))
+                            AND c.meter_type = 1
+                          GROUP BY a.point_id, lastTime
+                          ORDER BY lastTime DESC
+                      ) b ON a.point_id = b.point_id
+                          AND a.lastTime = DATE_ADD(b.lastTime, INTERVAL 1 DAY)
+                 WHERE a.create_time between #{startTime} and #{endTime}
+             ) a
+                 LEFT JOIN t_std_region b ON a.edge_code = b.region_code
+        WHERE b.state = 1
+        GROUP BY a.edge_code
     </select>
 </mapper>

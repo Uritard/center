@@ -15,6 +15,7 @@ import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
+import com.yjh.platform.module.task.entity.RealTimeWarn;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -78,14 +79,17 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         int iotMeterType = 840;
         List<IotDeviceDataEx> tIotDeviceList = meterFlag ? getBaseMapper().selectIotData(regionList, iotMeterType)
                 : getBaseMapper().selectIotData(regionList, null);
-        //筛选出电表的设备
-        List<Long> pointList = tIotDeviceList.stream().filter(t -> t.getIotDeviceType() == iotMeterType)
-                .map(IotDeviceDataEx::getPointId).collect(Collectors.toList());
         List<TIotDeviceData> tIotDeviceDataList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(pointList)) {
-            tIotDeviceDataList = getBaseMapper().selectMeterData(pointList);
+        if (meterFlag) {
+            //筛选出电表的设备
+            List<Long> pointList = tIotDeviceList.stream()
+                    .map(IotDeviceDataEx::getPointId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(pointList)) {
+                tIotDeviceDataList = getBaseMapper().selectMeterData(pointList);
+            }
         }
-        Map<Long, TIotDeviceData> dataMap = tIotDeviceDataList.stream().collect(Collectors.toMap(TIotDeviceData::getPointId, Function.identity()));
+        Map<Long, List<TIotDeviceData>> dataMap = tIotDeviceDataList.stream().collect(Collectors.groupingBy(TIotDeviceData::getPointId));
+
         tIotDeviceList.forEach(data -> {
             if (data.getChannelNum() != null) {
                 String key = Constant.envKey + data.getIotDeviceId();
@@ -104,21 +108,29 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                     data.setUnit("");
                 }
                 if (data.getIotDeviceType() == iotMeterType) {
-                    TIotDeviceData iotDeviceData = dataMap.get(data.getPointId());
-                    //没有前一天的数据直接给0
-                    if (Objects.isNull(iotDeviceData)) {
-                        data.setPowerValue("");
-                    } else {
-                        double num = Double.parseDouble(StringUtils.isNotBlank(data.getValue()) ? data.getValue() : "0")
-                                - Double.parseDouble(StringUtils.isNotBlank(iotDeviceData.getValue()) ? iotDeviceData.getValue() : "0");
-                        //差值太大也是0
-                        if (num < 0 || num > 10) {
+                    List<TIotDeviceData> list = dataMap.get(data.getPointId());
+                    if (CollectionUtils.isNotEmpty(list)) {
+                        //数据库最早一条数据
+                        TIotDeviceData currentData = list.get(0);
+                        //前一天最早一条数据数据
+                        Date lastDay = DateTimeUtil.lastDay(currentData.getLastTime());
+                        TIotDeviceData lastData = list.stream().collect(Collectors.toMap(TIotDeviceData::getLastTime, Function.identity())).get(lastDay);
+                        if (Objects.nonNull(lastData)) {
+                            double num = Double.parseDouble(StringUtils.isNotBlank(currentData.getValue()) ? currentData.getValue() : "0")
+                                    - Double.parseDouble(StringUtils.isNotBlank(lastData.getValue()) ? lastData.getValue() : "0");
+                            //差值太大也是0
+                            if (num < 0 || num > 10) {
+                                data.setPowerValue("");
+                            } else {
+                                DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                                float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
+                                data.setPowerValue(decimalFormat.format(num * nc));
+                            }
+                        } else  {
                             data.setPowerValue("");
-                        } else {
-                            DecimalFormat decimalFormat = new DecimalFormat("#0.00");
-                            float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
-                            data.setPowerValue(decimalFormat.format(num * nc));
                         }
+                    } else {
+                        data.setPowerValue("");
                     }
                 }
             }
@@ -146,7 +158,8 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
             pointGroupMap.forEach((key, value) -> {
                 value.forEach( v -> v.setLastTime(DateTimeUtil.parseFormat(DateTimeUtil.getDateString(v.getCreateTime()), DateTimeUtil.getDatePattern())));
                 //根据时间分组
-                Map<Date, List<TIotDeviceData>> timeGroupMap = value.stream().collect(Collectors.groupingBy(TIotDeviceData::getLastTime));
+                Map<Date, List<TIotDeviceData>> timeGroupMap = value.stream()
+                        .collect(Collectors.groupingBy(TIotDeviceData::getLastTime, TreeMap::new, Collectors.toList()));
                 timeGroupMap.forEach((time, l) -> {
                     TIotDeviceData data = l.get(0);
                     List<TIotDeviceData> lastList = timeGroupMap.get(DateTimeUtil.lastDay(time));
@@ -154,11 +167,14 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
                         TIotDeviceData lastData = lastList.get(0);
                         if (StringUtils.isNotBlank(data.getValue()) && StringUtils.isNotBlank(lastData.getValue()) ){
                             double num = Double.parseDouble(data.getValue()) - Double.parseDouble(lastData.getValue());
-                            if (num > 0 || num < 10) {
+                            TIotDeviceData realData = new TIotDeviceData()
+                                    .setPointId(data.getPointId()).setPointName(data.getPointName())
+                                    .setCreateTime(data.getCreateTime()).setUnit(data.getUnit());
+                            if (0 <= num && num < 10) {
                                 DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                                 float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
-                                data.setValue(decimalFormat.format(num * nc));
-                                tIotDeviceList.add(data);
+                                realData.setValue(decimalFormat.format(num * nc));
+                                tIotDeviceList.add(realData);
                             }
                         }
                     }
@@ -243,7 +259,7 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     }
 
     private String conventResult(String value) {
-        switch (value) {
+        switch (Optional.ofNullable(value).orElse("")) {
             case "正常":
             case "开启":
                 return "0";

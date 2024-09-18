@@ -140,6 +140,7 @@ public class DataCollectTask implements Runnable {
                 .setPointName(device.getDeviceName())
                 .setUpRegionId(device.getUpRegionId())
                 .setIotDeviceType(device.getIotDeviceType())
+                .setMagnificationCoefficient(device.getMagnificationCoefficient())
                 .setCreateTime(new Date());
 
         if (devicePoints.isEmpty()) {
@@ -199,6 +200,7 @@ public class DataCollectTask implements Runnable {
                 .setUnit(device.getUnit())
                 .setUpRegionId(device.getUpRegionId())
                 .setIotDeviceType(device.getIotDeviceType())
+                .setMagnificationCoefficient(device.getMagnificationCoefficient())
                 .setCreateTime(createTime);
 
             data.setState(m.getStatus()).setValue(m.getValue());
