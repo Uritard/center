@@ -948,10 +948,10 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('5','auto_detail_type','测点','自动审核配置类型', 5);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `remark`, `sort`) VALUES ('6','auto_detail_type','标签','自动审核配置类型', 6);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('1', 'home_model', 'StationOverview', 0, '站所概览', 1);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2', 'home_model', 'RobotInfoOverview', 0, '设备工况', 2);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2', 'home_model', 'RobotInfoOverview', 0, '机器人信息概况', 2);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('3', 'home_model', 'VideoCarousel', 0, '视频轮巡', 3);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('4', 'home_model', 'Map', 0, '地图', 4);
-INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('5', 'home_model', 'WarningActual', 0, '告警记录', 5);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('4', 'home_model', 'Map', 0, '区域地图', 4);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('5', 'home_model', 'WarningActual', 0, '实时告警', 5);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('6', 'home_model', 'WarningStatistic', 0, '告警统计', 6);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('7', 'home_model', 'DefectStatistic', 0, '缺陷统计', 7);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'home_model', 'TaskStatistic', 0, '巡视统计', 8);
