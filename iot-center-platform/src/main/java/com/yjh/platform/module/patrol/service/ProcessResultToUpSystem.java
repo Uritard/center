@@ -943,7 +943,7 @@ public class ProcessResultToUpSystem {
     private String getTaskPatrolledId(String taskId) {
         String key = PATROL_SUMMARY_PREFIX + taskId;
         String taskPatrolledId = (String)redisTemplate.opsForHash().get(key, "task_patrolled_id");
-        if (CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
+        if (!CommonUtils.isEmptyOrNullstr(taskPatrolledId)) {
             String stationCode = SysParamConfig.getSysContent("edgeId");
             UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
             taskPatrolledId = stationCode + "_" + task.getTaskCode() + "_" + DateTimeUtil.format3(task.getStartTime());
@@ -1053,14 +1053,16 @@ public class ProcessResultToUpSystem {
                 if (defect) {
                     List<TDefectInfo> tDefectInfoList = analyseDataOperateDao.selectDefectListByIds(warnIdList);
                     for (TDefectInfo tDefectInfo : tDefectInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tDefectInfo.getDevicePointId():tDefectInfo.getDeviceId()),
-                                tDefectInfo.getDealPersonId(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2"));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tDefectInfo.getDevicePointId():tDefectInfo.getInstanceId()),
+                                tDefectInfo.getDealPersonId(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2",
+                                tDefectInfo.getAlarmSource(), tDefectInfo.getDefectTime()));
                     }
                 } else {
                     List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
                     for (TWarnInfo tWarnInfo : tWarnInfoList) {
-                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tWarnInfo.getDevicePointId():tWarnInfo.getDeviceId()),
-                                tWarnInfo.getDealPersonId(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2"));
+                        xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tWarnInfo.getDevicePointId():tWarnInfo.getInstanceId()),
+                                tWarnInfo.getDealPersonId(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2",
+                                tWarnInfo.getAlarmSource(), tWarnInfo.getWarnTime()));
                     }
                 }
                 xmlBaseModel.setItems(xmlItems);
@@ -1082,11 +1084,11 @@ public class ProcessResultToUpSystem {
      * @return
      */
     public Map<String, Object> getReviewAlarmXml(String taskId, String deviceId, String dealPersonId, String dealTime,
-                                                 String isWarn) {
+                                                 String isWarn, Integer alarmSource, Date warnTime) {
 
         String taskPatrolledId = getTaskPatrolledId(taskId);
         Map<String, Object> xmlItem = new HashMap<>(8);
-        xmlItem.put("task_patrolled_id", taskPatrolledId);
+        xmlItem.put("task_patrolled_id", alarmSource == 689 ? "jm_" + DateTimeUtil.format3(warnTime) : taskPatrolledId);
         xmlItem.put("device_id", deviceId);
         xmlItem.put("is_alarm", isWarn);
         xmlItem.put("confirm_people", dealPersonId);
