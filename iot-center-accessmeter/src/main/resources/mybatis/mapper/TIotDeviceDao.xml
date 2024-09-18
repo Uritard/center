@@ -35,6 +35,12 @@
         from t_iot_device
     </select>
 
+    <select id="selectAllMeter" resultType="com.yjh.accessmeter.module.device.entity.IotDevice">
+        select
+        <include refid="Base_Column_List"/>
+        from t_iot_device
+        where iot_device_type = 840
+    </select>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

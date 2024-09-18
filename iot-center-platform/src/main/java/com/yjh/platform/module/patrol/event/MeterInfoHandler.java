@@ -88,7 +88,7 @@ public class MeterInfoHandler {
         iotDeviceDataEx.setIp(iotDevice.getIp());
         iotDeviceDataEx.setPort(iotDevice.getPort());
         iotDeviceDataEx.setAddress(iotDevice.getAddress());
-        iotDeviceDataEx.setDeviceId(iotDevice.getDeviceId());
+        iotDeviceDataEx.setMeterType(iotDevice.getMeterType());
         iotDeviceDataEx.setControllable(iotDevice.getControllable());
         iotDeviceDataEx.setChannelNum(iotDevicePoint.getChannelNum());
         List<IotDeviceDataEx> list = new ArrayList<>();
@@ -137,7 +137,7 @@ public class MeterInfoHandler {
                 item.put("magnificationCoefficient", tIotDeviceData.getMagnificationCoefficient());
                 item.put("channelNum", tIotDeviceData.getChannelNum());
                 item.put("iotDeviceType", tIotDeviceData.getIotDeviceType());
-                item.put("deviceId", tIotDeviceData.getDeviceId());
+                item.put("meterType", tIotDeviceData.getMeterType());
                 item.put("upRegionName", tIotDeviceData.getUpRegionName());
                 item.put("controllable", tIotDeviceData.getControllable());
                 itemList.add(item);

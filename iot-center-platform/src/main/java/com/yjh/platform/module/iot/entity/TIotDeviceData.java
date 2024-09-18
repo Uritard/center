@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 物联设备结果表
@@ -16,6 +17,7 @@ import lombok.Data;
  */
 @TableName(value ="t_iot_device_data")
 @Data
+@Accessors(chain = true)
 public class TIotDeviceData implements Serializable {
     /**
      * Id

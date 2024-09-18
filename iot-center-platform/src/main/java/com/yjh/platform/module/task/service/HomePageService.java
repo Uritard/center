@@ -13,7 +13,6 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
-import com.yjh.platform.module.device.dao.TMeterDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
@@ -106,8 +105,8 @@ public class HomePageService {
     private TStdDevicemeteDao tStdDevicemeteDao;
     @Resource
     private TWarnInfoDao tWarnInfoDao;
-    @Autowired
-    private TMeterDao tMeterDao;
+    @Resource
+    private TIotDeviceDataMapper tIotDeviceDataMapper;
     @Autowired
     private TWarnInfoService warnInfoService;
     @Autowired
@@ -673,16 +672,6 @@ public class HomePageService {
         return list;
     }
 
-//    public List<Map<String,Float>> countPowerTotal(Integer type){
-//        //type 1-根据区域进行统计 2-根据节点进行统计
-////        if (1 == type){
-////            return tMeterDao.countPowerTotalByRegion();
-//////        } else {
-//////            return tMeterDao.countPowerTotalByEdge();
-//////        }
-//
-//    }
-
     public Map<String, Object> countPowerTotalByDay() {
         LocalDate today = LocalDate.now();
         // 获取昨天的日期
@@ -698,8 +687,8 @@ public class HomePageService {
         // 昨天的结束时间，即23:59:59.999999999
         LocalDateTime beforeYesterdayEnd = LocalDateTime.of(beforeYesterday, LocalTime.MAX);
 
-        List<Map<String, String>> yesterdayList = tMeterDao.countPowerTotalByEdge(yesterdayStart, yesterdayEnd);
-        List<Map<String, String>> beforeYesterdayList = tMeterDao.countPowerTotalByEdge(beforeYesterdayStart, beforeYesterdayEnd);
+        List<Map<String, String>> yesterdayList = tIotDeviceDataMapper.countPowerTotalByEdge(yesterdayStart, yesterdayEnd);
+        List<Map<String, String>> beforeYesterdayList = tIotDeviceDataMapper.countPowerTotalByEdge(beforeYesterdayStart, beforeYesterdayEnd);
 
         Map<String, Object> reMap = new HashMap<>(4);
         dealPowerInfo(yesterdayList, beforeYesterdayList, reMap);

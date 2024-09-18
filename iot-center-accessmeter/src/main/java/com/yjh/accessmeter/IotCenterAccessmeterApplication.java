@@ -1,5 +1,6 @@
 package com.yjh.accessmeter;
 
+import com.yjh.accessmeter.module.service.SensorCollectService;
 import com.yjh.accessmeter.module.service.TMeterCollectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @Slf4j
 public class IotCenterAccessmeterApplication implements CommandLineRunner {
     @Autowired
-    private TMeterCollectService tMeterCollectService;
+    private SensorCollectService sensorCollectService;
 
     public static void main(String[] args) {
         SpringApplication.run(IotCenterAccessmeterApplication.class, args);
@@ -23,6 +24,6 @@ public class IotCenterAccessmeterApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        tMeterCollectService.init();
+        sensorCollectService.collectMeterDataTask();
     }
 }

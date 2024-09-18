@@ -94,6 +94,22 @@ public class IotDeviceCollectController {
         return result;
     }
 
+    @ApiOperation(value = "采集所有电表电量数据")
+    @GetMapping(value = "/collectMeterDataTask")
+    public Result collectMeterDataTask() {
+        Result result = new Result();
+        try {
+            sensorCollectService.collectMeterDataTask();
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("采集设备数据失败", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "智能环境设备控制")
     @PostMapping(value = "/envDeviceControl")
     public Result envDeviceControl(@RequestBody Map<String, Object> map) {

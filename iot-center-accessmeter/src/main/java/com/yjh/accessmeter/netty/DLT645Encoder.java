@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DLT645Encoder extends MessageToByteEncoder<DLT645Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, DLT645Message dlt645Message, ByteBuf byteBuf) throws Exception {
-        log.info("消息出站 before encode  remoteAddress:{} msg:{}", ctx.channel().remoteAddress(), dlt645Message);
         //数据帧
         byte[] dataFarme = new byte[dlt645Message.getDataType().length + 12];
         dataFarme[0] = Constant.START_OF_FRAME;
