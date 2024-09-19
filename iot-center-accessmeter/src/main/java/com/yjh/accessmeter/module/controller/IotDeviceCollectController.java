@@ -8,6 +8,7 @@ import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
 import com.yjh.accessmeter.module.service.SensorCollectService;
+import com.yjh.accessmeter.netty.DLT645Message;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -130,4 +131,23 @@ public class IotDeviceCollectController {
         }
         return result;
     }
+
+
+    @ApiOperation(value = "新增物联设备配置,数值,例:23.50,小数保留两位")
+    @GetMapping(value = "/getMeterCode")
+    public Result getMeterCode(@RequestParam("iot_device_id") Long iotDeviceId,
+                               @RequestParam("channelNum") String channelNum,
+                               @RequestParam(value = "value") String value) {
+        Result result = new Result();
+        try {
+            result.setData(sensorCollectService.getMeterCode(iotDeviceId, channelNum, value));
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("增加物联设备失败：", e);
+        }
+        return result;
+    }
+
 }
