@@ -111,7 +111,7 @@
         </trim>
     </insert>
     <insert id="batchInsert" keyColumn="preset_id" keyProperty="presetId" parameterType="java.util.List" useGeneratedKeys="true">
-        insert into t_camera_preset
+        replace into t_camera_preset
         (camera_id,preset_num
         ,preset_name,preset_type
         ,creator_user,creator_time,is_use

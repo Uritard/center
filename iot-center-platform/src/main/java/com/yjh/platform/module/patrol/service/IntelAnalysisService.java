@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.PathUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -1170,7 +1171,7 @@ public class IntelAnalysisService {
                 String alarmLevel = analyseDataOperateService.selectAlarmLevel(resultArr[i]);
                 TWarnInfo tWarnInfo = new TWarnInfo()
                         .setWarnLevel(ValueUtil.toInteger(alarmLevel,131))
-                        .setWarnTime(new Date())
+                        .setWarnTime(DateUtil.dateSecond())
                         .setWarnName("静默监视告警数据")
                         .setWarnContent(analyseDataOperateService.resolveDefectResult(resultArr[i]))
                         .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))

@@ -333,7 +333,7 @@ public class UPatrolResultController {
         return result;
     }
 
-    @ApiOperation(value = "下级系统告警审核")
+    @ApiOperation(value = "上/下级系统告警审核")
     @PostMapping(value = "/robotWarnReview")
     public Result robotWarnReview(@RequestBody List<TWarnInfo> tWarnInfoList) {
         Result result = new Result();

@@ -120,9 +120,12 @@ public class TStdDeviceModelService {
                                 //视频
                                 //构建 t_camera_preset
                                 String cameraChannelId = posJson.getString("device_code");
+                                if (StringUtils.isEmpty(cameraChannelId)) {
+                                    return;
+                                }
                                 TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t ->
-                                        (cameraChannelId.equals(t.getBcameraChannelId()) || cameraChannelId.equals(t.getCameraChannelId()))
-                                                && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
+                                        (StringUtils.equals(cameraChannelId, t.getBcameraChannelId()) || StringUtils.equals(cameraChannelId, t.getCameraChannelId()))
+                                                && edgeCode.equals(t.getEdgeCode())).findFirst().orElse(new TCameraInfo());
                                 TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, posJson, tCameraInfo.getCameraId());
                                 cruiseDeviceId = String.valueOf(tCameraInfo.getCameraId());
                                 cruiseId = posJson.getLongValue("device_pos");
@@ -386,7 +389,7 @@ public class TStdDeviceModelService {
         tRobotInspection.setInspectionCode(String.valueOf(device.getOrDefault("inspection_code", "")));
         TRobotInfo tRobotInfo = tRobotInfoList.stream().filter(t ->
                 String.valueOf(posJson.get(keyCode)).equals(String.valueOf(t.getRobotNum())))
-                .collect(Collectors.toList()).get(0);
+            .findFirst().orElse(new TRobotInfo());
         tRobotInspection.setRobotId(tRobotInfo.getRobotId());
         tRobotInspection.setInspectionName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
@@ -466,8 +469,8 @@ public class TStdDeviceModelService {
     private List<TCameraPreset> dealCameraPreset(List<TCameraPreset> oldList, List<TCameraPreset> newList,
                                                  String edgeCode, String presetPath, String presetRealPath,
                                                  String edgeLevel, String ftpsPath) {
-        Map<String, TCameraPreset> oldMap = oldList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity()));
-        Map<String, TCameraPreset> newMap = newList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity()));
+        Map<String, TCameraPreset> oldMap = oldList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity(), (e1, e2) -> e1));
+        Map<String, TCameraPreset> newMap = newList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity(), (e1, e2) -> e1));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
         if (CollectionUtils.isNotEmpty(updateIdSet)) {
             newList.stream().filter(t ->
@@ -595,21 +598,21 @@ public class TStdDeviceModelService {
                     case 229:
                         tCruisePointInstance.setCruiseId(insertCameraPresetList.stream().filter(tCameraPreset ->
                                         String.valueOf(tCruisePointInstance.getCruiseId()).equals(String.valueOf(tCameraPreset.getPresetNum())) && tCruisePointInstance.getCruiseDeviceId().equals(String.valueOf(tCameraPreset.getCameraId())))
-                            .findFirst().map(TCameraPreset::getPresetId).orElse(null));
+                            .findFirst().map(TCameraPreset::getPresetId).orElse(0L));
                         break;
                     case 228:
                     case 524:
                         tCruisePointInstance.setCruiseId(insertRobotInspectionList.stream().filter(tRobotInspection ->
                                         String.valueOf(tCruisePointInstance.getCruiseId()).equals(tRobotInspection.getOriginId()))
-                                .collect(Collectors.toList()).get(0).getInspectionId());
+                                .findFirst().map(TRobotInspection::getInspectionId).orElse(0L));
                         break;
                     case 232:
                         tCruisePointInstance.setCruiseId(tVoiceDeviceList.stream().filter(tVoiceDevice ->
                                         String.valueOf(tCruisePointInstance.getCruiseId()).equals(tVoiceDevice.getOriginId()))
-                                .collect(Collectors.toList()).get(0).getVoiceDeviceId());
+                            .findFirst().map(TVoiceDevice::getVoiceDeviceId).orElse(0L));
                         break;
                     case 231:
-                        tCruisePointInstance.setCruiseId(tCruisePointInstance.getCruiseId());
+                        tCruisePointInstance.setCruiseId(tCruisePointInstance.getCruiseId() == null ? 0L : tCruisePointInstance.getCruiseId());
                         break;
                     default:
                         break;

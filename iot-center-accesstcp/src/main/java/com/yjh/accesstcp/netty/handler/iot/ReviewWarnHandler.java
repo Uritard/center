@@ -1,10 +1,12 @@
 package com.yjh.accesstcp.netty.handler.iot;
 
+import cn.hutool.core.util.NumberUtil;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.entity.TWarnInfo;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import com.yjh.accesstcp.netty.TCPClientHandler;
 import com.yjh.accesstcp.netty.entiy.MessageHeader;
 import com.yjh.accesstcp.netty.handler.MessageHandlerStrategy;
@@ -42,6 +44,9 @@ public class ReviewWarnHandler  implements MessageHandlerStrategy<XMLBaseModel>,
             tWarnInfo.setIsWarn(NumberUtils.toInt((String)item.get("is_alarm")));
             tWarnInfo.setDealPersonId((String)item.get("confirm_people"));
             tWarnInfo.setDealTime(DateTimeUtil.parse((String)item.get("confirm_date")));
+            if (StringUtils.isNotEmpty((String) item.get("alarm_id"))) {
+                tWarnInfo.setWarnId(NumberUtils.toLong((String)item.get("alarm_id")));
+            }
             tWarnInfo.setEdgeCode(sendCode);
             warnInfoList.add(tWarnInfo);
         }

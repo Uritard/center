@@ -296,6 +296,7 @@
             <if test="taskId != null ">a.task_id = #{taskId},</if>
         </set>
         where a.task_id = #{taskId} and a.instance_id = #{instanceId}
+        <if test="warnId != null"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
     </update>
 
     <update id="updateByWarnTimeAndInstanceId">
@@ -326,6 +327,8 @@
             <if test="taskId != null ">a.task_id = #{taskId},</if>
         </set>
         where a.warn_time = #{warnTime} and a.instance_id = #{instanceId}
+        <if test="originId != null and originId != '' "> and a.origin_id = #{originId, jdbcType=VARCHAR}</if>
+        <if test="warnId != null"> and a.defect_id = #{warnId, jdbcType=BIGINT}</if>
     </update>
     <update id="batchUpDate">
         update t_warn_info a
