@@ -86,6 +86,7 @@ public class IotDeviceDataHandler implements MessageHandlerStrategy, Initializin
             data.setUpRegionId(upRegionId);
             data.setCreateTime(DateTimeUtil.parse(MapUtils.getString(item,"createTime")));
             data.setChannelNum(MapUtils.getString(item,"channelNum"));
+            data.setMagnificationCoefficient(MapUtils.getInteger(item, "magnificationCoefficient"));
             data.setIotDeviceType(MapUtils.getInteger(item,"iotDeviceType"));
             data.setIotDeviceId(data.getId());
             data.setUpRegionName(MapUtils.getString(item,"upRegionName"));

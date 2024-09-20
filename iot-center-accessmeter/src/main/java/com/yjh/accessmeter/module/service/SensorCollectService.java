@@ -4,19 +4,23 @@
 
 package com.yjh.accessmeter.module.service;
 
+import com.yjh.accessmeter.common.Constant;
 import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.Result;
 import com.yjh.accessmeter.common.result.ResultCodeEnum;
+import com.yjh.accessmeter.common.utils.ByteUtil;
 import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
+import com.yjh.accessmeter.netty.DLT645Message;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
 import com.yjh.accessmeter.protocol.entity.EnvAction;
 import com.yjh.accessmeter.protocol.impl.EnvTerminalProtocolImpl;
 import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
+import io.netty.buffer.ByteBufUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -205,5 +209,79 @@ public class SensorCollectService {
         }
 
         return sensorProtocol.sendControl(device, map);
+    }
+
+    public String getMeterCode(Long iotDeviceId, String channelNum, String value) {
+        IotDevice device = iotDeviceDao.selectByPrimaryKey(iotDeviceId);
+        DLT645Message dlt645Message = new DLT645Message();
+        dlt645Message.setAddress(device.getAddress());
+        dlt645Message.setValue(value);
+        dlt645Message.setDataType(ByteUtil.HexString2Bytes(channelNum));
+        if (ProtocolEnum.getEnum(device.getProtocolModel()) == ProtocolEnum.DLT645_97) {
+            dlt645Message.setControlCode(Constant.CONTROLL_CODE_ANSWER);
+        } else {
+            dlt645Message.setControlCode(Constant.CONTROLL_CODE_ANSWER_2007);
+        }
+        //数据帧
+        int decimalIndex = dlt645Message.getValue().indexOf('.');
+        String integerPart = dlt645Message.getValue().substring(0, decimalIndex);
+        String decimalPart = dlt645Message.getValue().substring(decimalIndex + 1);
+        int integerLength = integerPart.length();
+        String[] strings = new String[]{
+                // 小数部分
+                decimalPart,
+                // 十位
+                integerPart.substring(Math.max(0, integerLength - 2), Math.max(0, integerLength - 1)),
+                // 个位
+                integerPart.substring(Math.max(0, integerLength - 1), integerLength),
+                // 千位
+                integerPart.substring(Math.max(0, integerLength - 4), Math.max(0, integerLength - 3)),
+                // 百位
+                integerPart.substring(Math.max(0, integerLength - 3), Math.max(0, integerLength - 2)),
+                // 十万位
+                integerPart.substring(Math.max(0, integerLength - 5), Math.max(0, integerLength - 4)),
+                // 万位
+                integerPart.substring(Math.max(0, integerLength - 4), Math.max(0, integerLength - 43))
+        };
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : strings) {
+            if (StringUtils.isNotBlank(s)) {
+                stringBuilder.append(s);
+            } else {
+                stringBuilder.append("0");
+            }
+        }
+        byte[] valueArray = ByteUtil.HexString2Bytes(stringBuilder.toString());
+        int valueNum = (dlt645Message.getDataType().length + valueArray.length);
+        byte[] dataArray = new byte[valueNum];
+        System.arraycopy(dlt645Message.getDataType(), 0, dataArray, 0, dlt645Message.getDataType().length);
+        System.arraycopy(valueArray, 0, dataArray, dlt645Message.getDataType().length, valueArray.length);
+        byte[] dataFarme = new byte[dataArray.length + 12];
+        dataFarme[0] = Constant.START_OF_FRAME;
+        byte[] address = ByteBufUtil.decodeHexDump(dlt645Message.getAddress());
+        //地址域
+        for (int i = 0; i < 6; i++) {
+            dataFarme[1 + i] = address[5 - i];
+        }
+        dataFarme[7] = Constant.START_OF_FRAME;
+        //控制码
+        dataFarme[8] = dlt645Message.getControlCode();
+        //数据长度
+        dataFarme[9] = (byte) valueNum;
+        //数据域
+        for (int i = 0; i < dataArray.length; i++) {
+            dataFarme[10 + i] = (byte) (dataArray[i] + Constant.DIFF_VALUE);
+        }
+        int cs = 0;
+        //计算校验码
+        for (int i = 0; i < dataFarme.length - 2; i++) {
+            cs = cs + Byte.toUnsignedInt(dataFarme[i]) % 256;
+        }
+        dataFarme[dataFarme.length - 2] = (byte) cs;
+        dataFarme[dataFarme.length - 1] = Constant.END_OF_FRAME;
+        String hex = ByteBufUtil.hexDump(dataFarme);
+        log.info("dlt645Message=> {} 的结果数据为 encode:{}", dlt645Message, hex);
+        return hex;
     }
 }

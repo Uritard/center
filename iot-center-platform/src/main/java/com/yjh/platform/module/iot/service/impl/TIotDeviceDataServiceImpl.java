@@ -152,30 +152,30 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
 
         //查询耗电量
         if (powerFlag) {
-            //根据点位进行分组
-            Map<Long, List<TIotDeviceData>> pointGroupMap = tIotDeviceDataList.stream().collect(Collectors.groupingBy(TIotDeviceData::getPointId));
-
-            pointGroupMap.forEach((key, value) -> {
-                value.forEach( v -> v.setLastTime(DateTimeUtil.parseFormat(DateTimeUtil.getDateString(v.getCreateTime()), DateTimeUtil.getDatePattern())));
-                //根据时间分组
-                Map<Date, List<TIotDeviceData>> timeGroupMap = value.stream()
-                        .collect(Collectors.groupingBy(TIotDeviceData::getLastTime, TreeMap::new, Collectors.toList()));
-                timeGroupMap.forEach((time, l) -> {
-                    TIotDeviceData data = l.get(0);
+            tIotDeviceDataList.forEach(v -> v.setLastTime(DateTimeUtil.parseFormat(DateTimeUtil.getDateString(v.getCreateTime()), DateTimeUtil.getDatePattern())));
+            Map<Date, List<TIotDeviceData>> timeGroupMap = tIotDeviceDataList.stream()
+                    .collect(Collectors.groupingBy(TIotDeviceData::getLastTime, TreeMap::new, Collectors.toList()));
+            timeGroupMap.forEach((time, l) -> {
+                Map<Long, List<TIotDeviceData>> pointGroupMap = l.stream().collect(Collectors.groupingBy(TIotDeviceData::getPointId));
+                pointGroupMap.forEach((key, value) ->{
+                    TIotDeviceData data = value.get(0);
                     List<TIotDeviceData> lastList = timeGroupMap.get(DateTimeUtil.lastDay(time));
-                    if (CollectionUtils.isNotEmpty(lastList) ) {
-                        TIotDeviceData lastData = lastList.get(0);
+                    if (CollectionUtils.isNotEmpty(lastList)) {
+                        List<TIotDeviceData> list =  lastList.stream().filter(o -> Objects.equals(o.getPointId(), key)).collect(Collectors.toList());
+                        TIotDeviceData lastData = list.get(0);
                         if (StringUtils.isNotBlank(data.getValue()) && StringUtils.isNotBlank(lastData.getValue()) ){
                             double num = Double.parseDouble(data.getValue()) - Double.parseDouble(lastData.getValue());
                             TIotDeviceData realData = new TIotDeviceData()
                                     .setPointId(data.getPointId()).setPointName(data.getPointName())
                                     .setCreateTime(data.getCreateTime()).setUnit(data.getUnit());
-                            if (0 <= num && num < 10) {
+                            if (num < 0 || num > 10) {
+                                realData.setValue("0.00");
+                            } else {
                                 DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                                 float nc = Objects.nonNull(data.getMagnificationCoefficient()) ? data.getMagnificationCoefficient() : 1;
                                 realData.setValue(decimalFormat.format(num * nc));
-                                tIotDeviceList.add(realData);
                             }
+                            tIotDeviceList.add(realData);
                         }
                     }
                 });
