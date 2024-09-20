@@ -654,7 +654,7 @@ public class UPatrolResultService {
     }
 
     /**
-     * 下级系统告警审核信息同步
+     * 上/下级系统告警审核信息同步
      */
     public int manualReviewWarn(List<TWarnInfo> tWarnInfoList) {
         int result = 0;
@@ -691,6 +691,8 @@ public class UPatrolResultService {
                     tDefectInfo.setDealInfo(tWarnInfo.getDealInfo());
                     tDefectInfo.setDealPersonId(tWarnInfo.getDealPersonId());
                     tDefectInfo.setDealTime(tWarnInfo.getDealTime());
+                    tDefectInfo.setOriginId(tWarnInfo.getOriginId());
+                    tDefectInfo.setDefectId(tWarnInfo.getWarnId());
                     tDefectInfoDao.updateByDefectType(tDefectInfo);
                 }
             }

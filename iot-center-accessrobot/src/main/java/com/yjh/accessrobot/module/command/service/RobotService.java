@@ -16,6 +16,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.common.utils.ValueUtil;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
@@ -3135,7 +3136,7 @@ public class RobotService {
                 tCameraRecorder.setRecordName(cameraModel.getPatroldeviceName());
                 tCameraRecorder.setRecorderModel(cameraModel.getCameraModel());
                 tCameraRecorder.setRecorderType(String.valueOf(cameraModel.getCameraType()));
-                tCameraRecorder.setVendorId(Integer.valueOf(cameraModel.getVendorId()));
+                tCameraRecorder.setVendorId(ValueUtil.getInteger(cameraModel.getVendorId(), null));
                 tCameraRecorder.setPmsId(cameraModel.getPmsId());
                 tCameraRecorder.setAliasName(cameraModel.getAliasName());
                 tCameraRecorder.setRecordIp(cameraModel.getCameraIp());

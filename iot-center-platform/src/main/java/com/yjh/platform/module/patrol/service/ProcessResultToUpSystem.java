@@ -1055,14 +1055,14 @@ public class ProcessResultToUpSystem {
                     for (TDefectInfo tDefectInfo : tDefectInfoList) {
                         xmlItems.add(getReviewAlarmXml(String.valueOf(tDefectInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tDefectInfo.getDevicePointId():tDefectInfo.getInstanceId()),
                                 tDefectInfo.getDealPersonId(), DateTimeUtil.format(tDefectInfo.getDealTime()), tDefectInfo.getDealType() == 286?"1":"2",
-                                tDefectInfo.getAlarmSource(), tDefectInfo.getDefectTime()));
+                                tDefectInfo.getAlarmSource(), tDefectInfo.getDefectTime(), tDefectInfo.getDefectId()));
                     }
                 } else {
                     List<TWarnInfo> tWarnInfoList = analyseDataOperateDao.selectWarnListByIds(warnIdList);
                     for (TWarnInfo tWarnInfo : tWarnInfoList) {
                         xmlItems.add(getReviewAlarmXml(String.valueOf(tWarnInfo.getTaskId()), String.valueOf(Constant.standardPoints()?tWarnInfo.getDevicePointId():tWarnInfo.getInstanceId()),
                                 tWarnInfo.getDealPersonId(), DateTimeUtil.format(tWarnInfo.getDealTime()), tWarnInfo.getDealType() == 286?"1":"2",
-                                tWarnInfo.getAlarmSource(), tWarnInfo.getWarnTime()));
+                                tWarnInfo.getAlarmSource(), tWarnInfo.getWarnTime(), tWarnInfo.getWarnId()));
                     }
                 }
                 xmlBaseModel.setItems(xmlItems);
@@ -1084,15 +1084,17 @@ public class ProcessResultToUpSystem {
      * @return
      */
     public Map<String, Object> getReviewAlarmXml(String taskId, String deviceId, String dealPersonId, String dealTime,
-                                                 String isWarn, Integer alarmSource, Date warnTime) {
+                                                 String isWarn, Integer alarmSource, Date warnTime, Long originId) {
 
         String taskPatrolledId = getTaskPatrolledId(taskId);
-        Map<String, Object> xmlItem = new HashMap<>(8);
+        Map<String, Object> xmlItem = new HashMap<>(16);
         xmlItem.put("task_patrolled_id", alarmSource == 689 ? "jm_" + DateTimeUtil.format3(warnTime) : taskPatrolledId);
         xmlItem.put("device_id", deviceId);
         xmlItem.put("is_alarm", isWarn);
         xmlItem.put("confirm_people", dealPersonId);
         xmlItem.put("confirm_date", dealTime);
+        xmlItem.put("edge_code", SysParamConfig.getSysContent("edgeCode"));
+        xmlItem.put("origin_id", originId);
         return xmlItem;
     }
 

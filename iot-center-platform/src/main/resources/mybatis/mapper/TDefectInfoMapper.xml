@@ -197,6 +197,8 @@
         <if test="linkMessage != null">a.link_message = #{linkMessage},</if>
     </set>
         where a.task_id = #{taskId} and a.instance_id = #{instanceId}
+        <if test="originId != null and originId != '' "> and a.origin_id = #{originId, jdbcType=VARCHAR}</if>
+        <if test="defectId != null"> and a.defect_id = #{defectId, jdbcType=BIGINT}</if>
     </update>
     <update id="batchUpDate">
         update t_defect_info a
