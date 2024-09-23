@@ -58,6 +58,8 @@
         device.iot_device_type,
         device.controllable,
         device.magnification_coefficient,
+        device.address,
+        device.up_region_id,
         point.unit,
         robot.robot_code,
         b.up_dict AS type

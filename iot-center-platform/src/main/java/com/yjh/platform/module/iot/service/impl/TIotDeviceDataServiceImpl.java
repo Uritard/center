@@ -7,11 +7,18 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.device.dao.TMeterDao;
+import com.yjh.platform.module.device.dao.TMeterLogDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
+import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
+import com.yjh.platform.module.iot.service.TIotDevicePointService;
+import com.yjh.platform.module.iot.service.TIotDeviceService;
 import com.yjh.platform.module.patrol.entity.LineKeyValue;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.EnvDeviceStatus;
@@ -50,6 +57,14 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
     private RedisTemplate redisTemplate;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private TMeterDao tMeterDao;
+    @Autowired
+    private TMeterLogDao tMeterLogDao;
+    @Autowired
+    private TIotDeviceService tIotDeviceService;
+    @Autowired
+    private TIotDevicePointService tIotDevicePointService;
 
     @Override
     public List<Map<String, Object>> selectIotData(Long upRegionId, Boolean meterFlag) {
@@ -398,6 +413,117 @@ public class TIotDeviceDataServiceImpl extends ServiceImpl<TIotDeviceDataMapper,
         } catch (Exception e) {
             log.info("上报环控数据出错！", e);
         }
+    }
+
+    @Override
+    public void deviceConverted(){
+        List<TMeter> meterList = tMeterDao.selectAll();
+        List<TIotDevice> iotDevices = new ArrayList<>();
+        meterList.forEach(tMeter -> {
+            TIotDevice tIotDevice = new TIotDevice();
+            tIotDevice.setDeviceName(tMeter.getName());
+            tIotDevice.setIp(tMeter.getIp());
+            tIotDevice.setPort(tMeter.getPort());
+            tIotDevice.setAddress(tMeter.getAddress());
+            tIotDevice.setIotDeviceType(840);
+            tIotDevice.setProtocolModel(String.valueOf(tMeter.getType() == 2 ? 8 : "1997".equals(tMeter.getProtocol()) ? 4 : 5));
+            tIotDevice.setMeterType(tMeter.getType() == 2 ? 1 : 0);
+            tIotDevice.setUpRegionId(tMeter.getUpRegionId());
+            tIotDevice.setUpRegionName(tStdRegionDao.selectByPrimaryId(tMeter.getUpRegionId()).getRegionName());
+            tIotDevice.setCreateTime(tMeter.getCreateTime());
+            tIotDevice.setCreatePerson("10001");
+            tIotDevice.setUpdateTime(tMeter.getCreateTime());
+            tIotDevice.setUpdatePerson("10001");
+            tIotDevice.setMagnificationCoefficient(Float.valueOf(tMeter.getMagnificationCoefficient()));
+            tIotDevice.setCollectionFrequency(0);
+            iotDevices.add(tIotDevice);
+        });
+        tIotDeviceService.saveBatch(iotDevices);
+        iotDevices.forEach(tIotDevice -> {
+            List<TIotDevicePoint> iotDevicePoints  = new ArrayList<>();
+            if ("4".equals(tIotDevice.getProtocolModel())){
+                String[] dlt97 = new String[]{"1090","1091","2091"};
+                for (String s : dlt97) {
+                    TIotDevicePoint tIotDevicePoint = new TIotDevicePoint();
+                    tIotDevicePoint.setIotDeviceId(tIotDevice.getId());
+                    tIotDevicePoint.setIotDeviceName(tIotDevice.getDeviceName());
+                    tIotDevicePoint.setChannelNum(s);
+                    tIotDevicePoint.setUnit("1090".equals(s) ? "kwh" : "kvarh");
+                    tIotDevicePoint.setPointName("1090".equals(s) ? "正向有功总" : "1091".equals(s) ? "正向无功总" : "反向无功总");
+                    iotDevicePoints.add(tIotDevicePoint);
+                }
+            }else if ("5".equals(tIotDevice.getProtocolModel())){
+                String[] dlt07 = new String[]{"00000100","00000500","00000800"};
+                for (String s : dlt07) {
+                    TIotDevicePoint tIotDevicePoint = new TIotDevicePoint();
+                    tIotDevicePoint.setIotDeviceId(tIotDevice.getId());
+                    tIotDevicePoint.setIotDeviceName(tIotDevice.getDeviceName());
+                    tIotDevicePoint.setChannelNum(s);
+                    tIotDevicePoint.setUnit("00000100".equals(s) ? "kwh" : "kvarh");
+                    tIotDevicePoint.setPointName("00000100".equals(s) ? "正向有功总" : "00000500".equals(s) ? "无功I总" : "无功IV总");
+                    iotDevicePoints.add(tIotDevicePoint);
+                }
+            }else {
+                String[] task = new String[]{"正向有功总","无功I总","无功IV总"};
+                for (String s : task) {
+                    TIotDevicePoint tIotDevicePoint = new TIotDevicePoint();
+                    tIotDevicePoint.setIotDeviceId(tIotDevice.getId());
+                    tIotDevicePoint.setIotDeviceName(tIotDevice.getDeviceName());
+                    tIotDevicePoint.setChannelNum("");
+                    tIotDevicePoint.setUnit("正向有功总".equals(s) ? "kwh" : "kvarh");
+                    tIotDevicePoint.setPointName(s);
+                    iotDevicePoints.add(tIotDevicePoint);
+                }
+            }
+            tIotDevicePointService.saveBatch(iotDevicePoints);
+        });
+    }
+
+    @Override
+    public void insertDataFromMeterLog() {
+        List<TMeter> list = tMeterLogDao.selectAll();
+        TMeter lastMeter = list.get(list.size() - 1);
+        Date date = DateTimeUtil.parseFormat(DateTimeUtil.getDateString(lastMeter.getCreateTime()), DateTimeUtil.getDatePattern());
+        List<IotDeviceDataEx> dataExList = getBaseMapper().selectIotData(new ArrayList<>(), 840);
+        List<TIotDeviceData> dataList = new ArrayList<>();
+        List<IotDeviceDataEx> redisList = new ArrayList<>();
+        Map<String, List<TMeter>> addressMap = list.stream().collect(Collectors.groupingBy(TMeter::getAddress));
+        addressMap.forEach((key, value) -> {
+            List<IotDeviceDataEx> pointList = dataExList.stream().filter(t-> t.getAddress().equals(key)).collect(Collectors.toList());
+            value.forEach(tMeter -> {
+                Map<String, String> map = new HashMap<>(1);
+                map.put("正向有功总", tMeter.getTotalPositivePower());
+                if (tMeter.getType() == 2 || "2007".equals(tMeter.getProtocol())){
+                    map.put("无功I总", tMeter.getTotalPositiveReactivePower());
+                    map.put("无功IV总", tMeter.getTotalNegativePositivePower());
+                }else {
+                    map.put("正向无功总", tMeter.getTotalPositiveReactivePower());
+                    map.put("反向无功总", tMeter.getTotalNegativePositivePower());
+                }
+                map.forEach((k,v) -> {
+                    TIotDeviceData iotDeviceData = new TIotDeviceData();
+                    IotDeviceDataEx deviceDataEx = pointList.stream().filter(f -> f.getPointName().equals(k)).collect(Collectors.toList()).get(0);
+                    iotDeviceData.setIotDeviceType(deviceDataEx.getIotDeviceType());
+                    iotDeviceData.setIotDeviceId(deviceDataEx.getIotDeviceId());
+                    iotDeviceData.setIotDeviceName(deviceDataEx.getIotDeviceName());
+                    iotDeviceData.setMagnificationCoefficient(deviceDataEx.getMagnificationCoefficient());
+                    iotDeviceData.setPointId(deviceDataEx.getPointId());
+                    iotDeviceData.setUnit(deviceDataEx.getUnit());
+                    iotDeviceData.setUpRegionId(deviceDataEx.getUpRegionId());
+                    iotDeviceData.setCreateTime(tMeter.getCreateTime());
+                    iotDeviceData.setPointName(k);
+                    iotDeviceData.setValue(v);
+                    dataList.add(iotDeviceData);
+                    if (tMeter.getCreateTime().getTime() >= date.getTime()){
+                        deviceDataEx.setValue(v);
+                        deviceDataEx.setCreateTime(tMeter.getCreateTime());
+                        redisList.add(deviceDataEx);
+                    }
+                });
+            });
+        });
+        this.saveBatch(dataList);
+        addToRedis(redisList);
     }
 }
 

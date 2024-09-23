@@ -153,4 +153,36 @@ public class TIotDeviceDataController {
         return result;
     }
 
+    @ApiOperation(value = "电表设备转换")
+    @RequestMapping(value = "/deviceConverted", method = RequestMethod.POST)
+    public Result deviceConverted() {
+        Result result = new Result();
+        try {
+            tIotDeviceDataService.deviceConverted();
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("deviceConverted失败：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "电表数据入库")
+    @RequestMapping(value = "/insertDataFromMeterLog", method = RequestMethod.POST)
+    public Result insertDataFromMeterLog() {
+        Result result = new Result();
+        try {
+            tIotDeviceDataService.insertDataFromMeterLog();
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("deviceConverted失败：", e);
+        }
+        return result;
+    }
+
 }

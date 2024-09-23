@@ -24,4 +24,8 @@ public interface TIotDeviceDataService extends IService<TIotDeviceData> {
     Boolean insertEnvData(List<EnvDeviceStatus> envDeviceStatusList);
 
     Boolean addToRedis(List<IotDeviceDataEx> dataList);
+
+    void deviceConverted();
+
+    void insertDataFromMeterLog();
 }
