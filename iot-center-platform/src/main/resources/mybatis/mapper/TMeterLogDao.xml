@@ -111,6 +111,15 @@
                  WHERE meter_id = d.id AND create_time &lt;= d.collectTime AND create_time &gt;= d.lastTime ORDER BY create_time LIMIT 1
              ) a
     </select>
+    <select id="selectAll" resultType="com.yjh.platform.module.device.entity.TMeter">
+        SELECT
+            a.*, b.protocol
+        FROM
+            t_meter_log a
+                LEFT JOIN t_meter b ON a.meter_id = b.id
+        WHERE
+            a.create_time > DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    </select>
 
     <delete id="deleteExpireData">
         delete from t_meter_log
