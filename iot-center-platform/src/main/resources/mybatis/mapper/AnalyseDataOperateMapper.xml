@@ -1128,4 +1128,12 @@
         </foreach>
         )
     </select>
+    <select id="selectWarnCountByATaskIdAndInsId" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            t_warn_info
+        WHERE task_id = #{taskId, jdbcType=VARCHAR}
+        AND instance_id = #{instanceId, jdbcType=BIGINT}
+    </select>
 </mapper>

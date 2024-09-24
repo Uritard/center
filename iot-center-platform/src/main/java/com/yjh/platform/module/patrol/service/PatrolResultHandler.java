@@ -704,7 +704,7 @@ public class PatrolResultHandler {
                 int alarmRuleType = tStdDevicemete.getAlarmRuleType();
                 int warnFlag = analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1,
                         highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
-
+                int warnCount = analyseDataOperateService.warnCount(cruiseResultMap.get("taskId"), Long.valueOf(cruiseResultMap.get("instanceId")));
                 // 正常结果
                 // cruiseResultMap.put("resultNum", resultValue);
                 // cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
@@ -732,7 +732,7 @@ public class PatrolResultHandler {
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
 
-                if (warnFlag == 1) {
+                if (warnFlag == 1 && warnCount == 0) {
                     Map<String, String> warnMap = new HashMap<>(16);
                     String warnPrefix = "warnInfo:" + cruiseResultMap.get("taskId");
                     String tempKey = String.valueOf(UUID.randomUUID()).replace("-", "");
