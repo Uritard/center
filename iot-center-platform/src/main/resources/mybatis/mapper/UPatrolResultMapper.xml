@@ -1503,6 +1503,7 @@
         WHERE
             1 = 1
           and d.task_id =  #{taskId}
+        order by startTime
     </select>
     <select id="selectCruiseInstanceByPatrol" resultType="com.yjh.platform.module.device.entity.CruiseOfPatrolDevice">
         SELECT
