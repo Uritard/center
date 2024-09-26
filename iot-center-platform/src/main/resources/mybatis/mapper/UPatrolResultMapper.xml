@@ -1483,7 +1483,7 @@
     <select id="queryOperationResult" resultType="com.yjh.platform.module.task.entity.OperationTaskRecordResult">
         SELECT DISTINCT
             a.cruise_data_id AS resultId,
-            h.dict_note AS cruiseName,
+            a.cruise_name AS cruiseName,
             a.result_desc AS resultNum,
             a.confirm_pic_path AS confirmPicPath,
             a.orig_confirm_pic_path AS origConfirmPicPath,
@@ -1497,9 +1497,6 @@
             u_patrol_data_result a
                 LEFT JOIN u_patrol_task d ON d.task_id = a.task_id
                 LEFT JOIN sys_user u ON d.create_user_id = u.user_id
-                LEFT JOIN t_cruise_point_instance e ON e.device_mete_id = a.device_mete_id
-                LEFT JOIN t_robot_inspection f ON f.inspection_id = e.cruise_id
-                LEFT JOIN t_dict_business h ON h.dict_code = f.operation_type AND h.col_name ='operation_type'
         WHERE
             1 = 1
           and d.task_id =  #{taskId}

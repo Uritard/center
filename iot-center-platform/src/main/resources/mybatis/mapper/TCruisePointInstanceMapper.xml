@@ -547,7 +547,7 @@
 
     <select id="selectForTask"  resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail">
         select a.instance_id, a.edge_code, a.origin_id, a.device_mete_id, a.station_id, a.station_name, a.device_id, a.custom_id,
-        a.data_format, a.identify_type, a.identify_son_type, a.cruise_type, a.cruise_id, a.cruise_name, a.cruise_content,
+        a.data_format, a.identify_type, a.identify_son_type, a.cruise_type, a.cruise_id, a.cruise_content,
         tsd.device_type,tsd.up_region_id,
         b.mete_name AS instanceName,
         b.mete_type,
@@ -558,7 +558,7 @@
         tsd.device_name,
         tsd.real_code,
         c.robot_id,
-        a.cruise_name,
+        IFNULL((SELECT dict_note FROM t_dict_business WHERE dict_code = c.operation_type AND col_name = 'operation_type'), a.cruise_name) as cruise_name,
         d.camera_id,
         f.camera_ip,
         e.voice_device_id as cruise_device_id,
