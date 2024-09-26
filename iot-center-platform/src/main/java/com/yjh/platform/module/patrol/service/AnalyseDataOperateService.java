@@ -586,6 +586,16 @@ public class AnalyseDataOperateService {
         return warnFlag;
     }
 
+    /**
+     * 根据 taskId  instanceId 查询 该点位的告警是否已经入过库了
+     * @param taskId
+     * @param instanceId
+     * @return
+     */
+    public int warnCount(String taskId, Long instanceId){
+        return  analyseDataOperateDao.selectWarnCountByATaskIdAndInsId(taskId, instanceId);
+    }
+
 
     /**
      * -------表计识别 数据告警判断 --------

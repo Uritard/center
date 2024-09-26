@@ -108,4 +108,6 @@ public interface AnalyseDataOperateDao {
     List<Map<String,String>> selectWarnAndResultListByIds(@Param(value = "instanceId") Long instanceId,
                                                           @Param(value = "taskId") String taskId);
 
+    int selectWarnCountByATaskIdAndInsId(@Param(value = "taskId")String taskId,
+                                         @Param(value = "instanceId") Long instanceId);
 }
