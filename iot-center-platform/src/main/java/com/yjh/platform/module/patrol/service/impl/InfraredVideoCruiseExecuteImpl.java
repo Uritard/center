@@ -78,14 +78,6 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
         return patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
     }
 
-    @Override
-    public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
-        if ("已拍照".equals(resultNum) || CommonUtils.isEmptyOrNullstr(resultNum)) {
-            return super.needAnalysis(deviceMeteId, resultNum);
-        }
-        // dlt 红外 抓图能直接获取到数值，不需要进行算法处理，直接返回 null
-        return null;
-    }
 
     @Override
     public void afterPropertiesSet() {
