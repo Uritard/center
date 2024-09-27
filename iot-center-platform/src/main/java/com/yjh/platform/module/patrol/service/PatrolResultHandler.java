@@ -244,16 +244,8 @@ public class PatrolResultHandler {
 
                 infoMap.put("instanceId", instanceId);
 
-                Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(robotCode);
-                if (countRegion != 0) {
-                    robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
-                }
-                Integer type = uPatrolTaskService.selectRobotType(robotCode);
-                boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-                //机器人是有值的处理非同源 + 下级主辅设备结果处理非同源/模拟机器人需要算法处理不走这里的非同源
-                if (Constant.isHost() && !isSimulationTool
-                        && ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode(), TypeEnum.ONLINE.getCode()}, instance.getCruiseType())
-                        && !Constant.fastTurbo()) {
+                //下级主辅设备结果处理非同源
+                if (Constant.isHost() &&  instance.getCruiseType() == TypeEnum.ONLINE.getCode() && !Constant.fastTurbo()) {
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
@@ -710,27 +702,14 @@ public class PatrolResultHandler {
                 // cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 // cruiseResultMap.put("cruiseAbnormal", "0");
 
-                boolean isSimulationTool = false;
-                String edgeCode = cruiseResultMap.get("edgeCode");
-                if (StringUtils.isNotEmpty(edgeCode)) {
-                    Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(edgeCode);
-                    String robotCode = edgeCode;
-                    if (countRegion != 0) {
-                        robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(cruiseResultMap.get("instanceId")));
-                    }
-                    Integer type = uPatrolTaskService.selectRobotType(robotCode);
-                    isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-                }
-                //检测工具上报的调用算法的需要走非同源逻辑
-                if (isSimulationTool || !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, MapUtils.getInteger(cruiseResultMap, "cruiseType"))) {
-                    RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
-                    robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
-                    robotPatrolTaskAlarm.setValue(resultStringValue);
-                    robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
-                    robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
-                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
-                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
-                }
+                //所有算法处理的都走非同源逻辑
+                RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+                robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+                robotPatrolTaskAlarm.setValue(resultStringValue);
+                robotPatrolTaskAlarm.setValueUnit(cruiseResultMap.get("resultDesc"));
+                robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
 
                 if (warnFlag == 1) {
                     Map<String, String> warnMap = new HashMap<>(16);

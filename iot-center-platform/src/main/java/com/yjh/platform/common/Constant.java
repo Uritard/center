@@ -218,6 +218,8 @@ public class Constant {
     private static Boolean middlegroundIds;
 
     private static String systemLevel;
+
+    private static String needAnalyseResult;
     /**
      * 是否开启修改同步模型
      */
@@ -336,6 +338,17 @@ public class Constant {
         }
         return missedPointRetry;
     }
+
+    public static String getNeedAnalyseResult() {
+        try {
+            needAnalyseResult = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:needAnalyseResult", "content"));
+            log.warn("needAnalyseResult is {}", needAnalyseResult);
+        } catch (Exception e) {
+            needAnalyseResult = "已拍照,拍照";
+        }
+        return needAnalyseResult;
+    }
+
 
     public static boolean isPacketLog() {
         if (packetLog == null) {

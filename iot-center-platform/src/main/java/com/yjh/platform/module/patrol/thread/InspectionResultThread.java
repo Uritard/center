@@ -133,7 +133,7 @@ public class InspectionResultThread implements Runnable{
             }
 
             // 是否为本级系统下发给下级系统的任务
-            boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"));
+            boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"), robotPatrolTaskResult.getValue());
             if (Boolean.FALSE.equals(flag)) {
                 log.info("This is simulation tool task！！！ {}", taskId);
                 simulationToolTaskHandler(infoMap.getOrDefault("absolutePath", ""), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
@@ -157,31 +157,18 @@ public class InspectionResultThread implements Runnable{
         if (countRegion != 0) {
             robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
         }
-        Integer type = uPatrolTaskService.selectRobotType(robotCode);
         TRobotInfo robotInfo = tRobotInfoDao.selectByRobotCode(robotCode);
-        boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
         String val = robotPatrolTaskResult.getValue();
-        // 非模拟工具上来的结果，如果值为空，则结果为异常
-        if (StringUtils.isNotEmpty(val)) {
-            //D200局放 单独处理结果
-            if (ResultConvertUtil.FIFTY.equals(robotPatrolTaskResult.getFileType()) && tCruiseTaskResultMap.get("origpic").contains(".txt")) {
-                Pair<String, String> result = ResultConvertUtil.dealJudgment(tCruiseTaskResultMap.get("origpic"), val, tCruiseTaskResultMap.getOrDefault("unit", ""));
-                tCruiseTaskResultMap.put("resultNum", result.getKey());
-                tCruiseTaskResultMap.put("resultDesc", result.getValue());
-            } else {
-                tCruiseTaskResultMap.put("resultNum", ResultConvertUtil.convertResult(val));
-                tCruiseTaskResultMap.put("resultDesc", ResultConvertUtil.convertDesc(val, tCruiseTaskResultMap.getOrDefault("unit", "")));
-            }
-            log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
-        } else if (!isSimulationTool) {
-            tCruiseTaskResultMap.put("resultNum", "-1");
-            tCruiseTaskResultMap.put("resultDesc", AbnormalResDescEnum.DATA_ERROR.getDesc());
-            tCruiseTaskResultMap.put("cruiseResult", "" + CRUISE_RESULT_ABNORMAL);
-            tCruiseTaskResultMap.put("cruiseAbnormal", "" + CRUISE_ABNORMAL_DATAABNORMAL);
-            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            robotPatrolTaskResult.setValid("0");
-            return whetherDiscarded(oldCruiseResult, String.valueOf(CRUISE_RESULT_ABNORMAL));
+        //D200局放 单独处理结果
+        if (ResultConvertUtil.FIFTY.equals(robotPatrolTaskResult.getFileType()) && tCruiseTaskResultMap.get("origpic").contains(".txt")) {
+            Pair<String, String> result = ResultConvertUtil.dealJudgment(tCruiseTaskResultMap.get("origpic"), val, tCruiseTaskResultMap.getOrDefault("unit", ""));
+            tCruiseTaskResultMap.put("resultNum", result.getKey());
+            tCruiseTaskResultMap.put("resultDesc", result.getValue());
+        } else {
+            tCruiseTaskResultMap.put("resultNum", ResultConvertUtil.convertResult(val));
+            tCruiseTaskResultMap.put("resultDesc", ResultConvertUtil.convertDesc(val, tCruiseTaskResultMap.getOrDefault("unit", "")));
         }
+        log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
         String cruiseResult;
         String cruiseAbnormal = "";
 
@@ -319,7 +306,7 @@ public class InspectionResultThread implements Runnable{
      * @param sendCode 下级唯一标识
      * @return boolean
      */
-    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType) {
+    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType, String value) {
         try {
             String sysLevel = Constant.getLevelEdge();
 
@@ -330,14 +317,13 @@ public class InspectionResultThread implements Runnable{
                 robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
             }
             Integer type = uPatrolTaskService.selectRobotType(robotCode);
-
-            // 机器人类型为模拟机器人/模拟无人机 为模拟工具
-            boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-            // 如果是节点 也走模拟工具的逻辑
-            boolean needAnalysis = type == null && !Constant.isUpSystem() && (ArrayUtils.contains(new TypeEnum[]{TypeEnum.INFRARED, TypeEnum.VIDEO, TypeEnum.VOICE}, cruiseTypeEnum));
-            isSimulationTool = isSimulationTool || needAnalysis;
-            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
-            if (Boolean.FALSE.equals(isSimulationTool)) {
+            //巡视结果为空值 或者 配置需要算法识别的结果
+            boolean resultAnalyse = StringUtils.isEmpty(value) || Constant.getNeedAnalyseResult().contains(value);
+            // 上级系统/在线监测 直接处理结果
+            boolean needAnalysis = type == null && !Constant.isUpSystem() && cruiseTypeEnum != TypeEnum.ONLINE;
+            needAnalysis = needAnalysis || resultAnalyse;
+            log.info("simulation tool flag, needAnalysis: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", needAnalysis, taskId, type, sysLevel, cruiseType);
+            if (Boolean.FALSE.equals(needAnalysis)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
                     log.info("taskId为{}巡视点instanceId为{}的点位产生了告警,需要更新图片", taskId, instanceId);
