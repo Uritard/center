@@ -1,32 +1,32 @@
 package com.yjh.platform.common.utils;
 
 import com.yjh.platform.common.quartz.SilentAlarmThread;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.Header;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.client.methods.AsyncCharConsumer;
 import org.apache.http.nio.client.methods.HttpAsyncMethods;
+import org.apache.http.nio.client.util.HttpAsyncClientUtils;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -36,71 +36,71 @@ import java.util.concurrent.Future;
 @Slf4j
 public class HttpAysncClientUtil {
 
-    public static CloseableHttpAsyncClient httpAsyncclient;
-    private static int reconnect = 3;
-    private static int timeout = 10000;
     private static boolean stoplink = false;
-    private static boolean DataRecv = false;
-    private static SilentAlarmThread alarmData;
-    private static List<Character> chBuffer = new CopyOnWriteArrayList<>();
 
-    //Initializes a long connection communication object
-    public static void HttpAysncInit(String user, String password) {
+    private static final Map<HttpHost, CloseableHttpAsyncClient> HTTP_ASYNC_CLIENT_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * Initializes a long connection communication object
+     */
+    private static CloseableHttpAsyncClient httpCredentialsInit(String host, int port, String username, String password, boolean newLink) {
+        HttpHost key = new HttpHost(host, port);
+
+        if (newLink) {
+            return HTTP_ASYNC_CLIENT_MAP.compute(key, (k, v) -> {
+                HttpAsyncClientUtils.closeQuietly(v);
+                return httpClientInit(username, password);
+            });
+        } else {
+            return HTTP_ASYNC_CLIENT_MAP.computeIfAbsent(key, k -> httpClientInit(username, password));
+        }
+    }
+
+    private static CloseableHttpAsyncClient httpClientInit(String username, String password) {
         //摘要认证
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, password));
-        httpAsyncclient = HttpAsyncClients.custom()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .build();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        return HttpAsyncClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
     }
 
     //Long connection function
-    public static void LonLink(String url, SilentAlarmThread data) {
+    public static void lonLink(String url, String user, String password, SilentAlarmThread alarmData) {
         log.info(url + "请求开始");
-        alarmData = data;
         stoplink = false;
-        chBuffer.clear();
         try {
             //设置回调函数
             FutureCallback<Boolean> callback = new FutureCallback<Boolean>() {
                 @Override
                 public void cancelled() {
-                    // TODO Auto-generated method stub
-                    log.info("cancelled");
+                    log.info("cancelled: {}", url);
                 }
 
                 @Override
                 public void completed(Boolean arg0) {
-                    // TODO Auto-generated method stub
-                    log.info("completed");
+                    log.info("completed: {}", url);
                 }
 
                 @Override
                 public void failed(Exception arg0) {
-                    // TODO Auto-generated method stub
-                    alarmData.stopAlarmGuard(true);
-                    log.error(arg0.getMessage(), arg0);
-                    log.info("failed");
+                    alarmData.stopAlarmGuard();
+                    log.error("failed: {}", url, arg0);
                 }
             };
+            Map<String, Object> params = new LinkedHashMap<>(8);
+            params.put("returnData", "success");
+            URI uri = uriBuild(url, params);
+            CloseableHttpAsyncClient httpAsyncclient = httpCredentialsInit(uri.getHost(), uri.getPort(), user, password, false);
             // Open the connection
             httpAsyncclient.start();
 
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("returnData", "success"));
-            URI uri = new URI(url + "?" + URLEncodedUtils.format(params, "utf-8"));
             HttpGet get = new HttpGet(uri);
 
             // Re3connect the query thread with a timeout on
-            ReConnect rec = new ReConnect();
-            Thread Rethread = new Thread(rec);
-            Rethread.start();
+            ThreadPoolUtil.COMMON_POOL.addThread(new ReConnect(httpAsyncclient, alarmData));
 
             // 创建连接，设置接收报警事件的回调函数
             // Url="http://"+ip+":"+port+"/ISAPI/Event/notification/alertStream";
-            Future<Boolean> future = httpAsyncclient.execute(
-                    HttpAsyncMethods.create(get),
-                    new ResponseConsumer(), callback);
+            Future<Boolean> future = httpAsyncclient.execute(HttpAsyncMethods.create(get), new ResponseConsumer(alarmData), callback);
 
             Boolean result = future.get();
 
@@ -112,39 +112,42 @@ public class HttpAysncClientUtil {
             assert result != null;
             log.info(result.toString());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            alarmData.stopAlarmGuard();
             log.error(e.getMessage(), e);
         }
     }
 
-    public static void StopLink() {
-        stoplink = true;
-        DataRecv = false;
+    private static URI uriBuild(String url, Map<String, Object> params) {
+        URI uri;
+        try {
+            URIBuilder uriBuilder = new URIBuilder(URI.create(url));
+            if (params != null && !params.isEmpty()) {
+                params.forEach((k, v) -> uriBuilder.addParameter(k, v == null ? "" : String.valueOf(v)));
+            }
+            uri = uriBuilder.build();
+        } catch (URISyntaxException x) {
+            throw new IllegalArgumentException(x.getMessage(), x);
+        }
+        return uri;
     }
 
+    public static void stopLink() {
+        stoplink = true;
+    }
+
+    @RequiredArgsConstructor
     static class ResponseConsumer extends AsyncCharConsumer<Boolean> {
 
+        private final SilentAlarmThread alarmData;
+
         // Message type
-        public String type;
+        private String type;
+        private StringBuilder chBuffer = new StringBuilder();
 
         @Override
         protected void onResponseReceived(final HttpResponse response) {
-            log.info("onResponseReceived" + response.toString());
-            if (response.getStatusLine().getStatusCode() == 401) {
-                Header[] headers = response.getHeaders("WWW-Authenticate");
-                log.info("headers" + Arrays.toString(headers));
-                String user = null;
-                String password = null;
-                for (Header header : headers) {
-                    if (header.getName().equals("qop")) {
-                        user = header.getValue();
-                    }
-                    if (header.getName().equals("nonce")) {
-                        password = header.getValue();
-                    }
-                }
-                HttpAysncClientUtil.HttpAysncInit(user, password);
-            }
+            log.info("onResponseReceived: {}", response.toString());
+
             // Determine the message type
             String tbuf = response.toString();
             if (tbuf.contains("multipart")) {
@@ -156,32 +159,24 @@ public class HttpAysncClientUtil {
             }
         }
 
-        // Callback function to receive a message
+        /**
+         * Callback function to receive a message
+         */
         @Override
         protected void onCharReceived(final CharBuffer buf, final IOControl ioctrl) throws IOException {
-            DataRecv = true;
-            // Parsing by message type
-            if (type.equals("multipart")) {
-                for (int i = 0; i < buf.length(); i++) {
-                    chBuffer.add(buf.charAt(i));
-                }
-                alarmData.makeData(chBuffer);
-            } else if (type.equals("xml")) {
-                for (int i = 0; i < buf.length(); i++) {
-                    chBuffer.add(buf.charAt(i));
-                }
-                alarmData.makeData(chBuffer);
-            } else if (type.equals("json")) {
-                for (int i = 0; i < buf.length(); i++) {
-                    chBuffer.add(buf.charAt(i));
-                }
-                alarmData.makeData(chBuffer);
+
+            while (buf.hasRemaining()) {
+                char c = buf.get();
+                chBuffer.append(c);
             }
+            alarmData.reciveUpdate();
+            // Parsing by message type
+            alarmData.makeData(chBuffer);
             if (stoplink) {
+                alarmData.stopAlarmGuard();
                 buf.clear();
                 this.close();
-                chBuffer.clear();
-                alarmData.stopAlarmGuard(false);
+                chBuffer = new StringBuilder();
                 log.info("stoplink == true");
                 stoplink = false;
             }
@@ -193,37 +188,40 @@ public class HttpAysncClientUtil {
         }
     }
 
+    @RequiredArgsConstructor
     static class ReConnect implements Runnable {
+        private static int reconnect = 3;
+        private static int timeout = 10000;
+
+        private final CloseableHttpAsyncClient httpAsyncclient;
+        private final SilentAlarmThread alarmData;
+
         @Override
         public void run() {
-            // TODO Auto-generated method stub
             try {
-                if (!DataRecv) {
+                while (alarmData.reciveTime() == 0L) {
                     if (timeout == 0) {
                         if (reconnect == 0) {
                             log.info("reconnect == 0");
                             httpAsyncclient.close();
-                            alarmData.stopAlarmGuard(false);
+                            alarmData.stopAlarmGuard();
                         } else {
                             // Timeout reconnect, clear buffer, flag bit initialization, close connection, open connection
-                            chBuffer.clear();
                             stoplink = false;
-                            timeout = 100000;
+                            timeout = 10000;
                             httpAsyncclient.close();
-                            log.info("reconnect != 0");
+                            log.info("reconnect == {}", reconnect--);
                             httpAsyncclient.start();
-                            reconnect--;
                         }
                     } else {
-                        Thread.sleep(10);
-                        timeout -= 10;
+                        Thread.sleep(100);
+                        timeout -= 100;
                     }
                 }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 log.error(e.getMessage(), e);
             }
-
+            log.info("reconnect thread closed == {}", alarmData.reciveTime());
         }
     }
 }
