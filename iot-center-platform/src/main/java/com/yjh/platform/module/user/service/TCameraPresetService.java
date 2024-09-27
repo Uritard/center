@@ -2,7 +2,6 @@ package com.yjh.platform.module.user.service;
 
 import cn.hutool.core.io.IORuntimeException;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -21,11 +20,11 @@ import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.video.entity.CameraConInfo;
 import com.yjh.platform.module.video.service.CameraConService;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -535,11 +534,11 @@ public class TCameraPresetService {
         return tCameraPresetDao.selectAlarmLevel(defectModel,desc);
     }
 
-    public int selectSilentByCameraIdAndPresetId(String cameraId, String presetId) {
-        return tCameraPresetDao.selectSilentByCameraIdAndPresetId(cameraId,presetId);
+    public int selectSilentByCameraIdAndPresetId(Long cameraId, Long presetId) {
+        return tCameraPresetDao.selectSilentByCameraIdAndPresetId(cameraId, presetId);
     }
 
-    public List<Map<String, Object>> selectCameraBySecondSilent() {
+    public List<CameraConInfo> selectCameraBySecondSilent() {
         return  tCameraPresetDao.selectCameraBySecondSilent();
     }
 

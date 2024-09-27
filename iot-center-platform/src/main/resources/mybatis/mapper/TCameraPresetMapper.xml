@@ -458,6 +458,7 @@
           and d.camera_id = a.camera_id
           AND b.device_mete_id = e.device_mete_id
           and a.preset_id = #{presetId,jdbcType=BIGINT}
+          limit 1
     </select>
 
     <select id="selectAlarmLevel" resultType="java.lang.String">
@@ -485,7 +486,7 @@
           and a.camera_id = #{cameraId}
           and b.preset_id = #{presetId}
     </select>
-    <select id="selectCameraBySecondSilent" resultType="java.util.Map">
+    <select id="selectCameraBySecondSilent" resultType="com.yjh.platform.module.video.entity.CameraConInfo">
         SELECT DISTINCT
             a.camera_id,
             b.preset_id,

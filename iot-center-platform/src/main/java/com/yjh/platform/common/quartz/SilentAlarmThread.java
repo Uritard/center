@@ -4,23 +4,22 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpAysncClientUtil;
-import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.service.AlarmShieldService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
-import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TCameraPresetService;
+import com.yjh.platform.module.video.entity.CameraConInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -28,9 +27,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -53,14 +49,12 @@ public class SilentAlarmThread implements Runnable {
     private static final String ContentI = "Content-ID: ";
     private static final String MSG = "success";
 
-    private static String strXML;
-    private String ip;
-    private String port;
-    private String presetId;
-    private String cameraId;
-      private String eventType;
-    private String filePath;
+    private CameraConInfo cameraConInfo;
+    private String eventType;
+    private String subEventType = "";
+    private String eventValue = "";
     private String eventState;
+    private long reciveTime = 0L;
 
     /**
      * 调用海康 接口
@@ -74,24 +68,10 @@ public class SilentAlarmThread implements Runnable {
 
     private TWarnInfoService tWarnInfoDao;
 
-    public String getPresetId() {
-        return presetId;
-    }
-
-    public String getCameraId() {
-        return cameraId;
-    }
-
-    public SilentAlarmThread() {
-    }
-
-    public SilentAlarmThread(String ip, String port, String presetId, String cameraId, RedisTemplate redisTemplate,
+    public SilentAlarmThread(CameraConInfo conInfo, RedisTemplate redisTemplate,
                              TCameraPresetService tCameraPresetService,ApplicationProperties applicationProperties,
                              TWarnInfoService tWarnInfoDao,AlarmShieldService alarmShieldService) {
-        this.ip = ip;
-        this.port = port;
-        this.presetId = presetId;
-        this.cameraId = cameraId;
+        this.cameraConInfo = conInfo;
         this.redisTemplate = redisTemplate;
         this.tCameraPresetService = tCameraPresetService;
         this.applicationProperties = applicationProperties;
@@ -103,7 +83,8 @@ public class SilentAlarmThread implements Runnable {
     public void run() {
         try {
             log.info("进入秒级静默线程");
-            HttpAysncClientUtil.LonLink("http://" + ip + ":" + port + ALERT_URL, this);
+            HttpAysncClientUtil.lonLink("http://" + cameraConInfo.getCameraIp() + ":" + cameraConInfo.getPort() + ALERT_URL,
+                cameraConInfo.getCameraManager(), cameraConInfo.getCameraCode(), this);
         } catch (Exception e) {
             log.error("秒级静默线程错误: ", e);
         }
@@ -114,13 +95,13 @@ public class SilentAlarmThread implements Runnable {
         if (content == null) {
             return;
         }
-        log.info("秒级静默监视数据处理 -- xml");
+        log.info("秒级静默监视数据处理 -- xml\n{}", content);
         try {
             // 静默任务开关
             String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
-                HttpAysncClientUtil.StopLink();
+                HttpAysncClientUtil.stopLink();
                 return;
             }
             SAXReader saxReader = new SAXReader();
@@ -129,23 +110,50 @@ public class SilentAlarmThread implements Runnable {
             Element rootEle = document.getRootElement();
             // 获取根节点下所有子节点
             List<Element> list = rootEle.elements();
+            String subType = null;
             for (Element element : list) {
-                if (element.getName().equals("eventType")) {
-                    eventType = element.getText();
+                String elementName = element.getName();
+                String elementText = element.getText();
+                if ("eventType".equals(elementName)) {
+                    eventType = elementText;
                     log.info("eventType --- " + element.getText());
-                    if (!element.getText().equals("mixedTargetDetection") && !element.getText().equals("fielddetection")) {
+
+                    if (StringUtils.equalsAny(elementText, "VMD", "videoloss")) {
+                        eventType = "";
                         return;
                     }
-                    if (element.getText().equals("VMD") || element.getText().equals("videoloss")) {
+                    if (!StringUtils.equalsAny(elementText, "mixedTargetDetection", "fielddetection", "audioexception")) {
                         return;
                     }
                 }
-                if (element.getName().equals("eventState")) {
+                if ("eventState".equals(elementName)) {
                     // 事件状态  [active#有效事件,inactive#无效事件]
-                    if (element.getText().equals("inactive")) {
-                        eventState = element.getText();
+                    if ("inactive".equals(elementText)) {
+                        eventState = elementText;
                     }
                 }
+                // 声纹相机解析
+                if ("AudioExceptionDetection".equals(elementName)) {
+                    Iterator<Element> iter = element.elementIterator();
+                    while (iter.hasNext()) {
+                        Element subEle = iter.next();
+                        if ("alarmType".equals(subEle.getName())) {
+                            subType = subEle.getText();
+                            subEventType = subType;
+                        }
+                        if (StringUtils.equals(subType, subEle.getName())) {
+                            eventValue = subEle.getText();
+                        }
+                    }
+                }
+                if ("alarmType".equals(elementName)) {
+                    subType = elementText;
+                    subEventType = subType;
+                }
+                if (StringUtils.equals(subType, elementName)) {
+                    eventValue = elementText;
+                }
+
             }
             log.info(content);
         } catch (Exception e) {
@@ -165,7 +173,7 @@ public class SilentAlarmThread implements Runnable {
             String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
-                HttpAysncClientUtil.StopLink();
+                HttpAysncClientUtil.stopLink();
                 return;
             }
             JSONObject json = JSONObject.parseObject(content);
@@ -200,9 +208,8 @@ public class SilentAlarmThread implements Runnable {
         }
     }
 
-    private void makImageData(char[] imageBuf) {
-        String str = new String(imageBuf);
-        if (str.contains("[bg_upload:1]")) {
+    private void makImageData(String imageBuf) {
+        if (imageBuf.contains("[bg_upload:1]")) {
             return;
         }
         log.info("秒级静默监视数据处理 -- img");
@@ -211,23 +218,17 @@ public class SilentAlarmThread implements Runnable {
             String silentFlag = SysParamConfig.getSysContent("isSilentTask");
             if (Boolean.FALSE.toString().equals(silentFlag)) {
                 log.info("isSilentTask is false");
-                HttpAysncClientUtil.StopLink();
+                HttpAysncClientUtil.stopLink();
                 return;
             }
-            if (Objects.equals("fielddetection", eventType) || Objects.equals("mixedTargetDetection", eventType) ||
-                    Objects.equals("anquanmao", eventType) || Objects.equals("renyuan", eventType)) {
-                Charset charset = StandardCharsets.ISO_8859_1;
-                CharBuffer charBuffer = CharBuffer.allocate(imageBuf.length);
-                charBuffer.put(imageBuf);
-                charBuffer.flip();
-                ByteBuffer byteBuffer = charset.encode(charBuffer);
-                byte[] image = byteBuffer.array();
+            if (StringUtils.equalsAny(eventType, "fielddetection", "mixedTargetDetection", "anquanmao", "renyuan", "audioexception")) {
+                byte[] image = imageBuf.getBytes(StandardCharsets.ISO_8859_1);
 
                 int max = 9999, min = 1;
                 int ran = (int) (Math.random() * (max - min) + min);
                 SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
                 String filePathTem = "/" + formatter.format(new Date()) + ran + ".jpg";
-                filePath = "/home/yjh_iot_center/iot-picture/resultImg" + filePathTem;
+                String filePath = "/home/yjh_iot_center/iot-picture/resultImg" + filePathTem;
                 log.info("filePath:{}", filePath);
                 File file = new File(filePath);
                 FileUtils.writeByteArrayToFile(file, image);
@@ -237,7 +238,7 @@ public class SilentAlarmThread implements Runnable {
 //                copyFile(filePathTem, filePath);
 
                 log.info("filePathTem:{}", filePathTem);
-                silentHandler(filePath, presetId, eventType);
+                silentHandler(filePath, eventType);
             }
         } catch (Exception e) {
             log.error("图片处理失败: ", e);
@@ -249,24 +250,20 @@ public class SilentAlarmThread implements Runnable {
      *
      * @param chBuffer
      */
-    public void makeData(List<Character> chBuffer) {
+    public void makeData(StringBuilder chBuffer) {
         //Data offset
         int offset = 0;
         int infoType = 0;
-        if (chBuffer.isEmpty() || chBuffer.size() < HeadSize) {
+        if (chBuffer.length() < HeadSize) {
             return;
         }
-        List<Character> targetList = chBuffer.subList(0, HeadSize);
-        StringBuilder targetBuf = new StringBuilder();
-        for (char tempNode : targetList) {
-            targetBuf.append(tempNode);
-        }
+
 //        StringBuilder sb =  new StringBuilder();
 //        for (char c : chBuffer){
 //            sb.append(c);
 //        }
 //        log.info("recive data, targetBuf:{}, data: {}", targetBuf, sb);
-        String strHeadBuf = targetBuf.toString();
+        String strHeadBuf = chBuffer.substring(0, HeadSize);
         if (strHeadBuf.contains(boundary)) {
             if (strHeadBuf.contains(ContentT)) {
                 offset += strHeadBuf.indexOf(ContentT);
@@ -284,81 +281,33 @@ public class SilentAlarmThread implements Runnable {
             StringBuilder strlen = new StringBuilder();
             int len = 0;
             if (strHeadBuf.contains(ContentL)) {
-                offset = strHeadBuf.indexOf(ContentL);
-                offset += ContentL.length();
+                offset = strHeadBuf.indexOf(ContentL) + ContentL.length();
 
                 for (; strHeadBuf.charAt(offset) != '\r'; offset++) {
                     strlen.append(strHeadBuf.charAt(offset));
                 }
-                len = Integer.parseInt(strlen.toString());
+                len = NumberUtils.toInt(strlen.toString());
             }
-            StringBuilder strien = new StringBuilder();
+            StringBuilder contentIdBuff = new StringBuilder();
             if (strHeadBuf.contains(ContentI)) {
                 offset = strHeadBuf.indexOf(ContentI);
                 offset += ContentI.length();
                 for (; strHeadBuf.charAt(offset) != '\r'; offset++) {
-                    strien.append(strHeadBuf.charAt(offset));
+                    contentIdBuff.append(strHeadBuf.charAt(offset));
                 }
             }
-            offset += (2 * end.length());
-            if (chBuffer.size() >= offset + len) {
-                char[] imageBuf = null;
-                switch (infoType) {
-                    case XML: {
-                        StringBuilder XmlBuf = new StringBuilder();
-                        targetList = chBuffer.subList(offset, offset + len);
-                        for (char c : targetList) {
-                            XmlBuf.append(c);
-                        }
-                        strXML = XmlBuf.toString();
-                        for (int i = 0; i < (offset + len) && chBuffer.size() > 0; i++) {
-                            chBuffer.remove(0);
-                        }
-                        break;
-                    }
-                    case JSON: {
-                        StringBuilder JsonBuf = new StringBuilder();
-                        targetList = chBuffer.subList(offset, offset + len);
-                        for (char c : targetList) {
-                            JsonBuf.append(c);
-                        }
-                        strXML = JsonBuf.toString();
-                        for (int i = 0; i < (offset + len) && chBuffer.size() > 0; i++) {
-                            chBuffer.remove(0);
-                        }
-                        break;
-                    }
-                    case IMAGE: {
-                        if (chBuffer.size() > offset + len) {
-                            imageBuf = new char[len];
-                            targetList = chBuffer.subList(offset, offset + len);
-                            for (int i = 0; i < len; i++) {
-                                imageBuf[i] = targetList.get(i);
-                            }
-                            for (int i = 0; i < (offset + len + end.length()) && chBuffer.size() > 0; i++) {
-                                chBuffer.remove(0);
-                            }
-                        }
-                        break;
-                    }
-                    case AUDIOFILE: {
-                        if (chBuffer.size() > offset + len) {
-                            imageBuf = new char[len];
-                            targetList = chBuffer.subList(offset, offset + len);
-                            for (int i = 0; i < len; i++) {
-                                imageBuf[i] = targetList.get(i);
-                            }
-                            chBuffer = chBuffer.subList(offset + len, chBuffer.size());
-                        }
-                        break;
-                    }
-                }
+            int start = strHeadBuf.indexOf(end+end, offset) + (2 * end.length());
+            int end = start + len;
+            if (chBuffer.length() >= end) {
+                String content = chBuffer.substring(start, start + len);
+                chBuffer.delete(0, start + len);
+
                 if (infoType == XML) {
-                    makeXMLData(strXML);
+                    makeXMLData(content);
                 } else if (infoType == JSON) {
-                    makeJSONData(strXML);
+                    makeJSONData(content);
                 }  else if (infoType == IMAGE) {
-                    makImageData(imageBuf);
+                    makImageData(content);
                 }  else if (infoType == AUDIOFILE) {
                     log.info("AUDIOFILE, {}", AUDIOFILE);
                 }
@@ -367,49 +316,34 @@ public class SilentAlarmThread implements Runnable {
         }
     }
 
-    public void stopAlarmGuard(boolean flag) {
+    public void stopAlarmGuard() {
         try {
-            String cameraId = this.cameraId;
-            String presetId = this.presetId;
-            String cameraIp = this.ip;
+            log.warn("关闭秒级静默连接: {}", cameraConInfo);
+            Long cameraId = cameraConInfo.getCameraId();
+            Long presetId = cameraConInfo.getPresetId();
+
             String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
-            Map<String, Object> entries = redisTemplate.opsForHash().entries(key);
-            if (cameraId.equals(String.valueOf(entries.get("cameraId"))) && presetId.equals(String.valueOf(entries.get("presetId")))) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(TCameraInfoService.cameraStateKey + cameraIp);
-                String state = redisInfoMap.get("state");
-                if (!StringUtils.equals("0", state)) {
-                    redisTemplate.opsForHash().delete(key);
-                    return;
-                }
-                if (tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0) {
-                    log.info("tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0");
-                    redisTemplate.opsForHash().delete(key);
-                    return;
-                }
-                if (flag) {
-                    redisTemplate.opsForHash().delete(key);
-                }
-            }
+            redisTemplate.opsForHash().delete(key);
         }catch (Exception e){
-            log.error("秒级静默监视删除redis配置出错：",e);
+            log.error("秒级静默监视删除redis配置出错：", e);
         }
     }
 
-    private void copyFile(String ftpsPath, String localPath){
-        try {
-            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
-            FtpsUtil.putFile(localPath, ftpsPath, applicationProperties.getUpSystemFtps().getIp(), applicationProperties.getUpSystemFtps().getPort(),
-                    applicationProperties.getUpSystemFtps().getUserName(), applicationProperties.getUpSystemFtps().getPassword());
-        } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误: ", e);
-        }
+    public long reciveTime() {
+        return reciveTime;
+    }
+
+    /**
+     * 更新收到消息时间，作为心跳校验参考
+     */
+    public void reciveUpdate() {
+        reciveTime = System.currentTimeMillis();
     }
 
     /**
      * 分析数据，将告警入库，上送
-     * @param presetId 预置位id  充当巡视点ID
      */
-    private void silentHandler(String filePath, String presetId, String eventType) {
+    private void silentHandler(String filePath, String eventType) {
         if (Objects.nonNull(filePath)) {
             try {
                 String monitorType;
@@ -428,11 +362,24 @@ public class SilentAlarmThread implements Runnable {
                 } else if ("renyuan".equals(eventType)){
                     monitorType = "4";
                     desc = "人员聚集/徘徊";
+                } else if ("audioexception".equals(eventType)){
+                    monitorType = "208";
+                    desc = "声纹检测";
+                    switch (subEventType){
+                        case "frequency":
+                            desc+= "频率过高: " + eventValue;
+                            break;
+                        case "audioDecibel":
+                            desc+= "分贝过大: " + eventValue;
+                            break;
+                        default:
+                            desc+= "声源定位异常";
+                    }
                 } else {
                     monitorType = "";
                     desc = "";
                 }
-                Map<String, Object> map = tCameraPresetService.selectInstanceInfo(Long.valueOf(presetId));
+                Map<String, Object> map = tCameraPresetService.selectInstanceInfo(cameraConInfo.getPresetId());
 
                 TWarnInfo tWarnInfo = silentMonitorHandle(filePath, desc, map);
                 alarmToUpSystem(map, tWarnInfo, monitorType);
@@ -543,7 +490,7 @@ public class SilentAlarmThread implements Runnable {
                 log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
                 String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeId").get("content"));
                 String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+"_"+System.currentTimeMillis()+".jpg";
+                String ftpsTarPath = edgeCode+"/jm/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraConInfo.getCameraId()+"/"+cameraConInfo.getPresetId()+"_"+System.currentTimeMillis()+".jpg";
 
                 uploadFileToUpFtps(imgPath, ftpsTarPath, applicationProperties.getUpSystemFtps());
 
@@ -565,22 +512,6 @@ public class SilentAlarmThread implements Runnable {
             }
         }
     }
-
-    /**
-     * 请求其他服务
-     *
-     * @param url  请求地址
-     * @param json 发送内容
-     * @return String
-     */
-    public void restTemplatePost(String url, String json) {
-        try {
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForEntity(url, json, String.class);
-        }catch (Exception e){
-            log.error("请求其他服务错误: ", e);
-        }
-    }
-
 
     /**
      * 将文件上传至上级系统ftp服务器

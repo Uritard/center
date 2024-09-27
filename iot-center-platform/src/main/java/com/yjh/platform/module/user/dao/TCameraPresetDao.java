@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.dao;
 import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
+import com.yjh.platform.module.video.entity.CameraConInfo;
 import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -85,9 +86,9 @@ public interface TCameraPresetDao {
 
     String selectAlarmLevel(@Param(value = "colName") String colName, @Param(value = "dictNote") String dictNote);
 
-    int selectSilentByCameraIdAndPresetId(@Param(value = "cameraId") String cameraId, @Param(value = "presetId") String presetId);
+    int selectSilentByCameraIdAndPresetId(@Param(value = "cameraId") Long cameraId, @Param(value = "presetId") Long presetId);
 
-    List<Map<String, Object>> selectCameraBySecondSilent();
+    List<CameraConInfo> selectCameraBySecondSilent();
 
   int selectCameraPresetInTask(@Param(value = "presetId") String presetId );
 
