@@ -207,31 +207,26 @@ public class ReportDataModel {
         List<TCruiseDataResultDetail> unReviewList = new ArrayList<>();
         for (TCruiseDataResultDetail cbsInspectionResultVo : tCDRDList) {
             cbsInspectionResultVo.setIdentifyResultName("正常");
-            // 正常结果 巡视结果正常 246， 无告警
-            boolean isNormal =  CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0) && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL);
-            if (Objects.nonNull(cbsInspectionResultVo.getIdentifyResult())) {
-                if (CommonUtils.equals(cbsInspectionResultVo.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL) && isNormal) {
-                    normalList.add(cbsInspectionResultVo);
-                } else {
-                    cbsInspectionResultVo.setIdentifyResultName("异常");
-                    abnormalList.add(cbsInspectionResultVo);
-                    if (isNormal) {
-                        String desc = cbsInspectionResultVo.getResultDesc() + "(" + DictConvertUtil.DICT.covertToDict("identifyResult", cbsInspectionResultVo.getIdentifyResult()) + ")";
-                        cbsInspectionResultVo.setResultDesc(desc);
-                    }
-                }
+            boolean isNormal =  CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0)
+                    && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL)
+                    && (CommonUtils.equals(cbsInspectionResultVo.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
+                    || CommonUtils.equals(cbsInspectionResultVo.getEvaluationState(), CruiseConstant.EVALUATION_STATE_IGNORE)
+                    || CommonUtils.equals(cbsInspectionResultVo.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL));
+            if (isNormal) {
+                // 正常，巡视结果正常且无告警，且未审核 或 无需审核 或 审核结果正常
+                normalList.add(cbsInspectionResultVo);
+            } else if (CommonUtils.equals(cbsInspectionResultVo.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
+                    && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)) {
+                // 待人工确认，未审核，且巡视结果异常
+                cbsInspectionResultVo.setIdentifyResultName("待人工确认");
+                unReviewList.add(cbsInspectionResultVo);
             } else {
-                if (isNormal) {
-                    // 无告警放入正常
-                    normalList.add(cbsInspectionResultVo);
-                } else if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 1)) {
-                    // 告警放入异常
-                    cbsInspectionResultVo.setIdentifyResultName("异常");
-                    abnormalList.add(cbsInspectionResultVo);
-                } else {
-                    // 巡视结果异常放入待人工确认
-                    cbsInspectionResultVo.setIdentifyResultName("待人工确认");
-                    unReviewList.add(cbsInspectionResultVo);
+                cbsInspectionResultVo.setIdentifyResultName("异常");
+                abnormalList.add(cbsInspectionResultVo);
+                if (CommonUtils.equals(cbsInspectionResultVo.getIsWarn(), 0)
+                        && CommonUtils.equals(cbsInspectionResultVo.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL)) {
+                    String desc = cbsInspectionResultVo.getResultDesc() + "(" + DictConvertUtil.DICT.covertToDict("identifyResult", cbsInspectionResultVo.getIdentifyResult()) + ")";
+                    cbsInspectionResultVo.setResultDesc(desc);
                 }
             }
         }

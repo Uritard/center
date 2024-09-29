@@ -39,7 +39,7 @@ public enum HandlerEnum {
     ROBOT_INSPECTION_WARN("62","robotInspectionWarn"),
     //环境数据异常告警数据
     ENV_WARN("22","envWarn"),
-    // 静默监视数据  边缘节点->巡视主机
+    // 静默监视数据  边缘节点->巡视主机； 告警审核  巡视主机->上级系统
     SILENT_MONITORING_DATA("64","silentMonitoringData"),
     // 静默监视告警  巡视主机->上级系统
     SILENT_MONITORING_ALARM("63","silentMonitoringAlarm"),

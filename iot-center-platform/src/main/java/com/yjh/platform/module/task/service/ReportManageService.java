@@ -377,31 +377,6 @@ public class ReportManageService {
         taskVO.setUnReview(unReviewList.size());
     }
 
-    public TaskVO getTaskVO(String taskId,List<TCruiseDataResultDetail> tCruiseDataResultDetailList,String remark) {
-        TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
-        delaCount(taskVO,tCruiseDataResultDetailList);
-        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
-        String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
-        String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
-        taskVO.setStationName(stationName);
-        taskVO.setVoltageClasses(voltageClasses);
-        taskVO.setStationType(stationType);
-
-        String cruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
-                + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
-        if (Objects.nonNull(taskVO.getUnReview())){
-            cruiseStatistics = cruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
-        }
-        taskVO.setCruiseStatistics(cruiseStatistics);
-        if ("1".equals(remark)) {
-            taskVO.setCruiseConclusion("已审核");
-        } else {
-            taskVO.setCruiseConclusion("未审核");
-        }
-
-        return taskVO;
-    }
-
     public TaskVO getTaskVoDefined(String taskId) {
         // 报告名称:站所名称+任务名称+巡视时间
         TaskVO taskVOtemp;
@@ -428,10 +403,10 @@ public class ReportManageService {
         long allCount = tCruiseDataResultDetailList.size();
         // 正常，巡视结果正常且无告警，且未审核 或 无需审核 或 审核结果正常
         long normalCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_NORMAL)
-                && !CommonUtils.equals(detail.getIsWarn(), 1)
+                && CommonUtils.equals(detail.getIsWarn(), 0)
                 && (CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
-                || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL)
-                || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.EVALUATION_STATE_IGNORE))).count();
+                || CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_IGNORE)
+                || CommonUtils.equals(detail.getIdentifyResult(), CruiseConstant.IDENTIFY_RESULT_NORMAL))).count();
         // 待人工确认，未审核，且巡视结果异常
         long unReviewCount = tCruiseDataResultDetailList.stream().filter(detail -> CommonUtils.equals(detail.getEvaluationState(), CruiseConstant.EVALUATION_STATE_UN)
                 && CommonUtils.equals(detail.getCruiseResult(), CruiseConstant.CRUISE_RESULT_ABNORMAL)).count();

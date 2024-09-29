@@ -185,6 +185,7 @@ public class InspectionResultThread implements Runnable{
                 case "2":
                     if (robotInfo.getApiType() == null || robotInfo.getApiType() == 2024){
                         //2024版本协议
+                        isnormal = false;
                         cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_ANALYSEFAILED);
                     }
                     break;
@@ -192,7 +193,12 @@ public class InspectionResultThread implements Runnable{
                 case "0":
                 default:
                     isnormal = false;
-                    cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_NOPIC);
+                    if (robotInfo.getApiType() == null || robotInfo.getApiType() == 2024){
+                        //2024版本协议
+                        cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_NOPIC);
+                    } else {
+                        cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL);
+                    }
                     break;
             }
         } else {

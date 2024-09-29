@@ -78,6 +78,7 @@ public class ReviewWarnHandler implements MessageHandlerStrategy, InitializingBe
             tWarnInfo.setIsWarn(NumberUtils.toInt((String)item.get("is_alarm")));
             tWarnInfo.setDealPersonId((String)item.get("confirm_people"));
             tWarnInfo.setDealTime(DateTimeUtil.parse((String)item.get("confirm_date")));
+            tWarnInfo.setOriginId((String)item.get("origin_id"));
             tWarnInfo.setEdgeCode(sendCode);
             warnInfoList.add(tWarnInfo);
         }

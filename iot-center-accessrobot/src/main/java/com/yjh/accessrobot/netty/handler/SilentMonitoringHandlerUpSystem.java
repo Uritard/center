@@ -6,6 +6,7 @@ import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.TStdDeviceMapper;
 import com.yjh.accessrobot.module.command.dao.TWarnInfoMapper;
@@ -68,6 +69,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         String content= String.valueOf(xmlBaseModel.getItems().get(0).get("content"));
         String alarmLevel= String.valueOf(xmlBaseModel.getItems().get(0).get("alarm_level"));
         String originId = String.valueOf(xmlBaseModel.getItems().get(0).get("origin_id"));
+        String time = String.valueOf(xmlBaseModel.getItems().get(0).get("time"));
 
         Map<String,String> map = tStdDeviceMapper.selectInstanceInfo(patrolDeviceCode, sendCode);
         if(map==null){
@@ -87,7 +89,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
         TWarnInfo tWarnInfo = new TWarnInfo()
                 .setWarnLevel(Integer.valueOf(AlarmLevelEnum.getAlarmLevelByProtocolCode(alarmLevel).getCode()))
-                .setWarnTime(new Date())
+                .setWarnTime(DateTimeUtil.parse(time))
                 .setWarnName("静默监视告警数据")
                 .setWarnContent(content)
                 .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
@@ -106,6 +108,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
         sendUpSystem(xmlBaseModel);
 
     }
+
 
     private void sendUpSystem(XMLBaseModel xmlBaseModel) {
         try{

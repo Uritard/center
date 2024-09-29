@@ -16,6 +16,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.common.utils.ValueUtil;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
@@ -2180,19 +2181,13 @@ public class RobotService {
      */
     private List<TCruisePointInstance> buildTCruisePointInstance(Map<String, Object> taskModelMap, Long robotId) {
         //操作机器人拓展协议 添加设备属性列表--处理操作测点行为
-        Map<String, String> inspectionIdAttrMap = new HashMap<>();
-        if (Objects.nonNull(taskModelMap.get("device_attr_list"))) {
-            String inspectionIdAttrString = taskModelMap.get("device_attr_list").toString();
-            String[] inspectionIdAttrs = inspectionIdAttrString.split(",");
-            List<String> inspectionIdAttrList = new ArrayList<>(Arrays.asList(inspectionIdAttrs));
-            for (String inspectionIdAttr : inspectionIdAttrList) {
-                String inspectionCode = StringUtils.substringBeforeLast(inspectionIdAttr, "_");
-                String attr = StringUtils.substringAfterLast(inspectionIdAttr, "_");
-                inspectionIdAttrMap.put(inspectionCode, attr);
-            }
-        }
+        String inspectionIdString;
         // 该任务下包含的点位
-        String inspectionIdString = taskModelMap.get("device_list").toString();
+        if (taskModelMap.containsKey("device_attr_list") && Objects.nonNull(taskModelMap.get("device_attr_list"))) {
+            inspectionIdString = taskModelMap.get("device_attr_list").toString();
+        } else {
+            inspectionIdString = taskModelMap.get("device_list").toString();
+        }
         String[] inspectionIds = inspectionIdString.split(",");
         List<String> inspectionIdList = new ArrayList<>();
         Collections.addAll(inspectionIdList, inspectionIds);
@@ -2204,12 +2199,12 @@ public class RobotService {
             tCruisePointInstance.setStationId(tStdRegion.getRegionId().toString());
             tCruisePointInstance.setStationName(tStdRegion.getRegionName());
             tCruisePointInstance.setCruiseType(228);
-            Map<String, Object> map = tRobotInspectionDao.selectInspection(inspectionCode);
+            Map<String, Object> map = tRobotInspectionDao.selectInspection(StringUtils.substringBefore(inspectionCode, "_"), robotId);
             tCruisePointInstance.setDeviceMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))));
             tCruisePointInstance.setCruiseId(Long.valueOf(map.get("inspection_id").toString()));
             tCruisePointInstance.setCruiseName(map.get("inspection_name").toString());
             tCruisePointInstance.setIfSy(1);
-            tCruisePointInstance.setTextDesc(inspectionIdAttrMap.get(inspectionCode));
+            tCruisePointInstance.setTextDesc(StringUtils.substringAfterLast(inspectionCode, "_"));
             tCruisePointInstanceList.add(tCruisePointInstance);
         }
         log.info("tCruisePointInstanceList==={}", tCruisePointInstanceList);
@@ -3141,7 +3136,7 @@ public class RobotService {
                 tCameraRecorder.setRecordName(cameraModel.getPatroldeviceName());
                 tCameraRecorder.setRecorderModel(cameraModel.getCameraModel());
                 tCameraRecorder.setRecorderType(String.valueOf(cameraModel.getCameraType()));
-                tCameraRecorder.setVendorId(Integer.valueOf(cameraModel.getVendorId()));
+                tCameraRecorder.setVendorId(ValueUtil.getInteger(cameraModel.getVendorId(), null));
                 tCameraRecorder.setPmsId(cameraModel.getPmsId());
                 tCameraRecorder.setAliasName(cameraModel.getAliasName());
                 tCameraRecorder.setRecordIp(cameraModel.getCameraIp());

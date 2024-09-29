@@ -296,6 +296,39 @@
             <if test="taskId != null ">a.task_id = #{taskId},</if>
         </set>
         where a.task_id = #{taskId} and a.instance_id = #{instanceId}
+        <if test="warnId != null"> and a.warn_id = #{warnId, jdbcType=BIGINT}</if>
+    </update>
+
+    <update id="updateByWarnTimeAndInstanceId">
+        update t_warn_info a
+        <set>
+            <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+            <if test="warnType != null ">a.warn_type = #{warnType, jdbcType=INTEGER},</if>
+            <if test="warnName != null and warnName != ''">a.warn_name = #{warnName},</if>
+            <if test="warnContent != null">a.warn_content = #{warnContent},</if>
+            <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+            <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
+            <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+            <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
+            <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
+            <if test="isWarn != null ">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+            <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+            <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
+            <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+            <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
+            <if test="defectModel != null ">a.defect_model = #{defectModel, jdbcType=INTEGER},</if>
+            <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
+            <if test="warnSubtype != null ">a.warn_subtype = #{warnSubtype, jdbcType=INTEGER},</if>
+            <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
+            <if test="imagePath != null ">a.image_path = #{imagePath},</if>
+            <if test="videoPath != null ">a.video_path = #{videoPath},</if>
+            <if test="value != null ">a.value = #{value},</if>
+            <if test="outRange != null ">a.out_range = #{outRange},</if>
+            <if test="taskId != null ">a.task_id = #{taskId},</if>
+        </set>
+        where a.warn_time = #{warnTime} and a.instance_id = #{instanceId}
+        <if test="originId != null and originId != '' "> and a.origin_id = #{originId, jdbcType=VARCHAR}</if>
+        <if test="warnId != null"> and a.defect_id = #{warnId, jdbcType=BIGINT}</if>
     </update>
     <update id="batchUpDate">
         update t_warn_info a
