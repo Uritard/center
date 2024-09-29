@@ -244,22 +244,6 @@ public class PatrolResultHandler {
 
                 infoMap.put("instanceId", instanceId);
 
-                //下级主辅设备结果处理非同源
-                if (Constant.isHost() &&  instance.getCruiseType() == TypeEnum.ONLINE.getCode() && !Constant.fastTurbo()) {
-                    // 只有巡视主机 非同源告警处理
-                    RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
-                    taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
-                    String value = StringUtils.isEmpty(robotPatrolTaskResult.getValue()) ? "" : ResultConvertUtil.convertResult(robotPatrolTaskResult.getValue());
-                    if ("0".equals(robotPatrolTaskResult.getValid())) {
-                        value = CruiseConstant.FAILED_VALUE;
-                    }
-                    taskAlarm.setValue(value);
-                    taskAlarm.setValueUnit(robotPatrolTaskResult.getValue());
-                    taskAlarm.setDeviceId(instanceId);
-                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
-                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
-                }
-
                 if (ArrayUtils.contains(new String[]{"690", "691", "692"}, stdDeviceMete.getMeteType()) && isJFRepeat) {
                     List<RobotPatrolTaskResult> list = multipleValuesResultMap.computeIfAbsent(robotPatrolTaskResult.getDeviceId(), v -> new ArrayList<>());
                     list.add(robotPatrolTaskResult);
@@ -658,10 +642,10 @@ public class PatrolResultHandler {
             log.info("resultStringValue=={}, resultValue=={}", resultStringValue, resultValue);
             String resultDesc = CommonUtils.defaultEmpty(cruiseResultMap.get("resultDesc"));
             StringBuilder retDesc = new StringBuilder(resultDesc);
-            if (CommonUtils.isEmptyOrNullstr(resultDesc)) {
-                retDesc.append(ResultConvertUtil.convertDesc(resultValue, tStdDevicemete.getUnit()));
-                cruiseResultMap.put("resultDesc", retDesc.toString());
-            }
+//            if (CommonUtils.isEmptyOrNullstr(resultDesc)) {
+//                retDesc.append(ResultConvertUtil.convertDesc(resultValue, tStdDevicemete.getUnit()));
+//                cruiseResultMap.put("resultDesc", retDesc.toString());
+//            }
 
             int cruiseResult = MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL);
 
