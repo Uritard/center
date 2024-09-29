@@ -8,6 +8,7 @@ import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.patrol.event.InspectionResultEvent;
@@ -316,20 +317,26 @@ public class InspectionResultThread implements Runnable{
         try {
             String sysLevel = Constant.getLevelEdge();
 
-            CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
-            Integer countRegion = uPatrolTaskService.getCruiseDeviceInfo(sendCode);
-            String robotCode = sendCode;
-            if (countRegion != 0) {
-                robotCode = uPatrolTaskService.selectRobotCodeByInstanceId(Long.valueOf(instanceId));
-            }
-            Integer type = uPatrolTaskService.selectRobotType(robotCode);
-            //巡视结果为空值 或者 配置需要算法识别的结果
+            //当前为巡视系统 并且 巡视结果为空值 或者 配置需要算法识别的结果
             boolean resultAnalyse = StringUtils.isEmpty(value) || Constant.getNeedAnalyseResult().contains(value);
-            // 上级系统/在线监测 直接处理结果
-            boolean needAnalysis = type == null && !Constant.isUpSystem() && cruiseTypeEnum != TypeEnum.ONLINE;
-            needAnalysis = needAnalysis || resultAnalyse;
-            log.info("simulation tool flag, needAnalysis: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", needAnalysis, taskId, type, sysLevel, cruiseType);
+            boolean needAnalysis = Constant.isHost() && resultAnalyse;
+            log.info("simulation tool flag, needAnalysis: {}, taskId: {}, sysLevel: {}, cruiseType: {}", needAnalysis, taskId, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(needAnalysis)) {
+                //不需要算法处理的->非同源 ->结果处理
+                if (!Constant.fastTurbo()) {
+                    RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
+                    taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
+                    value = ResultConvertUtil.convertResult(value);
+                    if ("0".equals(robotPatrolTaskResult.getValid())) {
+                        value = CruiseConstant.FAILED_VALUE;
+                    }
+                    taskAlarm.setValue(value);
+                    taskAlarm.setValueUnit(robotPatrolTaskResult.getValue());
+                    taskAlarm.setDeviceId(instanceId);
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
+                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                }
+
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
                     log.info("taskId为{}巡视点instanceId为{}的点位产生了告警,需要更新图片", taskId, instanceId);
