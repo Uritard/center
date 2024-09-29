@@ -77,9 +77,9 @@ public class TIotDevice implements Serializable {
     private String protocolModelName;
 
     /**
-     * 关联设备Id
+     * 电表类型  子表-0  总表-1
      */
-    private Long deviceId;
+    private Integer meterType;
 
     /**
      * 上级区域id

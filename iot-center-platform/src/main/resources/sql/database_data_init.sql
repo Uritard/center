@@ -964,6 +964,7 @@ INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('882', 'operation_type', '轨交_紧急分合闸_夹爪横置', 51, '操作类型', 1);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2022', 'api_type', '2022版本协议', 0, '协议版本', 1);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2024', 'api_type', '2024版本协议', 0, '协议版本', 1);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'protocol_model', '巡视结果', '0', '设备连接协议', '8');
 
 -- ----------------------------
 -- Records of t_period_model
@@ -1567,6 +1568,7 @@ INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, 
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'vocalPrintSrc', '声纹地址', 'http://192.168.2.221:10010/#/login', '声纹页面链接地址', '{\"rule\":\"^(http|https):\\\\/\\\\/[\\\\w\\\\-_]+(\\\\.[\\\\w\\\\-_]+)+([\\\\w\\\\-\\\\.,@?^=%&amp;:/~\\\\+#]*[\\\\w\\\\-\\\\@?^=%&amp;/~\\\\+#])?$\",\"msg\":\"请输入正确地址\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'mrtName', '首页展示名称', '地铁一号线', '首页展示当前站所名称，原无锡地铁展示地铁线路使用', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\-]+$\",\"msg\":\"请不要输入特殊字符\"}');
 INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'center', '无人机地图中心坐标', '32.30096967,119.2600425', '无人机地图默认展示中心点坐标', '{\"rule\":\"^[0-9,\\\\.]+$\",\"msg\":\"请不要输入特殊字符\"}');
+INSERT INTO `t_sys_param` (`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ('404', 'needAnalyseResult', '算法分析的结果值', '已拍照,拍照', '下级系统需要进行算法分析的结果值', '{\"rule\":\"^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9# \\\\#-,]+$\",\"msg\":\"请不要输入特殊字符\"}');
 
 -- ----------------------------
 -- Records of t_version

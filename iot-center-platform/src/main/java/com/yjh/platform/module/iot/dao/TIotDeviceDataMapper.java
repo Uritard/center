@@ -5,7 +5,9 @@ import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author YIJIAHE
@@ -17,7 +19,16 @@ public interface TIotDeviceDataMapper extends BaseMapper<TIotDeviceData> {
 
     List<IotDeviceDataEx> selectInfoByIp(@Param(value = "ip") String ip);
 
-    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list);
+    List<IotDeviceDataEx> selectIotData(@Param(value = "list")List<Long> list, @Param(value = "iotDeviceType") Integer iotDeviceType);
+
+    List<TIotDeviceData> selectMeterData(@Param(value = "list") List<Long> list);
+
+    List<TIotDeviceData> selectMeterLine(@Param(value = "iotDeviceId") Long iotDeviceId,
+                                         @Param(value = "startTime") String startTime,
+                                         @Param(value = "endTime") String endTime);
+
+    List<Map<String,String>> countPowerTotalByEdge(@Param(value = "startTime") LocalDateTime startTime,
+                                                   @Param(value = "endTime")LocalDateTime endTime);
 }
 
 

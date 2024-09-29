@@ -4,6 +4,9 @@
 
 package com.yjh.platform.common;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * <功能描述>
  *
@@ -12,7 +15,7 @@ package com.yjh.platform.common;
  * @since [产品/模块版本] （可选）
  */
 public interface ValidateConstant {
-    String REG_RICH_NAME = "^[a-zA-Z0-9\\u4e00-\\u9fa5_\\-#]*$";
+    String REG_RICH_NAME = "^[a-zA-Z0-9\\u4e00-\\u9fa5_\\-#IVXLCDM]*$";
     String MSG_RICH_NAME = "不可以有“#-_”以外的特殊字符";
 
     String REG_DEVICE_PROPERTIES = "^[ #a-zA-Z0-9,\":\\{\\}\\[\\]_]*$";

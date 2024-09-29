@@ -16,6 +16,8 @@ public interface TMeterLogDao {
 
     int deleteExpireData();
 
+    List<TMeter> selectAll();
+
     List<TMeter> list(TMeter tMeter);
 
     List<TMeter> collectList(TMeter tMeter);

@@ -97,7 +97,7 @@ public class IotDeviceHandler implements MessageHandlerStrategy, InitializingBea
             data.setCreateTime(new Date());
             data.setChannelNum(MapUtils.getString(item,"channelNum"));
             data.setIotDeviceType(MapUtils.getInteger(item,"iotDeviceType"));
-            data.setDeviceId(MapUtils.getLong(item,"deviceId"));
+            data.setMeterType(MapUtils.getInteger(item,"meterType"));
             data.setUpRegionName(MapUtils.getString(item,"upRegionName"));
             data.setCreatePerson("10001");
             data.setUpdatePerson("10001");

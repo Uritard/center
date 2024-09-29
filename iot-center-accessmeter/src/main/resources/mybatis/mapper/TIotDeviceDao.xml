@@ -12,7 +12,7 @@
         <result property="address" column="address" jdbcType="VARCHAR"/>
         <result property="iotDeviceType" column="iot_device_type" jdbcType="INTEGER"/>
         <result property="protocolModel" column="protocol_model" jdbcType="VARCHAR"/>
-        <result property="deviceId" column="device_id" jdbcType="VARCHAR"/>
+        <result property="meterType" column="meter_type" jdbcType="VARCHAR"/>
         <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
         <result property="upRegionName" column="up_region_name" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -25,7 +25,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,device_name,ip,port,address,iot_device_type,protocol_model,device_id,up_region_id,up_region_name,create_time,
+        id,device_name,ip,port,address,iot_device_type,protocol_model,meter_type,up_region_id,up_region_name,create_time,
         create_person,update_time,update_person,edge_code,magnification_coefficient,collection_frequency
     </sql>
 
@@ -35,6 +35,12 @@
         from t_iot_device
     </select>
 
+    <select id="selectAllMeter" resultType="com.yjh.accessmeter.module.device.entity.IotDevice">
+        select
+        <include refid="Base_Column_List"/>
+        from t_iot_device
+        where iot_device_type = 840
+    </select>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

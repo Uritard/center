@@ -128,7 +128,7 @@ public class DataCollectTask implements Runnable {
         IotDeviceDataEx baseData = new IotDeviceDataEx();
         baseData.setIp(device.getIp())
                 .setPort(device.getPort())
-                .setDeviceId(device.getDeviceId())
+                .setMeterType(device.getMeterType())
                 .setAddress(device.getAddress())
                 .setControllable(device.getControllable())
                 .setUpRegionName(device.getUpRegionName())
@@ -140,6 +140,7 @@ public class DataCollectTask implements Runnable {
                 .setPointName(device.getDeviceName())
                 .setUpRegionId(device.getUpRegionId())
                 .setIotDeviceType(device.getIotDeviceType())
+                .setMagnificationCoefficient(device.getMagnificationCoefficient())
                 .setCreateTime(new Date());
 
         if (devicePoints.isEmpty()) {
@@ -189,7 +190,7 @@ public class DataCollectTask implements Runnable {
             IotDeviceDataEx data = new IotDeviceDataEx();
             data.setIp(device.getIp())
                 .setPort(device.getPort())
-                .setDeviceId(device.getDeviceId())
+                .setMeterType(device.getMeterType())
                 .setAddress(device.getAddress())
                 .setControllable(device.getControllable())
                 .setUpRegionName(device.getUpRegionName())
@@ -199,6 +200,7 @@ public class DataCollectTask implements Runnable {
                 .setUnit(device.getUnit())
                 .setUpRegionId(device.getUpRegionId())
                 .setIotDeviceType(device.getIotDeviceType())
+                .setMagnificationCoefficient(device.getMagnificationCoefficient())
                 .setCreateTime(createTime);
 
             data.setState(m.getStatus()).setValue(m.getValue());
