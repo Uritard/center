@@ -986,9 +986,15 @@ public class HelloController {
     private ApplicationEventPublisher eventPublisher;
     @GetMapping(value = "/meterInfoTest")
     @ApiOperation(value = "meterInfoTest")
-    public Result meterInfoTest() throws Exception{
+    public Result meterInfoTest(@RequestParam String taskId,
+                                @RequestParam Long instanceId) throws Exception{
         Result result = new Result();
         try {
+            InspectionResultEvent event = new InspectionResultEvent();
+            event.setTaskId(taskId);
+            event.setInstanceId(String.valueOf(instanceId));
+            event.setResult(String.valueOf(NumberUtil.getIntRandomNum(0, 300)));
+            eventPublisher.publishEvent(event);
 //            InspectionResultEvent event = new InspectionResultEvent();
 //            event.setTaskId("666666");
 //            event.setDeviceId("156");
