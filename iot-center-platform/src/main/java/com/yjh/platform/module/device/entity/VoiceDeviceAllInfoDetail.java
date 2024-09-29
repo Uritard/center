@@ -46,6 +46,8 @@ public class VoiceDeviceAllInfoDetail{
 
     @Length(max = 32, message = "voiceCode长度必须小于等于32")
     @ApiModelProperty(value = "声纹设备编码")
+    @ExcelProperty(value = "设备编码")
+    @ExcelExtend(dictType = "voiceCode")
     private String voiceCode;
 
     @Length(max = 32, message = "voiceType长度必须小于等于32")

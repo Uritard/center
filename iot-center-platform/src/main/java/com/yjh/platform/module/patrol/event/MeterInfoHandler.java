@@ -4,23 +4,22 @@ import cn.hutool.core.bean.BeanUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TMeterDao;
-import com.yjh.platform.module.device.dao.TMeterLogDao;
-import com.yjh.platform.module.device.entity.TMeter;
 import com.yjh.platform.module.iot.dao.TIotDeviceDataMapper;
 import com.yjh.platform.module.iot.dao.TIotDeviceMapper;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
+import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import jdk.jfr.StackTrace;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -48,6 +47,8 @@ public class MeterInfoHandler {
     private TIotDeviceDataMapper iotDeviceDataMapper;
     @Resource
     private TIotDeviceMapper iotDeviceMapper;
+    @Resource
+    private TIotDeviceDataService iotDeviceDataService;
 
     @EventListener
     public void handleResultEvent(InspectionResultEvent event) {
@@ -66,6 +67,7 @@ public class MeterInfoHandler {
 
         }
     }
+
     public void handleMeterEndEvent(TIotDevicePoint iotDevicePoint, InspectionResultEvent event) {
         // 查询物联设备信息
         TIotDevice iotDevice = iotDeviceMapper.selectById(iotDevicePoint.getIotDeviceId());
@@ -93,6 +95,7 @@ public class MeterInfoHandler {
         iotDeviceDataEx.setChannelNum(iotDevicePoint.getChannelNum());
         List<IotDeviceDataEx> list = new ArrayList<>();
         list.add(iotDeviceDataEx);
+        iotDeviceDataService.addToRedis(list);
         iotDeviceDataUpload(list);
     }
 

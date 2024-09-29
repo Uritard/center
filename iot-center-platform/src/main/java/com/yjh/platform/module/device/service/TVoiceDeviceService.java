@@ -912,9 +912,13 @@ public class TVoiceDeviceService{
                 return;
             }
             o.setUpRegionId(regionId);
-            if(StringUtils.isNotEmpty(o.getVoiceCode())){
-                audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(o.getVoiceCode()));
+            if (StringUtils.isEmpty(o.getVoiceCode())) {
+                errorList.add("【" + o.getVoiceDeviceName() + "】设备编码未填写");
+                return;
             }
+//            if(StringUtils.isNotEmpty(o.getVoiceCode())){
+//                audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(o.getVoiceCode()));
+//            }
             tVoiceDeviceDao.addConf(o);
             insetList.add(o);
         });
