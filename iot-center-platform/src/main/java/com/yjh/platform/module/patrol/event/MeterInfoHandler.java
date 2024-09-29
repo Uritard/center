@@ -12,14 +12,13 @@ import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
-import jdk.jfr.StackTrace;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
