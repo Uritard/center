@@ -1386,7 +1386,11 @@ public class RobotService {
             // 根据instanceIdList查询inspectionCodeList
             for (String instanceId : instanceIdList) {
                 String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
-                str.add(inspectionCode);
+                if (!str.toString().contains(inspectionCode)){
+                    //发送给机器人的或者无人机的 做一个inspectionCode去重
+                    str.add(inspectionCode);
+                }
+
 
                 Map<String, String> redisInfoMap = new HashMap<>(16);
                 redisInfoMap.put("robotCode", robotCode);
