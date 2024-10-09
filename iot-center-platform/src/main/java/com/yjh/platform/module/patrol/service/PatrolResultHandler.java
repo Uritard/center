@@ -603,6 +603,9 @@ public class PatrolResultHandler {
             }
             String resultDesc = analyseDataOperateService.resolveDefectResult(resultList);
             resultValue = analyseDataOperateService.resolveDefectResultValue(resultList, resultValue);
+            if (StringUtils.isEmpty(resultDesc)) {
+                resultDesc = resultValue;
+            }
             cruiseResultMap.put("resultDesc", resultDesc);
 
             if (StringUtils.equals("-1", resultValue) || StringUtils.contains(resultDesc, "格式不正确")) {
