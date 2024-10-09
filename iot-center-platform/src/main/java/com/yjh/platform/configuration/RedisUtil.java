@@ -177,6 +177,7 @@ public class RedisUtil {
         }
         redisTemplate.opsForHash().putAll(infoKey, valueMap);
         redisTemplate.expire(infoKey, expire, TimeUnit.DAYS);
+        redisTemplate.expire(prefex, expire, TimeUnit.DAYS);
         return true;
     }
 }
