@@ -323,7 +323,7 @@ public class SilentAlarmThread implements Runnable {
             Long presetId = cameraConInfo.getPresetId();
 
             String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
-            redisTemplate.opsForHash().delete(key);
+            redisTemplate.delete(key);
         }catch (Exception e){
             log.error("秒级静默监视删除redis配置出错：", e);
         }
