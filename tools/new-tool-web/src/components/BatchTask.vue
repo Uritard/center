@@ -201,6 +201,10 @@ export default {
 </script>
 
 <style scoped>
+::v-deep .el-form-item__label {
+  color: #FFFFFF !important;
+  font-size: 16px;
+}
 .bg {
   color: #FFFFFF;
   width: 100%;
