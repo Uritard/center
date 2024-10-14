@@ -219,7 +219,7 @@ public class Constant {
 
     private static String systemLevel;
 
-    private static String needAnalyseResult;
+    private static String[] needAnalyseResult;
     /**
      * 是否开启修改同步模型
      */
@@ -339,12 +339,14 @@ public class Constant {
         return missedPointRetry;
     }
 
-    public static String getNeedAnalyseResult() {
-        try {
-            needAnalyseResult = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:needAnalyseResult", "content"));
-            log.warn("needAnalyseResult is {}", needAnalyseResult);
-        } catch (Exception e) {
-            needAnalyseResult = "已拍照,拍照";
+    public static String[] getNeedAnalyseResult() {
+        if (ArrayUtils.isEmpty(needAnalyseResult)) {
+            try {
+                needAnalyseResult = StringUtils.split((String)redisTemplate.opsForHash().get("t_sys_param:needAnalyseResult", "content"), ",");
+                log.warn("needAnalyseResult is {}", needAnalyseResult);
+            } catch (Exception e) {
+                needAnalyseResult = new String[] {"已拍照,拍照"};
+            }
         }
         return needAnalyseResult;
     }
@@ -523,6 +525,7 @@ public class Constant {
         logLevel = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:logLevel", "content"), LOG_LV_ONE);
         ftpsFilePath = (String)redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content");
         selfDefinedExtensions = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:selfDefinedExtensions", "content"));
+        needAnalyseResult = StringUtils.split((String)redisTemplate.opsForHash().get("t_sys_param:needAnalyseResult", "content"), ",");
     }
 
     /**

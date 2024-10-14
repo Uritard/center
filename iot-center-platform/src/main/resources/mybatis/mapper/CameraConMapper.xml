@@ -32,6 +32,7 @@
             resultType="com.yjh.platform.module.video.entity.CameraConInfo">
         SELECT
         a.camera_id,
+        a.camera_name,
         a.channel_num,
         a.camera_type,
         b.preset_id,
