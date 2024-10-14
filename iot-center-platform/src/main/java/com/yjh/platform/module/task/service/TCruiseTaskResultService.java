@@ -404,7 +404,7 @@ public class TCruiseTaskResultService {
                 if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                     realTimeWarn.setCruiseTime(new Date());
                 }else {
-                    realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
+                    realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime, new Date()));
                 }
                 realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
                 realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
@@ -431,7 +431,7 @@ public class TCruiseTaskResultService {
             if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
-                realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
+                realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime, new Date()));
             }
             realTimeWarn.setInstanceId(NumberUtils.toLong(instanceId));
             realTimeWarn.setAlarmContent(defectMap.get("defectContent"));
