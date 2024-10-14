@@ -318,7 +318,7 @@ public class InspectionResultThread implements Runnable{
             String sysLevel = Constant.getLevelEdge();
 
             //当前为巡视系统 并且 巡视结果为空值 或者 配置需要算法识别的结果
-            boolean resultAnalyse = StringUtils.isEmpty(value) || Constant.getNeedAnalyseResult().contains(value);
+            boolean resultAnalyse = StringUtils.isEmpty(value) || StringUtils.equalsAny(value, Constant.getNeedAnalyseResult());
             boolean needAnalysis = Constant.isHost() && resultAnalyse;
             log.info("simulation tool flag, needAnalysis: {}, taskId: {}, sysLevel: {}, cruiseType: {}", needAnalysis, taskId, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(needAnalysis)) {

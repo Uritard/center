@@ -85,4 +85,7 @@ public class CameraConInfo implements Serializable {
 
     @ApiModelProperty(value = "相机厂家ID")
     private String vendorId;
+
+    @ApiModelProperty(value = "相机名称")
+    private String cameraName;
 }

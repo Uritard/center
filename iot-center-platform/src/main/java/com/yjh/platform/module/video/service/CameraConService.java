@@ -17,6 +17,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.entity.TCameraInfo;
@@ -52,6 +53,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -1598,7 +1600,7 @@ public class CameraConService {
                 .password(password).build();
         Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
         if (result.getCode() != 200) {
-            throw new BusinessException(result.getMsg());
+            throw new BusinessException(cameraConInfo.getCameraName() + "备份失败," + result.getMsg());
         }
         CameraConfigResp cameraConfigResp = result.getData();
         String filePath = getConfigFileDir();
@@ -1670,13 +1672,29 @@ public class CameraConService {
         }
 
         log.info("exportCameraConfigBatch 入参cameraIds: {}", JSONUtil.toJSONString(cameraIds));
-        cameraIds.forEach(cameraId -> {
+        CountDownLatch cdl = new CountDownLatch(cameraIds.size());
+        List<String> errorList = new ArrayList<>();
+        cameraIds.forEach(cameraId -> ThreadPoolUtil.COMMON_POOL.addThread(() -> {
             try {
                 exportCameraConfig(cameraId);
+            } catch (BusinessException b) {
+                log.info("相机{}备份失败，errMsg:{}", cameraId, b.getMessage());
+                errorList.add(b.getMessage());
             } catch (Exception e) {
                 log.info("相机{}备份失败，errMsg:{}", cameraId, e.getMessage());
+                errorList.add("相机" + cameraId + "备份失败");
+            } finally {
+                cdl.countDown();
             }
-        });
+        }));
+        try {
+            cdl.await();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
+        if (!errorList.isEmpty()) {
+            throw new BusinessException("相机备份失败：" + StringUtils.join(errorList, "  "));
+        }
 
         return true;
     }

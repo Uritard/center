@@ -199,10 +199,10 @@ public class HttpAysncClientUtil {
         @Override
         public void run() {
             try {
-                while (alarmData.reciveTime() == 0L) {
+                while (alarmData.reciveTime() == 0L || reconnect == 0) {
                     if (timeout == 0) {
+                        log.info("reconnect == {}", --reconnect);
                         if (reconnect == 0) {
-                            log.info("reconnect == 0");
                             httpAsyncclient.close();
                             alarmData.stopAlarmGuard();
                         } else {
@@ -210,7 +210,6 @@ public class HttpAysncClientUtil {
                             stoplink = false;
                             timeout = 10000;
                             httpAsyncclient.close();
-                            log.info("reconnect == {}", reconnect--);
                             httpAsyncclient.start();
                         }
                     } else {

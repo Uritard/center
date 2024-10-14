@@ -254,10 +254,13 @@ public class PatrolResultHandler {
                                 redisTemplate, true, eventPublisher, this);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
-                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
-                if (Constant.isHost() && !ArrayUtils.contains(new Integer[]{TypeEnum.ROBOT.getCode(), TypeEnum.UAV.getCode()}, instance.getCruiseType())) {
+                // 只有当前节点是巡视主机，且非需要分析的点才需要告警处理
+                String value = robotPatrolTaskResult.getValue();
+                boolean resultAnalyse = StringUtils.isEmpty(value) || StringUtils.equalsAny(value, Constant.getNeedAnalyseResult());
+                boolean noAlarm = !Constant.isHost() || resultAnalyse;
+                if (noAlarm) {
                     log.info("No alarms need to be handled...");
-                } else if (!Constant.fastTurbo() && !Constant.isUpSystem()) {
+                } else if (!Constant.fastTurbo()) {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
                 }
