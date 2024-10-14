@@ -291,7 +291,7 @@
         b.device_name,
         b.device_mete_id,
         b.device_mete_name,
-        b.result_num,
+        b.result_num as resultNum,
         b.modify_num,
         b.picpath,
         b.person_check,
