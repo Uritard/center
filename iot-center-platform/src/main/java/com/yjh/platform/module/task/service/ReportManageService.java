@@ -202,6 +202,8 @@ public class ReportManageService {
 
     public TaskVO cruiseReportGenerate(String taskId, String userId){
         UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
+        REPORT_CACHE.put(taskId, 0);
+        Constant.sendProcess(uPatrolTask.getTaskName(), userId, 1, reportGenerateProgress(taskId));
         try {
             // 明细
             List<TCruiseDataResultDetail> cruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
