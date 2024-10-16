@@ -364,7 +364,7 @@ public class InspectionResultThread implements Runnable{
         try {
             // 复制图片到算法分析指定的路径
             String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
-            String resultImagePath = SysParamConfig.getSysContent("resultImgPath") + "/" + taskId + "/" + ftpFileName;
+            String resultImagePath = SysParamConfig.getSysContent("resultImgPath") + "/" + taskId + "/" +instanceId+"_"+ ftpFileName;
             FileUtil.copyFileUsingStream(originPath, resultImagePath);
 
             // 复制原图到算法分析指定的路径

@@ -875,6 +875,14 @@
         where c.channel_num in (select a.device_point_id
                                 from t_std_devicemete a
                                          left join t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
-                                where b.instance_id = #{instanceId})
+        where a.instance_id = #{instanceId})
+    </select>
+    <select id="selectMeteByInsId" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
+        select
+               *
+        from t_std_devicemete where device_mete_id = (
+            select device_mete_id from t_cruise_point_instance where instance_id = #{instanceId}
+            )
+            where b.instance_id = #{instanceId})
     </select>
 </mapper>
