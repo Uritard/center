@@ -21,6 +21,7 @@ import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -99,8 +100,9 @@ public class SecondLevelSilentTaskScheduled {
         long currTime = System.currentTimeMillis();
         SILENT_THREAD_MAP.forEach((k, v) -> {
             try {
-                if (currTime - v.reciveTime() > 5 * 60 * 1000L) {
+                if (Optional.ofNullable(v).isPresent() && currTime - v.reciveTime() > 5 * 60 * 1000L) {
                     v.stopAlarmGuard();
+                    SILENT_THREAD_MAP.put(k, null);
                 }
             } catch (Exception e) {
                 log.error("校验心跳失败", e);
@@ -111,6 +113,7 @@ public class SecondLevelSilentTaskScheduled {
     @PreDestroy
     public void stop() {
         SILENT_THREAD_MAP.forEach((k, v) -> v.stopAlarmGuard());
+        SILENT_THREAD_MAP.clear();
         THREAD_POOLS.shutdown();
     }
 }

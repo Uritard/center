@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
@@ -13,7 +14,6 @@ import com.google.common.io.Files;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.JSONUtil;
@@ -28,6 +28,7 @@ import com.yjh.video.api.CameraVendor;
 import com.yjh.video.api.entity.*;
 import com.yjh.video.api.entity.response.*;
 import com.yjh.video.api.result.Result;
+import com.yjh.video.api.result.ResultCodeEnum;
 import com.yjh.video.api.service.*;
 import com.yjh.video.api.util.PathVariableUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1599,8 +1600,9 @@ public class CameraConService {
                 .userName(userName)
                 .password(password).build();
         Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
-        if (result.getCode() != 200) {
-            throw new BusinessException(cameraConInfo.getCameraName() + "备份失败," + result.getMsg());
+        if (result.getCode() != ResultCodeEnum.SUCCESS.getCode()) {
+            String msg = result.getCode() == ResultCodeEnum.ERROR501.getCode() ? result.getMsg() : "备份失败";
+            throw new BusinessException(StrUtil.format("【{}】{}", cameraConInfo.getCameraName(), msg));
         }
         CameraConfigResp cameraConfigResp = result.getData();
         String filePath = getConfigFileDir();
@@ -1652,6 +1654,7 @@ public class CameraConService {
             bos.write(bytes);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException("备份文件保存失败");
         } finally {
             IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(fos);
