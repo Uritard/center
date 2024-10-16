@@ -1600,7 +1600,7 @@ public class CameraConService {
                 .password(password).build();
         Result<CameraConfigResp> result = iRecordService.exportCameraConfig(playEntity);
         if (result.getCode() != 200) {
-            throw new BusinessException(cameraConInfo.getCameraName() + "备份失败," + result.getMsg());
+            throw new BusinessException("【" + cameraConInfo.getCameraName() + "】备份失败");
         }
         CameraConfigResp cameraConfigResp = result.getData();
         String filePath = getConfigFileDir();
@@ -1652,6 +1652,7 @@ public class CameraConService {
             bos.write(bytes);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new RuntimeException("备份文件保存失败");
         } finally {
             IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(fos);

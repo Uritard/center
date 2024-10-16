@@ -190,8 +190,8 @@ public class HttpAysncClientUtil {
 
     @RequiredArgsConstructor
     static class ReConnect implements Runnable {
-        private static int reconnect = 3;
-        private static int timeout = 10000;
+        private int reconnect = 3;
+        private int timeout = 10000;
 
         private final CloseableHttpAsyncClient httpAsyncclient;
         private final SilentAlarmThread alarmData;
@@ -199,8 +199,8 @@ public class HttpAysncClientUtil {
         @Override
         public void run() {
             try {
-                while (alarmData.reciveTime() == 0L || reconnect == 0) {
-                    if (timeout == 0) {
+                while (alarmData.reciveTime() == 0L && reconnect > 0) {
+                    if (timeout <= 0) {
                         log.info("reconnect == {}", --reconnect);
                         if (reconnect == 0) {
                             httpAsyncclient.close();
@@ -213,8 +213,8 @@ public class HttpAysncClientUtil {
                             httpAsyncclient.start();
                         }
                     } else {
-                        Thread.sleep(100);
-                        timeout -= 100;
+                        Thread.sleep(1000);
+                        timeout -= 1000;
                     }
                 }
             } catch (Exception e) {
