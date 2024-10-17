@@ -40,6 +40,7 @@ import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.query.TaskMeteQuery;
 import com.yjh.platform.module.patrol.entity.query.TaskQuery;
+import com.yjh.platform.module.patrol.event.InspectionResultEvent;
 import com.yjh.platform.module.patrol.service.impl.OnLineMonitoringExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRetryThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
@@ -2350,6 +2351,17 @@ public class UPatrolTaskService {
      * 通过  cruiseResult 判断正常还是异常
      */
     public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
+
+        String resultNum = MapUtils.getString(cruiseResultMap,"resultNum");
+        if (!"-1".equals(resultNum)){
+            InspectionResultEvent event = new InspectionResultEvent();
+            event.setTaskId(MapUtils.getString(cruiseResultMap,"taskId"));
+            event.setInstanceId(MapUtils.getString(cruiseResultMap,"devicePointId"));
+            event.setResult(MapUtils.getString(cruiseResultMap,"resultNum"));
+            eventPublisher.publishEvent(event);
+        }
+
+
         patrolTaskResultHandler(Collections.singletonList(cruiseResultMap), MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL));
     }
 

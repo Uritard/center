@@ -870,11 +870,18 @@
             b.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
     <select id="getBindIotDevicePoint" resultType="com.yjh.platform.module.iot.entity.TIotDevicePoint">
-        select c.id,c.iot_device_id, c.iot_device_name, c.channel_num, c.point_name, c.unit
-        from t_iot_device_point c
-        where c.channel_num in (select a.device_point_id
-                                from t_std_devicemete a
-                                         left join t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
-                                where b.instance_id = #{instanceId})
+        SELECT
+            c.id,
+            c.iot_device_id,
+            c.iot_device_name,
+            c.channel_num,
+            c.point_name,
+            c.unit
+        FROM
+            t_iot_device_point c
+                LEFT JOIN t_iot_device d ON c.iot_device_id = d.id
+        WHERE
+            c.channel_num = #{devicePointId}
+          AND d.protocol_model = '8'
     </select>
 </mapper>
