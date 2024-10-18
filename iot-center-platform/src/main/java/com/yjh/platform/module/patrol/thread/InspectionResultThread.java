@@ -89,12 +89,6 @@ public class InspectionResultThread implements Runnable{
                 upSystemTaskInfoInitialize(tCruiseTaskResultMap, taskId, insInfo);
             }
 
-            InspectionResultEvent event = new InspectionResultEvent();
-            event.setTaskId(taskId);
-            event.setInstanceId(instanceId);
-            event.setResult(robotPatrolTaskResult.getValue());
-            eventPublisher.publishEvent(event);
-
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));

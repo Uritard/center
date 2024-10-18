@@ -58,7 +58,7 @@ public class MeterInfoHandler {
             if (StringUtils.isEmpty(value)) {
                 return;
             }
-            // 根据instanceId查询关联的测点及判断物联设备是否绑定测定
+            // 根据instanceId查询关联的测点及判断物联设备是否绑定测定 InstanceId传的是devicePointId
             iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
             if (iotDevicePoint != null) {
                 handleMeterEndEvent(iotDevicePoint, event);
