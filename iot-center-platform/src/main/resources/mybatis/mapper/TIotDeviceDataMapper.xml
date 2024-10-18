@@ -176,7 +176,7 @@
                           WHERE a.id in (SELECT id
                                          FROM t_iot_device_data
                                          WHERE iot_device_type = 840
-                                           AND channel_num IN ('1090', '00000100'))
+                                           AND point_name LIKE '%正向有功总%')
                             AND c.meter_type = 1
                           GROUP BY a.point_id, lastTime
                           ORDER BY lastTime DESC
@@ -195,7 +195,7 @@
                           WHERE a.id in (SELECT id
                                          FROM t_iot_device_data
                                          WHERE iot_device_type = 840
-                                           AND channel_num IN ('1090', '00000100'))
+                                           AND point_name LIKE '%正向有功总%')
                             AND c.meter_type = 1
                           GROUP BY a.point_id, lastTime
                           ORDER BY lastTime DESC
