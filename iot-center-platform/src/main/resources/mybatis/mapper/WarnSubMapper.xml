@@ -44,13 +44,13 @@
                  left join t_std_devicemete mete on info.std_mete_id = mete.device_mete_id
         where info.warn_id = #{warnId}
           and mete.alarm_note = 1
-        union all
+    </select>
+    <select id="selectDefectAlarmNote" resultType="java.lang.String">
         select IF(mete.alarm_level_string = '', mete.alarm_level, mete.alarm_level_string) AS alarm_level_string
         from t_defect_info defect
                  left join t_std_devicemete mete on defect.std_mete_id = mete.device_mete_id
-        where defect.defect_id = #{warnId}
+        where defect.defect_id = #{defectId}
           and mete.alarm_note = 1
-
     </select>
 
 </mapper>
