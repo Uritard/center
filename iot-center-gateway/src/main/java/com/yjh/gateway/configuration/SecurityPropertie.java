@@ -2,6 +2,7 @@ package com.yjh.gateway.configuration;
 
 import com.yjh.gateway.common.Constant;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,7 +11,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 @Configuration
 @Order
@@ -29,7 +35,19 @@ public class SecurityPropertie implements ApplicationRunner {
         //        this.getIsUkey();
         String fields = commonConfig.getFieldsNotValidat();
         if (StringUtils.isNotEmpty(fields)) {
-            Constant.FIELDS_NOT_VALIDAT = fields.split(",");
+            String[] rules = fields.split(",");
+            List<String> ruleList = new ArrayList<>();
+            List<Pair<String, String>> pairList = new ArrayList<>();
+            for (String r : rules) {
+                if (StringUtils.contains(r, ":")) {
+                    String[] p = r.split(":");
+                    pairList.add(Pair.of(p[0], p[1]));
+                } else {
+                    ruleList.add(r);
+                }
+            }
+            Constant.FIELDS_NOT_VALIDAT = ruleList.toArray(ruleList.toArray(new String[0]));
+            Constant.URL_FIELDS_NOT_VALIDAT = pairList.toArray(new Pair[0]);
         } else {
             Constant.FIELDS_NOT_VALIDAT = new String[0];
         }

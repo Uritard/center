@@ -3,6 +3,7 @@ package com.yjh.gateway.common;
 import com.yjh.gateway.common.utils.StaticContextAccessor;
 import com.yjh.gateway.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.gateway.commons.result.Result;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -76,6 +77,7 @@ public class Constant {
     public static String isUkey;
 
     public static String[] FIELDS_NOT_VALIDAT;
+    public static Pair<String, String>[] URL_FIELDS_NOT_VALIDAT;
 
     /**
      * ukey序列号
