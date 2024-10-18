@@ -883,6 +883,5 @@
         from t_std_devicemete where device_mete_id = (
             select device_mete_id from t_cruise_point_instance where instance_id = #{instanceId}
             )
-            where b.instance_id = #{instanceId})
     </select>
 </mapper>
