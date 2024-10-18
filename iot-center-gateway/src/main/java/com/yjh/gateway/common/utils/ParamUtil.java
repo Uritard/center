@@ -15,6 +15,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
@@ -153,13 +154,13 @@ public class ParamUtil {
     }
 
 
-    public static String validated(Map<String, Object> paramMap) {
+    public static String validated(String url, Map<String, Object> paramMap) {
 
         for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
             String key = entry.getKey();
             Object val = entry.getValue();
             // 对密码不进行校验
-            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(Constant.FIELDS_NOT_VALIDAT, key)) {
+            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ignoreHit(url, key)) {
                 continue;
             }
             if (val instanceof String && StringUtils.isNotEmpty((String) val)) {
@@ -172,5 +173,21 @@ public class ParamUtil {
         }
 
         return "";
+    }
+
+    private static boolean ignoreHit(String url, String key) {
+        if (ArrayUtils.contains(Constant.FIELDS_NOT_VALIDAT, key)) {
+            logger.warn("非法参数校验，{} - {}", url, key);
+            return true;
+        }
+
+        for (Pair<String, String> pair : Constant.URL_FIELDS_NOT_VALIDAT) {
+            if (StringUtils.endsWith(url, pair.getKey()) && ArrayUtils.contains(pair.getValue().split("\\|"), key)) {
+                logger.warn("非法参数校验，{} - {} - {}", url, key, pair);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

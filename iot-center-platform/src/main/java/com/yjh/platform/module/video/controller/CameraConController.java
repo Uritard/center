@@ -620,7 +620,7 @@ public class CameraConController {
         try {
             result.setData(cameraConService.exportCameraConfig(cameraId));
         } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+            result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("相机配置信息导出失败:", e);

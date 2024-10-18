@@ -30,6 +30,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author quzhihui
@@ -55,6 +57,8 @@ public class SilentAlarmThread implements Runnable {
     private String eventValue = "";
     private String eventState;
     private long reciveTime = 0L;
+    private AtomicInteger retryNums = new AtomicInteger(3);
+    private Future<Boolean> requestFuture;
 
     /**
      * 调用海康 接口
@@ -324,6 +328,10 @@ public class SilentAlarmThread implements Runnable {
 
             String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
             redisTemplate.delete(key);
+
+            if (requestFuture != null) {
+                requestFuture.cancel(true);
+            }
         }catch (Exception e){
             log.error("秒级静默监视删除redis配置出错：", e);
         }
@@ -534,6 +542,14 @@ public class SilentAlarmThread implements Runnable {
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
+    }
+
+    public int retryNums() {
+        return retryNums.getAndDecrement();
+    }
+
+    public void setRequestFuture(Future<Boolean> requestFuture) {
+        this.requestFuture = requestFuture;
     }
 }
 

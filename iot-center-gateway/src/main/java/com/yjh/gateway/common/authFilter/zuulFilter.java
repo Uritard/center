@@ -160,7 +160,7 @@ public class zuulFilter extends ZuulFilter {
         String needValid = (String) redisTemplate.opsForHash().get("t_sys_param:paramsValidate", "content");
         // 统一验证参数，不允许【~!$%^&*+<>?"{}();'】
         if ("true".equals(needValid)) {
-            String validatStr = ParamUtil.validated(paramMap);
+            String validatStr = ParamUtil.validated(url, paramMap);
             if (StringUtils.isNotEmpty(validatStr)) {
                 return errorRespnse(ctx, HttpStatus.SC_BAD_REQUEST, "{\"code\":400,\"message\":\"" + validatStr + "\"}");
             }

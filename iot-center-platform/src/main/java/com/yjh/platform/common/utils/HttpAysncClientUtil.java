@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.concurrent.FutureCallback;
@@ -49,10 +50,18 @@ public class HttpAysncClientUtil {
         if (newLink) {
             return HTTP_ASYNC_CLIENT_MAP.compute(key, (k, v) -> {
                 HttpAsyncClientUtils.closeQuietly(v);
-                return httpClientInit(username, password);
+                CloseableHttpAsyncClient httpAsyncclient = httpClientInit(username, password);
+                // Open the connection
+                httpAsyncclient.start();
+                return httpAsyncclient;
             });
         } else {
-            return HTTP_ASYNC_CLIENT_MAP.computeIfAbsent(key, k -> httpClientInit(username, password));
+            return HTTP_ASYNC_CLIENT_MAP.computeIfAbsent(key, k -> {
+                CloseableHttpAsyncClient httpAsyncclient = httpClientInit(username, password);
+                // Open the connection
+                httpAsyncclient.start();
+                return httpAsyncclient;
+            });
         }
     }
 
@@ -60,7 +69,9 @@ public class HttpAysncClientUtil {
         //摘要认证
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
-        return HttpAsyncClients.custom().setDefaultCredentialsProvider(credentialsProvider).build();
+
+        RequestConfig config = RequestConfig.custom().setConnectTimeout(5000).setConnectionRequestTimeout(10000).build();
+        return HttpAsyncClients.custom().setDefaultRequestConfig(config).setDefaultCredentialsProvider(credentialsProvider).build();
     }
 
     //Long connection function
@@ -90,17 +101,13 @@ public class HttpAysncClientUtil {
             params.put("returnData", "success");
             URI uri = uriBuild(url, params);
             CloseableHttpAsyncClient httpAsyncclient = httpCredentialsInit(uri.getHost(), uri.getPort(), user, password, false);
-            // Open the connection
-            httpAsyncclient.start();
 
             HttpGet get = new HttpGet(uri);
-
-            // Re3connect the query thread with a timeout on
-            ThreadPoolUtil.COMMON_POOL.addThread(new ReConnect(httpAsyncclient, alarmData));
 
             // 创建连接，设置接收报警事件的回调函数
             // Url="http://"+ip+":"+port+"/ISAPI/Event/notification/alertStream";
             Future<Boolean> future = httpAsyncclient.execute(HttpAsyncMethods.create(get), new ResponseConsumer(alarmData), callback);
+            alarmData.setRequestFuture(future);
 
             Boolean result = future.get();
 
@@ -112,8 +119,13 @@ public class HttpAysncClientUtil {
             assert result != null;
             log.info(result.toString());
         } catch (Exception e) {
-            alarmData.stopAlarmGuard();
             log.error(e.getMessage(), e);
+            if (alarmData.reciveTime() == 0L && alarmData.retryNums() > 0) {
+                log.info("连接失败，重试...");
+                lonLink(url, user, password, alarmData);
+            } else {
+                alarmData.stopAlarmGuard();
+            }
         }
     }
 
@@ -185,42 +197,6 @@ public class HttpAysncClientUtil {
         @Override
         protected Boolean buildResult(final HttpContext context) {
             return Boolean.TRUE;
-        }
-    }
-
-    @RequiredArgsConstructor
-    static class ReConnect implements Runnable {
-        private static int reconnect = 3;
-        private static int timeout = 10000;
-
-        private final CloseableHttpAsyncClient httpAsyncclient;
-        private final SilentAlarmThread alarmData;
-
-        @Override
-        public void run() {
-            try {
-                while (alarmData.reciveTime() == 0L || reconnect == 0) {
-                    if (timeout == 0) {
-                        log.info("reconnect == {}", --reconnect);
-                        if (reconnect == 0) {
-                            httpAsyncclient.close();
-                            alarmData.stopAlarmGuard();
-                        } else {
-                            // Timeout reconnect, clear buffer, flag bit initialization, close connection, open connection
-                            stoplink = false;
-                            timeout = 10000;
-                            httpAsyncclient.close();
-                            httpAsyncclient.start();
-                        }
-                    } else {
-                        Thread.sleep(100);
-                        timeout -= 100;
-                    }
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-            log.info("reconnect thread closed == {}", alarmData.reciveTime());
         }
     }
 }
