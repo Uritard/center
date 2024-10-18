@@ -17,8 +17,17 @@ public class WarnSubService {
     @Autowired
     private WarnSubDao warnSubDao;
 
-    public boolean select(Long userId, String type, String level, Long warnId) {
-        String alarmLevelString = warnSubDao.selectAlarmNote(warnId);
+    public boolean select(Long userId, String type, String level, Long warnId, String defectModel) {
+        if (StringUtils.isEmpty(defectModel)) {
+            //机器人告警
+            return false;
+        }
+        String alarmLevelString = "";
+        if ("450".equals(defectModel)) {
+            alarmLevelString = warnSubDao.selectAlarmNote(warnId);
+        } else {
+            alarmLevelString = warnSubDao.selectDefectAlarmNote(warnId);
+        }
         if (StringUtils.isNotBlank(alarmLevelString)) {
             List<String> l = Arrays.asList(alarmLevelString.split(","));
             if (l.contains(level) && SubWarnTypeEnum.DEVICE.getTypeCode().equals(type)) {

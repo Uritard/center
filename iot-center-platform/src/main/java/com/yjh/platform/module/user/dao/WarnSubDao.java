@@ -24,4 +24,6 @@ public interface WarnSubDao {
 
     String selectAlarmNote(@Param(value = "warnId") Long warnId);
 
+    String selectDefectAlarmNote(@Param(value = "defectId") Long defectId);
+
 }

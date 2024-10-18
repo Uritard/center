@@ -382,7 +382,9 @@ public class SilentAlarmThread implements Runnable {
                 Map<String, Object> map = tCameraPresetService.selectInstanceInfo(cameraConInfo.getPresetId());
 
                 TWarnInfo tWarnInfo = silentMonitorHandle(filePath, desc, map);
-                alarmToUpSystem(map, tWarnInfo, monitorType);
+                if (tWarnInfo != null) {
+                    alarmToUpSystem(map, tWarnInfo, monitorType);
+                }
             } catch (Exception e) {
                 log.error("静默监视异常: ", e);
             }
@@ -399,45 +401,46 @@ public class SilentAlarmThread implements Runnable {
 //            String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") + imageUrl;
 //            FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
 //
-            String defectResultRealImg = imageUrl.replaceAll(SysParamConfig.getSysContent("resultImgPath"),
-                SysParamConfig.getSysContent("resultImgRealPath"));
-            String alarmLevel = tCameraPresetService.selectAlarmLevel("defect_model", desc);
-            if (alarmLevel == null) {
-                alarmLevel = "132";
-            }
-            TWarnInfo tWarnInfo = new TWarnInfo()
-                    .setWarnLevel(Integer.valueOf(alarmLevel))
-                    .setWarnTime(new Date())
-                    .setWarnName("静默监视告警数据")
-                    .setWarnContent(desc)
-                    .setDeviceId(MapUtils.getLong(map, "device_id"))
-                    .setCunstomId(MapUtils.getString(map, "custom_id"))
-                    .setInstanceId(MapUtils.getLong(map, "instance_id"))
-                    .setStdMeteId(MapUtils.getLong(map, "device_mete_id"))
-                    .setConfMode(276)
-                    .setDefectModel(450)
-                    .setAlarmSource(689) // 静默监视
-                    .setImagePath(defectResultRealImg);
-            tWarnInfoDao.insert(tWarnInfo);
-            if (!alarmShieldService.isShield(tWarnInfo.getStdMeteId())){
+            if (!alarmShieldService.isShield(MapUtils.getLong(map, "device_mete_id"))) {
+                String defectResultRealImg = imageUrl.replaceAll(SysParamConfig.getSysContent("resultImgPath"),
+                        SysParamConfig.getSysContent("resultImgRealPath"));
+                String alarmLevel = tCameraPresetService.selectAlarmLevel("defect_model", desc);
+                if (alarmLevel == null) {
+                    alarmLevel = "132";
+                }
+                TWarnInfo tWarnInfo = new TWarnInfo()
+                        .setWarnLevel(Integer.valueOf(alarmLevel))
+                        .setWarnTime(new Date())
+                        .setWarnName("静默监视告警数据")
+                        .setWarnContent(desc)
+                        .setDeviceId(MapUtils.getLong(map, "device_id"))
+                        .setCunstomId(MapUtils.getString(map, "custom_id"))
+                        .setInstanceId(MapUtils.getLong(map, "instance_id"))
+                        .setStdMeteId(MapUtils.getLong(map, "device_mete_id"))
+                        .setConfMode(276)
+                        .setDefectModel(450)
+                        .setAlarmSource(689) // 静默监视
+                        .setImagePath(defectResultRealImg);
+                tWarnInfoDao.insert(tWarnInfo);
+
                 //webSocket通知前端调用查询告警弹框的接口
                 Map<String, String> jasonMaps = new HashMap<>(16);
                 jasonMaps.put("type", "alarmPopUp");
                 jasonMaps.put("warnType", "1");
                 jasonMaps.put("warnLevel", alarmLevel);
-                jasonMaps.put("warnId", ValueUtil.toString(tWarnInfo.getWarnId(),"1"));
+                jasonMaps.put("warnId", ValueUtil.toString(tWarnInfo.getWarnId(), "1"));
                 jasonMaps.put("defectModel", "450");
                 String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息: {}", json);
-                if (!Constant.isUpSystem()){
+                if (!Constant.isUpSystem()) {
 //                restTemplatePost(syncWebsocketUrl, json);
                     Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
                 }
+                return tWarnInfo;
             } else {
                 log.info("此告警被屏蔽了，不弹窗！");
+                return null;
             }
-
-            return tWarnInfo;
         } catch (Exception e) {
             log.error("组装并存储告警信息出错: ", e);
         }

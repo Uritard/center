@@ -960,6 +960,8 @@ INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, 
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('11', 'home_model', 'TaskOverview', 0, '巡视任务', 11);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('12', 'home_model', 'StationSignboard', 0, '变电站光字牌', 12);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('13', 'home_model', 'WeatherModel', 0, '微气象', 13);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('14', 'home_model', 'StationOverviewForWuxi', 0, '站所概览-无锡', 14);
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('15', 'home_model', 'IotOverview', 0, '物联设备统计概况', 15);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('881', 'operation_type', '紧急合闸_夹爪横置', 50, '操作类型', 1);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('882', 'operation_type', '轨交_紧急分合闸_夹爪横置', 51, '操作类型', 1);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2022', 'api_type', '2022版本协议', 0, '协议版本', 1);

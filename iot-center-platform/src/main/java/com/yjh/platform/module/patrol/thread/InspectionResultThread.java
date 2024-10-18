@@ -325,7 +325,7 @@ public class InspectionResultThread implements Runnable{
                 //不需要算法处理的->非同源 ->结果处理
                 if (!Constant.fastTurbo()) {
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
-                    taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
+                    taskAlarm.setTaskCode(taskId);
                     value = ResultConvertUtil.convertResult(value);
                     if ("0".equals(robotPatrolTaskResult.getValid())) {
                         value = CruiseConstant.FAILED_VALUE;

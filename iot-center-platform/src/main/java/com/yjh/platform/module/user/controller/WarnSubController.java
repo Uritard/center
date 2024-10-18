@@ -63,10 +63,11 @@ public class WarnSubController {
     public Result isPop(@RequestParam(value = "userId", required = true) Long userId,
                          @RequestParam(value = "type", required = true) String type,
                          @RequestParam(value = "warnId", required = true) Long warnId,
-                         @RequestParam(value = "level", required = true) String level) {
+                         @RequestParam(value = "level", required = true) String level,
+                         @RequestParam(value = "defectModel", required = true) String defectModel) {
         Result result = new Result();
         try {
-            result.setData(warnSubService.select(userId,type,level,warnId));
+            result.setData(warnSubService.select(userId,type,level,warnId, defectModel));
         } catch (Exception e) {
             log.error("查询告警订阅失败：",e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
