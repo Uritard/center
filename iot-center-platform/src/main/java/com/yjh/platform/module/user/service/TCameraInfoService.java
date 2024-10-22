@@ -582,14 +582,6 @@ public class TCameraInfoService {
         return null;
     }
 
-    public void startKeepWatch(){
-        KeepWatchJob keepWatchJob = new KeepWatchJob(redisTemplate,tCameraInfoDao,tCameraPresetDao, cameraConService);
-        Thread thread = new Thread(keepWatchJob);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    @Transactional(rollbackFor = Exception.class)
     public void stopStream(Long cameraId) {
         try {
             String result = cameraConService.stopStream(String.valueOf(cameraId));

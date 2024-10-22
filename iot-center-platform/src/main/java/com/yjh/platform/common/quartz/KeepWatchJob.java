@@ -1,5 +1,8 @@
 package com.yjh.platform.common.quartz;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.NumberUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -8,7 +11,12 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.video.service.CameraConService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,77 +29,67 @@ import java.util.Map;
  * @since 2022/4/8
  */
 @Slf4j
-public class KeepWatchJob implements Runnable {
+@Component
+public class KeepWatchJob {
 
     private final RedisTemplate redisTemplate;
-
-    private final TCameraInfoDao tCameraInfoDao;
 
     private final TCameraPresetDao tCameraPresetDao;
 
     private final CameraConService cameraConService;
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    public KeepWatchJob(RedisTemplate redisTemplate, TCameraInfoDao tCameraInfoDao, TCameraPresetDao tCameraPresetDao,
-                        CameraConService cameraConService) {
-        this.tCameraInfoDao = tCameraInfoDao;
+    public KeepWatchJob(RedisTemplate redisTemplate, TCameraPresetDao tCameraPresetDao, CameraConService cameraConService) {
         this.redisTemplate = redisTemplate;
         this.tCameraPresetDao = tCameraPresetDao;
         this.cameraConService = cameraConService;
     }
 
-    @Override
-    public void run() {
-        while (true) {
-            try {
-                List<TCameraPreset> cameraPresetList = tCameraPresetDao.selectKeepWatchList();
-                //获取间隔时间
-                Integer keepWatchTime = Integer.parseInt(SysParamConfig.getSysContent("keepWatchTime")) * 60 * 1000;
-                Date start = new Date();
-                cameraPresetList.forEach(preset -> {
-                    Long cameraId = preset.getCameraId();
-                    String str = TCameraInfoService.cameraStateKey + preset.getCameraIp();
-                    Map<String, String> map = redisTemplate.opsForHash().entries(str);
-                    if (map != null && map.size() > 0) {
-                        if ("0".equals(map.get("state"))) {
-                            //摄像机空闲 回归守望预置位
-                            String lastTime = map.get("lastTime");
-                            long oldTime = -1L;
-                            try {
-                                if (lastTime != null && !"".equals(lastTime)) {
-                                    oldTime = simpleDateFormat.parse(lastTime).getTime();
-                                }
-                            } catch (Exception e) {
-                                log.info("摄像机id：{} 回到守望位错误：{}", cameraId, e);
+    @Scheduled(cron = "30 * * * * ?")
+    public void keepWatchRunning() {
+        try {
+            //获取间隔时间
+            long keepWatchTime = NumberUtils.toLong(SysParamConfig.getSysContent("keepWatchTime")) * 60 * 1000L;
+            if (keepWatchTime <= 0) {
+                if (Constant.logUpLv3()) {
+                    log.warn("守望位未开启：{}", SysParamConfig.getSysContent("keepWatchTime"));
+                }
+                return;
+            }
+            List<TCameraPreset> cameraPresetList = tCameraPresetDao.selectKeepWatchList();
+            long now = System.currentTimeMillis();
+            String currDateStr = DateTimeUtil.format(new Date());
+            cameraPresetList.forEach(preset -> {
+                Long cameraId = preset.getCameraId();
+                String str = TCameraInfoService.cameraStateKey + preset.getCameraIp();
+                Map<String, String> map = redisTemplate.opsForHash().entries(str);
+                if (MapUtils.isNotEmpty(map)) {
+                    if ("0".equals(map.get("state"))) {
+                        //摄像机空闲 回归守望预置位
+                        String lastTime = map.get("lastTime");
+                        long oldTime = -1L;
+                        try {
+                            if (StringUtils.isNotEmpty(lastTime)) {
+                                oldTime = DateTimeUtil.parse(lastTime).getTime();
                             }
-                            long now = new Date().getTime();
-                            if ((now - oldTime) >= keepWatchTime) {
-                                if (preset != null) {
-                                    HashMap<String, Object> moveMap = new HashMap<>();
-                                    moveMap.put("presetId", preset.getPresetId());
-                                    moveMap.put("cameraId", preset.getCameraId());
-                                    log.info("守望时间：" + new Date());
-                                    ThreadPoolUtil.COMMON_POOL.addThread(() -> {
-                                        try {
-                                            cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId());
-                                        } catch (Exception e) {
-                                            log.error(e.getMessage(), e);
-                                        }
-                                    });
-                                    map.put("lastTime", simpleDateFormat.format(new Date()));
-                                    redisTemplate.opsForHash().putAll(str, map);
-                                }
-                            }
+                        } catch (Exception e) {
+                            log.info("摄像机id：{} 回到守望位错误：{}", cameraId, e);
+                        }
 
+                        if ((now - oldTime) >= keepWatchTime) {
+                            log.info("摄像机id：{} 守望时间：{}", cameraId, currDateStr);
+                            ThreadPoolUtil.COMMON_POOL.addThread(() -> {
+                                try {
+                                    cameraConService.moveToPresetForTask(preset.getPresetId(), preset.getCameraId());
+                                } catch (Exception e) {
+                                    log.error(e.getMessage(), e);
+                                }
+                            });
                         }
                     }
-                });
-
-                Thread.sleep(10 * 1000);//10秒查一次
-            } catch (Exception e) {
-                log.info("摄像头守望出错，", e);
-            }
+                }
+            });
+        } catch (Exception e) {
+            log.info("摄像头守望出错，", e);
         }
     }
 }
