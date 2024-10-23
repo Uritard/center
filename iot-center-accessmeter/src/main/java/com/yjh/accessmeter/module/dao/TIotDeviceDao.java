@@ -36,4 +36,6 @@ public interface TIotDeviceDao {
     String getSystemConfig(@Param("configType") String type, @Param("configKey") String key);
 
     List<IotDevice> selectAllMeter();
+
+    List<IotDeviceDataEx> selectByIp(@Param("ip") String ip);
 }

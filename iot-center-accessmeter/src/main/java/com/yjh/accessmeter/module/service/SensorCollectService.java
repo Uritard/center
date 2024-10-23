@@ -4,6 +4,7 @@
 
 package com.yjh.accessmeter.module.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessmeter.common.Constant;
 import com.yjh.accessmeter.common.result.BusinessException;
 import com.yjh.accessmeter.common.result.Result;
@@ -12,11 +13,13 @@ import com.yjh.accessmeter.common.utils.ByteUtil;
 import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
+import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.netty.DLT645Message;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
+import com.yjh.accessmeter.protocol.aigateway.info.Data;
 import com.yjh.accessmeter.protocol.entity.EnvAction;
 import com.yjh.accessmeter.protocol.impl.EnvTerminalProtocolImpl;
 import com.yjh.accessmeter.protocol.impl.transport.TcpShortManager;
@@ -283,5 +286,36 @@ public class SensorCollectService {
         String hex = ByteBufUtil.hexDump(dataFarme);
         log.info("dlt645Message=> {} 的结果数据为 encode:{}", dlt645Message, hex);
         return hex;
+    }
+
+    public void asyncResultHandler(Map<String,Object> re){
+        if (ProtocolEnum.AI_GATEWAY.getCode().equals(re.get("type"))){
+            //智能网关结果处理
+            AIGatewayResultHandler(re);
+        }
+    }
+
+    private void AIGatewayResultHandler(Map<String,Object> re){
+        String ip = re.get("ip").toString();
+        //根据ip查询设备
+        List<IotDeviceDataEx> list = iotDeviceDao.selectByIp(ip);
+        List<IotDeviceDataEx> resultList = new ArrayList<>();
+        list.forEach(device -> {
+            if (re.containsKey(device.getChannelNum())){
+                device.setId(null);
+                //建设备的时候 一对一 例如;灯=一个device+一个devicePoint
+                device.setValue(re.get(device.getChannelNum()).toString());
+                resultList.add(device);
+            }
+        });
+        if (!resultList.isEmpty()) {
+            try {
+                iotDeviceDao.batchInsertData(resultList);
+                platformProxy.uploadToRedis(resultList);
+            } catch (Exception e) {
+                log.error("设备采集数据入库失败: {}", JSON.toJSONString(resultList), e);
+            }
+
+        }
     }
 }
