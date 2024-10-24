@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -51,19 +52,23 @@ public class MeterInfoHandler {
 
     @EventListener
     public void handleResultEvent(InspectionResultEvent event) {
-        // 巡视结果
-        TIotDevicePoint iotDevicePoint = new TIotDevicePoint();
-        if (StringUtils.isNotEmpty(event.getResult())) {
-            String value = getNumeric(event.getResult());
-            if (StringUtils.isEmpty(value)) {
-                return;
-            }
-            // 根据instanceId查询关联的测点及判断物联设备是否绑定测定
-            iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
-            if (iotDevicePoint != null) {
-                handleMeterEndEvent(iotDevicePoint, event);
-            }
+        try {
+            // 巡视结果
+            TIotDevicePoint iotDevicePoint = new TIotDevicePoint();
+            if (StringUtils.isNotEmpty(event.getResult())) {
+                String value = getNumeric(event.getResult());
+                if (StringUtils.isEmpty(value)) {
+                    return;
+                }
+                // 根据instanceId查询关联的测点及判断物联设备是否绑定测定
+                iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
+                if (iotDevicePoint != null) {
+                    handleMeterEndEvent(iotDevicePoint, event);
+                }
 
+            }
+        }catch (Exception e){
+            log.error("处理电表数据出错：{},错误：",event,e);
         }
     }
 
