@@ -89,7 +89,6 @@ public class PlatformApplication  implements CommandLineRunner {
             sysKeyService.loadKeysToRedis();
             tSysParamService.insertIntoRedis(true);
             tCameraInfoService.intoRedis();
-            tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
             tCameraPresetService.startSilentTask();//开启摄像头静默任务
             sysUserService.insertIntoRedis();
             tVoiceDeviceService.registerAudioDevice();//声纹设备注册
