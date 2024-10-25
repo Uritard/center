@@ -12,7 +12,6 @@ import com.yjh.platform.module.iot.entity.TIotDeviceData;
 import com.yjh.platform.module.iot.entity.TIotDevicePoint;
 import com.yjh.platform.module.iot.service.TIotDeviceDataService;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,19 +50,22 @@ public class MeterInfoHandler {
 
     @EventListener
     public void handleResultEvent(InspectionResultEvent event) {
-        // 巡视结果
-        TIotDevicePoint iotDevicePoint = new TIotDevicePoint();
-        if (StringUtils.isNotEmpty(event.getResult())) {
-            String value = getNumeric(event.getResult());
-            if (StringUtils.isEmpty(value)) {
-                return;
-            }
-            // 根据instanceId查询关联的测点及判断物联设备是否绑定测定 InstanceId传的是devicePointId
-            iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
-            if (iotDevicePoint != null) {
-                handleMeterEndEvent(iotDevicePoint, event);
-            }
+        try {
+            // 巡视结果
+            if (StringUtils.isNotEmpty(event.getResult())) {
+                String value = getNumeric(event.getResult());
+                if (StringUtils.isEmpty(value)) {
+                    return;
+                }
+                // 根据instanceId查询关联的测点及判断物联设备是否绑定测定
+                TIotDevicePoint iotDevicePoint = cruisePointInstanceDao.getBindIotDevicePoint(Long.valueOf(event.getInstanceId()));
+                if (iotDevicePoint != null) {
+                    handleMeterEndEvent(iotDevicePoint, event);
+                }
 
+            }
+        }catch (Exception e){
+            log.error("处理电表数据出错：{},错误：",event,e);
         }
     }
 

@@ -129,6 +129,43 @@ public class PatrolResultHandler {
 
     /**
      * 处理下级系统的巡视结果
+     * 如果一个机器人测点结果对应多个巡视系统测点，则将结果进行复制
+     *
+     * @param resultList 下级系统的巡视结果
+     */
+    public List<RobotPatrolTaskResult> robotPatrolTaskResultCopy(List<RobotPatrolTaskResult> resultList){
+        List<RobotPatrolTaskResult> re = new ArrayList<>();
+        for (RobotPatrolTaskResult result:resultList){
+            re.add(result);
+            String robotCode = result.getSendCode();
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + result.getDeviceId();
+            log.info("Robot_SPAndIN_Info: 获取 redisKey： {}", redisKey);
+            Map<String, String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+            String instanceIds = robotInfoKeyMap.get("instanceId");
+            log.info("下级测点：{} 对应巡视点：{}",result.getDeviceId(),instanceIds);
+            if (StringUtils.isEmpty(instanceIds)){
+                continue;
+            }
+            //判断是巡视点还是操作点 取第一个
+            String[] instanceIdList = instanceIds.split(" ");
+            if (instanceIdList.length <= 1){
+                continue;
+            }
+            String instanceId = instanceIdList[0];
+            com.yjh.platform.module.device.entity.TStdDeviceMete deviceMete = tCruisePointInstanceDao.selectMeteByInsId(Long.valueOf(instanceId));
+            if ("1".equals(deviceMete.getInspectionType())){
+                //是巡检点
+                for (int i = 0; i < instanceIdList.length-1; i++) {
+                    re.add(result);
+                }
+            }
+
+        }
+        return re;
+    }
+
+    /**
+     * 处理下级系统的巡视结果
      *
      * @param resultList 下级系统的巡视结果
      */
@@ -264,6 +301,8 @@ public class PatrolResultHandler {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap, instanceId);
                 }
+
+                Thread.sleep(500L);
             } catch (Exception e) {
                 log.error("处理下级系统的巡视结果异常:", e);
             }

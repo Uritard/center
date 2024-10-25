@@ -40,6 +40,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -1365,7 +1366,7 @@ public class RobotService {
         String robotCode = item.getRobotCode();
         String taskId = item.getTaskId();
 
-        StringJoiner str = new StringJoiner(",");
+        Set<String> str = new LinkedHashSet<>(128);
         // 机器人任务临时信息存放至redis
         log.info("机器人任务临时信息存放至redis参数，robotCode：{}， taskId：{}， str：{}， item：{}", robotCode, taskId, str, JSONUtil.toJSONString(item));
         putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList(), item.getIsenable(),item.getCruiseType());
@@ -1374,7 +1375,7 @@ public class RobotService {
         packageXMLBaseModel(item, robotCode, taskId, str);
     }
 
-    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<String> instanceIdList, String isenable,Integer cruiseType) {
+    private void putInfoToRedisForRobot(String robotCode, String taskId, Set<String> str, List<String> instanceIdList, String isenable,Integer cruiseType) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
         try {
             // 将instanceIdList放缓存，以备后续使用
@@ -1386,6 +1387,7 @@ public class RobotService {
             // 根据instanceIdList查询inspectionCodeList
             for (String instanceId : instanceIdList) {
                 String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
+                //发送给机器人的或者无人机的 做一个inspectionCode去重
                 str.add(inspectionCode);
 
                 Map<String, String> redisInfoMap = new HashMap<>(16);
@@ -1446,10 +1448,9 @@ public class RobotService {
 
         String edgeCode = item.getEdgeCode();
         String taskId = item.getTaskId();
-        StringJoiner str = new StringJoiner(",");
-        for (String instanceId : item.getInstanceList()) {
-            str.add(instanceId);
-        }
+        Set<String> str = new LinkedHashSet<>(128);
+        str.addAll(item.getInstanceList());
+
         if ("0".equals(item.getIsenable())) {
             // 边缘节点任务临时信息存放至redis
             Map<String, Object> instanceListMap = new HashMap<>(4);
@@ -1469,7 +1470,7 @@ public class RobotService {
      * @param taskId     任务id
      * @param str        点位id
      */
-    private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, StringJoiner str) {
+    private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, Set<String> str) {
         Map<String, Object> resMap = packageItem(str, item, taskId);
         String code = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(uniqueFlag, 1);
@@ -1579,17 +1580,17 @@ public class RobotService {
      * @param taskId 任务id
      * @return Map<String, Object>
      */
-    private Map<String, Object> packageItem(StringJoiner str, RobotTaskInstanceInfo item, String taskId) {
-        Map<String, Object> taskItemMap = new HashMap<>();
+    private Map<String, Object> packageItem(Set<String> str, RobotTaskInstanceInfo item, String taskId) {
+        Map<String, Object> taskItemMap = new HashMap<>(8);
         List<Map<String, Object>> mapList = new ArrayList<>();
         Map<String, Object> map = new HashMap<>(16);
 
-        String deviceIdList = str.toString();
+        String deviceIdList = String.join(",", str);
 
         try {
             map.put("task_code", Optional.ofNullable(taskId).orElse(""));
             map.put("task_name", Optional.ofNullable(item.getTaskName()).orElse(""));
-            map.put("device_list", Optional.ofNullable(deviceIdList).orElse(""));
+            map.put("device_list", deviceIdList);
             if (Objects.isNull(item.getUnionTaskStatus())) {
                 log.info("This is a normal task！！！！！！！！！！！！！");
                 String planType = null;

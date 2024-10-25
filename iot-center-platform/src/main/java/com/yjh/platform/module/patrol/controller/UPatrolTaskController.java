@@ -80,6 +80,7 @@ public class UPatrolTaskController {
         Result result = new Result();
         try {
             log.info("The resultList from accessRobot is=={}", resultList);
+            resultList = patrolResultHandler.robotPatrolTaskResultCopy(resultList);
             patrolResultHandler.robotPatrolTaskResult(resultList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
