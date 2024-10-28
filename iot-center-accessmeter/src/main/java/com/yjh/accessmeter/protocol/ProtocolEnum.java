@@ -25,6 +25,7 @@ public enum ProtocolEnum {
     DLT645_07("5", "DLT645_07", 1),
     ENV_TERMINAL("6", "环控终端", 1),
     ROBOT("7", "机器人", 0),
+    AI_GATEWAY("9", "智能网关", 1),
     NAN("NAN", "未定义协议", 0)
     ;
 

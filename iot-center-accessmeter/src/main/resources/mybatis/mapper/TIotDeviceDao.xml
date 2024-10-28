@@ -119,4 +119,19 @@
             WHERE config_type =#{configType, jdbcType=VARCHAR} and config_key =#{configKey, jdbcType=VARCHAR}
             limit 1
     </select>
+
+    <select id="selectByIp" resultType="com.yjh.accessmeter.module.device.entity.IotDeviceDataEx">
+        select
+        a.*,
+        b.id as point_id,
+        b.iot_device_id,
+        b.iot_device_name,
+        b.channel_num,
+        b.point_name,
+        b.unit,
+        b.extend
+        from t_iot_device a
+        left join t_iot_device_point b on b.iot_device_id = a.id
+        where ip = #{ip} and protocol_model = 9
+    </select>
 </mapper>
