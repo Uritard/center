@@ -218,6 +218,9 @@ public class AutoreviewHandler {
                     flag = false;
                     break;
                 }
+                if (val  == null && review.size() == 1) {
+                    flag = false;
+                }
             }
             if (flag) {
                 if (Constant.logUpLv3()) {
