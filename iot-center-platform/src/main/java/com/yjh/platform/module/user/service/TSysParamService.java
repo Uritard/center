@@ -270,6 +270,7 @@ public class TSysParamService{
         result.put("center", SysParamConfig.getSysContent("center"));
         result.put("theme", SysParamConfig.getSysContent("theme"));
         result.put("homeType", SysParamConfig.getSysContent("homeType"));
+        result.put("videoPlayer", SysParamConfig.getSysContent("videoPlayer"));
 
         return result;
     }

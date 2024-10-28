@@ -98,15 +98,23 @@ public class DroneCameraConService {
         String videoHttps = String.valueOf(redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "videoHttpsEnable"));
         String hostIp = (String)redisTemplate.opsForHash().get("t_sys_param:hostIp", "content");
         String webRtcUrl;
+        String flvUrl = "";
+        String wsFlvUrl = "";
+
         if (CameraConService.MEDIA_ZLK.equalsIgnoreCase(mediaServer)) {
             // http://127.0.0.1/index/api/webrtc?app=live&stream=test&type=play
             String scheam = "1".equals(videoHttps) ? "https://" : "http://";
+            String wsSchema = "1".equals(videoHttps) ? "wss://" : "ws://";
             webRtcUrl = scheam + hostIp + "/ZLM/index/api/webrtc?app=live&stream=" + id + "&type=play";
+            flvUrl =  scheam + hostIp + "/ZLM/rtp/" + id + ".live.flv";
+            wsFlvUrl = wsSchema + hostIp + "/ZLM/rtp/" + id + ".live.flv";
         } else {
             // webrtc://172.24.39.10/live/40001
             webRtcUrl = "webrtc://" + hostIp + "/live/" + id;
         }
         returnMap.put("webRtcUrl", webRtcUrl);
+        returnMap.put("flvUrl", flvUrl);
+        returnMap.put("wsFlvUrl", wsFlvUrl);
     }
 
     public String sign(String transUrl, String cameraId) {

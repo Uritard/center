@@ -19,6 +19,7 @@ import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
+import com.yjh.platform.module.video.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -61,6 +63,8 @@ public class SysUserController {
     private Demo demo;
     @Autowired
     private SysKeyService sysKeyService;
+    @Resource
+    private CameraConService cameraConService;
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
 
     public SysUserController(SysUserService sysUserService) {
@@ -322,6 +326,7 @@ public class SysUserController {
         try {
             String userId = request.getHeader("userId");
             String token = request.getHeader("token");
+            cameraConService.handleEmergencyAccess(null, false, token, result);
             result.setData(this.sysUserService.userLogout(userId, token));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

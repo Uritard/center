@@ -20,6 +20,14 @@ public class WarnSubService {
     public boolean select(Long userId, String type, String level, Long warnId, String defectModel) {
         if (StringUtils.isEmpty(defectModel)) {
             //机器人告警
+            WarnSub warnSub = warnSubDao.selectByUserId(userId);
+            if (Objects.nonNull(warnSub) && StringUtils.isNotBlank(warnSub.getSubWarnType())) {
+                List<String> subWarnTypeList = Arrays.asList(warnSub.getSubWarnType().split(","));
+               if (SubWarnTypeEnum.DEVICE.getTypeCode().equals(type) && subWarnTypeList.contains(type) && StringUtils.isNotBlank(warnSub.getSubWarnLevel())) {
+                    List<String> subWarnLevelList = Arrays.asList(warnSub.getSubWarnLevel().split(","));
+                    return subWarnLevelList.contains(level);
+               }
+            }
             return false;
         }
         String alarmLevelString = "";

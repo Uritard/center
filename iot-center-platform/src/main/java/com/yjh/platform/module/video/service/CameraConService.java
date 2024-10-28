@@ -2171,6 +2171,27 @@ public class CameraConService {
         return iServerConfigService.getServerConfig().getData();
     }
 
+    public void handleEmergencyAccess(List<Long> cameraIdList, boolean flag, String token, com.yjh.platform.common.result.Result result) {
+        if (flag){
+            this.emergencyAccess(cameraIdList, token);
+        } else {
+            String res = this.isInEmergencyAccess(token,null);
+            if (cameraIdList == null){
+                cameraIdList = this.getEmergencyAccessCameraList().stream()
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList());
+            }
+            if ("0".equals(res) && cameraIdList != null) {
+                cameraIdList.forEach(cameraId -> {
+                    this.delCameraEmergencyAccess(null, cameraId);
+                });
+            } else if ("1".equals(res)){
+                result.setCode(209,"");
+            }
+            redisTemplate.delete(CameraConService.emergencyAccessKey);
+        }
+    }
+
     /*
     * 视频紧急调阅
     * 1.将次相机的状态 置为紧急调阅模式
