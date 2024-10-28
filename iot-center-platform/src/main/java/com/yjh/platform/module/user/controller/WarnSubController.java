@@ -64,7 +64,7 @@ public class WarnSubController {
                          @RequestParam(value = "type", required = true) String type,
                          @RequestParam(value = "warnId", required = true) Long warnId,
                          @RequestParam(value = "level", required = true) String level,
-                         @RequestParam(value = "defectModel", required = true) String defectModel) {
+                         @RequestParam(value = "defectModel", required = false) String defectModel) {
         Result result = new Result();
         try {
             result.setData(warnSubService.select(userId,type,level,warnId, defectModel));

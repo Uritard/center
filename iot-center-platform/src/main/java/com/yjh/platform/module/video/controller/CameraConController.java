@@ -768,24 +768,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             String token = request.getHeader("token");
-            if (flag){
-                cameraConService.emergencyAccess(cameraIdList,token);
-            } else {
-                String res = cameraConService.isInEmergencyAccess(token,null);
-                if (cameraIdList == null){
-                    cameraIdList = cameraConService.getEmergencyAccessCameraList().stream()
-                            .map(Long::valueOf)
-                            .collect(Collectors.toList());
-                }
-                if ("0".equals(res) && cameraIdList != null) {
-                    cameraIdList.forEach(cameraId -> {
-                        cameraConService.delCameraEmergencyAccess(null, cameraId);
-                    });
-                } else if ("1".equals(res)){
-                    result.setCode(209,"");
-                }
-                redisTemplate.delete(CameraConService.emergencyAccessKey);
-            }
+            cameraConService.handleEmergencyAccess(cameraIdList, flag, token, result);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
             log.error("获取国标服务的配置失败",e);
