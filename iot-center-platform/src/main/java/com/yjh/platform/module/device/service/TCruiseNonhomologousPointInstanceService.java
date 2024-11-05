@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.service;
 
 import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
@@ -12,6 +13,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.NonhomologousWarnEnum;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,35 +151,36 @@ public class TCruiseNonhomologousPointInstanceService {
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
         Map<String, Map<String,Object>> warnDetail = new HashMap<>();
         for(Map<String,Object> m : warnDetailInfo){
-            m.put("cruiseTime", DateTimeUtil.getDateTimeString((Date) m.get("cruiseTime")));
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(
                 UPatrolTaskService.PATROL_TASK_PREFIX + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
                 m.putAll(redisInfoMap);
             }
-            String resultNum = m.get("resultNum").toString();
+            m.put("cruiseTime", !CommonUtils.isEmptyOrNullstr(redisInfoMap.get("cruiseTime")) ? redisInfoMap.get("cruiseTime") : MapUtils.getString(m, "cruiseTime"));
+            String resultNum = !CommonUtils.isEmptyOrNullstr(redisInfoMap.get("resultNum")) ? redisInfoMap.get("resultNum") :  MapUtils.getString(m, "resultNum");
             if (resultNum.contains(",")){
                 resultNum = resultNum.split(",")[0];
                 m.put("resultNum",resultNum);
             }
+            String deviceMeteName = !CommonUtils.isEmptyOrNullstr(redisInfoMap.get("deviceMeteName")) ? redisInfoMap.get("deviceMeteName") :  MapUtils.getString(m, "deviceMeteName");
             if (tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName") != null) {
                 String oneCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("oneCruiseDeviceName").toString();
                 String oneDeviceName = oneCruiseDeviceName.substring(oneCruiseDeviceName.indexOf("-") + 1);
-                if (oneDeviceName.equals(m.get("device_mete_name").toString())) {
+                if (oneDeviceName.equals(deviceMeteName)) {
                     warnDetail.put("oneDeviceName", m);
                 }
             }
             if (tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName") != null) {
                 String twoCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("twoCruiseDeviceName").toString();
                 String twoDeviceName = twoCruiseDeviceName.substring(twoCruiseDeviceName.indexOf("-") + 1);
-                if (twoDeviceName.equals(m.get("device_mete_name").toString())) {
+                if (twoDeviceName.equals(deviceMeteName)) {
                     warnDetail.put("twoDeviceName", m);
                 }
             }
             if (tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName") != null) {
                 String threeCruiseDeviceName = tCruiseNonhomologousWarnInfo.get("threeCruiseDeviceName").toString();
                 String threeDeviceName = threeCruiseDeviceName.substring(threeCruiseDeviceName.indexOf("-") + 1);
-                if (threeDeviceName.equals(m.get("device_mete_name").toString())) {
+                if (threeDeviceName.equals(deviceMeteName)) {
                     warnDetail.put("threeDeviceName", m);
                 }
             }

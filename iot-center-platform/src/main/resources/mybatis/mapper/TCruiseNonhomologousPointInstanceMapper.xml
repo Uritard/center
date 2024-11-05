@@ -290,7 +290,7 @@
         b.device_id,
         b.device_name,
         b.device_mete_id,
-        b.device_mete_name,
+        b.device_mete_name as deviceMeteName,
         b.result_num as resultNum,
         b.modify_num,
         b.picpath,
