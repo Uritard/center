@@ -898,7 +898,7 @@ public class CameraConService {
             PresetEntity.builder().presetId(String.valueOf(cameraConInfo.getPresetNum())).deviceId(cameraConInfo.getDeviceChannel())
                 .channelId(cameraConInfo.getCameraChannelId()).presetCmd(presetCmd).build();
         Result result = ptzService.presetCommand(presetEntity);
-        log.info("调用预置位结果：{}", result);
+        log.info("调用预置位结果：{}, presetId: {}, cameraId: {}", result, presetId, cameraId);
         boolean ret = result.getCode() == 200;
         if (ret && presetCmd.equals(PresetCmd.PRESET_DELETE)) {
             String capturePresetPath = getPresetBasePath();

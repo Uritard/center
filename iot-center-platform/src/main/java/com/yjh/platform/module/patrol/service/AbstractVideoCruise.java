@@ -123,6 +123,7 @@ public abstract class AbstractVideoCruise {
                     //1.转到预置位
                     // 移动相机
                     moveWait(presetId, NumberUtils.toLong(cameraId));
+                    String parentPath = DateTimeUtil.format2(new Date()) + "/" + taskId;
 
                     HashMap<String, Object> captureMap = new HashMap<>();
                     captureMap.put("presetId", presetId);
@@ -131,7 +132,7 @@ public abstract class AbstractVideoCruise {
                     if (isThreePhase){
                         //三相电测点 存储20次拍照结果
                         for (int i = 0; i < 20; i++) {
-                            Map<String, String> tempResult = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
+                            Map<String, String> tempResult = capture(parentPath, NumberUtils.toLong(cameraId), instanceName);
                             captureList.add(tempResult);
                             //失败即终止
                             if (tempResult == null || StringUtils.isEmpty(tempResult.get("absPath"))) {
@@ -143,7 +144,7 @@ public abstract class AbstractVideoCruise {
                         }
                     } else {
                         //2.抓图
-                        re = capture(taskId, NumberUtils.toLong(cameraId), instanceName);
+                        re = capture(parentPath, NumberUtils.toLong(cameraId), instanceName);
                     }
                 } catch (Exception e) {
                     log.error("抓图失败，重试一次", e);

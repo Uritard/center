@@ -1072,8 +1072,7 @@ public class IntelAnalysisService {
     private String createAnalyseImage(String imageUrl, String objectId, String type) {
         int max=9999,min=1;
         int ran = (int) (Math.random()*(max-min)+min);
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-        String filePathTem = formatter.format(new Date())+ ran;
+        String filePathTem = DateTimeUtil.formatFilename(new Date())+ ran;
 
         String analyseImageUrl = String.format("/data/sb_output/%s_%s.jpg", objectId, filePathTem);
         String localPath = String.format("/home/yjh_iot_center/iot-picture/resultImg/%s_%s.jpg", objectId, filePathTem);
@@ -1380,17 +1379,18 @@ public class IntelAnalysisService {
         }
         try {
             String targetPath;
+            String timePath = "/" + DateTimeUtil.format2(new Date()) + "/";
             if (Objects.isNull(type) || Objects.equals("tx_pb",type)){
                 // 判别
-                targetPath = SysParamConfig.getSysContent("judgeResultImg") + "/" + sourcePath;
+                targetPath = SysParamConfig.getSysContent("judgeResultImg") + timePath + sourcePath;
             }else {
                 List<String> analyseType = analyseDataOperateDao.selectAlgorithmType();
                 if (analyseType.contains(type)){
                     // 表计识别(设备状态识别)
-                    targetPath = SysParamConfig.getSysContent("meterResultImg") + "/" +sourcePath;
+                    targetPath = SysParamConfig.getSysContent("meterResultImg") + timePath +sourcePath;
                 }else {
                     // 缺陷
-                    targetPath = SysParamConfig.getSysContent("defectResultImg") + "/" +sourcePath;
+                    targetPath = SysParamConfig.getSysContent("defectResultImg") + timePath +sourcePath;
                 }
             }
             ftpsService.downloadAnalysisFile(sourcePath, targetPath);

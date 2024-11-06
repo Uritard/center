@@ -37,7 +37,6 @@ public class TDeviceMaintenanceService{
     @Autowired
     private TDeviceMaintenanceDao tDeviceMaintenanceDao;
     private Logger log = LoggerFactory.getLogger(TDeviceMaintenanceService.class);
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -116,6 +115,8 @@ public class TDeviceMaintenanceService{
             }
             if (StringUtils.isNotEmpty(deviceListString)) {
                 createMap(enable, deviceListString, robot, tDeviceMaintenance);
+            } else {
+                log.warn("机器人没有上报当前节点数据，robot: {}, deviceLevel: {}", robot, deviceLevel);
             }
         });
         //下级节点(所选设备点所对应的下级节点)
@@ -157,6 +158,8 @@ public class TDeviceMaintenanceService{
             }
             if (StringUtils.isNotEmpty(deviceListString)) {
                 createMap(enable, deviceListString, edge, tDeviceMaintenance);
+            } else {
+                log.warn("下级节点没有上报当前节点数据，edge: {}, deviceLevel: {}", edge, deviceLevel);
             }
         });
     }

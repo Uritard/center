@@ -2292,7 +2292,7 @@ public class UPatrolTaskService {
             }
         });
 
-        if (Constant.logUpLv2()) {
+        if (Constant.logUpLv3()) {
             log.info("task [{}] ready, skipPointList: {}, cruiseGroupMap: {}", taskId, skipPointList.size(), cruiseGroupMap);
         }
         ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
@@ -2466,7 +2466,7 @@ public class UPatrolTaskService {
             log.error("执行完成点位重复：【{}】", JSON.toJSONString(inter));
         }
         // 已经执行的点位，正常点位数 + 异常点位数 - 重复点位数
-        long alredyDone = normalCounts + abnormalCounts - inter.size();
+        long alredyDone = normalCounts + abnormalCounts;
         if (allCounts != 0 && alredyDone >= allCounts && !ended) {
             //如果是操作任务  返回
             UPatrolTask task = selectByPrimaryId(taskId);
@@ -2705,7 +2705,7 @@ public class UPatrolTaskService {
             uPatrolResult.setWeather(stationWeather);
 
             uPatrolResultDao.update(uPatrolResult);
-            log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
+            log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended: {}", taskId, uPatrolDataResultList.size(), ended);
 
             // 如果 ended=true,表示巡视结果已经入库过一次，不再重复入库，但需要修改
             if (CollectionUtils.isNotEmpty(uPatrolDataResultList)) {
