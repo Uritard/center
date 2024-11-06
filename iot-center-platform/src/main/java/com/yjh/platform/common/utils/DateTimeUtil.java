@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils;
 
+import cn.hutool.core.date.format.FastDateFormat;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -27,6 +28,7 @@ public class DateTimeUtil {
     private static Logger logger = LoggerFactory.getLogger(DateTimeUtil.class);
 
     private static final String MONTHFORMATTPLCABLE = "yyyy-MM";
+    public static final FastDateFormat MONTHFORMATTPLCABLE_FORMAT = FastDateFormat.getInstance(MONTHFORMATTPLCABLE);
     private static final String MONTHFORMATTPL = "yyyyMM";
     private static final String DATEFORMATTPL = "yyyy-MM-dd";
     private static final String DATETIMEFORMATTPL = "yyyy-MM-dd HH:mm:ss";
@@ -38,6 +40,7 @@ public class DateTimeUtil {
     private static final String TIMEFORMAT = "yyyy/MM/dd";
     private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
     private static final String DATEOFFORMAT = "yyyyMMdd_HHmmss";
+    private static final String DATEFORMATFILE = "yyyyMMddHHmmssSSS";
 
 
     private static ResourceBundle resource = null;
@@ -52,7 +55,7 @@ public class DateTimeUtil {
      */
     public static String getDateByLong(Long source) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEMSFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(DATETIMEMSFORMATTPL);
         return sdf.format(source);
     }
 
@@ -143,7 +146,7 @@ public class DateTimeUtil {
      * @return
      */
     public static String getDateString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATEFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(DATEFORMATTPL);
         return sdf.format(date);
     }
 
@@ -163,7 +166,7 @@ public class DateTimeUtil {
      * @return
      */
     public static String getTimeString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMEFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(TIMEFORMATTPL);
         return sdf.format(date);
     }
 
@@ -192,7 +195,7 @@ public class DateTimeUtil {
      * @return
      */
     public static String getSimpleTimeString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(TIMESIMPLEFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(TIMESIMPLEFORMATTPL);
         return sdf.format(date);
     }
 
@@ -224,11 +227,11 @@ public class DateTimeUtil {
      * @return
      */
     public static String getDateTimeString(Date date, boolean withMillisecond) {
-        SimpleDateFormat sdf = null;
+        FastDateFormat sdf = null;
         if (withMillisecond) {
-            sdf = new SimpleDateFormat(DATETIMEMSFORMATTPL);
+            sdf = FastDateFormat.getInstance(DATETIMEMSFORMATTPL);
         } else {
-            sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
+            sdf = FastDateFormat.getInstance(DATETIMEFORMATTPL);
         }
         return sdf.format(date);
     }
@@ -243,7 +246,7 @@ public class DateTimeUtil {
         if (date == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+        FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern());
         return sdf.format(date);
     }
 
@@ -257,7 +260,7 @@ public class DateTimeUtil {
         if (date == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern2());
+        FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern2());
         return sdf.format(date);
     }
 
@@ -271,7 +274,7 @@ public class DateTimeUtil {
         if (date == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(getDatePattern());
+        FastDateFormat sdf = FastDateFormat.getInstance(getDatePattern());
         return sdf.format(date);
     }
 
@@ -285,7 +288,15 @@ public class DateTimeUtil {
         if (date == null) {
             return "";
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern3());
+        FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern3());
+        return sdf.format(date);
+    }
+
+    public static String formatFilename(Date date) {
+        if (date == null) {
+            return "";
+        }
+        FastDateFormat sdf = FastDateFormat.getInstance(DATEFORMATFILE);
         return sdf.format(date);
     }
 
@@ -306,7 +317,7 @@ public class DateTimeUtil {
                 source = defaultDateStr;
             }
             if(StringUtils.isNotEmpty(source)){
-                SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+                FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern());
                 rtn = sdf.parse(source);
             }
         } catch (Exception e) {
@@ -324,7 +335,7 @@ public class DateTimeUtil {
             if(StringUtils.isEmpty(source)){
                 return defaultDate;
             }
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+            FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern());
             rtn = sdf.parse(source);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -336,7 +347,7 @@ public class DateTimeUtil {
     public static Date parseFormat(String source, String format) {
         Date rtn = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            FastDateFormat sdf = FastDateFormat.getInstance(format);
             rtn = sdf.parse(source);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -436,11 +447,11 @@ public class DateTimeUtil {
      */
     public static Date getDate(String source, boolean withMillisecond) {
         try {
-            SimpleDateFormat sdf = null;
+            FastDateFormat sdf = null;
             if (withMillisecond) {
-                sdf = new SimpleDateFormat(DATETIMEMSFORMATTPL);
+                sdf = FastDateFormat.getInstance(DATETIMEMSFORMATTPL);
             } else {
-                sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
+                sdf = FastDateFormat.getInstance(DATETIMEFORMATTPL);
             }
             return sdf.parse(source);
         } catch (ParseException e) {
@@ -457,7 +468,7 @@ public class DateTimeUtil {
      */
     public static Date getDate(String source, String pattern) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+            FastDateFormat sdf = FastDateFormat.getInstance(pattern);
             return sdf.parse(source);
         } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -471,10 +482,10 @@ public class DateTimeUtil {
      * @throws ParseException
      */
     public static String convertDateFormat(String date) throws ParseException {
-        SimpleDateFormat allformat = new SimpleDateFormat(DATETIMEFORMATTPL);
-        SimpleDateFormat dateformat = new SimpleDateFormat(DATEFORMATTPL);
-        SimpleDateFormat timeformat = new SimpleDateFormat(TIMEFORMATTPL);
-        SimpleDateFormat datetimeformat = new SimpleDateFormat("MM-dd HH:mm:ss");
+        FastDateFormat allformat = FastDateFormat.getInstance(DATETIMEFORMATTPL);
+        FastDateFormat dateformat = FastDateFormat.getInstance(DATEFORMATTPL);
+        FastDateFormat timeformat = FastDateFormat.getInstance(TIMEFORMATTPL);
+        FastDateFormat datetimeformat = FastDateFormat.getInstance("MM-dd HH:mm:ss");
 
         Date myDate = allformat.parse(date);
         Calendar cal = Calendar.getInstance();
@@ -604,7 +615,7 @@ public class DateTimeUtil {
             return date;
         }
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+            FastDateFormat sdf = FastDateFormat.getInstance(getDateTimePattern());
             date = sdf.parse(sdf.format(time));
         } catch (ParseException e) {
             logger.error(e.getMessage());
@@ -675,7 +686,7 @@ public class DateTimeUtil {
      * @return
      */
     public static String getMonthDateString() {
-        SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(MONTHFORMATTPL);
         return sdf.format(new Date());
     }
 
@@ -685,12 +696,12 @@ public class DateTimeUtil {
      * @return
      */
     public static String getMonthDateStringCable() {
-        SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPLCABLE);
+        FastDateFormat sdf = FastDateFormat.getInstance(MONTHFORMATTPLCABLE);
         return sdf.format(new Date());
     }
 
     public static String getDateofFormatString() {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATEOFFORMAT);
+        FastDateFormat sdf = FastDateFormat.getInstance(DATEOFFORMAT);
         return sdf.format(new Date());
     }
 
@@ -703,7 +714,7 @@ public class DateTimeUtil {
     public static Date getCurMonthDate() {
         Date rtn = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPL);
+            FastDateFormat sdf = FastDateFormat.getInstance(MONTHFORMATTPL);
             String curDate = getMonthDateString();
             rtn = sdf.parse(curDate);
         } catch (Exception e) {
@@ -723,7 +734,7 @@ public class DateTimeUtil {
     }
 
     public static String getBeforeMonth() {
-        SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(MONTHFORMATTPL);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, -1);
         Date beforMonthDate = calendar.getTime();
@@ -742,7 +753,7 @@ public class DateTimeUtil {
         Calendar dd = Calendar.getInstance();
         // 设置日期起始时间
         dd.setTime(startDate);
-        SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(MONTHFORMATTPL);
         for (int i = 0; i < 12; i++) {
             String str = sdf.format(dd.getTime());
             yearDates.add(str);
@@ -764,7 +775,7 @@ public class DateTimeUtil {
         calendar.set(Calendar.SECOND, 0);
         calendar.add(calendar.MONTH,1);
         Date zero = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        FastDateFormat sdf = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
         // 定义日期实例
         GregorianCalendar gc =new GregorianCalendar();
         // 设置日期起始时间
@@ -787,7 +798,7 @@ public class DateTimeUtil {
         calendar.set(Calendar.SECOND, 0);
 //        calendar.add(calendar.DATE,1);
         Date zero = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        FastDateFormat sdf = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
 
         // 定义日期实例
         GregorianCalendar gc =new GregorianCalendar();
@@ -818,7 +829,7 @@ public class DateTimeUtil {
         // 指定时间格式由外部传入
         SimpleDateFormat format = new SimpleDateFormat(pattern);
         try {
-            // 设置lenient为false. 否则SimpleDateFormat会比较宽松地验证时间，
+            // 设置lenient为false. 否则 SimpleDateFormat 会比较宽松地验证时间，
             // 比如   1）2017/02/29会被接受，并转换成2017/03/01
             //     2）2017-07-01 66:66:66会被接受，并转换成2017-07-03 19:07:06
             format.setLenient(false);
@@ -878,7 +889,7 @@ public class DateTimeUtil {
             format = getDateTimePattern();
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        FastDateFormat sdf = FastDateFormat.getInstance(format);
         return sdf.format(date);
     }
 
@@ -923,7 +934,7 @@ public class DateTimeUtil {
      */
     public static String stampToDate(long s) {
         Date date = new Date(s);
-        SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEFORMATTPL);
+        FastDateFormat sdf = FastDateFormat.getInstance(DATETIMEFORMATTPL);
         return sdf.format(date);
     }
 
@@ -1013,7 +1024,7 @@ public class DateTimeUtil {
      */
     public static String getLastDayOfMonth(Date date) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(DATEFORMATTPL);
+            FastDateFormat sdf = FastDateFormat.getInstance(DATEFORMATTPL);
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             c.set(Calendar.DATE, c.getActualMaximum(Calendar.DATE));
@@ -1118,7 +1129,7 @@ public class DateTimeUtil {
             }
         }
 /*
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        FastDateFormat sdf = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
         List<String> validTimeList2 = new ArrayList<>();
         for (Date aValidTimeList:validTimeList) {
             validTimeList2.add(sdf.format(aValidTimeList));
@@ -1378,15 +1389,15 @@ public class DateTimeUtil {
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         Date time = cal.getTime();
-        return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
+        return FastDateFormat.getInstance("yyyy-MM-dd 00:00:00").format(time);
     }
     // 获得本周日24点时间
     public static String getWeekEnd() throws Exception{
         Calendar cal=Calendar.getInstance();
-        cal.setTime(new SimpleDateFormat("yyyy-MM-dd 00:00:00").parse(getWeekStart()));
+        cal.setTime(FastDateFormat.getInstance("yyyy-MM-dd 00:00:00").parse(getWeekStart()));
         cal.add(Calendar.DAY_OF_WEEK, 7);
         Date time=cal.getTime();
-        return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
+        return FastDateFormat.getInstance("yyyy-MM-dd 23:59:59").format(time);
     }
     //获得上周一0点时间
     public static String getLastWeekStart() {
@@ -1394,7 +1405,7 @@ public class DateTimeUtil {
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.add(Calendar.DAY_OF_WEEK, -13);
         Date time=cal.getTime();
-        return new SimpleDateFormat("yyyy-MM-dd 00:00:00").format(time);
+        return FastDateFormat.getInstance("yyyy-MM-dd 00:00:00").format(time);
     }
     //获得上周日24点时间
     public static String getLastWeekend() {
@@ -1402,15 +1413,15 @@ public class DateTimeUtil {
         cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONDAY), cal.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         cal.add(Calendar.DAY_OF_WEEK, -7);
         Date time=cal.getTime();
-        return new SimpleDateFormat("yyyy-MM-dd 23:59:59").format(time);
+        return FastDateFormat.getInstance("yyyy-MM-dd 23:59:59").format(time);
     }
     //将yyyyMMddHHmmss格式时间的字符串转为yyyy-MM-dd HH:mm:ss格式时间的字符串
     public static String changeTime1(String cTime){
         if (cTime == null || cTime == ""){
             return "";
         }else {
-            SimpleDateFormat sf1 = new SimpleDateFormat("yyyyMMddHHmmss");
-            SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            FastDateFormat sf1 = FastDateFormat.getInstance("yyyyMMddHHmmss");
+            FastDateFormat sf2 = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
             String changedTime = null;
             try {
                 Date date = sf1.parse(cTime);
@@ -1426,8 +1437,8 @@ public class DateTimeUtil {
         if (cTime == null || cTime == ""){
             return "";
         }else {
-            SimpleDateFormat sf1 = new SimpleDateFormat("yyyyMMddHHmmss");
-            SimpleDateFormat sf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            FastDateFormat sf1 = FastDateFormat.getInstance("yyyyMMddHHmmss");
+            FastDateFormat sf2 = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
             String changedTime = null;
             try {
                 Date date = sf2.parse(cTime);

@@ -18,6 +18,7 @@ import com.yjh.platform.module.video.entity.CameraConInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.dom4j.Document;
@@ -230,16 +231,12 @@ public class SilentAlarmThread implements Runnable {
 
                 int max = 9999, min = 1;
                 int ran = (int) (Math.random() * (max - min) + min);
-                SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
-                String filePathTem = "/" + formatter.format(new Date()) + ran + ".jpg";
-                String filePath = "/home/yjh_iot_center/iot-picture/resultImg" + filePathTem;
+                Date now = new Date();
+                String filePathTem = "resultImg/silentTask/" + DateTimeUtil.format2(now) + "/" + cameraConInfo.getCameraId() + "_" + DateTimeUtil.formatFilename(now) + ran + ".jpg";
+                String filePath = FilenameUtils.concat(SysParamConfig.getSysContent("prefixAbsolutePath"), filePathTem);
                 log.info("filePath:{}", filePath);
                 File file = new File(filePath);
                 FileUtils.writeByteArrayToFile(file, image);
-
-//                String url = "chmod 777 " + filePath;
-//                Runtime.getRuntime().exec(url);
-//                copyFile(filePathTem, filePath);
 
                 log.info("filePathTem:{}", filePathTem);
                 silentHandler(filePath, eventType);
