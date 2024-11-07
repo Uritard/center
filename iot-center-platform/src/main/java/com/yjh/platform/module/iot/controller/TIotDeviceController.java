@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DictConvertUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.iot.entity.LinkageConfig;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.yjh.platform.module.iot.entity.TIotDeviceExtend;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
@@ -167,6 +168,28 @@ public class TIotDeviceController {
                 result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
                 return result;
             }
+        } catch (BusinessException b) {
+            result.setCode(b.getCode(), b.getMessage());
+        } catch (Exception e) {
+            log.info("智能环境设备控制异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询其他设备的联动规则")
+    @PostMapping(value = "/linkageConfigQuery")
+    @Logs(title = "查询其他设备的联动规则",content = "根据用户传递的参数查询其他设备的联动规则",logType = 1)
+    public Result linkageConfigQuery(@RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+        Result result = new Result();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<LinkageConfig> list = tIotDeviceService.selectLinkageConfig();
+            Map<String, Object> resultMap = new HashMap<>(2);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
         } catch (BusinessException b) {
             result.setCode(b.getCode(), b.getMessage());
         } catch (Exception e) {

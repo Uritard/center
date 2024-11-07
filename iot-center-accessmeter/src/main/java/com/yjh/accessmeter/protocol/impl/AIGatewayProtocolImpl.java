@@ -11,6 +11,7 @@ import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.ProtocolListener;
 import com.yjh.accessmeter.protocol.ProtocolType;
+import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
 import com.yjh.accessmeter.protocol.aigateway.info.ControlReq;
 import com.yjh.accessmeter.protocol.aigateway.info.Data;
 import com.yjh.accessmeter.protocol.aigateway.info.LoginReqMsg;
@@ -44,20 +45,21 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
         for (IotDevice device : devices) {
             if (!mqttClientMap.containsKey(device.getIp())) {
                 try {
+                    log.info("{}开始注册mqtt",device.getDeviceName());
                     //注册
                     String url = "tcp://" + device.getIp() + ":" + device.getPort();
                     MqttClient client = new MqttClient(url, Topic.serverClientId, new MemoryPersistence());
                     MqttConnectOptions options = new MqttConnectOptions();
                     options.setCleanSession(true);
-                    client.connect();
                     client.setCallback(new MqttCallback() {
                         @Override
                         public void connectionLost(Throwable throwable) {
                             log.info("Connection lost: " + throwable.getMessage());
+                            throwable.printStackTrace();
                         }
 
                         @Override
-                        public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                        public void messageArrived(String topic, MqttMessage mqttMessage) {
                             log.info("收到消息，topic：{}，msg:{}", topic, mqttMessage);
                             msgHandler(device.getIp(), client, topic, mqttMessage);
                         }
@@ -67,6 +69,8 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
                             log.info("Delivery complete");
                         }
                     });
+                    client.connect(options);
+
                     client.subscribe(Topic.GATEWAY_ATTACH);
                     mqttClientMap.put(device.getIp(), client);
                 } catch (Exception e) {
@@ -78,31 +82,40 @@ public class AIGatewayProtocolImpl implements ISensorProtocol {
         return this;
     }
 
-    private void msgHandler(String ip, MqttClient client, String topic, MqttMessage message) throws Exception {
-        if (topic.equals(Topic.GATEWAY_ATTACH)) {
-            //注册消息
-            LoginReqMsg loginReqMsg = JSONObject.parseObject(String.valueOf(message), LoginReqMsg.class);
-            String gatewayId = loginReqMsg.getGatewayId();
-            gatewayIdMap.put(ip, gatewayId);
-            client.subscribe(String.format(Topic.DATA, gatewayId));
-        } else {
-            String gatewayId = gatewayIdMap.get(ip);
-            if (topic.equals(String.format(Topic.DATA, gatewayId))) {
-                //实时数据
-                Data data = JSONObject.parseObject(String.valueOf(message), Data.class);
-                log.info("实时数据：{}", data);
-                //结果数据处理
-                List<Data.DataInfo> list = data.getDataList().getSignal().getData();
-                list.addAll(data.getDataList().getPulse().getData());
-                list.addAll(data.getDataList().getPulse().getData());
-                Map<String, Object> re = new HashMap<>();
-                list.forEach(dataInfo -> {
-                    re.put(dataInfo.getNodeId(), dataInfo.getValue());
-                });
-                re.put("type", ProtocolEnum.AI_GATEWAY.getCode());
-                re.put("ip", ip);
-                SpringBeanUtils.getBean(SensorCollectService.class).asyncResultHandler(re);
+    private void msgHandler(String ip, MqttClient client, String topic, MqttMessage message) {
+        try {
+            if (topic.equals(Topic.GATEWAY_ATTACH)) {
+                //注册消息
+                LoginReqMsg loginReqMsg = JSONObject.parseObject(String.valueOf(message), LoginReqMsg.class);
+                String gatewayId = loginReqMsg.getGatewayId();
+                gatewayIdMap.put(ip, gatewayId);
+                client.subscribe(String.format(Topic.DATA, gatewayId));
+                client.subscribe(String.format(Topic.CONFIG_ACK, gatewayId));
+            } else {
+                String gatewayId = gatewayIdMap.get(ip);
+                if (topic.equals(String.format(Topic.DATA, gatewayId))) {
+                    //实时数据
+                    Data data = JSONObject.parseObject(String.valueOf(message), Data.class);
+                    log.info("实时数据：{}", data);
+                    //结果数据处理
+                    List<Data.DataInfo> list = data.getDataList().getSignal().getData();
+                    list.addAll(data.getDataList().getPulse().getData());
+                    list.addAll(data.getDataList().getPulse().getData());
+                    Map<String, Object> re = new HashMap<>();
+                    list.forEach(dataInfo -> {
+                        re.put(dataInfo.getNodeId(), dataInfo.getValue());
+                    });
+                    re.put("type", ProtocolEnum.AI_GATEWAY.getCode());
+                    re.put("ip", ip);
+                    SpringBeanUtils.getBean(SensorCollectService.class).asyncResultHandler(re);
+                } else if (topic.equals(String.format(Topic.CONFIG_ACK, gatewayId))) {
+                    //联动配置列表请求
+                    ConfigResp configResp = JSONObject.parseObject(String.valueOf(message), ConfigResp.class);
+                    SpringBeanUtils.getBean(SensorCollectService.class).linkageConfigSync(configResp, ip);
+                }
             }
+        }catch (Exception e){
+            log.error("处理消息出错：topic = {}，message{}",topic,message,e);
         }
     }
 

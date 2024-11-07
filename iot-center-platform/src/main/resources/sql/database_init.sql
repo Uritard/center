@@ -2931,3 +2931,14 @@ CREATE TABLE `sip_b_dict_area` (
  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SIP-B和国标编码字典表';
 
+DROP TABLE IF EXISTS `linkage_config`;
+CREATE TABLE `linkage_config` (
+ `id` int NOT NULL  AUTO_INCREMENT,
+ `type` int(6) DEFAULT '0' COMMENT '设备类型 0-智能网关',
+ `ip` varchar(48) DEFAULT '' COMMENT '网关ip',
+ `remark` varchar(48) DEFAULT '' COMMENT '备注解释',
+ `edge_code` varchar(48) DEFAULT '' COMMENT '区域编码',
+ `data` text COMMENT '内容',
+ PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='存储其他设备的联动规则';
+

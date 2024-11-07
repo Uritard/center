@@ -37,4 +37,11 @@ public interface Topic {
     public final static String COMMAND = "/gateway/%s/command";
     public final static String COMMAND_ACk = "/gateway/${gatewayId}/commandAck";
 
+
+    /**
+     * 联动列表
+     */
+    public final static String CONFIG = "/gateway/%s/config";
+    public final static String CONFIG_ACK = "/gateway/%s/configAck";
+
 }

@@ -14,11 +14,13 @@ import com.yjh.accessmeter.common.utils.XmlUtil;
 import com.yjh.accessmeter.module.dao.TIotDeviceDao;
 import com.yjh.accessmeter.module.device.entity.IotDevice;
 import com.yjh.accessmeter.module.device.entity.IotDeviceDataEx;
+import com.yjh.accessmeter.module.device.entity.LinkageConfig;
 import com.yjh.accessmeter.module.feign.PlatformProxy;
 import com.yjh.accessmeter.netty.DLT645Message;
 import com.yjh.accessmeter.protocol.ISensorProtocol;
 import com.yjh.accessmeter.protocol.ProtocolEnum;
 import com.yjh.accessmeter.protocol.SensorProtocolFactory;
+import com.yjh.accessmeter.protocol.aigateway.info.ConfigResp;
 import com.yjh.accessmeter.protocol.aigateway.info.Data;
 import com.yjh.accessmeter.protocol.entity.EnvAction;
 import com.yjh.accessmeter.protocol.impl.EnvTerminalProtocolImpl;
@@ -292,6 +294,23 @@ public class SensorCollectService {
         if (ProtocolEnum.AI_GATEWAY.getCode().equals(re.get("type"))){
             //智能网关结果处理
             AIGatewayResultHandler(re);
+        }
+    }
+
+    public void linkageConfigSync(ConfigResp configResp,String ip){
+        List<ConfigResp.LinkageListData> list = configResp.getLinkageList();
+        List<LinkageConfig> linkageConfigList = new ArrayList<>();
+        list.forEach(linkageListData -> {
+            LinkageConfig config = new LinkageConfig();
+            config.setType(0);
+            config.setIp(ip);
+            config.setData(JSON.toJSONString(linkageListData));
+            linkageConfigList.add(config);
+        });
+        //先删除 再添加
+        iotDeviceDao.deleteLinkageConfigByIp(ip);
+        if (!linkageConfigList.isEmpty()){
+            iotDeviceDao.banchInsertLinkageConfig(linkageConfigList);
         }
     }
 
