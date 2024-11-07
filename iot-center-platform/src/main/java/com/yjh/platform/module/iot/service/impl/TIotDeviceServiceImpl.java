@@ -1,6 +1,7 @@
 package com.yjh.platform.module.iot.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yjh.platform.common.Constant;
@@ -14,10 +15,7 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.iot.dao.TIotDeviceMapper;
-import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
-import com.yjh.platform.module.iot.entity.TIotDevice;
-import com.yjh.platform.module.iot.entity.TIotDeviceExtend;
-import com.yjh.platform.module.iot.entity.TIotDevicePoint;
+import com.yjh.platform.module.iot.entity.*;
 import com.yjh.platform.module.iot.service.TIotDevicePointService;
 import com.yjh.platform.module.iot.service.TIotDeviceService;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
@@ -30,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -315,6 +312,15 @@ public class TIotDeviceServiceImpl extends ServiceImpl<TIotDeviceMapper, TIotDev
             throw new BusinessException("控制设备失败");
         }
 
+    }
+
+    @Override
+    public List<LinkageConfig> selectLinkageConfig() {
+        List<LinkageConfig> list = baseMapper.selectLinkageConfig();
+        list.forEach(linkageConfig -> {
+            linkageConfig.setLinkageListData(JSONObject.parseObject(linkageConfig.getData(), LinkageConfigResp.LinkageListData.class));
+        });
+        return list;
     }
 
 }

@@ -2,6 +2,7 @@ package com.yjh.platform.module.iot.dao;
 
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.iot.entity.IotDeviceDataEx;
+import com.yjh.platform.module.iot.entity.LinkageConfig;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -26,6 +27,7 @@ public interface TIotDeviceMapper extends BaseMapper<TIotDevice> {
                                              @Param(value = "regionList") List<Long> regionList);
 
     List<IotDeviceDataEx> selectIotDeviceInfo();
+    List<LinkageConfig> selectLinkageConfig();
 }
 
 

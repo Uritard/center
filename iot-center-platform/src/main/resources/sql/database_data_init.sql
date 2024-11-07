@@ -967,6 +967,7 @@ INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2022', 'api_type', '2022版本协议', 0, '协议版本', 1);
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('2024', 'api_type', '2024版本协议', 0, '协议版本', 1);
 INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('8', 'protocol_model', '巡视结果', '0', '设备连接协议', '8');
+INSERT INTO `t_dict_business` (`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('9', 'protocol_model', '智能网关', '0', '设备连接协议', '9');
 
 -- ----------------------------
 -- Records of t_period_model

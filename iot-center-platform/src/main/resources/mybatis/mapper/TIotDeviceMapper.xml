@@ -98,4 +98,11 @@
             t_iot_device device
         LEFT JOIN t_iot_device_point point ON device.id = point.iot_device_id
     </select>
+
+    <select id="selectLinkageConfig" resultType="com.yjh.platform.module.iot.entity.LinkageConfig">
+        SELECT
+            *
+        FROM
+            linkage_config device
+    </select>
 </mapper>

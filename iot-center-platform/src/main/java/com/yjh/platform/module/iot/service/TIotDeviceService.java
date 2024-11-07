@@ -2,6 +2,7 @@ package com.yjh.platform.module.iot.service;
 
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.iot.entity.LinkageConfig;
 import com.yjh.platform.module.iot.entity.TIotDevice;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,4 +21,6 @@ public interface TIotDeviceService extends IService<TIotDevice> {
     void deviceUpload();
 
     Result envDeviceControl(Map<String, Object> map);
+
+    List<LinkageConfig> selectLinkageConfig();
 }
