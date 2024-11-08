@@ -1263,7 +1263,7 @@
             a.device_id = b.device_id
         where 1 = 1
           and (a.warn_type != '507' or a.warn_type is null)
-          and a.alarm_source in (279,280,281,689)
+          and a.alarm_source in (279,280,281,689,998)
           and conf_mode = 276
         group by b.up_region_id
         UNION ALL
@@ -1275,7 +1275,7 @@
             left join t_std_device b on
             a.device_id = b.device_id
         where 1 = 1
-          and a.alarm_source in (279,280,281,689)
+          and a.alarm_source in (279,280,281,689,998)
           and conf_mode = 276
         group by b.up_region_id
         UNION ALL

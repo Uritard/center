@@ -783,6 +783,14 @@
         UNION ALL
         SELECT
             count(*) AS count,
+		    '声纹' AS alarmSource
+        FROM
+            t_warn_info
+        WHERE
+            alarm_source = 998 AND conf_mode = 276
+        UNION ALL
+        SELECT
+            count(*) AS count,
 		    '物联设备' AS alarmSource
         FROM
             t_iot_device_warn
