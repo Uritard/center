@@ -231,6 +231,19 @@ public class Constant {
 
     private static String ftpsFilePath;
 
+    private static String ffmpegCmd;
+
+    public static String ffmpegCmd() {
+        if (StringUtils.isEmpty(ffmpegCmd)) {
+            try {
+                ffmpegCmd = (String) redisTemplate.opsForHash().get("systemConfigKey:videoServerConfig", "ffmpegCmd");
+            } catch (Exception e) {
+                ffmpegCmd = "ffmpeg.cmd";
+            }
+        }
+        return ffmpegCmd;
+    }
+
 
     public static String websocketSendMsg(String url, Map<String, String> map) {
         String result = null;
