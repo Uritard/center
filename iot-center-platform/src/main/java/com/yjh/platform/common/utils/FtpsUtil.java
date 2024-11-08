@@ -239,12 +239,11 @@ public class FtpsUtil {
     }
 
 
-    public static void downloadFile(String filepath,
-                                    String remoteFilename,String host,int port,String username,String password) throws NoSuchAlgorithmException {
+    public static void downloadFile(String filepath, String remoteFilename, String host, int port, String username, String password) {
         try {
             log.info("-------------------------------文件下载开始");
-            log.info("filepath：{}，remoteFilename：{}，host：{}，port:{},key_pw:{},username：{}，password：{}",
-                    filepath,remoteFilename,host,port,key_pw,username,password);
+            log.info("filepath：{}，remoteFilename：{}，host：{}，port:{},key_pw:{},username：{}，password：{}", filepath, remoteFilename, host,
+                port, key_pw, username, password);
             File file = new File(filepath);
             try {
                 FTPSClient ftpClient = new FTPSClient("TLS",true);

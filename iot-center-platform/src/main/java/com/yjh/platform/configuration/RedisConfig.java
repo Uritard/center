@@ -11,9 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -95,7 +93,17 @@ public class RedisConfig extends CachingConfigurerSupport {
             .usePooling()
             .poolConfig(redisConn.jedisPool())
             .build();
-        return new JedisConnectionFactory(standaloneConfig, clientConfiguration);
+
+        JedisConnectionFactory factory;
+
+        RedisClusterConfiguration clusterConfiguration = redisConn.getClusterConfiguration();
+        if (clusterConfiguration.getClusterNodes().isEmpty()) {
+            factory = new JedisConnectionFactory(standaloneConfig, clientConfiguration);
+        } else {
+            factory = new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
+        }
+
+        return factory;
     }
 
     /**

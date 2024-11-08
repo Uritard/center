@@ -622,11 +622,7 @@ public class RobotService {
             log.error("机器人或边点编码为空, Code：{}", nodeCode);
             throw new RuntimeException("机器人编码为空");
         }
-        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-        if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")){
-            filePathMap.put("content","C:\\robotData\\Model");
-        }
-        String filePathPrefix = filePathMap.get("content");
+        String filePathPrefix = (String)redisTemplate.opsForHash().get("t_sys_param:modelAbsolutePath", "content");
 
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(nodeCode, 1);
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
@@ -651,8 +647,9 @@ public class RobotService {
             log.info("map=={}", map);
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 String k = entry.getKey();
-                Object v = entry.getValue();
+                String v = (String)entry.getValue();
                 String filePath = filePathPrefix + File.separator + v;
+                downloadFile(filePath, v);
                 try {
                     //操作模型单独不解析,和巡检点位进行合并解析
                     if ("operation_device_file_path".equals(k)) {
@@ -2520,6 +2517,23 @@ public class RobotService {
         TaskExecutePool.getInstance().execute(runnable);
     }
 
+    public void downloadFile(String localPath, String remoteFilename) {
+        try {
+            if ("".equals(localPath)) {
+                return;
+            }
+            Map<String, String> upSystemFtps = redisTemplate.opsForHash().entries("systemConfigKey:managerSystem");
+            String managerSystemFtpsIp = upSystemFtps.get("managerSystemFtpsIp");
+            String managerSystemFtpsPort = upSystemFtps.get("managerSystemFtpsPort");
+            String managerSystemFtpsUsername = upSystemFtps.get("managerSystemFtpsUsername");
+            String managerSystemFtpsPassword = upSystemFtps.get("managerSystemFtpsPassword");
+            FtpsUtil.downloadFile(localPath, remoteFilename, managerSystemFtpsIp,
+                Integer.parseInt(managerSystemFtpsPort), managerSystemFtpsUsername, managerSystemFtpsPassword);
+        } catch (Exception e) {
+            log.error("下载ftp文件s错误 " + e);
+        }
+    }
+
     /**
      * 离线情况同步机器人模型信息-上传文件
      *
@@ -3069,7 +3083,6 @@ public class RobotService {
             //将文件复制到存放设备资源配置的地方
             String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
             String fileName = "source_file_model.cime";
-            File dir = new File(sourcePath);
 
             FileUtil.copyFileUsingStream(filePath,sourcePath+"/"+fileName);
         } catch (Exception e) {

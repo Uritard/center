@@ -86,9 +86,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                     taskId = taskCode;
                     log.info("taskId is empty, use taskCode as taskId");
                 }
-                log.info("taskCode==={},taskId===={}", taskCode, taskId);
-                String temporaryPath = filePathMap.get("content") + "/" + filePath;
-                log.info("temporaryPath是===" + temporaryPath);
+                log.info("taskCode==={},taskId===={}, filePath==={}", taskCode, taskId, filePath);
 
                 String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
                 // 开发环境图片相对路径文件目录
@@ -96,7 +94,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                 // 开发环境图片绝对路径文件目录
                 String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
                 // 将ftp服务器上的文件复制到开发环境
-                copyFileToDevelop(temporaryPath, developAbsoluteUrl);
+                robotService.downloadFile(developAbsoluteUrl, filePath);
 
                 robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
                 robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
@@ -188,23 +186,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                     upSystemFtpsUsername, upSystemFtpsPassword);
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误: ", e);
-        }
-    }
-
-    /**
-     * 将ftp服务器上的文件复制到开发环境
-     */
-    public static void copyFileToDevelop(String source, String aim) {
-        File ff = new File(aim);
-        if (!ff.exists()) {
-            ff.setWritable(true, false);
-            ff.mkdirs();
-        }
-        try {
-            String url = "cp " + source + " " + aim;
-            Runtime.getRuntime().exec(url);
-        } catch (Exception e) {
-            e.getMessage();
         }
     }
 

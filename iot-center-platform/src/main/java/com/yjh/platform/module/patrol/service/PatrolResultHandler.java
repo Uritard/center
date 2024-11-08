@@ -391,7 +391,6 @@ public class PatrolResultHandler {
 
         String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
         String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
-        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
         String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
         boolean isAlarm = false;
         String descFilePath = "";
@@ -407,12 +406,11 @@ public class PatrolResultHandler {
         if (StringUtils.isNotEmpty(robotPatrolTaskResult.getConfirmFilePath())){
             //待确认文件名称
             String confirmFilePath = robotPatrolTaskResult.getConfirmFilePath();
-            String confirmTemporaryFilePath = ftpsFilePath + "/" + confirmFilePath;
-            log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
+            log.info("confirmTemporaryFilePath==={}", confirmFilePath);
             String confirmFileName = confirmFilePath.trim().substring(confirmFilePath.trim().lastIndexOf("/") + 1);
             descConfirmFilePath = developAbsoluteUrl + "/CCD/" + confirmFileName;
             descConfirmRelativeUrl = developRelativeUrl + "/CCD/" + confirmFileName;
-            FileUtil.copyFileUsingStream(confirmTemporaryFilePath, descConfirmFilePath);
+            uPatrolTaskService.downloadPicture(descConfirmFilePath, confirmFilePath);
             infoMap.put("confirmRelativePath", descConfirmRelativeUrl);
             infoMap.put("confirmAbsolutePath", descConfirmFilePath);
         }
@@ -426,8 +424,7 @@ public class PatrolResultHandler {
                     // 文件路径  处理多个文件  如果有多个图片 取第一个图片
 
                     String filePath = filePathList[i];
-                    String temporaryFilePath = ftpsFilePath + "/" + filePath;
-                    log.info("temporaryFilePath==={}", temporaryFilePath);
+                    log.info("temporaryFilePath==={}", filePath);
                     String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
 
                     // 1.红外 2.可见光 3.音频 4.视频 50.局放
@@ -482,7 +479,7 @@ public class PatrolResultHandler {
                             break;
                     }
 
-                    FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
+                    uPatrolTaskService.downloadPicture(descFilePath, filePath);
                     allFilePath = allFilePath+ ","+descRelativeUrl;
                 }
                 if (!firstImgRealFilePath.isEmpty()){

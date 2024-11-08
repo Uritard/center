@@ -14,6 +14,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,8 @@ public class TStdDeviceModelService {
     private TCruisePointInstanceMapper tCruisePointInstanceMapper;
     @Resource
     private TVoiceDeviceMapper tVoiceDeviceMapper;
+    @Resource
+    private RobotService robotService;
 
     @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<Map<String, Object>> deviceModelList, String ftpsPath, String presetPath, String presetRealPath, String edgeCode, String edgeLevel) {
@@ -237,19 +240,12 @@ public class TStdDeviceModelService {
         if (StringUtils.isNotEmpty(tCameraPreset.getPresetImg())) {
             String imgPath = tCameraPreset.getPresetImg().replace(presetRealPath, "")
                     .replace(String.valueOf(tCameraPreset.getPresetId()), tCameraPreset.getOriginId());
-            String presetFtpsImg = ftpsPath + imgPath;
             String newPresetImagePath = imgPath.replace(tCameraPreset.getOriginId(), tCameraPreset.getPresetId().toString());
             String presetImg = presetPath + newPresetImagePath;
-            File ftpsFile = new File(presetFtpsImg);
-            if (ftpsFile.exists()) {
-                try {
-                    FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
-                    tCameraPreset.setPresetImg(presetRealPath + newPresetImagePath);
-                } catch (IOException e) {
-                    log.error("预置位文件拷贝失败", e);
-                }
-                tCameraPresetMapper.updateByPrimaryKeySelective(tCameraPreset);
-            }
+
+            robotService.downloadFile(presetImg, imgPath);
+            tCameraPreset.setPresetImg(presetRealPath + newPresetImagePath);
+            tCameraPresetMapper.updateByPrimaryKeySelective(tCameraPreset);
         }
     }
 

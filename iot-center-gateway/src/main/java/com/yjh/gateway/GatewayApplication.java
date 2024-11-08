@@ -20,7 +20,6 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -52,10 +51,6 @@ public class GatewayApplication implements CommandLineRunner {
         Constant.VIDEO_RECEIVE_DATA = voiceDataReceiveUrl;
         Constant.VIDEO_CLOSE_VOICE = videoCloseVoice;
         Constant.IS_PCM_ENCODE = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isPcmEncode", "content"));
-    }
-    @Bean
-    public static ConfigureRedisAction configureRedisAction() {
-        return ConfigureRedisAction.NO_OP;
     }
 
     @Bean

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,7 +26,6 @@ public class ManagerService {
     @Autowired
     private DiscoveryClient discoveryClient;
 
-    @Transactional(rollbackFor = Exception.class)
     public List<Map> select() {
         List<Application> sortedApplications = EurekaServerContextHolder.getInstance().getServerContext().getRegistry().getSortedApplications();
         List<Map> list = new ArrayList<>();

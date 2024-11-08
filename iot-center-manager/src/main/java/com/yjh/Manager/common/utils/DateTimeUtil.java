@@ -1,6 +1,6 @@
 package com.yjh.Manager.common.utils;
 
-import com.mysql.jdbc.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -687,7 +687,7 @@ public class DateTimeUtil {
             return "";
         }
 
-        if (StringUtils.isNullOrEmpty(format)) {
+        if (StringUtils.isBlank(format)) {
             format = getDateTimePattern();
         }
 
