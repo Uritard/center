@@ -247,24 +247,47 @@
 
     <select id="selectInstanceInfo" resultType="java.util.Map">
         SELECT
-            a.preset_id,
-            a.camera_id,
             b.cruise_id,
             b.instance_id,
             b.custom_id,
             b.device_id,
             d.device_name,
             b.device_mete_id,
-            e.mete_name
+            e.mete_name,
+            a.source
         FROM
-            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e,t_camera_info f
-        where a.preset_id = b.cruise_id
-          AND a.camera_id = f.camera_id
-          and d.device_id = b.device_id and e.custom_id = b.custom_id
+            (SELECT
+                 a.preset_id AS point_id,
+                 a.edge_code,
+                 689 AS source
+             FROM
+                 t_camera_preset a,
+                 t_camera_info f
+             WHERE
+                 a.camera_id = f.camera_id
+               AND a.preset_type IN (3, 4, 5, 6)
+               AND (
+                     f.b_camera_channel_id = #{patrolDeviceCode}
+                     OR f.camera_channel_id = #{patrolDeviceCode}
+                     OR f.origin_id = #{patrolDeviceCode}
+                 )
+             UNION ALL
+             SELECT
+                 voice_device_id AS point_id,
+                 edge_code,
+                 998 AS source
+             FROM
+                 t_voice_device
+             WHERE
+                 voice_code = #{patrolDeviceCode}) a,
+            t_cruise_point_instance b,
+            t_std_device d,
+            t_std_devicemete e
+        WHERE a.point_id = b.cruise_id
+          AND d.device_id = b.device_id
+          AND e.custom_id = b.custom_id
           AND b.device_mete_id = e.device_mete_id
-          and a.preset_type IN (3,4,5,6)
-          and (f.b_camera_channel_id = #{patrolDeviceCode} OR f.camera_channel_id = #{patrolDeviceCode} OR f.origin_id = #{patrolDeviceCode})
-          and f.edge_code = #{edgeCode}
+          AND a.edge_code = #{edgeCode}
     </select>
 
     <delete id="deleteAllMete">
