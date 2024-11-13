@@ -486,7 +486,6 @@
         create_time,
         magnification_coefficient,
         edge_code,
-        channel_num,
         iot_device_type
         ) values <foreach collection="list" item="iotDeviceData" separator=",">
         (
@@ -500,7 +499,6 @@
         #{iotDeviceData.createTime,jdbcType=TIMESTAMP},
         #{iotDeviceData.magnificationCoefficient},
         #{iotDeviceData.edgeCode},
-        #{iotDeviceData.channelNum},
         #{iotDeviceData.iotDeviceType}
         )
     </foreach>
