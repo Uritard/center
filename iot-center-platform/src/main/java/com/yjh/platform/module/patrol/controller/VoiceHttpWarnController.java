@@ -41,6 +41,7 @@ public class VoiceHttpWarnController {
     public Result voiceAlarm(@Validated @RequestBody VoiceAlarm voiceAlarm) {
         Result result = new Result();
         try {
+            log.info("收到土星声纹厂家的声纹告警了 {}", voiceAlarm);
             result.setData(voiceHttpWarnService.alarm(voiceAlarm));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
