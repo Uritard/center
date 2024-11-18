@@ -52,7 +52,7 @@ public class MeterInfoHandler {
     public void handleResultEvent(InspectionResultEvent event) {
         try {
             // 巡视结果
-            if (StringUtils.isNotEmpty(event.getResult())) {
+            if (StringUtils.isNotEmpty(event.getResult()) && StringUtils.isNotEmpty(event.getInstanceId())) {
                 String value = getNumeric(event.getResult());
                 if (StringUtils.isEmpty(value)) {
                     return;
