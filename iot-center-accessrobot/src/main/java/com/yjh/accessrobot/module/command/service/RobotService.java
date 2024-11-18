@@ -399,8 +399,8 @@ public class RobotService {
             String[] sArray = ftpFilePath.split("/");
             String ftpFileName = sArray[sArray.length - 1];
 
-            Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-            filePath = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+
+            filePath = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/CameraLib/";
             if (ftpFileName.endsWith(".jpg")) {
                 filePath = filePath + "BigImg/" + ftpFileName;
             } else if (ftpFileName.endsWith(".bmp")) {
@@ -779,7 +779,7 @@ public class RobotService {
         }
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
 
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
         log.info("图片路径为：{}", picPath);
@@ -825,7 +825,7 @@ public class RobotService {
         String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/Map";
         copyFileToDevelop(picPath, developMap);
-        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
+        String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/Map/" + fileName;
 
         tRobotInfo.setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
@@ -1048,7 +1048,7 @@ public class RobotService {
      * @return
      */
     private String convertPropertyPicPath(String path) {
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         String propertyPicPath = filePathMap.get("content") + "/" + path;
@@ -1058,7 +1058,7 @@ public class RobotService {
         String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/PRO";
         copyFileToDevelop(propertyPicPath, developMap);
-        return relativeImgMap.get("content") + "/PRO/" + fileName;
+        return Constant.FTP_IMAGE_RELATIVE + "/PRO/" + fileName;
     }
 
     /**
@@ -1173,7 +1173,7 @@ public class RobotService {
                     RobotServerHandler.getRobotResultMap().put("Item", map);
 
                     Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-                    Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
                     Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
 
                     // 文件在ftp服务器上的绝对路径
@@ -1186,7 +1186,7 @@ public class RobotService {
                         String ftpFileName = sArray[sArray.length - 1];
                         temporaryPath = temporaryPath + "/" + ftpFilePath;
                         String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/CameraLib/";
-                        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+                        String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/" + todayTime + "/CameraLib/";
 
                         if (ftpFileName.endsWith(".jpg")) {
                             developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
@@ -2259,7 +2259,7 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public void updateConfirmMsgForRedis(XMLBaseModel xmlBaseModel) throws Exception {
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, Object> jasonMaps = new HashMap<>();
@@ -2289,13 +2289,13 @@ public class RobotService {
         String splitArray[] = confirmPath.split("/");
         String fileName = splitArray[splitArray.length - 1];
         copyFileToDevelop(confirmPath, developMap);
-        String confirmUrl = relativeImgMap.get("content") + "/CFM/" + taskId + "/" + fileName;
+        String confirmUrl = Constant.FTP_IMAGE_RELATIVE + "/CFM/" + taskId + "/" + fileName;
         String originalFileUrl = "";
         if (org.apache.commons.lang.StringUtils.isNotEmpty(originalPath)) {
             String splitArrayOriginalPath[] = originalPath.split("/");
             String originalPathName = splitArrayOriginalPath[splitArrayOriginalPath.length - 1];
             copyFileToDevelop(originalPath, developMap);
-            originalFileUrl = relativeImgMap.get("content") + "/CFM/" + taskId + "/" + originalPathName;
+            originalFileUrl = Constant.FTP_IMAGE_RELATIVE + "/CFM/" + taskId + "/" + originalPathName;
         }
         //待确认图片
         jasonMaps.put("confirmUrl", confirmUrl);
@@ -2881,7 +2881,6 @@ public class RobotService {
     public void syncModelUpdate(String type, String filePath, String edgeCode) {
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
-        Map<String, String> mapForPresetReal = redisTemplate.opsForHash().entries("t_sys_param:presetRealImgPath");
         String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
             filePathMap.put("content", "C:\\robotData\\Model");
@@ -2891,7 +2890,7 @@ public class RobotService {
             case "1":
                 log.info("设备点位模型 {}", filePath);
                 dealDevicePointModel(ftpsPath, filePathMap.get("content"),
-                        mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode, edgeLevel);
+                        mapForPreset.get("content"), Constant.PRESET_REAL_IMG_PATH, edgeCode, edgeLevel);
                 break;
             case "2":
                 log.info("边缘节点模型 {}", filePath);
@@ -2994,12 +2993,12 @@ public class RobotService {
      */
     private void dealMapFile(String picPath, String edgeCode) {
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+
         String[] splitArray = picPath.split("/");
         String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/Map";
         copyFileToDevelop(picPath, developMap);
-        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
+        String developRelativeUrl = Constant.FTP_IMAGE_RELATIVE + "/Map/" + fileName;
         String robotNum = StringUtils.substringBefore(fileName, "_");
         log.info("更新 robotNum 为{}的地图文件", robotNum);
         Long robotId = tRobotInfoDao.selectRobotIdByRobotNum(robotNum, edgeCode);

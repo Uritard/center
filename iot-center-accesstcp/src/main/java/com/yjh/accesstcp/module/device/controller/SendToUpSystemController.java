@@ -228,13 +228,11 @@ public class SendToUpSystemController {
         try {
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String abspath = mapForPath.get("content");
-            mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
-            String realPath = mapForPath.get("content");
+            String realPath = Constant.MODEL_RELATIVE_PATH;
 
             mapForPath = redisTemplate.opsForHash().entries("t_sys_param:fileAbsPath");
             String fileAbsPath = mapForPath.get("content");
-            mapForPath = redisTemplate.opsForHash().entries("t_sys_param:fileRealPath");
-            String fileRealPath = mapForPath.get("content");
+            String fileRealPath = Constant.FILE_REAL_PATH;
 
             String path  = sendToUpSystemService.downloadFile(String.valueOf(map.get("type")));
 //            String path  = sendToUpSystemService.downloadFile("1");

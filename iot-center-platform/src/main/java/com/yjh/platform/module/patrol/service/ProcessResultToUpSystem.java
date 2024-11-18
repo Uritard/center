@@ -1143,12 +1143,12 @@ public class ProcessResultToUpSystem {
         String resultImage = analyseResultImg;
         try {
             String absPath = SysParamConfig.getSysContent("prefixAbsolutePath");
-            String relPath = SysParamConfig.getSysContent("prefixRelativePath");
+            String relPath = Constant.PREFIX_RELATIVE_PATH;
             if (StringUtils.startsWithAny(analyseResultImg, absPath, relPath)) {
                 resultImage = flag ? analyseResultImg.replace(absPath, relPath) : analyseResultImg.replace(relPath, absPath);
             } else {
                 String filePath = SysParamConfig.getSysContent("fileAbsPath");
-                String fileUrl = SysParamConfig.getSysContent("fileRealPath");
+                String fileUrl = Constant.FILE_REAL_PATH;
                 assert fileUrl != null; assert filePath != null;
                 resultImage = flag ? analyseResultImg.replace(filePath, fileUrl) : analyseResultImg.replace(fileUrl, filePath);
             }

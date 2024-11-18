@@ -415,7 +415,7 @@ public class UPatrolDataResultService {
                 String fileNamePath = filePathAndName + fileName;
 
                 String absPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixAbsolutePath", "content");
-                String relPath = (String) redisTemplate.opsForHash().get("t_sys_param:prefixRelativePath", "content");
+                String relPath = Constant.PREFIX_RELATIVE_PATH;
 
                 //设置表头
                 List<List<String>> heads = Lists.newArrayList();

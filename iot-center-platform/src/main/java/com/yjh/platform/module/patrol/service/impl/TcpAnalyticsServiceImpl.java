@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.configuration.ApplicationProperties;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -86,13 +87,13 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
                     pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                     if ("9".equals(analysis.getAnalyseType())) {
                         pictureDataObject.put("csvPath",
-                            StringUtils.replace(analysis.getCsvPath(), hashOperations.get("t_sys_param:infraredRealPath", "content"),
+                            StringUtils.replace(analysis.getCsvPath(), Constant.INFRARED_REAL_PATH,
                                 hashOperations.get("t_sys_param:infraredStorePath", "content")));
                         pictureDataObject.put("dataPath",
-                            StringUtils.replace(analysis.getDataPath(), hashOperations.get("t_sys_param:infraredRealPath", "content"),
+                            StringUtils.replace(analysis.getDataPath(), Constant.INFRARED_REAL_PATH,
                                 hashOperations.get("t_sys_param:infraredStorePath", "content")));
                         pictureDataObject.put("imagePath",
-                            StringUtils.replace(analysis.getPicPath(), hashOperations.get("t_sys_param:resultImgRealPath", "content"),
+                            StringUtils.replace(analysis.getPicPath(), Constant.RESULT_IMG_REAL_PATH,
                                 hashOperations.get("t_sys_param:resultImgPath", "content")));
                     }
                     pictureInfoObject.put("pictureInfo" + i, pictureDataObject);

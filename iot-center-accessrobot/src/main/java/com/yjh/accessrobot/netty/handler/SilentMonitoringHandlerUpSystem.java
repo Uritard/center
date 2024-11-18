@@ -86,7 +86,7 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
             return ;
         }
         String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
-                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                Constant.DEFECT_RESULT_REAL_IMG);
         //689->静默  998->声纹
         int alarmSource = Integer.parseInt(String.valueOf(map.getOrDefault("source", "689")));
         TWarnInfo tWarnInfo = new TWarnInfo()

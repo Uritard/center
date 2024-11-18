@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.LittlePriorityQueue;
@@ -235,7 +236,7 @@ public class TVoiceDeviceService{
 //        voiceDeviceTree.setChildren(child);
 //        re.add(voiceDeviceTree);
 //        return re;
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String realPath = Constant.RELATIVE_VOICE_PATH;
         String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
         if (StringUtils.isNotEmpty(voiceDeviceName)){
             List<VoiceDeviceAllInfo> voiceDeviceList = tVoiceDeviceDao.getUpRegionByVoiceDeviceName(voiceDeviceName, userId);
@@ -405,7 +406,7 @@ public class TVoiceDeviceService{
 
 
     public List<VoiceDevice> selectChildNode(Long voiceDeviceId){
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String realPath = Constant.RELATIVE_VOICE_PATH;
         String absPath  = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
         List<VoiceDevice> channelList = new ArrayList<>();
         VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(voiceDeviceId);
@@ -546,7 +547,7 @@ public class TVoiceDeviceService{
 //        }
         Long voiceDeviceId = null;
         String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String realPath = Constant.RELATIVE_VOICE_PATH;
 
         if (!voicePath.contains(realPath)) {
             // 异常保护，如果待分析的音频文件不是固定格式，不需要处理
@@ -671,7 +672,7 @@ public class TVoiceDeviceService{
     public List<Map<String,String>> frequencyAnalyse(String frequencyPath) throws Exception{
         Long voiceDeviceId = null;
         String absPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath", "content"));
-        String realPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath", "content"));
+        String realPath = Constant.RELATIVE_VOICE_PATH;
 
         if (!frequencyPath.contains(realPath)) {
             // 异常保护，如果待分析的音频文件不是固定格式，不需要处理

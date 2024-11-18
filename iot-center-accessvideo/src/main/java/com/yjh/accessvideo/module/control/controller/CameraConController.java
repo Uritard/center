@@ -284,7 +284,7 @@ public class CameraConController {
             String parent = StringUtils.isEmpty(parentPath) ? "" : parentPath + "/";
             String filePathTem = "/" + parent + formatter.format(new Date())+ ran + ".jpg";
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String capturePath = Constant.RESULT_IMG_REAL_PATH;
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId, meteName);
@@ -318,7 +318,7 @@ public class CameraConController {
             SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyyHHmmssSSS");
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
             String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-            String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+            String capturePath = Constant.RESULT_IMG_REAL_PATH;
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
             String message = cameraConService.capturePicture(filePath, cameraId, meteName);

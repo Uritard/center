@@ -383,7 +383,7 @@ public class InspectionResultThread implements Runnable{
             if (TypeEnum.VOICE.getCode() != cruiseType) {
                 tCruiseTaskResultMap.put("origpic", resultImagePath);
                 String picPath =
-                    resultImagePath.replace(SysParamConfig.getSysContent("resultImgPath"), SysParamConfig.getSysContent("resultImgRealPath"));
+                    resultImagePath.replace(SysParamConfig.getSysContent("resultImgPath"), Constant.RESULT_IMG_REAL_PATH);
                 tCruiseTaskResultMap.put("picpath", picPath);
             }
             AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);

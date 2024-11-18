@@ -143,7 +143,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         cameraConService.refreshRecordsOnSchedule();
         log.info("NVR list: " + recorderConInfoList);
         String captureResultPath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content"));
-        String capturePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content"));
+        String capturePath = Constant.RESULT_IMG_REAL_PATH;
         new Thread(() -> {
             for (RecorderConInfo recorderConInfo : recorderConInfoList) {
                 //设备信息

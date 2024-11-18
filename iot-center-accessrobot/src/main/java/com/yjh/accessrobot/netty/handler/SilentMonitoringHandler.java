@@ -159,7 +159,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
             return;
         }
         String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
-                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                Constant.DEFECT_RESULT_REAL_IMG);
         String alarmLevel = tWarnInfoMapper.selectAlarmLevel("defect_model", desc);
         if (alarmLevel == null) {
             alarmLevel = "132";
@@ -212,7 +212,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         xmlItem.put("monitor_type", monitorType);
         // 目前都是识别图片 所以是5
         xmlItem.put("file_type", "5");
-        String imgPath = tWarnInfo.getImagePath().replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
+        String imgPath = tWarnInfo.getImagePath().replaceAll(Constant.DEFECT_RESULT_REAL_IMG, String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
         String targetNamePath = imgPath.replace(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
         log.info("imgPath:{},targetNamePath:{}", imgPath, targetNamePath);
         uploadFileToUpFtps(imgPath, "jm/" + targetNamePath);

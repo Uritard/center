@@ -83,9 +83,7 @@ public class VoicePrintDataCollectRespService {
                         FileUtils.copyURLToFile(httpUrl, voiceSaveFile);
 
                         String absVoicePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content"));
-                        String relativeVoicePath =
-                                String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:relativeVoicePath").get("content"));
-                        String voiceFileUrl = voiceFilePath.replace(absVoicePath, relativeVoicePath);
+                        String voiceFileUrl = voiceFilePath.replace(absVoicePath, Constant.RELATIVE_VOICE_PATH);
                         inspectionMap.put("picpath", voiceFileUrl);
                         inspectionMap.put("voicePath", voiceFileUrl);
                         inspectionMap.put("resultDesc", "录音成功");

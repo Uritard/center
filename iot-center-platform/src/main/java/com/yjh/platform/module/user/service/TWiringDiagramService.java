@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
@@ -65,7 +66,7 @@ public class TWiringDiagramService {
         tWiringDiagram.setRegionId(regionId);
         tWiringDiagram.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");
-        String fileRealPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileRealPath", "content");
+        String fileRealPath = Constant.FILE_REAL_PATH;
         String folderName = "wiringDiagram" + "/" +  regionName + "/" + DateTimeUtil.format3(new Date()) + "/";
         String fileRealPathTemp = fileRealPath + folderName + file.getOriginalFilename();
         tWiringDiagram.setPicPath(fileRealPathTemp);
@@ -129,7 +130,7 @@ public class TWiringDiagramService {
         tWiringDiagramTemp.setRegionId(regionId);
         tWiringDiagramTemp.setRegionName(regionName);
         String fileAbsPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileAbsPath", "content");
-        String fileRealPath = (String) redisTemplate.opsForHash().get("t_sys_param:fileRealPath", "content");
+        String fileRealPath = Constant.FILE_REAL_PATH;
         String folderName = "wiringDiagram" + "/" +  regionName + "/" + DateTimeUtil.format3(new Date()) + "/";
         String fileRealPathTemp = fileRealPath + folderName + file.getOriginalFilename();
         tWiringDiagramTemp.setPicPath(fileRealPathTemp);

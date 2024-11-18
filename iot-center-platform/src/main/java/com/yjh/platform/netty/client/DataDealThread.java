@@ -198,7 +198,7 @@ public class DataDealThread implements Runnable {
                                 //表计识别图片放入缓存(已考虑双算法)
                                 if(StringUtils.isNotEmpty(jsonObjectResult.getString("analyseResultImg"))){
                                      analyseResultPic = jsonObjectResult.getString("analyseResultImg").replaceAll(
-                                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"), (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
+                                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"), Constant.METER_RESULT_REAL_IMG);
                                     log.info("表计识别图片-------------------------------"+analyseResultPic);
                                     log.info("缓存地址-----------------------"+redisName);
 
@@ -245,7 +245,7 @@ public class DataDealThread implements Runnable {
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
                                             if(!("".equals(jsonObjectResult.get("firDocPath")))){
                                                 String firDocPath=jsonObjectResult.getString("firDocPath").replaceAll(
-                                                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content")));
+                                                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")), Constant.INFRARED_REAL_PATH);
                                                 cruiseResultMap.put("firDocPath",firDocPath);
                                                 File file=new File(firDocPath);
                                                 cruiseResultMap.put("firName",file.getName().substring(0,file.getName().lastIndexOf(".")));//放入文件名
@@ -540,11 +540,11 @@ public class DataDealThread implements Runnable {
                                     if (resultImage.contains("analyseResultImg")){
                                         analyseResultImg = resultImage.replaceAll(
                                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
-                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                                                Constant.JUDGE_RESULT_REAL_IMG);
                                     }else {
                                         analyseResultImg = resultImage.replaceAll(
                                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
-                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                                                Constant.RESULT_IMG_REAL_PATH);
                                     }
                                     String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.getString("resultValue"));
 
@@ -591,11 +591,11 @@ public class DataDealThread implements Runnable {
                                     if (objectResultString.contains("analyseResultImg")){
                                         analyseResultImg = objectResultString.replaceAll(
                                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
-                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                                                Constant.DEFECT_RESULT_REAL_IMG);
                                     }else {
                                         analyseResultImg = objectResultString.replaceAll(
                                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
-                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                                                Constant.RESULT_IMG_REAL_PATH);
                                     }
                                     if ("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
                                         log.info("双算法-第二算法图片生成-D");

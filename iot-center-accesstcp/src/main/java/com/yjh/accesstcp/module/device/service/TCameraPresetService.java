@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.service;
 
+import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.dao.TCameraPresetMapper;
 import com.yjh.accesstcp.module.device.entity.TCameraPreset;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -110,10 +111,8 @@ public class TCameraPresetService {
      */
     private String getImageLocalPath(String presetImg) {
         // /home/yjh_iot_center/iot-picture/specimens
-        String presetRealImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
-        // https://172.24.39.9/imgs/specimens
         String presetImgPath = (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
 
-        return presetImg.replaceAll(presetRealImgPath, presetImgPath);
+        return presetImg.replaceAll(Constant.PRESET_REAL_IMG_PATH, presetImgPath);
     }
 }
